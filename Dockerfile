@@ -16,7 +16,7 @@ COPY --from=deps /app/node_modules ./node_modules
 RUN yarn build
 
 # DSB Container
-FROM 098061033856.dkr.ecr.us-east-1.amazonaws.com/ew-dos-dsb-ecr:1004ee0e-ba65-4d08-ab61-5e96e76f81c7
+FROM 098061033856.dkr.ecr.us-east-1.amazonaws.com/ew-dos-dsb-ecr:latest
 
 RUN apk update && apk add --no-cache supervisor yarn
 RUN mkdir -p /var/deployment/apps/aemo-gateway-ui
@@ -27,13 +27,12 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/.env.production ./.env.production
 
 WORKDIR /var/deployment/apps
 
 COPY --from=builder /app/docker/supervisord.conf /etc/supervisord.conf
 
 ENV NEXT_TELEMETRY_DISABLED 1
-ENV PORT 3001
 
 ENTRYPOINT [ "supervisord", "-c", "/etc/supervisord.conf" ]
-# ENTRYPOINT [ "sh" ]

@@ -1,8 +1,32 @@
 import Head from 'next/head'
 import Image from 'next/image'
+import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
 import styles from '../styles/Home.module.css'
 
-export default function Home() {
+export async function getServerSideProps(context: GetServerSidePropsContext) {
+  try {
+    const url = `${process.env.DSB_URL}/health`
+    console.log('fetching health from', url)
+    const res = await fetch(url)
+    const data: { status: 'ok' | 'error' } = await res.json()
+    console.log('got health:', data)
+    return {
+      // see http://dsb-dev.energyweb.org/swagger/#/default/HealthController_check
+      props: {
+        data
+      }
+    }
+  } catch (err) {
+    console.log('caught error:', err)
+    return {
+      props: {
+        err: err.message
+      }
+    }
+  }
+}
+
+export default function Home({ data, err }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   return (
     <div className={styles.container}>
       <Head>
@@ -15,6 +39,12 @@ export default function Home() {
         <h1 className={styles.title}>
           Welcome to <a href="https://nextjs.org">Next.js!</a>
         </h1>
+
+        <p className={styles.description}>
+          DSB Connection Status = <code className={styles.code}>{
+            data?.status ?? `error - ${err ?? 'problem with dsb server'}`
+          }</code>
+        </p>
 
         <p className={styles.description}>
           Get started by editing{' '}
