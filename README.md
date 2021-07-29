@@ -27,8 +27,29 @@ To learn more about Next.js, take a look at the following resources:
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
 
-## Deploy on Vercel
+## Config
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- `.env.development` -> points to a running instance of DSB
+- `.env.production` -> points to an instance of DSB on localhost
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+## Container
+
+This gateway is currently being shipped as a single docker container. To build
+the image:
+
+```sh
+# using access credentials
+aws configure
+
+# login to ecr
+aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 098061033856.dkr.ecr.us-east-1.amazonaws.com
+
+# pull the base image (e.g. the one in the Dockerfile)
+docker pull 098061033856.dkr.ecr.us-east-1.amazonaws.com/ew-dos-dsb-ecr:{TAG}
+
+# build the container
+docker build -t aemo-gateway .
+
+# run the container
+docker run --rm -it -p 3001:3001 -e NATS_JS_URL=nats://20.83.92.252:4222 aemo-gateway
+```

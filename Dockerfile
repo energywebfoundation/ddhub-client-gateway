@@ -16,7 +16,7 @@ COPY --from=deps /app/node_modules ./node_modules
 RUN yarn build
 
 # DSB Container
-FROM 098061033856.dkr.ecr.us-east-1.amazonaws.com/ew-dos-dsb-ecr:latest
+FROM 098061033856.dkr.ecr.us-east-1.amazonaws.com/ew-dos-dsb-ecr:1905e5c3-b069-45d3-82aa-2a8670c95d46
 
 RUN apk update && apk add --no-cache supervisor yarn
 RUN mkdir -p /var/deployment/apps/aemo-gateway-ui
