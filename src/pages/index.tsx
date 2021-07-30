@@ -1,33 +1,66 @@
 import React from 'react';
 import Head from 'next/head';
 import Image from 'next/image';
+import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
+import fs from 'fs/promises'
+import path from 'path'
+
 import { makeStyles, withStyles } from '@material-ui/styles';
 import { alpha } from '@material-ui/core/styles';
-import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
-import styles from '../styles/Home.module.css'
-import { AppBar, Toolbar, Typography, Button, Container, Divider, Theme, Grid, InputBase } from '@material-ui/core';
-import InfoIcon from '@material-ui/icons/Info';
+import { AppBar, Toolbar, Typography, Button, Container, Divider, Theme, Grid, InputBase } from '@material-ui/core'
+import InfoIcon from '@material-ui/icons/Info'
 
-import logo from '../public/ew-flex-single-logo.png';
+import styles from '../styles/Home.module.css'
+import logo from '../../public/ew-flex-single-logo.png'
+import { Result } from '../utils';
+
+async function getHealth(url: string): Promise<Result<boolean, string>> {
+  try {
+    console.log('fetch health from', url)
+    const res = await fetch(url)
+    if (res.status !== 200) {
+      console.log('fetch health failed', res.status, res.statusText)
+      throw Error(`${res.status} - ${res.statusText}`)
+    }
+    // see http://dsb-dev.energyweb.org/swagger/#/default/HealthController_check
+    const data: { status: 'ok' | 'error', error: any } = await res.json()
+    console.log('fetch health:', data)
+    if (data.status !== 'ok') {
+      throw Error(`${res.status} - ${Object.keys(data.error)}`)
+    }
+    return { ok: true }
+  } catch (err) {
+    return { ok: false, err: err.message }
+  }
+}
+
+async function hasSavedToDisk(filepath: string): Promise<Result<boolean, string>> {
+  try {
+    const contents = await fs.readFile(filepath)
+    if (Buffer.byteLength(contents)) {
+      throw Error('Empty file contents')
+    }
+    return { ok: true }
+  } catch (err) {
+    return { ok: false, err: err.message }
+  }
+}
+
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
-  try {
-    const url = `${process.env.DSB_URL}/health`
-    console.log('fetching health from', url)
-    const res = await fetch(url)
-    const data: { status: 'ok' | 'error' } = await res.json()
-    console.log('got health:', data)
-    return {
-      // see http://dsb-dev.energyweb.org/swagger/#/default/HealthController_check
-      props: {
-        data
-      }
-    }
-  } catch (err) {
-    console.log('caught error:', err)
-    return {
-      props: {
-        err: err.message
+  const status = await getHealth(`${process.env.DSB_URL}/health`)
+  const { ok: storedPrivateKey } = await hasSavedToDisk(
+    path.join(process.cwd(), 'key.ewc.prv')
+  )
+  const { ok: storedCertificate } = await hasSavedToDisk(
+    path.join(process.cwd(), 'vc.cert')
+  )
+  return {
+    props: {
+      status,
+      conf: {
+        privateKey: storedPrivateKey,
+        certificate: storedCertificate,
       }
     }
   }
@@ -51,7 +84,8 @@ const useStyles = makeStyles((theme: Theme) => ({
     }
   },
   logoText: {
-    marginLeft: '1rem'
+    marginLeft: '1rem',
+    fontFamily: 'Rajdhani'
   },
   version: {
     borderRadius: '1rem',
@@ -144,9 +178,9 @@ const CustomInput = withStyles((theme: Theme) => ({
   },
 }))(InputBase);
 
-export default function Home({ data, err }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function Home({ status, conf }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const classes = useStyles();
-  
+
   return (
     <div>
       <Head>
@@ -180,7 +214,7 @@ export default function Home({ data, err }: InferGetServerSidePropsType<typeof g
           <section className={classes.connectionStatus}>
             <Typography variant="h4">Connection Status </Typography>
             <Typography variant="caption" className={classes.connectionStatusPaper}>
-                { (data?.status == 'ok' && 'ONLINE') ?? `error - ${err ?? 'problem with dsb server'}` }
+                { status.ok ? 'ONLINE' : `ERROR [${status.err}]` }
             </Typography>
           </section>
 
