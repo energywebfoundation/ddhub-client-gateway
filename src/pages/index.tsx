@@ -12,11 +12,15 @@ import { AppBar, Toolbar, Typography, Button, Container, Divider, Theme, Grid, I
 
 import styles from '../styles/Home.module.css'
 import logo from '../../public/ew-flex-single-logo.png'
-import { Result } from '../utils'
+import { Result, snip, StringType } from '../utils'
+import axios from 'axios';
+import { useState } from 'react';
+import { Wallet } from 'ethers';
+import { useCallback } from 'react';
+import { useEffect } from 'react';
 
 async function getHealth(url: string): Promise<Result<boolean, string>> {
   try {
-    console.log('fetch health from', url)
     const res = await fetch(url)
     if (res.status !== 200) {
       console.log('fetch health failed', res.status, res.statusText)
@@ -24,7 +28,7 @@ async function getHealth(url: string): Promise<Result<boolean, string>> {
     }
     // see http://dsb-dev.energyweb.org/swagger/#/default/HealthController_check
     const data: { status: 'ok' | 'error', error: any } = await res.json()
-    console.log('fetch health:', data)
+    console.log('fetch health', data)
     if (data.status !== 'ok') {
       throw Error(`${res.status} - ${Object.keys(data.error)}`)
     }
@@ -34,33 +38,52 @@ async function getHealth(url: string): Promise<Result<boolean, string>> {
   }
 }
 
-async function hasSavedToDisk(filepath: string): Promise<Result<boolean, string>> {
+async function hasSavedToDisk(filepath: string): Promise<Result<string, string>> {
   try {
     const contents = await fs.readFile(filepath)
-    if (Buffer.byteLength(contents)) {
+    if (Buffer.byteLength(contents) === 0) {
       throw Error('Empty file contents')
     }
-    return { ok: true }
+    return { ok: contents.toString('utf-8') }
   } catch (err) {
-    return { ok: false, err: err.message }
+    return { err: err.message }
+  }
+}
+
+function parseIdentityFile(content: string) {
+  const values = content.split(',')
+  return {
+    did: values[0],
+    publicKey: values[1]
+  }
+}
+
+function parseProxyCredsFile(content: string) {
+  const values = content.split(',')
+  return {
+    clientId: values[0],
+    tenantId: values[1]
   }
 }
 
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const status = await getHealth(`${process.env.DSB_URL}/health`)
-  const { ok: storedPrivateKey } = await hasSavedToDisk(
-    path.join(process.cwd(), 'key.ewc.prv')
+  const baseUrl = process.env.DSB_URL
+  const status = await getHealth(`${baseUrl}/health`)
+  const { ok: gatewayId } = await hasSavedToDisk(
+    path.join(process.cwd(), 'ewc.prv')
   )
-  const { ok: storedCertificate } = await hasSavedToDisk(
+  const { ok: proxyId } = await hasSavedToDisk(
     path.join(process.cwd(), 'vc.cert')
   )
+  console.log('up', status.ok, 'priv', gatewayId, 'cert', proxyId)
   return {
     props: {
+      baseUrl,
       status,
       conf: {
-        privateKey: storedPrivateKey,
-        certificate: storedCertificate,
+        gateway: gatewayId ? parseIdentityFile(gatewayId) : null,
+        proxy: proxyId ? parseProxyCredsFile(proxyId) : null,
       }
     }
   }
@@ -164,6 +187,9 @@ const useStyles = makeStyles((theme: Theme) => ({
     '& input': {
       width: '100%'
     }
+  },
+  errorText: {
+    color: theme.palette.error.main
   }
 }));
 
@@ -189,8 +215,79 @@ const CustomInput = withStyles((theme: Theme) => ({
   },
 }))(InputBase);
 
-export default function Home({ status, conf }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+// TODO: break into components
+export default function Home({ baseUrl, status, conf }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const classes = useStyles();
+
+  const [did, setDid] = useState('')
+  const [publicKey, setPublicKey] = useState('')
+  const [privateKey, setPrivateKey] = useState('')
+
+  const [idPending, setIdPending] = useState(false)
+  const [idError, setIdError] = useState('')
+
+  const [clientId, setClientId] = useState('')
+  const [tenantId, setTenantId] = useState('')
+  const [clientSecret, setClientSecret] = useState('')
+
+  const [proxySaved, setProxySaved] = useState(false)
+  const [proxyPending, setProxyPending] = useState(false)
+  const [proxyError, setProxyError] = useState('')
+
+  useEffect(() => {
+    if (conf.gateway) {
+      setDid(conf.gateway.did)
+      setPublicKey(conf.gateway.publicKey)
+    }
+    if (conf.proxy) {
+      setClientId(conf.proxy.clientId)
+      setTenantId(conf.proxy.tenantId)
+      setClientSecret(' ')
+      setProxySaved(true)
+    }
+  }, [conf])
+
+  const saveIdentity = useCallback(() => {
+    const save = async () => {
+      setIdError('')
+      setIdPending(true)
+      try {
+        const res = await axios.post('/api/config/credentials/gateway', { privateKey })
+        if (res.status !== 200) {
+          throw Error('status not 200')
+        }
+        setDid(res.data.ok.did)
+        setPublicKey(res.data.ok.publicKey)
+        setPrivateKey('')
+      } catch (err) {
+        setIdError('Failed to save credentials')
+      }
+      setIdPending(false)
+    }
+    save()
+  }, [privateKey])
+
+  const saveProxyCert = useCallback(() => {
+    const save = async () => {
+      setProxyError('')
+      setProxyPending(true)
+      try {
+        const res = await axios.post('/api/config/credentials/proxy', {
+          clientId,
+          tenantId,
+          clientSecret
+        })
+        if (res.status !== 200) {
+          throw Error('status not 200')
+        }
+        setProxySaved(true)
+      } catch (err) {
+        setProxyError('Failed to save credentials')
+      }
+      setProxyPending(false)
+    }
+    save()
+  }, [clientId, tenantId, clientSecret])
 
   return (
     <div>
@@ -232,8 +329,8 @@ export default function Home({ status, conf }: InferGetServerSidePropsType<typeo
           <Divider className={classes.divider}/>
 
           <section className={classes.swagger}>
-            <Link rel="noopener noreferrer" href="http://localhost:3000/swagger" target="_blank">
-              http://localhost:3000/swagger
+            <Link rel="noopener noreferrer" href={`${baseUrl}/swagger`} target="_blank">
+              {baseUrl}/swagger
             </Link>
           </section>
 
@@ -251,19 +348,54 @@ export default function Home({ status, conf }: InferGetServerSidePropsType<typeo
                   <div className={classes.form}>
                     <div className={classes.formGroup}>
                       <Typography variant="caption">DID</Typography>
-                      <CustomInput placeholder="DID" fullWidth />
+                      <CustomInput
+                        placeholder={did
+                          ? snip(did, StringType.DID)
+                          : `DID known once private key is set`}
+                        fullWidth
+                        disabled
+                      />
                     </div>
                     <div className={classes.formGroup}>
                       <Typography variant="caption">PUBLIC KEY</Typography>
-                      <CustomInput placeholder="Public Key" fullWidth />
+                      <CustomInput
+                        placeholder={publicKey
+                          ? snip(publicKey, StringType.HEX_COMPRESSED)
+                          : `Public key known once private key is set`}
+                        fullWidth
+                        disabled
+                      />
                     </div>
                     <div className={classes.formGroup}>
                       <Typography variant="caption">PRIVATE KEY</Typography>
-                      <CustomInput placeholder="Private Key" fullWidth type="password" />
+                      <CustomInput
+                        fullWidth
+                        value={privateKey}
+                        onChange={(e) => setPrivateKey(e.target.value)}
+                      />
                     </div>
 
-                    <Button variant="outlined" color="secondary" fullWidth>generate keys</Button>
-                    <Button variant="outlined" color="secondary" fullWidth>Save</Button>
+                    <Button
+                      variant="outlined"
+                      color="secondary"
+                      fullWidth
+                    >
+                      Generate Keys
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      color="secondary"
+                      fullWidth
+                      disabled={idPending}
+                      onClick={saveIdentity}
+                    >
+                      Save
+                    </Button>
+
+                    <div className={classes.errorText}>
+                      <Typography>{idError}</Typography>
+                    </div>
+
                   </div>
                 </div>
               </Grid>
@@ -276,19 +408,50 @@ export default function Home({ status, conf }: InferGetServerSidePropsType<typeo
 
                   <div className={classes.form}>
                     <div className={classes.formGroup}>
-                      <Typography variant="caption">AZURE_CLIENT_ID</Typography>
-                      <CustomInput placeholder="AZURE_CLIENT_ID" fullWidth />
+                      <Typography variant="caption">AZURE CLIENT ID</Typography>
+                      <CustomInput
+                        placeholder="AZURE_CLIENT_ID"
+                        fullWidth
+                        disabled={proxySaved}
+                        value={clientId}
+                        onChange={(e) => setClientId(e.target.value)}
+                      />
                     </div>
                     <div className={classes.formGroup}>
-                      <Typography variant="caption">AZURE_TENANT_ID</Typography>
-                      <CustomInput placeholder="AZURE_TENANT_ID" fullWidth />
+                      <Typography variant="caption">AZURE TENANT ID</Typography>
+                      <CustomInput
+                        placeholder="AZURE_TENANT_ID"
+                        fullWidth
+                        disabled={proxySaved}
+                        value={tenantId}
+                        onChange={(e) => setTenantId(e.target.value)}
+                      />
                     </div>
                     <div className={classes.formGroup}>
-                      <Typography variant="caption">AZURE_CLIENT_SECRET</Typography>
-                      <CustomInput placeholder="AZURE_CLIENT_SECRET" fullWidth type="password" />
+                      <Typography variant="caption">AZURE CLIENT SECRET</Typography>
+                      <CustomInput
+                        placeholder="AZURE_CLIENT_SECRET"
+                        fullWidth
+                        disabled={proxySaved}
+                        value={clientSecret}
+                        onChange={(e) => setClientSecret(e.target.value)}
+                      />
                     </div>
 
-                    <Button variant="outlined" style={{marginTop: '4rem'}} color="secondary" fullWidth>Save</Button>
+                    <Button
+                      variant="outlined"
+                      style={{marginTop: '4rem'}}
+                      color="secondary"
+                      fullWidth
+                      disabled={proxyPending}
+                      onClick={saveProxyCert}
+                    >
+                      Save
+                    </Button>
+
+                    <div className={classes.errorText}>
+                      <Typography>{proxyError}</Typography>
+                    </div>
                   </div>
                 </div>
               </Grid>

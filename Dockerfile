@@ -16,7 +16,7 @@ COPY --from=deps /app/node_modules ./node_modules
 RUN yarn build
 
 # DSB Container
-FROM 098061033856.dkr.ecr.us-east-1.amazonaws.com/ew-dos-dsb-ecr:1905e5c3-b069-45d3-82aa-2a8670c95d46
+FROM 098061033856.dkr.ecr.us-east-1.amazonaws.com/ew-dos-dsb-ecr:canary
 
 RUN apk update && apk add --no-cache supervisor yarn
 RUN mkdir -p /var/deployment/apps/aemo-gateway-ui
@@ -29,9 +29,11 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/.env.production ./.env.production
 
+
 WORKDIR /var/deployment/apps
 
 COPY --from=builder /app/docker/supervisord.conf /etc/supervisord.conf
+COPY --from=builder /app/docker/dsb.env.default /var/deployment/apps/dsb-message-broker/.env
 
 ENV NEXT_TELEMETRY_DISABLED 1
 
