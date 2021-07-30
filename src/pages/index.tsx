@@ -5,14 +5,14 @@ import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'nex
 import fs from 'fs/promises'
 import path from 'path'
 
-import { makeStyles, withStyles } from '@material-ui/styles';
+import { makeStyles, withStyles } from '@material-ui/styles'
 import { alpha } from '@material-ui/core/styles';
-import { AppBar, Toolbar, Typography, Button, Container, Divider, Theme, Grid, InputBase } from '@material-ui/core'
 import InfoIcon from '@material-ui/icons/Info'
+import { AppBar, Toolbar, Typography, Button, Container, Divider, Theme, Grid, InputBase, Link } from '@material-ui/core'
 
 import styles from '../styles/Home.module.css'
 import logo from '../../public/ew-flex-single-logo.png'
-import { Result } from '../utils';
+import { Result } from '../utils'
 
 async function getHealth(url: string): Promise<Result<boolean, string>> {
   try {
@@ -103,7 +103,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     '& *': {
       color: '#fff'
     },
-    marginBottom: '1rem'
+    marginBottom: '2rem'
   },
   connectionStatusPaper: {
     padding: '.5rem 1rem',
@@ -115,6 +115,16 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   divider: {
     background: '#fff'
+  },
+  swagger: {
+    margin: '2rem 0',
+    padding: '0 2rem',
+
+    '& a': {
+      color: '#fff',
+      fontSize: '2.1rem',
+      textDecoration: 'underline'
+    }
   },
   main: {
     padding: '0 1rem',
@@ -134,7 +144,8 @@ const useStyles = makeStyles((theme: Theme) => ({
     marginTop: '1rem',
 
     '& button': {
-      padding: '.7rem'
+      padding: '.7rem',
+      marginBottom: '1rem'
     }
   },
   formGroup: {
@@ -220,6 +231,14 @@ export default function Home({ status, conf }: InferGetServerSidePropsType<typeo
 
           <Divider className={classes.divider}/>
 
+          <section className={classes.swagger}>
+            <Link rel="noopener noreferrer" href="http://localhost:3000/swagger" target="_blank">
+              http://localhost:3000/swagger
+            </Link>
+          </section>
+
+          <Divider className={classes.divider}/>
+
           <section className={classes.main}>
             <Grid container spacing={3}>
               <Grid item xs={12} md={6}>
@@ -243,6 +262,7 @@ export default function Home({ status, conf }: InferGetServerSidePropsType<typeo
                       <CustomInput placeholder="Private Key" fullWidth type="password" />
                     </div>
 
+                    <Button variant="outlined" color="secondary" fullWidth>generate keys</Button>
                     <Button variant="outlined" color="secondary" fullWidth>Save</Button>
                   </div>
                 </div>
@@ -250,25 +270,25 @@ export default function Home({ status, conf }: InferGetServerSidePropsType<typeo
               <Grid item xs={12} md={6}>
                 <div className={classes.credentials}>
                   <div className={classes.credentialsHeader}>
-                    <Typography variant="h6">CLIENT <br /> CREDENTIALS</Typography>
+                    <Typography variant="h6">EW-DSB CONNECTION <br /> CERTIFICATE</Typography>
                     <InfoIcon />
                   </div>
 
                   <div className={classes.form}>
                     <div className={classes.formGroup}>
-                      <Typography variant="caption">DID</Typography>
-                      <CustomInput placeholder="DID" fullWidth />
+                      <Typography variant="caption">AZURE_CLIENT_ID</Typography>
+                      <CustomInput placeholder="AZURE_CLIENT_ID" fullWidth />
                     </div>
                     <div className={classes.formGroup}>
-                      <Typography variant="caption">PUBLIC KEY</Typography>
-                      <CustomInput placeholder="Public Key" fullWidth />
+                      <Typography variant="caption">AZURE_TENANT_ID</Typography>
+                      <CustomInput placeholder="AZURE_TENANT_ID" fullWidth />
                     </div>
                     <div className={classes.formGroup}>
-                      <Typography variant="caption">PRIVATE KEY</Typography>
-                      <CustomInput placeholder="Private Key" fullWidth type="password" />
+                      <Typography variant="caption">AZURE_CLIENT_SECRET</Typography>
+                      <CustomInput placeholder="AZURE_CLIENT_SECRET" fullWidth type="password" />
                     </div>
 
-                    <Button variant="outlined" color="secondary" fullWidth>Save</Button>
+                    <Button variant="outlined" style={{marginTop: '4rem'}} color="secondary" fullWidth>Save</Button>
                   </div>
                 </div>
               </Grid>
