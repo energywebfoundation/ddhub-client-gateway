@@ -1,3 +1,5 @@
+export * from './errors'
+
 export type Result<T = boolean, E = Error> = {
     ok?: T
     err?: E

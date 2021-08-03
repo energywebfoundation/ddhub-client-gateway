@@ -1,10 +1,11 @@
 const { utils, Wallet } = require('ethers');
 
-const PRIVATE_KEY = Wallet.createRandom().privateKey;
+// replace with your own
+const PRIVATE_KEY = 'a229bf8f1bc264f2981f33f65f26302d5adebae767eb361e767add52e52c76d7';
 
 const generateIdentity = async (privateKey) => {
   const signer = new Wallet(privateKey);
-  
+
   const header = {
       alg: 'ES256',
       typ: 'JWT'
