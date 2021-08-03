@@ -1,4 +1,3 @@
-import { promises as fs } from 'fs'
 import { BigNumber, providers, Wallet } from "ethers"
 import { IAM, RegistrationTypes, setCacheClientOptions } from "iam-client-lib"
 import { Claim } from "iam-client-lib/dist/src/cacheServerClient/cacheServerClient.types"
@@ -6,6 +5,13 @@ import { ErrorCode, HttpApiError, HttpError, Result } from "utils"
 import { config } from 'config'
 import { parseEther } from 'ethers/lib/utils'
 import { writeIdentity } from './storage.service'
+
+/**
+ * TODO:
+ * - create DID for user if they don't already have one
+ * - debug `newStatus` immediately after enroling (still said NO_CLAIM)
+ * - sync to DID document after approved - probably have a button in FE to do this manually
+ */
 
 const PARENT_NAMESPACE = config.iam.parentNamespace
 const USER_ROLE = `user.roles.${PARENT_NAMESPACE}`
@@ -99,10 +105,7 @@ export async function initIdentity(privateKey: string): Promise<Result<IdentityM
             publicKey: wallet.publicKey,
             balance,
             getEnrolmentState: async () => {
-                // const doc = await iam.getDidDocument()
-                console.log('pre-claims')
                 const { ok: claims, err: fetchError } = await fetchClaims(iam, did)
-                console.log('claims', claims, fetchError)
                 if (!claims) {
                     return { err: fetchError }
                 }

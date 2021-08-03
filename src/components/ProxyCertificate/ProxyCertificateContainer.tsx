@@ -1,6 +1,5 @@
 import react, { useState } from 'react'
 import axios from 'axios'
-// import { useErrors } from 'hooks/useErrors'
 import { ProxyCertificate } from './ProxyCertificate'
 
 type ProxyCertificateContainerProps = {
@@ -14,7 +13,6 @@ type ProxyCertificateContainerProps = {
 export const ProxyCertificateContainer = ({
     certificate
 }: ProxyCertificateContainerProps) => {
-    // const errors = useErrors()
     const [isLoading, setIsLoading] = useState(false)
     const [error, setError] = useState('')
 
@@ -22,7 +20,7 @@ export const ProxyCertificateContainer = ({
         setError('')
         setIsLoading(true)
         try {
-            const res = await axios.post('/api/config/credentials/proxy', {
+            await axios.post('/api/config/credentials/proxy', {
                 clientId,
                 tenantId,
                 clientSecret
