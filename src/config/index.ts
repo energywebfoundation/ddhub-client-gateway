@@ -2,7 +2,7 @@ import path from 'path'
 
 const defaults = {
     chainId: '73799',
-    rpcUrl: 'https://volta-rpc.energweb.org/',
+    rpcUrl: 'https://volta-rpc.energyweb.org/',
     cacheServerUrl: 'https://identitycache-dev.energyweb.org/',
     inMemoryDbFilename: 'in-memory.json',
     parentNamespace: 'dsb.apps.energyweb.iam.ewc'

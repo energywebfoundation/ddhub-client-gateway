@@ -1,12 +1,18 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { Result } from 'utils'
-import { initIdentity } from 'services/identity.service'
+import { BalanceState, initIdentity, RoleState } from 'services/identity.service'
 import { ErrorCode } from 'utils/errors'
 
 
 type Response = {
     did: string
     publicKey: string
+    balance: BalanceState,
+    // TODO: make messagebroker optional
+    status: {
+        user: RoleState,
+        messagebroker: RoleState
+    }
 }
 
 export default async function handler(
@@ -34,12 +40,20 @@ export default async function handler(
         if (!persisted) {
             throw persistError
         }
-        return {
+        // fetch the state again based on new enrolments
+        const { ok: newState, err: newStateError } = await identity.getEnrolmentState()
+        if (!newState) {
+            throw newStateError
+        }
+        return res.status(200).json({
             ok: {
                 did: identity.did,
-                publicKey: identity.publicKey
+                publicKey: identity.publicKey,
+                balance: identity.balance,
+                status: newState
             }
-        }
+
+        })
     } catch (err) {
         return res.status(err.statusCode ?? 500).json({ err: err.message })
     }

@@ -1,24 +1,30 @@
-import path from 'path'
 import { promises as fs } from 'fs'
-import { Wallet } from "ethers"
+import { BigNumber, providers, Wallet } from "ethers"
 import { IAM, RegistrationTypes, setCacheClientOptions } from "iam-client-lib"
 import { Claim } from "iam-client-lib/dist/src/cacheServerClient/cacheServerClient.types"
 import { ErrorCode, HttpApiError, HttpError, Result } from "utils"
 import { config } from 'config'
+import { parseEther } from 'ethers/lib/utils'
 
 const PARENT_NAMESPACE = config.iam.parentNamespace
 const USER_ROLE = `user.roles.${PARENT_NAMESPACE}`
 const MESSAGEBROKER_ROLE = `messagebroker.roles.${PARENT_NAMESPACE}`
 
-enum RoleStatus {
+export enum RoleState {
     NO_CLAIM,
     AWAITING_APPROVAL,
     APPROVED,
 }
 
+export enum BalanceState {
+    NONE = 'NONE',
+    LOW = 'LOW',
+    OK = 'OK'
+}
+
 type EnrolmentState = {
-    user: RoleStatus
-    messagebroker: RoleStatus
+    user: RoleState
+    messagebroker: RoleState
 }
 
 type IdentityManager = {
@@ -30,6 +36,11 @@ type IdentityManager = {
      * Public key of associated private key of gateway
      */
     publicKey: string
+    /**
+     * Reports the status of the balance (i.e. if the identity will be able to
+     * pay for the transaction(s))
+     */
+    balance: BalanceState
     /**
      * Get enrolment status of the configured identity (private key)
      *
@@ -62,6 +73,16 @@ export async function initIdentity(privateKey: string): Promise<Result<IdentityM
     if (!wallet) {
         return { err: privateKeyError }
     }
+    const { ok: balance, err: balanceError } = await validateBalance(wallet.address)
+    if (balance === undefined) {
+        return { err: balanceError }
+    }
+    if (balance === BalanceState.NONE) {
+        // TODO: make this check optional - esp. in the context of generating keys
+        return {
+            err: new HttpApiError(HttpError.BAD_REQUEST, ErrorCode.NO_BALANCE)
+        }
+    }
     const { ok: iam, err: iamError } = await initIAM(privateKey)
     if (!iam) {
         return { err: iamError }
@@ -75,6 +96,7 @@ export async function initIdentity(privateKey: string): Promise<Result<IdentityM
         ok: {
             did,
             publicKey: wallet.publicKey,
+            balance,
             getEnrolmentState: async () => {
                 // const doc = await iam.getDidDocument()
                 console.log('pre-claims')
@@ -85,25 +107,25 @@ export async function initIdentity(privateKey: string): Promise<Result<IdentityM
                 }
                 // cycle through claims to get overall enrolment status
                 const state = {
-                    user: RoleStatus.NO_CLAIM,
-                    messagebroker: RoleStatus.NO_CLAIM
+                    user: RoleState.NO_CLAIM,
+                    messagebroker: RoleState.NO_CLAIM
                 }
                 for (const { claimType, isAccepted } of claims) {
                     if (claimType === MESSAGEBROKER_ROLE) {
                         state.messagebroker = isAccepted
-                            ? RoleStatus.APPROVED
-                            : RoleStatus.AWAITING_APPROVAL
+                            ? RoleState.APPROVED
+                            : RoleState.AWAITING_APPROVAL
                     }
                     if (claimType === USER_ROLE) {
                         state.user = isAccepted
-                            ? RoleStatus.APPROVED
-                            : RoleStatus.AWAITING_APPROVAL
+                            ? RoleState.APPROVED
+                            : RoleState.AWAITING_APPROVAL
                     }
                 }
                 return { ok: state }
             },
             handleEnrolement: async (state: EnrolmentState) => {
-                if (state.messagebroker === RoleStatus.NO_CLAIM) {
+                if (state.messagebroker === RoleState.NO_CLAIM) {
                     const { ok } = await createClaim(iam, MESSAGEBROKER_ROLE)
                     if (!ok) {
                         return { err: new HttpApiError(
@@ -112,7 +134,7 @@ export async function initIdentity(privateKey: string): Promise<Result<IdentityM
                         }
                     }
                 }
-                if (state.user === RoleStatus.NO_CLAIM) {
+                if (state.user === RoleState.NO_CLAIM) {
                     const { ok } = await createClaim(iam, USER_ROLE)
                     if (!ok) {
                         return { err: new HttpApiError(
@@ -161,6 +183,27 @@ function validatePrivateKey(privateKey: string): Result<Wallet, HttpApiError> {
     }
 }
 
+async function validateBalance(address: string): Promise<Result<BalanceState, HttpApiError>> {
+    try {
+        const provider = new providers.JsonRpcProvider(config.iam.rpcUrl)
+        const balance = await provider.getBalance(address)
+        if (balance.eq(BigNumber.from(0))) {
+            return { ok: BalanceState.NONE }
+        }
+        if (balance.lt(BigNumber.from(parseEther('0.005')))) {
+            return { ok: BalanceState.LOW }
+        }
+        return { ok: BalanceState.OK }
+    } catch (err) {
+        return {
+            err: new HttpApiError(
+                HttpError.INTERNAL_SERVER_ERROR,
+                ErrorCode.BALANCE_CHECK_FAILED
+            )
+        }
+    }
+}
+
 /**
  * Initialze IAM Client Library
  *
@@ -169,21 +212,23 @@ function validatePrivateKey(privateKey: string): Result<Wallet, HttpApiError> {
  */
 async function initIAM(privateKey: string): Promise<Result<IAM, HttpApiError>> {
     try {
+        console.log('conf', config)
+
+        console.log('prv', privateKey)
         const iam = new IAM({
             privateKey,
             rpcUrl: config.iam.rpcUrl,
         })
-        // todo: create DID
-        console.log('pre-init', iam.getDid())
-        await iam.initializeConnection()
-        console.log('init', iam.getDid())
-
         setCacheClientOptions(
             config.iam.chainId,
             {
                 url: config.iam.cacheServerUrl
             }
         )
+        // todo: create DID
+        console.log('pre-init', iam.getDid())
+        await iam.initializeConnection()
+        console.log('init', iam.getDid())
         return { ok: iam }
     } catch (err) {
         console.log(`Failed to init IAM: ${err.message}`)
