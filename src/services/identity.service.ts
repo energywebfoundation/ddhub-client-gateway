@@ -5,6 +5,7 @@ import { Claim } from "iam-client-lib/dist/src/cacheServerClient/cacheServerClie
 import { ErrorCode, HttpApiError, HttpError, Result } from "utils"
 import { config } from 'config'
 import { parseEther } from 'ethers/lib/utils'
+import { writeIdentity } from './storage.service'
 
 const PARENT_NAMESPACE = config.iam.parentNamespace
 const USER_ROLE = `user.roles.${PARENT_NAMESPACE}`
@@ -22,12 +23,12 @@ export enum BalanceState {
     OK = 'OK'
 }
 
-type EnrolmentState = {
+export type EnrolmentState = {
     user: RoleState
     messagebroker: RoleState
 }
 
-type IdentityManager = {
+export type IdentityManager = {
     /**
      * Decentralized Identifer (DID) belonging to gateway identity
      */
@@ -59,7 +60,7 @@ type IdentityManager = {
      *
      * @returns ok (boolean) or error code
      */
-    writeToFile: () => Promise<Result<boolean, HttpApiError>>
+    writeToFile: (state: EnrolmentState) => Promise<Result<boolean, HttpApiError>>
 }
 
 /**
@@ -145,21 +146,22 @@ export async function initIdentity(privateKey: string): Promise<Result<IdentityM
                 }
                 return { ok: true }
             },
-            writeToFile: async () => {
-                try {
-                    await fs.writeFile(config.storage.inMemoryDbFile, JSON.stringify({
-                        did: iam.getDid(),
-                        address: wallet.address,
-                        publicKey: wallet.publicKey,
-                        privateKey: wallet.privateKey,
-                    }, null, 2))
-                    return { ok: true }
-                } catch (err) {
+            writeToFile: async (state: EnrolmentState) => {
+                const { ok, err } = await writeIdentity({
+                    did,
+                    address: wallet.address,
+                    publicKey: wallet.publicKey,
+                    privateKey: wallet.privateKey,
+                    balance,
+                    state
+                })
+                if (err) {
                     return { err: new HttpApiError(
                         HttpError.INTERNAL_SERVER_ERROR,
-                        ErrorCode.DISK_PERSIST_FAILED)
-                    }
+                        ErrorCode.DISK_PERSIST_FAILED
+                    ) }
                 }
+                return { ok }
             }
         }
     }

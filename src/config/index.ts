@@ -5,7 +5,8 @@ const defaults = {
     rpcUrl: 'https://volta-rpc.energyweb.org/',
     cacheServerUrl: 'https://identitycache-dev.energyweb.org/',
     inMemoryDbFilename: 'in-memory.json',
-    parentNamespace: 'dsb.apps.energyweb.iam.ewc'
+    parentNamespace: 'dsb.apps.energyweb.iam.ewc',
+    dsbBaseUrl: 'http://dsb-dev.energyweb.org'
 }
 
 export const config = {
@@ -21,5 +22,8 @@ export const config = {
             process.cwd(),
             process.env.IN_MEMORY_DB_FILENAME ?? defaults.inMemoryDbFilename
         )
+    },
+    dsb: {
+        baseUrl: process.env.DSB_URL ?? defaults.dsbBaseUrl
     }
 }

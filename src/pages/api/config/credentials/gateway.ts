@@ -36,7 +36,7 @@ export default async function handler(
         if (!enroled) {
             throw enrolError
         }
-        const { ok: persisted, err: persistError } = await identity.writeToFile()
+        const { ok: persisted, err: persistError } = await identity.writeToFile(state)
         if (!persisted) {
             throw persistError
         }

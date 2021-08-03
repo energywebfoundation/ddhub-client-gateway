@@ -19,6 +19,19 @@ export enum ErrorCode {
     NO_BALANCE = 'ID::NO_BALANCE',
 }
 
+export const errorText = {
+    [ErrorCode.NO_PRIVATE_KEY]: 'Please enter a private key',
+    [ErrorCode.INVALID_PRIVATE_KEY]: 'Invalid private key',
+    [ErrorCode.IAM_INIT_ERROR]: 'Failed to initialize account',
+    [ErrorCode.FETCH_CLAIMS_FAILED]: 'Failed to fetch roles',
+    [ErrorCode.CREATE_MESSAGEBROKER_CLAIM_FAILED]: 'Could not enrol as "messagebroker"',
+    [ErrorCode.CREATE_USER_CLAIM_FAILED]: 'Could not enrol as "user"',
+    [ErrorCode.NO_DID]: 'Account has no DID',
+    [ErrorCode.DISK_PERSIST_FAILED]: 'Failed to persist credentials',
+    [ErrorCode.BALANCE_CHECK_FAILED]: 'Could not retrieve balance',
+    [ErrorCode.NO_BALANCE]: 'Account has no funds'
+}
+
 export class HttpApiError extends Error {
     constructor(
         public readonly statusCode: HttpError,
