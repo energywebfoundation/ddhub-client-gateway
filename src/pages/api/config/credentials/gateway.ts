@@ -28,22 +28,25 @@ export default async function handler(
         if (!identity) {
             throw initError
         }
+        // get current state to know which claims need enrolment
         const { ok: state, err: stateError } = await identity.getEnrolmentState()
         if (!state) {
             throw stateError
         }
+        // create messagebroker + user claims
         const { ok: enroled, err: enrolError } = await identity.handleEnrolement(state)
         if (!enroled) {
             throw enrolError
-        }
-        const { ok: persisted, err: persistError } = await identity.writeToFile(state)
-        if (!persisted) {
-            throw persistError
         }
         // fetch the state again based on new enrolments
         const { ok: newState, err: newStateError } = await identity.getEnrolmentState()
         if (!newState) {
             throw newStateError
+        }
+        // persist the current state
+        const { ok: persisted, err: persistError } = await identity.writeToFile(newState)
+        if (!persisted) {
+            throw persistError
         }
         return res.status(200).json({
             ok: {
