@@ -18,17 +18,18 @@ RUN yarn build
 # DSB Container
 FROM 098061033856.dkr.ecr.us-east-1.amazonaws.com/ew-dos-dsb-ecr:canary
 
-RUN apk update && apk add --no-cache supervisor yarn
-RUN mkdir -p /var/deployment/apps/aemo-gateway-ui
+RUN apk update && apk add --no-cache python3 yarn
+RUN pip3 install supervisor
 
-WORKDIR /var/deployment/apps/aemo-gateway-ui
+RUN mkdir -p /var/deployment/apps/dsb-client-gateway
+
+WORKDIR /var/deployment/apps/dsb-client-gateway
 
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/.env.production ./.env.production
-
 
 WORKDIR /var/deployment/apps
 

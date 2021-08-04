@@ -1,4 +1,5 @@
 import path from 'path'
+import { DsbControlType } from 'utils'
 
 const defaults = {
     chainId: '73799',
@@ -6,8 +7,15 @@ const defaults = {
     cacheServerUrl: 'https://identitycache-dev.energyweb.org/',
     inMemoryDbFilename: 'in-memory.json',
     parentNamespace: 'dsb.apps.energyweb.iam.ewc',
-    dsbBaseUrl: 'http://dsb-dev.energyweb.org'
+    dsbBaseUrl: 'http://dsb-dev.energyweb.org',
+    dsbProcessName: 'dsb',
+    dsbBinPath: '../dsb-message-broker/bin/dsb-message-broker'
 }
+
+const takeIf = <T>(requirement?: any, subject?: T): T | undefined =>
+    requirement ? subject : undefined
+
+const asBool = (some?: string) => some ? (some === 'true') : false
 
 export const config = {
     iam: {
@@ -24,6 +32,14 @@ export const config = {
         )
     },
     dsb: {
-        baseUrl: process.env.DSB_URL ?? defaults.dsbBaseUrl
+        baseUrl: process.env.DSB_BASE_URL ?? defaults.dsbBaseUrl,
+        controllable: asBool(process.env.DSB_CONTROLLABLE),
+        controlType: takeIf(
+            process.env.DSB_CONTROLLABLE,
+            process.env.DSB_CONTROL_TYPE),
+        pm2: takeIf(process.env.DSB_CONTROL_TYPE === DsbControlType.PM2, {
+            processName: process.env.DSB_PM2_PROCESS_NAME ?? defaults.dsbProcessName,
+            dsbBinPath: process.env.DSB_BIN_PATH ?? defaults.dsbBinPath
+        })
     }
 }

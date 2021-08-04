@@ -8,8 +8,8 @@ import { writeIdentity } from './storage.service'
 
 /**
  * TODO:
- * - create DID for user if they don't already have one
- * - debug `newStatus` immediately after enroling (still said NO_CLAIM)
+ * - don't necessarily error on each step: persist and maintain state
+ *      throughout process so it can be continued at an point
  * - sync to DID document after approved - probably have a button in FE to do this manually
  */
 
@@ -96,7 +96,7 @@ export async function initIdentity(privateKey: string): Promise<Result<IdentityM
     }
     const did = iam.getDid()
     if (!did) {
-        // TODO: create DID for identity
+        // IAM Client Library creates the DID for us so this *should* not occur
         return { err: new HttpApiError(HttpError.BAD_REQUEST, ErrorCode.NO_DID) }
     }
     return {
@@ -188,6 +188,12 @@ function validatePrivateKey(privateKey: string): Result<Wallet, HttpApiError> {
     }
 }
 
+/**
+ * Check user has enough funds to pay for transaction
+ *
+ * @param address check the balance of this account
+ * @returns balance state (NONE, LOW, OK)
+ */
 async function validateBalance(address: string): Promise<Result<BalanceState, HttpApiError>> {
     try {
         const provider = new providers.JsonRpcProvider(config.iam.rpcUrl)
