@@ -1,3 +1,5 @@
+# DSB Client Gateway
+
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
@@ -31,6 +33,8 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 
 - `.env.development` -> points to a running instance of DSB
 - `.env.production` -> points to an instance of DSB on localhost
+
+For the full configuration options see [Configuration](./CONFIGURATION.md).
 
 ## Container
 

@@ -39,7 +39,7 @@ export const config = {
             process.env.DSB_CONTROL_TYPE),
         pm2: takeIf(process.env.DSB_CONTROL_TYPE === DsbControlType.PM2, {
             processName: process.env.DSB_PM2_PROCESS_NAME ?? defaults.dsbProcessName,
-            dsbBinPath: process.env.DSB_BIN_PATH ?? defaults.dsbBinPath
+            dsbBinPath: process.env.DSB_PM2_BIN_PATH ?? defaults.dsbBinPath
         })
     }
 }
