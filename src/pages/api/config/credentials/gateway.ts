@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { Result } from 'utils'
 import { BalanceState, initIdentity, RoleState } from 'services/identity.service'
 import { ErrorCode } from 'utils/errors'
+import { config } from 'config'
 
 
 type Response = {
@@ -33,6 +34,17 @@ export default async function handler(
         if (!state) {
             throw stateError
         }
+        // exit early if already approved
+        if (state.ready) {
+            return res.status(200).json({
+                ok: {
+                    did: identity.did,
+                    publicKey: identity.publicKey,
+                    balance: identity.balance,
+                    status: state
+                }
+            })
+        }
         // create messagebroker + user claims
         const { ok: enroled, err: enrolError } = await identity.handleEnrolement(state)
         if (!enroled) {
@@ -55,7 +67,6 @@ export default async function handler(
                 balance: identity.balance,
                 status: newState
             }
-
         })
     } catch (err) {
         return res.status(err.statusCode ?? 500).json({ err: err.message })

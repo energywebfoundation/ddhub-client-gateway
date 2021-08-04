@@ -31,6 +31,7 @@ export enum BalanceState {
 }
 
 export type EnrolmentState = {
+    ready: boolean
     user: RoleState
     messagebroker: RoleState
 }
@@ -112,16 +113,19 @@ export async function initIdentity(privateKey: string): Promise<Result<IdentityM
                 }
                 // cycle through claims to get overall enrolment status
                 const state = {
+                    ready: false,
                     user: RoleState.NO_CLAIM,
                     messagebroker: config.dsb.controllable ? RoleState.NO_CLAIM : RoleState.NOT_WANTED
                 }
                 for (const { claimType, isAccepted } of claims) {
                     if (claimType === MESSAGEBROKER_ROLE) {
+                        state.ready = isAccepted && !config.dsb.controllable
                         state.messagebroker = isAccepted
                             ? RoleState.APPROVED
                             : RoleState.AWAITING_APPROVAL
                     }
                     if (claimType === USER_ROLE) {
+                        state.ready = isAccepted
                         state.user = isAccepted
                             ? RoleState.APPROVED
                             : RoleState.AWAITING_APPROVAL
