@@ -21,6 +21,7 @@ export enum RoleState {
     NO_CLAIM,
     AWAITING_APPROVAL,
     APPROVED,
+    NOT_WANTED, // if gateway is not controlling message broker
 }
 
 export enum BalanceState {
@@ -112,7 +113,7 @@ export async function initIdentity(privateKey: string): Promise<Result<IdentityM
                 // cycle through claims to get overall enrolment status
                 const state = {
                     user: RoleState.NO_CLAIM,
-                    messagebroker: RoleState.NO_CLAIM
+                    messagebroker: config.dsb.controllable ? RoleState.NO_CLAIM : RoleState.NOT_WANTED
                 }
                 for (const { claimType, isAccepted } of claims) {
                     if (claimType === MESSAGEBROKER_ROLE) {
