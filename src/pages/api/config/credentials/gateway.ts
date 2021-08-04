@@ -1,38 +1,60 @@
-// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { Wallet } from 'ethers'
-import fs from 'fs/promises'
-import path from 'path'
-import { Result } from '../../../../utils'
+import { Result } from 'utils'
+import { BalanceState, initIdentity, RoleState } from 'services/identity.service'
+import { ErrorCode } from 'utils/errors'
 
-type Data = {
+
+type Response = {
     did: string
     publicKey: string
+    balance: BalanceState,
+    // TODO: make messagebroker optional
+    status: {
+        user: RoleState,
+        messagebroker: RoleState
+    }
 }
 
 export default async function handler(
     req: NextApiRequest,
-    res: NextApiResponse<Result<Data, string>>
+    res: NextApiResponse<Result<Response, string>>
 ) {
-    const { privateKey } = req.body
-    if (!privateKey) {
-        return res.status(400).json({ err: 'privateKey required' })
-    }
     try {
-        const { address, publicKey } = new Wallet(privateKey)
-        const did = `did:ethr:${address}`
-        const filepath = path.join(process.cwd(), 'ewc.prv')
-        await fs.writeFile(filepath, `${did},${publicKey},${privateKey}`)
-        // here we could optionally restart the broker
-        res.status(200).json({
+        const { privateKey } = req.body
+        if (!privateKey) {
+            throw new Error(ErrorCode.NO_PRIVATE_KEY)
+        }
+        const { ok: identity, err: initError } = await initIdentity(privateKey)
+        if (!identity) {
+            throw initError
+        }
+        const { ok: state, err: stateError } = await identity.getEnrolmentState()
+        if (!state) {
+            throw stateError
+        }
+        const { ok: enroled, err: enrolError } = await identity.handleEnrolement(state)
+        if (!enroled) {
+            throw enrolError
+        }
+        const { ok: persisted, err: persistError } = await identity.writeToFile(state)
+        if (!persisted) {
+            throw persistError
+        }
+        // fetch the state again based on new enrolments
+        const { ok: newState, err: newStateError } = await identity.getEnrolmentState()
+        if (!newState) {
+            throw newStateError
+        }
+        return res.status(200).json({
             ok: {
-                did,
-                publicKey
+                did: identity.did,
+                publicKey: identity.publicKey,
+                balance: identity.balance,
+                status: newState
             }
+
         })
     } catch (err) {
-        res.status(400).json({
-            err: `privateKey invalid: ${err.message}`
-        })
+        return res.status(err.statusCode ?? 500).json({ err: err.message })
     }
 }

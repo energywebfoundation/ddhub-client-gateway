@@ -36,3 +36,6 @@ yarn-error.log*
 # persisted credentials
 ewc.prv
 vc.cert
+in-memory.json
+
+/.vscode
