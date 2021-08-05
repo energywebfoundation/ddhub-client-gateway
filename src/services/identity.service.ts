@@ -119,17 +119,18 @@ export async function initIdentity(privateKey: string): Promise<Result<IdentityM
                 }
                 for (const { claimType, isAccepted } of claims) {
                     if (claimType === MESSAGEBROKER_ROLE) {
-                        state.ready = isAccepted && !config.dsb.controllable
                         state.messagebroker = isAccepted
                             ? RoleState.APPROVED
                             : RoleState.AWAITING_APPROVAL
                     }
                     if (claimType === USER_ROLE) {
-                        state.ready = isAccepted
                         state.user = isAccepted
                             ? RoleState.APPROVED
                             : RoleState.AWAITING_APPROVAL
                     }
+                    state.ready = config.dsb.controllable
+                        ? (state.messagebroker === RoleState.APPROVED) && (state.user === RoleState.APPROVED)
+                        : state.user === RoleState.APPROVED
                 }
                 return { ok: state }
             },
