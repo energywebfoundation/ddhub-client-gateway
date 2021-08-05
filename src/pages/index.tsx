@@ -81,34 +81,6 @@ export default function Home({ baseUrl, health, state }: InferGetServerSideProps
 }
 
 const useStyles = makeStyles((theme: Theme) => ({
-  appBar: {
-    background: '#000',
-    '& *': {
-      color: '#fff'
-    },
-    marginBottom: '3rem'
-  },
-  toolbar: {
-    display: 'flex',
-    justifyContent: 'space-between',
-
-    '& > div': {
-      display: 'flex',
-      alignItems: 'center'
-    }
-  },
-  logoText: {
-    marginLeft: '1rem',
-    fontFamily: 'Rajdhani'
-  },
-  version: {
-    borderRadius: '1rem',
-    marginLeft: '1rem',
-    padding: '.3rem .8rem',
-    color: '#fff',
-    fontSize: '.7rem',
-    background: theme.palette.secondary.main
-  },
   connectionStatus: {
     display: 'flex',
     alignItems: 'center',
