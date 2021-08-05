@@ -16,5 +16,5 @@ export enum StringType {
 }
 
 export enum DsbControlType {
-    PM2 = 'PM2'
+    PM2 = 'pm2'
 }

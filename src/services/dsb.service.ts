@@ -4,6 +4,7 @@ import { initPM2, ProcessState } from './pm2.service'
 
 type MessageBrokerOptions = {
     privateKey: string
+    did: string
 }
 
 // todo: use error codes
@@ -47,7 +48,8 @@ export async function initMessageBroker(options: MessageBrokerOptions): Promise<
 }
 
 async function usingPM2({
-    privateKey
+    privateKey,
+    did
 }: MessageBrokerOptions): Promise<Result> {
     if (!config.dsb.pm2) {
         return { err: new Error(ErrorCode.PM2_NOT_CONFIGURED) }
@@ -66,7 +68,10 @@ async function usingPM2({
         name: processName,
         script: dsbBinPath,
         env: {
-            PRIVATE_KEY: privateKey
+            PRIVATE_KEY: privateKey,
+            MB_DID: did,
+            JWT_SECRET: 'secret', // TODO
+            PORT: '3001'
         }
     }
     if (state === ProcessState.NONE) {

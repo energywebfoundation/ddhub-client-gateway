@@ -1,8 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { Result } from 'utils'
+import { Result, ErrorCode } from 'utils'
 import { BalanceState, initIdentity, RoleState } from 'services/identity.service'
-import { ErrorCode } from 'utils/errors'
-import { config } from 'config'
+import { initMessageBroker } from 'services/dsb.service'
 
 
 type Response = {
@@ -16,6 +15,7 @@ type Response = {
     }
 }
 
+// might want to split this up into multiple api calls...
 export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse<Result<Response, string>>
@@ -36,6 +36,17 @@ export default async function handler(
         }
         // exit early if already approved
         if (state.ready) {
+            const { ok: persisted, err: persistError } = await identity.writeToFile(state)
+            if (!persisted) {
+                throw persistError
+            }
+            const { ok: broker, err: brokerError } = await initMessageBroker({
+                privateKey,
+                did: identity.did
+            })
+            if (!broker) {
+                throw brokerError
+            }
             return res.status(200).json({
                 ok: {
                     did: identity.did,
@@ -59,6 +70,13 @@ export default async function handler(
         const { ok: persisted, err: persistError } = await identity.writeToFile(newState)
         if (!persisted) {
             throw persistError
+        }
+        const { ok: broker, err: brokerError } = await initMessageBroker({
+            privateKey,
+            did: identity.did
+        })
+        if (!broker) {
+            throw brokerError
         }
         return res.status(200).json({
             ok: {

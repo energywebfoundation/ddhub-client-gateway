@@ -69,9 +69,12 @@ export async function initPM2(): Promise<Result<PM2>> {
                             if (description.length === 0) {
                                 return resolve({ ok: ProcessState.NONE })
                             }
+                            // process is not online (stopped, errored, etc)
                             if (description[0].pm2_env?.status !== 'online') {
                                 return resolve({ ok: ProcessState.NOT_ONLINE })
                             }
+                            // is ruunning: needs to be restarted
+                            // todo: don't restart if private key already set (?)
                             return resolve({ ok: ProcessState.ONLINE })
                         })
                     }),

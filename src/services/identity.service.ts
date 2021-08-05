@@ -228,9 +228,6 @@ async function validateBalance(address: string): Promise<Result<BalanceState, Ht
  */
 async function initIAM(privateKey: string): Promise<Result<IAM, HttpApiError>> {
     try {
-        console.log('conf', config)
-
-        console.log('prv', privateKey)
         const iam = new IAM({
             privateKey,
             rpcUrl: config.iam.rpcUrl,
@@ -241,10 +238,7 @@ async function initIAM(privateKey: string): Promise<Result<IAM, HttpApiError>> {
                 url: config.iam.cacheServerUrl
             }
         )
-        // todo: create DID
-        console.log('pre-init', iam.getDid())
         await iam.initializeConnection()
-        console.log('init', iam.getDid())
         return { ok: iam }
     } catch (err) {
         console.log(`Failed to init IAM: ${err.message}`)

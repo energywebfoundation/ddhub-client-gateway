@@ -52,8 +52,10 @@ aws ecr get-login-password --region us-east-1 | docker login --username AWS --pa
 docker pull 098061033856.dkr.ecr.us-east-1.amazonaws.com/ew-dos-dsb-ecr:{TAG}
 
 # build the container
-docker build -t aemo-gateway .
+docker build -t dsb-client-gateway .
 
 # run the container
-docker run --rm -it -p 3001:3001 -e NATS_JS_URL=nats://20.83.92.252:4222 aemo-gateway
+docker run --rm -it -p 3000:3000 -p 3001:3001 -e NATS_JS_URL=nats://20.83.92.252:4222 dsb-client-gateway
 ```
+
+The gateway UI should now be accessible on https://localhost:3000

@@ -1,5 +1,5 @@
-import { ErrorCode, errorText } from "utils"
+import { errorText } from "utils"
 
 export const useErrors = () => {
-    return (key: string) => (errorText[key] ?? 'Unknown Error')
+    return (key: string) => (errorText[key] ?? key)
 }

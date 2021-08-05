@@ -8,7 +8,7 @@ const defaults = {
     inMemoryDbFilename: 'in-memory.json',
     parentNamespace: 'dsb.apps.energyweb.iam.ewc',
     dsbBaseUrl: 'http://dsb-dev.energyweb.org',
-    dsbProcessName: 'dsb',
+    dsbProcessName: 'dsb-message-broker',
     dsbBinPath: '../dsb-message-broker/bin/dsb-message-broker'
 }
 
