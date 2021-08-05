@@ -16,6 +16,7 @@ import { getStorage } from 'services/storage.service';
 import { GatewayIdentityContainer } from 'components/GatewayIdentity/GatewayIdentityContainer';
 import { ProxyCertificateContainer } from 'components/ProxyCertificate/ProxyCertificateContainer';
 import { Header } from 'components/Layout/components/Header/Header';
+import Layout from 'components/Layout/Layout';
 
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {

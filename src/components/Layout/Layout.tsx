@@ -29,15 +29,20 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     }
 }
 
-ty
+type LayoutProps = {
+    title: string,
+    children: React.ReactChild | React.ReactChild[]
+}
 
-export default function Layout({ baseUrl, health, state }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function Layout({
+    baseUrl, health, state, title = 'EW-DSB Client Gateway', children
+}: InferGetServerSidePropsType<typeof getServerSideProps> & LayoutProps) {
     const classes = useStyles()
   
     return (
         <>
             <Head>
-                <title>EW-DSB Client Gateway</title>
+                <title>{title}</title>
                 <meta name="description" content="EW-DSB Client Gateway" />
                 <link rel="icon" href="/favicon.ico" />
             </Head>
@@ -52,6 +57,8 @@ export default function Layout({ baseUrl, health, state }: InferGetServerSidePro
                             { health.ok ? 'ONLINE' : `ERROR [${health.err}]` }
                         </Typography>
                     </section>
+
+                    {children}
 
                 </Container>
             </main>
