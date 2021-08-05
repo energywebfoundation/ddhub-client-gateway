@@ -13,9 +13,10 @@ import {
 import { config } from 'config';
 import { getHealth } from 'services/dsb.service';
 import { getStorage } from 'services/storage.service';
-import { GatewayIdentityContainer } from 'components/GatewayIdentity/GatewayIdentityContainer';
+import { UploadContainer } from 'components/UploadFile/UploadContainer';
 import { ProxyCertificateContainer } from 'components/ProxyCertificate/ProxyCertificateContainer';
 import Header from 'components/Header/Header';
+import { DownloadContainer } from 'components/DownloadFile/DownloadContainer';
 
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
@@ -32,13 +33,13 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 }
 
 // TODO: break into components
-export default function Home({ baseUrl, health, state }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function FileUpload({ baseUrl, health, state }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const classes = useStyles()
 
   return (
     <div>
       <Head>
-        <title>EW-DSB Client Gateway</title>
+        <title>EW-DSB Client Gateway - File Upload / Download</title>
         <meta name="description" content="EW-DSB Client Gateway" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
@@ -46,7 +47,7 @@ export default function Home({ baseUrl, health, state }: InferGetServerSideProps
       <main>
         <Header />
 
-        <Container maxWidth="md">
+        <Container maxWidth="lg">
           <section className={classes.connectionStatus}>
             <Typography variant="h4">Connection Status </Typography>
             <Typography variant="caption" className={classes.connectionStatusPaper}>
@@ -56,24 +57,18 @@ export default function Home({ baseUrl, health, state }: InferGetServerSideProps
 
           <Divider className={classes.divider}/>
 
-          <section className={classes.swagger}>
-            <Link rel="noopener noreferrer" href={`${baseUrl}/swagger`} target="_blank">
-              {baseUrl}/swagger
-            </Link>
+          <section className={classes.main}>
+						<Typography className={classes.textWhite} variant="h4">File Upload </Typography>
+						<UploadContainer />
           </section>
 
           <Divider className={classes.divider}/>
 
-          <section className={classes.main}>
-            <Grid container spacing={3}>
-              <Grid item xs={12} md={6}>
-                <GatewayIdentityContainer identity={state.ok?.identity} />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <ProxyCertificateContainer certificate={state.ok?.certificate} />
-              </Grid>
-            </Grid>
+					<section className={classes.main}>
+						<Typography className={classes.textWhite} variant="h4">File Download </Typography>
+						<DownloadContainer />
           </section>
+
         </Container>
       </main>
     </div>
@@ -81,43 +76,14 @@ export default function Home({ baseUrl, health, state }: InferGetServerSideProps
 }
 
 const useStyles = makeStyles((theme: Theme) => ({
-  appBar: {
-    background: '#000',
-    '& *': {
-      color: '#fff'
-    },
-    marginBottom: '3rem'
-  },
-  toolbar: {
-    display: 'flex',
-    justifyContent: 'space-between',
-
-    '& > div': {
-      display: 'flex',
-      alignItems: 'center'
-    }
-  },
-  logoText: {
-    marginLeft: '1rem',
-    fontFamily: 'Rajdhani'
-  },
-  version: {
-    borderRadius: '1rem',
-    marginLeft: '1rem',
-    padding: '.3rem .8rem',
-    color: '#fff',
-    fontSize: '.7rem',
-    background: theme.palette.secondary.main
-  },
   connectionStatus: {
     display: 'flex',
     alignItems: 'center',
-    padding: '0 1rem',
+    padding: '0 2rem',
 
     '& *': {
       color: '#fff'
-    },
-    marginBottom: '2rem'
+    }
   },
   connectionStatusPaper: {
     padding: '.5rem 1rem',
@@ -128,20 +94,13 @@ const useStyles = makeStyles((theme: Theme) => ({
     alignItems: 'center'
   },
   divider: {
-    background: '#fff'
-  },
-  swagger: {
-    margin: '2rem 0',
-    padding: '0 2rem',
-
-    '& a': {
-      color: '#fff',
-      fontSize: '2.1rem',
-      textDecoration: 'underline'
-    }
+    background: '#fff',
+		margin: '3rem 0'
   },
   main: {
-    padding: '0 1rem',
-    marginTop: '2rem'
+    padding: '0 2rem',
+  },
+  textWhite: {
+    color: '#fff'
   }
 }))
