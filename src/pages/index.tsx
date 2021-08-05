@@ -15,7 +15,7 @@ import { getHealth } from 'services/dsb.service';
 import { getStorage } from 'services/storage.service';
 import { GatewayIdentityContainer } from 'components/GatewayIdentity/GatewayIdentityContainer';
 import { ProxyCertificateContainer } from 'components/ProxyCertificate/ProxyCertificateContainer';
-import { Header } from 'components/Header/Header';
+import Header from 'components/Header/Header';
 
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {

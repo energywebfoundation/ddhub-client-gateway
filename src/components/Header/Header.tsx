@@ -9,7 +9,7 @@ import {
 } from '@material-ui/core';
 import logo from '../../../public/ew-flex-single-logo.png';
 
-export const Header = () => {
+export default function Header() {
     const classes = useStyles();
 
     return (
