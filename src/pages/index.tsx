@@ -1,11 +1,8 @@
 import React from 'react';
 import Head from 'next/head';
-import Image from 'next/image';
 import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
 import { makeStyles } from '@material-ui/styles'
 import {
-  AppBar,
-  Toolbar,
   Typography,
   Container,
   Divider,
@@ -13,13 +10,12 @@ import {
   Grid,
   Link
 } from '@material-ui/core'
-import styles from '../styles/Home.module.css'
-import logo from '../../public/ew-flex-single-logo.png'
 import { config } from 'config';
 import { getHealth } from 'services/dsb.service';
 import { getStorage } from 'services/storage.service';
 import { GatewayIdentityContainer } from 'components/GatewayIdentity/GatewayIdentityContainer';
 import { ProxyCertificateContainer } from 'components/ProxyCertificate/ProxyCertificateContainer';
+import { Header } from 'components/Header/Header';
 
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
@@ -48,25 +44,7 @@ export default function Home({ baseUrl, health, state }: InferGetServerSideProps
       </Head>
 
       <main>
-        <AppBar position="static" className={classes.appBar}>
-          <Toolbar className={classes.toolbar}>
-            <div>
-              <Image src={logo} alt="EW logo" height={40} width={40} />
-              <Typography className={classes.logoText} variant="h6">
-                energy web
-              </Typography>
-            </div>
-
-            <div>
-              <Typography>
-                  EW-DSB Client Gateway
-              </Typography>
-              <Typography className={classes.version} variant="caption">
-                V 0.0.1
-              </Typography>
-            </div>
-          </Toolbar>
-        </AppBar>
+        <Header />
 
         <Container maxWidth="md">
           <section className={classes.connectionStatus}>
@@ -103,34 +81,6 @@ export default function Home({ baseUrl, health, state }: InferGetServerSideProps
 }
 
 const useStyles = makeStyles((theme: Theme) => ({
-  appBar: {
-    background: '#000',
-    '& *': {
-      color: '#fff'
-    },
-    marginBottom: '3rem'
-  },
-  toolbar: {
-    display: 'flex',
-    justifyContent: 'space-between',
-
-    '& > div': {
-      display: 'flex',
-      alignItems: 'center'
-    }
-  },
-  logoText: {
-    marginLeft: '1rem',
-    fontFamily: 'Rajdhani'
-  },
-  version: {
-    borderRadius: '1rem',
-    marginLeft: '1rem',
-    padding: '.3rem .8rem',
-    color: '#fff',
-    fontSize: '.7rem',
-    background: theme.palette.secondary.main
-  },
   connectionStatus: {
     display: 'flex',
     alignItems: 'center',
