@@ -8,14 +8,12 @@ type Response = {
     did: string
     publicKey: string
     balance: BalanceState,
-    // TODO: make messagebroker optional
     status: {
         user: RoleState,
         messagebroker: RoleState
     }
 }
 
-// might want to split this up into multiple api calls...
 export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse<Result<Response, string>>

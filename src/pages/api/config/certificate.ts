@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { Wallet } from 'ethers'
 import fs from 'fs/promises'
 import path from 'path'
-import { Result } from '../../../../utils'
+import { Result } from '../../../utils'
 
 export default async function handler(
     req: NextApiRequest,
@@ -22,7 +22,7 @@ export default async function handler(
         })
     } catch (err) {
         res.status(400).json({
-            err: `privateKey invalid: ${err.message}`
+            err: `Credentials invalid: ${err.message}`
         })
     }
 }

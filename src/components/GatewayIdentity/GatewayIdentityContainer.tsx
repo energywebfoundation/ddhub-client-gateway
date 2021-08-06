@@ -23,7 +23,7 @@ export const GatewayIdentityContainer = ({
         setError('')
         setIsLoading(true)
         try {
-            const res = await axios.post('/api/config/credentials/gateway', { privateKey })
+            const res = await axios.post('/api/config/identity', { privateKey })
             setDid(res.data.ok.did)
             setPublicKey(res.data.ok.publicKey)
         } catch (err) {

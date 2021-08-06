@@ -1,0 +1,112 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "DSB Client Gateway",
+    "description": "The DSB Client Gateway acts as an API Gateway to the Energy Web Decentralized Service Bus (DSB).",
+    "contact": {
+      "email": "dev@energyweb.org"
+    },
+    "version": "0.1.0"
+  },
+  "tags": [
+    {
+      "name": "config",
+      "description": "Manage the DSB Client Gateway as admin"
+    }
+  ],
+  "paths": {
+    "/config/identity": {
+      "post": {
+        "tags": [
+          "config"
+        ],
+        "summary": "Sets the decentralized identity of the gateway, enroling it on to DSB",
+        "operationId": "createIdentity",
+        "requestBody": {
+          "description": "The private key which will be associated with the DID",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IdentityConfig"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "The DID was successfully created and enroled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdentityConfigSuccess"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error processing private key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "IdentityConfig": {
+        "required": [
+          "privateKey"
+        ],
+        "type": "object",
+        "properties": {
+          "privateKey": {
+            "type": "string",
+            "description": "Ethereum compliant hex-encoded private key"
+          }
+        }
+      },
+      "IdentityConfigSuccess": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "$ref": "#/components/schemas/Identity"
+          }
+        }
+      },
+      "Identity": {
+        "type": "object",
+        "properties": {
+          "did": {
+            "type": "string"
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "err": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "basicAuth": {
+        "type": "http",
+        "scheme": "basic"
+      }
+    }
+  }
+}
