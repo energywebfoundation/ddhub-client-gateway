@@ -1,19 +1,18 @@
 import { BigNumber, providers, utils, Wallet } from "ethers"
 import { IAM, RegistrationTypes, setCacheClientOptions } from "iam-client-lib"
 import { Claim } from "iam-client-lib/dist/src/cacheServerClient/cacheServerClient.types"
+import { IClaimIssuance } from "iam-client-lib/dist/src/iam"
+import { parseEther } from 'ethers/lib/utils'
 import {
     BalanceState,
     EnrolmentState,
     ErrorCode,
-    HttpApiError,
-    HttpError,
     IdentityManager,
     Result,
     RoleState
 } from "utils"
 import { config } from 'config'
-import { parseEther } from 'ethers/lib/utils'
-import { getIdentity, writeIdentity } from './storage.service'
+import { getIdentity, writeIdentity, writePartialIdentity } from './storage.service'
 
 const PARENT_NAMESPACE = config.iam.parentNamespace
 const USER_ROLE = `user.roles.${PARENT_NAMESPACE}`
@@ -27,7 +26,7 @@ const MESSAGEBROKER_ROLE = `messagebroker.roles.${PARENT_NAMESPACE}`
 export async function signProof(): Promise<Result<string>> {
     const { some: identity } = await getIdentity()
     if (!identity) {
-        return { err: new Error(ErrorCode.NO_PRIVATE_KEY) }
+        return { err: new Error(ErrorCode.ID_NO_PRIVATE_KEY) }
     }
     const signer = new Wallet(identity.privateKey)
     const header = {
@@ -60,7 +59,7 @@ export async function signProof(): Promise<Result<string>> {
 export async function signPayload(payload: string): Promise<Result<string>> {
     const { some: identity } = await getIdentity()
     if (!identity) {
-        return { err: new Error(ErrorCode.NO_PRIVATE_KEY) }
+        return { err: new Error(ErrorCode.ID_NO_PRIVATE_KEY) }
     }
     const signer = new Wallet(identity.privateKey)
     const sig = await signer.signMessage(payload)
@@ -80,7 +79,7 @@ export async function signPayload(payload: string): Promise<Result<string>> {
  * @param privateKey sets IAM to use this private key
  * @returns IdentityManager - object with helper methods to query and create claims
  */
-export async function initIdentity(privateKey: string): Promise<Result<IdentityManager, HttpApiError>> { // TODO: change
+export async function initIdentity(privateKey: string): Promise<Result<IdentityManager>> {
     const { ok: wallet, err: privateKeyError } = validatePrivateKey(privateKey)
     if (!wallet) {
         return { err: privateKeyError }
@@ -90,9 +89,19 @@ export async function initIdentity(privateKey: string): Promise<Result<IdentityM
         return { err: balanceError }
     }
     if (balance === BalanceState.NONE) {
-        // TODO: make this check optional - esp. in the context of generating keys
+        // this errors (we can't initiate the identity without funds)
+        // but we still want to persist the private key for later
+        const { ok, err } = await writePartialIdentity({
+            address: wallet.address,
+            publicKey: wallet.publicKey,
+            privateKey: wallet.privateKey,
+            balance,
+        })
+        if (!ok) {
+            return { err }
+        }
         return {
-            err: new HttpApiError(HttpError.BAD_REQUEST, ErrorCode.NO_BALANCE)
+            err: new Error(ErrorCode.ID_NO_BALANCE)
         }
     }
     const { ok: iam, err: iamError } = await initIAM(privateKey)
@@ -102,11 +111,12 @@ export async function initIdentity(privateKey: string): Promise<Result<IdentityM
     const did = iam.getDid()
     if (!did) {
         // IAM Client Library creates the DID for us so this *should* not occur
-        return { err: new HttpApiError(HttpError.BAD_REQUEST, ErrorCode.NO_DID) }
+        return { err: new Error(ErrorCode.ID_NO_DID) }
     }
     return {
         ok: {
             did,
+            address: wallet.address,
             publicKey: wallet.publicKey,
             balance,
             getEnrolmentState: async () => {
@@ -141,24 +151,21 @@ export async function initIdentity(privateKey: string): Promise<Result<IdentityM
                 if (state.messagebroker === RoleState.NO_CLAIM) {
                     const { ok } = await createClaim(iam, MESSAGEBROKER_ROLE)
                     if (!ok) {
-                        return { err: new HttpApiError(
-                            HttpError.INTERNAL_SERVER_ERROR,
-                            ErrorCode.CREATE_MESSAGEBROKER_CLAIM_FAILED)
-                        }
+                        return { err: new Error(ErrorCode.ID_CREATE_MESSAGEBROKER_CLAIM_FAILED) }
                     }
+
                 }
                 if (state.user === RoleState.NO_CLAIM) {
                     const { ok } = await createClaim(iam, USER_ROLE)
                     if (!ok) {
-                        return { err: new HttpApiError(
-                            HttpError.INTERNAL_SERVER_ERROR,
-                            ErrorCode.CREATE_USER_CLAIM_FAILED)
-                        }
+                        return { err: new Error(ErrorCode.ID_CREATE_USER_CLAIM_FAILED) }
                     }
                 }
+                // setup subscriber for claim approval events
+                await listenForApproval(iam)
                 return { ok: true }
             },
-            writeToFile: async (state: EnrolmentState) => {
+            save: async (state: EnrolmentState) => {
                 const { ok, err } = await writeIdentity({
                     did,
                     address: wallet.address,
@@ -168,10 +175,7 @@ export async function initIdentity(privateKey: string): Promise<Result<IdentityM
                     state
                 })
                 if (err) {
-                    return { err: new HttpApiError(
-                        HttpError.INTERNAL_SERVER_ERROR,
-                        ErrorCode.DISK_PERSIST_FAILED
-                    ) }
+                    return { err: new Error(ErrorCode.DISK_PERSIST_FAILED) }
                 }
                 return { ok }
             }
@@ -185,14 +189,12 @@ export async function initIdentity(privateKey: string): Promise<Result<IdentityM
  * @param privateKey string private key that the wallet should use
  * @returns the wallet initiated from private key
  */
-function validatePrivateKey(privateKey: string): Result<Wallet, HttpApiError> {
+function validatePrivateKey(privateKey: string): Result<Wallet> {
     try {
         return { ok: new Wallet(privateKey) }
     } catch (err) {
         return {
-            err: new HttpApiError(
-                HttpError.BAD_REQUEST,
-                ErrorCode.INVALID_PRIVATE_KEY)
+            err: new Error(ErrorCode.ID_INVALID_PRIVATE_KEY)
         }
     }
 }
@@ -203,7 +205,7 @@ function validatePrivateKey(privateKey: string): Result<Wallet, HttpApiError> {
  * @param address check the balance of this account
  * @returns balance state (NONE, LOW, OK)
  */
-async function validateBalance(address: string): Promise<Result<BalanceState, HttpApiError>> {
+async function validateBalance(address: string): Promise<Result<BalanceState>> {
     try {
         const provider = new providers.JsonRpcProvider(config.iam.rpcUrl)
         const balance = await provider.getBalance(address)
@@ -216,10 +218,7 @@ async function validateBalance(address: string): Promise<Result<BalanceState, Ht
         return { ok: BalanceState.OK }
     } catch (err) {
         return {
-            err: new HttpApiError(
-                HttpError.INTERNAL_SERVER_ERROR,
-                ErrorCode.BALANCE_CHECK_FAILED
-            )
+            err: new Error(ErrorCode.ID_BALANCE_CHECK_FAILED)
         }
     }
 }
@@ -230,7 +229,7 @@ async function validateBalance(address: string): Promise<Result<BalanceState, Ht
  * @param privateKey the identity controlling to the DID
  * @returns initialized IAM object
  */
-async function initIAM(privateKey: string): Promise<Result<IAM, HttpApiError>> {
+async function initIAM(privateKey: string): Promise<Result<IAM>> {
     try {
         const iam = new IAM({
             privateKey,
@@ -247,9 +246,7 @@ async function initIAM(privateKey: string): Promise<Result<IAM, HttpApiError>> {
     } catch (err) {
         console.log(`Failed to init IAM: ${err.message}`)
         return {
-            err: new HttpApiError(
-                HttpError.INTERNAL_SERVER_ERROR,
-                ErrorCode.IAM_INIT_ERROR)
+            err: new Error(ErrorCode.ID_IAM_INIT_ERROR)
         }
     }
 }
@@ -261,7 +258,7 @@ async function initIAM(privateKey: string): Promise<Result<IAM, HttpApiError>> {
  * @param did subject of the claims
  * @returns array of claims
  */
-async function fetchClaims(iam: IAM, did: string): Promise<Result<Claim[], HttpApiError>> {
+async function fetchClaims(iam: IAM, did: string): Promise<Result<Claim[]>> {
     try {
         const claims = (await iam.getClaimsBySubject({
             did,
@@ -271,9 +268,7 @@ async function fetchClaims(iam: IAM, did: string): Promise<Result<Claim[], HttpA
     } catch (err) {
         console.log(`Failed to fetch claims for ${did}: ${err.message}`)
         return {
-            err: new HttpApiError(
-                HttpError.INTERNAL_SERVER_ERROR,
-                ErrorCode.FETCH_CLAIMS_FAILED)
+            err: new Error(ErrorCode.ID_FETCH_CLAIMS_FAILED)
         }
     }
 }
@@ -304,6 +299,51 @@ async function createClaim(iam: IAM, claim: string): Promise<Result> {
         return { err }
     }
 }
+
+/**
+ * Sets up a listener for approved role claims. Exits once done. 
+ *
+ * @param iam initialized IAM object
+ */
+async function listenForApproval(iam: IAM) {
+    const state = {
+        user: RoleState.AWAITING_APPROVAL,
+        messagebroker: RoleState.AWAITING_APPROVAL
+    }
+    console.log('Listening for role approval')
+    const sub = await iam.subscribeTo({
+        messageHandler: async (message) => {
+            console.log('Received identity event:', message)
+            if (message.requester !== iam.getDid()) {
+                return
+            }
+            // cast to IClaimIssuance so we can access token (if it exists)
+            const claim = message as IClaimIssuance
+            if (claim.issuedToken) {
+                console.log('Received claim has been issued:', claim.id)
+                if (claim.id === USER_ROLE) {
+                    await iam.publishPublicClaim({ token: claim.issuedToken })
+                    state.user = RoleState.APPROVED
+                }
+                if (config.dsb.controllable && claim.id === MESSAGEBROKER_ROLE) {
+                    await iam.publishPublicClaim({ token: claim.issuedToken })
+                    state.user = RoleState.APPROVED
+                }
+            }
+            // finish
+            if (state.user === RoleState.APPROVED) {
+                if (config.dsb.controllable && state.messagebroker !== RoleState.APPROVED) {
+                    // wait for approval
+                    return
+                }
+                if (sub) {
+                    await iam.unsubscribeFrom(sub)
+                }
+            }
+        }
+    })
+}
+
 
 /**
  * Queries chain to get current block for signing identity proof

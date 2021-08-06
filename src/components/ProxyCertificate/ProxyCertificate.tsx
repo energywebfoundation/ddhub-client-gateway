@@ -28,7 +28,7 @@ export const ProxyCertificate = ({
         <div>
             <div className={classes.credentials}>
                 <div className={classes.credentialsHeader}>
-                    <Typography variant="h6">EW-DSB CONNECTION <br /> CERTIFICATE</Typography>
+                    <Typography variant="h6">OUTBOUND CERTIFICATE</Typography>
                     <InfoIcon />
                 </div>
 

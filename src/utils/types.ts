@@ -46,6 +46,10 @@ export type IdentityManager = {
      */
     did: string
     /**
+     * Address of associated private key of gateway (note could differ from did)
+     */
+    address: string
+    /**
      * Public key of associated private key of gateway
      */
     publicKey: string
@@ -59,20 +63,20 @@ export type IdentityManager = {
      *
      * @returns individual state of messagebroker and user roles
      */
-    getEnrolmentState: () => Promise<Result<EnrolmentState, HttpApiError>>
+    getEnrolmentState: () => Promise<Result<EnrolmentState>>
     /**
      * Creates enrolment claims (messagebroker and user) for gateway identity
      *
      * @param state current state, retreived from getEnrolmentState
      * @returns ok (boolean) or error code
      */
-    handleEnrolement: (state: EnrolmentState) => Promise<Result<boolean, HttpApiError>>
+    handleEnrolement: (state: EnrolmentState) => Promise<Result>
     /**
      * Persists gateway identity to json file
      *
      * @returns ok (boolean) or error code
      */
-    writeToFile: (state: EnrolmentState) => Promise<Result<boolean, HttpApiError>>
+    save: (state: EnrolmentState) => Promise<Result>
 }
 
 export type SendMessageData = {

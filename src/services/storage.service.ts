@@ -1,6 +1,6 @@
 import { config } from 'config'
 import { promises as fs } from 'fs'
-import { BalanceState, ErrorCode, Option, Result, RoleState } from 'utils'
+import { BalanceState, EnrolmentState, ErrorCode, Option, Result, RoleState } from 'utils'
 
 export type Identity = {
     did: string
@@ -8,10 +8,7 @@ export type Identity = {
     publicKey: string
     privateKey: string
     balance: BalanceState
-    state: {
-        user: RoleState
-        messagebroker: RoleState
-    }
+    state: EnrolmentState
 }
 
 export type Certificate = {
@@ -25,16 +22,20 @@ export type Storage = {
     certificate?: Certificate
 }
 
-export async function writeIdentity(identity: Identity): Promise<Result> {
+export async function writePartialIdentity(identity: Partial<Identity>): Promise<Result> {
     try {
         const { some: storage } = await getStorage()
         await fs.writeFile(
             config.storage.inMemoryDbFile,
-            JSON.stringify({...storage, identity}, null, 2))
+            JSON.stringify({ ...storage, identity }, null, 2))
         return { ok: true }
     } catch (err) {
         return { err: new Error(ErrorCode.DISK_PERSIST_FAILED) }
     }
+}
+
+export async function writeIdentity(identity: Identity): Promise<Result> {
+    return writePartialIdentity(identity)
 }
 
 export async function writeCertificate(certificate: Certificate): Promise<Result> {

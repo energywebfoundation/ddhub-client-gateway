@@ -24,14 +24,13 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   console.log('health', health, 'state', state)
   return {
     props: {
-      baseUrl: config.dsb.baseUrl,
       health,
       state
     }
   }
 }
 
-export default function Home({ baseUrl, health, state }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function Home({ health, state }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const classes = useStyles()
 
   return (

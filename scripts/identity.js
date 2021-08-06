@@ -16,8 +16,8 @@ const generateIdentity = async (privateKey) => {
   const address = await signer.getAddress();
   const did = `did:ethr:${address}`;
 
-//   const provider = new providers.JsonRpcProvider('https://volta-rpc.energyweb.org')
-//   const block = await provider.getBlockNumber()
+  // const provider = new providers.JsonRpcProvider('https://volta-rpc.energyweb.org')
+  // const blockNumber = await provider.getBlockNumber()
 
   const payload = {
       iss: did,

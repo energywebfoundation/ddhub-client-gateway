@@ -1,55 +1,74 @@
-import React, { useState } from 'react'
-import { Button, InputBase, makeStyles, Theme, Typography, withStyles } from '@material-ui/core'
+import React, { useEffect, useState } from 'react'
+import { Button, makeStyles, Theme, Typography } from '@material-ui/core'
 import InfoIcon from '@material-ui/icons/Info'
 import { CustomInput } from 'components/CustomInput/CustomInput'
-import { snip, StringType } from 'utils'
+import { EnrolmentState, snip, StringType } from 'utils'
 
 type GatewayIdentityProps = {
     did?: string
-    publicKey?: string
+    address: string
+    balance?: boolean
+    enrolment?: EnrolmentState
     isLoading: boolean
     error: string
-    onSubmit: (privateKey: string) => void
+    onSubmit: (privateKey?: string) => void
 }
 
 export const GatewayIdentity = ({
     did,
-    publicKey,
+    address,
+    balance,
+    enrolment,
     isLoading,
     error,
     onSubmit
 }: GatewayIdentityProps) => {
     const classes = useStyles()
     const [privateKey, setPrivatekey] = useState('')
+    const [statusText, setStatusText] = useState('')
+    const [showFundedButton, setShowFundedButton] = useState(false)
+
+    useEffect(() => {
+        if (address) {
+            if (!did) {
+                if (!balance) {
+                    setShowFundedButton(true)
+                    setStatusText('No funds')
+                } else {
+                    setStatusText('Missing DID')
+                }
+            } else {
+                if (enrolment?.ready) {
+                    setStatusText('Enroled')
+                } else {
+                    setStatusText('Awaiting enrolment approval')
+                }
+            }
+        }
+    }, [did, address, balance, enrolment])
+
     return (
         <div>
             <div className={classes.credentials}>
                 <div className={classes.credentialsHeader}>
-                    <Typography variant="h6">MESSAGE BROKER <br /> CREDENTIALS</Typography>
+                    <Typography variant="h6">GATEWAY IDENTITY</Typography>
                     <InfoIcon />
                 </div>
 
+                {statusText && (
+                    <div className={classes.description}>
+                        <Typography variant="caption">STATUS</Typography>
+                        <Typography variant="h6">{statusText}</Typography>
+                    </div>
+                )}
+                {(did || address) && (
+                    <div className={classes.description}>
+                        <Typography variant="caption">ID</Typography>
+                        <Typography className={classes.id} variant="h6">{did || address}</Typography>
+                    </div>
+                )}
+
                 <div className={classes.form}>
-                    <div className={classes.formGroup}>
-                        <Typography variant="caption">DID</Typography>
-                        <CustomInput
-                            placeholder={did
-                                ? snip(did, StringType.DID)
-                                : `DID known once private key is set`}
-                            fullWidth
-                            disabled
-                        />
-                    </div>
-                    <div className={classes.formGroup}>
-                        <Typography variant="caption">PUBLIC KEY</Typography>
-                        <CustomInput
-                            placeholder={publicKey
-                                ? snip(publicKey, StringType.HEX_COMPRESSED)
-                                : `Public key known once private key is set`}
-                            fullWidth
-                            disabled
-                        />
-                    </div>
                     <div className={classes.formGroup}>
                         <Typography variant="caption">PRIVATE KEY</Typography>
                         <CustomInput
@@ -59,11 +78,24 @@ export const GatewayIdentity = ({
                         />
                     </div>
 
+                    {showFundedButton && (
+                        <Button
+                            variant="outlined"
+                            color="secondary"
+                            fullWidth
+                            disabled={isLoading}
+                            onClick={() => onSubmit()}
+                        >
+                            I Have Funds
+                        </Button>
+                    )}
+
                     <Button
                         variant="outlined"
                         color="secondary"
                         fullWidth
-                        disabled={true}
+                        disabled={isLoading}
+                        onClick={() => onSubmit()}
                     >
                         Generate Keys
                     </Button>
@@ -97,6 +129,13 @@ const useStyles = makeStyles((theme: Theme) => ({
         justifyContent: 'space-between',
         alignItems: 'center',
         color: '#fff'
+    },
+    description: {
+        margin: '1rem 0',
+        color: '#ccc'
+    },
+    id: {
+        fontSize: '.9rem'
     },
     form: {
         marginTop: '1rem',
