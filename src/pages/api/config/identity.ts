@@ -19,6 +19,9 @@ export default async function handler(
     res: NextApiResponse<Result<Response, string>>
 ) {
     try {
+        if (req.method !== 'POST') {
+            return res.status(405).end()
+        }
         const { privateKey } = req.body
         if (!privateKey) {
             throw new Error(ErrorCode.NO_PRIVATE_KEY)

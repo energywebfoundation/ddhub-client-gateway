@@ -9,6 +9,9 @@ export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse<Result<boolean, string>>
 ) {
+    if (req.method !== 'POST') {
+        return res.status(405).end()
+    }
     const { clientId, tenantId, clientSecret } = req.body
     if (!clientId || !tenantId || !clientSecret) {
         return res.status(400).json({ err: 'clientId, tenantId, clientSecret all required' })
