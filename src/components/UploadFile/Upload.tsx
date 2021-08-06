@@ -52,8 +52,13 @@ export const Upload = () => {
 								color="secondary"
 								fullWidth
 								className={classes.fileButton}
+								component="label"
 							>
 								Browse
+								<input
+									type="file"
+									hidden
+								/>
 							</Button>
 						</Grid>
 						<Grid item xs={6} sm={5}>
@@ -112,6 +117,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 		color: theme.palette.error.main
 	},
 	fileButton: {
-		marginTop: theme.spacing(3)
+		marginTop: theme.spacing(3),
+		padding: '.5rem'
 	}
 }))
