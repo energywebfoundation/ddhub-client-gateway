@@ -1,10 +1,71 @@
-import { BigNumber, providers, Wallet } from "ethers"
+import { BigNumber, providers, utils, Wallet } from "ethers"
 import { IAM, RegistrationTypes, setCacheClientOptions } from "iam-client-lib"
 import { Claim } from "iam-client-lib/dist/src/cacheServerClient/cacheServerClient.types"
-import { ErrorCode, HttpApiError, HttpError, Result } from "utils"
+import {
+    BalanceState,
+    EnrolmentState,
+    ErrorCode,
+    HttpApiError,
+    HttpError,
+    IdentityManager,
+    Result,
+    RoleState
+} from "utils"
 import { config } from 'config'
 import { parseEther } from 'ethers/lib/utils'
-import { writeIdentity } from './storage.service'
+import { getIdentity, writeIdentity } from './storage.service'
+
+const PARENT_NAMESPACE = config.iam.parentNamespace
+const USER_ROLE = `user.roles.${PARENT_NAMESPACE}`
+const MESSAGEBROKER_ROLE = `messagebroker.roles.${PARENT_NAMESPACE}`
+
+/**
+ * Signs proof of private key ownership with current block to prevent replay attacks
+ *
+ * @returns JWT
+ */
+export async function signProof(): Promise<Result<string>> {
+    const { some: identity } = await getIdentity()
+    if (!identity) {
+        return { err: new Error(ErrorCode.NO_PRIVATE_KEY) }
+    }
+    const signer = new Wallet(identity.privateKey)
+    const header = {
+        alg: 'ES256',
+        typ: 'JWT'
+    }
+    const encodedHeader = utils.base64.encode(Buffer.from(JSON.stringify(header)))
+    // does not work :(
+    // const { ok: block } = await getCurrentBlock()
+    const payload = {
+        iss: identity.did,
+        claimData: {
+            blockNumber: 999999999999
+        }
+    }
+    const encodedPayload = utils.base64.encode(Buffer.from(JSON.stringify(payload)))
+    const message = utils.arrayify(
+        utils.keccak256(Buffer.from(`${encodedHeader}.${encodedPayload}`))
+    )
+    const sig = await signer.signMessage(message)
+    const encodedSig = utils.base64.encode(Buffer.from(sig))
+    return { ok: `${encodedHeader}.${encodedPayload}.${encodedSig}` }
+}
+
+/**
+ *
+ * @param payload message paylaod stringified
+ * @returns signature (string of concatenated r+s+v)
+ */
+export async function signPayload(payload: string): Promise<Result<string>> {
+    const { some: identity } = await getIdentity()
+    if (!identity) {
+        return { err: new Error(ErrorCode.NO_PRIVATE_KEY) }
+    }
+    const signer = new Wallet(identity.privateKey)
+    const sig = await signer.signMessage(payload)
+    return { ok: sig }
+}
 
 /**
  * TODO:
@@ -13,71 +74,13 @@ import { writeIdentity } from './storage.service'
  * - sync to DID document after approved - probably have a button in FE to do this manually
  */
 
-const PARENT_NAMESPACE = config.iam.parentNamespace
-const USER_ROLE = `user.roles.${PARENT_NAMESPACE}`
-const MESSAGEBROKER_ROLE = `messagebroker.roles.${PARENT_NAMESPACE}`
-
-export enum RoleState {
-    NO_CLAIM,
-    AWAITING_APPROVAL,
-    APPROVED,
-    NOT_WANTED, // if gateway is not controlling message broker
-}
-
-export enum BalanceState {
-    NONE = 'NONE',
-    LOW = 'LOW',
-    OK = 'OK'
-}
-
-export type EnrolmentState = {
-    ready: boolean
-    user: RoleState
-    messagebroker: RoleState
-}
-
-export type IdentityManager = {
-    /**
-     * Decentralized Identifer (DID) belonging to gateway identity
-     */
-    did: string
-    /**
-     * Public key of associated private key of gateway
-     */
-    publicKey: string
-    /**
-     * Reports the status of the balance (i.e. if the identity will be able to
-     * pay for the transaction(s))
-     */
-    balance: BalanceState
-    /**
-     * Get enrolment status of the configured identity (private key)
-     *
-     * @returns individual state of messagebroker and user roles
-     */
-    getEnrolmentState: () => Promise<Result<EnrolmentState, HttpApiError>>
-    /**
-     * Creates enrolment claims (messagebroker and user) for gateway identity
-     *
-     * @param state current state, retreived from getEnrolmentState
-     * @returns ok (boolean) or error code
-     */
-    handleEnrolement: (state: EnrolmentState) => Promise<Result<boolean, HttpApiError>>
-    /**
-     * Persists gateway identity to json file
-     *
-     * @returns ok (boolean) or error code
-     */
-    writeToFile: (state: EnrolmentState) => Promise<Result<boolean, HttpApiError>>
-}
-
 /**
  * Configure Identity Access Management (IAM)
  *
  * @param privateKey sets IAM to use this private key
  * @returns IdentityManager - object with helper methods to query and create claims
  */
-export async function initIdentity(privateKey: string): Promise<Result<IdentityManager, HttpApiError>> {
+export async function initIdentity(privateKey: string): Promise<Result<IdentityManager, HttpApiError>> { // TODO: change
     const { ok: wallet, err: privateKeyError } = validatePrivateKey(privateKey)
     if (!wallet) {
         return { err: privateKeyError }
@@ -299,5 +302,21 @@ async function createClaim(iam: IAM, claim: string): Promise<Result> {
     } catch (err) {
         console.log(`Failed to create claim ${claim}: ${err.message}`)
         return { err }
+    }
+}
+
+/**
+ * Queries chain to get current block for signing identity proof
+ *
+ * @returns block height
+ */
+async function getCurrentBlock(): Promise<Result<number>> {
+    try {
+        const provider = new providers.JsonRpcProvider(config.iam.rpcUrl)
+        const block = await provider.getBlockNumber()
+        return { ok: block }
+    } catch (err) {
+        console.log(`Failed to get current block: ${err.message}`)
+        return { err: new Error(ErrorCode.WEB3_PROVIDER_ERROR) }
     }
 }

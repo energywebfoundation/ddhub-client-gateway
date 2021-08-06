@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { Result, ErrorCode } from 'utils'
-import { BalanceState, initIdentity, RoleState } from 'services/identity.service'
+import { Result, ErrorCode, BalanceState, RoleState } from 'utils'
+import { initIdentity } from 'services/identity.service'
 import { initMessageBroker } from 'services/dsb.service'
 
 

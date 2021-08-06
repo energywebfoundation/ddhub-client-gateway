@@ -11,15 +11,15 @@ import {
   Link
 } from '@material-ui/core'
 import { config } from 'config';
-import { getHealth } from 'services/dsb.service';
 import { getStorage } from 'services/storage.service';
 import { GatewayIdentityContainer } from 'components/GatewayIdentity/GatewayIdentityContainer';
 import { ProxyCertificateContainer } from 'components/ProxyCertificate/ProxyCertificateContainer';
 import Header from 'components/Header/Header';
+import { DsbApiService } from 'services/dsb-api.service';
 
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const health = await getHealth()
+  const health = await DsbApiService.init().getHealth()
   const state = await getStorage()
   console.log('health', health, 'state', state)
   return {
@@ -31,7 +31,6 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   }
 }
 
-// TODO: break into components
 export default function Home({ baseUrl, health, state }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const classes = useStyles()
 
@@ -67,10 +66,10 @@ export default function Home({ baseUrl, health, state }: InferGetServerSideProps
           <section className={classes.main}>
             <Grid container spacing={3}>
               <Grid item xs={12} md={6}>
-                <GatewayIdentityContainer identity={state.ok?.identity} />
+                <GatewayIdentityContainer identity={state.some?.identity} />
               </Grid>
               <Grid item xs={12} md={6}>
-                <ProxyCertificateContainer certificate={state.ok?.certificate} />
+                <ProxyCertificateContainer certificate={state.some?.certificate} />
               </Grid>
             </Grid>
           </section>
