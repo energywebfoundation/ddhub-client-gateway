@@ -56,8 +56,8 @@ export default function Home({ baseUrl, health, state }: InferGetServerSideProps
           <Divider className={classes.divider}/>
 
           <section className={classes.swagger}>
-            <Link rel="noopener noreferrer" href={`${baseUrl}/swagger`} target="_blank">
-              {baseUrl}/swagger
+            <Link href="/docs">
+              API Documentation
             </Link>
           </section>
 
