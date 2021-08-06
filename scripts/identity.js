@@ -1,4 +1,4 @@
-const { utils, Wallet } = require('ethers');
+const { utils, Wallet, providers } = require('ethers');
 
 // replace with your own
 const PRIVATE_KEY = 'a229bf8f1bc264f2981f33f65f26302d5adebae767eb361e767add52e52c76d7';
@@ -15,6 +15,9 @@ const generateIdentity = async (privateKey) => {
 
   const address = await signer.getAddress();
   const did = `did:ethr:${address}`;
+
+//   const provider = new providers.JsonRpcProvider('https://volta-rpc.energyweb.org')
+//   const block = await provider.getBlockNumber()
 
   const payload = {
       iss: did,

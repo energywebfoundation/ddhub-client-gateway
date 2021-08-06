@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { Result, ErrorCode } from 'utils'
-import { BalanceState, initIdentity, RoleState } from 'services/identity.service'
+import { Result, ErrorCode, BalanceState, RoleState } from 'utils'
+import { initIdentity } from 'services/identity.service'
 import { initMessageBroker } from 'services/dsb.service'
 
 
@@ -8,19 +8,20 @@ type Response = {
     did: string
     publicKey: string
     balance: BalanceState,
-    // TODO: make messagebroker optional
     status: {
         user: RoleState,
         messagebroker: RoleState
     }
 }
 
-// might want to split this up into multiple api calls...
 export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse<Result<Response, string>>
 ) {
     try {
+        if (req.method !== 'POST') {
+            return res.status(405).end()
+        }
         const { privateKey } = req.body
         if (!privateKey) {
             throw new Error(ErrorCode.NO_PRIVATE_KEY)

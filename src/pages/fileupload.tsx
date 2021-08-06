@@ -7,20 +7,17 @@ import {
   Container,
   Divider,
   Theme,
-  Grid,
-  Link
 } from '@material-ui/core'
 import { config } from 'config';
-import { getHealth } from 'services/dsb.service';
 import { getStorage } from 'services/storage.service';
 import { UploadContainer } from 'components/UploadFile/UploadContainer';
-import { ProxyCertificateContainer } from 'components/ProxyCertificate/ProxyCertificateContainer';
 import Header from 'components/Header/Header';
 import { DownloadContainer } from 'components/DownloadFile/DownloadContainer';
+import { DsbApiService } from 'services/dsb-api.service';
 
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const health = await getHealth()
+  const health = await DsbApiService.init().getHealth()
   const state = await getStorage()
   console.log('health', health, 'state', state)
   return {

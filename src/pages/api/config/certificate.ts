@@ -3,12 +3,15 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { Wallet } from 'ethers'
 import fs from 'fs/promises'
 import path from 'path'
-import { Result } from '../../../../utils'
+import { Result } from '../../../utils'
 
 export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse<Result<boolean, string>>
 ) {
+    if (req.method !== 'POST') {
+        return res.status(405).end()
+    }
     const { clientId, tenantId, clientSecret } = req.body
     if (!clientId || !tenantId || !clientSecret) {
         return res.status(400).json({ err: 'clientId, tenantId, clientSecret all required' })
@@ -22,7 +25,7 @@ export default async function handler(
         })
     } catch (err) {
         res.status(400).json({
-            err: `privateKey invalid: ${err.message}`
+            err: `Credentials invalid: ${err.message}`
         })
     }
 }

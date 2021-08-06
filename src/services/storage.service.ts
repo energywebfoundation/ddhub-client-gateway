@@ -1,7 +1,6 @@
 import { config } from 'config'
 import { promises as fs } from 'fs'
-import { ErrorCode, Result } from 'utils'
-import { BalanceState, RoleState } from './identity.service'
+import { BalanceState, ErrorCode, Option, Result, RoleState } from 'utils'
 
 export type Identity = {
     did: string
@@ -28,10 +27,7 @@ export type Storage = {
 
 export async function writeIdentity(identity: Identity): Promise<Result> {
     try {
-        const { ok: storage, err: storageError } = await getStorage()
-        if (!storage) {
-            return { err: storageError }
-        }
+        const { some: storage } = await getStorage()
         await fs.writeFile(
             config.storage.inMemoryDbFile,
             JSON.stringify({...storage, identity}, null, 2))
@@ -43,10 +39,7 @@ export async function writeIdentity(identity: Identity): Promise<Result> {
 
 export async function writeCertificate(certificate: Certificate): Promise<Result> {
     try {
-        const { ok: storage, err: storageError } = await getStorage()
-        if (!storage) {
-            return { err: storageError }
-        }
+        const { some: storage } = await getStorage()
         await fs.writeFile(
             config.storage.inMemoryDbFile,
             JSON.stringify({ ...storage, certificate }, null, 2))
@@ -56,14 +49,22 @@ export async function writeCertificate(certificate: Certificate): Promise<Result
     }
 }
 
-export async function getStorage(): Promise<Result<Storage>> {
+export async function getStorage(): Promise<Option<Storage>> {
     try {
         const contents = await fs.readFile(config.storage.inMemoryDbFile, 'utf-8')
         return {
-            ok: JSON.parse(contents)
+            some: JSON.parse(contents)
         }
     } catch (err) {
         console.log('Error reading storage:', err.message)
-        return { ok: {} }
+        return { none: true }
     }
+}
+
+export async function getIdentity(): Promise<Option<Identity>> {
+    const { some: storage } = await getStorage()
+    if (storage && storage.identity) {
+        return { some: storage.identity }
+    }
+    return { none: true }
 }

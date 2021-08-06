@@ -20,7 +20,7 @@ export const ProxyCertificateContainer = ({
         setError('')
         setIsLoading(true)
         try {
-            await axios.post('/api/config/credentials/proxy', {
+            await axios.post('/api/config/certificate', {
                 clientId,
                 tenantId,
                 clientSecret

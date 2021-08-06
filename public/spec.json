@@ -1,0 +1,266 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "DSB Client Gateway",
+    "description": "The DSB Client Gateway acts as an API Gateway to the Energy Web Decentralized Service Bus (DSB). It acts as a client to the DSB Message Broker, allowing it to publish and subscribe to messages on particular channels.",
+    "contact": {
+      "email": "dev@energyweb.org"
+    },
+    "version": "0.1.0"
+  },
+  "tags": [
+    {
+      "name": "config",
+      "description": "Manage the DSB Client Gateway as admin"
+    },
+    {
+      "name": "message",
+      "description": "Send and retrieve messages on the DSB"
+    }
+  ],
+  "paths": {
+    "/api/config/identity": {
+      "post": {
+        "tags": [
+          "config"
+        ],
+        "summary": "Sets the decentralized identity of the gateway, enroling it on to DSB",
+        "operationId": "createIdentity",
+        "requestBody": {
+          "description": "The private key which will be associated with the DID",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IdentityConfig"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "The DID was successfully created and enroled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdentityConfigSuccess"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error processing request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ]
+      }
+    },
+    "/api/message": {
+      "post": {
+        "tags": [
+          "message"
+        ],
+        "summary": "Send message on a DSB channel",
+        "operationId": "createMessage",
+        "requestBody": {
+          "description": "Unsigned message to be published on desired channel",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendMessage"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The message was successfully published",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SendMessageSuccess"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error processing request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "message"
+        ],
+        "summary": "Consume messages from a DSB channel",
+        "operationId": "getMessage",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "fqcn",
+            "required": true,
+            "description": "Fully Qualified Channel Name e.g. `test.channels.testapp.apps.testorganization.iam.ewc`",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "amount",
+            "required": false,
+            "default": 1,
+            "description": "Amount of messages that should be retrieved",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The array of messages",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetMessageSuccess"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error processing request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "IdentityConfig": {
+        "required": [
+          "privateKey"
+        ],
+        "type": "object",
+        "properties": {
+          "privateKey": {
+            "type": "string",
+            "description": "Ethereum compliant hex-encoded private key"
+          }
+        }
+      },
+      "IdentityConfigSuccess": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "$ref": "#/components/schemas/Identity"
+          }
+        }
+      },
+      "Identity": {
+        "type": "object",
+        "properties": {
+          "did": {
+            "type": "string"
+          }
+        }
+      },
+      "SendMessage": {
+        "type": "object",
+        "properties": {
+          "fqcn": {
+            "description": "Fully Qualified Channel Name e.g. `test.channels.testapp.apps.testorganization.iam.ewc`",
+            "type": "string"
+          },
+          "payload": {
+            "description": "Message data conforming to channel",
+            "type": "string"
+          }
+        }
+      },
+      "SendMessageSuccess": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "Message ID on the DSB",
+            "type": "string"
+          }
+        }
+      },
+      "GetMessageSuccess": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Message"
+        }
+      },
+      "Message": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "Message ID",
+            "type": "string"
+          },
+          "payload": {
+            "description": "The message data",
+            "type": "string"
+          },
+          "signature": {
+            "description": "Ethereum (secp256k1) Signature corresponding to the payload as signed by the private key of the sender",
+            "type": "string"
+          },
+          "sender": {
+            "description": "DID of the sender of the message",
+            "type": "string"
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "err": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "basicAuth": {
+        "type": "http",
+        "scheme": "basic"
+      }
+    }
+  }
+}
