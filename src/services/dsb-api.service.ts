@@ -1,5 +1,5 @@
 import { config } from "config"
-import { ErrorCode, joinUrl, Result, SendMessageData } from "utils"
+import { ErrorCode, GetMessageOptions, joinUrl, Message, Result, SendMessageData, SendMessageResult } from "utils"
 import { signProof } from "./identity.service"
 
 export class DsbApiService {
@@ -45,7 +45,7 @@ export class DsbApiService {
      *
      * @returns
      */
-    public async sendMessage(data: SendMessageData): Promise<Result<{ id: string }>> {
+    public async sendMessage(data: SendMessageData): Promise<Result<SendMessageResult>> {
         // todo: check enrolment complete
         try {
             if (!this.authToken) {
@@ -66,7 +66,7 @@ export class DsbApiService {
                 case 401:
                     throw Error(ErrorCode.DSB_UNAUTHORIZED)
                 default:
-                    console.log('DSB POST Message request failed', res.status, res.statusText)
+                    console.log('DSB POST /message error', res.status, res.statusText)
                     throw Error(ErrorCode.DSB_REQUEST_FAILED)
             }
         } catch (err) {
@@ -76,6 +76,41 @@ export class DsbApiService {
                     return { err }
                 }
                 return this.sendMessage(data)
+            }
+            return { err: err.message }
+        }
+    }
+
+    public async getMessages(options: GetMessageOptions): Promise<Result<Message[]>> {
+        try {
+            if (!this.authToken) {
+                throw Error(ErrorCode.DSB_UNAUTHORIZED)
+            }
+            const url = joinUrl(
+                config.dsb.baseUrl,
+                `message?fqcn=${options.fqcn}${options.amount ? `&amount=${options.amount}` : ''}`
+            )
+            const res = await fetch(url, {
+                headers: {
+                    'Authorization': `Bearer ${this.authToken}`,
+                },
+            })
+            switch (res.status) {
+                case 200:
+                    return { ok: await res.json() }
+                case 401:
+                    throw Error(ErrorCode.DSB_UNAUTHORIZED)
+                default:
+                    console.log('DSB GET /message error', res.status, res.statusText)
+                    throw Error(ErrorCode.DSB_REQUEST_FAILED)
+            }
+        } catch (err) {
+            if (err.message === ErrorCode.DSB_UNAUTHORIZED) {
+                const { ok, err } = await this.login()
+                if (!ok) {
+                    return { err }
+                }
+                return this.getMessages(options)
             }
             return { err: err.message }
         }

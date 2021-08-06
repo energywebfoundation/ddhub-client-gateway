@@ -8,22 +8,46 @@ export default async function handler(
 ) {
     switch (req.method) {
         case 'GET':
-            return res.status(501).end()
+            return forGET(req, res)
         case 'POST':
-            const { ok: signature, err: signError } = await signPayload(req.body.payload)
-            if (!signature) {
-                return res.status(400).send({ err: signError })
-            }
-            const { ok: sent, err: sentError } = await DsbApiService.init().sendMessage({
-                ...req.body,
-                signature
-            })
-            if (!sent) {
-                return res.status(400).send({ err: sentError })
-            }
-            return res.status(200).send(sent)
+            return forPOST(req, res)
         default:
             return res.status(405).end()
     }
 }
 
+/**
+ * Handles the GET /messages request
+ */
+async function forGET(
+    req: NextApiRequest,
+    res: NextApiResponse
+): Promise<void> {
+    // todo: validate request bodies/queries
+    const { ok: messages, err: reqError } = await DsbApiService.init().getMessages(req.query as any)
+    if (messages === undefined) {
+        return res.status(500).send({ err: reqError })
+    }
+    return res.status(200).send(messages)
+}
+
+/**
+ * Handles the POST /messages request
+ */
+async function forPOST(
+    req: NextApiRequest,
+    res: NextApiResponse
+): Promise<void> {
+    const { ok: signature, err: signError } = await signPayload(req.body.payload)
+    if (!signature) {
+        return res.status(400).send({ err: signError })
+    }
+    const { ok: sent, err: sendError } = await DsbApiService.init().sendMessage({
+        ...req.body,
+        signature
+    })
+    if (!sent) {
+        return res.status(400).send({ err: sendError })
+    }
+    return res.status(200).send(sent)
+}

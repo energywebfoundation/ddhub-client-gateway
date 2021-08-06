@@ -49,7 +49,7 @@
             }
           },
           "default": {
-            "description": "Error processing private key",
+            "description": "Error processing request",
             "content": {
               "application/json": {
                 "schema": {
@@ -95,7 +95,62 @@
             }
           },
           "default": {
-            "description": "Error processing message",
+            "description": "Error processing request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "message"
+        ],
+        "summary": "Consume messages from a DSB channel",
+        "operationId": "getMessage",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "fqcn",
+            "required": true,
+            "description": "Fully Qualified Channel Name e.g. `test.channels.testapp.apps.testorganization.iam.ewc`",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "amount",
+            "required": false,
+            "default": 1,
+            "description": "Amount of messages that should be retrieved",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The array of messages",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetMessageSuccess"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error processing request",
             "content": {
               "application/json": {
                 "schema": {
@@ -161,6 +216,33 @@
         "properties": {
           "id": {
             "description": "Message ID on the DSB",
+            "type": "string"
+          }
+        }
+      },
+      "GetMessageSuccess": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Message"
+        }
+      },
+      "Message": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "Message ID",
+            "type": "string"
+          },
+          "payload": {
+            "description": "The message data",
+            "type": "string"
+          },
+          "signature": {
+            "description": "Ethereum (secp256k1) Signature corresponding to the payload as signed by the private key of the sender",
+            "type": "string"
+          },
+          "sender": {
+            "description": "DID of the sender of the message",
             "type": "string"
           }
         }

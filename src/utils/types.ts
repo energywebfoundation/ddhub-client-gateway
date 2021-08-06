@@ -80,3 +80,19 @@ export type SendMessageData = {
     payload: string
     signature: string
 }
+
+export type SendMessageResult = {
+    id: string
+}
+
+export type GetMessageOptions = {
+    fqcn: string
+    amount?: number
+}
+
+export type Message = {
+    id: string
+    payload: string
+    sender: string
+    signature: string
+}
