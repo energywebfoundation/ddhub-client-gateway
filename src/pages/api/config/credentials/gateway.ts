@@ -40,13 +40,8 @@ export default async function handler(
             if (!persisted) {
                 throw persistError
             }
-            const { ok: broker, err: brokerError } = await initMessageBroker({
-                privateKey,
-                did: identity.did
-            })
-            if (!broker) {
-                throw brokerError
-            }
+            // fire and forget starting the message broker
+            await initMessageBroker({ privateKey, did: identity.did })
             return res.status(200).json({
                 ok: {
                     did: identity.did,
@@ -78,6 +73,8 @@ export default async function handler(
         if (!broker) {
             throw brokerError
         }
+        // fire and forget starting the message broker
+        await initMessageBroker({ privateKey, did: identity.did })
         return res.status(200).json({
             ok: {
                 did: identity.did,
