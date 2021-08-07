@@ -1,5 +1,6 @@
-import react, { useState } from 'react'
+import React, { useState } from 'react'
 import axios from 'axios'
+import swal from '@sweetalert/with-react'
 import { useErrors } from 'hooks/useErrors'
 import { GatewayIdentity } from './GatewayIdentity'
 import { BalanceState, Enrolment, EnrolmentState, Identity } from 'utils'
@@ -22,14 +23,12 @@ export const GatewayIdentityContainer = ({
 }: GatewayIdentityContainerProps) => {
     const errors = useErrors()
     const [isLoading, setIsLoading] = useState(false)
-    const [error, setError] = useState('')
     const [did, setDid] = useState(enrolment?.did ?? '')
     const [address, setAddress] = useState(identity?.address ?? '')
     const [balance, setBalance] = useState(hasFunds(identity?.balance))
     const [enroled, setEnroled] = useState<EnrolmentState | undefined>(enrolment?.state)
 
-    const handleSubmit = async (privateKey?: string) => {
-        setError('')
+    const handleCreate = async (privateKey?: string) => {
         setIsLoading(true)
         try {
             const body = privateKey ? { privateKey } : undefined
@@ -37,7 +36,19 @@ export const GatewayIdentityContainer = ({
             setAddress(res.data.address)
             setBalance(hasFunds(res.data.balance))
         } catch (err) {
-            setError(`Error: ${errors(err.response.data.err)}`)
+            swal('Private Key Error', errors(err.response.data.err), 'error')
+        }
+        setIsLoading(false)
+    }
+
+    const handleEnrol = async () => {
+        setIsLoading(true)
+        try {
+            const res = await axios.post('/api/config/enrol')
+            setDid(res.data.did)
+            setEnroled(res.data.state)
+        } catch (err) {
+            swal('Enrolment Error', errors(err.response.data.err), 'error')
         }
         setIsLoading(false)
     }
@@ -49,8 +60,8 @@ export const GatewayIdentityContainer = ({
             balance={balance}
             enroled={enroled}
             isLoading={isLoading}
-            error={error}
-            onSubmit={handleSubmit}
+            onCreate={handleCreate}
+            onEnrol={handleEnrol}
         />
     )
 }

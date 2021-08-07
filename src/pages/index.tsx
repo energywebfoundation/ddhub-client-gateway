@@ -15,16 +15,37 @@ import { GatewayIdentityContainer } from 'components/GatewayIdentity/GatewayIden
 import { ProxyCertificateContainer } from 'components/ProxyCertificate/ProxyCertificateContainer';
 import Header from 'components/Header/Header';
 import { DsbApiService } from 'services/dsb-api.service';
+import { shouldValidateBalance, validateBalance } from 'services/identity.service';
+import { Identity, Option, Storage } from 'utils';
 
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const health = await DsbApiService.init().getHealth()
   const state = await getStorage()
-  console.log('health', health, 'state', state)
+  let newState: Option<Storage> = { none: true }
+  // get latest balance and overwrite (ugly!)
+  if (state.some && shouldValidateBalance(state.some)) {
+    const address = state.some.identity?.address
+    if (address) {
+      const { ok: balance } = await validateBalance(address)
+      if (balance !== undefined) {
+        newState = {
+          some: {
+            ...state.some,
+            identity: {
+              ...state.some.identity as Identity,
+              balance
+            }
+          }
+        }
+      }
+    }
+  }
+  console.log('health', health, 'state', state, 'newState', newState)
   return {
     props: {
       health,
-      state
+      state: newState.none ? state : newState
     }
   }
 }

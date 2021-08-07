@@ -11,6 +11,7 @@ import {
     EnrolmentManager,
     Result,
     RoleState,
+    Storage,
 } from "utils"
 import { config } from 'config'
 import { getEnrolment, getIdentity, writeEnrolment } from './storage.service'
@@ -179,6 +180,14 @@ export function validatePrivateKey(privateKey: string): Result<Wallet> {
             err: new Error(ErrorCode.ID_INVALID_PRIVATE_KEY)
         }
     }
+}
+
+/**
+ * Checks if balance validation required (e.g. on server side rendering)
+ */
+export function shouldValidateBalance({ identity, enrolment }: Storage): boolean {
+    const alreadyEnroled = enrolment ? (enrolment.state.approved || enrolment.state.waiting) : false
+    return identity?.address ? !alreadyEnroled : false
 }
 
 /**

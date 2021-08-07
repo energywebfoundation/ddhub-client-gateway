@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Button, makeStyles, Theme, Typography } from '@material-ui/core'
 import InfoIcon from '@material-ui/icons/Info'
 import { CustomInput } from 'components/CustomInput/CustomInput'
-import { EnrolmentState } from 'utils'
+import { EnrolmentState, snip, StringType } from 'utils'
 
 type GatewayIdentityProps = {
     did?: string
@@ -10,8 +10,8 @@ type GatewayIdentityProps = {
     balance?: boolean
     enroled?: EnrolmentState
     isLoading: boolean
-    error: string
-    onSubmit: (privateKey?: string) => void
+    onCreate: (privateKey?: string) => void
+    onEnrol: () => void
 }
 
 export const GatewayIdentity = ({
@@ -20,29 +20,27 @@ export const GatewayIdentity = ({
     balance,
     enroled,
     isLoading,
-    error,
-    onSubmit
+    onCreate,
+    onEnrol
 }: GatewayIdentityProps) => {
     const classes = useStyles()
     const [privateKey, setPrivatekey] = useState('')
     const [statusText, setStatusText] = useState('')
-    const [showFundedButton, setShowFundedButton] = useState(false)
+    const [showEnrolButton, setShowEnrolButton] = useState(false)
 
     useEffect(() => {
-        if (address) {
-            if (!did) {
-                if (!balance) {
-                    setShowFundedButton(true)
-                    setStatusText('No funds')
-                } else {
-                    setStatusText('Missing DID')
-                }
+        if (enroled?.approved) {
+            return setStatusText('Enrolment complete')
+        }
+        if (enroled?.waiting) {
+            return setStatusText('Awaiting approval')
+        }
+        if (address && !did) {
+            setShowEnrolButton(true)
+            if (!balance) {
+                return setStatusText('Funds required')
             } else {
-                if (enroled?.approved) {
-                    setStatusText('Enroled')
-                } else {
-                    setStatusText('Awaiting enrolment approval')
-                }
+                return setStatusText('Ready to enrol')
             }
         }
     }, [did, address, balance, enroled])
@@ -64,7 +62,12 @@ export const GatewayIdentity = ({
                 {(did || address) && (
                     <div className={classes.description}>
                         <Typography variant="caption">ID</Typography>
-                        <Typography className={classes.id} variant="h6">{did || address}</Typography>
+                        <Typography
+                            className={classes.id}
+                            variant="h6"
+                        >
+                            {did ? snip(did, StringType.DID) : address}
+                        </Typography>
                     </div>
                 )}
 
@@ -78,35 +81,15 @@ export const GatewayIdentity = ({
                         />
                     </div>
 
-                    {showFundedButton && (
+                    {showEnrolButton && (
                         <Button
                             variant="outlined"
                             color="secondary"
                             fullWidth
                             disabled={isLoading}
-                            onClick={() => onSubmit()} // tood: need to "resume" i.e. use a different private key
-                            /**
-                             * Better API design
-                             *  - POST /identity { privateKey } - save private key
-                             *  - POST /identity                - generate private key
-                             *
-                             *      |-> saves + returns { address, publicKey, balance }
-                             *
-                             * - POST /enrol
-                             *
-                             *      |-> uses stored identity
-                             *      |-> fails if no identity set
-                             *      |-> fails if no balance (fetch again)
-                             *      \-> returns if already AWAITING_APPROVAL or APPROVED
-                             *      |-> creates listener for approval
-                             *
-                             *  - GET /enrol
-                             *
-                             *      |-> gets enrolment state
-                             *
-                             */
+                            onClick={() => onEnrol()} // tood: need to "resume" i.e. use a different private key
                         >
-                            I Have Funds
+                            Enrol
                         </Button>
                     )}
 
@@ -115,7 +98,7 @@ export const GatewayIdentity = ({
                         color="secondary"
                         fullWidth
                         disabled={isLoading}
-                        onClick={() => onSubmit()}
+                        onClick={() => onCreate()}
                     >
                         Generate Keys
                     </Button>
@@ -124,15 +107,13 @@ export const GatewayIdentity = ({
                         color="secondary"
                         fullWidth
                         disabled={isLoading}
-                        onClick={() => onSubmit(privateKey)}
+                        onClick={() => {
+                            setPrivatekey('')
+                            onCreate(privateKey)
+                        }}
                     >
                         Save
                     </Button>
-
-                    <div className={classes.errorText}>
-                        <Typography>{error}</Typography>
-                    </div>
-
                 </div>
             </div>
         </div>

@@ -27,7 +27,7 @@ export default function Header() {
                   EW-DSB Client Gateway
               </Typography>
               <Typography className={classes.version} variant="caption">
-                V 0.0.1
+                V 0.1.0
               </Typography>
             </div>
           </Toolbar>
@@ -46,7 +46,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     toolbar: {
       display: 'flex',
       justifyContent: 'space-between',
-  
+
       '& > div': {
         display: 'flex',
         alignItems: 'center'
@@ -65,4 +65,3 @@ const useStyles = makeStyles((theme: Theme) => ({
       background: theme.palette.secondary.main
     }
 }))
-  
