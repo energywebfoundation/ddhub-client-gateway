@@ -38,7 +38,7 @@ export const GatewayIdentity = ({
                     setStatusText('Missing DID')
                 }
             } else {
-                if (enroled?.ready) {
+                if (enroled?.approved) {
                     setStatusText('Enroled')
                 } else {
                     setStatusText('Awaiting enrolment approval')

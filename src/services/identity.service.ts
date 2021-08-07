@@ -14,6 +14,7 @@ import {
 } from "utils"
 import { config } from 'config'
 import { getEnrolment, getIdentity, writeEnrolment } from './storage.service'
+import { events } from "./events.service"
 
 const PARENT_NAMESPACE = config.iam.parentNamespace
 const USER_ROLE = `user.roles.${PARENT_NAMESPACE}`
@@ -108,35 +109,42 @@ export async function initEnrolment({
                     return { err: fetchError }
                 }
                 // cycle through claims to get overall enrolment status
-                const state = {
-                    ready: false,
-                    user: RoleState.NO_CLAIM,
-                    messagebroker: config.dsb.controllable ? RoleState.NO_CLAIM : RoleState.NOT_WANTED
+                const state: EnrolmentState = {
+                    approved: false,
+                    waiting: false,
+                    roles: {
+                        user: RoleState.NO_CLAIM,
+                        messagebroker: config.dsb.controllable ? RoleState.NO_CLAIM : RoleState.NOT_WANTED
+                    }
                 }
                 for (const { claimType, isAccepted } of claims) {
                     if (claimType === MESSAGEBROKER_ROLE) {
-                        state.messagebroker = isAccepted
+                        state.roles.messagebroker = isAccepted
                             ? RoleState.APPROVED
                             : RoleState.AWAITING_APPROVAL
                     }
                     if (claimType === USER_ROLE) {
-                        state.user = isAccepted
+                        state.roles.user = isAccepted
                             ? RoleState.APPROVED
                             : RoleState.AWAITING_APPROVAL
                     }
-                    state.ready = isReady(state)
+                    state.approved = isApproved(state)
+                    state.waiting = isWaiting(state)
+                    if (state.approved) {
+                        events.emit('approved')
+                    }
                 }
                 return { ok: state }
             },
-            handle: async (state: EnrolmentState) => {
-                if (state.messagebroker === RoleState.NO_CLAIM) {
+            handle: async ({ roles }: EnrolmentState) => {
+                if (roles.messagebroker === RoleState.NO_CLAIM) {
                     const { ok } = await createClaim(iam, MESSAGEBROKER_ROLE)
                     if (!ok) {
                         return { err: new Error(ErrorCode.ID_CREATE_MESSAGEBROKER_CLAIM_FAILED) }
                     }
 
                 }
-                if (state.user === RoleState.NO_CLAIM) {
+                if (roles.user === RoleState.NO_CLAIM) {
                     const { ok } = await createClaim(iam, USER_ROLE)
                     if (!ok) {
                         return { err: new Error(ErrorCode.ID_CREATE_USER_CLAIM_FAILED) }
@@ -281,9 +289,12 @@ async function createClaim(iam: IAM, claim: string): Promise<Result> {
  */
 async function listenForApproval(iam: IAM) {
     const state = {
-        ready: false,
-        user: RoleState.AWAITING_APPROVAL,
-        messagebroker: RoleState.AWAITING_APPROVAL
+        approved: false,
+        waiting: true,
+        roles: {
+            user: RoleState.AWAITING_APPROVAL,
+            messagebroker: RoleState.AWAITING_APPROVAL
+        }
     }
     console.log('Listening for role approval')
     const sub = await iam.subscribeTo({
@@ -298,22 +309,25 @@ async function listenForApproval(iam: IAM) {
                 console.log('Received claim has been issued:', claim.id)
                 if (claim.id === USER_ROLE) {
                     await iam.publishPublicClaim({ token: claim.issuedToken })
-                    state.user = RoleState.APPROVED
+                    state.roles.user = RoleState.APPROVED
                 }
                 if (config.dsb.controllable && claim.id === MESSAGEBROKER_ROLE) {
                     await iam.publishPublicClaim({ token: claim.issuedToken })
-                    state.user = RoleState.APPROVED
+                    state.roles.messagebroker = RoleState.APPROVED
                 }
             }
             // finish
-            if (state.user === RoleState.APPROVED) {
-                if (config.dsb.controllable && state.messagebroker !== RoleState.APPROVED) {
+            if (state.roles.user === RoleState.APPROVED) {
+                if (config.dsb.controllable && state.roles.messagebroker !== RoleState.APPROVED) {
                     // wait for approval
                     return
                 }
                 if (sub) {
-                    state.ready = isReady(state)
+                    console.log('Roles have been approved')
+                    state.approved = isApproved(state)
+                    state.waiting = false
                     await writeEnrolment({ state, did: claim.requester })
+                    events.emit('approved')
                     await iam.unsubscribeFrom(sub)
                 }
             }
@@ -322,13 +336,25 @@ async function listenForApproval(iam: IAM) {
 }
 
 /**
+ * Check approval state of claims based on MB controllable state
  *
- * @returns
+ * @returns true if is approved
  */
-function isReady(state: EnrolmentState): boolean {
+function isApproved({ roles }: EnrolmentState): boolean {
     return config.dsb.controllable
-        ? (state.messagebroker === RoleState.APPROVED) && (state.user === RoleState.APPROVED)
-        : state.user === RoleState.APPROVED
+        ? (roles.messagebroker === RoleState.APPROVED) && (roles.user === RoleState.APPROVED)
+        : roles.user === RoleState.APPROVED
+}
+
+/**
+ * Check wait state of claims based on MB controllable state
+ *
+ * @returns true if waiting
+ */
+function isWaiting({ roles }: EnrolmentState): boolean {
+    return config.dsb.controllable
+        ? (roles.messagebroker === RoleState.AWAITING_APPROVAL) || (roles.user === RoleState.AWAITING_APPROVAL)
+        : roles.user === RoleState.AWAITING_APPROVAL
 }
 
 /**

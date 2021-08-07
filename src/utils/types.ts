@@ -68,9 +68,12 @@ export enum BalanceState {
 }
 
 export type EnrolmentState = {
-    ready: boolean
-    user: RoleState
-    messagebroker: RoleState
+    approved: boolean
+    waiting: boolean
+    roles: {
+        user: RoleState
+        messagebroker: RoleState
+    }
 }
 
 export enum StringType {

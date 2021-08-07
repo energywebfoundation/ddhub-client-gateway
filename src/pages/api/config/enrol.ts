@@ -1,5 +1,4 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { initMessageBroker } from 'services/dsb.service'
 import { initEnrolment } from 'services/identity.service'
 import { getEnrolment, getIdentity } from 'services/storage.service'
 import { Enrolment, ErrorCode, errorExplainer } from 'utils'
@@ -53,7 +52,7 @@ async function forPOST(
         }
         const { some: enrolment } = await getEnrolment()
         // todo: check if already requested approval and return early
-        if (enrolment?.did && enrolment?.state.ready) {
+        if (enrolment?.did && (enrolment?.state.approved || enrolment?.state.waiting)) {
             throw Error(ErrorCode.ID_ALREADY_ENROLED)
         }
         const { ok: requestor, err: initError } = await initEnrolment(identity)
@@ -77,11 +76,6 @@ async function forPOST(
         if (!saved) {
             throw saveError
         }
-        // side effect: start message broker (if controllable)
-        await initMessageBroker({
-            privateKey: identity.privateKey,
-            did: requestor.did
-        })
         return res.status(200).send({
             did: requestor.did,
             state: newState
