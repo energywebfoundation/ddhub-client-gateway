@@ -28,11 +28,11 @@ async function forGET(
 ) {
     const { some: identity } = await getIdentity()
     if (!identity) {
-        return res.status(400).end({ err: ErrorCode.ID_NO_PRIVATE_KEY })
+        return res.status(400).send({ err: ErrorCode.ID_NO_PRIVATE_KEY })
     }
     const { some: enrolment } = await getEnrolment()
     if (!enrolment || !enrolment.did) {
-        return res.status(400).end({ err: ErrorCode.ID_NO_DID })
+        return res.status(400).send({ err: ErrorCode.ID_NO_DID })
     }
     return res.status(200).send(enrolment)
 }

@@ -30,9 +30,11 @@ export const GatewayIdentity = ({
 
     useEffect(() => {
         if (enroled?.approved) {
+            setShowEnrolButton(false)
             return setStatusText('Enrolment complete')
         }
         if (enroled?.waiting) {
+            setShowEnrolButton(false)
             return setStatusText('Awaiting approval')
         }
         if (address && !did) {
@@ -46,21 +48,22 @@ export const GatewayIdentity = ({
     }, [did, address, balance, enroled])
 
     return (
-        <div>
-            <div className={classes.credentials}>
+        <div className={classes.credentials}>
+            <div className={classes.formGroup}>
+
                 <div className={classes.credentialsHeader}>
                     <Typography variant="h6">GATEWAY IDENTITY</Typography>
                     <InfoIcon />
                 </div>
 
                 {statusText && (
-                    <div className={classes.description}>
+                    <div className={classes.formGroup}>
                         <Typography variant="caption">STATUS</Typography>
                         <Typography variant="h6">{statusText}</Typography>
                     </div>
                 )}
                 {(did || address) && (
-                    <div className={classes.description}>
+                    <div className={classes.formGroup}>
                         <Typography variant="caption">ID</Typography>
                         <Typography
                             className={classes.id}
@@ -71,50 +74,51 @@ export const GatewayIdentity = ({
                     </div>
                 )}
 
-                <div className={classes.form}>
-                    <div className={classes.formGroup}>
-                        <Typography variant="caption">PRIVATE KEY</Typography>
-                        <CustomInput
-                            fullWidth
-                            value={privateKey}
-                            onChange={(e) => setPrivatekey(e.target.value)}
-                        />
-                    </div>
-
-                    {showEnrolButton && (
-                        <Button
-                            variant="outlined"
-                            color="secondary"
-                            fullWidth
-                            disabled={isLoading}
-                            onClick={() => onEnrol()} // tood: need to "resume" i.e. use a different private key
-                        >
-                            Enrol
-                        </Button>
-                    )}
-
-                    <Button
-                        variant="outlined"
-                        color="secondary"
+                <div className={classes.formGroup}>
+                    <Typography variant="caption">PRIVATE KEY</Typography>
+                    <CustomInput
                         fullWidth
-                        disabled={isLoading}
-                        onClick={() => onCreate()}
-                    >
-                        Generate Keys
-                    </Button>
-                    <Button
-                        variant="outlined"
-                        color="secondary"
-                        fullWidth
-                        disabled={isLoading}
-                        onClick={() => {
-                            setPrivatekey('')
-                            onCreate(privateKey)
-                        }}
-                    >
-                        Save
-                    </Button>
+                        value={privateKey}
+                        onChange={(e) => setPrivatekey(e.target.value)}
+                    />
                 </div>
+            </div>
+            <div className={classes.buttonGroup}>
+
+                {showEnrolButton && (
+                    <Button
+                        variant="outlined"
+                        color="secondary"
+                        fullWidth
+                        disabled={isLoading}
+                        onClick={() => onEnrol()} // tood: need to "resume" i.e. use a different private key
+                    >
+                        Enrol
+                    </Button>
+                )}
+
+                <Button
+                    variant="outlined"
+                    color="secondary"
+                    fullWidth
+                    disabled={isLoading}
+                    onClick={() => onCreate()}
+                >
+                    Generate Keys
+                </Button>
+                <Button
+                    variant="outlined"
+                    color="secondary"
+                    fullWidth
+                    disabled={isLoading}
+                    onClick={() => {
+                        setPrivatekey('')
+                        onCreate(privateKey)
+                    }}
+                >
+                    Save
+                </Button>
+
             </div>
         </div>
     )
@@ -124,12 +128,17 @@ const useStyles = makeStyles((theme: Theme) => ({
     credentials: {
         border: '1px solid #fff',
         padding: '2rem',
+        height: '550px',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between'
     },
     credentialsHeader: {
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        color: '#fff'
+        color: '#fff',
+        marginBottom: '1rem'
     },
     description: {
         margin: '1rem 0',
@@ -138,19 +147,11 @@ const useStyles = makeStyles((theme: Theme) => ({
     id: {
         fontSize: '.9rem'
     },
-    form: {
-        marginTop: '1rem',
-
-        '& button': {
-            padding: '.7rem',
-            marginBottom: '1rem'
-        }
-    },
     formGroup: {
         display: 'flex',
         flexDirection: 'column',
         width: '100%',
-        marginBottom: '2rem',
+        marginBottom: '1.2rem',
 
         '& span': {
             fontSize: '.8rem',
@@ -163,7 +164,12 @@ const useStyles = makeStyles((theme: Theme) => ({
             width: '100%'
         }
     },
-    errorText: {
-        color: theme.palette.error.main
-    }
+    buttonGroup: {
+        marginTop: '1rem',
+
+        '& button': {
+            padding: '.7rem',
+            marginBottom: '1rem'
+        }
+    },
 }))

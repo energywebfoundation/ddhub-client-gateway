@@ -14,7 +14,7 @@ import {
     Storage,
 } from "utils"
 import { config } from 'config'
-import { getEnrolment, getIdentity, writeEnrolment } from './storage.service'
+import { getEnrolment, getIdentity, getStorage, writeEnrolment, writeIdentity } from './storage.service'
 import { events } from "./events.service"
 
 const PARENT_NAMESPACE = config.iam.parentNamespace
@@ -109,31 +109,9 @@ export async function initEnrolment({
                 if (!claims) {
                     return { err: fetchError }
                 }
-                // cycle through claims to get overall enrolment status
-                const state: EnrolmentState = {
-                    approved: false,
-                    waiting: false,
-                    roles: {
-                        user: RoleState.NO_CLAIM,
-                        messagebroker: config.dsb.controllable ? RoleState.NO_CLAIM : RoleState.NOT_WANTED
-                    }
-                }
-                for (const { claimType, isAccepted } of claims) {
-                    if (claimType === MESSAGEBROKER_ROLE) {
-                        state.roles.messagebroker = isAccepted
-                            ? RoleState.APPROVED
-                            : RoleState.AWAITING_APPROVAL
-                    }
-                    if (claimType === USER_ROLE) {
-                        state.roles.user = isAccepted
-                            ? RoleState.APPROVED
-                            : RoleState.AWAITING_APPROVAL
-                    }
-                    state.approved = isApproved(state)
-                    state.waiting = isWaiting(state)
-                    if (state.approved) {
-                        events.emit('approved')
-                    }
+                const state = readClaims(claims)
+                if (state.approved) {
+                    events.emit('approved')
                 }
                 return { ok: state }
             },
@@ -215,6 +193,45 @@ export async function validateBalance(address: string): Promise<Result<BalanceSt
 }
 
 /**
+ * Retrieve dynamic state (e.g. balance, claim status) as part of storage
+ */
+export async function refreshState(): Promise<Result<Storage>> {
+    const { some: storage } = await getStorage()
+    let newState: Storage = {}
+    if (storage?.identity?.address) {
+        const address = storage.identity.address
+        const { ok: balance, err: balanceError } = await validateBalance(address)
+        if (balance === undefined) {
+            return { err: balanceError }
+        }
+        newState.identity = {
+            ...storage.identity,
+            balance
+        }
+        await writeIdentity(newState.identity)
+    }
+    if (storage?.enrolment?.did) {
+        const { ok: iam, err: iamError } = await initIAM(storage.identity?.privateKey!!)
+        if (!iam) {
+            return { err: iamError }
+        }
+        const { ok: claims, err: claimsError } = await fetchClaims(iam, storage.enrolment.did)
+        if (!claims) {
+            return { err: claimsError }
+        }
+        newState.enrolment = {
+            ...storage.enrolment,
+            state: readClaims(claims)
+        }
+        await writeEnrolment(newState.enrolment)
+    }
+    if (storage?.certificate) {
+        newState.certificate = storage.certificate
+    }
+    return { ok: newState }
+}
+
+/**
  * Initialze IAM Client Library
  *
  * @param privateKey the identity controlling to the DID
@@ -251,10 +268,11 @@ async function initIAM(privateKey: string): Promise<Result<IAM>> {
  */
 async function fetchClaims(iam: IAM, did: string): Promise<Result<Claim[]>> {
     try {
-        const claims = (await iam.getClaimsBySubject({
+        console.log('Fetching claims for', did, 'on', PARENT_NAMESPACE)
+        const claims = await iam.getClaimsByRequester({
             did,
             parentNamespace: PARENT_NAMESPACE,
-        }))
+        })
         return { ok: claims }
     } catch (err) {
         console.log(`Failed to fetch claims for ${did}: ${err.message}`)
@@ -262,6 +280,39 @@ async function fetchClaims(iam: IAM, did: string): Promise<Result<Claim[]>> {
             err: new Error(ErrorCode.ID_FETCH_CLAIMS_FAILED)
         }
     }
+}
+
+/**
+ * Parse claim data to find out overall enrolment state
+ *
+ * @param claims list of claims from IAM Client Library
+ * @returns EnrolmentState
+ */
+function readClaims(claims: Claim[]): EnrolmentState {
+    // cycle through claims to get overall enrolment status
+    const state: EnrolmentState = {
+        approved: false,
+        waiting: false,
+        roles: {
+            user: RoleState.NO_CLAIM,
+            messagebroker: config.dsb.controllable ? RoleState.NO_CLAIM : RoleState.NOT_WANTED
+        }
+    }
+    for (const { claimType, isAccepted } of claims) {
+        if (claimType === MESSAGEBROKER_ROLE) {
+            state.roles.messagebroker = isAccepted
+                ? RoleState.APPROVED
+                : RoleState.AWAITING_APPROVAL
+        }
+        if (claimType === USER_ROLE) {
+            state.roles.user = isAccepted
+                ? RoleState.APPROVED
+                : RoleState.AWAITING_APPROVAL
+        }
+        state.approved = isApproved(state)
+        state.waiting = isWaiting(state)
+    }
+    return state
 }
 
 /**

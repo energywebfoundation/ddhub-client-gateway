@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Head from 'next/head';
 import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
+import swal from '@sweetalert/with-react'
 import { makeStyles } from '@material-ui/styles'
 import {
   Typography,
@@ -10,48 +11,35 @@ import {
   Grid,
   Link
 } from '@material-ui/core'
-import { getStorage } from 'services/storage.service';
 import { GatewayIdentityContainer } from 'components/GatewayIdentity/GatewayIdentityContainer';
 import { ProxyCertificateContainer } from 'components/ProxyCertificate/ProxyCertificateContainer';
 import Header from 'components/Header/Header';
 import { DsbApiService } from 'services/dsb-api.service';
-import { shouldValidateBalance, validateBalance } from 'services/identity.service';
-import { Identity, Option, Storage } from 'utils';
-
+import { refreshState } from 'services/identity.service';
+import { useErrors } from 'hooks/useErrors';
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const health = await DsbApiService.init().getHealth()
-  const state = await getStorage()
-  let newState: Option<Storage> = { none: true }
-  // get latest balance and overwrite (ugly!)
-  if (state.some && shouldValidateBalance(state.some)) {
-    const address = state.some.identity?.address
-    if (address) {
-      const { ok: balance } = await validateBalance(address)
-      if (balance !== undefined) {
-        newState = {
-          some: {
-            ...state.some,
-            identity: {
-              ...state.some.identity as Identity,
-              balance
-            }
-          }
-        }
-      }
-    }
-  }
-  console.log('health', health, 'state', state, 'newState', newState)
+  const state = await refreshState()
+  console.log('health', health, 'state', state)
   return {
     props: {
       health,
-      state: newState.none ? state : newState
+      state,
     }
   }
 }
 
 export default function Home({ health, state }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const classes = useStyles()
+  const errors = useErrors()
+
+  useEffect(() => {
+    if (health.err) {
+      swal('Error', errors(health.err), 'error')
+    }
+  }, [health, state, errors])
+
 
   return (
     <div>
@@ -86,12 +74,12 @@ export default function Home({ health, state }: InferGetServerSidePropsType<type
             <Grid container spacing={3}>
               <Grid item xs={12} md={6}>
                 <GatewayIdentityContainer
-                  identity={state.some?.identity}
-                  enrolment={state.some?.enrolment}
+                  identity={state.ok?.identity}
+                  enrolment={state.ok?.enrolment}
                 />
               </Grid>
               <Grid item xs={12} md={6}>
-                <ProxyCertificateContainer certificate={state.some?.certificate} />
+                <ProxyCertificateContainer certificate={state.ok?.certificate} />
               </Grid>
             </Grid>
           </section>
