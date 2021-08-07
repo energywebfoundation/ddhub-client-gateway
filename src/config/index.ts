@@ -1,10 +1,11 @@
 import path from 'path'
-import { DsbControlType } from 'utils'
+import { DsbControlType } from 'utils/types'
 
 const defaults = {
     chainId: '73799',
     rpcUrl: 'https://volta-rpc.energyweb.org/',
     cacheServerUrl: 'https://identitycache-dev.energyweb.org/',
+    eventServerUrl: 'https://identityevents-dev.energyweb.org/',
     inMemoryDbFilename: 'in-memory.json',
     parentNamespace: 'dsb.apps.energyweb.iam.ewc',
     dsbBaseUrl: 'http://dsb-dev.energyweb.org',
@@ -22,6 +23,7 @@ export const config = {
         chainId: parseInt(process.env.CHAIN_ID ?? defaults.chainId, 10),
         rpcUrl: process.env.RPC_URL ?? defaults.rpcUrl,
         cacheServerUrl: process.env.CACHE_SERVER_URL ?? defaults.cacheServerUrl,
+        eventServerUrl: process.env.EVENT_SERVER_URL ?? defaults.eventServerUrl,
         parentNamespace:
             process.env.PARENT_NAMESPACE ?? defaults.parentNamespace
     },

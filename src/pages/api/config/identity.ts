@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { BalanceState, ErrorCode, errorExplainer } from 'utils'
 import { Wallet } from 'ethers'
 import { validateBalance, validatePrivateKey } from 'services/identity.service'
-import { getIdentity, writeIdentity } from 'services/storage.service'
+import { deleteEnrolment, getIdentity, writeIdentity } from 'services/storage.service'
 
 type Response = {
     address: string
@@ -75,6 +75,7 @@ async function forPOST(
         if (!saved) {
             throw saveError
         }
+        await deleteEnrolment()
         return res.status(200).send(publicIdentity)
     } catch (err) {
         const status = errorExplainer[err.message]?.status ?? 500

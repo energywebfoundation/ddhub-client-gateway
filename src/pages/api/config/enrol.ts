@@ -34,6 +34,7 @@ async function forGET(
     if (!enrolment || !enrolment.did) {
         return res.status(400).send({ err: ErrorCode.ID_NO_DID })
     }
+    // todo: refresh state
     return res.status(200).send(enrolment)
 }
 
@@ -50,11 +51,6 @@ async function forPOST(
         if (!identity) {
             throw Error(ErrorCode.ID_NO_PRIVATE_KEY)
         }
-        const { some: enrolment } = await getEnrolment()
-        // todo: check if already requested approval and return early
-        if (enrolment?.did && (enrolment?.state.approved || enrolment?.state.waiting)) {
-            throw Error(ErrorCode.ID_ALREADY_ENROLED)
-        }
         const { ok: requestor, err: initError } = await initEnrolment(identity)
         if (!requestor) {
             throw initError
@@ -62,6 +58,10 @@ async function forPOST(
         const { ok: state, err: stateError } = await requestor.getState()
         if (!state) {
             throw stateError
+        }
+        if (state.approved || state.waiting) {
+            await requestor.save(state)
+            throw Error(ErrorCode.ID_ALREADY_ENROLED)
         }
         const { ok: enroled, err: enrolError } = await requestor.handle(state)
         if (!enroled) {

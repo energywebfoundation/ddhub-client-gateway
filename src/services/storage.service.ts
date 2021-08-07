@@ -79,3 +79,20 @@ export async function getCertificate(): Promise<Option<Certificate>> {
     }
     return { none: true }
 }
+
+// DELETE STATE
+
+export async function deleteEnrolment(): Promise<Result> {
+    const { some: storage } = await getStorage()
+    if (storage?.enrolment) {
+        try {
+            await fs.writeFile(
+                config.storage.inMemoryDbFile,
+                JSON.stringify({ ...storage, enrolment: undefined }, null, 2))
+            return { ok: true }
+        } catch (err) {
+            return { err: new Error(ErrorCode.DISK_PERSIST_FAILED) }
+        }
+    }
+    return { ok: true }
+}

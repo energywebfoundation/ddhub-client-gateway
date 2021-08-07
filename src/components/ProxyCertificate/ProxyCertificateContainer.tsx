@@ -26,6 +26,7 @@ export const ProxyCertificateContainer = ({
                 tenantId,
                 clientSecret
             })
+            swal('Success', 'Certificate saved', 'success')
         } catch (err) {
             swal('Error', errors(err.response.data.err), 'error')
         }

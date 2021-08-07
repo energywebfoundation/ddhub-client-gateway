@@ -3,6 +3,7 @@ import { Button, makeStyles, Theme, Typography } from '@material-ui/core'
 import InfoIcon from '@material-ui/icons/Info'
 import { CustomInput } from 'components/CustomInput/CustomInput'
 import { EnrolmentState, snip, StringType } from 'utils'
+import swal from 'sweetalert'
 
 type GatewayIdentityProps = {
     did?: string
@@ -102,7 +103,10 @@ export const GatewayIdentity = ({
                     color="secondary"
                     fullWidth
                     disabled={isLoading}
-                    onClick={() => onCreate()}
+                    onClick={() => {
+                        setPrivatekey('')
+                        onCreate()
+                    }}
                 >
                     Generate Keys
                 </Button>
@@ -112,6 +116,9 @@ export const GatewayIdentity = ({
                     fullWidth
                     disabled={isLoading}
                     onClick={() => {
+                        if (!privateKey) {
+                            return swal('Error', 'No private key set', 'error')
+                        }
                         setPrivatekey('')
                         onCreate(privateKey)
                     }}

@@ -1,7 +1,6 @@
 import { BigNumber, providers, utils, Wallet } from "ethers"
 import { IAM, RegistrationTypes, setCacheClientOptions } from "iam-client-lib"
 import { Claim } from "iam-client-lib/dist/src/cacheServerClient/cacheServerClient.types"
-import { IClaimIssuance } from "iam-client-lib/dist/src/iam"
 import { parseEther } from 'ethers/lib/utils'
 import {
     BalanceState,
@@ -12,14 +11,13 @@ import {
     Result,
     RoleState,
     Storage,
+    MESSAGEBROKER_ROLE,
+    USER_ROLE,
+    PARENT_NAMESPACE,
 } from "utils"
 import { config } from 'config'
 import { getEnrolment, getIdentity, getStorage, writeEnrolment, writeIdentity } from './storage.service'
 import { events } from "./events.service"
-
-const PARENT_NAMESPACE = config.iam.parentNamespace
-const USER_ROLE = `user.roles.${PARENT_NAMESPACE}`
-const MESSAGEBROKER_ROLE = `messagebroker.roles.${PARENT_NAMESPACE}`
 
 /**
  * Signs proof of private key ownership with current block to prevent replay attacks
@@ -110,6 +108,9 @@ export async function initEnrolment({
                     return { err: fetchError }
                 }
                 const state = readClaims(claims)
+                if (state.waiting) {
+                    events.emit('awaiting_approval', iam)
+                }
                 if (state.approved) {
                     events.emit('approved')
                 }
@@ -130,7 +131,7 @@ export async function initEnrolment({
                     }
                 }
                 // setup subscriber for claim approval events
-                await listenForApproval(iam)
+                events.emit('await_approval', iam)
                 return { ok: true }
             },
             save: async (state: EnrolmentState) => {
@@ -237,7 +238,7 @@ export async function refreshState(): Promise<Result<Storage>> {
  * @param privateKey the identity controlling to the DID
  * @returns initialized IAM object
  */
-async function initIAM(privateKey: string): Promise<Result<IAM>> {
+export async function initIAM(privateKey: string): Promise<Result<IAM>> {
     try {
         const iam = new IAM({
             privateKey,
@@ -343,64 +344,11 @@ async function createClaim(iam: IAM, claim: string): Promise<Result> {
 }
 
 /**
- * Sets up a listener for approved role claims. Exits once done.
- *
- * @param iam initialized IAM object
- */
-async function listenForApproval(iam: IAM) {
-    const state = {
-        approved: false,
-        waiting: true,
-        roles: {
-            user: RoleState.AWAITING_APPROVAL,
-            messagebroker: RoleState.AWAITING_APPROVAL
-        }
-    }
-    console.log('Listening for role approval')
-    const sub = await iam.subscribeTo({
-        messageHandler: async (message) => {
-            console.log('Received identity event:', message)
-            if (message.requester !== iam.getDid()) {
-                return
-            }
-            // cast to IClaimIssuance so we can access token (if it exists)
-            const claim = message as IClaimIssuance
-            if (claim.issuedToken) {
-                console.log('Received claim has been issued:', claim.id)
-                if (claim.id === USER_ROLE) {
-                    await iam.publishPublicClaim({ token: claim.issuedToken })
-                    state.roles.user = RoleState.APPROVED
-                }
-                if (config.dsb.controllable && claim.id === MESSAGEBROKER_ROLE) {
-                    await iam.publishPublicClaim({ token: claim.issuedToken })
-                    state.roles.messagebroker = RoleState.APPROVED
-                }
-            }
-            // finish
-            if (state.roles.user === RoleState.APPROVED) {
-                if (config.dsb.controllable && state.roles.messagebroker !== RoleState.APPROVED) {
-                    // wait for approval
-                    return
-                }
-                if (sub) {
-                    console.log('Roles have been approved')
-                    state.approved = isApproved(state)
-                    state.waiting = false
-                    await writeEnrolment({ state, did: claim.requester })
-                    events.emit('approved')
-                    await iam.unsubscribeFrom(sub)
-                }
-            }
-        }
-    })
-}
-
-/**
  * Check approval state of claims based on MB controllable state
  *
  * @returns true if is approved
  */
-function isApproved({ roles }: EnrolmentState): boolean {
+export function isApproved({ roles }: EnrolmentState): boolean {
     return config.dsb.controllable
         ? (roles.messagebroker === RoleState.APPROVED) && (roles.user === RoleState.APPROVED)
         : roles.user === RoleState.APPROVED

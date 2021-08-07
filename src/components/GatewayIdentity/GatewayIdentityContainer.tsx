@@ -35,8 +35,15 @@ export const GatewayIdentityContainer = ({
             const res = await axios.post('/api/config/identity', body)
             setAddress(res.data.address)
             setBalance(hasFunds(res.data.balance))
+            setDid('')
+            setEnroled(undefined)
+            swal(
+                'Success',
+                'Private key saved. If not already funded, visit https://voltafaucet.energyweb.org/',
+                'success'
+            )
         } catch (err) {
-            swal('Private Key Error', errors(err.response.data.err), 'error')
+            swal('Error', errors(err.response.data.err), 'error')
         }
         setIsLoading(false)
     }

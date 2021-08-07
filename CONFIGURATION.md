@@ -100,6 +100,13 @@ can be expensive to rely only on querying smart contract data).
 
 **Default**: `https://identitycache-dev.energyweb.org/`
 
+### `EVENT_SERVER_URL` [optional]
+
+Sets the Energy Web IAM events server URL, used to receive notification of
+approved DSB role claims.
+
+**Default**: `https://identityevents-dev.energyweb.org/`
+
 ### `PARENT_NAMESPACE` [optional]
 
 Sets the Energy Web IAM application namespace. DSB related roles, such as
