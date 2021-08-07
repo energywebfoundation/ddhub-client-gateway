@@ -1,28 +1,10 @@
 import { config } from 'config'
 import { promises as fs } from 'fs'
-import { BalanceState, EnrolmentState, ErrorCode, Option, Result, RoleState } from 'utils'
+import { Certificate, Enrolment, ErrorCode, Identity, Option, Result, Storage } from 'utils'
 
-export type Identity = {
-    did: string
-    address: string
-    publicKey: string
-    privateKey: string
-    balance: BalanceState
-    state: EnrolmentState
-}
+// SETTERS
 
-export type Certificate = {
-    clientId: string
-    tenantId: string
-    clientSecret: string
-}
-
-export type Storage = {
-    identity?: Identity
-    certificate?: Certificate
-}
-
-export async function writePartialIdentity(identity: Partial<Identity>): Promise<Result> {
+export async function writeIdentity(identity: Identity): Promise<Result> {
     try {
         const { some: storage } = await getStorage()
         await fs.writeFile(
@@ -34,9 +16,19 @@ export async function writePartialIdentity(identity: Partial<Identity>): Promise
     }
 }
 
-export async function writeIdentity(identity: Identity): Promise<Result> {
-    return writePartialIdentity(identity)
+
+export async function writeEnrolment(enrolment: Enrolment): Promise<Result> {
+    try {
+        const { some: storage } = await getStorage()
+        await fs.writeFile(
+            config.storage.inMemoryDbFile,
+            JSON.stringify({ ...storage, enrolment }, null, 2))
+        return { ok: true }
+    } catch (err) {
+        return { err: new Error(ErrorCode.DISK_PERSIST_FAILED) }
+    }
 }
+
 
 export async function writeCertificate(certificate: Certificate): Promise<Result> {
     try {
@@ -49,6 +41,8 @@ export async function writeCertificate(certificate: Certificate): Promise<Result
         return { err: new Error(ErrorCode.DISK_PERSIST_FAILED) }
     }
 }
+
+// GETTERS
 
 export async function getStorage(): Promise<Option<Storage>> {
     try {
@@ -66,6 +60,22 @@ export async function getIdentity(): Promise<Option<Identity>> {
     const { some: storage } = await getStorage()
     if (storage && storage.identity) {
         return { some: storage.identity }
+    }
+    return { none: true }
+}
+
+export async function getEnrolment(): Promise<Option<Enrolment>> {
+    const { some: storage } = await getStorage()
+    if (storage && storage.enrolment) {
+        return { some: storage.enrolment }
+    }
+    return { none: true }
+}
+
+export async function getCertificate(): Promise<Option<Certificate>> {
+    const { some: storage } = await getStorage()
+    if (storage && storage.certificate) {
+        return { some: storage.certificate }
     }
     return { none: true }
 }

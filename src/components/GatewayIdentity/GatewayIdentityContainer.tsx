@@ -2,11 +2,11 @@ import react, { useState } from 'react'
 import axios from 'axios'
 import { useErrors } from 'hooks/useErrors'
 import { GatewayIdentity } from './GatewayIdentity'
-import { BalanceState, EnrolmentState } from 'utils'
-import { Identity } from 'services/storage.service'
+import { BalanceState, Enrolment, EnrolmentState, Identity } from 'utils'
 
 type GatewayIdentityContainerProps = {
     identity?: Identity
+    enrolment?: Enrolment
 }
 
 const hasFunds = (balance?: BalanceState) => {
@@ -17,15 +17,16 @@ const hasFunds = (balance?: BalanceState) => {
 }
 
 export const GatewayIdentityContainer = ({
-    identity
+    identity,
+    enrolment
 }: GatewayIdentityContainerProps) => {
     const errors = useErrors()
     const [isLoading, setIsLoading] = useState(false)
     const [error, setError] = useState('')
-    const [did, setDid] = useState(identity?.did ?? '')
+    const [did, setDid] = useState(enrolment?.did ?? '')
     const [address, setAddress] = useState(identity?.address ?? '')
     const [balance, setBalance] = useState(hasFunds(identity?.balance))
-    const [enrolment, setEnrolment] = useState<EnrolmentState | undefined>(identity?.state)
+    const [enroled, setEnroled] = useState<EnrolmentState | undefined>(enrolment?.state)
 
     const handleSubmit = async (privateKey?: string) => {
         setError('')
@@ -33,10 +34,8 @@ export const GatewayIdentityContainer = ({
         try {
             const body = privateKey ? { privateKey } : undefined
             const res = await axios.post('/api/config/identity', body)
-            setDid(res.data.did)
             setAddress(res.data.address)
             setBalance(hasFunds(res.data.balance))
-            setEnrolment(res.data.state)
         } catch (err) {
             setError(`Error: ${errors(err.response.data.err)}`)
         }
@@ -48,7 +47,7 @@ export const GatewayIdentityContainer = ({
             did={did}
             address={address}
             balance={balance}
-            enrolment={enrolment}
+            enroled={enroled}
             isLoading={isLoading}
             error={error}
             onSubmit={handleSubmit}

@@ -1,100 +1,83 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { BalanceState, RoleState, errorExplainer, ErrorCode } from 'utils'
+import { BalanceState, ErrorCode, errorExplainer } from 'utils'
 import { Wallet } from 'ethers'
-import { initIdentity } from 'services/identity.service'
-import { initMessageBroker } from 'services/dsb.service'
-import { getIdentity } from 'services/storage.service'
+import { validateBalance, validatePrivateKey } from 'services/identity.service'
+import { getIdentity, writeIdentity } from 'services/storage.service'
 
 type Response = {
-    did?: string
     address: string
     publicKey: string
     balance: BalanceState,
-    status?: {
-        user: RoleState,
-        messagebroker: RoleState
-    }
 } | { err: string }
 
 export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse<Response>
 ) {
-    try {
-        if (req.method !== 'POST') {
+    switch (req.method) {
+        case 'GET':
+            return forGET(req, res)
+        case 'POST':
+            return forPOST(req, res)
+        default:
             return res.status(405).end()
-        }
-        // take optional private key or generate a new one
+    }
+}
+
+/**
+ * Get identity stored on file
+ */
+async function forGET(
+    req: NextApiRequest,
+    res: NextApiResponse<Response>
+) {
+    const { some: identity } = await getIdentity()
+    if (!identity) {
+        return res.status(404).end()
+    }
+    const { ok: balance } = await validateBalance(identity.address)
+    if (balance === undefined) {
+        return res.status(500).send({ err: ErrorCode.ID_BALANCE_CHECK_FAILED })
+    }
+    return res.status(200).send({
+        address: identity.address,
+        publicKey: identity.publicKey,
+        balance
+    })
+}
+
+/**
+ * Set the identity, given a private key or else generated
+ */
+async function forPOST(
+    req: NextApiRequest,
+    res: NextApiResponse<Response>
+) {
+    try {
         const privateKey = req.body?.privateKey ?? Wallet.createRandom().privateKey
-        const { ok: identity, err: initError } = await initIdentity(privateKey)
+        const { ok: identity, err: identityError } = validatePrivateKey(privateKey)
         if (!identity) {
-            if (initError?.message === ErrorCode.ID_NO_BALANCE) {
-                const { some: identity } = await getIdentity()
-                if (!identity) {
-                    throw Error(ErrorCode.DISK_PERSIST_FAILED)
-                }
-                return res.status(200).json({
-                    address: identity.address,
-                    publicKey: identity.publicKey,
-                    balance: identity.balance
-                })
-            }
-            throw initError
+            throw identityError
         }
-        // get current state to know which claims need enrolment
-        const { ok: state, err: stateError } = await identity.getEnrolmentState()
-        if (!state) {
-            throw stateError
+        const { ok: balance, err: balanceError } = await validateBalance(identity.address)
+        if (balance === undefined) {
+            throw balanceError
         }
-        // exit early if already approved
-        if (state.ready) {
-            const { ok: persisted, err: persistError } = await identity.save(state)
-            if (!persisted) {
-                throw persistError
-            }
-            // fire and forget starting the message broker
-            await initMessageBroker({ privateKey, did: identity.did })
-            return res.status(200).json({
-                did: identity.did,
-                address: identity.address,
-                publicKey: identity.publicKey,
-                balance: identity.balance,
-                status: state
-            })
-        }
-        // create messagebroker + user claims
-        const { ok: enroled, err: enrolError } = await identity.handleEnrolement(state)
-        if (!enroled) {
-            throw enrolError
-        }
-        // fetch the state again based on new enrolments
-        const { ok: newState, err: newStateError } = await identity.getEnrolmentState()
-        if (!newState) {
-            throw newStateError
-        }
-        // persist the current state
-        const { ok: persisted, err: persistError } = await identity.save(newState)
-        if (!persisted) {
-            throw persistError
-        }
-        const { ok: broker, err: brokerError } = await initMessageBroker({
-            privateKey,
-            did: identity.did
-        })
-        if (!broker) {
-            throw brokerError
-        }
-        // fire and forget starting the message broker
-        await initMessageBroker({ privateKey, did: identity.did })
-        return res.status(200).json({
-            did: identity.did,
+        const publicIdentity = {
             address: identity.address,
             publicKey: identity.publicKey,
-            balance: identity.balance,
-            status: newState
+            balance
+        }
+        const { ok: saved, err: saveError } = await writeIdentity({
+            ...publicIdentity,
+            privateKey
         })
+        if (!saved) {
+            throw saveError
+        }
+        return res.status(200).send(publicIdentity)
     } catch (err) {
         const status = errorExplainer[err.message]?.status ?? 500
-        return res.status(status).json({ err: err.message })
+        return res.status(status).send({ err: err.message })
     }
 }

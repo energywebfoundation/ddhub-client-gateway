@@ -10,7 +10,6 @@ import {
   Grid,
   Link
 } from '@material-ui/core'
-import { config } from 'config';
 import { getStorage } from 'services/storage.service';
 import { GatewayIdentityContainer } from 'components/GatewayIdentity/GatewayIdentityContainer';
 import { ProxyCertificateContainer } from 'components/ProxyCertificate/ProxyCertificateContainer';
@@ -65,7 +64,10 @@ export default function Home({ health, state }: InferGetServerSidePropsType<type
           <section className={classes.main}>
             <Grid container spacing={3}>
               <Grid item xs={12} md={6}>
-                <GatewayIdentityContainer identity={state.some?.identity} />
+                <GatewayIdentityContainer
+                  identity={state.some?.identity}
+                  enrolment={state.some?.enrolment}
+                />
               </Grid>
               <Grid item xs={12} md={6}>
                 <ProxyCertificateContainer certificate={state.some?.certificate} />

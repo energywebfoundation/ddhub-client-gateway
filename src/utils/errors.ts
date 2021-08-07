@@ -17,6 +17,7 @@ export enum ErrorCode {
     ID_NO_DID = 'ID::NO_DID',
     ID_BALANCE_CHECK_FAILED = 'ID::BALANCE_CHECK_FAILED',
     ID_NO_BALANCE = 'ID::NO_BALANCE',
+    ID_ALREADY_ENROLED = 'ID::ALREADY_ENROLED',
 
     // DSB ERRORS
     DSB_NOT_CONTROLLABLE = 'DSB::NOT_CONTROLLABLE',
@@ -79,6 +80,10 @@ export const errorExplainer: { [key: string]: { status: number, text: string} } 
     [ErrorCode.ID_NO_BALANCE]: {
         status: 500,
         text:'Account has no funds'
+    },
+    [ErrorCode.ID_ALREADY_ENROLED]: {
+        status: 400,
+        text: 'DID has already been enroled'
     }
 }
 

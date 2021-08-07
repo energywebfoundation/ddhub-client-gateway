@@ -2,13 +2,13 @@ import React, { useEffect, useState } from 'react'
 import { Button, makeStyles, Theme, Typography } from '@material-ui/core'
 import InfoIcon from '@material-ui/icons/Info'
 import { CustomInput } from 'components/CustomInput/CustomInput'
-import { EnrolmentState, snip, StringType } from 'utils'
+import { EnrolmentState } from 'utils'
 
 type GatewayIdentityProps = {
     did?: string
     address: string
     balance?: boolean
-    enrolment?: EnrolmentState
+    enroled?: EnrolmentState
     isLoading: boolean
     error: string
     onSubmit: (privateKey?: string) => void
@@ -18,7 +18,7 @@ export const GatewayIdentity = ({
     did,
     address,
     balance,
-    enrolment,
+    enroled,
     isLoading,
     error,
     onSubmit
@@ -38,14 +38,14 @@ export const GatewayIdentity = ({
                     setStatusText('Missing DID')
                 }
             } else {
-                if (enrolment?.ready) {
+                if (enroled?.ready) {
                     setStatusText('Enroled')
                 } else {
                     setStatusText('Awaiting enrolment approval')
                 }
             }
         }
-    }, [did, address, balance, enrolment])
+    }, [did, address, balance, enroled])
 
     return (
         <div>
@@ -84,7 +84,27 @@ export const GatewayIdentity = ({
                             color="secondary"
                             fullWidth
                             disabled={isLoading}
-                            onClick={() => onSubmit()}
+                            onClick={() => onSubmit()} // tood: need to "resume" i.e. use a different private key
+                            /**
+                             * Better API design
+                             *  - POST /identity { privateKey } - save private key
+                             *  - POST /identity                - generate private key
+                             *
+                             *      |-> saves + returns { address, publicKey, balance }
+                             *
+                             * - POST /enrol
+                             *
+                             *      |-> uses stored identity
+                             *      |-> fails if no identity set
+                             *      |-> fails if no balance (fetch again)
+                             *      \-> returns if already AWAITING_APPROVAL or APPROVED
+                             *      |-> creates listener for approval
+                             *
+                             *  - GET /enrol
+                             *
+                             *      |-> gets enrolment state
+                             *
+                             */
                         >
                             I Have Funds
                         </Button>
