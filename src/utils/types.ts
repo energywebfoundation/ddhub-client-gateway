@@ -55,10 +55,10 @@ export type Message = {
 }
 
 export enum RoleState {
-    NO_CLAIM,
-    AWAITING_APPROVAL,
-    APPROVED,
-    NOT_WANTED, // if gateway is not controlling message broker
+    NO_CLAIM = 'NO_CLAIM',
+    AWAITING_APPROVAL = 'AWAITING_APPROVAL',
+    APPROVED = 'APPROVED',
+    NOT_WANTED = 'NOT_WANTED', // if gateway is not controlling message broker
 }
 
 export enum BalanceState {

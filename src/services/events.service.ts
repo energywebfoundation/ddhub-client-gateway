@@ -89,6 +89,10 @@ events.on('await_approval', async (iam: IAM) => {
 })
 
 events.on('approved', async () => {
+    // TODO: it could be the case that there was no subscription at the time of
+    // claim approval (see event above) - in such a case the subject would need
+    // to manually sync the document in Switchboard. We could check here whether
+    // the claim has been synced to the document and do so if not.
     console.log('Running approved enrolment job')
     const { some: identity } = await getIdentity()
     if (!identity) {

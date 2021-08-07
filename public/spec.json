@@ -10,19 +10,22 @@
   },
   "tags": [
     {
-      "name": "config",
+      "name": "Config",
       "description": "Manage the DSB Client Gateway as admin"
     },
     {
-      "name": "message",
+      "name": "Message",
       "description": "Send and retrieve messages on the DSB"
+    },
+    {
+      "name": "Other"
     }
   ],
   "paths": {
     "/api/config/identity": {
       "post": {
         "tags": [
-          "config"
+          "Config"
         ],
         "summary": "Sets the decentralized identity of the gateway, enroling it on to DSB",
         "operationId": "createIdentity",
@@ -34,16 +37,15 @@
                 "$ref": "#/components/schemas/IdentityConfig"
               }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
           "200": {
-            "description": "The DID was successfully created and enroled",
+            "description": "The private key was accepted and saved.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/IdentityConfigSuccess"
+                  "$ref": "#/components/schemas/Identity"
                 }
               }
             }
@@ -52,6 +54,9 @@
             "description": "Error processing request",
             "content": {
               "application/json": {
+                "example": {
+                  "err": "ID::INVALID_PRIVATE_KEY"
+                },
                 "schema": {
                   "$ref": "#/components/schemas/Error"
                 }
@@ -64,12 +69,72 @@
             "basicAuth": []
           }
         ]
+      },
+      "get": {
+        "tags": [
+          "Config"
+        ],
+        "summary": "Gets the public information of the configured identity",
+        "operationId": "getIdentity",
+        "responses": {
+          "200": {
+            "description": "The public key and balance of the configured private key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Identity"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/config/enrol": {
+      "post": {
+        "tags": [
+          "Config"
+        ],
+        "summary": "Requests enrolment with the configured identity.",
+        "description": "On success, starts a listener for claim approval. On approval of desired claim(s), syncs them to the subject's DID Document. Note that this event can be missed, in which case the subject must manually sync them via Switchboard. Note this endpoint can be called again to restart the claim approval listener in the event that the claim(s) have not yet been approved but the listener was removed, for instance during a restart of the application.",
+        "operationId": "createEnrolment",
+        "responses": {
+          "200": {
+            "description": "A DID was created and enrolment requested",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Enrolment"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Config"
+        ],
+        "summary": "Gets the current enrolment state",
+        "operationId": "getEnrolment",
+        "responses": {
+          "200": {
+            "description": "The created DID and current enrolment state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Enrolment"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/api/message": {
       "post": {
         "tags": [
-          "message"
+          "Message"
         ],
         "summary": "Send message on a DSB channel",
         "operationId": "createMessage",
@@ -113,7 +178,7 @@
       },
       "get": {
         "tags": [
-          "message"
+          "Message"
         ],
         "summary": "Consume messages from a DSB channel",
         "operationId": "getMessage",
@@ -122,7 +187,8 @@
             "in": "query",
             "name": "fqcn",
             "required": true,
-            "description": "Fully Qualified Channel Name e.g. `test.channels.testapp.apps.testorganization.iam.ewc`",
+            "description": "Fully Qualified Channel Name",
+            "example": "test.channels.testapp.apps.testorganization.iam.ewc",
             "schema": {
               "type": "string"
             }
@@ -166,14 +232,25 @@
           }
         ]
       }
+    },
+    "/api/spec": {
+      "get": {
+        "tags": [
+          "Other"
+        ],
+        "summary": "Retrieve this Open API schema in JSON",
+        "operationId": "getSchema",
+        "responses": {
+          "200": {
+            "description": "The JSON schema"
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
       "IdentityConfig": {
-        "required": [
-          "privateKey"
-        ],
         "type": "object",
         "properties": {
           "privateKey": {
@@ -182,19 +259,52 @@
           }
         }
       },
-      "IdentityConfigSuccess": {
+      "Identity": {
         "type": "object",
         "properties": {
-          "ok": {
-            "$ref": "#/components/schemas/Identity"
+          "address": {
+            "type": "string"
+          },
+          "publicKey": {
+            "type": "string"
+          },
+          "balance": {
+            "type": "string",
+            "enum": [
+              "NONE",
+              "LOW",
+              "OK"
+            ]
           }
         }
       },
-      "Identity": {
+      "Enrolment": {
         "type": "object",
         "properties": {
           "did": {
             "type": "string"
+          },
+          "state": {
+            "type": "object",
+            "properties": {
+              "ready": {
+                "type": "boolean"
+              },
+              "waiting": {
+                "type": "boolean"
+              },
+              "roles": {
+                "type": "object",
+                "properties": {
+                  "user": {
+                    "$ref": "#/components/schemas/RoleState"
+                  },
+                  "messagebroker": {
+                    "$ref": "#/components/schemas/RoleState"
+                  }
+                }
+              }
+            }
           }
         }
       },
@@ -202,11 +312,13 @@
         "type": "object",
         "properties": {
           "fqcn": {
-            "description": "Fully Qualified Channel Name e.g. `test.channels.testapp.apps.testorganization.iam.ewc`",
+            "description": "Fully Qualified Channel Name",
+            "example": "test.channels.testapp.apps.testorganization.iam.ewc",
             "type": "string"
           },
           "payload": {
             "description": "Message data conforming to channel",
+            "example": "{\"some\": \"data\"}",
             "type": "string"
           }
         }
@@ -216,6 +328,7 @@
         "properties": {
           "id": {
             "description": "Message ID on the DSB",
+            "example": "msg-#22",
             "type": "string"
           }
         }
@@ -254,6 +367,15 @@
             "type": "string"
           }
         }
+      },
+      "RoleState": {
+        "type": "string",
+        "enum": [
+          "NO_CLAIM",
+          "AWAITING_APPROVAL",
+          "APPROVED",
+          "NOT_WANTED"
+        ]
       }
     },
     "securitySchemes": {
