@@ -19,24 +19,28 @@ export class DsbApiService {
         return DsbApiService.instance
     }
 
-    // todo: use error codes
-    public async getHealth(): Promise<Result<boolean, string>> {
+    /**
+     * Performs health check on DSB Message Broker
+     *
+     * @returns true if up
+     */
+    public async getHealth(): Promise<Result> {
         try {
             const url = joinUrl(config.dsb.baseUrl, 'health')
             const res = await fetch(url)
             if (res.status !== 200) {
-                console.log('fetch health failed', res.status, res.statusText)
-                throw Error(`${res.status} - ${res.statusText}`)
+                console.log('DSB /health error', res.status, res.statusText)
+                throw Error(ErrorCode.DSB_REQUEST_FAILED)
             }
             // see http://dsb-dev.energyweb.org/swagger/#/default/HealthController_check
             const data: { status: 'ok' | 'error', error: any } = await res.json()
-            console.log('fetch health', data)
             if (data.status !== 'ok') {
-                throw Error(`${res.status} - ${Object.keys(data.error)}`)
+                console.log('DSB reporting unhealthy:', JSON.stringify(data.error))
+                throw Error(ErrorCode.DSB_UNHEALTHY)
             }
             return { ok: true }
         } catch (err) {
-            return { err: err.message }
+            return { err }
         }
     }
 

@@ -17,20 +17,64 @@ import Header from 'components/Header/Header';
 import { DsbApiService } from 'services/dsb-api.service';
 import { refreshState } from 'services/identity.service';
 import { useErrors } from 'hooks/useErrors';
+import { getAuth } from 'services/auth.service';
+import { ErrorCode, serializeError } from 'utils';
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const health = await DsbApiService.init().getHealth()
   const state = await refreshState()
-  console.log('health', health, 'state', state)
-  return {
-    props: {
-      health,
-      state,
+
+  const props = {
+    health: serializeError(health),
+    state: serializeError(state),
+    auth: undefined
+  }
+
+  const auth = getAuth()
+  const authenticationHeader = context.req.headers.authorization
+
+  if (!auth) {
+    return { props }
+  } else if (!authenticationHeader) {
+    context.res.setHeader("WWW-Authenticate", "Basic realm=\"Authorization Required\"")
+    context.res.statusCode = 401
+    return {
+      props: {
+        health: { err: ErrorCode.REQUIRES_AUTHENTICATION },
+        state: { err: ErrorCode.REQUIRES_AUTHENTICATION },
+        auth: undefined
+      }
+    }
+  } else {
+    try {
+      const token = authenticationHeader?.split(" ").pop()
+      if (!token) {
+        throw Error(ErrorCode.UNAUTHORIZED)
+      }
+      const credentials = Buffer.from(token, "base64").toString("ascii")
+      if (credentials === `${auth.username}:${auth.password}`) {
+        return {
+          props: {
+            ...props,
+            auth: authenticationHeader
+          }
+        }
+      } else {
+        throw Error(ErrorCode.UNAUTHORIZED)
+      }
+    } catch (err) {
+      return {
+        props: {
+          health: { err: err.message as string },
+          state: { err: err.message as string },
+          auth: undefined
+        }
+      }
     }
   }
 }
 
-export default function Home({ health, state }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function Home({ health, state, auth }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const classes = useStyles()
   const errors = useErrors()
 
@@ -70,19 +114,25 @@ export default function Home({ health, state }: InferGetServerSidePropsType<type
 
           <Divider className={classes.divider}/>
 
-          <section className={classes.main}>
-            <Grid container spacing={3}>
-              <Grid item xs={12} md={6}>
-                <GatewayIdentityContainer
-                  identity={state.ok?.identity}
-                  enrolment={state.ok?.enrolment}
-                />
+          {state.ok && (
+            <section className={classes.main}>
+              <Grid container spacing={3}>
+                <Grid item xs={12} md={6}>
+                  <GatewayIdentityContainer
+                    identity={state.ok?.identity}
+                    enrolment={state.ok?.enrolment}
+                    auth={auth}
+                  />
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <ProxyCertificateContainer
+                    certificate={state.ok?.certificate}
+                    auth={auth}
+                  />
+                </Grid>
               </Grid>
-              <Grid item xs={12} md={6}>
-                <ProxyCertificateContainer certificate={state.ok?.certificate} />
-              </Grid>
-            </Grid>
-          </section>
+            </section>
+          )}
         </Container>
       </main>
     </div>

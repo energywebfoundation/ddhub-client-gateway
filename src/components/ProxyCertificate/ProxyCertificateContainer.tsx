@@ -9,11 +9,13 @@ type ProxyCertificateContainerProps = {
         clientId: string
         tenantId: string
         clientSecret: string
-    }
+    },
+    auth?: string
 }
 
 export const ProxyCertificateContainer = ({
-    certificate
+    certificate,
+    auth
 }: ProxyCertificateContainerProps) => {
     const errors = useErrors()
     const [isLoading, setIsLoading] = useState(false)
@@ -21,11 +23,17 @@ export const ProxyCertificateContainer = ({
     const handleSubmit = async (clientId: string, tenantId: string, clientSecret: string) => {
         setIsLoading(true)
         try {
-            await axios.post('/api/v1/config/certificate', {
-                clientId,
-                tenantId,
-                clientSecret
-            })
+            await axios.post(
+                '/api/v1/config/certificate',
+                {
+                    clientId,
+                    tenantId,
+                    clientSecret
+                },
+                 auth
+                    ? { headers: { 'Authorization': `Bearer ${auth}` } }
+                    : undefined
+            )
             swal('Success', 'Certificate saved', 'success')
         } catch (err) {
             swal('Error', errors(err.response.data.err), 'error')

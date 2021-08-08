@@ -1,4 +1,4 @@
-import { StringType } from "./types"
+import { Result, StringType } from "./types"
 
 export const snip = (some: string, type: StringType) => {
     let start: number
@@ -28,4 +28,8 @@ export const joinUrl = (base: string, path: string): string => {
         return `${base}/${path}`
     }
     return `${base}${path}`
+}
+
+export const serializeError = <T>(result: Result<T, Error>): Result<T, string> => {
+    return result.err ? { err: result.err.message } : { ok: result.ok }
 }

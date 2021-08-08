@@ -8,6 +8,7 @@ import { BalanceState, Enrolment, EnrolmentState, Identity } from 'utils'
 type GatewayIdentityContainerProps = {
     identity?: Identity
     enrolment?: Enrolment
+    auth?: string
 }
 
 const hasFunds = (balance?: BalanceState) => {
@@ -19,7 +20,8 @@ const hasFunds = (balance?: BalanceState) => {
 
 export const GatewayIdentityContainer = ({
     identity,
-    enrolment
+    enrolment,
+    auth
 }: GatewayIdentityContainerProps) => {
     const errors = useErrors()
     const [isLoading, setIsLoading] = useState(false)
@@ -32,7 +34,13 @@ export const GatewayIdentityContainer = ({
         setIsLoading(true)
         try {
             const body = privateKey ? { privateKey } : undefined
-            const res = await axios.post('/api/v1/config/identity', body)
+            const res = await axios.post(
+                '/api/v1/config/identity',
+                body,
+                auth
+                    ? { headers: { 'Authorization': `Bearer ${auth}` } }
+                    : undefined
+            )
             setAddress(res.data.address)
             setBalance(hasFunds(res.data.balance))
             setDid('')
