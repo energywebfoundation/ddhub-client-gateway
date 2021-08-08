@@ -3,6 +3,7 @@ import { BalanceState, ErrorCode, errorExplainer } from 'utils'
 import { Wallet } from 'ethers'
 import { validateBalance, validatePrivateKey } from 'services/identity.service'
 import { deleteEnrolment, getIdentity, writeIdentity } from 'services/storage.service'
+import { isAuthorized } from 'services/auth.service'
 
 type Response = {
     address: string
@@ -14,13 +15,25 @@ export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse<Response>
 ) {
-    switch (req.method) {
-        case 'GET':
-            return forGET(req, res)
-        case 'POST':
-            return forPOST(req, res)
-        default:
-            return res.status(405).end()
+    const authHeader = req.headers.authorization
+    const { err } = isAuthorized(authHeader)
+    if (!err) {
+        switch (req.method) {
+            case 'GET':
+                return forGET(req, res)
+            case 'POST':
+                return forPOST(req, res)
+            default:
+                return res.status(405).end()
+        }
+    } else {
+        if (err.message === ErrorCode.UNAUTHORIZED) {
+            res.status(401)
+            res.setHeader("WWW-Authenticate", "Basic realm=\"Authorization Required\"")
+            res.end()
+        } else {
+            res.status(403).end()
+        }
     }
 }
 

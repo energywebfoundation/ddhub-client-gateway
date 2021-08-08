@@ -17,58 +17,44 @@ import Header from 'components/Header/Header';
 import { DsbApiService } from 'services/dsb-api.service';
 import { refreshState } from 'services/identity.service';
 import { useErrors } from 'hooks/useErrors';
-import { getAuth } from 'services/auth.service';
-import { ErrorCode, serializeError } from 'utils';
+import { isAuthorized } from 'services/auth.service';
+import { ErrorCode, Option, Result, serializeError, Storage } from 'utils';
 
-export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const health = await DsbApiService.init().getHealth()
-  const state = await refreshState()
+type Props = {
+  health: Result < boolean, string >
+  state: Result < Storage, string >
+  auth: Option<string>
+}
 
-  const props = {
-    health: serializeError(health),
-    state: serializeError(state),
-    auth: undefined
-  }
-
-  const auth = getAuth()
-  const authenticationHeader = context.req.headers.authorization
-
-  if (!auth) {
-    return { props }
-  } else if (!authenticationHeader) {
-    context.res.setHeader("WWW-Authenticate", "Basic realm=\"Authorization Required\"")
-    context.res.statusCode = 401
+export async function getServerSideProps(
+  context: GetServerSidePropsContext
+): Promise<{
+  props: Props
+}> {
+  const authHeader = context.req.headers.authorization
+  const { err } = isAuthorized(authHeader)
+  if (!err) {
+    const health = await DsbApiService.init().getHealth()
+    const state = await refreshState()
     return {
       props: {
-        health: { err: ErrorCode.REQUIRES_AUTHENTICATION },
-        state: { err: ErrorCode.REQUIRES_AUTHENTICATION },
-        auth: undefined
+        health: serializeError(health),
+        state: serializeError(state),
+        auth: { some: authHeader }
       }
     }
   } else {
-    try {
-      const token = authenticationHeader?.split(" ").pop()
-      if (!token) {
-        throw Error(ErrorCode.UNAUTHORIZED)
-      }
-      const credentials = Buffer.from(token, "base64").toString("ascii")
-      if (credentials === `${auth.username}:${auth.password}`) {
-        return {
-          props: {
-            ...props,
-            auth: authenticationHeader
-          }
-        }
-      } else {
-        throw Error(ErrorCode.UNAUTHORIZED)
-      }
-    } catch (err) {
-      return {
-        props: {
-          health: { err: err.message as string },
-          state: { err: err.message as string },
-          auth: undefined
-        }
+    if (err.message === ErrorCode.UNAUTHORIZED) {
+      context.res.statusCode = 401
+      context.res.setHeader("WWW-Authenticate", "Basic realm=\"Authorization Required\"")
+    } else {
+      context.res.statusCode = 403
+    }
+    return {
+      props: {
+        health: { err: err.message },
+        state: { err: err.message },
+        auth: { none: true }
       }
     }
   }
@@ -121,13 +107,13 @@ export default function Home({ health, state, auth }: InferGetServerSidePropsTyp
                   <GatewayIdentityContainer
                     identity={state.ok?.identity}
                     enrolment={state.ok?.enrolment}
-                    auth={auth}
+                    auth={auth.some}
                   />
                 </Grid>
                 <Grid item xs={12} md={6}>
                   <ProxyCertificateContainer
                     certificate={state.ok?.certificate}
-                    auth={auth}
+                    auth={auth.some}
                   />
                 </Grid>
               </Grid>

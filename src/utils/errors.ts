@@ -39,8 +39,8 @@ export enum ErrorCode {
 
     // GENERAL ERRORS
     DISK_PERSIST_FAILED = 'DISK_PERSIST_FAILED',
-    REQUIRES_AUTHENTICATION = 'REQUIRES_AUTHENTICATION',
-    UNAUTHORIZED = 'UNAUTHORIZED'
+    UNAUTHORIZED = 'UNAUTHORIZED',
+    FORBIDDEN = 'FORBIDDEN'
 }
 
 export const errorExplainer: { [key: string]: { status: number, text: string} } = {
