@@ -22,7 +22,7 @@
     }
   ],
   "paths": {
-    "/api/config/identity": {
+    "/api/v1/config/identity": {
       "post": {
         "tags": [
           "Config"
@@ -90,7 +90,7 @@
         }
       }
     },
-    "/api/config/enrol": {
+    "/api/v1/config/enrol": {
       "post": {
         "tags": [
           "Config"
@@ -131,7 +131,7 @@
         }
       }
     },
-    "/api/message": {
+    "/api/v1/message": {
       "post": {
         "tags": [
           "Message"
@@ -233,7 +233,7 @@
         ]
       }
     },
-    "/api/spec": {
+    "/api/v1/spec": {
       "get": {
         "tags": [
           "Other"

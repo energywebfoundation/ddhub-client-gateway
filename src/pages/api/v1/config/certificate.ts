@@ -1,9 +1,8 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { Wallet } from 'ethers'
 import fs from 'fs/promises'
 import path from 'path'
-import { Result } from '../../../utils'
+import { Result } from '../../../../utils'
 
 export default async function handler(
     req: NextApiRequest,

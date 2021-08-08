@@ -32,7 +32,7 @@ export const GatewayIdentityContainer = ({
         setIsLoading(true)
         try {
             const body = privateKey ? { privateKey } : undefined
-            const res = await axios.post('/api/config/identity', body)
+            const res = await axios.post('/api/v1/config/identity', body)
             setAddress(res.data.address)
             setBalance(hasFunds(res.data.balance))
             setDid('')

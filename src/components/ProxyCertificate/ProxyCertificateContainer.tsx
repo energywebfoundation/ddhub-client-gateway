@@ -21,7 +21,7 @@ export const ProxyCertificateContainer = ({
     const handleSubmit = async (clientId: string, tenantId: string, clientSecret: string) => {
         setIsLoading(true)
         try {
-            await axios.post('/api/config/certificate', {
+            await axios.post('/api/v1/config/certificate', {
                 clientId,
                 tenantId,
                 clientSecret
