@@ -2,9 +2,9 @@
   "openapi": "3.0.1",
   "info": {
     "title": "DSB Client Gateway",
-    "description": "The DSB Client Gateway acts as an API Gateway to the Energy Web Decentralized Service Bus (DSB). It acts as a client to the DSB Message Broker, allowing it to publish and subscribe to messages on particular channels.",
+    "description": "The DSB Client Gateway acts as a client to the Energy Web Decentralized Service Bus (DSB), allowing it to publish and subscribe to  messages on particular channels.",
     "contact": {
-      "email": "dev@energyweb.org"
+      "email": "dsb@energyweb.org"
     },
     "version": "0.1.0"
   },
