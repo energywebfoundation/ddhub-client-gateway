@@ -102,7 +102,6 @@ events.on('approved', async () => {
     if (!enrolment) {
         return
     }
-    console.log('Starting message broker...')
     await initMessageBroker({
         privateKey: identity.privateKey,
         did: enrolment.did

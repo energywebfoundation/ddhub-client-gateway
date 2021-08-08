@@ -109,7 +109,7 @@ export async function initEnrolment({
                 }
                 const state = readClaims(claims)
                 if (state.waiting) {
-                    events.emit('awaiting_approval', iam)
+                    events.emit('await_approval', iam)
                 }
                 if (state.approved) {
                     events.emit('approved')

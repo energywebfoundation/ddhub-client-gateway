@@ -59,7 +59,13 @@ export const GatewayIdentityContainer = ({
     const handleEnrol = async () => {
         setIsLoading(true)
         try {
-            const res = await axios.post('/api/config/enrol')
+            const res = await axios.post(
+                '/api/v1/config/enrol',
+                undefined,
+                auth
+                    ? { headers: { 'Authorization': `Bearer ${auth}` } }
+                    : undefined
+            )
             setDid(res.data.did)
             setEnroled(res.data.state)
         } catch (err) {
