@@ -27,7 +27,7 @@ events.on('await_approval', async (iam: IAM) => {
 
     console.log('Connecting to', config.iam.eventServerUrl)
     const nc = await connect({ servers: `wss://${config.iam.eventServerUrl}` })
-    console.log('Connected to identity server')
+    console.log('Connected to identity events server')
 
     const did = iam.getDid()
     const topic = `${iam.getDid()}.${NATS_EXCHANGE_TOPIC}`
@@ -59,7 +59,7 @@ events.on('await_approval', async (iam: IAM) => {
                     console.log(`[${count}] Synced ${USER_ROLE} claim to DID Document`)
                     state.roles.user = RoleState.APPROVED
                 }
-                if (config.dsb.controllable && claim.id === MESSAGEBROKER_ROLE) {
+                if (config.dsb.controllable && decodedToken.claimData.claimType === MESSAGEBROKER_ROLE) {
                     console.log(`[${count}] Received issued claim is ${MESSAGEBROKER_ROLE}`)
                     await iam.publishPublicClaim({ token: claim.issuedToken })
                     console.log(`[${count}] Synced ${MESSAGEBROKER_ROLE} claim to DID Document`)
@@ -68,7 +68,7 @@ events.on('await_approval', async (iam: IAM) => {
             }
             if (state.roles.user === RoleState.APPROVED) {
                 if (config.dsb.controllable && state.roles.messagebroker !== RoleState.APPROVED) {
-                    // wait for approval
+                    // wait for messagebroker approval
                     continue
                 }
                 if (sub) {

@@ -40,7 +40,7 @@ export async function getServerSideProps(
       props: {
         health: serializeError(health),
         state: serializeError(state),
-        auth: { some: authHeader }
+        auth: authHeader ? { some: authHeader } : { none: true }
       }
     }
   } else {

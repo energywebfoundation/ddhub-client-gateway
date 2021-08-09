@@ -130,8 +130,6 @@ export async function initEnrolment({
                         return { err: new Error(ErrorCode.ID_CREATE_USER_CLAIM_FAILED) }
                     }
                 }
-                // setup subscriber for claim approval events
-                events.emit('await_approval', iam)
                 return { ok: true }
             },
             save: async (state: EnrolmentState) => {

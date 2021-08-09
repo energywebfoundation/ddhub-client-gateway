@@ -25,23 +25,25 @@ export class DsbApiService {
      * @returns true if up
      */
     public async getHealth(): Promise<Result> {
+        const url = joinUrl(config.dsb.baseUrl, 'health')
+        let res: Response
         try {
-            const url = joinUrl(config.dsb.baseUrl, 'health')
-            const res = await fetch(url)
-            if (res.status !== 200) {
-                console.log('DSB /health error', res.status, res.statusText)
-                throw Error(ErrorCode.DSB_REQUEST_FAILED)
-            }
-            // see http://dsb-dev.energyweb.org/swagger/#/default/HealthController_check
-            const data: { status: 'ok' | 'error', error: any } = await res.json()
-            if (data.status !== 'ok') {
-                console.log('DSB reporting unhealthy:', JSON.stringify(data.error))
-                throw Error(ErrorCode.DSB_UNHEALTHY)
-            }
-            return { ok: true }
+            res = await fetch(url)
         } catch (err) {
-            return { err }
+            console.log('DSB /health error:', err.message)
+            return { err: new Error(ErrorCode.DSB_REQUEST_FAILED) }
         }
+        if (res.status !== 200) {
+            console.log('DSB /health error', res.status, res.statusText)
+            return { err: new Error(ErrorCode.DSB_REQUEST_FAILED) }
+        }
+        // see http://dsb-dev.energyweb.org/swagger/#/default/HealthController_check
+        const data: { status: 'ok' | 'error', error: any } = await res.json()
+        if (data.status !== 'ok') {
+            console.log('DSB reporting unhealthy:', JSON.stringify(data.error))
+            return { err: new Error(ErrorCode.DSB_UNHEALTHY) }
+        }
+        return { ok: true }
     }
 
     /**

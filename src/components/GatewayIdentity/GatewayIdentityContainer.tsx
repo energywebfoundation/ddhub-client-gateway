@@ -47,7 +47,7 @@ export const GatewayIdentityContainer = ({
             setEnroled(undefined)
             swal(
                 'Success',
-                'Private key saved. If not already funded, visit https://voltafaucet.energyweb.org/',
+                'Private key saved. If not already funded, visit https://voltafaucet.energyweb.org',
                 'success'
             )
         } catch (err) {
@@ -68,6 +68,12 @@ export const GatewayIdentityContainer = ({
             )
             setDid(res.data.did)
             setEnroled(res.data.state)
+            swal(
+                'Success',
+                'Enrolment to DSB requested. The gateway is listening for approval and will automatically '
+                + 'sync the approved claims to the configured DID\'s Document once notified.',
+                'success'
+            )
         } catch (err) {
             swal('Enrolment Error', errors(err.response.data.err), 'error')
         }

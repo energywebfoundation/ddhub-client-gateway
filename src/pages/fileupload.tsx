@@ -32,7 +32,7 @@ export async function getServerSideProps(
     return {
       props: {
         health: serializeError(health),
-        auth: { some: authHeader }
+        auth: authHeader ? { some: authHeader } : { none: true }
       }
     }
   } else {
