@@ -33,6 +33,7 @@ async function usingPM2({
     if (!config.dsb.pm2) {
         return { err: new Error(ErrorCode.PM2_NOT_CONFIGURED) }
     }
+    console.log('Starting message broker via PM2')
     const { processName, dsbBinPath } = config.dsb.pm2
     const { ok: pm2, err: initError } = await initPM2()
     if (!pm2) {

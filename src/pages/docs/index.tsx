@@ -14,7 +14,11 @@ export const getStaticProps: GetStaticProps = async (context) => {
 };
 
 const ApiDoc = ({ spec }: InferGetStaticPropsType<typeof getStaticProps>) => {
-    return <SwaggerUI spec={spec} />;
+    return (
+        <div style={{ backgroundColor: '#fff', padding: '2rem 0' }}>
+            <SwaggerUI spec={spec} />
+        </div>
+    );
 };
 
 export default ApiDoc;

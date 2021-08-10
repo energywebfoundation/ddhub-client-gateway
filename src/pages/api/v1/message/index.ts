@@ -1,18 +1,32 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
+import { isAuthorized } from 'services/auth.service'
 import { DsbApiService } from 'services/dsb-api.service'
 import { signPayload } from 'services/identity.service'
+import { ErrorCode } from 'utils'
 
 export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse
 ) {
-    switch (req.method) {
-        case 'GET':
-            return forGET(req, res)
-        case 'POST':
-            return forPOST(req, res)
-        default:
-            return res.status(405).end()
+    const authHeader = req.headers.authorization
+    const { err } = isAuthorized(authHeader)
+    if (!err) {
+        switch (req.method) {
+            case 'GET':
+                return forGET(req, res)
+            case 'POST':
+                return forPOST(req, res)
+            default:
+                return res.status(405).end()
+        }
+    } else {
+        if (err.message === ErrorCode.UNAUTHORIZED) {
+            res.status(401)
+            res.setHeader("WWW-Authenticate", "Basic realm=\"Authorization Required\"")
+            res.end()
+        } else {
+            res.status(403).end()
+        }
     }
 }
 

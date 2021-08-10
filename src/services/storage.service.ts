@@ -1,41 +1,34 @@
 import { config } from 'config'
 import { promises as fs } from 'fs'
-import { BalanceState, ErrorCode, Option, Result, RoleState } from 'utils'
+import { Certificate, Enrolment, ErrorCode, Identity, Option, Result, Storage } from 'utils'
 
-export type Identity = {
-    did: string
-    address: string
-    publicKey: string
-    privateKey: string
-    balance: BalanceState
-    state: {
-        user: RoleState
-        messagebroker: RoleState
-    }
-}
-
-export type Certificate = {
-    clientId: string
-    tenantId: string
-    clientSecret: string
-}
-
-export type Storage = {
-    identity?: Identity
-    certificate?: Certificate
-}
+// SETTERS
 
 export async function writeIdentity(identity: Identity): Promise<Result> {
     try {
         const { some: storage } = await getStorage()
         await fs.writeFile(
             config.storage.inMemoryDbFile,
-            JSON.stringify({...storage, identity}, null, 2))
+            JSON.stringify({ ...storage, identity }, null, 2))
         return { ok: true }
     } catch (err) {
         return { err: new Error(ErrorCode.DISK_PERSIST_FAILED) }
     }
 }
+
+
+export async function writeEnrolment(enrolment: Enrolment): Promise<Result> {
+    try {
+        const { some: storage } = await getStorage()
+        await fs.writeFile(
+            config.storage.inMemoryDbFile,
+            JSON.stringify({ ...storage, enrolment }, null, 2))
+        return { ok: true }
+    } catch (err) {
+        return { err: new Error(ErrorCode.DISK_PERSIST_FAILED) }
+    }
+}
+
 
 export async function writeCertificate(certificate: Certificate): Promise<Result> {
     try {
@@ -48,6 +41,8 @@ export async function writeCertificate(certificate: Certificate): Promise<Result
         return { err: new Error(ErrorCode.DISK_PERSIST_FAILED) }
     }
 }
+
+// GETTERS
 
 export async function getStorage(): Promise<Option<Storage>> {
     try {
@@ -67,4 +62,37 @@ export async function getIdentity(): Promise<Option<Identity>> {
         return { some: storage.identity }
     }
     return { none: true }
+}
+
+export async function getEnrolment(): Promise<Option<Enrolment>> {
+    const { some: storage } = await getStorage()
+    if (storage && storage.enrolment) {
+        return { some: storage.enrolment }
+    }
+    return { none: true }
+}
+
+export async function getCertificate(): Promise<Option<Certificate>> {
+    const { some: storage } = await getStorage()
+    if (storage && storage.certificate) {
+        return { some: storage.certificate }
+    }
+    return { none: true }
+}
+
+// DELETE STATE
+
+export async function deleteEnrolment(): Promise<Result> {
+    const { some: storage } = await getStorage()
+    if (storage?.enrolment) {
+        try {
+            await fs.writeFile(
+                config.storage.inMemoryDbFile,
+                JSON.stringify({ ...storage, enrolment: undefined }, null, 2))
+            return { ok: true }
+        } catch (err) {
+            return { err: new Error(ErrorCode.DISK_PERSIST_FAILED) }
+        }
+    }
+    return { ok: true }
 }

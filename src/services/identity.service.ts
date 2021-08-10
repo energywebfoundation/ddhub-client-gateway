@@ -1,23 +1,23 @@
 import { BigNumber, providers, utils, Wallet } from "ethers"
 import { IAM, RegistrationTypes, setCacheClientOptions } from "iam-client-lib"
 import { Claim } from "iam-client-lib/dist/src/cacheServerClient/cacheServerClient.types"
+import { parseEther } from 'ethers/lib/utils'
 import {
     BalanceState,
     EnrolmentState,
     ErrorCode,
-    HttpApiError,
-    HttpError,
-    IdentityManager,
+    Identity,
+    EnrolmentManager,
     Result,
-    RoleState
+    RoleState,
+    Storage,
+    MESSAGEBROKER_ROLE,
+    USER_ROLE,
+    PARENT_NAMESPACE,
 } from "utils"
 import { config } from 'config'
-import { parseEther } from 'ethers/lib/utils'
-import { getIdentity, writeIdentity } from './storage.service'
-
-const PARENT_NAMESPACE = config.iam.parentNamespace
-const USER_ROLE = `user.roles.${PARENT_NAMESPACE}`
-const MESSAGEBROKER_ROLE = `messagebroker.roles.${PARENT_NAMESPACE}`
+import { getEnrolment, getIdentity, getStorage, writeEnrolment, writeIdentity } from './storage.service'
+import { events } from "./events.service"
 
 /**
  * Signs proof of private key ownership with current block to prevent replay attacks
@@ -27,7 +27,11 @@ const MESSAGEBROKER_ROLE = `messagebroker.roles.${PARENT_NAMESPACE}`
 export async function signProof(): Promise<Result<string>> {
     const { some: identity } = await getIdentity()
     if (!identity) {
-        return { err: new Error(ErrorCode.NO_PRIVATE_KEY) }
+        return { err: new Error(ErrorCode.ID_NO_PRIVATE_KEY) }
+    }
+    const { some: enrolment } = await getEnrolment()
+    if (!enrolment || !enrolment.did) {
+        return { err: new Error(ErrorCode.ID_NO_DID )}
     }
     const signer = new Wallet(identity.privateKey)
     const header = {
@@ -38,7 +42,7 @@ export async function signProof(): Promise<Result<string>> {
     // does not work :(
     // const { ok: block } = await getCurrentBlock()
     const payload = {
-        iss: identity.did,
+        iss: enrolment.did,
         claimData: {
             blockNumber: 999999999999
         }
@@ -60,7 +64,7 @@ export async function signProof(): Promise<Result<string>> {
 export async function signPayload(payload: string): Promise<Result<string>> {
     const { some: identity } = await getIdentity()
     if (!identity) {
-        return { err: new Error(ErrorCode.NO_PRIVATE_KEY) }
+        return { err: new Error(ErrorCode.ID_NO_PRIVATE_KEY) }
     }
     const signer = new Wallet(identity.privateKey)
     const sig = await signer.signMessage(payload)
@@ -68,31 +72,22 @@ export async function signPayload(payload: string): Promise<Result<string>> {
 }
 
 /**
- * TODO:
- * - don't necessarily error on each step: persist and maintain state
- *      throughout process so it can be continued at an point
- * - sync to DID document after approved - probably have a button in FE to do this manually
- */
-
-/**
  * Configure Identity Access Management (IAM)
  *
- * @param privateKey sets IAM to use this private key
- * @returns IdentityManager - object with helper methods to query and create claims
+ * @param identity sets IAM to use this private key
+ * @returns EnrolmentManager - queries and creates claims
  */
-export async function initIdentity(privateKey: string): Promise<Result<IdentityManager, HttpApiError>> { // TODO: change
-    const { ok: wallet, err: privateKeyError } = validatePrivateKey(privateKey)
-    if (!wallet) {
-        return { err: privateKeyError }
-    }
-    const { ok: balance, err: balanceError } = await validateBalance(wallet.address)
+export async function initEnrolment({
+    address,
+    privateKey
+}: Identity): Promise<Result<EnrolmentManager>> {
+    const { ok: balance, err: balanceError } = await validateBalance(address)
     if (balance === undefined) {
         return { err: balanceError }
     }
     if (balance === BalanceState.NONE) {
-        // TODO: make this check optional - esp. in the context of generating keys
         return {
-            err: new HttpApiError(HttpError.BAD_REQUEST, ErrorCode.NO_BALANCE)
+            err: new Error(ErrorCode.ID_NO_BALANCE)
         }
     }
     const { ok: iam, err: iamError } = await initIAM(privateKey)
@@ -102,76 +97,45 @@ export async function initIdentity(privateKey: string): Promise<Result<IdentityM
     const did = iam.getDid()
     if (!did) {
         // IAM Client Library creates the DID for us so this *should* not occur
-        return { err: new HttpApiError(HttpError.BAD_REQUEST, ErrorCode.NO_DID) }
+        return { err: new Error(ErrorCode.ID_NO_DID) }
     }
     return {
         ok: {
             did,
-            publicKey: wallet.publicKey,
-            balance,
-            getEnrolmentState: async () => {
+            getState: async () => {
                 const { ok: claims, err: fetchError } = await fetchClaims(iam, did)
                 if (!claims) {
                     return { err: fetchError }
                 }
-                // cycle through claims to get overall enrolment status
-                const state = {
-                    ready: false,
-                    user: RoleState.NO_CLAIM,
-                    messagebroker: config.dsb.controllable ? RoleState.NO_CLAIM : RoleState.NOT_WANTED
+                const state = readClaims(claims)
+                if (state.waiting) {
+                    events.emit('await_approval', iam)
                 }
-                for (const { claimType, isAccepted } of claims) {
-                    if (claimType === MESSAGEBROKER_ROLE) {
-                        state.messagebroker = isAccepted
-                            ? RoleState.APPROVED
-                            : RoleState.AWAITING_APPROVAL
-                    }
-                    if (claimType === USER_ROLE) {
-                        state.user = isAccepted
-                            ? RoleState.APPROVED
-                            : RoleState.AWAITING_APPROVAL
-                    }
-                    state.ready = config.dsb.controllable
-                        ? (state.messagebroker === RoleState.APPROVED) && (state.user === RoleState.APPROVED)
-                        : state.user === RoleState.APPROVED
+                if (state.approved) {
+                    events.emit('approved')
                 }
                 return { ok: state }
             },
-            handleEnrolement: async (state: EnrolmentState) => {
-                if (state.messagebroker === RoleState.NO_CLAIM) {
+            handle: async ({ roles }: EnrolmentState) => {
+                if (roles.messagebroker === RoleState.NO_CLAIM) {
                     const { ok } = await createClaim(iam, MESSAGEBROKER_ROLE)
                     if (!ok) {
-                        return { err: new HttpApiError(
-                            HttpError.INTERNAL_SERVER_ERROR,
-                            ErrorCode.CREATE_MESSAGEBROKER_CLAIM_FAILED)
-                        }
+                        return { err: new Error(ErrorCode.ID_CREATE_MESSAGEBROKER_CLAIM_FAILED) }
                     }
+
                 }
-                if (state.user === RoleState.NO_CLAIM) {
+                if (roles.user === RoleState.NO_CLAIM) {
                     const { ok } = await createClaim(iam, USER_ROLE)
                     if (!ok) {
-                        return { err: new HttpApiError(
-                            HttpError.INTERNAL_SERVER_ERROR,
-                            ErrorCode.CREATE_USER_CLAIM_FAILED)
-                        }
+                        return { err: new Error(ErrorCode.ID_CREATE_USER_CLAIM_FAILED) }
                     }
                 }
                 return { ok: true }
             },
-            writeToFile: async (state: EnrolmentState) => {
-                const { ok, err } = await writeIdentity({
-                    did,
-                    address: wallet.address,
-                    publicKey: wallet.publicKey,
-                    privateKey: wallet.privateKey,
-                    balance,
-                    state
-                })
+            save: async (state: EnrolmentState) => {
+                const { ok, err } = await writeEnrolment({ did, state })
                 if (err) {
-                    return { err: new HttpApiError(
-                        HttpError.INTERNAL_SERVER_ERROR,
-                        ErrorCode.DISK_PERSIST_FAILED
-                    ) }
+                    return { err: new Error(ErrorCode.DISK_PERSIST_FAILED) }
                 }
                 return { ok }
             }
@@ -185,16 +149,22 @@ export async function initIdentity(privateKey: string): Promise<Result<IdentityM
  * @param privateKey string private key that the wallet should use
  * @returns the wallet initiated from private key
  */
-function validatePrivateKey(privateKey: string): Result<Wallet, HttpApiError> {
+export function validatePrivateKey(privateKey: string): Result<Wallet> {
     try {
         return { ok: new Wallet(privateKey) }
     } catch (err) {
         return {
-            err: new HttpApiError(
-                HttpError.BAD_REQUEST,
-                ErrorCode.INVALID_PRIVATE_KEY)
+            err: new Error(ErrorCode.ID_INVALID_PRIVATE_KEY)
         }
     }
+}
+
+/**
+ * Checks if balance validation required (e.g. on server side rendering)
+ */
+export function shouldValidateBalance({ identity, enrolment }: Storage): boolean {
+    const alreadyEnroled = enrolment ? (enrolment.state.approved || enrolment.state.waiting) : false
+    return identity?.address ? !alreadyEnroled : false
 }
 
 /**
@@ -203,7 +173,7 @@ function validatePrivateKey(privateKey: string): Result<Wallet, HttpApiError> {
  * @param address check the balance of this account
  * @returns balance state (NONE, LOW, OK)
  */
-async function validateBalance(address: string): Promise<Result<BalanceState, HttpApiError>> {
+export async function validateBalance(address: string): Promise<Result<BalanceState>> {
     try {
         const provider = new providers.JsonRpcProvider(config.iam.rpcUrl)
         const balance = await provider.getBalance(address)
@@ -216,12 +186,48 @@ async function validateBalance(address: string): Promise<Result<BalanceState, Ht
         return { ok: BalanceState.OK }
     } catch (err) {
         return {
-            err: new HttpApiError(
-                HttpError.INTERNAL_SERVER_ERROR,
-                ErrorCode.BALANCE_CHECK_FAILED
-            )
+            err: new Error(ErrorCode.ID_BALANCE_CHECK_FAILED)
         }
     }
+}
+
+/**
+ * Retrieve dynamic state (e.g. balance, claim status) as part of storage
+ */
+export async function refreshState(): Promise<Result<Storage>> {
+    const { some: storage } = await getStorage()
+    let newState: Storage = {}
+    if (storage?.identity?.address) {
+        const address = storage.identity.address
+        const { ok: balance, err: balanceError } = await validateBalance(address)
+        if (balance === undefined) {
+            return { err: balanceError }
+        }
+        newState.identity = {
+            ...storage.identity,
+            balance
+        }
+        await writeIdentity(newState.identity)
+    }
+    if (storage?.enrolment?.did) {
+        const { ok: iam, err: iamError } = await initIAM(storage.identity?.privateKey!!)
+        if (!iam) {
+            return { err: iamError }
+        }
+        const { ok: claims, err: claimsError } = await fetchClaims(iam, storage.enrolment.did)
+        if (!claims) {
+            return { err: claimsError }
+        }
+        newState.enrolment = {
+            ...storage.enrolment,
+            state: readClaims(claims)
+        }
+        await writeEnrolment(newState.enrolment)
+    }
+    if (storage?.certificate) {
+        newState.certificate = storage.certificate
+    }
+    return { ok: newState }
 }
 
 /**
@@ -230,7 +236,7 @@ async function validateBalance(address: string): Promise<Result<BalanceState, Ht
  * @param privateKey the identity controlling to the DID
  * @returns initialized IAM object
  */
-async function initIAM(privateKey: string): Promise<Result<IAM, HttpApiError>> {
+export async function initIAM(privateKey: string): Promise<Result<IAM>> {
     try {
         const iam = new IAM({
             privateKey,
@@ -247,9 +253,7 @@ async function initIAM(privateKey: string): Promise<Result<IAM, HttpApiError>> {
     } catch (err) {
         console.log(`Failed to init IAM: ${err.message}`)
         return {
-            err: new HttpApiError(
-                HttpError.INTERNAL_SERVER_ERROR,
-                ErrorCode.IAM_INIT_ERROR)
+            err: new Error(ErrorCode.ID_IAM_INIT_ERROR)
         }
     }
 }
@@ -261,21 +265,53 @@ async function initIAM(privateKey: string): Promise<Result<IAM, HttpApiError>> {
  * @param did subject of the claims
  * @returns array of claims
  */
-async function fetchClaims(iam: IAM, did: string): Promise<Result<Claim[], HttpApiError>> {
+async function fetchClaims(iam: IAM, did: string): Promise<Result<Claim[]>> {
     try {
-        const claims = (await iam.getClaimsBySubject({
+        console.log('Fetching claims for', did, 'on', PARENT_NAMESPACE)
+        const claims = await iam.getClaimsByRequester({
             did,
             parentNamespace: PARENT_NAMESPACE,
-        }))
+        })
         return { ok: claims }
     } catch (err) {
         console.log(`Failed to fetch claims for ${did}: ${err.message}`)
         return {
-            err: new HttpApiError(
-                HttpError.INTERNAL_SERVER_ERROR,
-                ErrorCode.FETCH_CLAIMS_FAILED)
+            err: new Error(ErrorCode.ID_FETCH_CLAIMS_FAILED)
         }
     }
+}
+
+/**
+ * Parse claim data to find out overall enrolment state
+ *
+ * @param claims list of claims from IAM Client Library
+ * @returns EnrolmentState
+ */
+function readClaims(claims: Claim[]): EnrolmentState {
+    // cycle through claims to get overall enrolment status
+    const state: EnrolmentState = {
+        approved: false,
+        waiting: false,
+        roles: {
+            user: RoleState.NO_CLAIM,
+            messagebroker: config.dsb.controllable ? RoleState.NO_CLAIM : RoleState.NOT_WANTED
+        }
+    }
+    for (const { claimType, isAccepted } of claims) {
+        if (claimType === MESSAGEBROKER_ROLE) {
+            state.roles.messagebroker = isAccepted
+                ? RoleState.APPROVED
+                : RoleState.AWAITING_APPROVAL
+        }
+        if (claimType === USER_ROLE) {
+            state.roles.user = isAccepted
+                ? RoleState.APPROVED
+                : RoleState.AWAITING_APPROVAL
+        }
+        state.approved = isApproved(state)
+        state.waiting = isWaiting(state)
+    }
+    return state
 }
 
 /**
@@ -303,6 +339,28 @@ async function createClaim(iam: IAM, claim: string): Promise<Result> {
         console.log(`Failed to create claim ${claim}: ${err.message}`)
         return { err }
     }
+}
+
+/**
+ * Check approval state of claims based on MB controllable state
+ *
+ * @returns true if is approved
+ */
+export function isApproved({ roles }: EnrolmentState): boolean {
+    return config.dsb.controllable
+        ? (roles.messagebroker === RoleState.APPROVED) && (roles.user === RoleState.APPROVED)
+        : roles.user === RoleState.APPROVED
+}
+
+/**
+ * Check wait state of claims based on MB controllable state
+ *
+ * @returns true if waiting
+ */
+function isWaiting({ roles }: EnrolmentState): boolean {
+    return config.dsb.controllable
+        ? (roles.messagebroker === RoleState.AWAITING_APPROVAL) || (roles.user === RoleState.AWAITING_APPROVAL)
+        : roles.user === RoleState.AWAITING_APPROVAL
 }
 
 /**
