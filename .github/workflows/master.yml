@@ -1,0 +1,101 @@
+name: Build and deploy
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  cancel-previous:
+    name: 'Cancel Previous Runs'
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: styfle/cancel-workflow-action@0.9.0
+        with:
+          access_token: ${{ github.token }}
+  
+  unique_id:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate unique id
+        id: unique_id
+        run: echo "::set-output name=id::$(uuidgen)"
+    outputs:
+      unique_id: ${{ steps.unique_id.outputs.id }}
+
+  install-build-and-push:
+    runs-on: ubuntu-latest
+    needs: [cancel-previous, unique_id]
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+
+    - uses: actions/setup-node@v2-beta
+      with:
+        node-version: '14'
+
+    - name: Check dependency versions
+      run: node common/scripts/install-run-rush.js check
+
+    - name: Install application
+      run: |
+        node common/scripts/install-run-rush.js update
+    - name: Build application
+      run: node common/scripts/install-run-rush.js rebuild --verbose
+
+    - name: Build containers
+      run: node common/scripts/install-run-rush.js build:container --verbose
+        
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+      
+    - name: Build & push docker images
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        BUILD_ID: ${{needs.unique_id.outputs.unique_id}}
+      run: |
+        docker tag energyweb/dsb-client-gateway:canary $ECR_REGISTRY/${{ secrets.ECR_REPOSITORY }}:canary 
+        docker push $ECR_REGISTRY/${{ secrets.ECR_REPOSITORY }}:canary 
+        docker tag $ECR_REGISTRY/${{ secrets.ECR_REPOSITORY }}:canary $ECR_REGISTRY/${{ secrets.ECR_REPOSITORY }}:$BUILD_ID 
+        docker push $ECR_REGISTRY/${{ secrets.ECR_REPOSITORY }}:$BUILD_ID 
+    
+    - name: Logout of Amazon ECR
+      if: always()
+      run: docker logout ${{ steps.login-ecr.outputs.registry }}
+
+    - name: 'Login via Azure CLI'
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+    
+    - name: 'Build and push image'
+      uses: azure/docker-login@v1
+      with:
+        login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
+        username: ${{ secrets.REGISTRY_USERNAME }}
+        password: ${{ secrets.REGISTRY_PASSWORD }}
+    - run: |
+        docker tag ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}:${{needs.unique_id.outputs.unique_id}} ${{ secrets.REGISTRY_LOGIN_SERVER }}/dsb/client-gateway:${{needs.unique_id.outputs.unique_id}}
+        docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/dsb/client-gateway:${{needs.unique_id.outputs.unique_id}}
+    - name: ArgoCD login
+      uses: clowdhaus/argo-cd-action/@main
+      id: argocd_login
+      with:
+        command: login ${{ secrets.ARGOCD_DEV_URL }}
+        options: --insecure --password ${{ secrets.ARGOCD_DEV_PASS }} --username ${{ secrets.ARGOCD_DEV_USERNAME }}
+    
+    - name: ArgoCD overvrite values.yaml
+      uses: clowdhaus/argo-cd-action/@main
+      id: argocd_image_tag_overwrite
+      with:
+        command: app set dsb-client-gateway
+        options: -p image.tag=${{needs.unique_id.outputs.unique_id}}
