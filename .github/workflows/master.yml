@@ -2,7 +2,7 @@ name: Build and deploy
 
 on:
   push:
-    branches: [ master ]
+    branches: [ DOI-1152-Setup-GH-Action-pipeline-for-DSB-Client-Gateway ]
 
 jobs:
   cancel-previous:
@@ -23,29 +23,13 @@ jobs:
     outputs:
       unique_id: ${{ steps.unique_id.outputs.id }}
 
-  install-build-and-push:
+  build-and-push:
     runs-on: ubuntu-latest
     needs: [cancel-previous, unique_id]
     steps:
     - uses: actions/checkout@v2
       with:
         fetch-depth: 0
-
-    - uses: actions/setup-node@v2-beta
-      with:
-        node-version: '14'
-
-    - name: Check dependency versions
-      run: node common/scripts/install-run-rush.js check
-
-    - name: Install application
-      run: |
-        node common/scripts/install-run-rush.js update
-    - name: Build application
-      run: node common/scripts/install-run-rush.js rebuild --verbose
-
-    - name: Build containers
-      run: node common/scripts/install-run-rush.js build:container --verbose
         
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
@@ -63,10 +47,8 @@ jobs:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         BUILD_ID: ${{needs.unique_id.outputs.unique_id}}
       run: |
-        docker tag energyweb/dsb-client-gateway:canary $ECR_REGISTRY/${{ secrets.ECR_REPOSITORY }}:canary 
-        docker push $ECR_REGISTRY/${{ secrets.ECR_REPOSITORY }}:canary 
-        docker tag $ECR_REGISTRY/${{ secrets.ECR_REPOSITORY }}:canary $ECR_REGISTRY/${{ secrets.ECR_REPOSITORY }}:$BUILD_ID 
-        docker push $ECR_REGISTRY/${{ secrets.ECR_REPOSITORY }}:$BUILD_ID 
+        docker pull 098061033856.dkr.ecr.us-east-1.amazonaws.com/ew-dos-dsb-ecr:canary
+        docker build -t dsb-client-gateway .
     
     - name: Logout of Amazon ECR
       if: always()
@@ -86,16 +68,16 @@ jobs:
     - run: |
         docker tag ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}:${{needs.unique_id.outputs.unique_id}} ${{ secrets.REGISTRY_LOGIN_SERVER }}/dsb/client-gateway:${{needs.unique_id.outputs.unique_id}}
         docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/dsb/client-gateway:${{needs.unique_id.outputs.unique_id}}
-    - name: ArgoCD login
-      uses: clowdhaus/argo-cd-action/@main
-      id: argocd_login
-      with:
-        command: login ${{ secrets.ARGOCD_DEV_URL }}
-        options: --insecure --password ${{ secrets.ARGOCD_DEV_PASS }} --username ${{ secrets.ARGOCD_DEV_USERNAME }}
+    # - name: ArgoCD login
+    #   uses: clowdhaus/argo-cd-action/@main
+    #   id: argocd_login
+    #   with:
+    #     command: login ${{ secrets.ARGOCD_DEV_URL }}
+    #     options: --insecure --password ${{ secrets.ARGOCD_DEV_PASS }} --username ${{ secrets.ARGOCD_DEV_USERNAME }}
     
-    - name: ArgoCD overvrite values.yaml
-      uses: clowdhaus/argo-cd-action/@main
-      id: argocd_image_tag_overwrite
-      with:
-        command: app set dsb-client-gateway
-        options: -p image.tag=${{needs.unique_id.outputs.unique_id}}
+    # - name: ArgoCD overvrite values.yaml
+    #   uses: clowdhaus/argo-cd-action/@main
+    #   id: argocd_image_tag_overwrite
+    #   with:
+    #     command: app set dsb-client-gateway
+    #     options: -p image.tag=${{needs.unique_id.outputs.unique_id}}
