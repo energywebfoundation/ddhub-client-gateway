@@ -66,7 +66,7 @@ jobs:
         username: ${{ secrets.REGISTRY_USERNAME }}
         password: ${{ secrets.REGISTRY_PASSWORD }}
     - run: |
-        docker tag ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}:${{needs.unique_id.outputs.unique_id}} ${{ secrets.REGISTRY_LOGIN_SERVER }}/dsb/client-gateway:${{needs.unique_id.outputs.unique_id}}
+        docker tag dsb-client-gateway ${{ secrets.REGISTRY_LOGIN_SERVER }}/dsb/client-gateway:${{needs.unique_id.outputs.unique_id}}
         docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/dsb/client-gateway:${{needs.unique_id.outputs.unique_id}}
     # - name: ArgoCD login
     #   uses: clowdhaus/argo-cd-action/@main
