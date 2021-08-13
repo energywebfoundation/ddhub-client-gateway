@@ -1,7 +1,7 @@
 const { utils, Wallet, providers } = require('ethers');
 
 // replace with your own
-const PRIVATE_KEY = 'a229bf8f1bc264f2981f33f65f26302d5adebae767eb361e767add52e52c76d7';
+const PRIVATE_KEY = '0xe2caca2e7c22fc5bf985cc6838e152753c52b925620bf2449e388c90e3d853f7';
 
 const generateIdentity = async (privateKey) => {
   const signer = new Wallet(privateKey);

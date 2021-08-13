@@ -5,7 +5,7 @@ export type Result<T = boolean, E = Error> = {
 
 export type Option<T> = {
     some?: T
-    none?: Boolean
+    none?: boolean
 }
 
 export type Identity = {

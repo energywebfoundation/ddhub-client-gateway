@@ -39,3 +39,4 @@ vc.cert
 in-memory.json
 
 /.vscode
+/dist
