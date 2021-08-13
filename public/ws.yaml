@@ -1,0 +1,30 @@
+asyncapi: '2.1.0'
+info:
+  title: DSB Gateway WebSocket API
+  version: 0.1.0
+  description: The Gateway WebSocket API is an alternative to the REST interface, allowing for real-time messaging (particularly asynchronous responses).
+channels:
+  message:
+    description: Publish a message on a particular channel using its fully-qualified channel name.
+    publish:
+      message:
+        $ref: '#/components/messages/Message'
+  :fqcn:
+    description: Subscribe to messages on a particular channel, where the fully-qualified channel name is the subscription topic.
+    subscribe:
+      message:
+        $ref: '#/components/messages/Message'
+components:
+  messages:
+    Message:
+      payload:
+        type: object
+        properties:
+          fqcn:
+            type: string
+            description: Fully-qualified channel name
+            example: test.channels.testapp.apps.testorganization.iam.ewc
+          payload:
+            type: object
+            description: Payload of the message on the channel
+            example: { data: "test" }

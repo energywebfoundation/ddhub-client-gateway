@@ -1,0 +1,245 @@
+openapi: 3.0.1
+info:
+  title: DSB Client Gateway
+  description: The DSB Client Gateway acts as a client to the Energy Web Decentralized Service Bus (DSB), allowing it to publish and subscribe to  messages on particular channels.
+  contact:
+    email: dsb@energyweb.org
+  version: 0.1.0
+tags:
+  - name: Config
+    description: Manage the DSB Client Gateway as admin
+  - name: Message
+    description: Send and retrieve messages on the DSB
+  - name: Other
+paths:
+  /api/v1/config/identity:
+    post:
+      tags:
+        - Config
+      summary: Sets the decentralized identity of the gateway, enroling it on to DSB
+      operationId: createIdentity
+      requestBody:
+        description: The private key which will be associated with the DID
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IdentityConfig'
+      responses:
+        '200':
+          description: The private key was accepted and saved.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Identity'
+        default:
+          description: Error processing request
+          content:
+            application/json:
+              example:
+                err: ID::INVALID_PRIVATE_KEY
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+        - basicAuth: []
+    get:
+      tags:
+        - Config
+      summary: Gets the public information of the configured identity
+      operationId: getIdentity
+      responses:
+        '200':
+          description: The public key and balance of the configured private key
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Identity'
+  /api/v1/config/enrol:
+    post:
+      tags:
+        - Config
+      summary: Requests enrolment with the configured identity.
+      description: On success, starts a listener for claim approval. On approval of desired claim(s), syncs them to the subject's DID Document. Note that this event can be missed, in which case the subject must manually sync them via Switchboard. Note this endpoint can be called again to restart the claim approval listener in the event that the claim(s) have not yet been approved but the listener was removed, for instance during a restart of the application.
+      operationId: createEnrolment
+      responses:
+        '200':
+          description: A DID was created and enrolment requested
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Enrolment'
+    get:
+      tags:
+        - Config
+      summary: Gets the current enrolment state
+      operationId: getEnrolment
+      responses:
+        '200':
+          description: The created DID and current enrolment state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Enrolment'
+  /api/v1/message:
+    post:
+      tags:
+        - Message
+      summary: Send message on a DSB channel
+      operationId: createMessage
+      requestBody:
+        description: Unsigned message to be published on desired channel
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendMessage'
+      responses:
+        '200':
+          description: The message was successfully published
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SendMessageSuccess'
+        default:
+          description: Error processing request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+        - basicAuth: []
+    get:
+      tags:
+        - Message
+      summary: Consume messages from a DSB channel
+      operationId: getMessage
+      parameters:
+        - in: query
+          name: fqcn
+          required: true
+          description: Fully Qualified Channel Name
+          example: test.channels.testapp.apps.testorganization.iam.ewc
+          schema:
+            type: string
+        - in: query
+          name: amount
+          required: false
+          default: 1
+          description: Amount of messages that should be retrieved
+          schema:
+            type: number
+      responses:
+        '200':
+          description: The array of messages
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetMessageSuccess'
+        default:
+          description: Error processing request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+        - basicAuth: []
+  /api/v1/spec:
+    get:
+      tags:
+        - Other
+      summary: Retrieve this Open API schema in JSON
+      operationId: getSchema
+      responses:
+        '200':
+          description: The JSON schema
+components:
+  schemas:
+    IdentityConfig:
+      type: object
+      properties:
+        privateKey:
+          type: string
+          description: Ethereum compliant hex-encoded private key
+    Identity:
+      type: object
+      properties:
+        address:
+          type: string
+        publicKey:
+          type: string
+        balance:
+          type: string
+          enum:
+            - NONE
+            - LOW
+            - OK
+    Enrolment:
+      type: object
+      properties:
+        did:
+          type: string
+        state:
+          type: object
+          properties:
+            ready:
+              type: boolean
+            waiting:
+              type: boolean
+            roles:
+              type: object
+              properties:
+                user:
+                  $ref: '#/components/schemas/RoleState'
+                messagebroker:
+                  $ref: '#/components/schemas/RoleState'
+    SendMessage:
+      type: object
+      properties:
+        fqcn:
+          description: Fully Qualified Channel Name
+          example: test.channels.testapp.apps.testorganization.iam.ewc
+          type: string
+        payload:
+          description: Message data conforming to channel
+          example: '{"some": "data"}'
+          type: string
+    SendMessageSuccess:
+      type: object
+      properties:
+        id:
+          description: Message ID on the DSB
+          example: msg-#22
+          type: string
+    GetMessageSuccess:
+      type: array
+      items:
+        $ref: '#/components/schemas/Message'
+    Message:
+      type: object
+      properties:
+        id:
+          description: Message ID
+          type: string
+        payload:
+          description: The message data
+          type: string
+        signature:
+          description: Ethereum (secp256k1) Signature corresponding to the payload as signed by the private key of the sender
+          type: string
+        sender:
+          description: DID of the sender of the message
+          type: string
+    Error:
+      type: object
+      properties:
+        err:
+          type: string
+    RoleState:
+      type: string
+      enum:
+        - NO_CLAIM
+        - AWAITING_APPROVAL
+        - APPROVED
+        - NOT_WANTED
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic

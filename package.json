@@ -3,8 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "nodemon --watch \"src/*\" --ext \"ts,json\", --ignore \"src/**/*.spec.ts\" --exec \"yarn dev:static\"",
-    "dev:static": "ts-node --project tsconfig.server.json src/server.ts",
+    "dev": "ts-node --project tsconfig.server.json src/server.ts",
     "build:server": "tsc --project tsconfig.server.json",
     "build:next": "next build",
     "build": "npm run build:next && npm run build:server",
@@ -13,6 +12,8 @@
     "test": "jest"
   },
   "dependencies": {
+    "@asyncapi/parser": "^1.7.0",
+    "@asyncapi/react-component": "^1.0.0-next.15",
     "@material-ui/core": "^4.12.2",
     "@material-ui/icons": "^4.11.2",
     "@sweetalert/with-react": "^0.1.1",
