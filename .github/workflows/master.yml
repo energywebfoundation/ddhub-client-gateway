@@ -68,6 +68,8 @@ jobs:
     - run: |
         docker tag dsb-client-gateway ${{ secrets.REGISTRY_LOGIN_SERVER }}/dsb/client-gateway:${{needs.unique_id.outputs.unique_id}}
         docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/dsb/client-gateway:${{needs.unique_id.outputs.unique_id}}
+        docker tag dsb-client-gateway ${{ secrets.REGISTRY_LOGIN_SERVER }}/dsb/client-gateway:canary
+        docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/dsb/client-gateway:canary
 
   deploy:
     runs-on: ubuntu-latest
