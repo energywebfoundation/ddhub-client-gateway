@@ -85,4 +85,4 @@ jobs:
       id: argocd_image_tag_overwrite
       with:
         command: app set dsb-client-gateway
-        options: -p image.tag=${{needs.unique_id.outputs.unique_id}} --values devops/values/values-dev.yaml
+        options: -p image.tag=${{needs.unique_id.outputs.unique_id}} --values ./devops/values/values-dev.yaml
