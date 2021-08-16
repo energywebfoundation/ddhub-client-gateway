@@ -1,87 +1,131 @@
-import React, { useState } from 'react'
-import { Button, InputBase, makeStyles, Theme, Typography, withStyles } from '@material-ui/core'
+import React, { useEffect, useState } from 'react'
+import { Button, makeStyles, Theme, Typography } from '@material-ui/core'
 import InfoIcon from '@material-ui/icons/Info'
 import { CustomInput } from 'components/CustomInput/CustomInput'
-import { snip, StringType } from 'utils'
+import { EnrolmentState, snip, StringType } from 'utils'
+import swal from 'sweetalert'
 
 type GatewayIdentityProps = {
     did?: string
-    publicKey?: string
+    address: string
+    balance?: boolean
+    enroled?: EnrolmentState
     isLoading: boolean
-    error: string
-    onSubmit: (privateKey: string) => void
+    onCreate: (privateKey?: string) => void
+    onEnrol: () => void
 }
 
 export const GatewayIdentity = ({
     did,
-    publicKey,
+    address,
+    balance,
+    enroled,
     isLoading,
-    error,
-    onSubmit
+    onCreate,
+    onEnrol
 }: GatewayIdentityProps) => {
     const classes = useStyles()
     const [privateKey, setPrivatekey] = useState('')
+    const [statusText, setStatusText] = useState('')
+    const [showEnrolButton, setShowEnrolButton] = useState(false)
+
+    useEffect(() => {
+        if (enroled?.approved) {
+            setShowEnrolButton(false)
+            return setStatusText('Enrolment complete')
+        }
+        if (enroled?.waiting) {
+            setShowEnrolButton(false)
+            return setStatusText('Awaiting approval')
+        }
+        if (address && !did) {
+            setShowEnrolButton(true)
+            if (!balance) {
+                return setStatusText('Funds required')
+            } else {
+                return setStatusText('Ready to enrol')
+            }
+        }
+    }, [did, address, balance, enroled])
+
     return (
-        <div>
-            <div className={classes.credentials}>
+        <div className={classes.credentials}>
+            <div className={classes.formGroup}>
+
                 <div className={classes.credentialsHeader}>
-                    <Typography variant="h6">MESSAGE BROKER <br /> CREDENTIALS</Typography>
+                    <Typography variant="h6">GATEWAY IDENTITY</Typography>
                     <InfoIcon />
                 </div>
 
-                <div className={classes.form}>
+                {statusText && (
                     <div className={classes.formGroup}>
-                        <Typography variant="caption">DID</Typography>
-                        <CustomInput
-                            placeholder={did
-                                ? snip(did, StringType.DID)
-                                : `DID known once private key is set`}
-                            fullWidth
-                            disabled
-                        />
+                        <Typography variant="caption">STATUS</Typography>
+                        <Typography variant="h6">{statusText}</Typography>
                     </div>
+                )}
+                {(did || address) && (
                     <div className={classes.formGroup}>
-                        <Typography variant="caption">PUBLIC KEY</Typography>
-                        <CustomInput
-                            placeholder={publicKey
-                                ? snip(publicKey, StringType.HEX_COMPRESSED)
-                                : `Public key known once private key is set`}
-                            fullWidth
-                            disabled
-                        />
+                        <Typography variant="caption">ID</Typography>
+                        <Typography
+                            className={classes.id}
+                            variant="h6"
+                        >
+                            {did ? snip(did, StringType.DID) : address}
+                        </Typography>
                     </div>
-                    <div className={classes.formGroup}>
-                        <Typography variant="caption">PRIVATE KEY</Typography>
-                        <CustomInput
-                            fullWidth
-                            value={privateKey}
-                            onChange={(e) => setPrivatekey(e.target.value)}
-                        />
-                    </div>
+                )}
 
-                    <Button
-                        variant="outlined"
-                        color="secondary"
+                <div className={classes.formGroup}>
+                    <Typography variant="caption">PRIVATE KEY</Typography>
+                    <CustomInput
                         fullWidth
-                        disabled={true}
-                    >
-                        Generate Keys
-                    </Button>
+                        value={privateKey}
+                        onChange={(e) => setPrivatekey(e.target.value)}
+                    />
+                </div>
+            </div>
+            <div className={classes.buttonGroup}>
+
+                {showEnrolButton && (
                     <Button
                         variant="outlined"
                         color="secondary"
                         fullWidth
                         disabled={isLoading}
-                        onClick={() => onSubmit(privateKey)}
+                        onClick={() => onEnrol()} // tood: need to "resume" i.e. use a different private key
                     >
-                        Save
+                        Enrol
                     </Button>
+                )}
 
-                    <div className={classes.errorText}>
-                        <Typography>{error}</Typography>
-                    </div>
+                <Button
+                    variant="outlined"
+                    color="secondary"
+                    fullWidth
+                    disabled={isLoading}
+                    onClick={() => {
+                        setPrivatekey('')
+                        onCreate()
+                    }}
+                >
+                    Generate Keys
+                </Button>
+                <Button
+                    variant="outlined"
+                    color="secondary"
+                    fullWidth
+                    disabled={isLoading}
+                    onClick={() => {
+                        if (!privateKey) {
+                            return swal('Error', 'No private key set', 'error')
+                        }
+                        setPrivatekey('')
+                        onCreate(privateKey)
+                    }}
+                >
+                    Save
+                </Button>
 
-                </div>
             </div>
         </div>
     )
@@ -91,26 +135,30 @@ const useStyles = makeStyles((theme: Theme) => ({
     credentials: {
         border: '1px solid #fff',
         padding: '2rem',
+        height: '550px',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between'
     },
     credentialsHeader: {
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        color: '#fff'
+        color: '#fff',
+        marginBottom: '1rem'
     },
-    form: {
-        marginTop: '1rem',
-
-        '& button': {
-            padding: '.7rem',
-            marginBottom: '1rem'
-        }
+    description: {
+        margin: '1rem 0',
+        color: '#ccc'
+    },
+    id: {
+        fontSize: '.9rem'
     },
     formGroup: {
         display: 'flex',
         flexDirection: 'column',
         width: '100%',
-        marginBottom: '2rem',
+        marginBottom: '1.2rem',
 
         '& span': {
             fontSize: '.8rem',
@@ -123,7 +171,12 @@ const useStyles = makeStyles((theme: Theme) => ({
             width: '100%'
         }
     },
-    errorText: {
-        color: theme.palette.error.main
-    }
+    buttonGroup: {
+        marginTop: '1rem',
+
+        '& button': {
+            padding: '.7rem',
+            marginBottom: '1rem'
+        }
+    },
 }))

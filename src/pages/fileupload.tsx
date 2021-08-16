@@ -8,29 +8,51 @@ import {
   Divider,
   Theme,
 } from '@material-ui/core'
-import { config } from 'config';
-import { getStorage } from 'services/storage.service';
 import { UploadContainer } from 'components/UploadFile/UploadContainer';
 import Header from 'components/Header/Header';
 import { DownloadContainer } from 'components/DownloadFile/DownloadContainer';
 import { DsbApiService } from 'services/dsb-api.service';
+import { isAuthorized } from 'services/auth.service';
+import { ErrorCode, Option, Result, serializeError } from 'utils';
 
+type Props = {
+  health: Result<boolean, string>
+  auth: Option<string>
+}
 
-export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const health = await DsbApiService.init().getHealth()
-  const state = await getStorage()
-  console.log('health', health, 'state', state)
-  return {
-    props: {
-      baseUrl: config.dsb.baseUrl,
-      health,
-      state
+export async function getServerSideProps(
+  context: GetServerSidePropsContext
+): Promise<{
+  props: Props
+}> {
+  const authHeader = context.req.headers.authorization
+  const { err } = isAuthorized(authHeader)
+  if (!err) {
+    const health = await DsbApiService.init().getHealth()
+    return {
+      props: {
+        health: serializeError(health),
+        auth: authHeader ? { some: authHeader } : { none: true }
+      }
+    }
+  } else {
+    if (err.message === ErrorCode.UNAUTHORIZED) {
+      context.res.statusCode = 401
+      context.res.setHeader("WWW-Authenticate", "Basic realm=\"Authorization Required\"")
+    } else {
+      context.res.statusCode = 403
+    }
+    return {
+      props: {
+        health: { err: err.message },
+        auth: { none: true }
+      }
     }
   }
 }
 
 // TODO: break into components
-export default function FileUpload({ baseUrl, health, state }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function FileUpload({ health }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const classes = useStyles()
 
   return (
