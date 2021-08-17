@@ -1,11 +1,11 @@
 // https://nextjs.org/docs/advanced-features/custom-server
 // https://levelup.gitconnected.com/set-up-next-js-with-a-custom-express-server-typescript-9096d819da1c
 import next from 'next'
-import { Server } from 'socket.io'
 import { createServer } from 'http'
 import { parse } from 'url'
-import { isAuthorized } from './services/auth.service'
-import { DsbApiService } from './services/dsb-api.service'
+import { config } from './config'
+import { WebSocketImplementation } from './utils'
+import { WebSocketClient, WebSocketServer } from './services/websocket.service'
 
 const dev = process.env.NODE_ENV !== 'production'
 const app = next({ dev })
@@ -22,32 +22,16 @@ const main = async () => {
         handle(req, res, parsedUrl)
     })
 
-    const io = new Server(server)
+    if (config.server.websocket === WebSocketImplementation.SERVER) {
+        WebSocketServer.init(server, '/events')
 
-    io.use((socket, next) => {
-        const token = socket.handshake.auth.bearer
-        const { err } = isAuthorized(`Bearer ${token}`)
-        next(err)
-    })
+    } else if (config.server.websocket === WebSocketImplementation.CLIENT) {
+        // TODO: client config
+        WebSocketClient.init('', '')
+    }
 
-    io.on('message', DsbApiService.init().sendMessage)
-
-    const channels = [
-        'test.channels.testapp.apps.testorganization.iam.ewc'
-    ]
-    setInterval(async () => {
-        for (const fqcn of channels) {
-            const { ok: messages } = await DsbApiService.init().getMessages({ fqcn })
-            for (const message of messages ?? []) {
-                // todo: filter sender
-                io.emit(fqcn, message)
-            }
-        }
-
-    }, 1000)
-
-    server.listen(process.env.PORT ?? 3000, () => {
-        console.log('Server listening on port 3000')
+    server.listen(config.server.port, () => {
+        console.log(`Server listening on port ${config.server.port}`)
     })
 }
 

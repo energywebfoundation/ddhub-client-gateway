@@ -87,6 +87,12 @@ export enum DsbControlType {
     PM2 = 'pm2'
 }
 
+export enum WebSocketImplementation {
+    NONE = 'NONE',
+    SERVER = 'SERVER',
+    CLIENT = 'CLIENT'
+}
+
 export type EnrolmentManager = {
     /**
      * Decentralized Identifer (DID) belonging to gateway identity

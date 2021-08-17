@@ -2,6 +2,8 @@ import path from 'path'
 import { DsbControlType } from '../utils/types'
 
 const defaults = {
+    port: '3000',
+    websocket: 'SERVER',
     chainId: '73799',
     rpcUrl: 'https://volta-rpc.energyweb.org/',
     cacheServerUrl: 'https://identitycache-dev.energyweb.org/',
@@ -18,7 +20,21 @@ const takeIf = <T>(requirement?: any, subject?: T): T | undefined =>
 
 const asBool = (some?: string) => some ? (some === 'true') : false
 
+const asEnum = (options: string[], some?: string) =>
+    options.includes(some ?? '') ? some : undefined
+
 export const config = {
+    server: {
+        port: parseInt(process.env.PORT ?? defaults.port, 10),
+        websocket: asEnum(
+            [
+                'SERVER',
+                'CLIENT',
+                'NONE'
+            ],
+            process.env.WEBSOCKET
+        ) ?? defaults.websocket
+    },
     iam: {
         chainId: parseInt(process.env.CHAIN_ID ?? defaults.chainId, 10),
         rpcUrl: process.env.RPC_URL ?? defaults.rpcUrl,

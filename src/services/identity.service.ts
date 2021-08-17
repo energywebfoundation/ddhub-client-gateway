@@ -151,6 +151,11 @@ export async function initEnrolment({
  */
 export function validatePrivateKey(privateKey: string): Result<Wallet> {
     try {
+        const isValidPrefixed = privateKey.startsWith('0x') && (privateKey.length === 66)
+        const isValidNoPrefix = !privateKey.startsWith('0x') && (privateKey.length === 64)
+        if (!isValidPrefixed && !isValidNoPrefix) {
+            throw Error()
+        }
         return { ok: new Wallet(privateKey) }
     } catch (err) {
         return {
