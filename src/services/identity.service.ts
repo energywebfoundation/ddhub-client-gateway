@@ -14,8 +14,8 @@ import {
     MESSAGEBROKER_ROLE,
     USER_ROLE,
     PARENT_NAMESPACE,
-} from "utils"
-import { config } from 'config'
+} from "../utils"
+import { config } from '../config'
 import { getEnrolment, getIdentity, getStorage, writeEnrolment, writeIdentity } from './storage.service'
 import { events } from "./events.service"
 

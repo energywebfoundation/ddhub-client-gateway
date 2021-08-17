@@ -1,6 +1,6 @@
 import { Wallet } from "ethers";
-import { initEnrolment } from "services/identity.service";
-import { BalanceState, ErrorCode } from "utils";
+import { initEnrolment } from "./identity.service";
+import { BalanceState, ErrorCode } from "../utils";
 
 describe('IdentityService', () => {
 

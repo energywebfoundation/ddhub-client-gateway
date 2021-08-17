@@ -11,7 +11,7 @@ import {
   Link,
 } from '@material-ui/core';
 import { Info } from '@material-ui/icons'
-import { CustomInput } from 'components/CustomInput/CustomInput';
+import { CustomInput } from '../../components/CustomInput/CustomInput';
 
 
 export const Download = () => {

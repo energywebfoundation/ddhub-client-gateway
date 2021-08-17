@@ -1,9 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { BalanceState, ErrorCode, errorExplainer } from 'utils'
 import { Wallet } from 'ethers'
-import { validateBalance, validatePrivateKey } from 'services/identity.service'
-import { deleteEnrolment, getIdentity, writeIdentity } from 'services/storage.service'
-import { isAuthorized } from 'services/auth.service'
+import { validateBalance, validatePrivateKey } from '../../../../services/identity.service'
+import { deleteEnrolment, getIdentity, writeIdentity } from '../../../../services/storage.service'
+import { isAuthorized } from '../../../../services/auth.service'
+import { BalanceState, ErrorCode, errorExplainer } from '../../../../utils'
 
 type Response = {
     address: string

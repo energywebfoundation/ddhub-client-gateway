@@ -3,9 +3,9 @@
     "compilerOptions": {
         "module": "commonjs",
         "outDir": "dist",
-        "noEmit": false
+        "noEmit": false,
     },
     "include": [
-        "src/server.ts"
+        "src/server.ts",
     ]
 }

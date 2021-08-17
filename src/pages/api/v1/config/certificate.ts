@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import fs from 'fs/promises'
 import path from 'path'
 import { ErrorCode, Result } from '../../../../utils'
-import { isAuthorized } from 'services/auth.service'
+import { isAuthorized } from '../../../../services/auth.service'
 
 export default async function handler(
     req: NextApiRequest,

@@ -1,6 +1,6 @@
 import Link from 'next/link'
-import Header from "components/Header/Header";
 import { Button, Container, makeStyles, Theme } from '@material-ui/core';
+import Header from "../../components/Header/Header";
 
 export default function Docs() {
     const classes = useStyles()

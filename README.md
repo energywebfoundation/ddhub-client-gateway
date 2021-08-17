@@ -56,4 +56,4 @@ docker run -p 8080:8080 swaggerapi/swagger-editor
 ```
 
 Visit http://localhost:8080 and import the existing specification
-(`public/spec.json`) to begin editing.
+(`public/rest.json`) to begin editing.

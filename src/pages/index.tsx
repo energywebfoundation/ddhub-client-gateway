@@ -11,14 +11,14 @@ import {
   Grid,
   Link
 } from '@material-ui/core'
-import { GatewayIdentityContainer } from 'components/GatewayIdentity/GatewayIdentityContainer';
-import { ProxyCertificateContainer } from 'components/ProxyCertificate/ProxyCertificateContainer';
-import Header from 'components/Header/Header';
-import { DsbApiService } from 'services/dsb-api.service';
-import { refreshState } from 'services/identity.service';
-import { useErrors } from 'hooks/useErrors';
-import { isAuthorized } from 'services/auth.service';
-import { ErrorCode, Option, Result, serializeError, Storage } from 'utils';
+import { GatewayIdentityContainer } from '../components/GatewayIdentity/GatewayIdentityContainer';
+import { ProxyCertificateContainer } from '../components/ProxyCertificate/ProxyCertificateContainer';
+import Header from '../components/Header/Header';
+import { DsbApiService } from '../services/dsb-api.service';
+import { refreshState } from '../services/identity.service';
+import { useErrors } from '../hooks/useErrors';
+import { isAuthorized } from '../services/auth.service';
+import { ErrorCode, Option, Result, serializeError, Storage } from '../utils';
 
 type Props = {
   health: Result < boolean, string >

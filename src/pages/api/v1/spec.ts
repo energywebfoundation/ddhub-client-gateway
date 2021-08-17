@@ -1,6 +1,6 @@
 
 import type { NextApiRequest, NextApiResponse } from 'next'
-import spec from '../../../../public/spec.json'
+import spec from '../../../../public/rest.json'
 
 export default function handler(
     req: NextApiRequest,

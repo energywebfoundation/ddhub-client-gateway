@@ -1,5 +1,5 @@
-import { config } from "config"
-import { ErrorCode, GetMessageOptions, joinUrl, Message, Result, SendMessageData, SendMessageResult } from "utils"
+import { config } from "../config"
+import { ErrorCode, GetMessageOptions, joinUrl, Message, Result, SendMessageData, SendMessageResult } from "../utils"
 import { signProof } from "./identity.service"
 
 export class DsbApiService {

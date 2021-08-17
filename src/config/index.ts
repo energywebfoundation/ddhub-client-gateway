@@ -1,5 +1,5 @@
 import path from 'path'
-import { DsbControlType } from 'utils/types'
+import { DsbControlType } from '../utils/types'
 
 const defaults = {
     chainId: '73799',
