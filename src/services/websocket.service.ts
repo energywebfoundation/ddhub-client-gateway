@@ -76,7 +76,11 @@ export class WebSocketClient {
                 const client = new WebSocketClient(ws, connection, url, protocol)
                 resolve(client)
             })
-            ws.connect(url, protocol)
+            try {
+                ws.connect(url, protocol)
+            } catch (err) {
+                reject(err)
+            }
         })
     }
 
@@ -102,6 +106,10 @@ export class WebSocketClient {
 
     emit(message: Message) {
         this.connection.send(Buffer.from(JSON.stringify(message)))
+    }
+
+    close() {
+        this.connection.close()
     }
 
     private async reconnect(url: string, protocol: string): Promise<void> {

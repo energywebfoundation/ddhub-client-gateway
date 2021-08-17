@@ -1,5 +1,5 @@
 import { Server } from 'http'
-import { client, server } from 'websocket'
+import { client as WsClient, server as WsServer } from 'websocket'
 import { WebSocketClient, WebSocketServer } from './websocket.service'
 
 
@@ -21,7 +21,7 @@ describe('WebSocketService', () => {
 
 
         it('should accept connections', (done) => {
-            const ws = new client()
+            const ws = new WsClient()
             ws.on('connect', (conn) => {
                 conn.close()
                 done()
@@ -31,7 +31,7 @@ describe('WebSocketService', () => {
         })
 
         it('should reject connections on wrong path', () => {
-            const ws = new client()
+            const ws = new WsClient()
             try {
                 ws.connect('ws://localhost:5000/wss', 'dsb-messages')
             } catch (err) {
@@ -40,7 +40,7 @@ describe('WebSocketService', () => {
         })
 
         it('should reject connections on wrong protocol', () => {
-            const ws = new client()
+            const ws = new WsClient()
             try {
                 ws.connect('ws://localhost:5000/ws', 'dsb')
             } catch (err) {
@@ -56,9 +56,27 @@ describe('WebSocketService', () => {
 
     describe('Client', () => {
 
-        // TODO: write basic server impl.
+        let httpServer: Server
+        let server: WsServer
 
-        // TODO: write test case to connect to server using client
+        beforeEach(() => {
+            httpServer = new Server()
+            httpServer.listen(3030)
+            server = new WsServer({ httpServer })
+            server.on('request', (req) => {
+                req.accept('dsb-gateway')
+            })
+        })
+
+        afterEach(() => {
+            httpServer.close()
+            server.shutDown()
+        })
+
+        it('should connect to server', async () => {
+            const client = await WebSocketClient.init('http://localhost:3030/', 'dsb-gateway')
+            client.close()
+        })
 
     })
 })
