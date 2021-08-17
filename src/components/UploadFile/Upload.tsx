@@ -89,6 +89,7 @@ export const Upload = ({ onUpload }: UploadProps) => {
 								<input
 									type="file"
 									hidden
+									accept=".txt, .xml, .csv"
 									onChange={uploadToClient}
 								/>
 							</Button>
@@ -100,8 +101,11 @@ export const Upload = ({ onUpload }: UploadProps) => {
 								fullWidth
 								onClick={() => {
 
+									if (!channelName) {
+										return swal('Error', 'Please enter channel name', 'error')
+									}
 									if (!file) {
-										return swal('Error', 'No private key set', 'error')
+										return swal('Error', 'No file uploaded', 'error')
 									}
 									onUpload(file, channelName)
 								}}
