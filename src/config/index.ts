@@ -12,7 +12,12 @@ const defaults = {
     parentNamespace: 'dsb.apps.energyweb.iam.ewc',
     dsbBaseUrl: 'http://dsb-dev.energyweb.org',
     dsbProcessName: 'dsb-message-broker',
-    dsbBinPath: '../dsb-message-broker/bin/dsb-message-broker'
+    dsbBinPath: '../dsb-message-broker/bin/dsb-message-broker',
+    websocketReconnect: 'true',
+    websocketReconnectTimeout: '10000',
+    websocketReconnectMaxRetries: '10',
+    eventsMode: 'BULK',
+    eventsPerSecond: '100'
 }
 
 const takeIf = <T>(requirement?: any, subject?: T): T | undefined =>
@@ -36,7 +41,16 @@ export const config = {
         ) ?? defaults.websocket,
         websocketClient: takeIf(process.env.WEBSOCKET === 'CLIENT', {
             url: process.env.WEBSOCKET_URL,
-            protocol: process.env.WEBSOCKET_PROTOCOL
+            protocol: process.env.WEBSOCKET_PROTOCOL,
+            reconnect: asBool(process.env.WEBSOCKET_RECONNECT ?? defaults.websocketReconnect),
+            reconnectTimeout: parseInt(
+                process.env.WEBSOCKET_RECONNECT_TIMEOUT ?? defaults.websocketReconnectTimeout,
+                10
+            ),
+            reconnectMaxRetries: parseInt(
+                process.env.WEBSOCKET_RECONNECT_MAX_RETRIES ?? defaults.websocketReconnectMaxRetries,
+                10
+            )
         }),
     },
     iam: {
@@ -67,5 +81,18 @@ export const config = {
     auth: {
         username: process.env.USERNAME,
         password: process.env.PASSWORD,
+    },
+    events: {
+        emitMode: asEnum(
+            [
+                'SINGLE',
+                'BULK',
+            ],
+            process.env.EVENTS_EMIT_MODE
+        ) ?? defaults.eventsMode,
+        maxPerSecond: parseInt(
+            process.env.EVENTS_MAX_PER_SECOND ?? defaults.eventsPerSecond,
+            10
+        )
     }
 }

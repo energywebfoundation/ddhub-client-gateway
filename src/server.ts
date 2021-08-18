@@ -4,8 +4,9 @@ import next from 'next'
 import { createServer } from 'http'
 import { parse } from 'url'
 import { config } from './config'
-import { WebSocketImplementation } from './utils'
+import { WebSocketClientOptions, WebSocketImplementation } from './utils'
 import { WebSocketClient, WebSocketServer } from './services/websocket.service'
+import { DsbApiService } from './services/dsb-api.service'
 
 const dev = process.env.NODE_ENV !== 'production'
 const app = next({ dev })
@@ -22,16 +23,21 @@ const main = async () => {
         handle(req, res, parsedUrl)
     })
 
-    if (config.server.websocket === WebSocketImplementation.SERVER) {
-        WebSocketServer.init(server, '/events')
+    const channels = [
+        'test.channels.testapp.apps.testorganization.iam.ewc'
+    ]
 
+    if (config.server.websocket === WebSocketImplementation.SERVER) {
+        const ws = WebSocketServer.init(server, '/events')
+        DsbApiService.init().pollForNewMessages(channels, ws.emit)
     } else if (config.server.websocket === WebSocketImplementation.CLIENT) {
         if (config.server.websocketClient?.url) {
-            WebSocketClient.init(
-                config.server.websocketClient.url,
-                config.server.websocketClient.protocol)
+            const ws = await WebSocketClient.init(
+                config.server.websocketClient as WebSocketClientOptions
+            )
+            DsbApiService.init().pollForNewMessages(channels, ws.emit)
         } else {
-            console.log('URL not provided for WebSocket Client. Skipping...')
+            console.log('Need URL to connect to WebSocket Server. Skipping...')
         }
     }
 

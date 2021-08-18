@@ -2,7 +2,7 @@ import { base64 } from 'ethers/lib/utils'
 import { Server } from 'http'
 import { EventEmitter } from 'events'
 import { client as WsClient, IBinaryMessage, IUtf8Message, server as WsServer } from 'websocket'
-import { SendMessageData, WebSocketClientOptions, WsMessage } from '../utils'
+import { SendMessageData, WebSocketClientOptions } from '../utils'
 import { WebSocketClient, WebSocketServer } from './websocket.service'
 
 const parseMessage = <T>(msg: IUtf8Message | IBinaryMessage): T => {
@@ -100,7 +100,7 @@ describe('WebSocketService', () => {
                     signature: 'signed'
                 }
                 conn.on('message', (data) => {
-                    const msg: WsMessage = parseMessage(data)
+                    const msg = parseMessage(data)
                     expect(msg).toEqual(payload)
                     conn.close()
                     done()

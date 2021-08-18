@@ -6,7 +6,7 @@ import {
     client as WsClient,
     connection as WsClientConnection,
 } from 'websocket'
-import { SendMessageData, WebSocketClientOptions, WsMessage } from '../utils'
+import { Message, SendMessageData, WebSocketClientOptions } from '../utils'
 import { isAuthorized } from './auth.service'
 import { DsbApiService } from './dsb-api.service'
 
@@ -100,12 +100,12 @@ export class WebSocketServer {
     }
 
     /**
-     * Send a message to active connections (we can assume that each connection
+     * Send message(s) to active connections (we can assume that each connection
      * is authorized to receive the message so we broadcast instead of unicast)
      *
-     * @param message message as pulled/received from DSB message broker
+     * @param message message(s) as pulled/received from DSB message broker
      */
-    emit(message: WsMessage) {
+    emit(message: Message | Message[]) {
         this.ws.broadcast(toBytes(message))
     }
 }
@@ -186,11 +186,11 @@ export class WebSocketClient {
     }
 
     /**
-     * Sends a message to the server
+     * Sends message(s) to the server
      *
-     * @param message a message DTO as retreived from the DSB message broker
+     * @param message message DTO(s) as retreived from the DSB message broker
      */
-    emit(message: WsMessage) {
+    emit(message: Message | Message[]) {
         this.connection.send(Buffer.from(JSON.stringify(message)))
     }
 

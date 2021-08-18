@@ -1,5 +1,14 @@
 import { config } from "../config"
-import { ErrorCode, GetMessageOptions, joinUrl, Message, Result, SendMessageData, SendMessageResult } from "../utils"
+import {
+    ErrorCode,
+    GetMessageOptions,
+    joinUrl,
+    Message,
+    Result,
+    SendMessageData,
+    SendMessageResult,
+    EventEmitMode
+} from "../utils"
 import { signProof } from "./identity.service"
 
 export class DsbApiService {
@@ -120,6 +129,42 @@ export class DsbApiService {
             }
             return { err: err.message }
         }
+    }
+
+    /**
+     * Start polling for new messages on the DSB message broker. Note that this
+     * will begin consuming from a channel/topic queue so it might take a while
+     * to catch up to real-time.
+     *
+     * @param fqcn
+     * @param callback
+     */
+    public async pollForNewMessages(
+        channels: string[],
+        callback: (message: Message | Message[]) => void
+    ) {
+        setInterval(async () => {
+            for (const fqcn of channels) {
+                const { ok: messages } = await this.getMessages({
+                    fqcn,
+                    amount: config.events.maxPerSecond
+                })
+                if (messages === undefined) {
+                    continue
+                }
+                if (config.events.emitMode === EventEmitMode.BULK) {
+                    return callback(
+                        messages.map((msg) => ({ ...msg, fqcn }))
+                    )
+                }
+                for (const message of messages) {
+                    callback({
+                        ...message,
+                        fqcn
+                    })
+                }
+            }
+        }, 1000)
     }
 
     /**

@@ -50,14 +50,13 @@ export type GetMessageOptions = {
 
 export type Message = {
     id: string
+    fqcn?: string
+    // topic: string
     payload: string
     sender: string
     signature: string
+    // timestampNanos: string
 }
-
-export type WsMessage = {
-    fqcn: string
-} & Message
 
 export enum RoleState {
     NO_CLAIM = 'NO_CLAIM',
@@ -104,6 +103,11 @@ export type WebSocketClientOptions = {
     reconnect?: boolean
     reconnectTimeout?: number
     reconnectMaxRetries?: number
+}
+
+export enum EventEmitMode {
+    SINGLE = 'SINGLE',
+    BULK = 'BULK'
 }
 
 export type EnrolmentManager = {
