@@ -1,4 +1,4 @@
-  import type { NextApiRequest, NextApiResponse } from 'next'
+import type { NextApiRequest, NextApiResponse } from 'next'
 import { isAuthorized } from 'services/auth.service'
 import { DsbApiService } from 'services/dsb-api.service'
 import { signPayload } from 'services/identity.service'

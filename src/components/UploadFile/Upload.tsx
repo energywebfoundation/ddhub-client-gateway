@@ -89,7 +89,7 @@ export const Upload = ({ onUpload }: UploadProps) => {
 								<input
 									type="file"
 									hidden
-									accept=".txt, .xml, .csv"
+									accept=".txt, .xml, .csv, .json"
 									onChange={uploadToClient}
 								/>
 							</Button>

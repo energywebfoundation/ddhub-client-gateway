@@ -35,31 +35,24 @@ async function forPOST(
     res: NextApiResponse
 ): Promise<void> {
 
-    console.log(req.body.split('\n')[4]);
+    const payload = req.body.split('\n')[4]; //taking only the content of the file from the request body
 
-    try {
+    const { ok: signature, err: signError } = await signPayload(payload);
 
-        const { ok: signature, err: signError } = await signPayload(req.body.split('\n')[4]);
-
-        if (!signature) {
-            return res.status(400).send({ err: signError });
-        }
-        let body = { fqcn: req.query.channelname as string, payload: req.body.split('\n')[4], };
-
-        const { ok: sent, err: sendError } = await DsbApiService.init().sendMessage({
-            ...body,
-            signature
-        });
-
-        if (!sent) {
-            return res.status(400).send({ err: sendError })
-        }
-        return res.status(200).send(sent)
-
-    } catch (err) {
-        res.status(400).json({
-            err: `Credentials invalid: ${err.message}`
-        })
+    if (!signature) {
+        return res.status(400).send({ err: signError });
     }
+    let body = { fqcn: req.query.fqcn as string, payload: payload };
+
+    const { ok: sent, err: sendError } = await DsbApiService.init().sendMessage({
+        ...body,
+        signature
+    });
+
+    if (!sent) {
+        return res.status(400).send({ err: sendError })
+    }
+    return res.status(200).send(sent)
+
 }
 
