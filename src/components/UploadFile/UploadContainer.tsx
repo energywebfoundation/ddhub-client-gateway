@@ -29,6 +29,8 @@ export const UploadContainer = ({ auth }: UploadContainerProps) => {
 					: undefined
 			)
 
+			swal("'Success", "Your file has been uploaded!", "success");
+
 		} catch (err) {
 			swal('Error', errors(err.response.data.err), 'error');
 			setIsLoading(false);
