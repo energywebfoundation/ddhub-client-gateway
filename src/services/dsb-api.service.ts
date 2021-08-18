@@ -149,7 +149,7 @@ export class DsbApiService {
                     fqcn,
                     amount: config.events.maxPerSecond
                 })
-                if (messages === undefined) {
+                if (!messages || messages.length === 0) {
                     continue
                 }
                 if (config.events.emitMode === EventEmitMode.BULK) {

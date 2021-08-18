@@ -228,6 +228,7 @@ export class WebSocketClient {
     }
 
     private update(connection: WsClientConnection) {
+        this.retryCount = 0
         this.connection = connection
     }
 
