@@ -8,8 +8,7 @@ import {
   Container,
   Divider,
   Theme,
-  Grid,
-  Link
+  Grid
 } from '@material-ui/core'
 import { GatewayIdentityContainer } from 'components/GatewayIdentity/GatewayIdentityContainer';
 import { ProxyCertificateContainer } from 'components/ProxyCertificate/ProxyCertificateContainer';
@@ -19,6 +18,7 @@ import { refreshState } from 'services/identity.service';
 import { useErrors } from 'hooks/useErrors';
 import { isAuthorized } from 'services/auth.service';
 import { ErrorCode, Option, Result, serializeError, Storage } from 'utils';
+import { Swagger } from 'components/Swagger/Swagger';
 
 type Props = {
   health: Result < boolean, string >
@@ -92,11 +92,7 @@ export default function Home({ health, state, auth }: InferGetServerSidePropsTyp
 
           <Divider className={classes.divider}/>
 
-          <section className={classes.swagger}>
-            <Link href="/docs">
-              API Documentation
-            </Link>
-          </section>
+          <Swagger />
 
           <Divider className={classes.divider}/>
 
@@ -146,16 +142,6 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   divider: {
     background: '#fff'
-  },
-  swagger: {
-    margin: '2rem 0',
-    padding: '0 2rem',
-
-    '& a': {
-      color: '#fff',
-      fontSize: '2.1rem',
-      textDecoration: 'underline'
-    }
   },
   main: {
     padding: '0 1rem',

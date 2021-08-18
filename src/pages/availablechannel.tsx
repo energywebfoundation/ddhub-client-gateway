@@ -6,16 +6,14 @@ import {
   Typography,
   Container,
   Divider,
-  Theme,
-  Link
-} from '@material-ui/core'
-import { UploadContainer } from 'components/UploadFile/UploadContainer';
+  Theme
+} from '@material-ui/core';
 import Header from 'components/Header/Header';
-import { DownloadContainer } from 'components/DownloadFile/DownloadContainer';
 import { DsbApiService } from 'services/dsb-api.service';
 import { isAuthorized } from 'services/auth.service';
 import { ErrorCode, Option, Result, serializeError } from 'utils';
 import { AvailableChannelContainer } from 'components/AvailableChannel/AvailableChannelContainer';
+import { Swagger } from 'components/Swagger/Swagger';
 
 type Props = {
   health: Result<boolean, string>
@@ -78,11 +76,7 @@ export default function AvailableChannel({ health }: InferGetServerSidePropsType
 
           <Divider className={classes.divider}/>
 
-          <section className={classes.swagger}>
-            <Link href="/docs">
-              API Documentation
-            </Link>
-          </section>
+          <Swagger />
 
           <Divider className={classes.divider}/>
 
@@ -124,15 +118,5 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   textWhite: {
     color: '#fff'
-  },
-  swagger: {
-    margin: '2rem 0',
-    padding: '0 2rem',
-
-    '& a': {
-      color: '#fff',
-      fontSize: '2.1rem',
-      textDecoration: 'underline'
-    }
-  },
+  }
 }))
