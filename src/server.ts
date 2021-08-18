@@ -26,8 +26,13 @@ const main = async () => {
         WebSocketServer.init(server, '/events')
 
     } else if (config.server.websocket === WebSocketImplementation.CLIENT) {
-        // TODO: client config
-        WebSocketClient.init('', '')
+        if (config.server.websocketClient?.url) {
+            WebSocketClient.init(
+                config.server.websocketClient.url,
+                config.server.websocketClient.protocol)
+        } else {
+            console.log('URL not provided for WebSocket Client. Skipping...')
+        }
     }
 
     server.listen(config.server.port, () => {

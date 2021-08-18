@@ -7,8 +7,15 @@ import {
     connection as WsClientConnection,
 } from 'websocket'
 import { Message, SendMessageData } from '../utils'
+import { isAuthorized } from './auth.service'
 import { DsbApiService } from './dsb-api.service'
 
+/**
+ * Parse a websocket message into our domain transfer object (message request)
+ *
+ * @param message the UTF-8 or binary message from the WS connection
+ * @returns Message DTO
+ */
 const parseMessage = (message: IUtf8Message | IBinaryMessage): SendMessageData => {
     if (message.type === 'utf8') {
         return JSON.parse(message.utf8Data)
@@ -16,12 +23,24 @@ const parseMessage = (message: IUtf8Message | IBinaryMessage): SendMessageData =
     return JSON.parse(message.binaryData.toString())
 }
 
+/**
+ * WebSocket server implementation (singleton)
+ */
 export class WebSocketServer {
     private static instance: WebSocketServer
     private readonly ws: WsServer
 
+    /**
+     * WebSocket Protocol spoken by the server
+     */
     protocol = 'dsb-messages'
 
+    /**
+     * Instantiate an instance or retrieve existing instance of the server
+     *
+     * @param server http server to use
+     * @param path url path to listen for WS connections
+     */
     static init(server: Server, path: string): WebSocketServer {
         if (this.instance) {
             return this.instance
@@ -29,6 +48,9 @@ export class WebSocketServer {
         return new WebSocketServer(server, path)
     }
 
+    /**
+     * Get the server instance
+     */
     static get(): WebSocketServer {
         if (!this.instance) {
             throw Error('Server not initialized yet!')
@@ -39,34 +61,64 @@ export class WebSocketServer {
     constructor(server: Server, public path: string) {
         this.ws = new WsServer({ httpServer: server })
         this.ws.on('request', (req) => {
-            if (req.resource === this.path) {
-                // todo: check auth
-                if (req.requestedProtocols.includes(this.protocol)) {
-                    const connection = req.accept('dsb-messages')
-                    connection.on('message', async (data) => {
-                        const message = parseMessage(data)
-                        await DsbApiService.init().sendMessage(message)
-                    })
-                } else {
-                    console.log('rejecting 400')
-                    req.reject(400, 'Protocol not supported')
-                }
-            } else {
-                console.log('rejecting 404')
-                req.reject(404, 'Not found')
+            // must be requesting {path} e.g. /events
+            if (req.resource !== this.path) {
+                return req.reject(404)
             }
+            // must agree on the ws protocol
+            if (!req.requestedProtocols.includes(this.protocol)) {
+                return req.reject(400, 'Protocol Not Supported')
+            }
+            // must be authorized using basic auth
+            const { err } = isAuthorized(req.httpRequest.headers.authorization)
+            if (err) {
+                return req.reject(401)
+            }
+
+            // accept connection request and listen for messages
+            const connection = req.accept('dsb-messages')
+            connection.on('message', async (data) => {
+                const message = parseMessage(data)
+                const { ok, err } = await DsbApiService.init().sendMessage(message)
+                if (!ok) {
+                    connection.send(this.toBytes({
+                        correlationId: message.correlationId,
+                        err: err?.message
+                    }))
+                }
+            })
         })
     }
 
-    emit(message: Message) {
-        this.ws.broadcast(Buffer.from(JSON.stringify(message)))
+    /**
+     * Send a message to active connections (we can assume that each connection
+     * is authorized to receive the message so we broadcast instead of unicast)
+     *
+     * @param message message as pulled/received from DSB message broker
+     */
+    emit(message: Message & { fqcn: string }) {
+        this.ws.broadcast(this.toBytes(message))
+    }
+
+    private toBytes(data: object) {
+        return Buffer.from(JSON.stringify(data))
     }
 }
 
+/**
+ * WebSocket client implementation (singleton)
+ */
 export class WebSocketClient {
     private static instance: WebSocketClient
 
-    static async init(url: string, protocol: string): Promise<WebSocketClient> {
+    /**
+     * Instantiate an instance or retrieve the existing client instance
+     *
+     * @param url of websocket server the client should connect to
+     * @param protocol the websocket server speaks
+     * @returns
+     */
+    static async init(url: string, protocol?: string): Promise<WebSocketClient> {
         if (this.instance) {
             return this.instance
         }
@@ -84,6 +136,9 @@ export class WebSocketClient {
         })
     }
 
+    /**
+     * Get the client instance
+     */
     static get(): WebSocketClient {
         if (!this.instance) {
             throw Error('Client not initialized yet!')
@@ -95,7 +150,7 @@ export class WebSocketClient {
         private readonly ws: WsClient,
         private connection: WsClientConnection,
         url: string,
-        protocol: string) {
+        protocol?: string) {
             this.connection.on('error', async () => this.reconnect(url, protocol))
             this.connection.on('close', async () => this.reconnect(url, protocol))
             this.connection.on('message', async (data) => {
@@ -104,15 +159,23 @@ export class WebSocketClient {
             })
     }
 
+    /**
+     * Sends a message to the server
+     *
+     * @param message a message DTO as retreived from the DSB message broker
+     */
     emit(message: Message) {
         this.connection.send(Buffer.from(JSON.stringify(message)))
     }
 
+    /**
+     * End the client connection
+     */
     close() {
         this.connection.close()
     }
 
-    private async reconnect(url: string, protocol: string): Promise<void> {
+    private async reconnect(url: string, protocol?: string): Promise<void> {
         return new Promise((resolve) => {
             this.ws.on('connect', (connection) => {
                 this.update(connection)
@@ -125,8 +188,4 @@ export class WebSocketClient {
     private update(connection: WsClientConnection) {
         this.connection = connection
     }
-}
-
-export class WebSocketClientConnection {
-
 }

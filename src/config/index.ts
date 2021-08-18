@@ -33,7 +33,11 @@ export const config = {
                 'NONE'
             ],
             process.env.WEBSOCKET
-        ) ?? defaults.websocket
+        ) ?? defaults.websocket,
+        websocketClient: takeIf(process.env.WEBSOCKET === 'CLIENT', {
+            url: process.env.WEBSOCKET_URL,
+            protocol: process.env.WEBSOCKET_PROTOCOL
+        }),
     },
     iam: {
         chainId: parseInt(process.env.CHAIN_ID ?? defaults.chainId, 10),

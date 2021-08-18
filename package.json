@@ -1,6 +1,6 @@
 {
   "name": "dsb-client-gateway",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "scripts": {
     "dev": "ts-node --project tsconfig.server.json src/server.ts",
@@ -9,7 +9,7 @@
     "build": "npm run build:next && npm run build:server",
     "start": "NODE_ENV=production node dist/server.js",
     "lint": "next lint",
-    "test": "jest"
+    "test": "USERNAME=test PASSWORD=password jest --detectOpenHandles --verbose"
   },
   "dependencies": {
     "@asyncapi/parser": "^1.7.0",
