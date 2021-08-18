@@ -118,11 +118,10 @@ describe('WebSocketService', () => {
         it('should receive a message from the client', (done) => {
             const ws = new WsClient()
             ws.on('connect', (conn) => {
-                const payload: SendMessageData = {
+                const payload = {
                     fqcn: 'test.channel',
                     payload: '<payload>',
                     correlationId: '123',
-                    signature: 'signed'
                 }
                 conn.on('message', (data) => {
                     const msg: { correlationId: string, err: string } = parseMessage(data)
@@ -242,11 +241,10 @@ describe('WebSocketService', () => {
                     if (server.connections.length !== 1) {
                         throw Error('Server should have exactly 1 connection')
                     }
-                    const payload: SendMessageData = {
+                    const payload = {
                         fqcn: 'my.channel',
                         payload: '<test_payload>',
                         correlationId: '456',
-                        signature: 'signed by me'
                     }
                     events.on(payload.correlationId, (msg) => {
                         expect(msg.correlationId).toBe(payload.correlationId)

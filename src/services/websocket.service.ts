@@ -9,6 +9,7 @@ import {
 import { Message, SendMessageData, WebSocketClientOptions } from '../utils'
 import { isAuthorized } from './auth.service'
 import { DsbApiService } from './dsb-api.service'
+import { signPayload } from './identity.service'
 
 /**
  * Parse a websocket message into our domain transfer object (message request)
@@ -170,13 +171,27 @@ export class WebSocketClient {
             this.reconnect({ err, code })
         })
         this.connection.on('message', async (data) => {
+            // todo: better parser
             const message = parseMessage(data)
-            const { ok, err } = await DsbApiService.init().sendMessage(message)
-            if (!ok) {
-                this.connection.send(toBytes({
-                    correlationId: message.correlationId,
-                    err: err?.message
-                }))
+            try {
+                const { ok: signature, err: signError } = await signPayload(message.payload)
+                if (!signature) {
+                    throw signError
+                }
+                const { ok: sent, err: sendError } = await DsbApiService.init().sendMessage({
+                    ...message,
+                    signature
+                })
+                if (!sent) {
+                    throw sendError
+                }
+            } catch (err) {
+                if (message.correlationId) {
+                    this.connection.send(toBytes({
+                        correlationId: message.correlationId,
+                        err: err.message
+                    }))
+                }
             }
         })
     }
