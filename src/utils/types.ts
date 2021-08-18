@@ -33,7 +33,7 @@ export type Storage = {
 }
 
 export type SendMessageData = {
-    fcqn: string
+    fqcn: string
     payload: string
     signature: string
 }
