@@ -55,6 +55,10 @@ export type Message = {
     signature: string
 }
 
+export type WsMessage = {
+    fqcn: string
+} & Message
+
 export enum RoleState {
     NO_CLAIM = 'NO_CLAIM',
     AWAITING_APPROVAL = 'AWAITING_APPROVAL',
@@ -92,6 +96,14 @@ export enum WebSocketImplementation {
     NONE = 'NONE',
     SERVER = 'SERVER',
     CLIENT = 'CLIENT'
+}
+
+export type WebSocketClientOptions = {
+    url: string
+    protocol?: string
+    reconnect?: boolean
+    reconnectTimeout?: number
+    reconnectMaxRetries?: number
 }
 
 export type EnrolmentManager = {

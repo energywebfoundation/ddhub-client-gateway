@@ -6,7 +6,7 @@ import {
     client as WsClient,
     connection as WsClientConnection,
 } from 'websocket'
-import { Message, SendMessageData } from '../utils'
+import { SendMessageData, WebSocketClientOptions, WsMessage } from '../utils'
 import { isAuthorized } from './auth.service'
 import { DsbApiService } from './dsb-api.service'
 
@@ -21,6 +21,15 @@ const parseMessage = (message: IUtf8Message | IBinaryMessage): SendMessageData =
         return JSON.parse(message.utf8Data)
     }
     return JSON.parse(message.binaryData.toString())
+}
+
+/**
+ * Prepares a message for sending (as binary)
+ *
+ * @param data JSON payload
+ */
+const toBytes = (data: object): Buffer => {
+    return Buffer.from(JSON.stringify(data))
 }
 
 /**
@@ -81,7 +90,7 @@ export class WebSocketServer {
                 const message = parseMessage(data)
                 const { ok, err } = await DsbApiService.init().sendMessage(message)
                 if (!ok) {
-                    connection.send(this.toBytes({
+                    connection.send(toBytes({
                         correlationId: message.correlationId,
                         err: err?.message
                     }))
@@ -96,12 +105,8 @@ export class WebSocketServer {
      *
      * @param message message as pulled/received from DSB message broker
      */
-    emit(message: Message & { fqcn: string }) {
-        this.ws.broadcast(this.toBytes(message))
-    }
-
-    private toBytes(data: object) {
-        return Buffer.from(JSON.stringify(data))
+    emit(message: WsMessage) {
+        this.ws.broadcast(toBytes(message))
     }
 }
 
@@ -111,6 +116,8 @@ export class WebSocketServer {
 export class WebSocketClient {
     private static instance: WebSocketClient
 
+    private retryCount = 0
+
     /**
      * Instantiate an instance or retrieve the existing client instance
      *
@@ -118,19 +125,24 @@ export class WebSocketClient {
      * @param protocol the websocket server speaks
      * @returns
      */
-    static async init(url: string, protocol?: string): Promise<WebSocketClient> {
+    static async init(options: WebSocketClientOptions): Promise<WebSocketClient> {
         if (this.instance) {
             return this.instance
         }
         return new Promise((resolve, reject) => {
             const ws = new WsClient()
+            ws.on('connectFailed', reject)
             ws.on('connect', (connection) => {
-                const client = new WebSocketClient(ws, connection, url, protocol)
+                const client = new WebSocketClient(
+                    ws,
+                    connection,
+                    options)
                 resolve(client)
             })
             try {
-                ws.connect(url, protocol)
+                ws.connect(options.url, options.protocol)
             } catch (err) {
+                console.log('err', err)
                 reject(err)
             }
         })
@@ -149,14 +161,28 @@ export class WebSocketClient {
     constructor(
         private readonly ws: WsClient,
         private connection: WsClientConnection,
-        url: string,
-        protocol?: string) {
-            this.connection.on('error', async () => this.reconnect(url, protocol))
-            this.connection.on('close', async () => this.reconnect(url, protocol))
-            this.connection.on('message', async (data) => {
-                const message = parseMessage(data)
-                await DsbApiService.init().sendMessage(message)
-            })
+        private options: WebSocketClientOptions
+    ) {
+        this.connection.on('error', async (err) => {
+            this.reconnect({ err: err.message })
+        })
+        this.connection.on('close', async (code, err) => {
+            this.reconnect({ err, code })
+        })
+        this.connection.on('message', async (data) => {
+            const message = parseMessage(data)
+            const { ok, err } = await DsbApiService.init().sendMessage(message)
+            if (!ok) {
+                this.connection.send(toBytes({
+                    correlationId: message.correlationId,
+                    err: err?.message
+                }))
+            }
+        })
+    }
+
+    isConnected(): Boolean {
+        return this.connection.connected
     }
 
     /**
@@ -164,7 +190,7 @@ export class WebSocketClient {
      *
      * @param message a message DTO as retreived from the DSB message broker
      */
-    emit(message: Message) {
+    emit(message: WsMessage) {
         this.connection.send(Buffer.from(JSON.stringify(message)))
     }
 
@@ -172,20 +198,44 @@ export class WebSocketClient {
      * End the client connection
      */
     close() {
+        this.options.reconnect = false
         this.connection.close()
     }
 
-    private async reconnect(url: string, protocol?: string): Promise<void> {
+    private async reconnect(reason?: { err: string, code?: number }): Promise<void> {
+        if (!this.canReconnect()) {
+            return
+        }
+        if (reason) {
+            console.log('WebSocket Client error:', reason.code, reason.err)
+        }
+        console.log(`WebSocket Client attempting reconnect [${this.retryCount}]...`)
         return new Promise((resolve) => {
+            this.ws.on('connectFailed', (err) => {
+                console.log('WebSocket Client failed to reconnect:', err.message)
+                this.reconnect()
+            })
             this.ws.on('connect', (connection) => {
                 this.update(connection)
                 resolve()
             })
-            this.ws.connect(url, protocol)
+            const timeout = this.options.reconnectTimeout ?? 10 * 1000
+            setTimeout(() => {
+                this.ws.connect(this.options.url, this.options.protocol)
+                this.retryCount += 1
+            }, timeout)
         })
     }
 
     private update(connection: WsClientConnection) {
         this.connection = connection
+    }
+
+    private canReconnect(): Boolean {
+        if (!this.options.reconnect) {
+            return false
+        }
+        const maxRetries = this.options.reconnectMaxRetries ?? 10
+        return this.retryCount < maxRetries
     }
 }

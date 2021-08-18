@@ -51,6 +51,6 @@ describe('IdentityService', () => {
         })
         expect(ok).toBeUndefined()
         expect(err?.message).toBe(ErrorCode.ID_NO_BALANCE)
-    }, 10 * 1000)
+    }, 20 * 1000) // 20s timeout - can be rate limited by rpc
 
 })
