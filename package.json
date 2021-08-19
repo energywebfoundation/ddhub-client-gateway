@@ -9,7 +9,7 @@
     "build": "npm run build:next && npm run build:server",
     "start": "NODE_ENV=production node dist/server.js",
     "lint": "next lint",
-    "test": "USERNAME=test PASSWORD=password jest --detectOpenHandles --verbose"
+    "test": "jest --detectOpenHandles --verbose"
   },
   "dependencies": {
     "@asyncapi/parser": "^1.7.0",

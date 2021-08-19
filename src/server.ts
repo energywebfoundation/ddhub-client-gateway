@@ -23,19 +23,17 @@ const main = async () => {
         handle(req, res, parsedUrl)
     })
 
-    const channels = [
-        'test.channels.testapp.apps.testorganization.iam.ewc'
-    ]
-
     if (config.server.websocket === WebSocketImplementation.SERVER) {
         const ws = WebSocketServer.init(server, '/events')
-        DsbApiService.init().pollForNewMessages(channels, ws.emit)
+        console.log('WebSocket available on /events')
+        DsbApiService.init().pollForNewMessages((message) => ws.emit(message))
     } else if (config.server.websocket === WebSocketImplementation.CLIENT) {
         if (config.server.websocketClient?.url) {
             const ws = await WebSocketClient.init(
                 config.server.websocketClient as WebSocketClientOptions
             )
-            DsbApiService.init().pollForNewMessages(channels, ws.emit)
+            console.log('WebSocket client connected to', config.server.websocketClient.url)
+            DsbApiService.init().pollForNewMessages((message) => ws.emit(message))
         } else {
             console.log('Need URL to connect to WebSocket Server. Skipping...')
         }

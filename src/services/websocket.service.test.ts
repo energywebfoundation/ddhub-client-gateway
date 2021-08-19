@@ -2,7 +2,7 @@ import { base64 } from 'ethers/lib/utils'
 import { Server } from 'http'
 import { EventEmitter } from 'events'
 import { client as WsClient, IBinaryMessage, IUtf8Message, server as WsServer } from 'websocket'
-import { SendMessageData, WebSocketClientOptions } from '../utils'
+import { WebSocketClientOptions } from '../utils'
 import { WebSocketClient, WebSocketServer } from './websocket.service'
 
 const parseMessage = <T>(msg: IUtf8Message | IBinaryMessage): T => {
@@ -27,6 +27,7 @@ describe('WebSocketService', () => {
         })
 
         afterEach(() => {
+            WebSocketServer.destroy()
             server.close()
         })
 
@@ -140,6 +141,16 @@ describe('WebSocketService', () => {
                 { authorization })
         })
 
+        it('should emit on second instance', () => {
+            const ws = WebSocketServer.get().emit({
+                id: '1',
+                fqcn: 'test.channel',
+                payload: 'string',
+                sender: 'did:ethr:addr',
+                signature: 'sig'
+            })
+        })
+
     })
 
     describe('Client', () => {
@@ -178,6 +189,7 @@ describe('WebSocketService', () => {
         })
 
         afterEach(() => {
+            WebSocketClient.destroy()
             httpServer.close()
             server.shutDown()
         })
@@ -279,6 +291,20 @@ describe('WebSocketService', () => {
                             done()
                         }, 500)
                     }, 200)
+                })
+        })
+
+        it('should emit on second instance', (done) => {
+            WebSocketClient.init(defaults)
+                .then(() => {
+                    WebSocketClient.get().emit({
+                        id: '1',
+                        fqcn: 'test.channel',
+                        payload: 'string',
+                        sender: 'did:ethr:addr',
+                        signature: 'sig'
+                    })
+                    done()
                 })
         })
     })

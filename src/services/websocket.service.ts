@@ -37,7 +37,7 @@ const toBytes = (data: object): Buffer => {
  * WebSocket server implementation (singleton)
  */
 export class WebSocketServer {
-    private static instance: WebSocketServer
+    private static instance?: WebSocketServer
     private readonly ws: WsServer
 
     /**
@@ -55,7 +55,8 @@ export class WebSocketServer {
         if (this.instance) {
             return this.instance
         }
-        return new WebSocketServer(server, path)
+        this.instance = new WebSocketServer(server, path)
+        return this.instance
     }
 
     /**
@@ -66,6 +67,10 @@ export class WebSocketServer {
             throw Error('Server not initialized yet!')
         }
         return this.instance
+    }
+
+    static destroy() {
+        this.instance = undefined
     }
 
     constructor(server: Server, public path: string) {
@@ -115,7 +120,7 @@ export class WebSocketServer {
  * WebSocket client implementation (singleton)
  */
 export class WebSocketClient {
-    private static instance: WebSocketClient
+    private static instance?: WebSocketClient
 
     private retryCount = 0
 
@@ -138,6 +143,7 @@ export class WebSocketClient {
                     ws,
                     connection,
                     options)
+                this.instance = client
                 resolve(client)
             })
             try {
@@ -157,6 +163,10 @@ export class WebSocketClient {
             throw Error('Client not initialized yet!')
         }
         return this.instance
+    }
+
+    static destroy() {
+        this.instance = undefined
     }
 
     constructor(

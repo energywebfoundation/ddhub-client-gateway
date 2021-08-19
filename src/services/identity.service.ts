@@ -31,7 +31,7 @@ export async function signProof(): Promise<Result<string>> {
     }
     const { some: enrolment } = await getEnrolment()
     if (!enrolment || !enrolment.did) {
-        return { err: new Error(ErrorCode.ID_NO_DID )}
+        return { err: new Error(ErrorCode.ID_NO_DID) }
     }
     const signer = new Wallet(identity.privateKey)
     const header = {

@@ -1,5 +1,9 @@
+import { loadEnvConfig } from '@next/env'
 import path from 'path'
 import { DsbControlType } from '../utils/types'
+
+// manually load config because we have a custom server
+loadEnvConfig(process.cwd(), process.env.NODE_ENV !== 'production')
 
 const defaults = {
     port: '3000',

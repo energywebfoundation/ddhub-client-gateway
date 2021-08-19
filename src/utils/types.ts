@@ -58,6 +58,23 @@ export type Message = {
     // timestampNanos: string
 }
 
+export type Channel = {
+    fqcn: string
+    topics?: {
+        namespace: string
+        schema: object | string
+    }[]
+    admins?: string[]
+    publishers?: string[]
+    subscribers?: string[]
+    maxMsgAge?: number
+    maxMsgSize?: number
+    createdBy: string
+    createdDateTime: string
+    modifiedBy?: string
+    modifiedDateTime?: string
+}
+
 export enum RoleState {
     NO_CLAIM = 'NO_CLAIM',
     AWAITING_APPROVAL = 'AWAITING_APPROVAL',
