@@ -108,17 +108,21 @@ events.on('approved', async () => {
         privateKey: identity.privateKey,
         did: enrolment.did
     })
+
+    // cannot do this as next pages don't have access to the same state as
+    // the server
+    
     // wait for message broker to start if it's under our control
-    const delay = config.dsb.controllable ? 20 * 1000 : 0
-    setTimeout(() => {
-        if (config.server.websocket === WebSocketImplementation.SERVER) {
-            DsbApiService.init().pollForNewMessages(
-                (message) => WebSocketServer.get().emit(message)
-            )
-        } else if (config.server.websocket === WebSocketImplementation.CLIENT) {
-            DsbApiService.init().pollForNewMessages(
-                (message) => WebSocketClient.get().emit(message)
-            )
-        }
-    }, delay)
+    // const delay = config.dsb.controllable ? 20 * 1000 : 0
+    // setTimeout(() => {
+    //     if (config.server.websocket === WebSocketImplementation.SERVER) {
+    //         DsbApiService.init().pollForNewMessages(
+    //             (message) => WebSocketServer.get().emit(message)
+    //         )
+    //     } else if (config.server.websocket === WebSocketImplementation.CLIENT) {
+    //         DsbApiService.init().pollForNewMessages(
+    //             (message) => WebSocketClient.get().emit(message)
+    //         )
+    //     }
+    // }, delay)
 })

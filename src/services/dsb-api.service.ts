@@ -181,41 +181,52 @@ export class DsbApiService {
      * will begin consuming from a channel/topic queue so it might take a while
      * to catch up to real-time.
      *
+     * To be deleted once we have websocket support on the message broker
+     *
      * @param fqcn
      * @param callback
      */
     public async pollForNewMessages(
         callback: (message: Message | Message[]) => void
-    ): Promise<Result> {
-        const { some: enrolment } = await getEnrolment()
-        if (!enrolment?.state.approved) {
-            return { err: new Error(ErrorCode.ID_NOT_ENROLED) }
-        }
-        const { ok: channels, err: fetchErr } = await this.getChannels()
-        if (!channels) {
-            console.log('Error fetching available channels', fetchErr?.message)
-            return { err: fetchErr }
-        }
-        const subscriptions = channels.filter(
-            ({ subscribers }) => subscribers?.includes(enrolment.did)
-        )
-        if (subscriptions.length === 0) {
-            console.log(
-                'No subscriptions found. Restart once the DID has been added to a channel to enable push messages'
-            )
-            return { err: new Error(ErrorCode.DSB_NO_SUBSCRIPTIONS) }
-        }
+    ): Promise<void> {
+        let interval = 10
 
-        console.log('Starting listener for messages in', channels.map((channel) => channel.fqcn))
-        const interval = setInterval(async () => {
+        const job = async () => {
+            console.log(`[Job] Attempt to start listening for messages [${interval}s]`)
+            const { some: enrolment } = await getEnrolment()
+            if (!enrolment?.state.approved) {
+                console.log('User not enroled')
+                interval = 60
+                return
+            }
+            const { ok: channels, err: fetchErr } = await this.getChannels()
+            if (!channels) {
+                console.log('Error fetching available channels', fetchErr?.message)
+                interval = 60
+                return { err: fetchErr }
+            }
+            const subscriptions = channels.filter(
+                ({ subscribers }) => subscribers?.includes(enrolment.did)
+            )
+            if (subscriptions.length === 0) {
+                console.log(
+                    'No subscriptions found. Restart once the DID has been added to a channel to enable push messages'
+                )
+                interval = 60
+                return { err: new Error(ErrorCode.DSB_NO_SUBSCRIPTIONS) }
+            }
+
+            console.log('Starting listener for messages in', channels.map((channel) => channel.fqcn))
+            interval = 1
+
             for (const sub of subscriptions) {
                 const { ok: messages, err } = await this.getMessages({
                     fqcn: sub.fqcn,
                     amount: config.events.maxPerSecond
                 })
                 if (err) {
-                    console.log('Could not start listener for new messages, reason:', err.message)
-                    clearInterval(interval)
+                    interval = 60
+                    console.log('[Job] Error fetching messages:', err.message)
                     break
                 }
                 if (messages && messages?.length > 0) {
@@ -233,8 +244,14 @@ export class DsbApiService {
                     }
                 }
             }
-        }, 1000)
-        return { ok: true }
+        }
+        // use setTimeout instead of setInterval so we can control the interval
+        const runner = () => {
+            // could return here to get the latest interval
+            job()
+            setTimeout(runner, interval * 1000)
+        }
+        runner()
     }
 
     /**
