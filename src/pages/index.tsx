@@ -10,15 +10,14 @@ import {
   Theme,
   Grid
 } from '@material-ui/core'
-import { GatewayIdentityContainer } from 'components/GatewayIdentity/GatewayIdentityContainer';
-import { ProxyCertificateContainer } from 'components/ProxyCertificate/ProxyCertificateContainer';
-import Header from 'components/Header/Header';
-import { DsbApiService } from 'services/dsb-api.service';
-import { refreshState } from 'services/identity.service';
-import { useErrors } from 'hooks/useErrors';
-import { isAuthorized } from 'services/auth.service';
-import { ErrorCode, Option, Result, serializeError, Storage } from 'utils';
-import { Swagger } from 'components/Swagger/Swagger';
+import { GatewayIdentityContainer } from '../components/GatewayIdentity/GatewayIdentityContainer';
+import { ProxyCertificateContainer } from '../components/ProxyCertificate/ProxyCertificateContainer';
+import Header from '../components/Header/Header';
+import { DsbApiService } from '../services/dsb-api.service';
+import { refreshState } from '../services/identity.service';
+import { useErrors } from '../hooks/useErrors';
+import { isAuthorized } from '../services/auth.service';
+import { ErrorCode, Option, Result, serializeError, Storage } from '../utils';
 
 type Props = {
   health: Result < boolean, string >
@@ -89,10 +88,6 @@ export default function Home({ health, state, auth }: InferGetServerSidePropsTyp
                 { health.ok ? 'ONLINE' : `ERROR [${health.err}]` }
             </Typography>
           </section>
-
-          <Divider className={classes.divider}/>
-
-          <Swagger />
 
           <Divider className={classes.divider}/>
 

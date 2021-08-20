@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import swal from '@sweetalert/with-react'
 import axios from 'axios'
 import { ProxyCertificate } from './ProxyCertificate'
-import { useErrors } from 'hooks/useErrors'
+import { useErrors } from '../../hooks/useErrors'
 
 type ProxyCertificateContainerProps = {
     certificate?: {

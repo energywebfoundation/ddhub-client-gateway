@@ -1,8 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { isAuthorized } from 'services/auth.service'
-import { initEnrolment } from 'services/identity.service'
-import { getEnrolment, getIdentity } from 'services/storage.service'
-import { Enrolment, ErrorCode, errorExplainer } from 'utils'
+import { isAuthorized } from '../../../../services/auth.service'
+import { initEnrolment } from '../../../../services/identity.service'
+import { getEnrolment, getIdentity } from '../../../../services/storage.service'
+import { Enrolment, ErrorCode, errorExplainer } from '../../../../utils'
 
 type Response = Enrolment | { err: string }
 

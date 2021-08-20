@@ -5,7 +5,7 @@ export type Result<T = boolean, E = Error> = {
 
 export type Option<T> = {
     some?: T
-    none?: Boolean
+    none?: boolean
 }
 
 export type Identity = {
@@ -33,8 +33,9 @@ export type Storage = {
 }
 
 export type SendMessageData = {
-    fcqn: string
+    fqcn: string
     payload: string
+    correlationId: string
     signature: string
 }
 
@@ -49,9 +50,29 @@ export type GetMessageOptions = {
 
 export type Message = {
     id: string
+    fqcn?: string
+    // topic: string
     payload: string
     sender: string
     signature: string
+    // timestampNanos: string
+}
+
+export type Channel = {
+    fqcn: string
+    topics?: {
+        namespace: string
+        schema: object | string
+    }[]
+    admins?: string[]
+    publishers?: string[]
+    subscribers?: string[]
+    maxMsgAge?: number
+    maxMsgSize?: number
+    createdBy: string
+    createdDateTime: string
+    modifiedBy?: string
+    modifiedDateTime?: string
 }
 
 export enum RoleState {
@@ -85,6 +106,25 @@ export enum StringType {
 
 export enum DsbControlType {
     PM2 = 'pm2'
+}
+
+export enum WebSocketImplementation {
+    NONE = 'NONE',
+    SERVER = 'SERVER',
+    CLIENT = 'CLIENT'
+}
+
+export type WebSocketClientOptions = {
+    url: string
+    protocol?: string
+    reconnect?: boolean
+    reconnectTimeout?: number
+    reconnectMaxRetries?: number
+}
+
+export enum EventEmitMode {
+    SINGLE = 'SINGLE',
+    BULK = 'BULK'
 }
 
 export type EnrolmentManager = {

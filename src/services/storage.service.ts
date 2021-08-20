@@ -1,6 +1,6 @@
-import { config } from 'config'
 import { promises as fs } from 'fs'
-import { Certificate, Enrolment, ErrorCode, Identity, Option, Result, Storage } from 'utils'
+import { config } from '../config'
+import { Certificate, Enrolment, ErrorCode, Identity, Option, Result, Storage } from '../utils'
 
 // SETTERS
 

@@ -246,10 +246,86 @@
           }
         }
       }
+    },
+    "/api/v1/upload": {
+      "post": {
+        "tags": [
+          "Other"
+        ],
+        "summary": "Upload File with message and sends the message to DSB",
+        "operationId": "uploadFile",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "fqcn",
+            "required": true,
+            "description": "Fully Qualified Channel Name",
+            "example": "test.channels.testapp.apps.testorganization.iam.ewc",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "fqtn",
+            "required": false,
+            "description": "Fully Qualified Topic Name",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Unsigned message to be published on desired channel",
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadFile"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "File was successfully uploaded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SendMessageSuccess"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error processing request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ]
+      }
     }
   },
   "components": {
     "schemas": {
+      "UploadFile": {
+        "type": "object",
+        "properties": {
+          "file": {
+            "type": "object",
+            "description": "file containing message"
+          }
+        }
+      },
       "IdentityConfig": {
         "type": "object",
         "properties": {

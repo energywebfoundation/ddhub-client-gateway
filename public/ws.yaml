@@ -1,0 +1,84 @@
+asyncapi: '2.1.0'
+info:
+  title: DSB Gateway WebSocket API
+  version: 0.1.0
+  description: The Gateway WebSocket API is an alternative to the REST interface, allowing for real-time messaging (particularly asynchronous responses).
+defaultContentType: application/json
+channels:
+  message:
+    publish:
+      description: Publish a message on a particular channel using its fully-qualified channel name.
+      message:
+        $ref: '#/components/messages/OutgoingMessage'
+    subscribe:
+      description: Subscribe to messages on relevant channels.
+      message:
+        oneOf:
+          - $ref: '#/components/messages/IncomingMessage'
+          - $ref: '#/components/messages/ErrorMessage'
+components:
+  serverBindings:
+    ws:
+      method: GET
+      headers:
+        authorization:
+          type: string
+  messages:
+    OutgoingMessage:
+      bindings:
+        $ref: '#/components/serverBindings/ws'
+      payload:
+        type: object
+        properties:
+          fqcn:
+            type: string
+            description: Fully-qualified channel name
+            example: test.channels.testapp.apps.testorganization.iam.ewc
+          payload:
+            type: string
+            description: Payload of the message on the channel
+            example: "{\"data\":\"test\"}"
+          correlationId:
+            type: string
+            description: User-defined unique identifier for tracing the message
+            example: e9c82d33-d60c-42d8-bc76-e5107d97e1b9
+    IncomingMessage:
+      payload:
+        type: object
+        properties:
+          id:
+            type: string
+            description: The unique identifier of the message on the given channel.
+            example: "23"
+          fqcn:
+            type: string
+            description: Fully-qualified channel name that the message was sent on.
+            example: test.channels.testapp.apps.testorganization.iam.ewc
+          payload:
+            type: string
+            description: The message data
+            example: "{\"data\":\"test\"}"
+          sender:
+            type: string
+            description: The DID of the sender.
+            example: did:ethr:0xEd6e3B7a9D7354030e5900646Fc89BFF2E5aEC51
+          signature:
+            type: string
+            description: The signature, created by signing the message payload with
+                the private key belonging to the sender's DID.
+    ErrorMessage:
+      payload:
+        type: object
+        properties:
+          correlationId:
+            type: string
+            description: The user-defined unique identifier present in the
+              attempted publishing of a message
+            example: e9c82d33-d60c-42d8-bc76-e5107d97e1b9
+          err:
+            type: string
+            description: Error code string describing the reason a message could
+              not be published
+            example: DSB::UNAUTHORIZED
+
+          
