@@ -137,9 +137,7 @@ export class WebSocketClient {
         }
         return new Promise((resolve, reject) => {
             const ws = new WsClient()
-            ws.on('connectFailed', (err) => {
-                reject(err.message)
-            })
+            ws.on('connectFailed', reject)
             ws.on('connect', (connection) => {
                 const client = new WebSocketClient(
                     ws,

@@ -1,5 +1,6 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
+import { v4 as uuidv4 } from 'uuid'
 import { ErrorCode } from '../../../utils'
 import { isAuthorized } from '../../../services/auth.service'
 import { DsbApiService } from '../../../services/dsb-api.service'
@@ -43,6 +44,7 @@ async function forPOST(
 
     const { ok: sent, err: sendError } = await DsbApiService.init().sendMessage({
         ...body,
+        correlationId: uuidv4(),
         signature
     });
 
