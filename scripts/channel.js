@@ -23,7 +23,7 @@ const dids = [
 ]
 
 console.log(JSON.stringify({
-    fqcn: "adam.channels.dsb.apps.energyweb.iam.ewc",
+    fqcn: "test.channels.dsb.apps.energyweb.iam.ewc",
     topics: [{
         namespace: "test",
         schema: JSON.stringify(schema)

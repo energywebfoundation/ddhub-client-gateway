@@ -4,11 +4,14 @@ The DSB Client Gateway acts as a client to the DSB, enabling easier integration.
 
 ## Getting Started
 
-First, run the development server:
+Install dependencies:
+```
+yarn
+```
+
+Run the development server:
 
 ```bash
-npm run dev
-# or
 yarn dev
 ```
 
@@ -17,10 +20,43 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ## Config
 
-- `.env.development` -> points to a running instance of DSB
-- `.env.production` -> points to an instance of DSB on localhost
+The DSB Client Gateway can be configured in a number of ways.
 
 For the full configuration options see [Configuration](./CONFIGURATION.md).
+
+For developers:
+- `.env` -> applies to all environments
+- `.env.development` -> points to a running instance of DSB
+- `.env.production` -> points to an instance of DSB on localhost
+- `.env.test` -> applies only on `yarn test`
+- `.env.local` -> local overrides (do not commit to source control)
+
+## Testing WebSockets
+
+The gateway supports WebSockets for bidirectional communication. You can use
+[wscat](https://github.com/websockets/wscat) to easily receiving and sending
+messages over WebSockets.
+
+If running the gateway in WebSocket server mode, connect via
+```
+wscat --connect ws://localhost:3000/events --subprotocol dsb-messages
+```
+
+If you have configured the gateway to use basic authentication, supply the
+following flag in addition to the above command
+```
+--auth {username}:{password}
+```
+
+If running the gateway in WebSocket client mode, start a server with
+```
+wscat --listen 5001
+```
+
+Be sure to now set your gateway's `WEBSOCKET_URL` to ws://localhost:5001/.
+
+With wscat running, you should be able to start receiving messages once the
+gateway's DSB enrolment is complete.
 
 ## Building the Container
 

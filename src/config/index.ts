@@ -44,7 +44,7 @@ export const config = {
             process.env.WEBSOCKET
         ) ?? defaults.websocket,
         websocketClient: takeIf(process.env.WEBSOCKET === 'CLIENT', {
-            url: process.env.WEBSOCKET_URL,
+        url: process.env.WEBSOCKET_URL,
             protocol: process.env.WEBSOCKET_PROTOCOL,
             reconnect: asBool(process.env.WEBSOCKET_RECONNECT ?? defaults.websocketReconnect),
             reconnectTimeout: parseInt(

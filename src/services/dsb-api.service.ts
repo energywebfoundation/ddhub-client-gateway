@@ -192,7 +192,7 @@ export class DsbApiService {
         let interval = 10
 
         const job = async () => {
-            console.log(`[Job] Attempt to start listening for messages [${interval}s]`)
+            // console.log(`Attempt to start listening for messages [${interval}s]`)
             const { some: enrolment } = await getEnrolment()
             if (!enrolment?.state.approved) {
                 console.log('User not enroled')
@@ -216,7 +216,6 @@ export class DsbApiService {
                 return { err: new Error(ErrorCode.DSB_NO_SUBSCRIPTIONS) }
             }
 
-            console.log('Starting listener for messages in', channels.map((channel) => channel.fqcn))
             interval = 1
 
             for (const sub of subscriptions) {
@@ -226,7 +225,7 @@ export class DsbApiService {
                 })
                 if (err) {
                     interval = 60
-                    console.log('[Job] Error fetching messages:', err.message)
+                    console.log('Error fetching messages:', err.message)
                     break
                 }
                 if (messages && messages?.length > 0) {
@@ -247,8 +246,8 @@ export class DsbApiService {
         }
         // use setTimeout instead of setInterval so we can control the interval
         const runner = () => {
-            // could return here to get the latest interval
             job()
+            console.log()
             setTimeout(runner, interval * 1000)
         }
         runner()

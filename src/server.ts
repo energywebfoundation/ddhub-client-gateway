@@ -29,11 +29,15 @@ const main = async () => {
         DsbApiService.init().pollForNewMessages((message) => ws.emit(message))
     } else if (config.server.websocket === WebSocketImplementation.CLIENT) {
         if (config.server.websocketClient?.url) {
-            const ws = await WebSocketClient.init(
-                config.server.websocketClient as WebSocketClientOptions
-            )
-            console.log('WebSocket client connected to', config.server.websocketClient.url)
-            DsbApiService.init().pollForNewMessages((message) => ws.emit(message))
+            try {
+                const ws = await WebSocketClient.init(
+                    config.server.websocketClient as WebSocketClientOptions
+                )
+                console.log('WebSocket client connected to', config.server.websocketClient.url)
+                DsbApiService.init().pollForNewMessages((message) => ws.emit(message))
+            } catch (err) {
+                console.log('WebSocket client failed to connect:', err)
+            }
         } else {
             console.log('Need URL to connect to WebSocket Server. Skipping...')
         }
