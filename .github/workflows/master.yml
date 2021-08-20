@@ -2,7 +2,7 @@ name: Build and deploy
 
 on:
   push:
-    branches: [ DOI-1152-Setup-GH-Action-pipeline-for-DSB-Client-Gateway ]
+    branches: [ master ]
 
 jobs:
   cancel-previous:
@@ -13,7 +13,7 @@ jobs:
       - uses: styfle/cancel-workflow-action@0.9.0
         with:
           access_token: ${{ github.token }}
-  
+
   unique_id:
     runs-on: ubuntu-latest
     steps:
@@ -30,7 +30,7 @@ jobs:
     - uses: actions/checkout@v2
       with:
         fetch-depth: 0
-        
+
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
@@ -41,7 +41,7 @@ jobs:
     - name: Login to Amazon ECR
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
-      
+
     - name: Pull & build docker image
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
@@ -49,7 +49,7 @@ jobs:
       run: |
         docker pull 098061033856.dkr.ecr.us-east-1.amazonaws.com/ew-dos-dsb-ecr:canary
         docker build -t dsb-client-gateway .
-    
+
     - name: Logout of Amazon ECR
       if: always()
       run: docker logout ${{ steps.login-ecr.outputs.registry }}
@@ -58,7 +58,7 @@ jobs:
       uses: azure/login@v1
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
-    
+
     - name: Push image
       uses: azure/docker-login@v1
       with:
@@ -81,7 +81,7 @@ jobs:
       with:
         command: login ${{ secrets.ARGOCD_DEV_URL }}
         options: --insecure --password ${{ secrets.ARGOCD_DEV_PASS }} --username ${{ secrets.ARGOCD_DEV_USERNAME }}
-    
+
     - name: ArgoCD overwrite values.yaml
       uses: clowdhaus/argo-cd-action/@main
       id: argocd_image_tag_overwrite
