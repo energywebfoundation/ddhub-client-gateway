@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Button, makeStyles, Theme, Typography } from '@material-ui/core'
+import { Button, makeStyles, Theme, Tooltip, Typography } from '@material-ui/core'
 import InfoIcon from '@material-ui/icons/Info'
 import swal from 'sweetalert'
 import { CustomInput } from '../../components/CustomInput/CustomInput'
@@ -54,7 +54,12 @@ export const GatewayIdentity = ({
 
                 <div className={classes.credentialsHeader}>
                     <Typography variant="h6">GATEWAY IDENTITY</Typography>
-                    <InfoIcon />
+                    <Tooltip
+                        title="Configure and enrol the gateway as a DSB user using Energy Web Switchboard. You need
+                        to do this before the gateway can publish/subscribe to messages."
+                    >
+                        <InfoIcon />
+                    </Tooltip>
                 </div>
 
                 {statusText && (

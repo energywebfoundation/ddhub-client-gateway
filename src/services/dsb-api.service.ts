@@ -247,7 +247,6 @@ export class DsbApiService {
         // use setTimeout instead of setInterval so we can control the interval
         const runner = () => {
             job()
-            console.log()
             setTimeout(runner, interval * 1000)
         }
         runner()

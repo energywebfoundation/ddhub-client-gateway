@@ -10,7 +10,10 @@ tags:
     description: Manage the DSB Client Gateway as admin
   - name: Message
     description: Send and retrieve messages on the DSB
-  - name: Other
+  - name: Channels
+    description: Find information on available channels
+  - name: Docs
+    description: Download API schemas
 paths:
   /api/v1/config/identity:
     post:
@@ -116,7 +119,7 @@ paths:
           name: fqcn
           required: true
           description: Fully Qualified Channel Name
-          example: test.channels.testapp.apps.testorganization.iam.ewc
+          example: test.channels.dsb.apps.energyweb.iam.ewc
           schema:
             type: string
         - in: query
@@ -132,7 +135,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GetMessageSuccess'
+                type: array
+                items:
+                  $ref: '#/components/schemas/Message'
         default:
           description: Error processing request
           content:
@@ -141,15 +146,47 @@ paths:
                 $ref: '#/components/schemas/Error'
       security:
         - basicAuth: []
-  /api/v1/spec:
+  /api/v1/channels:
     get:
       tags:
-        - Other
-      summary: Retrieve this Open API schema in JSON
-      operationId: getSchema
+        - Channels
+      summary: Retreive channels with publisher or subcriber rights
+      operationId: getChannels
       responses:
         '200':
-          description: The JSON schema
+          description: The array of channels
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Channel'
+        default:
+          description: An error occurred retrieving the channels
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+        - basicAuth: []
+  /api/v1/docs/rest.yaml:
+    get:
+      tags:
+        - Docs
+      summary: Retrieve this Open API schema in YAML
+      operationId: getOpenAPISchema
+      responses:
+        '200':
+          description: The YAML schema file
+  /api/v1/docs/ws.yaml:
+    get:
+      tags:
+        - Docs
+      summary: Retrieve the Async API schema in YAML
+      operationId: getAsyncAPISchema
+      responses:
+        '200':
+          description: The YAML schema file
 components:
   schemas:
     IdentityConfig:
@@ -195,7 +232,7 @@ components:
       properties:
         fqcn:
           description: Fully Qualified Channel Name
-          example: test.channels.testapp.apps.testorganization.iam.ewc
+          example: test.channels.dsb.apps.energyweb.iam.ewc
           type: string
         payload:
           description: Message data conforming to channel
@@ -208,10 +245,6 @@ components:
           description: Message ID on the DSB
           example: msg-#22
           type: string
-    GetMessageSuccess:
-      type: array
-      items:
-        $ref: '#/components/schemas/Message'
     Message:
       type: object
       properties:
@@ -227,6 +260,65 @@ components:
         sender:
           description: DID of the sender of the message
           type: string
+    Channel:
+      type: object
+      properties:
+        fqcn:
+          description: Fully-qualified channel name
+          example: test.channels.dsb.apps.energyweb.iam.ewc
+          type: string
+        topics:
+          type: object
+          properties:
+            namespace:
+              description: The name of the topic within the channel
+              example: offers
+              type: string
+            schema:
+              description: JSON Schema object or string (only JSON currently supported)
+              example: "{\"$schema\":\"http://json-schema.org/draft-07/schema#\",\"$id\":\"0d0db676-4da7-414e-a36c-a4b62b151d22\",\"title\":\"test\",\"type\":\"object\",\"required\":[\"id\",\"name\"],\"properties\":{\"id\":{\"type\":\"integer\"},\"name\":{\"type\":\"string\"}}}"
+              type: string
+        admins:
+          description: Array of DIDs allowed to manage the channel
+          example: ["did:ethr:0x3E8c2db768f876907C54F52B9e6Cc7F8E48d850F"]
+          type: array
+          items:
+            type: string
+        publishers:
+          description: Array of DIDS and/or role authorized to pubish on the channel
+          example: ["did:ethr:0x3E8c2db768f876907C54F52B9e6Cc7F8E48d850F", "user.roles.dsb.apps.energyweb.iam.ewc"]
+          type: array
+          items:
+            type: string
+        subscribers:
+          description: Array of DIDS and/or role authorized to subscribe to the channel
+          example: ["did:ethr:0x3E8c2db768f876907C54F52B9e6Cc7F8E48d850F", "user.roles.dsb.apps.energyweb.iam.ewc"]
+          type: array
+          items:
+            type: string
+        maxMsgAge:
+          description: Duration a message lives until it is removed from persistent storage (nanoseconds)
+          example: 86400000000
+          type: number
+        maxMsgSize:
+          description: Size of messages allowed on the channel (bytes)
+          example: 10240
+          type: number
+        createdBy:
+          description: The DID that created the channel
+          example: "did:ethr:0x3E8c2db768f876907C54F52B9e6Cc7F8E48d850F"
+          type: string
+        createdDateTime:
+          description: Timestamp of when the channel was created (ISO 8601 UTC)
+          example: "2021-08-19T11:40:43.303Z"
+          type: string
+        modifiedBy:
+          description: The DID of the admin that last modified the channel
+          example: "did:ethr:0x3E8c2db768f876907C54F52B9e6Cc7F8E48d850F"
+          type: string
+        modifiedByDateTime:
+          description: Timestamp of when the channel was modified last (ISO 8601 UTC)
+          example: "2021-08-20T11:40:43.303Z"
     Error:
       type: object
       properties:

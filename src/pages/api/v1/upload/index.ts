@@ -1,10 +1,10 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { v4 as uuidv4 } from 'uuid'
-import { ErrorCode } from '../../../utils'
-import { isAuthorized } from '../../../services/auth.service'
-import { DsbApiService } from '../../../services/dsb-api.service'
-import { signPayload } from '../../../services/identity.service'
+import { ErrorCode } from '../../../../utils'
+import { isAuthorized } from '../../../../services/auth.service'
+import { DsbApiService } from '../../../../services/dsb-api.service'
+import { signPayload } from '../../../../services/identity.service'
 
 export default async function handler(
     req: NextApiRequest,

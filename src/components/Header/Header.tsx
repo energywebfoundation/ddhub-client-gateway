@@ -1,13 +1,14 @@
-import React from 'react';
-import Image from 'next/image';
+import React from 'react'
+import Image from 'next/image'
+import Link from 'next/link'
 import { makeStyles } from '@material-ui/styles'
 import {
   AppBar,
   Toolbar,
   Typography,
   Theme
-} from '@material-ui/core';
-import logo from '../../../public/ew-flex-single-logo.png';
+} from '@material-ui/core'
+import logo from '../../../public/ew-flex-single-logo.png'
 
 export default function Header() {
     const classes = useStyles();
@@ -23,11 +24,23 @@ export default function Header() {
             </div>
 
             <div>
+              <div className={classes.nav}>
+                <Link href="/">
+                  <a className={classes.navLink}>Admin</a>
+                </Link>
+                <Link href="/files">
+                  <a className={classes.navLink}>Files</a>
+                </Link>
+                <Link href="/docs">
+                <a className={classes.navLink}>Docs</a>
+                </Link>
+              </div>
+            <p className={classes.divider}>•</p>
               <Typography>
                   EW-DSB Client Gateway
               </Typography>
               <Typography className={classes.version} variant="caption">
-                V 0.1.0
+                v0.1.1
               </Typography>
             </div>
           </Toolbar>
@@ -63,5 +76,23 @@ const useStyles = makeStyles((theme: Theme) => ({
       color: '#fff',
       fontSize: '.7rem',
       background: theme.palette.secondary.main
+    },
+    divider: {
+      margin: '0 1rem',
+    },
+    nav: {
+      display: 'flex',
+      width: '10rem',
+      justifyContent: 'space-between',
+    },
+    navLink: {
+      fontSize: '1rem',
+      fontWeight: 'bold',
+
+      '&:hover': {
+        textDecorationLine: 'underline',
+        fontWeight: 'bolder',
+        color: theme.palette.secondary.main,
+      }
     }
 }))

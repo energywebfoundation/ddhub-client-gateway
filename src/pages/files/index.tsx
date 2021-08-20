@@ -8,12 +8,12 @@ import {
   Divider,
   Theme,
 } from '@material-ui/core'
-import { UploadContainer } from '../components/UploadFile/UploadContainer';
-import Header from '../components/Header/Header';
-import { DownloadContainer } from '../components/DownloadFile/DownloadContainer';
-import { DsbApiService } from '../services/dsb-api.service';
-import { isAuthorized } from '../services/auth.service';
-import { ErrorCode, Option, Result, serializeError } from '../utils';
+import { UploadContainer } from '../../components/UploadFile/UploadContainer';
+import Header from '../../components/Header/Header';
+import { DownloadContainer } from '../../components/DownloadFile/DownloadContainer';
+import { DsbApiService } from '../../services/dsb-api.service';
+import { isAuthorized } from '../../services/auth.service';
+import { ErrorCode, Option, Result, serializeError } from '../../utils';
 
 type Props = {
   health: Result<boolean, string>
