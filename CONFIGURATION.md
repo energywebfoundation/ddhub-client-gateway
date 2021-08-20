@@ -2,11 +2,89 @@
 
 The DSB Client Gateway is configured via environment variables.
 
+## Server
+
+The following variables control the setup of the gateway server.
+
 ### `PORT` [optional]
 
 Define the port the gateway will run on.
 
 **Default**: 3000
+
+### `WEBSOCKET` [optional]
+
+Select WebSocket mode depending on architecture (i.e. preference for inbound
+or outbound connections).
+
+By default, the gateway will run a WebSocket server on /events. However, it
+can also operate as a client with additional configuration (see below).
+Alternatively, this functionality can be turned off.
+
+*Options: `SERVER`, `CLIENT`, `NONE`*
+
+**Default**: `SERVER`
+
+### `WEBSOCKET_URL` [optional]
+
+Sets the URL of the WebSocket server the client should try to connect to.
+
+**Required if `WEBSOCKET` is set to `CLIENT`**
+
+### `WEBSOCKET_PROTOCOL` [optional]
+
+Sets the protocol the WebSocket client should request access to. Acceptable
+protocols are defined by the WebSocket server, however, this can also be left
+undefined.
+
+Note that if `WEBSOCKET` is set to `SERVER` this variable is ignored. The
+server will only accept connection requests on the `dsb-messages` protocol.
+
+### `WEBSOCKET_RECONNECT` [optional]
+
+Define whether the WebSocket client should reconnect on connection error/close.
+
+**Default**: `true`
+
+### `WEBSOCKET_RECONNECT_TIMEOUT` [optional]
+
+Define the interval between receiving a connection error/close and attempting
+to reconnect, in milliseconds.
+
+**Default**: `10000` (10s)
+
+### `WEBSOCKET_RECONNECT_MAX_RETRIES` [optional]
+
+Define how many times the WebSocket client should attempt reconnection with the
+server upon receving connection error/close.
+
+**Default**: `10`
+
+## Events
+
+The following variables control how the DSB Client Gateway reacts to events,
+for example, incoming messages on a channel. This is used in conjunction with
+the WebSocket configuration to define how data is pushed to connections.
+
+### `EVENTS_EMIT_MODE` [optional]
+
+Defines the format for messages pushed over a real-time communication channel.
+
+If bulk mode is chosen, messages will be sent as an array. At every 1 second
+interval, the gateway will emit an array of the latest messages received.
+
+If single mode is chosen, messages will be sent individually.
+
+*Options*: `BULK`, `SINGLE`
+
+**Default**: `BULK`
+
+### `EVENTS_MAX_PER_SECOND` [optional]
+
+Defines how many events should be pushed per second, regardless of mode chosen
+(see above).
+
+**Default**: `100`
 
 ## DSB Message Broker
 

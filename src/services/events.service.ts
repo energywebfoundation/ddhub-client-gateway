@@ -1,14 +1,16 @@
-import { config } from 'config'
 import { EventEmitter } from 'events'
 import { IAM, NATS_EXCHANGE_TOPIC } from 'iam-client-lib'
 import { IClaimIssuance } from 'iam-client-lib/dist/src/iam'
 import { Claim } from 'iam-client-lib/dist/src/cacheServerClient/cacheServerClient.types'
 import { connect, JSONCodec } from 'nats.ws'
 import { w3cwebsocket } from 'websocket'
-import { MESSAGEBROKER_ROLE, RoleState, USER_ROLE } from 'utils'
+import { config } from '../config'
+import { MESSAGEBROKER_ROLE, RoleState, USER_ROLE, WebSocketImplementation } from '../utils'
 import { initMessageBroker } from './dsb.service'
 import { isApproved } from './identity.service'
 import { getEnrolment, getIdentity, writeEnrolment } from './storage.service'
+import { DsbApiService } from './dsb-api.service'
+import { WebSocketClient, WebSocketServer } from './websocket.service'
 
 // shim websocket for nats.ws
 globalThis.WebSocket = w3cwebsocket as any
@@ -106,4 +108,21 @@ events.on('approved', async () => {
         privateKey: identity.privateKey,
         did: enrolment.did
     })
+
+    // cannot do this as next pages don't have access to the same state as
+    // the server
+    
+    // wait for message broker to start if it's under our control
+    // const delay = config.dsb.controllable ? 20 * 1000 : 0
+    // setTimeout(() => {
+    //     if (config.server.websocket === WebSocketImplementation.SERVER) {
+    //         DsbApiService.init().pollForNewMessages(
+    //             (message) => WebSocketServer.get().emit(message)
+    //         )
+    //     } else if (config.server.websocket === WebSocketImplementation.CLIENT) {
+    //         DsbApiService.init().pollForNewMessages(
+    //             (message) => WebSocketClient.get().emit(message)
+    //         )
+    //     }
+    // }, delay)
 })

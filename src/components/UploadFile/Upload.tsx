@@ -1,17 +1,13 @@
-import React, { useEffect, useState } from 'react';
-import Head from 'next/head';
-import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
+import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/styles'
 import {
 	Typography,
-	Container,
 	Button,
 	Theme,
 	Grid,
-	Link,
 } from '@material-ui/core';
 import { Info } from '@material-ui/icons'
-import { CustomInput } from 'components/CustomInput/CustomInput';
+import { CustomInput } from '../CustomInput/CustomInput';
 import swal from 'sweetalert'
 
 

@@ -1,5 +1,5 @@
-import { config } from "config"
-import { ErrorCode, Result } from "utils"
+import { config } from "../config"
+import { ErrorCode, Result } from "../utils"
 
 type Auth = {
     username: string

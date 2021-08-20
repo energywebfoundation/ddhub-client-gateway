@@ -1,6 +1,17 @@
-import { config } from "config"
-import { ErrorCode, GetMessageOptions, joinUrl, Message, Result, SendMessageData, SendMessageResult } from "utils"
+import { config } from "../config"
+import {
+    ErrorCode,
+    GetMessageOptions,
+    joinUrl,
+    Message,
+    Result,
+    SendMessageData,
+    SendMessageResult,
+    EventEmitMode,
+    Channel
+} from "../utils"
 import { signProof } from "./identity.service"
+import { getEnrolment } from "./storage.service"
 
 export class DsbApiService {
 
@@ -52,7 +63,6 @@ export class DsbApiService {
      * @returns
      */
     public async sendMessage(data: SendMessageData): Promise<Result<SendMessageResult>> {
-        // todo: check enrolment complete
         try {
             if (!this.authToken) {
                 throw Error(ErrorCode.DSB_UNAUTHORIZED)
@@ -106,6 +116,50 @@ export class DsbApiService {
                     return { ok: await res.json() }
                 case 401:
                     throw Error(ErrorCode.DSB_UNAUTHORIZED)
+                case 403:
+                    throw Error(ErrorCode.DSB_FORBIDDEN)
+                default:
+                    console.log('DSB GET /message error', res.status, res.statusText)
+                    throw Error(ErrorCode.DSB_REQUEST_FAILED)
+            }
+        } catch (err) {
+            if (err.message === ErrorCode.DSB_UNAUTHORIZED) {
+                const { ok, err } = await this.login()
+                console.log('ok', ok)
+                if (!ok) {
+                    console.log('login failed:', err?.message)
+                    return { err }
+                }
+                return this.getMessages(options)
+            }
+            console.log('returning error')
+            return { err: err }
+        }
+    }
+
+    /**
+     * Gets the list of channels that the gateway has publish/subscribe rights to
+     *
+     * @returns list of channels
+     */
+    public async getChannels(): Promise<Result<Channel[]>> {
+        try {
+            if (!this.authToken) {
+                throw Error(ErrorCode.DSB_UNAUTHORIZED)
+            }
+            const url = joinUrl(config.dsb.baseUrl, `/channel/pubsub`)
+            const res = await fetch(url, {
+                headers: {
+                    'Authorization': `Bearer ${this.authToken}`,
+                },
+            })
+            switch (res.status) {
+                case 200:
+                    return { ok: await res.json() }
+                case 401:
+                    throw Error(ErrorCode.DSB_UNAUTHORIZED)
+                case 403:
+                    throw Error(ErrorCode.DSB_FORBIDDEN)
                 default:
                     console.log('DSB GET /message error', res.status, res.statusText)
                     throw Error(ErrorCode.DSB_REQUEST_FAILED)
@@ -116,10 +170,87 @@ export class DsbApiService {
                 if (!ok) {
                     return { err }
                 }
-                return this.getMessages(options)
+                return this.getChannels()
             }
-            return { err: err.message }
+            return { err }
         }
+    }
+
+    /**
+     * Start polling for new messages on the DSB message broker. Note that this
+     * will begin consuming from a channel/topic queue so it might take a while
+     * to catch up to real-time.
+     *
+     * To be deleted once we have websocket support on the message broker
+     *
+     * @param fqcn
+     * @param callback
+     */
+    public async pollForNewMessages(
+        callback: (message: Message | Message[]) => void
+    ): Promise<void> {
+        let interval = 10
+
+        const job = async () => {
+            // console.log(`Attempt to start listening for messages [${interval}s]`)
+            const { some: enrolment } = await getEnrolment()
+            if (!enrolment?.state.approved) {
+                console.log('User not enroled')
+                interval = 60
+                return
+            }
+            const { ok: channels, err: fetchErr } = await this.getChannels()
+            if (!channels) {
+                console.log('Error fetching available channels', fetchErr?.message)
+                interval = 60
+                return { err: fetchErr }
+            }
+            const subscriptions = channels.filter(
+                ({ subscribers }) => subscribers?.includes(enrolment.did)
+            )
+            if (subscriptions.length === 0) {
+                console.log(
+                    'No subscriptions found. Restart once the DID has been added to a channel to enable push messages'
+                )
+                interval = 60
+                return { err: new Error(ErrorCode.DSB_NO_SUBSCRIPTIONS) }
+            }
+
+            interval = 1
+
+            for (const sub of subscriptions) {
+                const { ok: messages, err } = await this.getMessages({
+                    fqcn: sub.fqcn,
+                    amount: config.events.maxPerSecond
+                })
+                if (err) {
+                    interval = 60
+                    console.log('Error fetching messages:', err.message)
+                    break
+                }
+                if (messages && messages?.length > 0) {
+                    console.log(`Received new messages - count: ${messages.length}`)
+                    if (config.events.emitMode === EventEmitMode.BULK) {
+                        return callback(
+                            messages.map((msg) => ({ ...msg, fqcn: sub.fqcn }))
+                        )
+                    }
+                    for (const message of messages) {
+                        callback({
+                            ...message,
+                            fqcn: sub.fqcn
+                        })
+                    }
+                }
+            }
+        }
+        // use setTimeout instead of setInterval so we can control the interval
+        const runner = () => {
+            job()
+            console.log()
+            setTimeout(runner, interval * 1000)
+        }
+        runner()
     }
 
     /**

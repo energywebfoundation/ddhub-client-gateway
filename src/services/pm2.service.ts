@@ -1,6 +1,5 @@
-import { config } from 'config'
 import pm2, { StartOptions } from 'pm2'
-import { ErrorCode, Result } from 'utils'
+import { ErrorCode, Result } from '../utils'
 
 type PM2 = {
     /**

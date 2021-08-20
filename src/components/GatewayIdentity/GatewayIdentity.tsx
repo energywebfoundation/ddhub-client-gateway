@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { Button, makeStyles, Theme, Typography } from '@material-ui/core'
 import InfoIcon from '@material-ui/icons/Info'
-import { CustomInput } from 'components/CustomInput/CustomInput'
-import { EnrolmentState, snip, StringType } from 'utils'
 import swal from 'sweetalert'
+import { CustomInput } from '../../components/CustomInput/CustomInput'
+import { EnrolmentState, snip, StringType } from '../../utils'
 
 type GatewayIdentityProps = {
     did?: string

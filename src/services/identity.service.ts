@@ -14,8 +14,8 @@ import {
     MESSAGEBROKER_ROLE,
     USER_ROLE,
     PARENT_NAMESPACE,
-} from "utils"
-import { config } from 'config'
+} from "../utils"
+import { config } from '../config'
 import { getEnrolment, getIdentity, getStorage, writeEnrolment, writeIdentity } from './storage.service'
 import { events } from "./events.service"
 
@@ -31,7 +31,7 @@ export async function signProof(): Promise<Result<string>> {
     }
     const { some: enrolment } = await getEnrolment()
     if (!enrolment || !enrolment.did) {
-        return { err: new Error(ErrorCode.ID_NO_DID )}
+        return { err: new Error(ErrorCode.ID_NO_DID) }
     }
     const signer = new Wallet(identity.privateKey)
     const header = {
@@ -151,6 +151,11 @@ export async function initEnrolment({
  */
 export function validatePrivateKey(privateKey: string): Result<Wallet> {
     try {
+        const isValidPrefixed = privateKey.startsWith('0x') && (privateKey.length === 66)
+        const isValidNoPrefix = !privateKey.startsWith('0x') && (privateKey.length === 64)
+        if (!isValidPrefixed && !isValidNoPrefix) {
+            throw Error()
+        }
         return { ok: new Wallet(privateKey) }
     } catch (err) {
         return {

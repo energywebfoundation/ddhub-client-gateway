@@ -1,5 +1,5 @@
-import { config } from 'config'
-import { DsbControlType, ErrorCode, joinUrl, Result } from "utils"
+import { config } from '../config'
+import { DsbControlType, ErrorCode, Result } from "../utils"
 import { initPM2, ProcessState } from './pm2.service'
 
 type MessageBrokerOptions = {
