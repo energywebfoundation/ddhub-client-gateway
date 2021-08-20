@@ -1,10 +1,10 @@
 openapi: 3.0.1
 info:
   title: DSB Client Gateway
-  description: The DSB Client Gateway acts as a client to the Energy Web Decentralized Service Bus (DSB), allowing it to publish and subscribe to  messages on particular channels.
+  description: The DSB Client Gateway acts as a client to the Energy Web Decentralized Service Bus (DSB), allowing it to publish and subscribe to messages on particular channels.
   contact:
     email: dsb@energyweb.org
-  version: 0.1.0
+  version: 0.2.0
 tags:
   - name: Config
     description: Manage the DSB Client Gateway as admin
@@ -234,6 +234,9 @@ components:
           description: Fully Qualified Channel Name
           example: test.channels.dsb.apps.energyweb.iam.ewc
           type: string
+        topic:
+          description: Topic to send the message to
+          type: string
         payload:
           description: Message data conforming to channel
           example: '{"some": "data"}'
@@ -251,6 +254,9 @@ components:
         id:
           description: Message ID
           type: string
+        topic:
+          description: Topic the message was sent to
+          type: string
         payload:
           description: The message data
           type: string
@@ -260,6 +266,9 @@ components:
         sender:
           description: DID of the sender of the message
           type: string
+        timestampNanos:
+          description: Timestamp the message was sent in nanoseconds
+          type: number
     Channel:
       type: object
       properties:
