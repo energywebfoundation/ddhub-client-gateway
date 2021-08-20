@@ -56,7 +56,7 @@ export type Message = {
     payload: string
     sender: string
     signature: string
-    timestampNanos: string
+    timestampNanos: number
 }
 
 export type Channel = {
