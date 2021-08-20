@@ -16,8 +16,8 @@ export const getStaticProps: GetStaticProps = async (context) => {
         props: {
             schema,
         },
-    };
-};
+    }
+}
 
 export default function AsyncApiDocs({ schema }: InferGetStaticPropsType<typeof getStaticProps>) {
     return (

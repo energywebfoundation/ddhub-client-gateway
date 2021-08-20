@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
-import { Button, makeStyles, Theme, Typography } from '@material-ui/core';
+import { Button, makeStyles, Theme, Typography } from '@material-ui/core'
 import InfoIcon from '@material-ui/icons/Info'
-import { CustomInput } from '../../components/CustomInput/CustomInput';
+import { CustomInput } from '../../components/CustomInput/CustomInput'
 
 type ProxyCertificateProps = {
     originalClientId: string
@@ -118,4 +118,4 @@ const useStyles = makeStyles((theme: Theme) => ({
             marginBottom: '1rem'
         }
     },
-}));
+}))

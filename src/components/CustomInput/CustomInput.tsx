@@ -1,5 +1,5 @@
 import react from 'react'
-import { alpha, InputBase, Theme, withStyles } from "@material-ui/core";
+import { alpha, InputBase, Theme, withStyles } from "@material-ui/core"
 
 export const CustomInput = withStyles((theme: Theme) => ({
     root: {
@@ -21,4 +21,4 @@ export const CustomInput = withStyles((theme: Theme) => ({
             borderColor: theme.palette.secondary.dark,
         },
     },
-}))(InputBase);
+}))(InputBase)

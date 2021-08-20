@@ -1,5 +1,5 @@
 import React, {useState} from 'react'
-import { Channel as ChannelType } from '../../utils';
+import { Channel as ChannelType } from '../../utils'
 import Channel from './Channels'
 
 type ChannelContainerProps = {

@@ -11,7 +11,7 @@ import {
 import logo from '../../../public/ew-flex-single-logo.png'
 
 export default function Header() {
-    const classes = useStyles();
+    const classes = useStyles()
 
     return (
         <AppBar position="static" className={classes.appBar}>

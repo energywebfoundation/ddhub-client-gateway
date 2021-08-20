@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import Head from 'next/head';
+import React, { useEffect } from 'react'
+import Head from 'next/head'
 import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
 import swal from '@sweetalert/with-react'
 import { makeStyles } from '@material-ui/styles'
@@ -10,14 +10,14 @@ import {
   Theme,
   Grid
 } from '@material-ui/core'
-import { GatewayIdentityContainer } from '../components/GatewayIdentity/GatewayIdentityContainer';
-import { ProxyCertificateContainer } from '../components/ProxyCertificate/ProxyCertificateContainer';
-import Header from '../components/Header/Header';
-import { DsbApiService } from '../services/dsb-api.service';
-import { refreshState } from '../services/identity.service';
-import { useErrors } from '../hooks/useErrors';
-import { isAuthorized } from '../services/auth.service';
-import { ErrorCode, Option, Result, serializeError, Storage } from '../utils';
+import { GatewayIdentityContainer } from '../components/GatewayIdentity/GatewayIdentityContainer'
+import { ProxyCertificateContainer } from '../components/ProxyCertificate/ProxyCertificateContainer'
+import Header from '../components/Header/Header'
+import { DsbApiService } from '../services/dsb-api.service'
+import { refreshState } from '../services/identity.service'
+import { useErrors } from '../hooks/useErrors'
+import { isAuthorized } from '../services/auth.service'
+import { ErrorCode, Option, Result, serializeError, Storage } from '../utils'
 
 type Props = {
   health: Result < boolean, string >

@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'
 import { makeStyles } from '@material-ui/styles'
 import {
 	Typography,
 	Button,
 	Theme,
 	Grid,
-} from '@material-ui/core';
+} from '@material-ui/core'
 import { Info } from '@material-ui/icons'
-import { CustomInput } from '../CustomInput/CustomInput';
+import { CustomInput } from '../CustomInput/CustomInput'
 import swal from 'sweetalert'
 
 
@@ -19,8 +19,8 @@ type UploadProps = {
 export const Upload = ({ onUpload }: UploadProps) => {
 	const classes = useStyles()
 
-	const [file, setFile] = useState<File>();
-	const [fileName, setFileName] = useState('');
+	const [file, setFile] = useState<File>()
+	const [fileName, setFileName] = useState('')
 	const [channelName, setChannelName] = useState('')
 
 
@@ -28,9 +28,9 @@ export const Upload = ({ onUpload }: UploadProps) => {
 	const uploadToClient = (event) => {
 		if (event.target.files && event.target.files[0]) {
 			setFileName(event.target.files[0].name)
-			setFile(event.target.files[0]);
+			setFile(event.target.files[0])
 		}
-	};
+	}
 
 	return (
 		<section className={classes.upload}>

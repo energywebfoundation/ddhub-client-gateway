@@ -8,8 +8,8 @@ import {
 } from '@material-ui/core'
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
 import { Channel as ChannelType } from '../../utils'
-import { JsonView, defaultStyles } from 'react-json-view-lite';
-import 'react-json-view-lite/dist/index.css';
+import { JsonView, defaultStyles } from 'react-json-view-lite'
+import 'react-json-view-lite/dist/index.css'
 
 type ChannelProps = {
   channel: ChannelType,
@@ -32,13 +32,13 @@ const AccordionSummary = withStyles({
     },
   },
   expanded: {},
-})(MuiAccordionSummary);
+})(MuiAccordionSummary)
 
 export default function Channel({
   channel,
   myDID,
 }: ChannelProps) {
-  const classes = useStyles();
+  const classes = useStyles()
 
   const isPubSub = () => {
     if (!myDID) {
@@ -147,11 +147,11 @@ const duration = 500
 const defaultStyle = {
   transition: `transform 200ms, opacity ${duration}ms ease`,
   opacity: 1
-};
+}
 
 const transitionStyles = {
   entering: { opacity: 0, display: 'block' },
   entered: { opacity: 1},
   exiting: { opacity: 0 },
   exited: { opacity: 0, display: 'none' }
-};
+}

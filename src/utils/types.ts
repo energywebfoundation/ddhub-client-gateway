@@ -51,11 +51,11 @@ export type GetMessageOptions = {
 export type Message = {
     id: string
     fqcn?: string
-    // topic: string
+    topic: string
     payload: string
     sender: string
     signature: string
-    // timestampNanos: string
+    timestampNanos: string
 }
 
 export type Channel = {

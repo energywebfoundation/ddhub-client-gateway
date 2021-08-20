@@ -33,20 +33,20 @@ async function forPOST(
     res: NextApiResponse
 ): Promise<void> {
 
-    const payload = req.body.split('\n')[4]; //taking only the content of the file from the request body
+    const payload = req.body.split('\n')[4] //taking only the content of the file from the request body
 
-    const { ok: signature, err: signError } = await signPayload(payload);
+    const { ok: signature, err: signError } = await signPayload(payload)
 
     if (!signature) {
-        return res.status(400).send({ err: signError });
+        return res.status(400).send({ err: signError })
     }
-    let body = { fqcn: req.query.fqcn as string, payload: payload };
+    let body = { fqcn: req.query.fqcn as string, payload: payload }
 
     const { ok: sent, err: sendError } = await DsbApiService.init().sendMessage({
         ...body,
         correlationId: uuidv4(),
         signature
-    });
+    })
 
     if (!sent) {
         return res.status(400).send({ err: sendError })

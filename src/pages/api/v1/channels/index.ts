@@ -1,7 +1,7 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import { isAuthorized } from "../../../../services/auth.service";
-import { DsbApiService } from "../../../../services/dsb-api.service";
-import { ErrorCode } from "../../../../utils";
+import { NextApiRequest, NextApiResponse } from "next"
+import { isAuthorized } from "../../../../services/auth.service"
+import { DsbApiService } from "../../../../services/dsb-api.service"
+import { ErrorCode } from "../../../../utils"
 
 export default async function handler(
     req: NextApiRequest,
