@@ -1,21 +1,23 @@
-const schema = {
-    $schema: 'http://json-schema.org/draft-07/schema#',
-    $id: '0d0db676-4da7-414e-a36c-a4b62b151d22',
-    title: 'test',
-    type: 'object',
-    required: [
-        'id',
-        'name'
-    ],
-    properties: {
-        id: {
-            'type': 'integer'
-        },
-        name: {
-            type: 'string'
-        }
-    }
-}
+// const schema = {
+//     $schema: 'http://json-schema.org/draft-07/schema#',
+//     $id: '0d0db676-4da7-414e-a36c-a4b62b151d22',
+//     title: 'test',
+//     type: 'object',
+//     required: [
+//         'id',
+//         'name'
+//     ],
+//     properties: {
+//         id: {
+//             'type': 'integer'
+//         },
+//         name: {
+//             type: 'string'
+//         }
+//     }
+// }
+
+const schema = require('./schema.json')
 
 const dids = [
     'did:ethr:0x8adc5FFD53f13Df59bf2D17C7489595a87B705c9',

@@ -6,14 +6,14 @@ import {
   Typography,
   Container,
   Divider,
-  Theme
-} from '@material-ui/core';
-import Header from 'components/Header/Header';
-import { DsbApiService } from 'services/dsb-api.service';
-import { isAuthorized } from 'services/auth.service';
-import { ErrorCode, Option, Result, serializeError } from 'utils';
-import { AvailableChannelContainer } from 'components/AvailableChannel/AvailableChannelContainer';
-import { Swagger } from 'components/Swagger/Swagger';
+  Theme,
+} from '@material-ui/core'
+import { UploadContainer } from '../../components/UploadFile/UploadContainer';
+import Header from '../../components/Header/Header';
+import { DownloadContainer } from '../../components/DownloadFile/DownloadContainer';
+import { DsbApiService } from '../../services/dsb-api.service';
+import { isAuthorized } from '../../services/auth.service';
+import { ErrorCode, Option, Result, serializeError } from '../../utils';
 
 type Props = {
   health: Result<boolean, string>
@@ -52,7 +52,7 @@ export async function getServerSideProps(
 }
 
 // TODO: break into components
-export default function AvailableChannel({ health }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function FileUpload({ health }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const classes = useStyles()
 
   return (
@@ -76,13 +76,16 @@ export default function AvailableChannel({ health }: InferGetServerSidePropsType
 
           <Divider className={classes.divider}/>
 
-          <Swagger />
+          <section className={classes.main}>
+						<Typography className={classes.textWhite} variant="h4">File Upload </Typography>
+						<UploadContainer />
+          </section>
 
           <Divider className={classes.divider}/>
 
-          <section className={classes.main}>
-            <Typography className={classes.textWhite} variant="h4">Available Channels</Typography>
-            <AvailableChannelContainer />
+					<section className={classes.main}>
+						<Typography className={classes.textWhite} variant="h4">File Download </Typography>
+						<DownloadContainer />
           </section>
 
         </Container>

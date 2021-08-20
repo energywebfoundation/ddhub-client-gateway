@@ -3,6 +3,7 @@
   "version": "0.1.1",
   "private": true,
   "scripts": {
+    "dev:next": "next dev",
     "dev": "ts-node --project tsconfig.server.json src/server.ts",
     "build:server": "tsc --project tsconfig.server.json",
     "build:next": "next build",
@@ -26,6 +27,7 @@
     "pm2": "^5.1.0",
     "react": "17.0.2",
     "react-dom": "17.0.2",
+    "react-json-view-lite": "^0.9.2",
     "react-transition-group": "^4.4.2",
     "swagger-ui-react": "^4.0.0-beta.2",
     "sweetalert": "^2.1.2",
