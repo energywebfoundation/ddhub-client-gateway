@@ -14,6 +14,7 @@ tags:
     description: Find information on available channels
   - name: Docs
     description: Download API schemas
+  - name: Other
 paths:
   /api/v1/config/identity:
     post:
@@ -187,6 +188,21 @@ paths:
       responses:
         '200':
           description: The YAML schema file
+  /health:
+    get:
+      tags:
+        - Other
+      description: Asserts the DSB Gateway is running and the DSB Message Broker is reachable
+      operationId: getHealth
+      responses:
+        '200':
+          description: OK
+        '503':
+          description: The DSB Message Broker is unreachable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 components:
   schemas:
     IdentityConfig:
