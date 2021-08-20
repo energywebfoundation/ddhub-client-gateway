@@ -96,9 +96,11 @@ describe('WebSocketService', () => {
                 const payload = {
                     id: '1',
                     fqcn: 'test.channel',
+                    topic: 'test',
                     payload: '<payload>',
                     sender: 'did:ethr:<address>',
-                    signature: 'signed'
+                    signature: 'signed',
+                    timestampNanos: 0
                 }
                 conn.on('message', (data) => {
                     const msg = parseMessage(data)
@@ -145,9 +147,11 @@ describe('WebSocketService', () => {
             const ws = WebSocketServer.get().emit({
                 id: '1',
                 fqcn: 'test.channel',
+                topic: 'test',
                 payload: 'string',
                 sender: 'did:ethr:addr',
-                signature: 'sig'
+                signature: 'sig',
+                timestampNanos: 0
             })
         })
 
@@ -234,9 +238,11 @@ describe('WebSocketService', () => {
                     const payload = {
                         id: '1',
                         fqcn: 'test.channel',
+                        topic: 'test',
                         payload: '<payload>',
                         sender: 'did:ethr:<address>',
-                        signature: 'signed'
+                        signature: 'signed',
+                        timestampNanos: 0
                     }
                     events.on(`${payload.fqcn}#${payload.id}`, (msg) => {
                         expect(msg).toEqual(payload)
@@ -300,9 +306,11 @@ describe('WebSocketService', () => {
                     WebSocketClient.get().emit({
                         id: '1',
                         fqcn: 'test.channel',
+                        topic: 'test',
                         payload: 'string',
                         sender: 'did:ethr:addr',
-                        signature: 'sig'
+                        signature: 'sig',
+                        timestampNanos: 0
                     })
                     done()
                 })

@@ -34,6 +34,7 @@ export type Storage = {
 
 export type SendMessageData = {
     fqcn: string
+    topic: string
     payload: string
     correlationId: string
     signature: string
@@ -51,11 +52,11 @@ export type GetMessageOptions = {
 export type Message = {
     id: string
     fqcn?: string
-    // topic: string
+    topic: string
     payload: string
     sender: string
     signature: string
-    // timestampNanos: string
+    timestampNanos: number
 }
 
 export type Channel = {

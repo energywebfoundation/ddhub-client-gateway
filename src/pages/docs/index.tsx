@@ -1,5 +1,5 @@
-import React from 'react';
-import Head from 'next/head';
+import React from 'react'
+import Head from 'next/head'
 import Link from 'next/link'
 import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
 import { makeStyles } from '@material-ui/styles'
@@ -9,17 +9,17 @@ import {
   Divider,
   Theme,
   Button
-} from '@material-ui/core';
+} from '@material-ui/core'
 import swal from '@sweetalert/with-react'
-import Header from '../../components/Header/Header';
-import { DsbApiService } from '../../services/dsb-api.service';
-import { isAuthorized } from '../../services/auth.service';
-import { Channel, ErrorCode, Option, Result, serializeError } from '../../utils';
-import { useEffect } from 'react';
-import { useErrors } from '../../hooks/useErrors';
-import { useState } from 'react';
-import { ChannelContainer } from '../../components/Channels/ChannelsContainer';
-import { getEnrolment } from '../../services/storage.service';
+import Header from '../../components/Header/Header'
+import { DsbApiService } from '../../services/dsb-api.service'
+import { isAuthorized } from '../../services/auth.service'
+import { Channel, ErrorCode, Option, Result, serializeError } from '../../utils'
+import { useEffect } from 'react'
+import { useErrors } from '../../hooks/useErrors'
+import { useState } from 'react'
+import { ChannelContainer } from '../../components/Channels/ChannelsContainer'
+import { getEnrolment } from '../../services/storage.service'
 
 type Props = {
   health: Result<boolean, string>

@@ -11,7 +11,7 @@ import {
 import logo from '../../../public/ew-flex-single-logo.png'
 
 export default function Header() {
-    const classes = useStyles();
+    const classes = useStyles()
 
     return (
         <AppBar position="static" className={classes.appBar}>
@@ -40,7 +40,7 @@ export default function Header() {
                   EW-DSB Client Gateway
               </Typography>
               <Typography className={classes.version} variant="caption">
-                v0.1.1
+                v0.2.0
               </Typography>
             </div>
           </Toolbar>

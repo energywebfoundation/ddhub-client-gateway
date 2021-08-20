@@ -1,36 +1,35 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'
 import { makeStyles } from '@material-ui/styles'
 import {
 	Typography,
 	Button,
 	Theme,
 	Grid,
-} from '@material-ui/core';
+} from '@material-ui/core'
 import { Info } from '@material-ui/icons'
-import { CustomInput } from '../CustomInput/CustomInput';
+import { CustomInput } from '../CustomInput/CustomInput'
 import swal from 'sweetalert'
 
 
 type UploadProps = {
-	onUpload: (file: File, channelName: string) => void
+	onUpload: (file: File, channelName: string, topic: string) => void
 }
 
 
 export const Upload = ({ onUpload }: UploadProps) => {
 	const classes = useStyles()
 
-	const [file, setFile] = useState<File>();
-	const [fileName, setFileName] = useState('');
+	const [file, setFile] = useState<File>()
+	const [fileName, setFileName] = useState('')
 	const [channelName, setChannelName] = useState('')
-
-
+	const [topicName, setTopicName] = useState('')
 
 	const uploadToClient = (event) => {
 		if (event.target.files && event.target.files[0]) {
 			setFileName(event.target.files[0].name)
-			setFile(event.target.files[0]);
+			setFile(event.target.files[0])
 		}
-	};
+	}
 
 	return (
 		<section className={classes.upload}>
@@ -55,8 +54,9 @@ export const Upload = ({ onUpload }: UploadProps) => {
 						<div className={classes.formGroup}>
 							<Typography variant="caption">TOPIC NAME</Typography>
 							<CustomInput
-								placeholder='Fully Qualified Topic Name'
+								placeholder='Topic Name'
 								fullWidth
+								onChange={(event) => setTopicName(event.target.value)}
 							/>
 						</div>
 					</Grid>
@@ -103,7 +103,7 @@ export const Upload = ({ onUpload }: UploadProps) => {
 									if (!file) {
 										return swal('Error', 'No file uploaded', 'error')
 									}
-									onUpload(file, channelName)
+									onUpload(file, channelName, topicName)
 								}}
 							>
 								Upload

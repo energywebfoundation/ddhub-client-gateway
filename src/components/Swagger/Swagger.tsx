@@ -7,7 +7,7 @@ import {
 } from '@material-ui/core'
 
 export const Swagger = () => {
-  const classes = useStyles();
+  const classes = useStyles()
 
   return (
     <section className={classes.swagger}>

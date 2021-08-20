@@ -1,7 +1,7 @@
 asyncapi: '2.1.0'
 info:
   title: DSB Gateway WebSocket API
-  version: 0.1.0
+  version: 0.2.0
   description: The Gateway WebSocket API is an alternative to the REST interface, allowing for real-time messaging (particularly asynchronous responses).
 defaultContentType: application/json
 channels:
@@ -33,7 +33,10 @@ components:
           fqcn:
             type: string
             description: Fully-qualified channel name
-            example: test.channels.testapp.apps.testorganization.iam.ewc
+            example: test.channels.dsb.apps.energyweb.iam.ewc
+          topic:
+            type: string
+            description: Topic to send the message to
           payload:
             type: string
             description: Payload of the message on the channel
@@ -53,7 +56,10 @@ components:
           fqcn:
             type: string
             description: Fully-qualified channel name that the message was sent on.
-            example: test.channels.testapp.apps.testorganization.iam.ewc
+            example: test.channels.dsb.apps.energyweb.iam.ewc
+          topic:
+            type: string
+            example: Topic the message was sent to
           payload:
             type: string
             description: The message data
@@ -66,6 +72,9 @@ components:
             type: string
             description: The signature, created by signing the message payload with
                 the private key belonging to the sender's DID.
+          timestampNanos:
+            description: Timestamp the message was sent in nanoseconds
+            type: number
     ErrorMessage:
       payload:
         type: object
@@ -80,5 +89,3 @@ components:
             description: Error code string describing the reason a message could
               not be published
             example: DSB::UNAUTHORIZED
-
-          

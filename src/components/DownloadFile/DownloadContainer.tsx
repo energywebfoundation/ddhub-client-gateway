@@ -1,5 +1,5 @@
-import React from 'react';
-import { Download } from './Download';
+import React from 'react'
+import { Download } from './Download'
 
 export const DownloadContainer = () => {
 	return (
