@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Upload } from './Upload';
 import axios from 'axios'
 import swal from '@sweetalert/with-react'
-import { useErrors } from 'hooks/useErrors'
+import { useErrors } from '../../hooks/useErrors'
 
 
 type UploadContainerProps = {
