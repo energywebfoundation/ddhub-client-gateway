@@ -14,7 +14,7 @@ export const UploadContainer = ({ auth }: UploadContainerProps) => {
 	const [isLoading, setIsLoading] = useState(false)
 
 
-	const handleUpload = async (file: File, fqcn: string) => {
+	const handleUpload = async (file: File, fqcn: string, topic: string) => {
 
 		setIsLoading(true)
 		const formData = new FormData()
@@ -22,7 +22,7 @@ export const UploadContainer = ({ auth }: UploadContainerProps) => {
 
 		try {
 			await axios.post(
-				`/api/v1/upload?fqcn=${fqcn}`,
+				`/api/v1/upload?fqcn=${fqcn}&topic=${topic}`,
 				formData,
 				auth
 					? { headers: { 'Authorization': `Bearer ${auth}`, 'content-type': 'multipart/form-data' } }

@@ -32,15 +32,23 @@ async function forPOST(
     req: NextApiRequest,
     res: NextApiResponse
 ): Promise<void> {
-
-    const payload = req.body.split('\n')[4] //taking only the content of the file from the request body
+    //taking only the content of the file from the request body
+    const lines = (req.body as string).split('\n')
+    const payload = lines
+        .slice(3, lines.length - 2)
+        .filter((line) => line !== '\r')
+        .join('')
 
     const { ok: signature, err: signError } = await signPayload(payload)
 
     if (!signature) {
         return res.status(400).send({ err: signError })
     }
-    let body = { fqcn: req.query.fqcn as string, payload: payload }
+    let body = {
+        fqcn: req.query.fqcn as string,
+        topic: req.query.topic as string,
+        payload: payload
+    }
 
     const { ok: sent, err: sendError } = await DsbApiService.init().sendMessage({
         ...body,

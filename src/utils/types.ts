@@ -34,6 +34,7 @@ export type Storage = {
 
 export type SendMessageData = {
     fqcn: string
+    topic: string
     payload: string
     correlationId: string
     signature: string
