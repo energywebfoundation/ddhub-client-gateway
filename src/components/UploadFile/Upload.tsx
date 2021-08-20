@@ -1,22 +1,41 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/styles'
 import {
-  Typography,
-  Button,
-  Theme,
-  Grid,
+	Typography,
+	Button,
+	Theme,
+	Grid,
 } from '@material-ui/core';
 import { Info } from '@material-ui/icons'
-import { CustomInput } from '../../components/CustomInput/CustomInput';
+import { CustomInput } from '../CustomInput/CustomInput';
+import swal from 'sweetalert'
 
 
-export const Upload = () => {
-  const classes = useStyles()
+type UploadProps = {
+	onUpload: (file: File, channelName: string) => void
+}
+
+
+export const Upload = ({ onUpload }: UploadProps) => {
+	const classes = useStyles()
+
+	const [file, setFile] = useState<File>();
+	const [fileName, setFileName] = useState('');
+	const [channelName, setChannelName] = useState('')
+
+
+
+	const uploadToClient = (event) => {
+		if (event.target.files && event.target.files[0]) {
+			setFileName(event.target.files[0].name)
+			setFile(event.target.files[0]);
+		}
+	};
 
 	return (
 		<section className={classes.upload}>
 			<div className={classes.uploadHeader}>
-					<Info />
+				<Info />
 			</div>
 
 			<div className={classes.form}>
@@ -27,6 +46,17 @@ export const Upload = () => {
 							<CustomInput
 								placeholder='Fully Qualified Channel Name'
 								fullWidth
+								onChange={(event) => setChannelName(event.target.value)}
+							/>
+						</div>
+					</Grid>
+
+					<Grid item xs={12} sm={7} md={9}>
+						<div className={classes.formGroup}>
+							<Typography variant="caption">TOPIC NAME</Typography>
+							<CustomInput
+								placeholder='Fully Qualified Topic Name'
+								fullWidth
 							/>
 						</div>
 					</Grid>
@@ -36,9 +66,10 @@ export const Upload = () => {
 							<div className={classes.formGroup}>
 								<Typography variant="caption">FILE</Typography>
 								<CustomInput
-									placeholder='File'
+									placeholder={fileName ? fileName : 'No file chosen'}
 									fullWidth
 									disabled
+
 								/>
 							</div>
 						</Grid>
@@ -54,6 +85,8 @@ export const Upload = () => {
 								<input
 									type="file"
 									hidden
+									accept=".txt, .xml, .csv, .json"
+									onChange={uploadToClient}
 								/>
 							</Button>
 						</Grid>
@@ -62,24 +95,35 @@ export const Upload = () => {
 								variant="outlined"
 								color="secondary"
 								fullWidth
+								onClick={() => {
+
+									if (!channelName) {
+										return swal('Error', 'Please enter channel name', 'error')
+									}
+									if (!file) {
+										return swal('Error', 'No file uploaded', 'error')
+									}
+									onUpload(file, channelName)
+								}}
 							>
 								Upload
 							</Button>
 						</Grid>
+
 					</Grid>
 				</Grid>
 			</div>
 
 		</section>
-  )
+	)
 }
 
 const useStyles = makeStyles((theme: Theme) => ({
-  upload: {
-    border: '1px solid #fff',
+	upload: {
+		border: '1px solid #fff',
 		padding: theme.spacing(6),
 		margin: theme.spacing(3, 1)
-  },
+	},
 	uploadHeader: {
 		textAlign: 'right',
 		color: '#fff'
@@ -99,15 +143,15 @@ const useStyles = makeStyles((theme: Theme) => ({
 		marginBottom: '2rem',
 
 		'& span': {
-				fontSize: '.8rem',
-				marginBottom: '.3rem'
+			fontSize: '.8rem',
+			marginBottom: '.3rem'
 		},
 		'& *': {
-				color: '#fff'
+			color: '#fff'
 		},
 		'& input': {
-				width: '100%'
-			}
+			width: '100%'
+		}
 	},
 	errorText: {
 		color: theme.palette.error.main
