@@ -16,15 +16,16 @@ COPY --from=deps /app/node_modules ./node_modules
 RUN yarn build
 
 # DSB Container
-FROM 098061033856.dkr.ecr.us-east-1.amazonaws.com/ew-dos-dsb-ecr:canary
+FROM 098061033856.dkr.ecr.us-east-1.amazonaws.com/ew-dos-dsb-ecr:868a4a6f-6921-46b8-a7b7-5e1488304abf
 
 RUN mkdir -p /var/deployment/apps/dsb-client-gateway
 
 WORKDIR /var/deployment/apps/dsb-client-gateway
 
-# COPY --from=builder /app/next.config.js ./next.config.js
+COPY --from=builder /app/next.config.js ./next.config.js
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/.env ./.env
