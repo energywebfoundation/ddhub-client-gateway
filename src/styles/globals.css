@@ -11,3 +11,10 @@ a {
 * {
   box-sizing: border-box;
 }
+#nprogress .bar {
+  background: #A567FF !important;
+}
+
+#nprogress .peg {
+  box-shadow: 0 0 10px #A567FF, 0 0 5px #A567FF;
+}

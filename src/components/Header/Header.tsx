@@ -95,7 +95,6 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
     navLink: {
       fontSize: '1rem',
-      fontWeight: 'bold',
 
       '&:hover': {
         textDecorationLine: 'underline',
