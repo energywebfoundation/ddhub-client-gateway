@@ -49,7 +49,6 @@ async function verifySignature(
             msgHashBytes,
             body.signature,
         );
-        console.log('recoveredPublicKey', recoveredPublicKey);
         if (recoveredPublicKey === expectedPublicKey) {
             res.status(200).json({
                 ok: true
