@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Upload } from './Upload'
 import axios from 'axios'
 import swal from '@sweetalert/with-react'
@@ -13,6 +13,25 @@ export const UploadContainer = ({ auth }: UploadContainerProps) => {
 	const errors = useErrors()
 	const [isLoading, setIsLoading] = useState(false)
 
+
+	useEffect(() => {
+		loadChannels()
+	})
+
+	const loadChannels = async () => {
+		try {
+			let res = await axios.get(
+				`/api/v1/channels`,
+				auth
+					? { headers: { 'Authorization': `Bearer ${auth}`, 'content-type': 'multipart/form-data' } }
+					: undefined
+			)
+
+			console.log(res)
+		} catch (error) {
+			swal('Error', errors(error.response.data.err), 'error')
+		}
+	}
 
 	const handleUpload = async (file: File, fqcn: string, topic: string) => {
 
