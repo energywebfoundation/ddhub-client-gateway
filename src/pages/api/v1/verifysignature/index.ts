@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next"
 import { isAuthorized } from "../../../../services/auth.service"
 import { Result, ErrorCode } from "../../../../utils"
-import { utils } from 'ethers';
+import { utils } from 'ethers'
 
 export default async function handler(
     req: NextApiRequest,
@@ -13,7 +13,7 @@ export default async function handler(
     const authHeader = req.headers.authorization
     const { err } = isAuthorized(authHeader)
     if (!err) {
-        return verifySignature(req, res);
+        return verifySignature(req, res)
     } else {
         if (err.message === ErrorCode.UNAUTHORIZED) {
             res.status(401)
@@ -38,25 +38,25 @@ async function verifySignature(
         signature: req.body.signature as string,
         did: req.body.did as string,
         payload: req.body.payload as string
-    };
+    }
 
-    const msgHash = utils.hashMessage(body.payload);
-    const msgHashBytes = utils.arrayify(msgHash);
-    const expectedPublicKey = body.did.split(':')[2];
+    const msgHash = utils.hashMessage(body.payload)
+    const msgHashBytes = utils.arrayify(msgHash)
+    const expectedPublicKey = body.did.split(':')[2]
 
     try {
         const recoveredPublicKey = utils.recoverPublicKey(
             msgHashBytes,
             body.signature,
-        );
+        )
         if (recoveredPublicKey === expectedPublicKey) {
             res.status(200).json({
                 ok: true
             })
         } else {
-            res.status(400).json({ err: 'SIGNATURE_NOT_VERIFIED' });
+            res.status(400).json({ err: 'SIGNATURE_NOT_VERIFIED' })
         }
     } catch (error) {
-        res.status(400).json({ err: 'Signature not correct' });
+        res.status(400).json({ err: 'Signature not correct' })
     }
 }
