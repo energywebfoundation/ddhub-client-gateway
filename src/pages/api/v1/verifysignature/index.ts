@@ -42,21 +42,23 @@ async function verifySignature(
 
     const msgHash = utils.hashMessage(body.payload)
     const msgHashBytes = utils.arrayify(msgHash)
-    const expectedPublicKey = body.did.split(':')[2]
+    const expectedAddress = body.did.split(':')[2]
 
     try {
-        const recoveredPublicKey = utils.recoverPublicKey(
+
+        const recoveredAddress = utils.recoverAddress(
             msgHashBytes,
             body.signature,
         )
-        if (recoveredPublicKey === expectedPublicKey) {
+
+        if (recoveredAddress === expectedAddress) {
             res.status(200).json({
                 ok: true
             })
         } else {
-            res.status(400).json({ err: 'SIGNATURE_NOT_VERIFIED' })
+            res.status(400).json({ err: 'Signature not verified!' })
         }
     } catch (error) {
-        res.status(400).json({ err: 'Signature not correct' })
+        res.status(400).json({ err: 'Signature not correct!' })
     }
 }
