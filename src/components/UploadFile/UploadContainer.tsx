@@ -3,6 +3,8 @@ import { Upload } from './Upload'
 import axios from 'axios'
 import swal from '@sweetalert/with-react'
 import { useErrors } from '../../hooks/useErrors'
+import { Channel, Result, } from '../../utils';
+
 
 
 type UploadContainerProps = {
@@ -12,22 +14,17 @@ type UploadContainerProps = {
 export const UploadContainer = ({ auth }: UploadContainerProps) => {
 	const errors = useErrors()
 	const [isLoading, setIsLoading] = useState(false)
-
-
-	useEffect(() => {
-		loadChannels()
-	})
+	const [channels, setChannels] = useState<Channel[] | undefined>([])
 
 	const loadChannels = async () => {
 		try {
-			let res = await axios.get(
+			const res = await axios.get(
 				`/api/v1/channels`,
 				auth
 					? { headers: { 'Authorization': `Bearer ${auth}`, 'content-type': 'multipart/form-data' } }
 					: undefined
 			)
-
-			console.log(res)
+			setChannels(res.data)
 		} catch (error) {
 			swal('Error', errors(error.response.data.err), 'error')
 		}
@@ -58,6 +55,8 @@ export const UploadContainer = ({ auth }: UploadContainerProps) => {
 
 	return (
 		<Upload
+			channels={channels}
+			fetchChannels={loadChannels}
 			onUpload={handleUpload}
 		/>
 	)

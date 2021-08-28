@@ -11,30 +11,45 @@ import {
 } from '@material-ui/core'
 import { Info } from '@material-ui/icons'
 import { CustomInput } from '../CustomInput/CustomInput'
-import { Channel } from '../../utils'
 import swal from 'sweetalert'
+import { Channel } from '../../utils';
 
 type UploadProps = {
+	channels?: Channel[]
 	onUpload: (file: File, channelName: string, topic: string) => void
+	fetchChannels: () => void
 }
 
-export const Upload = ({ onUpload }: UploadProps) => {
+export const Upload = ({ channels, fetchChannels, onUpload }: UploadProps) => {
 	const classes = useStyles()
 
 	const [file, setFile] = useState<File>()
 	const [fileName, setFileName] = useState('')
 	const [topicName, setTopicName] = useState('')
 	const [channelName, setChannelName] = useState('')
-	const [channels, setChannels] = useState<Channel[]>([
-		{
-			fqcn: 'testK.channels.dsb.apps.energyweb.iam.ewc',
-			createdBy: 'did:ethr:0xfd6b809B81cAEbc3EAB0d33f0211E5934621b2D2',
-			createdDateTime: '2021-08-26T09:23:08.291Z',
-			admins: [
-				'did:ethr:0xfd6b809B81cAEbc3EAB0d33f0211E5934621b2D2'
-			]
-		}
-	])
+
+	useEffect(() => {
+		fetchChannels()
+    }, [])
+
+	// const [channels, setChannels] = useState<Channel[]>([
+	// 	{
+	// 		fqcn: 'testK.channels.dsb.apps.energyweb.iam.ewc',
+	// 		createdBy: 'did:ethr:0xfd6b809B81cAEbc3EAB0d33f0211E5934621b2D2',
+	// 		createdDateTime: '2021-08-26T09:23:08.291Z',
+	// 		admins: [
+	// 			'did:ethr:0xfd6b809B81cAEbc3EAB0d33f0211E5934621b2D2'
+	// 		]
+	// 	},
+	// 	{
+	// 		fqcn: 'testV.channels.dsb.apps.energyweb.iam.ewc',
+	// 		createdBy: 'did:ethr:0xfd6b809B81cAEbc3EAB0d33f0211E5934621b2D2',
+	// 		createdDateTime: '2021-08-26T09:23:08.291Z',
+	// 		admins: [
+	// 			'did:ethr:0xfd6b809B81cAEbc3EAB0d33f0211E5934621b2D2'
+	// 		]
+	// 	}
+	// ])
 
 	const uploadToClient = (event) => {
 		if (event.target.files && event.target.files[0]) {
@@ -60,14 +75,14 @@ export const Upload = ({ onUpload }: UploadProps) => {
 									id="demo-customized-select"
 									value={channelName}
 									onChange={(event: any) => setChannelName(event.target.value)}
-									input={<CustomInput/>}
+									input={<CustomInput />}
 									fullWidth
 								>
-									{channels.map(channel => (
+									{(channels && channels.length  > 0) ? channels.map(channel => (
 										<MenuItem key={channel.fqcn} value={channel.fqcn}>
 											{channel.fqcn}
 										</MenuItem>
-									))}
+									)): null }
 								</Select>
 							</FormControl>
 						</div>
