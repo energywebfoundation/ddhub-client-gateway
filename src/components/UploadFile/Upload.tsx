@@ -12,7 +12,7 @@ import {
 import { Info } from '@material-ui/icons'
 import { CustomInput } from '../CustomInput/CustomInput'
 import swal from 'sweetalert'
-import { Channel, Topics } from '../../utils'
+import { Channel, Topic } from '../../utils'
 
 type UploadProps = {
 	channels?: Channel[]
@@ -26,7 +26,7 @@ export const Upload = ({ channels, onUpload }: UploadProps) => {
 	const [fileName, setFileName] = useState('')
 	const [topicName, setTopicName] = useState('')
 	const [channelName, setChannelName] = useState('')
-	const [topics, setTopics] = useState<Topics[]>()
+	const [topics, setTopics] = useState<Topic[]>()
 
 	useEffect(() => {
 		const channel = channels?.find(channel => channel.fqcn == channelName)

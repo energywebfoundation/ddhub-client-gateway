@@ -61,7 +61,7 @@ export type Message = {
 
 export type Channel = {
     fqcn: string
-    topics?: Topics[]
+    topics?: Topic[]
     admins?: string[]
     publishers?: string[]
     subscribers?: string[]
@@ -73,7 +73,7 @@ export type Channel = {
     modifiedDateTime?: string
 }
 
-export type Topics = {
+export type Topic = {
     namespace: string
     schema: object | string
 }

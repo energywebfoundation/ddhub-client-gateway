@@ -63,13 +63,13 @@ export default function FileUpload({ health, auth }: InferGetServerSidePropsType
   useEffect(() => {
     loadChannels()
   }, [])
-  
+
   const loadChannels = async () => {
     try {
       const res = await axios.get(
         `/api/v1/channels`,
         auth
-          ? { headers: { 'Authorization': `Bearer ${auth}`, 'content-type': 'multipart/form-data' } }
+          ? { headers: { 'Authorization': `Bearer ${auth}` } }
           : undefined
       )
       setChannels(res.data)
