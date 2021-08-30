@@ -3,16 +3,16 @@ import { Upload } from './Upload'
 import axios from 'axios'
 import swal from '@sweetalert/with-react'
 import { useErrors } from '../../hooks/useErrors'
-
+import { Channel } from '../../utils'
 
 type UploadContainerProps = {
-	auth?: string
+	auth?: string,
+	channels: Channel[] | undefined
 }
 
-export const UploadContainer = ({ auth }: UploadContainerProps) => {
+export const UploadContainer = ({ auth, channels }: UploadContainerProps) => {
 	const errors = useErrors()
 	const [isLoading, setIsLoading] = useState(false)
-
 
 	const handleUpload = async (file: File, fqcn: string, topic: string) => {
 
@@ -39,6 +39,7 @@ export const UploadContainer = ({ auth }: UploadContainerProps) => {
 
 	return (
 		<Upload
+			channels={channels}
 			onUpload={handleUpload}
 		/>
 	)

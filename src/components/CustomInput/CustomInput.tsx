@@ -13,7 +13,7 @@ export const CustomInput = withStyles((theme: Theme) => ({
         backgroundColor: theme.palette.secondary.dark,
         border: `1px solid ${theme.palette.secondary.dark}`,
         fontSize: 16,
-        width: 'auto',
+        width: '100%',
         padding: '10px 12px',
         transition: theme.transitions.create(['border-color', 'box-shadow']),
         '&:focus': {

@@ -8,10 +8,15 @@ import {
   Typography,
   Theme
 } from '@material-ui/core'
+import { useRouter } from 'next/router'
+import clsx from 'clsx'
 import logo from '../../../public/ew-flex-single-logo.png'
 
 export default function Header() {
     const classes = useStyles()
+    const router = useRouter()
+
+    const isActive = (pathname: string) => router.pathname === pathname ? classes.active : ''
 
     return (
         <AppBar position="static" className={classes.appBar}>
@@ -26,13 +31,13 @@ export default function Header() {
             <div>
               <div className={classes.nav}>
                 <Link href="/">
-                  <a className={classes.navLink}>Admin</a>
+                  <a className={clsx(classes.navLink, isActive('/'))}>Admin</a>
                 </Link>
                 <Link href="/files">
-                  <a className={classes.navLink}>Files</a>
+                  <a className={clsx(classes.navLink, isActive('/files'))}>Files</a>
                 </Link>
                 <Link href="/docs">
-                <a className={classes.navLink}>Docs</a>
+                <a className={clsx(classes.navLink, isActive('/docs'))}>Docs</a>
                 </Link>
               </div>
             <p className={classes.divider}>•</p>
@@ -55,6 +60,9 @@ const useStyles = makeStyles((theme: Theme) => ({
         color: '#fff'
       },
       marginBottom: '3rem'
+    },
+    active: {
+      color: theme.palette.secondary.main
     },
     toolbar: {
       display: 'flex',
@@ -87,7 +95,6 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
     navLink: {
       fontSize: '1rem',
-      fontWeight: 'bold',
 
       '&:hover': {
         textDecorationLine: 'underline',

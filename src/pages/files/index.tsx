@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useState, useEffect} from 'react'
 import Head from 'next/head'
 import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
 import { makeStyles } from '@material-ui/styles'
@@ -8,12 +8,15 @@ import {
   Divider,
   Theme,
 } from '@material-ui/core'
+import axios from 'axios'
+import swal from '@sweetalert/with-react'
 import { UploadContainer } from '../../components/UploadFile/UploadContainer'
 import Header from '../../components/Header/Header'
 import { DownloadContainer } from '../../components/DownloadFile/DownloadContainer'
 import { DsbApiService } from '../../services/dsb-api.service'
 import { isAuthorized } from '../../services/auth.service'
-import { ErrorCode, Option, Result, serializeError } from '../../utils'
+import { ErrorCode, Option, Result, serializeError, Channel } from '../../utils'
+import { useErrors } from '../../hooks/useErrors'
 
 type Props = {
   health: Result<boolean, string>
@@ -52,8 +55,28 @@ export async function getServerSideProps(
 }
 
 // TODO: break into components
-export default function FileUpload({ health }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function FileUpload({ health, auth }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const classes = useStyles()
+  const errors = useErrors()
+	const [channels, setChannels] = useState<Channel[] | undefined>([])
+
+  useEffect(() => {
+    loadChannels()
+  }, [])
+
+  const loadChannels = async () => {
+    try {
+      const res = await axios.get(
+        `/api/v1/channels`,
+        auth
+          ? { headers: { 'Authorization': `Bearer ${auth}` } }
+          : undefined
+      )
+      setChannels(res.data)
+    } catch (error) {
+      swal('Error', errors(error.response.data.err), 'error')
+    }
+  }
 
   return (
     <div>
@@ -78,14 +101,14 @@ export default function FileUpload({ health }: InferGetServerSidePropsType<typeo
 
           <section className={classes.main}>
 						<Typography className={classes.textWhite} variant="h4">File Upload </Typography>
-						<UploadContainer />
+						<UploadContainer channels={channels} />
           </section>
 
           <Divider className={classes.divider}/>
 
 					<section className={classes.main}>
 						<Typography className={classes.textWhite} variant="h4">File Download </Typography>
-						<DownloadContainer />
+						<DownloadContainer channels={channels} />
           </section>
 
         </Container>
