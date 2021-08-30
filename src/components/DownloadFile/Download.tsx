@@ -15,20 +15,13 @@ import { Info } from '@material-ui/icons'
 import { CustomInput } from '../../components/CustomInput/CustomInput'
 import { Channel } from '../../utils'
 
+type DownloadProps = {
+	channels: Channel[] | undefined
+}
 
-export const Download = () => {
+export const Download = ({channels}: DownloadProps) => {
   const classes = useStyles()
 	const [channelName, setChannelName] = useState('')
-	const [channels, setChannels] = useState<Channel[]>([
-		{
-			fqcn: 'testK.channels.dsb.apps.energyweb.iam.ewc',
-			createdBy: 'did:ethr:0xfd6b809B81cAEbc3EAB0d33f0211E5934621b2D2',
-			createdDateTime: '2021-08-26T09:23:08.291Z',
-			admins: [
-				'did:ethr:0xfd6b809B81cAEbc3EAB0d33f0211E5934621b2D2'
-			]
-		}
-	])
 
 	return (
 		<section className={classes.download}>
@@ -50,7 +43,7 @@ export const Download = () => {
 									input={<CustomInput/>}
 									fullWidth
 								>
-									{channels.map(channel => (
+									{channels?.map(channel => (
 										<MenuItem key={channel.fqcn} value={channel.fqcn}>
 											{channel.fqcn}
 										</MenuItem>

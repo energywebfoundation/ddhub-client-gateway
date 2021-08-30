@@ -61,10 +61,7 @@ export type Message = {
 
 export type Channel = {
     fqcn: string
-    topics?: {
-        namespace: string
-        schema: object | string
-    }[]
+    topics?: Topics[]
     admins?: string[]
     publishers?: string[]
     subscribers?: string[]
@@ -74,6 +71,11 @@ export type Channel = {
     createdDateTime: string
     modifiedBy?: string
     modifiedDateTime?: string
+}
+
+export type Topics = {
+    namespace: string
+    schema: object | string
 }
 
 export enum RoleState {

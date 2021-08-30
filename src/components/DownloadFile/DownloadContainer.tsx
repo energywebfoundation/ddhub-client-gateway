@@ -1,8 +1,13 @@
 import React from 'react'
 import { Download } from './Download'
+import { Channel } from '../../utils'
 
-export const DownloadContainer = () => {
+type DownloadContainerProps = {
+	channels: Channel[] | undefined
+}
+
+export const DownloadContainer = ({channels} : DownloadContainerProps) => {
 	return (
-		<Download />
+		<Download channels={channels} />
 	)
 }
