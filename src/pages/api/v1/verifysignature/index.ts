@@ -34,6 +34,10 @@ async function verifySignature(
         return res.status(400).json({ err: 'signature, did, payload all required' })
     }
 
+    if (typeof(req.body.signature) !== 'string' || typeof(req.body.did) !== 'string' || typeof(req.body.payload) !== 'string') {
+        return res.status(400).json({ err: 'signature, did, payload should be string' })
+    }
+
     let body = {
         signature: req.body.signature as string,
         did: req.body.did as string,
@@ -45,7 +49,6 @@ async function verifySignature(
     const expectedAddress = body.did.split(':')[2]
 
     try {
-
         const recoveredAddress = utils.recoverAddress(
             msgHashBytes,
             body.signature,
