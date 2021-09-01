@@ -34,7 +34,9 @@ async function verifySignature(
         return res.status(400).json({ err: 'signature, did, payload all required' })
     }
 
-    if (typeof(req.body.signature) !== 'string' || typeof(req.body.did) !== 'string' || typeof(req.body.payload) !== 'string') {
+    if (typeof (req.body.signature) !== 'string' ||
+        typeof (req.body.did) !== 'string' ||
+        typeof (req.body.payload) !== 'string') {
         return res.status(400).json({ err: 'signature, did, payload should be string' })
     }
 
