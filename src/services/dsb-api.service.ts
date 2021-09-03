@@ -249,7 +249,8 @@ export class DsbApiService {
             job()
             setTimeout(runner, interval * 1000)
         }
-        runner()
+        // commented because participants couldn't pull normally and this runner consumes them before user's request
+        // runner()
     }
 
     /**
