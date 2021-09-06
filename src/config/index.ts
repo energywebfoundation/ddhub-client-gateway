@@ -7,7 +7,7 @@ loadEnvConfig(process.cwd(), process.env.NODE_ENV !== 'production')
 
 const defaults = {
     port: '3000',
-    websocket: 'SERVER',
+    websocket: 'NONE',
     chainId: '73799',
     rpcUrl: 'https://volta-rpc.energyweb.org/',
     cacheServerUrl: 'https://identitycache-dev.energyweb.org/',
