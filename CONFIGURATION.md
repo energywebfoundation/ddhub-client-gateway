@@ -21,9 +21,16 @@ By default, the gateway will run a WebSocket server on /events. However, it
 can also operate as a client with additional configuration (see below).
 Alternatively, this functionality can be turned off.
 
+Note that under the hood, the WebSocket implementation uses the same message
+consumer as the GET /api/v1/message endpoint. Turning WebSocket support on is
+therefore likely to render the REST endpoint useless because outstanding
+messages will have already been pulled by the WebSocket implementation. If you
+intend to use the REST endpoint to pull new messages from the queue, please
+leave this value set to `NONE`.
+
 *Options: `SERVER`, `CLIENT`, `NONE`*
 
-**Default**: `SERVER`
+**Default**: `NONE`
 
 ### `WEBSOCKET_URL` [optional]
 
