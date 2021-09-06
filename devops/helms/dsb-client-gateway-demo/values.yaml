@@ -1,0 +1,121 @@
+dsb-client-gateway: 
+  replicaCount: 1
+
+  clientgateway:
+    config:
+      # -- Define the port the gateway will run on.
+      port: 3000
+      # -- Select WebSocket mode depending on architecture (i.e. preference for inbound or outbound connections). By default, the gateway will run a WebSocket server on /events. However, it can also operate as a client with additional configuration (see below). Alternatively, this functionality can be turned off. Options: SERVER, CLIENT, NONE
+      websocket: SERVER
+      # -- Sets the URL of the WebSocket server the client should try to connect to. Required if WEBSOCKET is set to CLIENT.
+      websocket_url: ws://localhost:5001/
+      # -- Sets the protocol the WebSocket client should request access to. Acceptable protocols are defined by the WebSocket server, however, this can also be left undefined. Note that if WEBSOCKET is set to SERVER this variable is ignored. The server will only accept connection requests on the dsb-messages protocol.
+      websocket_protocol: ""
+      # -- Define whether the WebSocket client should reconnect on connection error/close.
+      websocket_reconnect: true
+      # -- Define the interval between receiving a connection error/close and attempting to reconnect, in milliseconds.
+      websocket_reconnect_timeout: 10000
+      # -- Define how many times the WebSocket client should attempt reconnection with the server upon receving connection error/close.
+      websocket_reconnect_max_retries: 10
+      # -- Defines the format for messages pushed over a real-time communication channel. If bulk mode is chosen, messages will be sent as an array. At every 1 second interval, the gateway will emit an array of the latest messages received. If single mode is chosen, messages will be sent individually. Options: BULK, SINGLE
+      events_emit_mode: BULK
+      # -- Defines how many events should be pushed per second, regardless of mode chosen (see above).
+      events_max_per_second: 100
+      # -- The URL of the DSB Message Broker you want to connect to. Trailing / allowed.
+      dsb_base_url: http://dsb-demo.energyweb.org
+      # -- This allows the DSB Message Broker to be controlled by the DSB Client Gateway. In this situation, the identities of both components are shared. This means that a single private key is used for each component and, in addition to the user DSB role, the gateway will enrol itself as a messagebroker. If a DSB_CONTROL_TYPE is also provided, the gateway may spawn a process with the chosen method, in order to configure it (i.e. setting the same private key).
+      dsb_controllable: false
+      # -- Used in conjunction with DSB_CONTROLLABLE, the DSB_CONTROL_TYPE defines how the DSB Client Gateway controls the DSB Message Broker. Options: pm2
+      dsb_control_type: ""
+      # -- If DSB_CONTROL_TYPE is set to pm2, set the name of the DSB Message Broker process which will be controlled by the gateway.
+      dsb_pm2_process_name: dsb-message-broker
+      # -- Sets the path of the message broker to control if DSB_CONTROL_TYPE is set to pm2. Can be relative (from the current working directory) or absolute. The message broker must be built first for this to work.
+      dsb_bin_path: ../dsb-message-broker/bin/dsb-message-broker
+      # -- Sets the filename of the JSON file the DSB Client Gateway will write to. The file will be written to the current working directory (subject to change).
+      in_memory_db_filename: in-memory.json
+      # -- Sets the chain ID of the blockchain network. Options: 73799 (Volta), 246 (EWC)
+      chain_id: 73799
+      # -- Sets the blockchain RPC node to connect to retreive state from and submit transactions to. Should match the network given in CHAIN_ID.
+      rpc_url: https://volta-rpc.energyweb.org/
+      # -- Sets the Energy Web IAM cache server URL, used to cache identities (as it can be expensive to rely only on querying smart contract data).
+      cache_server_url: https://identitycache-dev.energyweb.org/
+      # -- Sets the Energy Web IAM events server URL, used to receive notification of approved DSB role claims.
+      event_server_url: https://identityevents-dev.energyweb.org/
+      # -- Sets the Energy Web IAM application namespace. DSB related roles, such as user and messagebroker should fall under this namespace.
+      parent_namespace: dsb.apps.energyweb.iam.ewc
+  image:
+    repository: aemocontainerregistry.azurecr.io/dsb/client-gateway
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: canary
+
+  imagePullSecrets: []
+  nameOverride: "dsb-client-gateway-demo"
+  fullnameOverride: "dsb-client-gateway-demo"
+
+  serviceAccount:
+    # Specifies whether a service account should be created
+    create: true
+    # Annotations to add to the service account
+    annotations: {}
+    # The name of the service account to use.
+    # If not set and create is true, a name is generated using the fullname template
+    name: ""
+
+  podAnnotations: {}
+
+  podSecurityContext: {}
+    # fsGroup: 2000
+
+  securityContext: {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
+
+  service:
+    type: LoadBalancer
+    port: 80
+
+  ingress:
+    enabled: false
+    annotations: {kubernetes.io/ingress.class: "alb",alb.ingress.kubernetes.io/scheme: "internet-facing"}
+      # kubernetes.io/tls-acme: "true"
+    hosts:
+      - host: dsb-gateway-demo.energyweb.org
+        paths:
+        - path: /*
+          backend:
+            serviceName: client-gateway
+            servicePort: 80
+    tls: []
+    #  - secretName: chart-example-tls
+    #    hosts:
+    #      - chart-example.local
+
+  resources: {}
+    # We usually recommend not to specify default resources and to leave this as a conscious
+    # choice for the user. This also increases chances charts run on environments with little
+    # resources, such as Minikube. If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 100
+    targetCPUUtilizationPercentage: 80
+    # targetMemoryUtilizationPercentage: 80
+
+  nodeSelector: {}
+
+  tolerations: []
+
+  affinity: {}
