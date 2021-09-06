@@ -25,7 +25,7 @@ Note that under the hood, the WebSocket implementation uses the same message
 consumer as the GET /api/v1/message endpoint. Turning WebSocket support on is
 therefore likely to render the REST endpoint useless because outstanding
 messages will have already been pulled by the WebSocket implementation. If you
-intend to use the REST endpoint to pull new messages from the queue, please set
+intend to use the REST endpoint to pull new messages from the queue, please
 leave this value set to `NONE`.
 
 *Options: `SERVER`, `CLIENT`, `NONE`*
