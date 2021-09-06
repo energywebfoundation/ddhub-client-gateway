@@ -31,6 +31,8 @@ COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/.env ./.env
 COPY --from=builder /app/.env.production ./.env.production
 
+RUN echo '{}' > ./in-memory.json
+
 WORKDIR /var/deployment/apps
 
 COPY --from=builder /app/docker/ecosystem.config.js ./ecosystem.config.js
