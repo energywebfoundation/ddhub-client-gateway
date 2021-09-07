@@ -4,7 +4,7 @@ info:
   description: The DSB Client Gateway acts as a client to the Energy Web Decentralized Service Bus (DSB), allowing it to publish and subscribe to messages on particular channels.
   contact:
     email: dsb@energyweb.org
-  version: 0.2.0
+  version: 0.2.1
 tags:
   - name: Config
     description: Manage the DSB Client Gateway as admin
@@ -14,7 +14,7 @@ tags:
     description: Find information on available channels
   - name: Docs
     description: Download API schemas
-  - name: Other
+  - name: Utilities
 paths:
   /api/v1/config/identity:
     post:
@@ -126,7 +126,7 @@ paths:
         - in: query
           name: amount
           required: false
-          default: 1
+          example: 1
           description: Amount of messages that should be retrieved
           schema:
             type: number
@@ -170,11 +170,44 @@ paths:
                 $ref: '#/components/schemas/Error'
       security:
         - basicAuth: []
+  /api/v1/docs/rest.yaml:
+    get:
+      tags:
+        - Docs
+      summary: Retrieve this Open API schema in YAML
+      operationId: getOpenAPISchema
+      responses:
+        '200':
+          description: The YAML schema file
+  /api/v1/docs/ws.yaml:
+    get:
+      tags:
+        - Docs
+      summary: Retrieve the Async API schema in YAML
+      operationId: getAsyncAPISchema
+      responses:
+        '200':
+          description: The YAML schema file
+  /api/health:
+    get:
+      tags:
+        - Utilities
+      description: Asserts the DSB Gateway is running and the DSB Message Broker is reachable
+      operationId: getHealth
+      responses:
+        '200':
+          description: OK
+        '503':
+          description: The DSB Message Broker is unreachable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /api/v1/verifysignature:
     post:
       tags:
-        - Verify Signature
-      summary: Verify Signature 
+        - Utilities
+      summary: Verify Signature
       operationId: verifySignature
       requestBody:
         description: Verify Signature and compare the public key generated from signature and the given public key in request body
@@ -197,40 +230,6 @@ paths:
                 $ref: '#/components/schemas/Error'
       security:
         - basicAuth: []
-        
-  /api/v1/docs/rest.yaml:
-    get:
-      tags:
-        - Docs
-      summary: Retrieve this Open API schema in YAML
-      operationId: getOpenAPISchema
-      responses:
-        '200':
-          description: The YAML schema file
-  /api/v1/docs/ws.yaml:
-    get:
-      tags:
-        - Docs
-      summary: Retrieve the Async API schema in YAML
-      operationId: getAsyncAPISchema
-      responses:
-        '200':
-          description: The YAML schema file
-  /health:
-    get:
-      tags:
-        - Other
-      description: Asserts the DSB Gateway is running and the DSB Message Broker is reachable
-      operationId: getHealth
-      responses:
-        '200':
-          description: OK
-        '503':
-          description: The DSB Message Broker is unreachable
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
 components:
   schemas:
     IdentityConfig:
@@ -313,7 +312,7 @@ components:
         ok:
           description: Successfully Verified the Signature
           example: true
-          type: boolean      
+          type: boolean
     Message:
       type: object
       properties:
