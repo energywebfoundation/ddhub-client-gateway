@@ -63,7 +63,8 @@ export const config = {
         cacheServerUrl: process.env.CACHE_SERVER_URL ?? defaults.cacheServerUrl,
         eventServerUrl: process.env.EVENT_SERVER_URL ?? defaults.eventServerUrl,
         parentNamespace:
-            process.env.PARENT_NAMESPACE ?? defaults.parentNamespace
+            process.env.PARENT_NAMESPACE ?? defaults.parentNamespace,
+        privateKey: process.env.PRIVATE_KEY
     },
     storage: {
         inMemoryDbFile: path.join(
