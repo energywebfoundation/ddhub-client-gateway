@@ -82,14 +82,22 @@ docker run --rm -it -p 3000:3000 -p 3001:3001 -e NATS_JS_URL=nats://20.83.92.252
 
 The gateway UI should now be accessible on https://localhost:3000
 
-## Updating OpenAPI Documentation
+## Updating REST/WebSocket Documentation
 
 Please keep the documentation up to date! Unfortunately, this is manual right now.
+
+### REST (OpenAPI)
+
+Visit https://editor.swagger.io/ or run locally (localhost:8080):
 
 ```
 docker pull swaggerapi/swagger-editor
 docker run -p 8080:8080 swaggerapi/swagger-editor
 ```
 
-Visit http://localhost:8080 and import the existing specification
-(`public/rest.json`) to begin editing.
+Now import the existing specification (`public/rest.yaml`) to begin editing.
+
+### WebSocket (AsyncAPI)
+
+Visit https://playground.asyncapi.io/ and import the existing specification
+(`public/ws.yaml`) to begin editing.
