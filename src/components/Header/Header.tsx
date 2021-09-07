@@ -45,7 +45,7 @@ export default function Header() {
                   EW-DSB Client Gateway
               </Typography>
               <Typography className={classes.version} variant="caption">
-                v0.2.0
+                v0.2.1
               </Typography>
             </div>
           </Toolbar>
@@ -98,7 +98,6 @@ const useStyles = makeStyles((theme: Theme) => ({
 
       '&:hover': {
         textDecorationLine: 'underline',
-        fontWeight: 'bolder',
         color: theme.palette.secondary.main,
       }
     }
