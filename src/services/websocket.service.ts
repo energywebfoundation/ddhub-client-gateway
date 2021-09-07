@@ -25,15 +25,6 @@ const parseMessage = (message: IUtf8Message | IBinaryMessage): SendMessageData =
 }
 
 /**
- * Prepares a message for sending (as binary)
- *
- * @param data JSON payload
- */
-const toBytes = (data: object): Buffer => {
-    return Buffer.from(JSON.stringify(data))
-}
-
-/**
  * WebSocket server implementation (singleton)
  */
 export class WebSocketServer {
@@ -96,7 +87,7 @@ export class WebSocketServer {
                 const message = parseMessage(data)
                 const { ok, err } = await DsbApiService.init().sendMessage(message)
                 if (!ok) {
-                    connection.send(toBytes({
+                    connection.send(JSON.stringify({
                         correlationId: message.correlationId,
                         err: err?.message
                     }))
@@ -112,7 +103,7 @@ export class WebSocketServer {
      * @param message message(s) as pulled/received from DSB message broker
      */
     emit(message: Message | Message[]) {
-        this.ws.broadcast(toBytes(message))
+        this.ws.broadcast(JSON.stringify(message))
     }
 }
 
@@ -197,7 +188,7 @@ export class WebSocketClient {
                 }
             } catch (err) {
                 if (message.correlationId) {
-                    this.connection.send(toBytes({
+                    this.connection.send(JSON.stringify({
                         correlationId: message.correlationId,
                         err: err.message
                     }))
