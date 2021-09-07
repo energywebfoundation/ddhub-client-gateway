@@ -189,28 +189,32 @@ export class DsbApiService {
     public async pollForNewMessages(
         callback: (message: Message | Message[]) => void
     ): Promise<void> {
-        let interval = 10
+        let interval = 60
 
         const job = async () => {
             // console.log(`Attempt to start listening for messages [${interval}s]`)
             const { some: enrolment } = await getEnrolment()
             if (!enrolment?.state.approved) {
-                console.log('User not enroled')
+                console.log('User not enroled. Waiting for enrolment... (60s)')
                 interval = 60
                 return
             }
             const { ok: channels, err: fetchErr } = await this.getChannels()
             if (!channels) {
-                console.log('Error fetching available channels', fetchErr?.message)
+                    console.log(
+                        'Error fetching available channels:',
+                        fetchErr?.message ? fetchErr.message : fetchErr
+                    )
                 interval = 60
                 return { err: fetchErr }
             }
             const subscriptions = channels.filter(
-                ({ subscribers }) => subscribers?.includes(enrolment.did)
+                // take by default, but if subscribers present check the list
+                ({ subscribers }) => subscribers ? subscribers?.includes(enrolment.did) : true
             )
             if (subscriptions.length === 0) {
                 console.log(
-                    'No subscriptions found. Restart once the DID has been added to a channel to enable push messages'
+                    'No subscriptions found. Push messages are enabled when the DID is added to a channel... (60s)'
                 )
                 interval = 60
                 return { err: new Error(ErrorCode.DSB_NO_SUBSCRIPTIONS) }
@@ -224,8 +228,8 @@ export class DsbApiService {
                     amount: config.events.maxPerSecond
                 })
                 if (err) {
-                    interval = 60
                     console.log('Error fetching messages:', err.message)
+                    interval = 60
                     break
                 }
                 if (messages && messages?.length > 0) {

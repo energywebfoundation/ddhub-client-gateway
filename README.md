@@ -2,36 +2,34 @@
 
 The DSB Client Gateway acts as a client to the DSB, enabling easier integration.
 
-## Getting Started
+## Quickstart
 
-Install dependencies:
+The simplest way to run the gateway is via the Docker container stored in the
+Azure container registry.
+
 ```
-yarn
-```
-
-Run the development server:
-
-```bash
-yarn dev
+docker run -p 3000:3000 -e NATS_JS_URL=nats://20.83.92.252:4222 aemocontainerregistry.azurecr.io/dsb/client-gateway:canary
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The gateway UI can now be accessed on http://localhost:3000.
 
+By default, the gateway will not persist data configured during runtime
+(e.g. identity, cerficates). To do this, a Docker bind mount can be used with
+the following flag:
 
-## Config
+```
+-v $(pwd)/in-memory.json:/var/deployment/apps/dsb-client-gateway/in-memory.json
+```
+
+This will bind the container's `in-memory.json` file to the host filesystem.
+
+### Configuration
 
 The DSB Client Gateway can be configured in a number of ways.
 
 For the full configuration options see [Configuration](./CONFIGURATION.md).
 
-For developers:
-- `.env` -> applies to all environments
-- `.env.development` -> points to a running instance of DSB
-- `.env.production` -> points to an instance of DSB on localhost
-- `.env.test` -> applies only on `yarn test`
-- `.env.local` -> local overrides (do not commit to source control)
-
-## Testing WebSockets
+### Testing WebSockets
 
 The gateway supports WebSockets for bidirectional communication. You can use
 [wscat](https://github.com/websockets/wscat) to easily receiving and sending
@@ -58,7 +56,31 @@ Be sure to now set your gateway's `WEBSOCKET_URL` to ws://localhost:5001/.
 With wscat running, you should be able to start receiving messages once the
 gateway's DSB enrolment is complete.
 
-## Building the Container
+## Development
+
+Install dependencies:
+```
+yarn
+```
+
+Run the development server:
+
+```bash
+yarn dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+
+### Config
+
+- `.env` -> applies to all environments
+- `.env.development` -> points to a running instance of DSB
+- `.env.production` -> points to an instance of DSB on localhost
+- `.env.test` -> applies only on `yarn test`
+- `.env.local` -> local overrides (do not commit to source control)
+
+### Building the Container
 
 This gateway is currently being shipped as a single docker container. To build
 the image:
@@ -67,20 +89,12 @@ the image:
 # using access credentials
 aws configure
 
-# login to ecr
+# login to ecr (so we can fetch latest dsb base image)
 aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 098061033856.dkr.ecr.us-east-1.amazonaws.com
-
-# pull the base image (e.g. the one in the Dockerfile)
-docker pull 098061033856.dkr.ecr.us-east-1.amazonaws.com/ew-dos-dsb-ecr:{TAG}
 
 # build the container
 docker build -t dsb-client-gateway .
-
-# run the container
-docker run --rm -it -p 3000:3000 -p 3001:3001 -e NATS_JS_URL=nats://20.83.92.252:4222 dsb-client-gateway
 ```
-
-The gateway UI should now be accessible on https://localhost:3000
 
 ## Updating REST/WebSocket Documentation
 
