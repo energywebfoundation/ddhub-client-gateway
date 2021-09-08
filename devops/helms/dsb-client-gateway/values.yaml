@@ -11,7 +11,7 @@ dsb-client-gateway:
     repository: aemocontainerregistry.azurecr.io/dsb/client-gateway
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
-    tag: canary
+    tag: latest
 
   imagePullSecrets: []
   nameOverride: "dsb-client-gateway"
