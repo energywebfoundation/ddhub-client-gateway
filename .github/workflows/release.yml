@@ -104,19 +104,19 @@ jobs:
     needs: [cancel-previous, semantic-version, build-and-push]
     steps:
     - name: Build Changelog
-        id: github_release
-        uses: mikepenz/release-changelog-builder-action@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      id: github_release
+      uses: mikepenz/release-changelog-builder-action@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Create a GitHub release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{needs.semantic-version.outputs.version_tag}}
-          release_name: Release ${{needs.semantic-version.outputs.version_tag}}
-          body: ${{steps.github_release.outputs.changelog}}
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{needs.semantic-version.outputs.version_tag}}
+        release_name: Release ${{needs.semantic-version.outputs.version_tag}}
+        body: ${{steps.github_release.outputs.changelog}}
 
     - name: ArgoCD login
       uses: clowdhaus/argo-cd-action/@main
