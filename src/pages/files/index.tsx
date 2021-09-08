@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react'
+import { useEffect } from 'react'
 import Head from 'next/head'
 import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
 import { makeStyles } from '@material-ui/styles'
@@ -8,14 +8,13 @@ import {
   Divider,
   Theme,
 } from '@material-ui/core'
-import axios from 'axios'
 import swal from '@sweetalert/with-react'
 import { UploadContainer } from '../../components/UploadFile/UploadContainer'
 import Header from '../../components/Header/Header'
 import { DownloadContainer } from '../../components/DownloadFile/DownloadContainer'
 import { DsbApiService } from '../../services/dsb-api.service'
 import { isAuthorized } from '../../services/auth.service'
-import { ErrorCode, Option, Result, serializeError, Channel } from '../../utils'
+import { ErrorCode, Result, serializeError, Channel } from '../../utils'
 import { useErrors } from '../../hooks/useErrors'
 
 type Props = {
@@ -55,7 +54,6 @@ export async function getServerSideProps(
   }
 }
 
-// TODO: break into components
 export default function FileUpload({ health, channels }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const classes = useStyles()
   const errors = useErrors()
