@@ -82,9 +82,16 @@ jobs:
         command: login ${{ secrets.ARGOCD_DEV_URL }}
         options: --insecure --password ${{ secrets.ARGOCD_DEV_PASS }} --username ${{ secrets.ARGOCD_DEV_USERNAME }}
 
-    - name: ArgoCD overwrite values.yaml
+    - name: ArgoCD overwrite image tag
       uses: clowdhaus/argo-cd-action/@main
       id: argocd_image_tag_overwrite
       with:
         command: app set dsb-client-gateway
+        options: -p image.tag=${{needs.unique_id.outputs.unique_id}}
+
+    - name: ArgoCD overwrite image tag DEMO
+      uses: clowdhaus/argo-cd-action/@main
+      id: argocd_image_tag_overwrite
+      with:
+        command: app set dsb-client-gateway-demo
         options: -p image.tag=${{needs.unique_id.outputs.unique_id}}

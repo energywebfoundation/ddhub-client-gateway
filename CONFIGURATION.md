@@ -204,3 +204,11 @@ Sets the Energy Web IAM application namespace. DSB related roles, such as
 `user` and `messagebroker` should fall under this namespace.
 
 **Default**: `dsb.apps.energyweb.iam.ewc`
+
+### `PRIVATE_KEY` [optional]
+
+Sets the private key that will be used by the DSB Client Gateway. This will
+also check the balance and enrolment state on startup.
+
+Note that this will **overwrite** the current identity stored by the gateway.
+
