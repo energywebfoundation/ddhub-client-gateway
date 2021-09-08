@@ -1,4 +1,4 @@
-import React from 'react'
+import { useEffect, Fragment } from 'react'
 import '../styles/globals.css'
 import type { AppProps } from 'next/app'
 import Router from "next/router"
@@ -11,7 +11,7 @@ import CssBaseline from '@material-ui/core/CssBaseline'
 import theme from '../styles/theme/theme'
 function MyApp({ Component, pageProps }: AppProps) {
 
-  React.useEffect(() => {
+  useEffect(() => {
     // Remove the server-side injected CSS.
     const jssStyles = document.querySelector('#jss-server-side')
     if (jssStyles) {
@@ -24,7 +24,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   }, [])
 
   return (
-    <React.Fragment>
+    <Fragment>
       <Head>
         <title>DSB Client Gateway</title>
         <meta name="viewport" content="minimum-scale=1, initial-scale=1, width=device-width" />
@@ -33,7 +33,7 @@ function MyApp({ Component, pageProps }: AppProps) {
         <CssBaseline />
         <Component {...pageProps} />
       </ThemeProvider>
-    </React.Fragment>
+    </Fragment>
   )
 }
 

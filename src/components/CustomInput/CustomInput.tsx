@@ -1,4 +1,3 @@
-import react from 'react'
 import { alpha, InputBase, Theme, withStyles } from "@material-ui/core"
 
 export const CustomInput = withStyles((theme: Theme) => ({

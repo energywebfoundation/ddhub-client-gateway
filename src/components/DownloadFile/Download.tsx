@@ -1,6 +1,4 @@
-import React, {useState} from 'react'
-import Head from 'next/head'
-import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
+import {useState} from 'react'
 import { makeStyles } from '@material-ui/styles'
 import {
   Typography,

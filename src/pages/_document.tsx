@@ -1,4 +1,4 @@
-import React from 'react'
+import { Children } from 'react'
 import Document, {
   Html, Main, NextScript, Head
 } from 'next/document'
@@ -45,6 +45,6 @@ MyDocument.getInitialProps = async (ctx) => {
   return {
     ...initialProps,
     // Styles fragment is rendered after the app and page rendering finish.
-    styles: [...React.Children.toArray(initialProps.styles), sheets.getStyleElement()],
+    styles: [...Children.toArray(initialProps.styles), sheets.getStyleElement()],
   }
 }

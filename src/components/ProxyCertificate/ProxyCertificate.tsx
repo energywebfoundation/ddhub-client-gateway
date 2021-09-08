@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Button, makeStyles, Theme, Typography } from '@material-ui/core'
 import InfoIcon from '@material-ui/icons/Info'
 import { CustomInput } from '../../components/CustomInput/CustomInput'
