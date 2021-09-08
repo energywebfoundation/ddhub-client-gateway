@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import swal from '@sweetalert/with-react'
 import axios from 'axios'
 import { ProxyCertificate } from './ProxyCertificate'

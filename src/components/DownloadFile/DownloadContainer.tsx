@@ -1,4 +1,3 @@
-import React from 'react'
 import { Download } from './Download'
 import { Channel } from '../../utils'
 

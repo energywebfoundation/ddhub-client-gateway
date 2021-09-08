@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Upload } from './Upload'
 import axios from 'axios'
 import swal from '@sweetalert/with-react'
