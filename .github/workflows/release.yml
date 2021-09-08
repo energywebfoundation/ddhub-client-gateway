@@ -71,10 +71,10 @@ jobs:
       run: |
         docker pull $ECR_REGISTRY/ew-dos-dsb-ecr:latest
         docker build -t dsb-client-gateway .
-        docker tag dsb-client-gateway $ECR_REGISTRY/dsb-client-gateway:$BUILD_ID
-        docker push $ECR_REGISTRY/dsb-client-gateway:$BUILD_ID
-        docker tag dsb-client-gateway $ECR_REGISTRY/dsb-client-gateway:latest
-        docker push $ECR_REGISTRY/dsb-client-gateway:latest
+        docker tag dsb-client-gateway $ECR_REGISTRY/ew-dos-dsb-gateway-ecr:$BUILD_ID
+        docker push $ECR_REGISTRY/ew-dos-dsb-gateway-ecr:$BUILD_ID
+        docker tag dsb-client-gateway $ECR_REGISTRY/ew-dos-dsb-gateway-ecr:latest
+        docker push $ECR_REGISTRY/ew-dos-dsb-gateway-ecr:latest
 
     - name: Logout of Amazon ECR
       if: always()
