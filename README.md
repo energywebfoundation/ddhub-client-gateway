@@ -64,7 +64,7 @@ This gateway is currently being shipped as a single docker container. To build
 the image:
 
 ```sh
-# using access credentials
+# using access credentials  
 aws configure
 
 # login to ecr
