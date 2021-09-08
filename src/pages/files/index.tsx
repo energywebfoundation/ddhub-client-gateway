@@ -20,7 +20,7 @@ import { useErrors } from '../../hooks/useErrors'
 
 type Props = {
   health: Result<boolean, string>
-  auth: Option<string>
+  channels: Result<Channel[], string>
 }
 
 export async function getServerSideProps(
@@ -32,10 +32,11 @@ export async function getServerSideProps(
   const { err } = isAuthorized(authHeader)
   if (!err) {
     const health = await DsbApiService.init().getHealth()
+    const channels = await DsbApiService.init().getChannels()
     return {
       props: {
         health: serializeError(health),
-        auth: authHeader ? { some: authHeader } : { none: true }
+        channels: serializeError(channels),
       }
     }
   } else {
@@ -48,34 +49,25 @@ export async function getServerSideProps(
     return {
       props: {
         health: { err: err.message },
-        auth: { none: true }
+        channels: { err: err.message }
       }
     }
   }
 }
 
 // TODO: break into components
-export default function FileUpload({ health, auth }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function FileUpload({ health, channels }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const classes = useStyles()
   const errors = useErrors()
-	const [channels, setChannels] = useState<Channel[] | undefined>([])
 
   useEffect(() => {
-    const loadChannels = async () => {
-      try {
-        const res = await axios.get(
-          `/api/v1/channels`,
-          auth
-            ? { headers: { 'Authorization': `Bearer ${auth}` } }
-            : undefined
-        )
-        setChannels(res.data)
-      } catch (error) {
-        swal('Error', errors((error as any).response.data.err), 'error')
-      }
+    if (health.err) {
+      return swal('Error', errors(health.err), 'error')
     }
-    loadChannels()
-  }, [auth, errors])
+    if (channels.err) {
+      return swal('Error', errors(channels.err), 'error')
+    }
+  }, [health, channels, errors])
 
   return (
     <div>
@@ -100,14 +92,14 @@ export default function FileUpload({ health, auth }: InferGetServerSidePropsType
 
           <section className={classes.main}>
 						<Typography className={classes.textWhite} variant="h4">File Upload </Typography>
-						<UploadContainer channels={channels} />
+						<UploadContainer channels={channels.ok} />
           </section>
 
           <Divider className={classes.divider}/>
 
 					<section className={classes.main}>
 						<Typography className={classes.textWhite} variant="h4">File Download </Typography>
-						<DownloadContainer channels={channels} />
+						<DownloadContainer channels={channels.ok} />
           </section>
 
         </Container>
