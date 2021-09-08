@@ -91,4 +91,4 @@ jobs:
       id: argocd_image_tag_overwrite
       with:
         command: app set dsb-gateway-dev
-        options: -p image.tag=${{needs.unique_id.outputs.unique_id}}
+        options: -p dsb-client-gateway.image.tag=${{needs.unique_id.outputs.unique_id}}

@@ -130,4 +130,4 @@ jobs:
       id: argocd_image_tag_overwrite
       with:
         command: app set dsb-gateway
-        options: -p image.tag=${{needs.semantic-version.outputs.version_tag}}
+        options: -p dsb-client-gateway.image.tag=${{needs.semantic-version.outputs.version_tag}}
