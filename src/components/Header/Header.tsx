@@ -44,7 +44,7 @@ export default function Header() {
                   EW-DSB Client Gateway
               </Typography>
               <Typography className={classes.version} variant="caption">
-                v0.2.1
+                v0.3.0
               </Typography>
             </div>
           </Toolbar>
