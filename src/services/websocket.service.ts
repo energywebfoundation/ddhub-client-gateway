@@ -186,11 +186,18 @@ export class WebSocketClient {
                     throw sendError
                 }
             } catch (err) {
-                if (message.correlationId && err instanceof GatewayError) {
-                    this.connection.send(JSON.stringify({
-                        correlationId: message.correlationId,
-                        err: err.body
-                    }))
+                if (message.correlationId) {
+                    if (err instanceof GatewayError) {
+                        this.connection.send(JSON.stringify({
+                            correlationId: message.correlationId,
+                            err: err.body
+                        }))
+                    } else {
+                        this.connection.send(JSON.stringify({
+                            correlationId: message.correlationId,
+                            err: err instanceof Error ? err.message : err
+                        }))
+                    }
                 }
             }
         })

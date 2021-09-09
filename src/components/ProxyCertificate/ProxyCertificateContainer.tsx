@@ -2,7 +2,6 @@ import { useState } from 'react'
 import swal from '@sweetalert/with-react'
 import axios from 'axios'
 import { ProxyCertificate } from './ProxyCertificate'
-import { useErrors } from '../../hooks/useErrors'
 
 type ProxyCertificateContainerProps = {
     certificate?: {
@@ -17,7 +16,6 @@ export const ProxyCertificateContainer = ({
     certificate,
     auth
 }: ProxyCertificateContainerProps) => {
-    const errors = useErrors()
     const [isLoading, setIsLoading] = useState(false)
 
     const handleSubmit = async (clientId: string, tenantId: string, clientSecret: string) => {
@@ -36,7 +34,11 @@ export const ProxyCertificateContainer = ({
             )
             swal('Success', 'Certificate saved', 'success')
         } catch (err) {
-            swal('Error', errors(err.response.data.err), 'error')
+            if (axios.isAxiosError(err)) {
+                swal('Error', err.response?.data?.err?.reason, 'error')
+            } else {
+                swal('Error', `Could not set identity: ${err}`, 'error')
+            }
         }
         setIsLoading(false)
     }

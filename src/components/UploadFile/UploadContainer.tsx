@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { Upload } from './Upload'
 import axios from 'axios'
 import swal from '@sweetalert/with-react'
-import { useErrors } from '../../hooks/useErrors'
 import { Channel } from '../../utils'
 
 type UploadContainerProps = {
@@ -11,7 +10,6 @@ type UploadContainerProps = {
 }
 
 export const UploadContainer = ({ auth, channels }: UploadContainerProps) => {
-	const errors = useErrors()
 	const [isLoading, setIsLoading] = useState(false)
 
 	const handleUpload = async (file: File, fqcn: string, topic: string) => {
@@ -32,7 +30,11 @@ export const UploadContainer = ({ auth, channels }: UploadContainerProps) => {
 			swal("'Success", "Your file has been uploaded!", "success")
 
 		} catch (err) {
-			swal('Error', errors(err.response.data.err), 'error')
+			if (axios.isAxiosError(err)) {
+				swal('Error', err.response?.data?.err?.reason, 'error')
+			} else {
+				swal('Error', `Could not set identity: ${err}`, 'error')
+			}
 			setIsLoading(false)
 		}
 	}
