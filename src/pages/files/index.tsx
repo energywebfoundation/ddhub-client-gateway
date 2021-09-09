@@ -14,12 +14,11 @@ import Header from '../../components/Header/Header'
 import { DownloadContainer } from '../../components/DownloadFile/DownloadContainer'
 import { DsbApiService } from '../../services/dsb-api.service'
 import { isAuthorized } from '../../services/auth.service'
-import { ErrorCode, Result, serializeError, Channel } from '../../utils'
-import { useErrors } from '../../hooks/useErrors'
+import { ErrorCode, Result, serializeError, Channel, ErrorBody } from '../../utils'
 
 type Props = {
-  health: Result<boolean, string>
-  channels: Result<Channel[], string>
+  health: Result<boolean, ErrorBody>
+  channels: Result<Channel[], ErrorBody>
 }
 
 export async function getServerSideProps(
@@ -47,8 +46,8 @@ export async function getServerSideProps(
     }
     return {
       props: {
-        health: { err: err.message },
-        channels: { err: err.message }
+        health: {},
+        channels: {}
       }
     }
   }
@@ -56,16 +55,15 @@ export async function getServerSideProps(
 
 export default function FileUpload({ health, channels }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const classes = useStyles()
-  const errors = useErrors()
 
   useEffect(() => {
     if (health.err) {
-      return swal('Error', errors(health.err), 'error')
+      return swal('Error', health.err.reason, 'error')
     }
     if (channels.err) {
-      return swal('Error', errors(channels.err), 'error')
+      return swal('Error', channels.err.reason, 'error')
     }
-  }, [health, channels, errors])
+  }, [health, channels])
 
   return (
     <div>
@@ -82,7 +80,7 @@ export default function FileUpload({ health, channels }: InferGetServerSideProps
           <section className={classes.connectionStatus}>
             <Typography variant="h4">Connection Status </Typography>
             <Typography variant="caption" className={classes.connectionStatusPaper}>
-                { health.ok ? 'ONLINE' : `ERROR [${health.err}]` }
+                { health.ok ? 'ONLINE' : `ERROR [${health.err?.code}]` }
             </Typography>
           </section>
 

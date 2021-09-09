@@ -13,16 +13,15 @@ import swal from '@sweetalert/with-react'
 import Header from '../../components/Header/Header'
 import { DsbApiService } from '../../services/dsb-api.service'
 import { isAuthorized } from '../../services/auth.service'
-import { Channel, ErrorCode, Option, Result, serializeError } from '../../utils'
+import { Channel, ErrorBody, ErrorCode, Option, Result, serializeError } from '../../utils'
 import { useEffect } from 'react'
-import { useErrors } from '../../hooks/useErrors'
 import { useState } from 'react'
 import { ChannelContainer } from '../../components/Channels/ChannelsContainer'
 import { getEnrolment } from '../../services/storage.service'
 
 type Props = {
-  health: Result<boolean, string>
-  channels: Result<Channel[], string>,
+  health: Result<boolean, ErrorBody>
+  channels: Result<Channel[], ErrorBody>,
   did: Option<string>,
   auth: Option<string>
 }
@@ -55,8 +54,8 @@ export async function getServerSideProps(
     }
     return {
       props: {
-        health: { err: err.message },
-        channels: { err: err.message },
+        health: {},
+        channels: {},
         did: { none: true },
         auth: { none: true }
       }
@@ -70,13 +69,12 @@ export default function Documentation({
   did
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const classes = useStyles()
-  const errors = useErrors()
 
   const [channelErrorText, setChannelErrorText] = useState<string>()
 
   useEffect(() => {
     if (channels.err) {
-      swal('Error', errors(channels.err), 'error')
+      swal('Error', channels.err.reason, 'error')
       setChannelErrorText('Error retrieving channels. Make sure your gateway is enroled first.')
     } else {
       const count = channels.ok?.length ?? 0
@@ -84,7 +82,7 @@ export default function Documentation({
         setChannelErrorText('No channels found with publish or subscribe rights.')
       }
     }
-  }, [channels, errors])
+  }, [channels])
 
   return (
     <div>
@@ -101,7 +99,7 @@ export default function Documentation({
           <section className={classes.connectionStatus}>
             <Typography variant="h4">Connection Status </Typography>
             <Typography variant="caption" className={classes.connectionStatusPaper}>
-                { health.ok ? 'ONLINE' : `ERROR [${health.err}]` }
+                { health.ok ? 'ONLINE' : `ERROR [${health.err?.code}]` }
             </Typography>
           </section>
 

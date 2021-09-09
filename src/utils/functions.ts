@@ -31,8 +31,8 @@ export const joinUrl = (base: string, path: string): string => {
     return `${base}${path}`
 }
 
-export const serializeError = <T>(result: Result<T, Error>): Result<T, string> => {
-    return result.err ? { err: result.err.message } : { ok: result.ok }
+export const serializeError = <T>(result: Result<T, GatewayError>): Result<T, ErrorBody> => {
+    return result.err ? { err: result.err.body } : { ok: result.ok }
 }
 
 export const errorOrElse = (error: GatewayError | undefined): GatewayError => {
