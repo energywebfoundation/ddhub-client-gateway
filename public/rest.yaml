@@ -147,6 +147,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+        '404':
+          description: The channel or topic could not be found
+          content:
+            application/json:
+              example:
+                err:
+                  code: DSB::UNKNOWN_MSG_DESTINATION
+                  reason: Channel or topic does not exist
+              schema:
+                $ref: '#/components/schemas/Error'
         '500':
           description: The message could not be sent
           content:
@@ -156,7 +166,7 @@ paths:
                   code: DSB::REQUEST_FAILED
                   reason: Message broker is unreachable
               schema:
-                $ref: '#components/schemas/Error'
+                $ref: '#/components/schemas/Error'
       security:
         - basicAuth: []
     get:
@@ -529,12 +539,21 @@ components:
           properties:
             code:
               description: Error code outlining the type of error that has occurred
-              example: 'DSB::REQUEST_FAILED'
+              example: 'DSB::INVALID_PAYLOAD'
               type: string
             reason:
               description: Human-readable text detailing the reason of the error
-              example: 'The request failed with error response: Invalid payload'
+              example: 'Payload does not match the schema for the topic'
               type: string
+            additionalInformation:
+              example:
+                instancePath: ''
+                schemaPath: '#/required'
+                keyword: required
+                params:
+                  missingProperty: id
+                message: must have required property 'id'
+              description: Any additional information attributed to the error
     RoleState:
       type: string
       description: The state of the role request

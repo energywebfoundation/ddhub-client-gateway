@@ -2,12 +2,12 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import fs from 'fs/promises'
 import path from 'path'
-import { ErrorCode, Result } from '../../../../utils'
+import { ErrorBody, ErrorCode, Result } from '../../../../utils'
 import { isAuthorized } from '../../../../services/auth.service'
 
 export default async function handler(
     req: NextApiRequest,
-    res: NextApiResponse<Result<boolean, string>>
+    res: NextApiResponse<Result<boolean, ErrorBody>>
 ) {
     if (req.method !== 'POST') {
         return res.status(405).end()
@@ -29,11 +29,14 @@ export default async function handler(
 
 async function forPOST(
     req: NextApiRequest,
-    res: NextApiResponse<Result<boolean, string>>
+    res: NextApiResponse<Result<boolean, ErrorBody>>
 ) {
     const { clientId, tenantId, clientSecret } = req.body
     if (!clientId || !tenantId || !clientSecret) {
-        return res.status(400).json({ err: 'clientId, tenantId, clientSecret all required' })
+        return res.status(400).json({ err: {
+            code: ErrorCode.DISK_WRITE_FAILED,
+            reason: 'clientId, tenantId, clientSecret all required'
+        }})
     }
     try {
         const filepath = path.join(process.cwd(), 'vc.cert')
@@ -44,7 +47,9 @@ async function forPOST(
         })
     } catch (err) {
         res.status(400).json({
-            err: `Credentials invalid: ${err.message}`
+            err: {
+                code: ErrorCode.DISK_WRITE_FAILED
+            }
         })
     }
 }

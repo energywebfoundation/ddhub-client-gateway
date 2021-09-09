@@ -13,7 +13,7 @@ function getAuth(): Auth | undefined {
     return
 }
 
-export function isAuthorized(authHeader?: string): Result<boolean> {
+export function isAuthorized(authHeader?: string): Result<boolean, Error> {
     const auth = getAuth()
     if (!auth) {
         return { ok: true }

@@ -110,11 +110,20 @@ components:
             properties:
               code:
                 description: Error code outlining the type of error that has occurred
-                example: DSB::UNAUTHORIZED
+                example: DSB::INVALID_PAYLOAD
               reason:
                 description: Human-readable text detailing the reason of the error
                 type: string
-                example: 'The request failed with error response: Invalid payload'
+                example: 'Payload does not match the schema for the topic'
+              additionalInformation:
+                example:
+                  instancePath: ''
+                  schemaPath: '#/required'
+                  keyword: required
+                  params:
+                    missingProperty: id
+                  message: must have required property 'id'
+                description: Any additional information attributed to the error
 
 
 

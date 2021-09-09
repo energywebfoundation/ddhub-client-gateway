@@ -5,12 +5,10 @@ import { Claim } from 'iam-client-lib/dist/src/cacheServerClient/cacheServerClie
 import { connect, JSONCodec } from 'nats.ws'
 import { w3cwebsocket } from 'websocket'
 import { config } from '../config'
-import { MESSAGEBROKER_ROLE, RoleState, USER_ROLE, WebSocketImplementation } from '../utils'
+import { MESSAGEBROKER_ROLE, RoleState, USER_ROLE } from '../utils'
 import { initMessageBroker } from './dsb.service'
 import { isApproved } from './identity.service'
 import { getEnrolment, getIdentity, writeEnrolment } from './storage.service'
-import { DsbApiService } from './dsb-api.service'
-import { WebSocketClient, WebSocketServer } from './websocket.service'
 
 // shim websocket for nats.ws
 globalThis.WebSocket = w3cwebsocket as any
@@ -111,7 +109,7 @@ events.on('approved', async () => {
 
     // cannot do this as next pages don't have access to the same state as
     // the server
-    
+
     // wait for message broker to start if it's under our control
     // const delay = config.dsb.controllable ? 20 * 1000 : 0
     // setTimeout(() => {

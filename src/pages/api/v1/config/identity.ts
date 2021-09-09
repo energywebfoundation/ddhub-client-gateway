@@ -3,13 +3,21 @@ import { Wallet } from 'ethers'
 import { validateBalance, validatePrivateKey } from '../../../../services/identity.service'
 import { deleteEnrolment, getIdentity, writeIdentity } from '../../../../services/storage.service'
 import { isAuthorized } from '../../../../services/auth.service'
-import { BalanceState, ErrorCode, errorExplainer } from '../../../../utils'
+import {
+    BalanceCheckError,
+    BalanceState,
+    ErrorBody,
+    ErrorCode,
+    GatewayError,
+    NoPrivateKeyError,
+    UnknownError
+} from '../../../../utils'
 
 type Response = {
     address: string
     publicKey: string
     balance: BalanceState,
-} | { err: string }
+} | { err: ErrorBody }
 
 export default async function handler(
     req: NextApiRequest,
@@ -46,11 +54,11 @@ async function forGET(
 ) {
     const { some: identity } = await getIdentity()
     if (!identity) {
-        return res.status(404).end()
+        return res.status(404).end({ err: new NoPrivateKeyError().body })
     }
     const { ok: balance } = await validateBalance(identity.address)
     if (balance === undefined) {
-        return res.status(500).send({ err: ErrorCode.ID_BALANCE_CHECK_FAILED })
+        return res.status(500).send({ err: new BalanceCheckError().body })
     }
     return res.status(200).send({
         address: identity.address,
@@ -91,7 +99,10 @@ async function forPOST(
         await deleteEnrolment()
         return res.status(200).send(publicIdentity)
     } catch (err) {
-        const status = errorExplainer[err.message]?.status ?? 500
-        return res.status(status).send({ err: err.message })
+        if (err instanceof GatewayError) {
+            res.status(err.statusCode ?? 500).send({ err: err.body })
+        } else {
+            res.status(500).send({ err: new UnknownError(err).body })
+        }
     }
 }

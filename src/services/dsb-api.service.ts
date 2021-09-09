@@ -8,7 +8,12 @@ import {
     SendMessageData,
     SendMessageResult,
     EventEmitMode,
-    Channel
+    Channel,
+    GatewayError,
+    DSBRequestError,
+    DSBHealthError,
+    DSBPayloadError,
+    DSBLoginError
 } from "../utils"
 import { signProof } from "./identity.service"
 import { getEnrolment } from "./storage.service"
@@ -37,22 +42,13 @@ export class DsbApiService {
      */
     public async getHealth(): Promise<Result> {
         const url = joinUrl(config.dsb.baseUrl, 'health')
-        let res: Response
-        try {
-            res = await fetch(url)
-        } catch (err) {
-            console.log('DSB /health error:', err.message)
-            return { err: new Error(ErrorCode.DSB_REQUEST_FAILED) }
-        }
+        const res: Response = await fetch(url)
         if (res.status !== 200) {
-            console.log('DSB /health error', res.status, res.statusText)
-            return { err: new Error(ErrorCode.DSB_REQUEST_FAILED) }
+            return { err: new DSBRequestError(res.statusText) }
         }
-        // see http://dsb-dev.energyweb.org/swagger/#/default/HealthController_check
         const data: { status: 'ok' | 'error', error: any } = await res.json()
         if (data.status !== 'ok') {
-            console.log('DSB reporting unhealthy:', JSON.stringify(data.error))
-            return { err: new Error(ErrorCode.DSB_UNHEALTHY) }
+            return { err: new DSBHealthError(data.error) }
         }
         return { ok: true }
     }
@@ -62,11 +58,10 @@ export class DsbApiService {
      *
      * @returns
      */
-    public async sendMessage(data: SendMessageData): Promise<Result<SendMessageResult>> {
-        try {
-            if (!this.authToken) {
-                throw Error(ErrorCode.DSB_UNAUTHORIZED)
-            }
+    public async sendMessage(
+        data: SendMessageData
+    ): Promise<Result<SendMessageResult>> {
+        return this.tryAuthorizedRequest(async () => {
             const url = joinUrl(config.dsb.baseUrl, 'message')
             const res = await fetch(url, {
                 method: 'POST',
@@ -76,32 +71,23 @@ export class DsbApiService {
                 },
                 body: JSON.stringify(data)
             })
+            console.log('res:', res)
             switch (res.status) {
-                case 201:
+                case 202:
                     return { ok: { id: await res.text() } }
+                case 400:
+                    const { message: payloadErrorMessage } = await res.json()
+                    throw new DSBPayloadError(payloadErrorMessage)
                 case 401:
                     throw Error(ErrorCode.DSB_UNAUTHORIZED)
                 default:
-                    console.log('DSB POST /message error', res.status, res.statusText)
-                    throw Error(ErrorCode.DSB_REQUEST_FAILED)
+                    throw new DSBRequestError(`[${res.status}] ${res.statusText}`)
             }
-        } catch (err) {
-            if (err.message === ErrorCode.DSB_UNAUTHORIZED) {
-                const { ok, err } = await this.login()
-                if (!ok) {
-                    return { err }
-                }
-                return this.sendMessage(data)
-            }
-            return { err: err.message }
-        }
+        })
     }
 
     public async getMessages(options: GetMessageOptions): Promise<Result<Message[]>> {
-        try {
-            if (!this.authToken) {
-                throw Error(ErrorCode.DSB_UNAUTHORIZED)
-            }
+        return this.tryAuthorizedRequest(async () => {
             const url = joinUrl(
                 config.dsb.baseUrl,
                 `message?fqcn=${options.fqcn}${options.amount ? `&amount=${options.amount}` : ''}`
@@ -122,19 +108,7 @@ export class DsbApiService {
                     console.log('DSB GET /message error', res.status, res.statusText)
                     throw Error(ErrorCode.DSB_REQUEST_FAILED)
             }
-        } catch (err) {
-            if (err.message === ErrorCode.DSB_UNAUTHORIZED) {
-                const { ok, err } = await this.login()
-                console.log('ok', ok)
-                if (!ok) {
-                    console.log('login failed:', err?.message)
-                    return { err }
-                }
-                return this.getMessages(options)
-            }
-            console.log('returning error')
-            return { err: err }
-        }
+        })
     }
 
     /**
@@ -143,10 +117,7 @@ export class DsbApiService {
      * @returns list of channels
      */
     public async getChannels(): Promise<Result<Channel[]>> {
-        try {
-            if (!this.authToken) {
-                throw Error(ErrorCode.DSB_UNAUTHORIZED)
-            }
+        return this.tryAuthorizedRequest(async () => {
             const url = joinUrl(config.dsb.baseUrl, `/channel/pubsub`)
             const res = await fetch(url, {
                 headers: {
@@ -164,16 +135,7 @@ export class DsbApiService {
                     console.log('DSB GET /message error', res.status, res.statusText)
                     throw Error(ErrorCode.DSB_REQUEST_FAILED)
             }
-        } catch (err) {
-            if (err.message === ErrorCode.DSB_UNAUTHORIZED) {
-                const { ok, err } = await this.login()
-                if (!ok) {
-                    return { err }
-                }
-                return this.getChannels()
-            }
-            return { err }
-        }
+        })
     }
 
     /**
@@ -276,15 +238,55 @@ export class DsbApiService {
                 body: JSON.stringify({ identityToken })
             })
             if (res.status !== 200) {
-                console.log('DSB Login request failed:', res.status, res.statusText)
-                throw Error(ErrorCode.DSB_REQUEST_FAILED)
+                return { err: new DSBLoginError(`${res.status} ${res.statusText}`) }
             }
             const data: { token: string } = await res.json()
             // todo: verify signature
             this.authToken = data.token
             return { ok: data.token }
         } catch (err) {
-            return { err: err.message }
+            return {
+                err: new DSBRequestError(
+                    err instanceof Error ? err.message : err as string
+                )
+            }
+        }
+    }
+
+    /**
+     * Wraps a request in a try/catch and attempts to login to the message
+     * broker if the `fn` throws a DSB_UNAUTHORIZED error
+     *
+     * @param fn request to execute
+     * @returns the result of the request
+     */
+    private async tryAuthorizedRequest(
+        fn: () => Promise<Result<any, GatewayError>>,
+    ): Promise<Result<any, GatewayError>> {
+        try {
+            if (!this.authToken) {
+                throw Error(ErrorCode.DSB_UNAUTHORIZED)
+            }
+            return fn()
+        } catch (err) {
+            if (err instanceof Error) {
+                if (err.message === ErrorCode.DSB_UNAUTHORIZED) {
+                    const { ok, err } = await this.login()
+                    if (!ok) {
+                        return { err }
+                    }
+                    return this.tryAuthorizedRequest(fn)
+                }
+                return {
+                    err: new DSBRequestError(err.message)
+                }
+            }
+            else if (err instanceof GatewayError) {
+                return { err }
+            } else {
+                console.log('Unknown error type in sendMessage:', err)
+                return { err: new GatewayError(err as any) }
+            }
         }
     }
 }

@@ -1,11 +1,13 @@
 import { NextApiRequest, NextApiResponse } from "next"
 import { isAuthorized } from "../../../../services/auth.service"
-import { Result, ErrorCode } from "../../../../utils"
+import { ErrorCode, ErrorBody, SignatureCheckError, BadRequestError } from "../../../../utils"
 import { utils } from 'ethers'
+
+type Response = void | { err: ErrorBody }
 
 export default async function handler(
     req: NextApiRequest,
-    res: NextApiResponse
+    res: NextApiResponse<Response>
 ) {
     if (req.method !== 'POST') {
         return res.status(405).end()
@@ -27,17 +29,21 @@ export default async function handler(
 
 async function verifySignature(
     req: NextApiRequest,
-    res: NextApiResponse<Result<boolean, string>>
+    res: NextApiResponse<Response>
 ) {
 
     if (!req.body.signature || !req.body.did || !req.body.payload) {
-        return res.status(400).json({ err: 'signature, did, payload all required' })
+        return res.status(400).json({
+            err: new BadRequestError('signature, did, payload all required').body
+        })
     }
 
     if (typeof (req.body.signature) !== 'string' ||
         typeof (req.body.did) !== 'string' ||
         typeof (req.body.payload) !== 'string') {
-        return res.status(400).json({ err: 'signature, did, payload should be string' })
+        return res.status(400).json({
+            err: new BadRequestError('signature, did, payload should be string').body
+        })
     }
 
     let body = {
@@ -57,13 +63,18 @@ async function verifySignature(
         )
 
         if (recoveredAddress === expectedAddress) {
-            res.status(200).json({
-                ok: true
-            })
+            res.status(200).end()
         } else {
-            res.status(400).json({ err: 'Signature not verified!' })
+            res.status(200).json({ err: {
+                code: ErrorCode.SIGNATURE_DOES_NOT_MATCH,
+                reason: 'Expected and actual public key differ',
+                additionalInformation: {
+                    expected: expectedAddress,
+                    actual: recoveredAddress
+                }
+            } })
         }
     } catch (error) {
-        res.status(400).json({ err: 'Signature not correct!' })
+        res.status(400).json({ err: new SignatureCheckError().body })
     }
 }

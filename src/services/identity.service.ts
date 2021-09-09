@@ -5,7 +5,6 @@ import { parseEther } from 'ethers/lib/utils'
 import {
     BalanceState,
     EnrolmentState,
-    ErrorCode,
     Identity,
     EnrolmentManager,
     Result,
@@ -14,6 +13,17 @@ import {
     MESSAGEBROKER_ROLE,
     USER_ROLE,
     PARENT_NAMESPACE,
+    NoPrivateKeyError,
+    NotEnroledError,
+    NoBalanceError,
+    NoDIDError,
+    CreateClaimError,
+    DiskWriteError,
+    InvalidPrivateKeyError,
+    BalanceCheckError,
+    IAMInitError,
+    FetchClaimsError,
+    Web3ProviderError,
 } from "../utils"
 import { config } from '../config'
 import { getEnrolment, getIdentity, getStorage, writeEnrolment, writeIdentity } from './storage.service'
@@ -27,11 +37,11 @@ import { events } from "./events.service"
 export async function signProof(): Promise<Result<string>> {
     const { some: identity } = await getIdentity()
     if (!identity) {
-        return { err: new Error(ErrorCode.ID_NO_PRIVATE_KEY) }
+        return { err: new NoPrivateKeyError() }
     }
     const { some: enrolment } = await getEnrolment()
     if (!enrolment || !enrolment.did) {
-        return { err: new Error(ErrorCode.ID_NO_DID) }
+        return { err: new NotEnroledError() }
     }
     const signer = new Wallet(identity.privateKey)
     const header = {
@@ -64,7 +74,7 @@ export async function signProof(): Promise<Result<string>> {
 export async function signPayload(payload: string): Promise<Result<string>> {
     const { some: identity } = await getIdentity()
     if (!identity) {
-        return { err: new Error(ErrorCode.ID_NO_PRIVATE_KEY) }
+        return { err: new NoPrivateKeyError() }
     }
     const signer = new Wallet(identity.privateKey)
     const sig = await signer.signMessage(payload)
@@ -86,9 +96,7 @@ export async function initEnrolment({
         return { err: balanceError }
     }
     if (balance === BalanceState.NONE) {
-        return {
-            err: new Error(ErrorCode.ID_NO_BALANCE)
-        }
+        return { err: new NoBalanceError() }
     }
     const { ok: iam, err: iamError } = await initIAM(privateKey)
     if (!iam) {
@@ -97,7 +105,7 @@ export async function initEnrolment({
     const did = iam.getDid()
     if (!did) {
         // IAM Client Library creates the DID for us so this *should* not occur
-        return { err: new Error(ErrorCode.ID_NO_DID) }
+        return { err: new NoDIDError() }
     }
     return {
         ok: {
@@ -120,14 +128,14 @@ export async function initEnrolment({
                 if (roles.messagebroker === RoleState.NO_CLAIM) {
                     const { ok } = await createClaim(iam, MESSAGEBROKER_ROLE)
                     if (!ok) {
-                        return { err: new Error(ErrorCode.ID_CREATE_MESSAGEBROKER_CLAIM_FAILED) }
+                        return { err: new CreateClaimError(MESSAGEBROKER_ROLE) }
                     }
 
                 }
                 if (roles.user === RoleState.NO_CLAIM) {
                     const { ok } = await createClaim(iam, USER_ROLE)
                     if (!ok) {
-                        return { err: new Error(ErrorCode.ID_CREATE_USER_CLAIM_FAILED) }
+                        return { err: new CreateClaimError(USER_ROLE) }
                     }
                 }
                 return { ok: true }
@@ -135,7 +143,7 @@ export async function initEnrolment({
             save: async (state: EnrolmentState) => {
                 const { ok, err } = await writeEnrolment({ did, state })
                 if (err) {
-                    return { err: new Error(ErrorCode.DISK_PERSIST_FAILED) }
+                    return { err: new DiskWriteError('enrolment data') }
                 }
                 return { ok }
             }
@@ -159,7 +167,7 @@ export function validatePrivateKey(privateKey: string): Result<Wallet> {
         return { ok: new Wallet(privateKey) }
     } catch (err) {
         return {
-            err: new Error(ErrorCode.ID_INVALID_PRIVATE_KEY)
+            err: new InvalidPrivateKeyError()
         }
     }
 }
@@ -191,7 +199,7 @@ export async function validateBalance(address: string): Promise<Result<BalanceSt
         return { ok: BalanceState.OK }
     } catch (err) {
         return {
-            err: new Error(ErrorCode.ID_BALANCE_CHECK_FAILED)
+            err: new BalanceCheckError()
         }
     }
 }
@@ -256,9 +264,11 @@ export async function initIAM(privateKey: string): Promise<Result<IAM>> {
         await iam.initializeConnection()
         return { ok: iam }
     } catch (err) {
-        console.log(`Failed to init IAM: ${err.message}`)
+        if (err instanceof Error) {
+            console.log(`Failed to init IAM: ${err.message}`)
+        }
         return {
-            err: new Error(ErrorCode.ID_IAM_INIT_ERROR)
+            err: new IAMInitError()
         }
     }
 }
@@ -279,9 +289,11 @@ async function fetchClaims(iam: IAM, did: string): Promise<Result<Claim[]>> {
         })
         return { ok: claims }
     } catch (err) {
-        console.log(`Failed to fetch claims for ${did}: ${err.message}`)
+        if (err instanceof Error) {
+            console.log(`Failed to fetch claims for ${did}: ${err.message}`)
+        }
         return {
-            err: new Error(ErrorCode.ID_FETCH_CLAIMS_FAILED)
+            err: new FetchClaimsError()
         }
     }
 }
@@ -326,7 +338,10 @@ function readClaims(claims: Claim[]): EnrolmentState {
  * @param claim the type of claim (messagebroker, user, etc.)
  * @returns ok (boolean)
  */
-async function createClaim(iam: IAM, claim: string): Promise<Result> {
+async function createClaim(
+    iam: IAM,
+    claim: string
+): Promise<Result<boolean, Error>> {
     try {
         await iam.createClaimRequest({
             claim: {
@@ -341,8 +356,11 @@ async function createClaim(iam: IAM, claim: string): Promise<Result> {
         })
         return { ok: true }
     } catch (err) {
-        console.log(`Failed to create claim ${claim}: ${err.message}`)
-        return { err }
+        if (err instanceof Error) {
+            console.log(`Failed to create claim ${claim}: ${err.message}`)
+            return { err }
+        }
+        return { err: new Error() }
     }
 }
 
@@ -379,7 +397,9 @@ async function getCurrentBlock(): Promise<Result<number>> {
         const block = await provider.getBlockNumber()
         return { ok: block }
     } catch (err) {
-        console.log(`Failed to get current block: ${err.message}`)
-        return { err: new Error(ErrorCode.WEB3_PROVIDER_ERROR) }
+        if (err instanceof Error) {
+            console.log(`Failed to get current block: ${err.message}`)
+        }
+        return { err: new Web3ProviderError() }
     }
 }

@@ -3,7 +3,10 @@ export enum HttpError {
     UNAUTHORIZED = 401,
     FORBIDDEN = 403,
     NOT_FOUND = 404,
+    UNPROCESSABLE_ENTITY = 422,
     INTERNAL_SERVER_ERROR = 500,
+    BAD_GATEWAY = 502,
+    SERVICE_UNAVAILABLE = 503
 }
 
 export enum ErrorCode {
@@ -12,8 +15,7 @@ export enum ErrorCode {
     ID_INVALID_PRIVATE_KEY = 'ID::INVALID_PRIVATE_KEY',
     ID_IAM_INIT_ERROR = 'ID::IAM_INIT_ERROR',
     ID_FETCH_CLAIMS_FAILED = 'ID::FETCH_CLAIMS_FAILED',
-    ID_CREATE_MESSAGEBROKER_CLAIM_FAILED = 'ID::CREATE_MESSAGEBROKER_CLAIM_FAILED',
-    ID_CREATE_USER_CLAIM_FAILED = 'ID::CREATE_USER_CLAIM_FAILED',
+    ID_CREATE_CLAIM_FAILED = 'ID::CREATE_CLAIM_FAILED',
     ID_NO_DID = 'ID::NO_DID',
     ID_BALANCE_CHECK_FAILED = 'ID::BALANCE_CHECK_FAILED',
     ID_NO_BALANCE = 'ID::NO_BALANCE',
@@ -29,6 +31,7 @@ export enum ErrorCode {
     DSB_FORBIDDEN = 'DSB::FORBIDDEN',
     DSB_UNHEALTHY = 'DSB_UNHEALTHY',
     DSB_NO_SUBSCRIPTIONS = 'DSB::NO_SUBSCRIPTIONS',
+    DSB_INVALID_PAYLOAD = 'DSB::INVALID_PAYLOAD',
 
     // PM2 ERRORS
     PM2_NOT_CONFIGURED = 'PM2::NOT_CONFIGURED',
@@ -41,63 +44,306 @@ export enum ErrorCode {
     WEB3_PROVIDER_ERROR = 'WEB3::PROVIDER_ERROR',
 
     // GENERAL ERRORS
-    DISK_PERSIST_FAILED = 'DISK_PERSIST_FAILED',
+    DISK_READ_FAILED = 'DISK_READ_FAILED',
+    DISK_WRITE_FAILED = 'DISK_WRITE_FAILED',
     UNAUTHORIZED = 'UNAUTHORIZED',
-    FORBIDDEN = 'FORBIDDEN'
+    FORBIDDEN = 'FORBIDDEN',
+    BAD_REQUEST = 'BAD_REQUEST',
+    UNKNOWN_ERROR = 'UNKNOWN_ERROR',
+
+    // SIGNATURE ERRORS
+    SIGNATURE_CHECK_FAILED = 'SIG::CHECK_FAILED',
+    SIGNATURE_DOES_NOT_MATCH = 'SIG_NO_MATCH',
 }
 
-export const errorExplainer: { [key: string]: { status: number, text: string} } = {
-    [ErrorCode.ID_NO_PRIVATE_KEY]: {
-        status: 400,
-        text: 'Private key not set'
-    },
-    [ErrorCode.ID_INVALID_PRIVATE_KEY]: {
-        status: 400,
-        text: 'Private key should be hex-encoded string',
-    },
-    [ErrorCode.ID_IAM_INIT_ERROR]: {
-        status: 500,
-        text: 'Failed to initialize account',
-    },
-    [ErrorCode.ID_FETCH_CLAIMS_FAILED]: {
-        status: 500,
-        text: 'Failed to fetch roles',
-    },
-    [ErrorCode.ID_CREATE_MESSAGEBROKER_CLAIM_FAILED]: {
-        status: 500,
-        text: 'Could not enrol as "messagebroker"',
-    },
-    [ErrorCode.ID_CREATE_USER_CLAIM_FAILED]: {
-        status: 500,
-        text: 'Could not enrol as "user"',
-    },
-    [ErrorCode.ID_NO_DID]: {
-        status: 500,
-        text: 'Could not retrieve or create DID for account',
-    },
-    [ErrorCode.DISK_PERSIST_FAILED]: {
-        status: 500,
-        text: 'Failed to save state',
-    },
-    [ErrorCode.ID_BALANCE_CHECK_FAILED]: {
-        status: 500,
-        text: 'Could not retrieve balance for acount',
-    },
-    [ErrorCode.ID_NO_BALANCE]: {
-        status: 500,
-        text:'Account has no funds'
-    },
-    [ErrorCode.ID_ALREADY_ENROLED]: {
-        status: 400,
-        text: 'DID has already been enroled'
+// export const errorExplainer: { [key: string]: { status: number, text: string} } = {
+//     [ErrorCode.ID_NO_PRIVATE_KEY]: {
+//         status: 400,
+//         text: 'Private key not set'
+//     },
+//     [ErrorCode.ID_INVALID_PRIVATE_KEY]: {
+//         status: 400,
+//         text: 'Private key should be hex-encoded string',
+//     },
+//     [ErrorCode.ID_IAM_INIT_ERROR]: {
+//         status: 500,
+//         text: 'Failed to initialize account',
+//     },
+//     [ErrorCode.ID_FETCH_CLAIMS_FAILED]: {
+//         status: 500,
+//         text: 'Failed to fetch roles',
+//     },
+//     [ErrorCode.ID_CREATE_MESSAGEBROKER_CLAIM_FAILED]: {
+//         status: 500,
+//         text: 'Could not enrol as "messagebroker"',
+//     },
+//     [ErrorCode.ID_CREATE_USER_CLAIM_FAILED]: {
+//         status: 500,
+//         text: 'Could not enrol as "user"',
+//     },
+//     [ErrorCode.ID_NO_DID]: {
+//         status: 500,
+//         text: 'Could not retrieve or create DID for account',
+//     },
+//     [ErrorCode.DISK_PERSIST_FAILED]: {
+//         status: 500,
+//         text: 'Failed to save state',
+//     },
+//     [ErrorCode.ID_BALANCE_CHECK_FAILED]: {
+//         status: 500,
+//         text: 'Could not retrieve balance for acount',
+//     },
+//     [ErrorCode.ID_NO_BALANCE]: {
+//         status: 500,
+//         text:'Account has no funds'
+//     },
+//     [ErrorCode.ID_ALREADY_ENROLED]: {
+//         status: 400,
+//         text: 'DID has already been enroled'
+//     }
+// }
+
+export type ErrorBody = {
+    code: ErrorCode,
+    reason?: string,
+    additionalInformation?: any
+}
+
+/**
+ * Custom Error class with additional user information
+ */
+export class GatewayError extends Error {
+    public readonly body: ErrorBody
+    public readonly statusCode: HttpError
+
+    constructor({
+        code,
+        reason,
+        additionalInformation,
+        statusCode
+    }: {
+        statusCode: HttpError
+        code: ErrorCode,
+        reason?: string
+        additionalInformation?: any,
+    }
+    ) {
+        super(code)
+        this.statusCode = statusCode
+        this.body = {
+            code,
+            reason,
+            additionalInformation
+        }
     }
 }
 
-export class HttpApiError extends Error {
-    constructor(
-        public readonly statusCode: HttpError,
-        errorCode: ErrorCode,
-    ) {
-        super(errorCode)
+//
+// IDENTITY ERRORS
+//
+
+export class NoPrivateKeyError extends GatewayError {
+    constructor() {
+        super({
+            statusCode: HttpError.FORBIDDEN,
+            code: ErrorCode.ID_NO_PRIVATE_KEY,
+            reason: 'Gateway has no identity, please set private key first'
+        })
+    }
+}
+
+export class InvalidPrivateKeyError extends GatewayError {
+    constructor() {
+        super({
+            statusCode: HttpError.BAD_REQUEST,
+            code: ErrorCode.ID_INVALID_PRIVATE_KEY,
+            reason: 'Must be 64 bytes secp256k1 private key'
+        })
+    }
+}
+
+export class NotEnroledError extends GatewayError {
+    constructor() {
+        super({
+            statusCode: HttpError.FORBIDDEN,
+            code: ErrorCode.ID_NOT_ENROLED,
+            reason: 'Gateway identity has not enroled as DSB user yet'
+        })
+    }
+}
+export class AlreadyEnroledError extends GatewayError {
+    constructor() {
+        super({
+            statusCode: 403,
+            code: ErrorCode.ID_ALREADY_ENROLED,
+            reason: 'Gateway identity has already been enroled, state restored'
+        })
+    }
+}
+export class NoBalanceError extends GatewayError {
+    constructor() {
+        super({
+            statusCode: HttpError.UNPROCESSABLE_ENTITY,
+            code: ErrorCode.ID_NO_BALANCE,
+            reason: 'Gateway identity has no balance, use faucet to request funds'
+        })
+    }
+}
+
+export class BalanceCheckError extends GatewayError {
+    constructor() {
+        super({
+            statusCode: HttpError.INTERNAL_SERVER_ERROR,
+            code: ErrorCode.ID_BALANCE_CHECK_FAILED,
+            reason: 'Failed to fetch balance, please check RPC node connection'
+        })
+    }
+}
+
+
+export class IAMInitError extends GatewayError {
+    constructor() {
+        super({
+            statusCode: HttpError.INTERNAL_SERVER_ERROR,
+            code: ErrorCode.ID_IAM_INIT_ERROR,
+            reason: 'Fatal: Unable to initialize connection to IAM services'
+        })
+    }
+}
+
+export class NoDIDError extends GatewayError {
+    constructor() {
+        super({
+            statusCode: HttpError.INTERNAL_SERVER_ERROR,
+            code: ErrorCode.ID_NO_DID,
+            reason: 'Fatal: Unable to resolve or create DID'
+        })
+    }
+}
+
+export class FetchClaimsError extends GatewayError {
+    constructor() {
+        super({
+            statusCode: HttpError.INTERNAL_SERVER_ERROR,
+            code: ErrorCode.ID_FETCH_CLAIMS_FAILED,
+            reason: `Unable to fetch claims associated with DID`
+        })
+    }
+}
+
+export class CreateClaimError extends GatewayError {
+    constructor(roleName: string) {
+        super({
+            statusCode: HttpError.INTERNAL_SERVER_ERROR,
+            code: ErrorCode.ID_CREATE_CLAIM_FAILED,
+            reason: `Unable to create claim for role ${roleName}`
+        })
+    }
+}
+
+//
+// DSB ERRORS
+//
+
+export class DSBRequestError extends GatewayError {
+    constructor(reason?: string) {
+        super({
+            statusCode: HttpError.BAD_GATEWAY,
+            code: ErrorCode.DSB_REQUEST_FAILED,
+            reason: `Could not make request to DSB Message Broker`
+                + reason ? `: ${reason}` : ''
+        })
+    }
+}
+
+export class DSBHealthError extends GatewayError {
+    constructor(error: any) {
+        super({
+            statusCode: HttpError.SERVICE_UNAVAILABLE,
+            code: ErrorCode.DSB_UNHEALTHY,
+            reason: `DSB Message Broker is up but has problems`,
+            additionalInformation: error
+        })
+    }
+}
+
+export class DSBPayloadError extends GatewayError {
+    constructor(errorMessage: any[]) {
+        const [reason, error] = errorMessage
+        super({
+            statusCode: HttpError.BAD_REQUEST,
+            code: ErrorCode.DSB_INVALID_PAYLOAD,
+            reason,
+            additionalInformation: error
+        })
+    }
+}
+
+export class DSBLoginError extends GatewayError {
+    constructor(reason: string) {
+        super({
+            statusCode: HttpError.UNAUTHORIZED,
+            code: ErrorCode.DSB_LOGIN_FAILED,
+            reason,
+        })
+    }
+}
+
+//
+// SIGNATURE ERRORS
+//
+
+export class SignatureCheckError extends GatewayError {
+    constructor() {
+        super({
+            statusCode: HttpError.BAD_REQUEST,
+            code: ErrorCode.SIGNATURE_CHECK_FAILED,
+            reason: 'Unable to verify public key used to sign payload, please check signature format and try again'
+        })
+    }
+}
+
+
+//
+// MISC ERRORS
+//
+
+export class DiskWriteError extends GatewayError {
+    constructor(reason: string) {
+        super({
+            statusCode: HttpError.INTERNAL_SERVER_ERROR,
+            code: ErrorCode.DISK_WRITE_FAILED,
+            reason: `Failed to write to disk: ${reason}`
+        })
+    }
+}
+
+export class Web3ProviderError extends GatewayError {
+    constructor() {
+        super({
+            statusCode: HttpError.INTERNAL_SERVER_ERROR,
+            code: ErrorCode.WEB3_PROVIDER_ERROR,
+            reason: `Could not connect to RPC node, please check connection`
+        })
+    }
+}
+
+export class BadRequestError extends GatewayError {
+    constructor(reason: string) {
+        super({
+            statusCode: HttpError.BAD_REQUEST,
+            code: ErrorCode.BAD_REQUEST,
+            reason,
+        })
+    }
+}
+
+export class UnknownError extends GatewayError {
+    constructor(err: any) {
+        super({
+            statusCode: HttpError.INTERNAL_SERVER_ERROR,
+            code: ErrorCode.UNKNOWN_ERROR,
+            reason: err instanceof Error ? err.message : err
+        })
     }
 }
