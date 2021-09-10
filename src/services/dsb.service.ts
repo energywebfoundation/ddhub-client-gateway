@@ -14,7 +14,9 @@ type MessageBrokerOptions = {
  * @param options DSB Message Broker config options
  * @returns true if process managed successfully
  */
-export async function initMessageBroker(options: MessageBrokerOptions): Promise<Result> {
+export async function initMessageBroker(
+    options: MessageBrokerOptions
+): Promise<Result<boolean, Error>> {
     if (!config.dsb.controllable) {
         return { err: new Error(ErrorCode.DSB_NOT_CONTROLLABLE) }
     }
@@ -29,7 +31,7 @@ export async function initMessageBroker(options: MessageBrokerOptions): Promise<
 async function usingPM2({
     privateKey,
     did
-}: MessageBrokerOptions): Promise<Result> {
+}: MessageBrokerOptions): Promise<Result<boolean, Error>> {
     if (!config.dsb.pm2) {
         return { err: new Error(ErrorCode.PM2_NOT_CONFIGURED) }
     }

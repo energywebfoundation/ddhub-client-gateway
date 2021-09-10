@@ -2,7 +2,15 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { isAuthorized } from '../../../../services/auth.service'
 import { DsbApiService } from '../../../../services/dsb-api.service'
 import { signPayload } from '../../../../services/identity.service'
-import { ErrorCode } from '../../../../utils'
+import {
+    ErrorBody,
+    ErrorCode,
+    errorOrElse,
+    GatewayError,
+    Message,
+    SendMessageResult,
+    UnknownError
+} from '../../../../utils'
 
 export default async function handler(
     req: NextApiRequest,
@@ -35,12 +43,13 @@ export default async function handler(
  */
 async function forGET(
     req: NextApiRequest,
-    res: NextApiResponse
+    res: NextApiResponse<Message[] | { err: ErrorBody }>
 ): Promise<void> {
     // todo: validate request bodies/queries
     const { ok: messages, err: reqError } = await DsbApiService.init().getMessages(req.query as any)
     if (messages === undefined) {
-        return res.status(500).send({ err: reqError })
+        const error = errorOrElse(reqError)
+        return res.status(error.statusCode).send({ err: error.body })
     }
     return res.status(200).send(messages)
 }
@@ -50,18 +59,26 @@ async function forGET(
  */
 async function forPOST(
     req: NextApiRequest,
-    res: NextApiResponse
+    res: NextApiResponse<SendMessageResult | { err: ErrorBody }>
 ): Promise<void> {
-    const { ok: signature, err: signError } = await signPayload(req.body.payload)
-    if (!signature) {
-        return res.status(400).send({ err: signError })
+    try {
+        const { ok: signature, err: signError } = await signPayload(req.body.payload)
+        if (!signature) {
+            throw signError
+        }
+        const { ok: sent, err: sendError } = await DsbApiService.init().sendMessage({
+            ...req.body,
+            signature
+        })
+        if (!sent) {
+            throw sendError
+        }
+        return res.status(200).send(sent)
+    } catch (err) {
+        if (err instanceof GatewayError) {
+            res.status(err.statusCode).send({ err: err.body })
+        } else {
+            res.status(500).send({ err: new UnknownError(err).body })
+        }
     }
-    const { ok: sent, err: sendError } = await DsbApiService.init().sendMessage({
-        ...req.body,
-        signature
-    })
-    if (!sent) {
-        return res.status(400).send({ err: sendError })
-    }
-    return res.status(200).send(sent)
 }

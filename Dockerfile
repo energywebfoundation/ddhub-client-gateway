@@ -16,7 +16,7 @@ COPY --from=deps /app/node_modules ./node_modules
 RUN yarn build
 
 # DSB Container
-FROM 098061033856.dkr.ecr.us-east-1.amazonaws.com/ew-dos-dsb-ecr:3598aac0-11b3-420e-a06b-892baaacd7a6
+FROM 098061033856.dkr.ecr.us-east-1.amazonaws.com/ew-dos-dsb-ecr:841d75ec-3596-487c-93c6-acfaf76bbe72
 
 RUN mkdir -p /var/deployment/apps/dsb-client-gateway
 

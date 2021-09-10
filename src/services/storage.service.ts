@@ -4,7 +4,9 @@ import { Certificate, Enrolment, ErrorCode, Identity, Option, Result, Storage } 
 
 // SETTERS
 
-export async function writeIdentity(identity: Identity): Promise<Result> {
+export async function writeIdentity(
+    identity: Identity
+): Promise<Result<boolean, Error>> {
     try {
         const { some: storage } = await getStorage()
         await fs.writeFile(
@@ -12,12 +14,14 @@ export async function writeIdentity(identity: Identity): Promise<Result> {
             JSON.stringify({ ...storage, identity }, null, 2))
         return { ok: true }
     } catch (err) {
-        return { err: new Error(ErrorCode.DISK_PERSIST_FAILED) }
+        return { err: new Error(ErrorCode.DISK_WRITE_FAILED) }
     }
 }
 
 
-export async function writeEnrolment(enrolment: Enrolment): Promise<Result> {
+export async function writeEnrolment(
+    enrolment: Enrolment
+): Promise<Result<boolean, Error>> {
     try {
         const { some: storage } = await getStorage()
         await fs.writeFile(
@@ -25,12 +29,14 @@ export async function writeEnrolment(enrolment: Enrolment): Promise<Result> {
             JSON.stringify({ ...storage, enrolment }, null, 2))
         return { ok: true }
     } catch (err) {
-        return { err: new Error(ErrorCode.DISK_PERSIST_FAILED) }
+        return { err: new Error(ErrorCode.DISK_WRITE_FAILED) }
     }
 }
 
 
-export async function writeCertificate(certificate: Certificate): Promise<Result> {
+export async function writeCertificate(
+    certificate: Certificate
+): Promise<Result<boolean, Error>> {
     try {
         const { some: storage } = await getStorage()
         await fs.writeFile(
@@ -38,7 +44,7 @@ export async function writeCertificate(certificate: Certificate): Promise<Result
             JSON.stringify({ ...storage, certificate }, null, 2))
         return { ok: true }
     } catch (err) {
-        return { err: new Error(ErrorCode.DISK_PERSIST_FAILED) }
+        return { err: new Error(ErrorCode.DISK_WRITE_FAILED) }
     }
 }
 
@@ -51,7 +57,9 @@ export async function getStorage(): Promise<Option<Storage>> {
             some: JSON.parse(contents)
         }
     } catch (err) {
-        console.log('Error reading storage:', err.message)
+        if (err instanceof Error) {
+            console.log('Error reading storage:', err.message)
+        }
         return { none: true }
     }
 }
@@ -82,7 +90,7 @@ export async function getCertificate(): Promise<Option<Certificate>> {
 
 // DELETE STATE
 
-export async function deleteEnrolment(): Promise<Result> {
+export async function deleteEnrolment(): Promise<Result<boolean, Error>> {
     const { some: storage } = await getStorage()
     if (storage?.enrolment) {
         try {
@@ -91,7 +99,7 @@ export async function deleteEnrolment(): Promise<Result> {
                 JSON.stringify({ ...storage, enrolment: undefined }, null, 2))
             return { ok: true }
         } catch (err) {
-            return { err: new Error(ErrorCode.DISK_PERSIST_FAILED) }
+            return { err: new Error(ErrorCode.DISK_WRITE_FAILED) }
         }
     }
     return { ok: true }

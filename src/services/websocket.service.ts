@@ -6,7 +6,7 @@ import {
     client as WsClient,
     connection as WsClientConnection,
 } from 'websocket'
-import { Message, SendMessageData, WebSocketClientOptions } from '../utils'
+import { GatewayError, Message, SendMessageData, WebSocketClientOptions } from '../utils'
 import { isAuthorized } from './auth.service'
 import { DsbApiService } from './dsb-api.service'
 import { signPayload } from './identity.service'
@@ -89,7 +89,7 @@ export class WebSocketServer {
                 if (!ok) {
                     connection.send(JSON.stringify({
                         correlationId: message.correlationId,
-                        err: err?.message
+                        err: err?.body
                     }))
                 }
             })
@@ -140,7 +140,6 @@ export class WebSocketClient {
             try {
                 ws.connect(options.url, options.protocol)
             } catch (err) {
-                console.log('err', err)
                 reject(err)
             }
         })
@@ -188,10 +187,17 @@ export class WebSocketClient {
                 }
             } catch (err) {
                 if (message.correlationId) {
-                    this.connection.send(JSON.stringify({
-                        correlationId: message.correlationId,
-                        err: err.message
-                    }))
+                    if (err instanceof GatewayError) {
+                        this.connection.send(JSON.stringify({
+                            correlationId: message.correlationId,
+                            err: err.body
+                        }))
+                    } else {
+                        this.connection.send(JSON.stringify({
+                            correlationId: message.correlationId,
+                            err: err instanceof Error ? err.message : err
+                        }))
+                    }
                 }
             }
         })

@@ -15,13 +15,12 @@ import { ProxyCertificateContainer } from '../components/ProxyCertificate/ProxyC
 import Header from '../components/Header/Header'
 import { DsbApiService } from '../services/dsb-api.service'
 import { refreshState } from '../services/identity.service'
-import { useErrors } from '../hooks/useErrors'
 import { isAuthorized } from '../services/auth.service'
-import { ErrorCode, Option, Result, serializeError, Storage } from '../utils'
+import { ErrorBodySerialized, ErrorCode, Option, Result, serializeError, Storage } from '../utils'
 
 type Props = {
-  health: Result < boolean, string >
-  state: Result < Storage, string >
+  health: Result<boolean, ErrorBodySerialized>
+  state: Result<Storage, ErrorBodySerialized>
   auth: Option<string>
 }
 
@@ -51,8 +50,8 @@ export async function getServerSideProps(
     }
     return {
       props: {
-        health: { err: err.message },
-        state: { err: err.message },
+        health: {},
+        state: {},
         auth: { none: true }
       }
     }
@@ -61,13 +60,12 @@ export async function getServerSideProps(
 
 export default function Home({ health, state, auth }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const classes = useStyles()
-  const errors = useErrors()
 
   useEffect(() => {
     if (health.err) {
-      swal('Error', errors(health.err), 'error')
+      swal('Error', health.err.reason, 'error')
     }
-  }, [health, state, errors])
+  }, [health, state])
 
 
   return (
@@ -85,7 +83,7 @@ export default function Home({ health, state, auth }: InferGetServerSidePropsTyp
           <section className={classes.connectionStatus}>
             <Typography variant="h4">Connection Status </Typography>
             <Typography variant="caption" className={classes.connectionStatusPaper}>
-                { health.ok ? 'ONLINE' : `ERROR [${health.err}]` }
+                { health.ok ? 'ONLINE' : `ERROR [${health.err?.code}]` }
             </Typography>
           </section>
 

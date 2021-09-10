@@ -2,9 +2,17 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { isAuthorized } from '../../../../services/auth.service'
 import { initEnrolment } from '../../../../services/identity.service'
 import { getEnrolment, getIdentity } from '../../../../services/storage.service'
-import { Enrolment, ErrorCode, errorExplainer } from '../../../../utils'
+import {
+    Enrolment,
+    ErrorBody,
+    ErrorCode,
+    GatewayError,
+    NoPrivateKeyError,
+    NotEnroledError,
+    UnknownError
+} from '../../../../utils'
 
-type Response = Enrolment | { err: string }
+type Response = Enrolment | { err: ErrorBody }
 
 export default async function handler(
     req: NextApiRequest,
@@ -41,11 +49,11 @@ async function forGET(
 ) {
     const { some: identity } = await getIdentity()
     if (!identity) {
-        return res.status(400).send({ err: ErrorCode.ID_NO_PRIVATE_KEY })
+        return res.status(400).send({ err: new NoPrivateKeyError().body })
     }
     const { some: enrolment } = await getEnrolment()
     if (!enrolment || !enrolment.did) {
-        return res.status(400).send({ err: ErrorCode.ID_NO_DID })
+        return res.status(400).send({ err: new NotEnroledError().body })
     }
     // todo: refresh state
     return res.status(200).send(enrolment)
@@ -62,7 +70,7 @@ async function forPOST(
     try {
         const { some: identity } = await getIdentity()
         if (!identity) {
-            throw Error(ErrorCode.ID_NO_PRIVATE_KEY)
+            throw new NoPrivateKeyError()
         }
         const { ok: requestor, err: initError } = await initEnrolment(identity)
         if (!requestor) {
@@ -74,7 +82,7 @@ async function forPOST(
         }
         if (state.approved || state.waiting) {
             await requestor.save(state)
-            throw Error(ErrorCode.ID_ALREADY_ENROLED)
+            return res.status(200).send({ did: requestor.did, state })
         }
         const { ok: enroled, err: enrolError } = await requestor.handle(state)
         if (!enroled) {
@@ -94,7 +102,10 @@ async function forPOST(
             state: newState
         })
     } catch (err) {
-        const status = errorExplainer[err.message]?.status ?? 500
-        res.status(status).send({ err: err.message })
+        if (err instanceof GatewayError) {
+            res.status(err.statusCode).send({ err: err.body })
+        } else {
+            res.status(500).send({ err: new UnknownError(err).body })
+        }
     }
 }

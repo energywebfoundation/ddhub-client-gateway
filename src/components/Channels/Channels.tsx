@@ -62,12 +62,12 @@ export default function Channel({
 
         <AccordionSummary className={classes.accordionTitle} expandIcon={<ExpandMoreIcon />}>
           <Typography className={classes.name} variant="h5">{channel.fqcn}</Typography>
-          <Typography variant="h6">{isPubSub()}</Typography>
+          <Typography variant="h6"><i>{isPubSub()}</i></Typography>
         </AccordionSummary>
 
         <AccordionDetails className={classes.channelDetail}>
           <div>
-            <Typography className={classes.sectionTitle} variant="h6">Topics</Typography>
+            <Typography className={classes.sectionTitle} variant="h6"><i>Topics</i></Typography>
           </div>
 
           <div>
@@ -102,9 +102,10 @@ const useStyles = makeStyles((theme: Theme) => ({
     margin: '2rem'
   },
   accordion: {
-    backgroundColor: theme.palette.background.paper
+    backgroundColor: theme.palette.secondary.light
   },
   accordionTitle: {
+    color: theme.palette.info.contrastText,
     '& div': {
       display: 'flex',
       justifyContent: 'space-between',
@@ -114,7 +115,9 @@ const useStyles = makeStyles((theme: Theme) => ({
     fontWeight: 'bold',
   },
   sectionTitle: {
-    margin: '1rem 0'
+    margin: '1rem 0.5rem',
+    color: theme.palette.info.contrastText,
+    textDecorationStyle: 'wavy'
   },
   channelDetail: {
     display: 'flex',

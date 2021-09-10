@@ -4,7 +4,7 @@ info:
   description: The DSB Client Gateway acts as a client to the Energy Web Decentralized Service Bus (DSB), allowing it to publish and subscribe to messages on particular channels.
   contact:
     email: dsb@energyweb.org
-  version: 0.2.1
+  version: 0.3.0
 tags:
   - name: Config
     description: Manage the DSB Client Gateway as admin
@@ -20,7 +20,7 @@ paths:
     post:
       tags:
         - Config
-      summary: Sets the decentralized identity of the gateway, enroling it on to DSB
+      summary: Sets the identity of the gateway
       operationId: createIdentity
       requestBody:
         description: The private key which will be associated with the DID
@@ -30,17 +30,19 @@ paths:
               $ref: '#/components/schemas/IdentityConfig'
       responses:
         '200':
-          description: The private key was accepted and saved.
+          description: The private key was accepted and saved
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Identity'
-        default:
-          description: Error processing request
+        '400':
+          description: The private key was rejected
           content:
             application/json:
               example:
-                err: ID::INVALID_PRIVATE_KEY
+                err:
+                  code: ID::INVALID_PRIVATE_KEY
+                  reason: 'Private key not 64 bytes'
               schema:
                 $ref: '#/components/schemas/Error'
       security:
@@ -57,6 +59,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Identity'
+      security:
+        - basicAuth: []
   /api/v1/config/enrol:
     post:
       tags:
@@ -71,6 +75,28 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Enrolment'
+        '400':
+          description: The enrolment request was rejected by the gateway
+          content:
+            application/json:
+              example:
+                err:
+                  code: 'ID::NO_PRIVATE_KEY'
+                  reason: 'Need a private key to initiate enrolment'
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: The gateway was unable to enrol the private key
+          content:
+            application/json:
+              example:
+                err:
+                  code: 'ID::FETCH_CLAIMS_FAILED'
+                  reason: 'Unable to request claims from RPC node'
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+        - basicAuth: []
     get:
       tags:
         - Config
@@ -83,14 +109,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Enrolment'
+      security:
+        - basicAuth: []
   /api/v1/message:
     post:
       tags:
         - Message
       summary: Send message on a DSB channel
+      description: Note that resending a message with the same `correlationId` will
+        return a 200 status code. The ID received will be the same as the first message
+        sent. A consumer will only see a single message.
+
       operationId: createMessage
       requestBody:
-        description: Unsigned message to be published on desired channel
+        description: Unsigned message to be published on desired channel.
         content:
           application/json:
             schema:
@@ -102,10 +134,59 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SendMessageSuccess'
-        default:
-          description: Error processing request
+        '400':
+          description: The message was rejected by the message broker (e.g. the payload
+            does not match the schema)
           content:
             application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized to access the message broker or channel
+          content:
+            application/json:
+              examples:
+                Channel:
+                  value:
+                    err:
+                      code: DSB::CHANNEL_UNAUTHORIZED
+                      reason: User cannot subscribe to channel
+                Login:
+                  value:
+                    err:
+                      code: DSB::LOGIN_FAILED
+                      reason: Unauthorized
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden to access channel subscriptions (i.e. not having the
+            DSB user role)
+          content:
+            application/json:
+              example:
+                err:
+                  code: DSB::FORBIDDEN_RESOURCE
+                  reason: Must be enroled as a DSB user to access messages
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: The channel or topic could not be found
+          content:
+            application/json:
+              example:
+                err:
+                  code: DSB::CHANNEL_NOT_FOUND
+                  reason: Channel or topic does not exist
+              schema:
+                $ref: '#/components/schemas/Error'
+        '502':
+          description: The message could not be sent
+          content:
+            application/json:
+              example:
+                err:
+                  code: DSB::REQUEST_FAILED
+                  reason: Message broker is unreachable
               schema:
                 $ref: '#/components/schemas/Error'
       security:
@@ -139,10 +220,52 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Message'
-        default:
-          description: Error processing request
+        '401':
+          description: Unauthorized to access the message broker or channel
           content:
             application/json:
+              examples:
+                Channel:
+                  value:
+                    err:
+                      code: DSB::CHANNEL_UNAUTHORIZED
+                      reason: User cannot subscribe to channel
+                Login:
+                  value:
+                    err:
+                      code: DSB::LOGIN_FAILED
+                      reason: Unauthorized
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden to access channel subscriptions (i.e. not having the
+            DSB user role)
+          content:
+            application/json:
+              example:
+                err:
+                  code: DSB::FORBIDDEN_RESOURCE
+                  reason: Must be enroled as a DSB user to access messages
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Channel does not exist
+          content:
+            application/json:
+              example:
+                err:
+                  code: DSB::CHANNEL_NOT_FOUND
+                  reason: Requested channel does not exist
+              schema:
+                $ref: '#/components/schemas/Error'
+        '502':
+          description: The request could not be sent (e.g. NATS connection down)
+          content:
+            application/json:
+              example:
+                err:
+                  code: DSB::REQUEST_FAILED
+                  reason: Message broker is unreachable
               schema:
                 $ref: '#/components/schemas/Error'
       security:
@@ -162,10 +285,24 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Channel'
-        default:
-          description: An error occurred retrieving the channels
+        '403':
+          description: Forbidden from retreiving channels
           content:
             application/json:
+              example:
+                err:
+                  code: DSB::FORBIDDEN
+                  reason: Must be enroled as a DSB user to access channels
+              schema:
+                $ref: '#/components/schemas/Error'
+        '502':
+          description: The request could not be sent (e.g. NATS connection down)
+          content:
+            application/json:
+              example:
+                err:
+                  code: DSB::REQUEST_FAILED
+                  reason: The DSB Message Broker is unreachable
               schema:
                 $ref: '#/components/schemas/Error'
       security:
@@ -197,10 +334,28 @@ paths:
       responses:
         '200':
           description: OK
-        '503':
+        '502':
           description: The DSB Message Broker is unreachable
           content:
             application/json:
+              example:
+                err:
+                  code: DSB::REQUEST_FAILED
+                  reason: The DSB Message Broker is unreachable
+              schema:
+                $ref: '#/components/schemas/Error'
+        '503':
+          description: The DSB Message Broker is unhealthy
+          content:
+            application/json:
+              example:
+                err:
+                  code: DSB::UNHEALTHY
+                  reason: The DSB Message Broker is running with issues
+                  additionalInformation:
+                    nats:
+                      status: down
+                      message: Could not connect
               schema:
                 $ref: '#/components/schemas/Error'
   /api/v1/verifysignature:
@@ -217,15 +372,32 @@ paths:
               $ref: '#/components/schemas/VerifySignature'
       responses:
         '200':
-          description: The message was successfully published
+          description: The message was verified (valid or not)
           content:
             application/json:
+              examples:
+                Success:
+                  value:
+                    ok: true
+                Failure:
+                  value:
+                    err:
+                      code: SIG::NO_MATCH
+                      reason: Expected and actual public key does not match
+                      additionalInformation:
+                        expected: '0xfd6b809B81cAEbc3EAB0d33f0211E5934621b2D2'
+                        actual: '0x3E8c2db768f876907C54F52B9e6Cc7F8E48d850F'
               schema:
                 $ref: '#/components/schemas/VerifySignatureSuccess'
-        default:
-          description: Error processing request
+        '400':
+          description: The request was invalid (e.g. signature is unexpected format)
           content:
             application/json:
+              example:
+                err:
+                  code: SIG::CHECK_FAILED
+                  reason: Unable to verify public key used to sign payload, please
+                    check signature format and try again
               schema:
                 $ref: '#/components/schemas/Error'
       security:
@@ -234,37 +406,66 @@ components:
   schemas:
     IdentityConfig:
       type: object
+      required:
+        - privateKey
       properties:
         privateKey:
           type: string
-          description: Ethereum compliant hex-encoded private key
+          example: '0xabc...def'
+          description: Ethereum-compliant 64 byte secp256k1 private key
     Identity:
       type: object
+      required:
+        - address
+        - publicKey
+        - balance
       properties:
         address:
+          description: The address (hashed public key) associated with the private key
+          example: '0x3E8c2db768f876907C54F52B9e6Cc7F8E48d850F'
           type: string
         publicKey:
+          description: The public key associated with the private key
+          example: '0x048a1f0526d7d33c1fa52a296d9668a1456615c3402a8401e4f4af7eace4ef747e99fa5a9119a09326190f4cb634202a5369a1f31f7b223ad30887295b2b061294'
           type: string
         balance:
           type: string
+          example: 'OK'
           enum:
             - NONE
             - LOW
             - OK
     Enrolment:
       type: object
+      required:
+        - did
+        - state
       properties:
         did:
+          description: The Decentralized Identity (DID) created with the configured
+            private key
+          example: 'did:ethr:0x3E8c2db768f876907C54F52B9e6Cc7F8E48d850F'
           type: string
         state:
           type: object
+          required:
+            - ready
+            - waiting
+            - roles
           properties:
             ready:
+              description: Enrolment state is complete
+              example: true
               type: boolean
             waiting:
+              description: Enrolment requires approval from the role issuer
+              example: false
               type: boolean
             roles:
               type: object
+              required:
+                - user
+                - messagebroker
               properties:
                 user:
                   $ref: '#/components/schemas/RoleState'
@@ -272,6 +473,9 @@ components:
                   $ref: '#/components/schemas/RoleState'
     SendMessage:
       type: object
+      required:
+        - fqcn
+        - payload
       properties:
         fqcn:
           description: Fully Qualified Channel Name
@@ -279,28 +483,33 @@ components:
           type: string
         topic:
           description: Topic to send the message to
+          example: myTopic
           type: string
         payload:
           description: Message data conforming to channel
           example: '{"some": "data"}'
+          type: string
+        correlationId:
+          description: Idempotency (message deduplication) identifier, e.g. UUID (v4)
+          example: 'e7dd9967-c369-4609-99ab-bdbb7d6a5ee6'
           type: string
     SendMessageSuccess:
       type: object
       properties:
         id:
           description: Message ID on the DSB
-          example: msg-#22
+          example: 'msg-#22'
           type: string
     VerifySignature:
       type: object
       properties:
         signature:
           description: Signature generated by the private key
-          example: "0x3c8847f7dbbf1f1dfd4d2bffab7e77e282e8bea61371cf0df78ef4a52204771d40c73086703632540c2a57dc677936971635e2ca4fd43a6df941bfe0d038e0c11c"
+          example: '0x3c8847f7dbbf1f1dfd4d2bffab7e77e282e8bea61371cf0df78ef4a52204771d40c73086703632540c2a57dc677936971635e2ca4fd43a6df941bfe0d038e0c11c'
           type: string
         did:
           description: did generated
-          example: did:ethr:0xfd6b809B81cAEbc3EAB0d33f0211E5934621b2D2
+          example: 'did:ethr:0xfd6b809B81cAEbc3EAB0d33f0211E5934621b2D2'
           type: string
         payload:
           description: Message data for which signature is generated
@@ -315,25 +524,42 @@ components:
           type: boolean
     Message:
       type: object
+      required:
+        - id
+        - fqcn
+        - payload
+        - signature
+        - sender
+        - timestampNanos
       properties:
         id:
           description: Message ID
+          example: '22'
           type: string
         topic:
           description: Topic the message was sent to
+          example: myTopic
           type: string
         payload:
           description: The message data
+          example: '{"some": "data"}'
           type: string
         signature:
           description: Ethereum (secp256k1) Signature corresponding to the payload as signed by the private key of the sender
+          example: '0x3c8847f7dbbf1f1dfd4d2bffab7e77e282e8bea61371cf0df78ef4a52204771d40c73086703632540c2a57dc677936971635e2ca4fd43a6df941bfe0d038e0c11c'
           type: string
         sender:
           description: DID of the sender of the message
+          example: 'did:ethr:0xfd6b809B81cAEbc3EAB0d33f0211E5934621b2D2'
           type: string
         timestampNanos:
           description: Timestamp the message was sent in nanoseconds
+          example: 1631179721295000000
           type: number
+        correlationId:
+          description: Idempotency (message deduplication) identifier, e.g. UUID (v4)
+          example: 'e7dd9967-c369-4609-99ab-bdbb7d6a5ee6'
+          type: string
     Channel:
       type: object
       properties:
@@ -342,16 +568,18 @@ components:
           example: test.channels.dsb.apps.energyweb.iam.ewc
           type: string
         topics:
-          type: object
-          properties:
-            namespace:
-              description: The name of the topic within the channel
-              example: offers
-              type: string
-            schema:
-              description: JSON Schema object or string (only JSON currently supported)
-              example: "{\"$schema\":\"http://json-schema.org/draft-07/schema#\",\"$id\":\"0d0db676-4da7-414e-a36c-a4b62b151d22\",\"title\":\"test\",\"type\":\"object\",\"required\":[\"id\",\"name\"],\"properties\":{\"id\":{\"type\":\"integer\"},\"name\":{\"type\":\"string\"}}}"
-              type: string
+          type: array
+          items:
+            type: object
+            properties:
+              namespace:
+                description: The name of the topic within the channel
+                example: offers
+                type: string
+              schema:
+                description: JSON Schema object or string (only JSON currently supported)
+                example: "{\"$schema\":\"http://json-schema.org/draft-07/schema#\",\"$id\":\"0d0db676-4da7-414e-a36c-a4b62b151d22\",\"title\":\"test\",\"type\":\"object\",\"required\":[\"id\",\"name\"],\"properties\":{\"id\":{\"type\":\"integer\"},\"name\":{\"type\":\"string\"}}}"
+                type: string
         admins:
           description: Array of DIDs allowed to manage the channel
           example: ["did:ethr:0x3E8c2db768f876907C54F52B9e6Cc7F8E48d850F"]
@@ -395,11 +623,36 @@ components:
           example: "2021-08-20T11:40:43.303Z"
     Error:
       type: object
+      required:
+        - err
       properties:
         err:
-          type: string
+          type: object
+          required:
+            - code
+            - reason
+          properties:
+            code:
+              description: Error code outlining the type of error that has occurred
+              example: 'DSB::INVALID_PAYLOAD'
+              type: string
+            reason:
+              description: Human-readable text detailing the reason of the error
+              example: 'Payload does not match the schema for the topic'
+              type: string
+            additionalInformation:
+              example:
+                instancePath: ''
+                schemaPath: '#/required'
+                keyword: required
+                params:
+                  missingProperty: id
+                message: must have required property 'id'
+              description: Any additional information attributed to the error
     RoleState:
       type: string
+      description: The state of the role request
+      example: APPROVED
       enum:
         - NO_CLAIM
         - AWAITING_APPROVAL

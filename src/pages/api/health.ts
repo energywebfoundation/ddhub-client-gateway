@@ -1,19 +1,18 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { DsbApiService } from '../../services/dsb-api.service'
-import { ErrorCode } from '../../utils'
+import { ErrorBody, errorOrElse } from '../../utils'
+
+type Response = void | { err: ErrorBody }
 
 export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
+    req: NextApiRequest,
+    res: NextApiResponse<Response>
 ) {
-  try {
     const { ok, err } = await DsbApiService.init().getHealth()
     if (!ok) {
-      throw err ? err : new Error(ErrorCode.DSB_UNHEALTHY)
+        const error = errorOrElse(err)
+        return res.status(error.statusCode).send({ err: error.body })
     }
-    res.status(200).end()
-  } catch (err) {
-    res.status(503).send({ err: err.message })
-  }
+    return res.status(200).end()
 }

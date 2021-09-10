@@ -1,7 +1,7 @@
 asyncapi: '2.1.0'
 info:
   title: DSB Gateway WebSocket API
-  version: 0.2.1
+  version: 0.3.0
   description: The Gateway WebSocket API is an alternative to the REST interface, allowing for real-time messaging (particularly asynchronous responses).
 defaultContentType: application/json
 channels:
@@ -29,6 +29,9 @@ components:
         $ref: '#/components/serverBindings/ws'
       payload:
         type: object
+        required:
+          - fqcn
+          - payload
         properties:
           fqcn:
             type: string
@@ -36,6 +39,7 @@ components:
             example: test.channels.dsb.apps.energyweb.iam.ewc
           topic:
             type: string
+            example: myTopic
             description: Topic to send the message to
           payload:
             type: string
@@ -48,6 +52,13 @@ components:
     IncomingMessage:
       payload:
         type: object
+        required:
+          - id
+          - fqcn
+          - payload
+          - sender
+          - signature
+          - timestampNanos
         properties:
           id:
             type: string
@@ -59,7 +70,8 @@ components:
             example: test.channels.dsb.apps.energyweb.iam.ewc
           topic:
             type: string
-            example: Topic the message was sent to
+            description: Topic the message was sent to
+            example: myTopic
           payload:
             type: string
             description: The message data
@@ -70,11 +82,17 @@ components:
             example: did:ethr:0xEd6e3B7a9D7354030e5900646Fc89BFF2E5aEC51
           signature:
             type: string
+            example: '0x3c8847f7dbbf1f1dfd4d2bffab7e77e282e8bea61371cf0df78ef4a52204771d40c73086703632540c2a57dc677936971635e2ca4fd43a6df941bfe0d038e0c11c'
             description: The signature, created by signing the message payload with
                 the private key belonging to the sender's DID.
           timestampNanos:
             description: Timestamp the message was sent in nanoseconds
+            example: 1631179721295000000
             type: number
+          correlationId:
+            description: Idempotency key for message depuplication (e.g. UUID v4)
+            example: e9c82d33-d60c-42d8-bc76-e5107d97e1b9
+            type: string
     ErrorMessage:
       payload:
         type: object
@@ -85,7 +103,28 @@ components:
               attempted publishing of a message
             example: e9c82d33-d60c-42d8-bc76-e5107d97e1b9
           err:
-            type: string
-            description: Error code string describing the reason a message could
-              not be published
-            example: DSB::UNAUTHORIZED
+            type: object
+            required:
+              - code
+              - reason
+            properties:
+              code:
+                description: Error code outlining the type of error that has occurred
+                example: DSB::INVALID_PAYLOAD
+              reason:
+                description: Human-readable text detailing the reason of the error
+                type: string
+                example: 'Payload does not match the schema for the topic'
+              additionalInformation:
+                example:
+                  instancePath: ''
+                  schemaPath: '#/required'
+                  keyword: required
+                  params:
+                    missingProperty: id
+                  message: must have required property 'id'
+                description: Any additional information attributed to the error
+
+
+
+          

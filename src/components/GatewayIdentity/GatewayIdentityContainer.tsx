@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import axios from 'axios'
 import swal from '@sweetalert/with-react'
-import { useErrors } from '../../hooks/useErrors'
 import { GatewayIdentity } from './GatewayIdentity'
 import { BalanceState, Enrolment, EnrolmentState, Identity } from '../../utils'
 
@@ -23,7 +22,6 @@ export const GatewayIdentityContainer = ({
     enrolment,
     auth
 }: GatewayIdentityContainerProps) => {
-    const errors = useErrors()
     const [isLoading, setIsLoading] = useState(false)
     const [did, setDid] = useState(enrolment?.did ?? '')
     const [address, setAddress] = useState(identity?.address ?? '')
@@ -51,7 +49,11 @@ export const GatewayIdentityContainer = ({
                 'success'
             )
         } catch (err) {
-            swal('Error', errors(err.response.data.err), 'error')
+            if (axios.isAxiosError(err)) {
+                swal('Error', err.response?.data?.err?.reason, 'error')
+            } else {
+                swal('Error', `Could not set identity: ${err}`, 'error')
+            }
         }
         setIsLoading(false)
     }
@@ -75,7 +77,11 @@ export const GatewayIdentityContainer = ({
                 'success'
             )
         } catch (err) {
-            swal('Enrolment Error', errors(err.response.data.err), 'error')
+            if (axios.isAxiosError(err)) {
+                swal('Enrolment Error', err.response?.data?.err?.reason, 'error')
+            } else {
+                swal('Error', `Could not enrol: ${err}`, 'error')
+            }
         }
         setIsLoading(false)
     }

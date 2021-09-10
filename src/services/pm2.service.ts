@@ -8,7 +8,7 @@ type PM2 = {
      * @param name name of the process to validate
      * @returns process state (NONE, ONLINE, NOT_ONLINE)
      */
-    isRunning: (name: string) => Promise<Result<ProcessState>>
+    isRunning: (name: string) => Promise<Result<ProcessState, Error>>
     /**
      * Starts a new PM2 process with the given options
      *
@@ -16,7 +16,7 @@ type PM2 = {
      * as per https://pm2.keymetrics.io/docs/usage/application-declaration/#attributes-available
      * @returns true if started successfully
      */
-    start: (options: StartOptions) => Promise<Result>
+    start: (options: StartOptions) => Promise<Result<boolean, Error>>
     /**
      * Restarts a PM2 process with the given options. For example:
      *
@@ -34,13 +34,13 @@ type PM2 = {
      * as per https://pm2.keymetrics.io/docs/usage/application-declaration/#attributes-available
      * @returns true if started successfully
      */
-    restart: (options: StartOptions) => Promise<Result>
+    restart: (options: StartOptions) => Promise<Result<boolean, Error>>
     /**
      * Call this once finished to disconnect from the PM2 daemon
      *
      * @returns true if disconnected successfully
      */
-    done: () => Result
+    done: () => Result<boolean, Error>
 }
 
 export enum ProcessState {
@@ -49,7 +49,7 @@ export enum ProcessState {
     NOT_ONLINE,
 }
 
-export async function initPM2(): Promise<Result<PM2>> {
+export async function initPM2(): Promise<Result<PM2, Error>> {
     return new Promise((resolve) => {
         pm2.connect((err) => {
             if (err) {
@@ -99,7 +99,9 @@ export async function initPM2(): Promise<Result<PM2>> {
                             pm2.disconnect()
                             return { ok: true }
                         } catch (err) {
-                            console.log(`Failed to disconnect from PM2 daemon: ${err.message}`)
+                            if (err instanceof Error) {
+                                console.log(`Failed to disconnect from PM2 daemon: ${err.message}`)
+                            }
                             return { err: new Error(ErrorCode.PM2_DISCONNECT_FAILED) }
                         }
                     }

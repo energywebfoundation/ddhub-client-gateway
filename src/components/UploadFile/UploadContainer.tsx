@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { Upload } from './Upload'
 import axios from 'axios'
 import swal from '@sweetalert/with-react'
-import { useErrors } from '../../hooks/useErrors'
 import { Channel } from '../../utils'
 
 type UploadContainerProps = {
@@ -11,7 +10,6 @@ type UploadContainerProps = {
 }
 
 export const UploadContainer = ({ auth, channels }: UploadContainerProps) => {
-	const errors = useErrors()
 	const [isLoading, setIsLoading] = useState(false)
 
 	const handleUpload = async (file: File, fqcn: string, topic: string) => {
@@ -21,18 +19,22 @@ export const UploadContainer = ({ auth, channels }: UploadContainerProps) => {
 		formData.append("file", file)
 
 		try {
-			await axios.post(
+			const res = await axios.post(
 				`/api/v1/upload?fqcn=${fqcn}&topic=${topic}`,
 				formData,
 				auth
 					? { headers: { 'Authorization': `Bearer ${auth}`, 'content-type': 'multipart/form-data' } }
 					: undefined
 			)
-
-			swal("'Success", "Your file has been uploaded!", "success")
+			const { id, correlationId } = res.data
+			swal(`Success: ${id}`, `File uploaded with correlation ID\n${correlationId}`, "success")
 
 		} catch (err) {
-			swal('Error', errors(err.response.data.err), 'error')
+			if (axios.isAxiosError(err)) {
+				swal('Error', err.response?.data?.err?.reason, 'error')
+			} else {
+				swal('Error', `Could not set identity: ${err}`, 'error')
+			}
 			setIsLoading(false)
 		}
 	}

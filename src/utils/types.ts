@@ -1,4 +1,6 @@
-export type Result<T = boolean, E = Error> = {
+import { GatewayError } from "./errors"
+
+export type Result<T = boolean, E = GatewayError> = {
     ok?: T
     err?: E
 }
@@ -36,7 +38,7 @@ export type SendMessageData = {
     fqcn: string
     topic: string
     payload: string
-    correlationId: string
+    correlationId?: string
     signature: string
 }
 
@@ -47,6 +49,7 @@ export type SendMessageResult = {
 export type GetMessageOptions = {
     fqcn: string
     amount?: number
+    clientId?: string
 }
 
 export type Message = {
