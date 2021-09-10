@@ -3,13 +3,7 @@ import Head from 'next/head'
 import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
 import swal from '@sweetalert/with-react'
 import { makeStyles } from '@material-ui/styles'
-import {
-  Typography,
-  Container,
-  Divider,
-  Theme,
-  Grid
-} from '@material-ui/core'
+import { Typography, Container, Divider, Theme, Grid } from '@material-ui/core'
 import { GatewayIdentityContainer } from '../components/GatewayIdentity/GatewayIdentityContainer'
 import { ProxyCertificateContainer } from '../components/ProxyCertificate/ProxyCertificateContainer'
 import Header from '../components/Header/Header'
@@ -24,9 +18,7 @@ type Props = {
   auth: Option<string>
 }
 
-export async function getServerSideProps(
-  context: GetServerSidePropsContext
-): Promise<{
+export async function getServerSideProps(context: GetServerSidePropsContext): Promise<{
   props: Props
 }> {
   const authHeader = context.req.headers.authorization
@@ -44,7 +36,7 @@ export async function getServerSideProps(
   } else {
     if (err.message === ErrorCode.UNAUTHORIZED) {
       context.res.statusCode = 401
-      context.res.setHeader("WWW-Authenticate", "Basic realm=\"Authorization Required\"")
+      context.res.setHeader('WWW-Authenticate', 'Basic realm="Authorization Required"')
     } else {
       context.res.statusCode = 403
     }
@@ -67,7 +59,6 @@ export default function Home({ health, state, auth }: InferGetServerSidePropsTyp
     }
   }, [health, state])
 
-
   return (
     <div>
       <Head>
@@ -83,11 +74,11 @@ export default function Home({ health, state, auth }: InferGetServerSidePropsTyp
           <section className={classes.connectionStatus}>
             <Typography variant="h4">Connection Status </Typography>
             <Typography variant="caption" className={classes.connectionStatusPaper}>
-                { health.ok ? 'ONLINE' : `ERROR [${health.err?.code}]` }
+              {health.ok ? 'ONLINE' : `ERROR [${health.err?.code}]`}
             </Typography>
           </section>
 
-          <Divider className={classes.divider}/>
+          <Divider className={classes.divider} />
 
           {state.ok && (
             <section className={classes.main}>
@@ -100,10 +91,7 @@ export default function Home({ health, state, auth }: InferGetServerSidePropsTyp
                   />
                 </Grid>
                 <Grid item xs={12} md={6}>
-                  <ProxyCertificateContainer
-                    certificate={state.ok?.certificate}
-                    auth={auth.some}
-                  />
+                  <ProxyCertificateContainer certificate={state.ok?.certificate} auth={auth.some} />
                 </Grid>
               </Grid>
             </section>

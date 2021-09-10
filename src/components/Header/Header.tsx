@@ -1,103 +1,96 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { makeStyles } from '@material-ui/styles'
-import {
-  AppBar,
-  Toolbar,
-  Typography,
-  Theme
-} from '@material-ui/core'
+import { AppBar, Toolbar, Typography, Theme } from '@material-ui/core'
 import { useRouter } from 'next/router'
 import clsx from 'clsx'
 import logo from '../../../public/ew-flex-single-logo.png'
 
 export default function Header() {
-    const classes = useStyles()
-    const router = useRouter()
+  const classes = useStyles()
+  const router = useRouter()
 
-    const isActive = (pathname: string) => router.pathname === pathname ? classes.active : ''
+  const isActive = (pathname: string) => (router.pathname === pathname ? classes.active : '')
 
-    return (
-        <AppBar position="static" className={classes.appBar}>
-          <Toolbar className={classes.toolbar}>
-            <div>
-              <Image src={logo} alt="EW logo" height={40} width={40} />
-              <Typography className={classes.logoText} variant="h6">
-                energy web
-              </Typography>
-            </div>
+  return (
+    <AppBar position="static" className={classes.appBar}>
+      <Toolbar className={classes.toolbar}>
+        <div>
+          <Image src={logo} alt="EW logo" height={40} width={40} />
+          <Typography className={classes.logoText} variant="h6">
+            energy web
+          </Typography>
+        </div>
 
-            <div>
-              <div className={classes.nav}>
-                <Link href="/">
-                  <a className={clsx(classes.navLink, isActive('/'))}>Admin</a>
-                </Link>
-                <Link href="/files">
-                  <a className={clsx(classes.navLink, isActive('/files'))}>Files</a>
-                </Link>
-                <Link href="/docs">
-                <a className={clsx(classes.navLink, isActive('/docs'))}>Docs</a>
-                </Link>
-              </div>
-            <p className={classes.divider}>•</p>
-              <Typography>
-                  EW-DSB Client Gateway
-              </Typography>
-              <Typography className={classes.version} variant="caption">
-                v0.3.0
-              </Typography>
-            </div>
-          </Toolbar>
-        </AppBar>
-    )
+        <div>
+          <div className={classes.nav}>
+            <Link href="/">
+              <a className={clsx(classes.navLink, isActive('/'))}>Admin</a>
+            </Link>
+            <Link href="/files">
+              <a className={clsx(classes.navLink, isActive('/files'))}>Files</a>
+            </Link>
+            <Link href="/docs">
+              <a className={clsx(classes.navLink, isActive('/docs'))}>Docs</a>
+            </Link>
+          </div>
+          <p className={classes.divider}>•</p>
+          <Typography>EW-DSB Client Gateway</Typography>
+          <Typography className={classes.version} variant="caption">
+            v0.3.0
+          </Typography>
+        </div>
+      </Toolbar>
+    </AppBar>
+  )
 }
 
 const useStyles = makeStyles((theme: Theme) => ({
-    appBar: {
-      background: '#000',
-      '& *': {
-        color: '#fff'
-      },
-      marginBottom: '3rem'
+  appBar: {
+    background: '#000',
+    '& *': {
+      color: '#fff'
     },
-    active: {
-      color: theme.palette.secondary.main
-    },
-    toolbar: {
-      display: 'flex',
-      justifyContent: 'space-between',
+    marginBottom: '3rem'
+  },
+  active: {
+    color: theme.palette.secondary.main
+  },
+  toolbar: {
+    display: 'flex',
+    justifyContent: 'space-between',
 
-      '& > div': {
-        display: 'flex',
-        alignItems: 'center'
-      }
-    },
-    logoText: {
-      marginLeft: '1rem',
-      fontFamily: 'Rajdhani'
-    },
-    version: {
-      borderRadius: '1rem',
-      marginLeft: '1rem',
-      padding: '.3rem .8rem',
-      color: '#fff',
-      fontSize: '.7rem',
-      background: theme.palette.secondary.main
-    },
-    divider: {
-      margin: '0 1rem',
-    },
-    nav: {
+    '& > div': {
       display: 'flex',
-      width: '10rem',
-      justifyContent: 'space-between',
-    },
-    navLink: {
-      fontSize: '1rem',
-
-      '&:hover': {
-        textDecorationLine: 'underline',
-        color: theme.palette.secondary.main,
-      }
+      alignItems: 'center'
     }
+  },
+  logoText: {
+    marginLeft: '1rem',
+    fontFamily: 'Rajdhani'
+  },
+  version: {
+    borderRadius: '1rem',
+    marginLeft: '1rem',
+    padding: '.3rem .8rem',
+    color: '#fff',
+    fontSize: '.7rem',
+    background: theme.palette.secondary.main
+  },
+  divider: {
+    margin: '0 1rem'
+  },
+  nav: {
+    display: 'flex',
+    width: '10rem',
+    justifyContent: 'space-between'
+  },
+  navLink: {
+    fontSize: '1rem',
+
+    '&:hover': {
+      textDecorationLine: 'underline',
+      color: theme.palette.secondary.main
+    }
+  }
 }))
