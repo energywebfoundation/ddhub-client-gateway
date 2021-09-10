@@ -49,6 +49,7 @@ export type SendMessageResult = {
 export type GetMessageOptions = {
     fqcn: string
     amount?: number
+    clientId?: string
 }
 
 export type Message = {

@@ -116,10 +116,11 @@ export class DsbApiService {
 
     public async getMessages(options: GetMessageOptions): Promise<Result<Message[]>> {
         try {
-            const url = joinUrl(
-                config.dsb.baseUrl,
-                `message?fqcn=${options.fqcn}${options.amount ? `&amount=${options.amount}` : ''}`
-            )
+            let query = `fqcn=${ options.fqcn }`
+            query += options.amount ? `&amount=${options.amount}` : ''
+            query += options.clientId ? `&clientId=${options.clientId}` : ''
+
+            const url = joinUrl(config.dsb.baseUrl, `message?${query}`)
             const res = await fetch(url, {
                 headers: {
                     'Authorization': `Bearer ${this.authToken}`,
@@ -233,7 +234,8 @@ export class DsbApiService {
             for (const sub of subscriptions) {
                 const { ok: messages, err } = await this.getMessages({
                     fqcn: sub.fqcn,
-                    amount: config.events.maxPerSecond
+                    amount: config.events.maxPerSecond,
+                    clientId: 'wsconsumer'
                 })
                 if (err) {
                     console.log('Error fetching messages:', err.message)
@@ -257,8 +259,8 @@ export class DsbApiService {
             }
         }
         // use setTimeout instead of setInterval so we can control the interval
-        const runner = () => {
-            job()
+        const runner = async () => {
+            await job()
             setTimeout(runner, interval * 1000)
         }
         runner()
