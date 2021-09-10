@@ -16,3 +16,25 @@ dsb-client-gateway:
   imagePullSecrets: []
   nameOverride: "dsb-client-gateway"
   fullnameOverride: "dsb-client-gateway"
+
+  service:
+    type: ClusterIP
+    port: 80
+
+  ingress:
+    enabled: true
+    annotations: {kubernetes.io/ingress.class: azure/application-gateway}
+    hosts:
+      - host: dsb-gateway.energyweb.org
+        paths:
+        - path: "/"
+          pathType: Prefix
+          backend:
+            service:
+              name: dsb-client-gateway
+              port:
+                number: 80
+    tls:
+      - secretName: dsb-tls-secret
+        hosts:
+          - dsb-gateway.energyweb.org
