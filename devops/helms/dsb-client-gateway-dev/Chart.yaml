@@ -26,3 +26,4 @@ dependencies:
   - name: dsb-client-gateway
     version: 0.4.3
     repository: https://aemocontainerregistry.azurecr.io/helm/v1/repo
+    
