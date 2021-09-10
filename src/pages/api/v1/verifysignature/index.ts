@@ -3,14 +3,14 @@ import { isAuthorized } from "../../../../services/auth.service"
 import { ErrorCode, ErrorBody, SignatureCheckError, BadRequestError } from "../../../../utils"
 import { utils } from 'ethers'
 
-type Response = void | { err: ErrorBody }
+type Response = { ok: true } | { err: ErrorBody }
 
 export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse<Response>
 ) {
     if (req.method !== 'POST') {
-        return res.status(405).end()
+        return res.status(405).send({ ok: true })
     }
     const authHeader = req.headers.authorization
     const { err } = isAuthorized(authHeader)

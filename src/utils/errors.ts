@@ -55,7 +55,7 @@ export enum ErrorCode {
 
     // SIGNATURE ERRORS
     SIGNATURE_CHECK_FAILED = 'SIG::CHECK_FAILED',
-    SIGNATURE_DOES_NOT_MATCH = 'SIG_NO_MATCH',
+    SIGNATURE_DOES_NOT_MATCH = 'SIG::NO_MATCH',
 }
 
 export type ErrorBody = {

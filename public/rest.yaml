@@ -383,15 +383,32 @@ paths:
               $ref: '#/components/schemas/VerifySignature'
       responses:
         '200':
-          description: The message was successfully published
+          description: The message was verified (valid or not)
           content:
             application/json:
+              examples:
+                Success:
+                  value:
+                    ok: true
+                Failure:
+                  value:
+                    err:
+                      code: SIG::NO_MATCH
+                      reason: Expected and actual public key does not match
+                      additionalInformation:
+                        expected: '0xfd6b809B81cAEbc3EAB0d33f0211E5934621b2D2'
+                        actual: '0x3E8c2db768f876907C54F52B9e6Cc7F8E48d850F'
               schema:
                 $ref: '#/components/schemas/VerifySignatureSuccess'
-        default:
-          description: Error processing request
+        '400':
+          description: The request was invalid (e.g. signature is unexpected format)
           content:
             application/json:
+              example:
+                err:
+                  code: SIG::CHECK_FAILED
+                  reason: Unable to verify public key used to sign payload, please
+                    check signature format and try again
               schema:
                 $ref: '#/components/schemas/Error'
       security:
