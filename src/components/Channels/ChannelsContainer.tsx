@@ -7,10 +7,5 @@ type ChannelContainerProps = {
 }
 
 export const ChannelContainer = ({ channel, did }: ChannelContainerProps) => {
-  return (
-    <Channel
-      channel={channel}
-      myDID={did}
-    />
-  )
+  return <Channel channel={channel} myDID={did} />
 }

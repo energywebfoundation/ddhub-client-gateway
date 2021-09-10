@@ -3,7 +3,9 @@ import {
   Accordion,
   AccordionDetails,
   AccordionSummary as MuiAccordionSummary,
-  Theme, Typography, withStyles,
+  Theme,
+  Typography,
+  withStyles
 } from '@material-ui/core'
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
 import { Channel as ChannelType } from '../../utils'
@@ -11,7 +13,7 @@ import { JsonView, defaultStyles } from 'react-json-view-lite'
 import 'react-json-view-lite/dist/index.css'
 
 type ChannelProps = {
-  channel: ChannelType,
+  channel: ChannelType
   myDID?: string
 }
 
@@ -22,21 +24,18 @@ const AccordionSummary = withStyles({
     marginBottom: -1,
     minHeight: 56,
     '&$expanded': {
-      minHeight: 56,
-    },
+      minHeight: 56
+    }
   },
   content: {
     '&$expanded': {
-      margin: '12px 0',
-    },
+      margin: '12px 0'
+    }
   },
-  expanded: {},
+  expanded: {}
 })(MuiAccordionSummary)
 
-export default function Channel({
-  channel,
-  myDID,
-}: ChannelProps) {
+export default function Channel({ channel, myDID }: ChannelProps) {
   const classes = useStyles()
 
   const isPubSub = () => {
@@ -59,22 +58,29 @@ export default function Channel({
   return (
     <div className={classes.container}>
       <Accordion className={classes.accordion}>
-
         <AccordionSummary className={classes.accordionTitle} expandIcon={<ExpandMoreIcon />}>
-          <Typography className={classes.name} variant="h5">{channel.fqcn}</Typography>
-          <Typography variant="h6"><i>{isPubSub()}</i></Typography>
+          <Typography className={classes.name} variant="h5">
+            {channel.fqcn}
+          </Typography>
+          <Typography variant="h6">
+            <i>{isPubSub()}</i>
+          </Typography>
         </AccordionSummary>
 
         <AccordionDetails className={classes.channelDetail}>
           <div>
-            <Typography className={classes.sectionTitle} variant="h6"><i>Topics</i></Typography>
+            <Typography className={classes.sectionTitle} variant="h6">
+              <i>Topics</i>
+            </Typography>
           </div>
 
           <div>
             {channel.topics?.map((topic) => (
               <Accordion key={topic.namespace}>
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  <Typography className={classes.name} variant="h6">{topic.namespace}</Typography>
+                  <Typography className={classes.name} variant="h6">
+                    {topic.namespace}
+                  </Typography>
                 </AccordionSummary>
                 <AccordionDetails>
                   <JsonView
@@ -89,9 +95,7 @@ export default function Channel({
               </Accordion>
             ))}
           </div>
-
         </AccordionDetails>
-
       </Accordion>
     </div>
   )
@@ -108,11 +112,11 @@ const useStyles = makeStyles((theme: Theme) => ({
     color: theme.palette.info.contrastText,
     '& div': {
       display: 'flex',
-      justifyContent: 'space-between',
+      justifyContent: 'space-between'
     }
   },
   name: {
-    fontWeight: 'bold',
+    fontWeight: 'bold'
   },
   sectionTitle: {
     margin: '1rem 0.5rem',
@@ -153,7 +157,7 @@ const defaultStyle = {
 
 const transitionStyles = {
   entering: { opacity: 0, display: 'block' },
-  entered: { opacity: 1},
+  entered: { opacity: 1 },
   exiting: { opacity: 0 },
   exited: { opacity: 0, display: 'none' }
 }

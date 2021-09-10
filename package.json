@@ -1,6 +1,6 @@
 {
   "name": "dsb-client-gateway",
-  "version": "0.3.0",
+  "version": "0.2.2",
   "scripts": {
     "dev:next": "next dev",
     "dev": "ts-node --project tsconfig.server.json src/server.ts",
@@ -9,7 +9,8 @@
     "build": "npm run build:next && npm run build:server",
     "start": "NODE_ENV=production node dist/server.js",
     "lint": "next lint",
-    "test": "jest --detectOpenHandles --verbose"
+    "test": "jest --detectOpenHandles --verbose",
+    "prettier:fix": "prettier --write src/*"
   },
   "dependencies": {
     "@asyncapi/parser": "^1.7.0",

@@ -1,6 +1,6 @@
 html,
 body {
-  font-family: "Rajdhani", sans-serif;
+  font-family: 'Rajdhani', sans-serif;
 }
 
 a {
@@ -12,9 +12,9 @@ a {
   box-sizing: border-box;
 }
 #nprogress .bar {
-  background: #A567FF !important;
+  background: #a567ff !important;
 }
 
 #nprogress .peg {
-  box-shadow: 0 0 10px #A567FF, 0 0 5px #A567FF;
+  box-shadow: 0 0 10px #a567ff, 0 0 5px #a567ff;
 }
