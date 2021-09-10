@@ -345,10 +345,28 @@ paths:
       responses:
         '200':
           description: OK
-        '503':
+        '502':
           description: The DSB Message Broker is unreachable
           content:
             application/json:
+              example:
+                err:
+                  code: DSB::REQUEST_FAILED
+                  reason: The DSB Message Broker is unreachable
+              schema:
+                $ref: '#/components/schemas/Error'
+        '503':
+          description: The DSB Message Broker is unhealthy
+          content:
+            application/json:
+              example:
+                err:
+                  code: DSB::UNHEALTHY
+                  reason: The DSB Message Broker is running with issues
+                  additionalInformation:
+                    nats:
+                      status: down
+                      message: Could not connect
               schema:
                 $ref: '#/components/schemas/Error'
   /api/v1/verifysignature:

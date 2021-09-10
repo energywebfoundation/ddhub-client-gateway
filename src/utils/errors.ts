@@ -25,7 +25,7 @@ export enum ErrorCode {
     // DSB ERRORS
     DSB_NOT_CONTROLLABLE = 'DSB::NOT_CONTROLLABLE',
     DSB_UNSUPPORTED_CONTROL_TYPE = 'DSB::UNSUPPORTED_CONTROL_TYPE',
-    DSB_UNHEALTHY = 'DSB_UNHEALTHY',
+    DSB_UNHEALTHY = 'DSB::UNHEALTHY',
     DSB_REQUEST_FAILED = 'DSB::REQUEST_FAILED',
     DSB_LOGIN_FAILED = 'DSB::LOGIN_FAILED',
     DSB_UNAUTHORIZED = 'DSB::UNAUTHORIZED',
@@ -235,7 +235,7 @@ export class DSBHealthError extends GatewayError {
         super({
             statusCode: HttpError.SERVICE_UNAVAILABLE,
             code: ErrorCode.DSB_UNHEALTHY,
-            reason: `DSB Message Broker is up but has problems`,
+            reason: `The DSB Message Broker is running with issues`,
             additionalInformation: error
         })
     }
