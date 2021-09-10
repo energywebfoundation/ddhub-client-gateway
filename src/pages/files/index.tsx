@@ -14,11 +14,11 @@ import Header from '../../components/Header/Header'
 import { DownloadContainer } from '../../components/DownloadFile/DownloadContainer'
 import { DsbApiService } from '../../services/dsb-api.service'
 import { isAuthorized } from '../../services/auth.service'
-import { ErrorCode, Result, serializeError, Channel, ErrorBody } from '../../utils'
+import { ErrorCode, Result, serializeError, Channel, ErrorBodySerialized } from '../../utils'
 
 type Props = {
-  health: Result<boolean, ErrorBody>
-  channels: Result<Channel[], ErrorBody>
+  health: Result<boolean, ErrorBodySerialized>
+  channels: Result<Channel[], ErrorBodySerialized>
 }
 
 export async function getServerSideProps(

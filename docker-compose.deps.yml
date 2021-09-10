@@ -2,7 +2,7 @@ version: '3.9'
 
 services:
     message-broker:
-      image: 098061033856.dkr.ecr.us-east-1.amazonaws.com/ew-dos-dsb-ecr:1a80a351-b40a-44a2-9815-5ae35c73dc03
+      image: 098061033856.dkr.ecr.us-east-1.amazonaws.com/ew-dos-dsb-ecr:841d75ec-3596-487c-93c6-acfaf76bbe72
       environment:
         - PORT=3001
         - MB_DID=did:ethr:0x4eD992B299f15eaD372E19DDAB2f95704F69D1B7

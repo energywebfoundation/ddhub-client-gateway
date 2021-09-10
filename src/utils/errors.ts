@@ -25,11 +25,13 @@ export enum ErrorCode {
     // DSB ERRORS
     DSB_NOT_CONTROLLABLE = 'DSB::NOT_CONTROLLABLE',
     DSB_UNSUPPORTED_CONTROL_TYPE = 'DSB::UNSUPPORTED_CONTROL_TYPE',
+    DSB_UNHEALTHY = 'DSB_UNHEALTHY',
     DSB_REQUEST_FAILED = 'DSB::REQUEST_FAILED',
     DSB_LOGIN_FAILED = 'DSB::LOGIN_FAILED',
     DSB_UNAUTHORIZED = 'DSB::UNAUTHORIZED',
-    DSB_FORBIDDEN = 'DSB::FORBIDDEN',
-    DSB_UNHEALTHY = 'DSB_UNHEALTHY',
+    DSB_FORBIDDEN_RESOURCE = 'DSB::FORBIDDEN_RESOURCE',
+    DSB_CHANNEL_UNAUTHORIZED = 'DSB::CHANNEL_UNAUTHORIZED',
+    DSB_CHANNEL_NOT_FOUND = 'DSB::CHANNEL_NOT_FOUND',
     DSB_NO_SUBSCRIPTIONS = 'DSB::NO_SUBSCRIPTIONS',
     DSB_INVALID_PAYLOAD = 'DSB::INVALID_PAYLOAD',
 
@@ -56,56 +58,15 @@ export enum ErrorCode {
     SIGNATURE_DOES_NOT_MATCH = 'SIG_NO_MATCH',
 }
 
-// export const errorExplainer: { [key: string]: { status: number, text: string} } = {
-//     [ErrorCode.ID_NO_PRIVATE_KEY]: {
-//         status: 400,
-//         text: 'Private key not set'
-//     },
-//     [ErrorCode.ID_INVALID_PRIVATE_KEY]: {
-//         status: 400,
-//         text: 'Private key should be hex-encoded string',
-//     },
-//     [ErrorCode.ID_IAM_INIT_ERROR]: {
-//         status: 500,
-//         text: 'Failed to initialize account',
-//     },
-//     [ErrorCode.ID_FETCH_CLAIMS_FAILED]: {
-//         status: 500,
-//         text: 'Failed to fetch roles',
-//     },
-//     [ErrorCode.ID_CREATE_MESSAGEBROKER_CLAIM_FAILED]: {
-//         status: 500,
-//         text: 'Could not enrol as "messagebroker"',
-//     },
-//     [ErrorCode.ID_CREATE_USER_CLAIM_FAILED]: {
-//         status: 500,
-//         text: 'Could not enrol as "user"',
-//     },
-//     [ErrorCode.ID_NO_DID]: {
-//         status: 500,
-//         text: 'Could not retrieve or create DID for account',
-//     },
-//     [ErrorCode.DISK_PERSIST_FAILED]: {
-//         status: 500,
-//         text: 'Failed to save state',
-//     },
-//     [ErrorCode.ID_BALANCE_CHECK_FAILED]: {
-//         status: 500,
-//         text: 'Could not retrieve balance for acount',
-//     },
-//     [ErrorCode.ID_NO_BALANCE]: {
-//         status: 500,
-//         text:'Account has no funds'
-//     },
-//     [ErrorCode.ID_ALREADY_ENROLED]: {
-//         status: 400,
-//         text: 'DID has already been enroled'
-//     }
-// }
-
 export type ErrorBody = {
     code: ErrorCode,
     reason?: string,
+    additionalInformation?: any
+}
+
+export type ErrorBodySerialized = {
+    code: ErrorCode,
+    reason: string | null,
     additionalInformation?: any
 }
 
@@ -134,6 +95,20 @@ export class GatewayError extends Error {
             code,
             reason,
             additionalInformation
+        }
+    }
+
+    public serialize(): ErrorBodySerialized {
+        return {
+            code: this.body.code,
+            reason:
+                this.body.reason
+                    ? this.body.reason
+                    : null,
+            additionalInformation:
+                this.body.additionalInformation
+                    ? this.body.additionalInformation
+                    : null,
         }
     }
 }
@@ -250,8 +225,7 @@ export class DSBRequestError extends GatewayError {
         super({
             statusCode: HttpError.BAD_GATEWAY,
             code: ErrorCode.DSB_REQUEST_FAILED,
-            reason: `Could not make request to DSB Message Broker`
-                + reason ? `: ${reason}` : ''
+            reason: `Could not make request to DSB Message Broker${reason ? `: ${reason}` : ''}`
         })
     }
 }
@@ -284,6 +258,36 @@ export class DSBLoginError extends GatewayError {
         super({
             statusCode: HttpError.UNAUTHORIZED,
             code: ErrorCode.DSB_LOGIN_FAILED,
+            reason,
+        })
+    }
+}
+
+export class DSBChannelNotFoundError extends GatewayError {
+    constructor(reason: string) {
+        super({
+            statusCode: HttpError.NOT_FOUND,
+            code: ErrorCode.DSB_CHANNEL_NOT_FOUND,
+            reason,
+        })
+    }
+}
+
+export class DSBChannelUnauthorizedError extends GatewayError {
+    constructor(reason: string) {
+        super({
+            statusCode: HttpError.UNAUTHORIZED,
+            code: ErrorCode.DSB_CHANNEL_UNAUTHORIZED,
+            reason,
+        })
+    }
+}
+
+export class DSBForbiddenError extends GatewayError {
+    constructor(reason: string) {
+        super({
+            statusCode: HttpError.FORBIDDEN,
+            code: ErrorCode.DSB_FORBIDDEN_RESOURCE,
             reason,
         })
     }

@@ -1,4 +1,4 @@
-import { ErrorBody, GatewayError, UnknownError } from "."
+import { ErrorBodySerialized, GatewayError, UnknownError } from "."
 import { Result, StringType } from "./types"
 
 export const snip = (some: string, type: StringType) => {
@@ -31,8 +31,12 @@ export const joinUrl = (base: string, path: string): string => {
     return `${base}${path}`
 }
 
-export const serializeError = <T>(result: Result<T, GatewayError>): Result<T, ErrorBody> => {
-    return result.err ? { err: result.err.body } : { ok: result.ok }
+export const serializeError = <T>(
+    result: Result<T, GatewayError>
+): Result<T, ErrorBodySerialized> => {
+    return result.err
+        ? { err: result.err.serialize() }
+        : { ok: result.ok }
 }
 
 export const errorOrElse = (error: GatewayError | undefined): GatewayError => {

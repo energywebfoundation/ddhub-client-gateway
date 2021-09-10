@@ -16,11 +16,11 @@ import Header from '../components/Header/Header'
 import { DsbApiService } from '../services/dsb-api.service'
 import { refreshState } from '../services/identity.service'
 import { isAuthorized } from '../services/auth.service'
-import { ErrorBody, ErrorCode, Option, Result, serializeError, Storage } from '../utils'
+import { ErrorBodySerialized, ErrorCode, Option, Result, serializeError, Storage } from '../utils'
 
 type Props = {
-  health: Result<boolean, ErrorBody>
-  state: Result<Storage, ErrorBody>
+  health: Result<boolean, ErrorBodySerialized>
+  state: Result<Storage, ErrorBodySerialized>
   auth: Option<string>
 }
 

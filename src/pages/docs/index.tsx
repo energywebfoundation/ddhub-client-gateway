@@ -13,15 +13,15 @@ import swal from '@sweetalert/with-react'
 import Header from '../../components/Header/Header'
 import { DsbApiService } from '../../services/dsb-api.service'
 import { isAuthorized } from '../../services/auth.service'
-import { Channel, ErrorBody, ErrorCode, Option, Result, serializeError } from '../../utils'
+import { Channel, ErrorBodySerialized, ErrorCode, Option, Result, serializeError } from '../../utils'
 import { useEffect } from 'react'
 import { useState } from 'react'
 import { ChannelContainer } from '../../components/Channels/ChannelsContainer'
 import { getEnrolment } from '../../services/storage.service'
 
 type Props = {
-  health: Result<boolean, ErrorBody>
-  channels: Result<Channel[], ErrorBody>,
+  health: Result<boolean, ErrorBodySerialized>
+  channels: Result<Channel[], ErrorBodySerialized>,
   did: Option<string>,
   auth: Option<string>
 }

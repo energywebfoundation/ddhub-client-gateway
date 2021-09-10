@@ -1,4 +1,3 @@
-import { ErrorCode } from "."
 import { GatewayError } from "./errors"
 
 export type Result<T = boolean, E = GatewayError> = {

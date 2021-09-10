@@ -127,9 +127,13 @@ paths:
       tags:
         - Message
       summary: Send message on a DSB channel
+      description: Note that resending a message with the same `correlationId` will
+        return a 200 status code. The ID received will be the same as the first message
+        sent. A consumer will only see a single message.
+
       operationId: createMessage
       requestBody:
-        description: Unsigned message to be published on desired channel
+        description: Unsigned message to be published on desired channel.
         content:
           application/json:
             schema:
@@ -142,9 +146,38 @@ paths:
               schema:
                 $ref: '#/components/schemas/SendMessageSuccess'
         '400':
-          description: The message was rejected by the message broker
+          description: The message was rejected by the message broker (e.g. the payload
+            does not match the schema)
           content:
             application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized to access the message broker or channel
+          content:
+            application/json:
+              examples:
+                Channel:
+                  value:
+                    err:
+                      code: DSB::CHANNEL_UNAUTHORIZED
+                      reason: User cannot subscribe to channel
+                Login:
+                  value:
+                    err:
+                      code: DSB::LOGIN_FAILED
+                      reason: Unauthorized
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden to access channel subscriptions (i.e. not having the
+            DSB user role)
+          content:
+            application/json:
+              example:
+                err:
+                  code: DSB::FORBIDDEN_RESOURCE
+                  reason: Must be enroled as a DSB user to access messages
               schema:
                 $ref: '#/components/schemas/Error'
         '404':
@@ -153,11 +186,11 @@ paths:
             application/json:
               example:
                 err:
-                  code: DSB::UNKNOWN_MSG_DESTINATION
+                  code: DSB::CHANNEL_NOT_FOUND
                   reason: Channel or topic does not exist
               schema:
                 $ref: '#/components/schemas/Error'
-        '500':
+        '502':
           description: The message could not be sent
           content:
             application/json:
@@ -198,8 +231,46 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Message'
-        '500':
-          description: Error processing request
+        '401':
+          description: Unauthorized to access the message broker or channel
+          content:
+            application/json:
+              examples:
+                Channel:
+                  value:
+                    err:
+                      code: DSB::CHANNEL_UNAUTHORIZED
+                      reason: User cannot subscribe to channel
+                Login:
+                  value:
+                    err:
+                      code: DSB::LOGIN_FAILED
+                      reason: Unauthorized
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden to access channel subscriptions (i.e. not having the
+            DSB user role)
+          content:
+            application/json:
+              example:
+                err:
+                  code: DSB::FORBIDDEN_RESOURCE
+                  reason: Must be enroled as a DSB user to access messages
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Channel does not exist
+          content:
+            application/json:
+              example:
+                err:
+                  code: DSB::CHANNEL_NOT_FOUND
+                  reason: Requested channel does not exist
+              schema:
+                $ref: '#/components/schemas/Error'
+        '502':
+          description: The request could not be sent (e.g. NATS connection down)
           content:
             application/json:
               example:
@@ -232,11 +303,11 @@ paths:
               example:
                 err:
                   code: DSB::FORBIDDEN
-                  reason: Only fully enroled users can request channels
+                  reason: Must be enroled as a DSB user to access channels
               schema:
                 $ref: '#/components/schemas/Error'
-        '500':
-          description: An error occurred retrieving the channels
+        '502':
+          description: The request could not be sent (e.g. NATS connection down)
           content:
             application/json:
               example:
