@@ -45,17 +45,6 @@ paths:
                   reason: 'Private key not 64 bytes'
               schema:
                 $ref: '#/components/schemas/Error'
-        '500':
-          description: The balance of the address associated with the private key could
-            not be retrieved
-          content:
-            application/json:
-              example:
-                err:
-                  code: ID::BALANCE_CHECK_FAILED
-                  reason: Connection to the RPC node could not be established
-              schema:
-                $ref: '#/components/schemas/Error'
       security:
         - basicAuth: []
     get:
