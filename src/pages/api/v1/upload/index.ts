@@ -6,9 +6,11 @@ import { isAuthorized } from '../../../../services/auth.service'
 import { DsbApiService } from '../../../../services/dsb-api.service'
 import { signPayload } from '../../../../services/identity.service'
 
+type Response = SendMessageResult & { correlationId: string  } | { err: ErrorBody }
+
 export default async function handler(
     req: NextApiRequest,
-    res: NextApiResponse
+    res: NextApiResponse<Response>
 ) {
     if (req.method !== 'POST') {
         return res.status(405).end()
@@ -30,7 +32,7 @@ export default async function handler(
 
 async function forPOST(
     req: NextApiRequest,
-    res: NextApiResponse<SendMessageResult | { err: ErrorBody }>
+    res: NextApiResponse<Response>
 ): Promise<void> {
     try {
         //taking only the content of the file from the request body
@@ -51,16 +53,18 @@ async function forPOST(
             payload: payload
         }
 
+        const correlationId = uuidv4()
+
         const { ok: sent, err: sendError } = await DsbApiService.init().sendMessage({
             ...body,
-            correlationId: uuidv4(),
+            correlationId,
             signature
         })
 
         if (!sent) {
             throw sendError
         }
-        return res.status(200).send(sent)
+        return res.status(200).send({ ...sent, correlationId })
     } catch (err) {
         if (err instanceof GatewayError) {
             res.status(err.statusCode ?? 500).send({ err: err.body })

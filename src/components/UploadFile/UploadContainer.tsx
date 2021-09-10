@@ -19,15 +19,15 @@ export const UploadContainer = ({ auth, channels }: UploadContainerProps) => {
 		formData.append("file", file)
 
 		try {
-			await axios.post(
+			const res = await axios.post(
 				`/api/v1/upload?fqcn=${fqcn}&topic=${topic}`,
 				formData,
 				auth
 					? { headers: { 'Authorization': `Bearer ${auth}`, 'content-type': 'multipart/form-data' } }
 					: undefined
 			)
-
-			swal("'Success", "Your file has been uploaded!", "success")
+			const { id, correlationId } = res.data
+			swal(`Success: ${id}`, `File uploaded with correlation ID\n${correlationId}`, "success")
 
 		} catch (err) {
 			if (axios.isAxiosError(err)) {
