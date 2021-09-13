@@ -89,7 +89,7 @@ export class WebSocketServer {
         if (!ok) {
           connection.send(
             JSON.stringify({
-              correlationId: message.correlationId,
+              transactionId: message.transactionId,
               err: err?.body
             })
           )
@@ -185,18 +185,18 @@ export class WebSocketClient {
           throw sendError
         }
       } catch (err) {
-        if (message.correlationId) {
+        if (message.transactionId) {
           if (err instanceof GatewayError) {
             this.connection.send(
               JSON.stringify({
-                correlationId: message.correlationId,
+                transactionId: message.transactionId,
                 err: err.body
               })
             )
           } else {
             this.connection.send(
               JSON.stringify({
-                correlationId: message.correlationId,
+                transactionId: message.transactionId,
                 err: err instanceof Error ? err.message : err
               })
             )
