@@ -75,7 +75,7 @@ export class DsbApiService {
           Authorization: `Bearer ${this.authToken}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(data)
+        body: JSON.stringify(this.translateIdempotencyKey(data, true))
       })
       switch (res.status) {
         case 201:
@@ -119,7 +119,9 @@ export class DsbApiService {
       })
       switch (res.status) {
         case 200:
-          return { ok: await res.json() }
+          return {
+            ok: (await res.json()).map(this.translateIdempotencyKey)
+          }
         case 401:
           // not logged in
           const unauthorizedMessage = (await res.json()).message
@@ -294,6 +296,35 @@ export class DsbApiService {
       }
     } else {
       return { err: new GatewayError(err as any) }
+    }
+  }
+
+  /**
+   * Translates the gateway's `transactionId` to message broker's `correlationId`
+   * or vice versa
+   *
+   * @param body outgoing or incoming message
+   * @param outgoing if message is outgoing (send to message broker)
+   * @returns
+   */
+  private translateIdempotencyKey(
+    body: { transactionId?: string, correlationId?: string },
+    outgoing = false
+  ): any {
+    if (outgoing) {
+      const correlationId = body.transactionId
+      delete body.transactionId
+      return {
+        ...body,
+        correlationId
+      }
+    } else {
+      const transactionId = body.correlationId
+      delete body.correlationId
+      return {
+        ...body,
+        transactionId
+      }
     }
   }
 }

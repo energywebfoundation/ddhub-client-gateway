@@ -38,7 +38,7 @@ export type SendMessageData = {
   fqcn: string
   topic: string
   payload: string
-  correlationId?: string
+  transactionId?: string
   signature: string
 }
 
@@ -60,6 +60,7 @@ export type Message = {
   sender: string
   signature: string
   timestampNanos: number
+  transactionId?: string
 }
 
 export type Channel = {

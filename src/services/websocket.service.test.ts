@@ -112,11 +112,11 @@ describe('WebSocketService', () => {
         const payload = {
           fqcn: 'test.channel',
           payload: '<payload>',
-          correlationId: '123'
+          transactionId: '123'
         }
         conn.on('message', (data) => {
-          const msg: { correlationId: string; err: string } = parseMessage(data)
-          expect(msg.correlationId).toBe(payload.correlationId)
+          const msg: { transactionId: string; err: string } = parseMessage(data)
+          expect(msg.transactionId).toBe(payload.transactionId)
           expect(msg.err).toBeDefined()
           conn.close()
           done()
@@ -167,8 +167,8 @@ describe('WebSocketService', () => {
           const msg: any = parseMessage(data)
           if (msg.fqcn) {
             events.emit(`${msg.fqcn}#${msg.id}`, msg)
-          } else if (msg.correlationId) {
-            events.emit(msg.correlationId, msg)
+          } else if (msg.transactionId) {
+            events.emit(msg.transactionId, msg)
           }
         })
       })
@@ -222,7 +222,8 @@ describe('WebSocketService', () => {
           payload: '<payload>',
           sender: 'did:ethr:<address>',
           signature: 'signed',
-          timestampNanos: 0
+          timestampNanos: 0,
+          transactionId: '<key>',
         }
         events.on(`${payload.fqcn}#${payload.id}`, (msg) => {
           expect(msg).toEqual(payload)
@@ -241,10 +242,10 @@ describe('WebSocketService', () => {
         const payload = {
           fqcn: 'my.channel',
           payload: '<test_payload>',
-          correlationId: '456'
+          transactionId: '456'
         }
-        events.on(payload.correlationId, (msg) => {
-          expect(msg.correlationId).toBe(payload.correlationId)
+        events.on(payload.transactionId, (msg) => {
+          expect(msg.transactionId).toBe(payload.transactionId)
           expect(msg.err).toBeDefined()
           client.close()
           done()

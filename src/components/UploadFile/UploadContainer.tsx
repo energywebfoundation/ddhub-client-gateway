@@ -23,8 +23,8 @@ export const UploadContainer = ({ auth, channels }: UploadContainerProps) => {
         formData,
         auth ? { headers: { Authorization: `Bearer ${auth}`, 'content-type': 'multipart/form-data' } } : undefined
       )
-      const { id, correlationId } = res.data
-      swal(`Success: ${id}`, `File uploaded with correlation ID\n${correlationId}`, 'success')
+      const { id, transactionId } = res.data
+      swal(`Success: ${id}`, `File uploaded with transaction ID\n${transactionId}`, 'success')
     } catch (err) {
       if (axios.isAxiosError(err)) {
         swal('Error', err.response?.data?.err?.reason, 'error')
