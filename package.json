@@ -1,6 +1,7 @@
 {
   "name": "dsb-client-gateway",
   "version": "0.3.0",
+  "license": "GPL-3.0-or-later",
   "scripts": {
     "dev:next": "next dev",
     "dev": "ts-node --project tsconfig.server.json src/server.ts",

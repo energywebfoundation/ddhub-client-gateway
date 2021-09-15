@@ -2,7 +2,7 @@ version: '3.9'
 
 services:
     message-broker:
-      image: 098061033856.dkr.ecr.us-east-1.amazonaws.com/ew-dos-dsb-ecr:841d75ec-3596-487c-93c6-acfaf76bbe72
+      image: 098061033856.dkr.ecr.us-east-1.amazonaws.com/ew-dos-dsb-ecr:76dd12d0-6536-4cf4-9f1a-ad90a5366c20
       environment:
         - PORT=3001
         - MB_DID=did:ethr:0x4eD992B299f15eaD372E19DDAB2f95704F69D1B7
@@ -11,5 +11,6 @@ services:
         #TODO: run NATS locally
         - NATS_JS_URL=nats://20.83.92.252:4222
         - WEB3_URL=https://volta-internal-archive.energyweb.org
+        - DUPLICATE_WINDOW=1
       ports:
         - 3001:3001
