@@ -120,7 +120,8 @@ export class DsbApiService {
       switch (res.status) {
         case 200:
           return {
-            ok: (await res.json()).map(this.translateIdempotencyKey)
+            ok: (await res.json())
+              .map((msg: any) => this.translateIdempotencyKey(msg, false))
           }
         case 401:
           // not logged in
@@ -309,7 +310,7 @@ export class DsbApiService {
    */
   private translateIdempotencyKey(
     body: { transactionId?: string, correlationId?: string },
-    outgoing = false
+    outgoing: boolean
   ): any {
     if (outgoing) {
       const correlationId = body.transactionId

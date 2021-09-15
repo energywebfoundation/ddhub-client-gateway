@@ -116,10 +116,9 @@ paths:
       tags:
         - Message
       summary: Send message on a DSB channel
-      description: Note that resending a message with the same `transactionId` will
-        return a 200 status code. The ID received will be the same as the first message
-        sent. A consumer will only see a single message.
-
+      # description: Note that resending a message with the same `transactionId` will
+      #   return a 200 status code. The ID received will be the same as the first message
+      #   sent. A consumer will only see a single message.
       operationId: createMessage
       requestBody:
         description: Unsigned message to be published on desired channel.
@@ -490,7 +489,8 @@ components:
           example: '{"some": "data"}'
           type: string
         transactionId:
-          description: Idempotency (message deduplication) identifier, e.g. UUID (v4)
+          # description: Idempotency (message deduplication) identifier, e.g. UUID (v4)
+          description: Message identifier (end-to-end), e.g. UUID v4
           example: 'e7dd9967-c369-4609-99ab-bdbb7d6a5ee6'
           type: string
     SendMessageSuccess:
@@ -557,7 +557,8 @@ components:
           example: 1631179721295000000
           type: number
         transactionId:
-          description: Idempotency (message deduplication) identifier, e.g. UUID (v4)
+          # description: Idempotency (message deduplication) identifier, e.g. UUID (v4)
+          description: Message identifier (end-to-end), e.g. UUID v4
           example: 'e7dd9967-c369-4609-99ab-bdbb7d6a5ee6'
           type: string
     Channel:
