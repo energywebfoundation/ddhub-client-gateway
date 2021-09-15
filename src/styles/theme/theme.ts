@@ -5,31 +5,31 @@ import { red } from '@material-ui/core/colors'
 const theme = createTheme({
   palette: {
     primary: {
-        main: '#33CBCB',
-        light: '#5BD6D6',
-        dark: '#159393'
+      main: '#33CBCB',
+      light: '#5BD6D6',
+      dark: '#159393'
     },
     secondary: {
-        main: '#A567FF',
-        light: '#B0ADDC',
-        dark: '#52446F'
+      main: '#A567FF',
+      light: '#B0ADDC',
+      dark: '#52446F'
     },
     error: {
-      main: '#C82E2E',
+      main: '#C82E2E'
     },
     warning: {
-        main: '#FFA501',
+      main: '#FFA501'
     },
     success: {
-        main: '#0FB544',
+      main: '#0FB544'
     },
     info: {
-        main: '#C1FFF9',
+      main: '#C1FFF9'
     },
     background: {
       default: '#181423;'
-    },
-  },
+    }
+  }
 })
 
 export default theme

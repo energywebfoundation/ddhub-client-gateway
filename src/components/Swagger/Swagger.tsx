@@ -1,9 +1,5 @@
 import { makeStyles } from '@material-ui/styles'
-import {
-  Theme,
-  Link,
-  Typography
-} from '@material-ui/core'
+import { Theme, Link, Typography } from '@material-ui/core'
 
 export const Swagger = () => {
   const classes = useStyles()
@@ -12,16 +8,11 @@ export const Swagger = () => {
     <section className={classes.swagger}>
       <Typography variant="h4">API Documentation </Typography>
       <div className={classes.swaggerLinks}>
-        <Link href="/docs">
-          rest api
-        </Link>
+        <Link href="/docs">rest api</Link>
 
-        <Link href="/docs">
-          websocket api
-        </Link>
+        <Link href="/docs">websocket api</Link>
       </div>
     </section>
-
   )
 }
 

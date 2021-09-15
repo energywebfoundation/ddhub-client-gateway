@@ -17,13 +17,6 @@ Define the port the gateway will run on.
 Select WebSocket mode depending on architecture (i.e. preference for inbound
 or outbound connections).
 
-Note that under the hood, the WebSocket implementation uses the same message
-consumer as the GET /api/v1/message endpoint. Turning WebSocket support on is
-therefore likely to render the REST endpoint (for pulling messages) useless
-because outstanding messages will have already been pulled by the WebSocket
-implementation. If you intend to use the REST endpoint to pull new messages
-from the queue, please leave this value set to `NONE`.
-
 If set to `SERVER`, the gateway will run a WebSocket server on /events which
 accepts clients requesting the subprotocol `dsb-messages`. If the gateway has
 been configured to use basic authentication, this should also be provided in
@@ -211,4 +204,3 @@ Sets the private key that will be used by the DSB Client Gateway. This will
 also check the balance and enrolment state on startup.
 
 Note that this will **overwrite** the current identity stored by the gateway.
-
