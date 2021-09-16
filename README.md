@@ -13,11 +13,11 @@ docker run -p 3000:3000 aemocontainerregistry.azurecr.io/dsb/client-gateway:late
 
 The gateway UI can now be accessed on http://localhost:3000.
 
-> Hint: use the `--init` flag if passing SIGINT signals (ctrl+c) to the container
+> Note: use the `--init` flag if passing SIGINT signals (ctrl+c) to the container
   fails. See [here](https://docs.docker.com/engine/reference/run/#specify-an-init-process)
   for documentation.
 
-> Hint: environment variables can be specified using `-e` flags. See
+> Note: environment variables can be specified using `-e` flags. See
   [here](https://docs.docker.com/engine/reference/run/#env-environment-variables)
   for documentation.
 ### Persisting Data
@@ -52,11 +52,6 @@ If running the gateway in WebSocket server mode, connect via
 wscat --connect ws://localhost:3000/events --subprotocol dsb-messages
 ```
 
-> Note: if running the Docker container, replace localhost with
-  host.docker.internal (windows, macOS). On Linux run the container with
-  `--net=host` to directly access localhost.
-
-
 If you have configured the gateway to use basic authentication, supply the
 following flag in addition to the above command
 ```
@@ -69,6 +64,10 @@ wscat --listen 5001
 ```
 
 Be sure to now set your gateway's `WEBSOCKET_URL` to ws://localhost:5001/.
+
+> Note: if running the Docker container, replace localhost with
+  host.docker.internal (windows, macOS). On Linux run the container with
+  `--net=host` to directly access localhost.
 
 With wscat running, you should be able to start receiving messages once the
 gateway's DSB enrolment is complete.
