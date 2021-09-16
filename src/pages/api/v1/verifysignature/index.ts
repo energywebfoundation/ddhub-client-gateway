@@ -2,10 +2,11 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import { isAuthorized } from '../../../../services/auth.service'
 import { ErrorCode, ErrorBody, SignatureCheckError, BadRequestError } from '../../../../utils'
 import { utils } from 'ethers'
+import { withSentry } from '@sentry/nextjs'
 
 type Response = { ok: true } | { err: ErrorBody }
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse<Response>) {
+const handler = async (req: NextApiRequest, res: NextApiResponse<Response>) => {
   if (req.method !== 'POST') {
     return res.status(405).send({ ok: true })
   }
@@ -72,3 +73,4 @@ async function verifySignature(req: NextApiRequest, res: NextApiResponse<Respons
     res.status(400).json({ err: new SignatureCheckError().body })
   }
 }
+export default withSentry(handler)

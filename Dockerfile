@@ -37,16 +37,20 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/.env ./.env
 COPY --from=builder /app/.env.production ./.env.production
+COPY --from=builder /app/sentry.client.config.js ./sentry.client.config.js
+COPY --from=builder /app/sentry.server.config.js ./sentry.server.config.js
+#COPY --from=builder /app/.sentryclirc ./.sentryclirc
 
 USER dsb
 
 RUN echo '{}' > ./in-memory.json
 
 # WORKDIR /var/deployment/apps
+#RUN export SENTRY_CLI=./node_modules/.bin/sentry-cli
 
 # COPY --from=builder /app/docker/ecosystem.config.js ./ecosystem.config.js
 
 ENV NODE_ENV production
 ENV NEXT_TELEMETRY_DISABLED 1
 
-CMD ["yarn", "start"]
+ENTRYPOINT [ "./dist/index.js" ]

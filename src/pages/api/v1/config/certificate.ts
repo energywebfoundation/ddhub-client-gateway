@@ -4,8 +4,9 @@ import fs from 'fs/promises'
 import path from 'path'
 import { ErrorBody, ErrorCode, Result } from '../../../../utils'
 import { isAuthorized } from '../../../../services/auth.service'
+import { withSentry } from '@sentry/nextjs'
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse<Result<boolean, ErrorBody>>) {
+const handler = async (req: NextApiRequest, res: NextApiResponse<Result<boolean, ErrorBody>>) => {
   if (req.method !== 'POST') {
     return res.status(405).end()
   }
@@ -49,3 +50,5 @@ async function forPOST(req: NextApiRequest, res: NextApiResponse<Result<boolean,
     })
   }
 }
+
+export default withSentry(handler)

@@ -12,6 +12,7 @@ import {
   NoPrivateKeyError,
   UnknownError
 } from '../../../../utils'
+import { captureException, withSentry } from '@sentry/nextjs'
 
 type Response =
   | {
@@ -21,7 +22,7 @@ type Response =
     }
   | { err: ErrorBody }
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse<Response>) {
+const handler = async (req: NextApiRequest, res: NextApiResponse<Response>) => {
   const authHeader = req.headers.authorization
   const { err } = isAuthorized(authHeader)
   if (!err) {
@@ -95,7 +96,10 @@ async function forPOST(req: NextApiRequest, res: NextApiResponse<Response>) {
     if (err instanceof GatewayError) {
       res.status(err.statusCode ?? 500).send({ err: err.body })
     } else {
+      const error = new UnknownError(err)
+      captureException(error)
       res.status(500).send({ err: new UnknownError(err).body })
     }
   }
 }
+export default withSentry(handler)
