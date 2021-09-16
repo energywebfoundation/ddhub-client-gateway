@@ -106,7 +106,7 @@ Examples:
 - `http://1.1.1.1:5000`
 - `https://broker.example.com/`
 
-**Default**: `http://dsb-dev.energyweb.org`
+**Default**: `http://dsb-demo.energyweb.org`
 
 ## Storage
 
