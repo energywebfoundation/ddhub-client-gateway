@@ -223,7 +223,7 @@ describe('WebSocketService', () => {
           sender: 'did:ethr:<address>',
           signature: 'signed',
           timestampNanos: 0,
-          transactionId: '<key>',
+          transactionId: '<key>'
         }
         events.on(`${payload.fqcn}#${payload.id}`, (msg) => {
           expect(msg).toEqual(payload)

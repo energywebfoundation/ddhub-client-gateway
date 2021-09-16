@@ -30,8 +30,14 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/.env ./.env
 COPY --from=builder /app/.env.production ./.env.production
+COPY --from=builder /app/sentry.client.config.js ./sentry.client.config.js
+COPY --from=builder /app/sentry.server.config.js ./sentry.server.config.js
+#COPY --from=builder /app/.sentryclirc ./.sentryclirc
+
 
 RUN echo '{}' > ./in-memory.json
+
+#RUN export SENTRY_CLI=./node_modules/.bin/sentry-cli
 
 WORKDIR /var/deployment/apps
 
@@ -40,3 +46,5 @@ COPY --from=builder /app/docker/ecosystem.config.js ./ecosystem.config.js
 ENV NEXT_TELEMETRY_DISABLED 1
 
 ENTRYPOINT [ "./dsb-client-gateway/node_modules/.bin/pm2", "start", "./ecosystem.config.js", "--attach" ]
+
+

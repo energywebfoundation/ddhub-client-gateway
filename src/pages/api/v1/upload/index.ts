@@ -5,10 +5,11 @@ import { ErrorBody, ErrorCode, GatewayError, SendMessageResult, UnknownError } f
 import { isAuthorized } from '../../../../services/auth.service'
 import { DsbApiService } from '../../../../services/dsb-api.service'
 import { signPayload } from '../../../../services/identity.service'
+import { captureException, withSentry } from '@sentry/nextjs'
 
 type Response = (SendMessageResult & { transactionId: string }) | { err: ErrorBody }
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse<Response>) {
+const handler = async (req: NextApiRequest, res: NextApiResponse<Response>) => {
   if (req.method !== 'POST') {
     return res.status(405).end()
   }
@@ -63,7 +64,10 @@ async function forPOST(req: NextApiRequest, res: NextApiResponse<Response>): Pro
     if (err instanceof GatewayError) {
       res.status(err.statusCode ?? 500).send({ err: err.body })
     } else {
+      const error = new UnknownError(err)
+      captureException(error)
       res.status(500).send({ err: new UnknownError(err).body })
     }
   }
 }
+export default withSentry(handler)

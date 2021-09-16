@@ -23,6 +23,12 @@ the following flag:
 
 This will bind the container's `in-memory.json` file to the host filesystem.
 
+If you want to run sentry in docker image then please include the following environment variables while running the docker container
+
+```
+-e NEXT_PUBLIC_SENTRY_ENABLED=true -e NEXT_PUBLIC_SENTRY_DSN=<SENTRY_DSN>
+``` 
+
 ### Configuration
 
 The DSB Client Gateway can be configured in a number of ways.
@@ -56,6 +62,16 @@ Be sure to now set your gateway's `WEBSOCKET_URL` to ws://localhost:5001/.
 With wscat running, you should be able to start receiving messages once the
 gateway's DSB enrolment is complete.
 
+### Sentry
+
+The gateway supports sentry integration for capturing logs, transactions, Performance Monitoring
+
+#### Install
+Sentry captures data by using an SDK within your application’s runtime.
+
+```
+yarn add @sentry/nextjs
+```
 ## Development
 
 Install dependencies:

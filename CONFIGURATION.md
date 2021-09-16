@@ -204,3 +204,44 @@ Sets the private key that will be used by the DSB Client Gateway. This will
 also check the balance and enrolment state on startup.
 
 Note that this will **overwrite** the current identity stored by the gateway.
+
+## Sentry
+
+Sentry is an optional feature and it is used to capture error capturing logs, transactions, Performance Monitoring.
+
+### `SENTRY_URL` [optional]
+
+For every partner different sentry url will be same 
+
+**Default**: `https://sentry.io/`
+
+### `NEXT_PUBLIC_SENTRY_ENABLED` [optional]
+
+This flag will decide if sentry is enabled or disabled
+
+**Default**: `false`
+
+### `SENTRY_ORG` [optional]
+
+This is the name of the organization for which sentry account is made
+
+**Default**: `energy-web`
+
+### `SENTRY_PROJECT` [optional]
+
+This is the name of the project under organization for which sentry is enabled
+
+**Default**: `dsb-client-gateway`
+
+### `AUTH_TOKEN` [optional]
+
+Sentry cli uses this token for authentication while building the project
+
+### `NEXT_PUBLIC_SENTRY_DSN` [optional]
+
+Data Source Name (DSN) when you create a project to start monitoring events in your app.
+
+A DSN tells a Sentry SDK where to send events so the events are associated with the correct project.
+
+
+
