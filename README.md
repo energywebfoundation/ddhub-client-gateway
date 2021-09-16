@@ -30,7 +30,10 @@ the following flag:
 -v $(pwd)/in-memory.json:/var/deployment/apps/dsb-client-gateway/in-memory.json
 ```
 
-This will bind the container's `in-memory.json` file to the host filesystem. See [here](https://docs.docker.com/engine/reference/run/#volume-shared-filesystems) for full documentation.
+This will bind the container's `in-memory.json` file to the host filesystem.
+Make sure that the file exists on the host filesystem first.
+See [here](https://docs.docker.com/engine/reference/run/#volume-shared-filesystems)
+for full documentation.
 
 ### Configuration
 
@@ -48,6 +51,11 @@ If running the gateway in WebSocket server mode, connect via
 ```
 wscat --connect ws://localhost:3000/events --subprotocol dsb-messages
 ```
+
+> Note: if running the Docker container, replace localhost with
+  host.docker.internal (windows, macOS). On Linux run the container with
+  `--net=host` to directly access localhost.
+
 
 If you have configured the gateway to use basic authentication, supply the
 following flag in addition to the above command

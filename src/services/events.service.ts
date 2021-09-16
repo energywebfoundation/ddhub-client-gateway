@@ -5,10 +5,9 @@ import { Claim } from 'iam-client-lib/dist/src/cacheServerClient/cacheServerClie
 import { connect, JSONCodec } from 'nats.ws'
 import { w3cwebsocket } from 'websocket'
 import { config } from '../config'
-import { MESSAGEBROKER_ROLE, RoleState, USER_ROLE } from '../utils'
-import { initMessageBroker } from './dsb.service'
+import { EnrolmentState, RoleState, USER_ROLE } from '../utils'
 import { isApproved } from './identity.service'
-import { getEnrolment, getIdentity, writeEnrolment } from './storage.service'
+import { writeEnrolment } from './storage.service'
 
 // shim websocket for nats.ws
 globalThis.WebSocket = w3cwebsocket as any
@@ -16,12 +15,12 @@ globalThis.WebSocket = w3cwebsocket as any
 export const events = new EventEmitter()
 
 events.on('await_approval', async (iam: IAM) => {
-  const state = {
+  const state: EnrolmentState = {
     approved: false,
     waiting: true,
     roles: {
       user: RoleState.AWAITING_APPROVAL,
-      messagebroker: RoleState.AWAITING_APPROVAL
+      // messagebroker: RoleState.AWAITING_APPROVAL
     }
   }
 
@@ -59,24 +58,24 @@ events.on('await_approval', async (iam: IAM) => {
           console.log(`[${count}] Synced ${USER_ROLE} claim to DID Document`)
           state.roles.user = RoleState.APPROVED
         }
-        if (config.dsb.controllable && decodedToken.claimData.claimType === MESSAGEBROKER_ROLE) {
-          console.log(`[${count}] Received issued claim is ${MESSAGEBROKER_ROLE}`)
-          await iam.publishPublicClaim({ token: claim.issuedToken })
-          console.log(`[${count}] Synced ${MESSAGEBROKER_ROLE} claim to DID Document`)
-          state.roles.messagebroker = RoleState.APPROVED
-        }
+        // if (config.dsb.controllable && decodedToken.claimData.claimType === MESSAGEBROKER_ROLE) {
+        //   console.log(`[${count}] Received issued claim is ${MESSAGEBROKER_ROLE}`)
+        //   await iam.publishPublicClaim({ token: claim.issuedToken })
+        //   console.log(`[${count}] Synced ${MESSAGEBROKER_ROLE} claim to DID Document`)
+        //   state.roles.messagebroker = RoleState.APPROVED
+        // }
       }
       if (state.roles.user === RoleState.APPROVED) {
-        if (config.dsb.controllable && state.roles.messagebroker !== RoleState.APPROVED) {
-          // wait for messagebroker approval
-          continue
-        }
+        // if (config.dsb.controllable && state.roles.messagebroker !== RoleState.APPROVED) {
+        //   // wait for messagebroker approval
+        //   continue
+        // }
         if (sub) {
           console.log('All roles have been approved and synced to DID Document')
           state.approved = isApproved(state)
           state.waiting = false
           await writeEnrolment({ state, did: claim.requester })
-          events.emit('approved')
+          // events.emit('approved')
           await nc.drain()
         }
       }
@@ -86,41 +85,4 @@ events.on('await_approval', async (iam: IAM) => {
     console.log('Got subscription error. Restarting...')
     events.emit('await_approval', iam)
   }
-})
-
-events.on('approved', async () => {
-  // TODO: it could be the case that there was no subscription at the time of
-  // claim approval (see event above) - in such a case the subject would need
-  // to manually sync the document in Switchboard. We could check here whether
-  // the claim has been synced to the document and do so if not.
-  console.log('Running approved enrolment job')
-  const { some: identity } = await getIdentity()
-  if (!identity) {
-    return
-  }
-  const { some: enrolment } = await getEnrolment()
-  if (!enrolment) {
-    return
-  }
-  await initMessageBroker({
-    privateKey: identity.privateKey,
-    did: enrolment.did
-  })
-
-  // cannot do this as next pages don't have access to the same state as
-  // the server
-
-  // wait for message broker to start if it's under our control
-  // const delay = config.dsb.controllable ? 20 * 1000 : 0
-  // setTimeout(() => {
-  //     if (config.server.websocket === WebSocketImplementation.SERVER) {
-  //         DsbApiService.init().pollForNewMessages(
-  //             (message) => WebSocketServer.get().emit(message)
-  //         )
-  //     } else if (config.server.websocket === WebSocketImplementation.CLIENT) {
-  //         DsbApiService.init().pollForNewMessages(
-  //             (message) => WebSocketClient.get().emit(message)
-  //         )
-  //     }
-  // }, delay)
 })

@@ -120,12 +120,12 @@ export async function initEnrolment({ address, privateKey }: Identity): Promise<
         return { ok: state }
       },
       handle: async ({ roles }: EnrolmentState) => {
-        if (roles.messagebroker === RoleState.NO_CLAIM) {
-          const { ok } = await createClaim(iam, MESSAGEBROKER_ROLE)
-          if (!ok) {
-            return { err: new CreateClaimError(MESSAGEBROKER_ROLE) }
-          }
-        }
+        // if (roles.messagebroker === RoleState.NO_CLAIM) {
+        //   const { ok } = await createClaim(iam, MESSAGEBROKER_ROLE)
+        //   if (!ok) {
+        //     return { err: new CreateClaimError(MESSAGEBROKER_ROLE) }
+        //   }
+        // }
         if (roles.user === RoleState.NO_CLAIM) {
           const { ok } = await createClaim(iam, USER_ROLE)
           if (!ok) {
@@ -302,13 +302,13 @@ function readClaims(claims: Claim[]): EnrolmentState {
     waiting: false,
     roles: {
       user: RoleState.NO_CLAIM,
-      messagebroker: config.dsb.controllable ? RoleState.NO_CLAIM : RoleState.NOT_WANTED
+      // messagebroker: config.dsb.controllable ? RoleState.NO_CLAIM : RoleState.NOT_WANTED
     }
   }
   for (const { claimType, isAccepted } of claims) {
-    if (claimType === MESSAGEBROKER_ROLE) {
-      state.roles.messagebroker = isAccepted ? RoleState.APPROVED : RoleState.AWAITING_APPROVAL
-    }
+    // if (claimType === MESSAGEBROKER_ROLE) {
+    //   state.roles.messagebroker = isAccepted ? RoleState.APPROVED : RoleState.AWAITING_APPROVAL
+    // }
     if (claimType === USER_ROLE) {
       state.roles.user = isAccepted ? RoleState.APPROVED : RoleState.AWAITING_APPROVAL
     }
@@ -351,9 +351,10 @@ async function createClaim(iam: IAM, claim: string): Promise<Result<boolean, Err
  * @returns true if is approved
  */
 export function isApproved({ roles }: EnrolmentState): boolean {
-  return config.dsb.controllable
-    ? roles.messagebroker === RoleState.APPROVED && roles.user === RoleState.APPROVED
-    : roles.user === RoleState.APPROVED
+  return roles.user === RoleState.APPROVED
+  // return config.dsb.controllable
+  //   ? roles.messagebroker === RoleState.APPROVED && roles.user === RoleState.APPROVED
+  //   : roles.user === RoleState.APPROVED
 }
 
 /**
@@ -362,9 +363,10 @@ export function isApproved({ roles }: EnrolmentState): boolean {
  * @returns true if waiting
  */
 function isWaiting({ roles }: EnrolmentState): boolean {
-  return config.dsb.controllable
-    ? roles.messagebroker === RoleState.AWAITING_APPROVAL || roles.user === RoleState.AWAITING_APPROVAL
-    : roles.user === RoleState.AWAITING_APPROVAL
+  return roles.user === RoleState.AWAITING_APPROVAL
+  // return config.dsb.controllable
+  //   ? roles.messagebroker === RoleState.AWAITING_APPROVAL || roles.user === RoleState.AWAITING_APPROVAL
+  //   : roles.user === RoleState.AWAITING_APPROVAL
 }
 
 /**
