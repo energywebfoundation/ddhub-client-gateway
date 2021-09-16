@@ -4,14 +4,23 @@ The DSB Client Gateway acts as a client to the DSB, enabling easier integration.
 
 ## Quickstart
 
-The simplest way to run the gateway is via the Docker container stored in the
-Azure container registry.
+The simplest way to run the gateway is via the public Docker container stored
+in the Azure container registry.
 
 ```
-docker run -p 3000:3000 -e NATS_JS_URL=nats://20.83.92.252:4222 aemocontainerregistry.azurecr.io/dsb/client-gateway:canary
+docker run -p 3000:3000 aemocontainerregistry.azurecr.io/dsb/client-gateway:latest
 ```
 
 The gateway UI can now be accessed on http://localhost:3000.
+
+> Hint: use the `--init` flag if passing SIGINT signals (ctrl+c) to the container
+  fails. See [here](https://docs.docker.com/engine/reference/run/#specify-an-init-process)
+  for documentation.
+
+> Hint: environment variables can be specified using `-e` flags. See
+  [here](https://docs.docker.com/engine/reference/run/#env-environment-variables)
+  for documentation.
+### Persisting Data
 
 By default, the gateway will not persist data configured during runtime
 (e.g. identity, cerficates). To do this, a Docker bind mount can be used with
@@ -21,7 +30,7 @@ the following flag:
 -v $(pwd)/in-memory.json:/var/deployment/apps/dsb-client-gateway/in-memory.json
 ```
 
-This will bind the container's `in-memory.json` file to the host filesystem.
+This will bind the container's `in-memory.json` file to the host filesystem. See [here](https://docs.docker.com/engine/reference/run/#volume-shared-filesystems) for full documentation.
 
 ### Configuration
 
@@ -86,7 +95,7 @@ This gateway is currently being shipped as a single docker container. To build
 the image:
 
 ```sh
-# using access credentials  
+# using access credentials
 aws configure
 
 # login to ecr (so we can fetch latest dsb base image)
