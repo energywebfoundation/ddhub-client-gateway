@@ -108,43 +108,6 @@ Examples:
 
 **Default**: `http://dsb-dev.energyweb.org`
 
-### `DSB_CONTROLLABLE` [optional]
-
-This allows the DSB Message Broker to be controlled by the DSB Client Gateway.
-In this situation, the identities of both components are shared. This means
-that a single private key is used for each component and, in addition to the
-`user` DSB role, the gateway will enrol itself as a `messagebroker`.
-
-If a `DSB_CONTROL_TYPE` is also provided, the gateway may spawn a process
-with the chosen method, in order to configure it (i.e. setting the same
-private key).
-
-**Default**: `false`
-
-### `DSB_CONTROL_TYPE` [optional]
-
-Used in conjunction with `DSB_CONTROLLABLE`, the `DSB_CONTROL_TYPE` defines
-how the DSB Client Gateway controls the DSB Message Broker.
-
-*Options*: `pm2`
-
-By default this is unset.
-
-### `DSB_PM2_PROCESS_NAME` [optional]
-
-If `DSB_CONTROL_TYPE` is set to `pm2`, set the name of the DSB Message Broker
-process which will be controlled by the gateway.
-
-**Default**: `dsb-message-broker`
-
-### `DSB_BIN_PATH` [optional]
-
-Sets the path of the message broker to control if `DSB_CONTROL_TYPE` is set to
-`pm2`. Can be relative (from the current working directory) or absolute. The
-message broker must be built first for this to work.
-
-**Default**: `../dsb-message-broker/bin/dsb-message-broker`
-
 ## Storage
 
 The following variables define the storage mechanism for persisted data.
