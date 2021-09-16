@@ -53,6 +53,12 @@ jobs:
       with:
         fetch-depth: 0
 
+    - name: Prepare docker image build (Sentry authentication)
+      env:
+        SENTRY_AUTH_TOKEN: ${{secrets.SENTRY_AUTH_TOKEN}}
+      run: |
+        echo "SENTRY_AUTH_TOKEN=$SENTRY_AUTH_TOKEN" > .env.local
+
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
@@ -64,7 +70,7 @@ jobs:
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
 
-    - name: Pull & build & push docker image to ECR
+    - name: Build & push docker image to ECR
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         BUILD_ID: ${{needs.semantic-version.outputs.version_tag}}

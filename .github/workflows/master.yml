@@ -31,6 +31,12 @@ jobs:
       with:
         fetch-depth: 0
 
+    - name: Prepare docker image build (Sentry authentication)
+      env:
+        SENTRY_AUTH_TOKEN: ${{secrets.SENTRY_AUTH_TOKEN}}
+      run: |
+        echo "SENTRY_AUTH_TOKEN=$SENTRY_AUTH_TOKEN" > .env.local
+
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
@@ -42,11 +48,10 @@ jobs:
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
 
-    - name: Pull & build docker image
+    - name: Build docker image and push (AWS)
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         BUILD_ID: ${{needs.unique_id.outputs.unique_id}}
-        SENTRY_AUTH_TOKEN: ${{secrets.SENTRY_AUTH_TOKEN}}
       run: |
         docker build -t dsb-client-gateway .
         docker tag dsb-client-gateway $ECR_REGISTRY/ew-dos-dsb-gateway-ecr:$BUILD_ID
@@ -63,7 +68,7 @@ jobs:
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-    - name: Push image
+    - name: Push image (Azure)
       uses: azure/docker-login@v1
       with:
         login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
