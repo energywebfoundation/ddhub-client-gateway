@@ -4,14 +4,23 @@ The DSB Client Gateway acts as a client to the DSB, enabling easier integration.
 
 ## Quickstart
 
-The simplest way to run the gateway is via the Docker container stored in the
-Azure container registry.
+The simplest way to run the gateway is via the public Docker container stored
+in the Azure container registry.
 
 ```
-docker run -p 3000:3000 -e NATS_JS_URL=nats://20.83.92.252:4222 aemocontainerregistry.azurecr.io/dsb/client-gateway:canary
+docker run -p 3000:3000 aemocontainerregistry.azurecr.io/dsb/client-gateway:latest
 ```
 
 The gateway UI can now be accessed on http://localhost:3000.
+
+> Note: use the `--init` flag if passing SIGINT signals (ctrl+c) to the container
+  fails. See [here](https://docs.docker.com/engine/reference/run/#specify-an-init-process)
+  for documentation.
+
+> Note: environment variables can be specified using `-e` flags. See
+  [here](https://docs.docker.com/engine/reference/run/#env-environment-variables)
+  for documentation.
+### Persisting Data
 
 By default, the gateway will not persist data configured during runtime
 (e.g. identity, cerficates). To do this, a Docker bind mount can be used with
@@ -22,6 +31,9 @@ the following flag:
 ```
 
 This will bind the container's `in-memory.json` file to the host filesystem.
+Make sure that the file exists on the host filesystem first.
+See [here](https://docs.docker.com/engine/reference/run/#volume-shared-filesystems)
+for full documentation.
 
 If you want to run sentry in docker image then please include the following environment variables while running the docker container
 
@@ -58,6 +70,10 @@ wscat --listen 5001
 ```
 
 Be sure to now set your gateway's `WEBSOCKET_URL` to ws://localhost:5001/.
+
+> Note: if running the Docker container, replace localhost with
+  host.docker.internal (windows, macOS). On Linux run the container with
+  `--net=host` to directly access localhost.
 
 With wscat running, you should be able to start receiving messages once the
 gateway's DSB enrolment is complete.
@@ -102,7 +118,7 @@ This gateway is currently being shipped as a single docker container. To build
 the image:
 
 ```sh
-# using access credentials  
+# using access credentials
 aws configure
 
 # login to ecr (so we can fetch latest dsb base image)

@@ -14,7 +14,7 @@ const dev = process.env.NODE_ENV !== 'production'
 const app = next({ dev })
 const handle = app.getRequestHandler()
 
-const main = async () => {
+export const startServer = async () => {
   await app.prepare()
 
   /**
@@ -115,5 +115,3 @@ const main = async () => {
     console.log(`Server listening on port ${config.server.port}`)
   })
 }
-
-main()

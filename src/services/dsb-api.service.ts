@@ -32,6 +32,7 @@ export class DsbApiService {
    */
   public static init(): DsbApiService {
     if (!DsbApiService.instance) {
+      console.log('Connecting to', config.dsb.baseUrl)
       DsbApiService.instance = new DsbApiService()
     }
     return DsbApiService.instance

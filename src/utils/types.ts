@@ -100,7 +100,7 @@ export type EnrolmentState = {
   waiting: boolean
   roles: {
     user: RoleState
-    messagebroker: RoleState
+    // messagebroker: RoleState
   }
 }
 
@@ -109,10 +109,6 @@ export enum StringType {
   HEX,
   HEX_COMPRESSED,
   DID
-}
-
-export enum DsbControlType {
-  PM2 = 'pm2'
 }
 
 export enum WebSocketImplementation {

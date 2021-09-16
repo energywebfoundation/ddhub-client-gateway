@@ -46,8 +46,8 @@ jobs:
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         BUILD_ID: ${{needs.unique_id.outputs.unique_id}}
+        SENTRY_AUTH_TOKEN: ${{secrets.SENTRY_AUTH_TOKEN}}
       run: |
-        docker pull $ECR_REGISTRY/ew-dos-dsb-ecr:canary
         docker build -t dsb-client-gateway .
         docker tag dsb-client-gateway $ECR_REGISTRY/ew-dos-dsb-gateway-ecr:$BUILD_ID
         docker push $ECR_REGISTRY/ew-dos-dsb-gateway-ecr:$BUILD_ID
