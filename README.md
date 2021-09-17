@@ -8,7 +8,7 @@ The simplest way to run the gateway is via the public Docker container stored
 in the Azure container registry.
 
 ```
-docker run -p 3000:3000 aemocontainerregistry.azurecr.io/dsb/client-gateway:canary
+docker run -p 3000:3000 -e NATS_JS_URL=nats://20.83.92.252:4222 aemocontainerregistry.azurecr.io/dsb/client-gateway:latest
 ```
 
 The gateway UI can now be accessed on http://localhost:3000.
