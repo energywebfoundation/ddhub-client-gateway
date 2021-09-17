@@ -41,6 +41,8 @@ jobs:
       run: yarn
 
     - name: Build application
+      env:
+        SENTRY_AUTH_TOKEN: ${{secrets.SENTRY_AUTH_TOKEN}}
       run: yarn build
 
     - name: Run tests

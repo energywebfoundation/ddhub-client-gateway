@@ -17,13 +17,6 @@ Define the port the gateway will run on.
 Select WebSocket mode depending on architecture (i.e. preference for inbound
 or outbound connections).
 
-Note that under the hood, the WebSocket implementation uses the same message
-consumer as the GET /api/v1/message endpoint. Turning WebSocket support on is
-therefore likely to render the REST endpoint (for pulling messages) useless
-because outstanding messages will have already been pulled by the WebSocket
-implementation. If you intend to use the REST endpoint to pull new messages
-from the queue, please leave this value set to `NONE`.
-
 If set to `SERVER`, the gateway will run a WebSocket server on /events which
 accepts clients requesting the subprotocol `dsb-messages`. If the gateway has
 been configured to use basic authentication, this should also be provided in
@@ -113,44 +106,7 @@ Examples:
 - `http://1.1.1.1:5000`
 - `https://broker.example.com/`
 
-**Default**: `http://dsb-dev.energyweb.org`
-
-### `DSB_CONTROLLABLE` [optional]
-
-This allows the DSB Message Broker to be controlled by the DSB Client Gateway.
-In this situation, the identities of both components are shared. This means
-that a single private key is used for each component and, in addition to the
-`user` DSB role, the gateway will enrol itself as a `messagebroker`.
-
-If a `DSB_CONTROL_TYPE` is also provided, the gateway may spawn a process
-with the chosen method, in order to configure it (i.e. setting the same
-private key).
-
-**Default**: `false`
-
-### `DSB_CONTROL_TYPE` [optional]
-
-Used in conjunction with `DSB_CONTROLLABLE`, the `DSB_CONTROL_TYPE` defines
-how the DSB Client Gateway controls the DSB Message Broker.
-
-*Options*: `pm2`
-
-By default this is unset.
-
-### `DSB_PM2_PROCESS_NAME` [optional]
-
-If `DSB_CONTROL_TYPE` is set to `pm2`, set the name of the DSB Message Broker
-process which will be controlled by the gateway.
-
-**Default**: `dsb-message-broker`
-
-### `DSB_BIN_PATH` [optional]
-
-Sets the path of the message broker to control if `DSB_CONTROL_TYPE` is set to
-`pm2`. Can be relative (from the current working directory) or absolute. The
-message broker must be built first for this to work.
-
-**Default**: `../dsb-message-broker/bin/dsb-message-broker`
+**Default**: `http://dsb-demo.energyweb.org`
 
 ## Storage
 
@@ -211,4 +167,44 @@ Sets the private key that will be used by the DSB Client Gateway. This will
 also check the balance and enrolment state on startup.
 
 Note that this will **overwrite** the current identity stored by the gateway.
+
+## Sentry
+
+Sentry is an optional feature and it is used to capture error capturing logs, transactions, Performance Monitoring.
+
+### `SENTRY_URL` [optional]
+
+For every partner different sentry url will be same 
+
+**Default**: `https://sentry.io/`
+
+### `NEXT_PUBLIC_SENTRY_ENABLED` [optional]
+
+This flag will decide if sentry is enabled or disabled
+
+**Default**: `false`
+
+### `SENTRY_ORG` [optional]
+
+This is the name of the organization for which sentry account is made
+
+**Default**: `energy-web`
+
+### `SENTRY_PROJECT` [optional]
+
+This is the name of the project under organization for which sentry is enabled
+
+**Default**: `dsb-client-gateway`
+
+### `AUTH_TOKEN` [optional]
+
+Sentry cli uses this token for authentication while building the project
+
+### `NEXT_PUBLIC_SENTRY_DSN` [optional]
+
+Data Source Name (DSN) when you create a project to start monitoring events in your app.
+
+A DSN tells a Sentry SDK where to send events so the events are associated with the correct project.
+
+
 

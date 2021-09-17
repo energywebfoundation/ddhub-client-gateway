@@ -2,29 +2,21 @@ import { useEffect } from 'react'
 import Head from 'next/head'
 import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
 import { makeStyles } from '@material-ui/styles'
-import {
-  Typography,
-  Container,
-  Divider,
-  Theme,
-} from '@material-ui/core'
+import { Typography, Container, Divider, Theme } from '@material-ui/core'
 import swal from '@sweetalert/with-react'
 import { UploadContainer } from '../../components/UploadFile/UploadContainer'
 import Header from '../../components/Header/Header'
 import { DownloadContainer } from '../../components/DownloadFile/DownloadContainer'
 import { DsbApiService } from '../../services/dsb-api.service'
 import { isAuthorized } from '../../services/auth.service'
-import { ErrorCode, Result, serializeError, Channel } from '../../utils'
-import { useErrors } from '../../hooks/useErrors'
+import { ErrorCode, Result, serializeError, Channel, ErrorBodySerialized } from '../../utils'
 
 type Props = {
-  health: Result<boolean, string>
-  channels: Result<Channel[], string>
+  health: Result<boolean, ErrorBodySerialized>
+  channels: Result<Channel[], ErrorBodySerialized>
 }
 
-export async function getServerSideProps(
-  context: GetServerSidePropsContext
-): Promise<{
+export async function getServerSideProps(context: GetServerSidePropsContext): Promise<{
   props: Props
 }> {
   const authHeader = context.req.headers.authorization
@@ -35,20 +27,20 @@ export async function getServerSideProps(
     return {
       props: {
         health: serializeError(health),
-        channels: serializeError(channels),
+        channels: serializeError(channels)
       }
     }
   } else {
     if (err.message === ErrorCode.UNAUTHORIZED) {
       context.res.statusCode = 401
-      context.res.setHeader("WWW-Authenticate", "Basic realm=\"Authorization Required\"")
+      context.res.setHeader('WWW-Authenticate', 'Basic realm="Authorization Required"')
     } else {
       context.res.statusCode = 403
     }
     return {
       props: {
-        health: { err: err.message },
-        channels: { err: err.message }
+        health: {},
+        channels: {}
       }
     }
   }
@@ -56,16 +48,15 @@ export async function getServerSideProps(
 
 export default function FileUpload({ health, channels }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const classes = useStyles()
-  const errors = useErrors()
 
   useEffect(() => {
     if (health.err) {
-      return swal('Error', errors(health.err), 'error')
+      return swal('Error', health.err.reason, 'error')
     }
     if (channels.err) {
-      return swal('Error', errors(channels.err), 'error')
+      return swal('Error', channels.err.reason, 'error')
     }
-  }, [health, channels, errors])
+  }, [health, channels])
 
   return (
     <div>
@@ -82,24 +73,27 @@ export default function FileUpload({ health, channels }: InferGetServerSideProps
           <section className={classes.connectionStatus}>
             <Typography variant="h4">Connection Status </Typography>
             <Typography variant="caption" className={classes.connectionStatusPaper}>
-                { health.ok ? 'ONLINE' : `ERROR [${health.err}]` }
+              {health.ok ? 'ONLINE' : `ERROR [${health.err?.code}]`}
             </Typography>
           </section>
 
-          <Divider className={classes.divider}/>
+          <Divider className={classes.divider} />
 
           <section className={classes.main}>
-						<Typography className={classes.textWhite} variant="h4">File Upload </Typography>
-						<UploadContainer channels={channels.ok} />
+            <Typography className={classes.textWhite} variant="h4">
+              File Upload{' '}
+            </Typography>
+            <UploadContainer channels={channels.ok} />
           </section>
 
-          <Divider className={classes.divider}/>
+          <Divider className={classes.divider} />
 
-					<section className={classes.main}>
-						<Typography className={classes.textWhite} variant="h4">File Download </Typography>
-						<DownloadContainer channels={channels.ok} />
+          <section className={classes.main}>
+            <Typography className={classes.textWhite} variant="h4">
+              File Download{' '}
+            </Typography>
+            <DownloadContainer channels={channels.ok} />
           </section>
-
         </Container>
       </main>
     </div>
@@ -126,10 +120,10 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   divider: {
     background: '#fff',
-		margin: '3rem 0'
+    margin: '3rem 0'
   },
   main: {
-    padding: '0 2rem',
+    padding: '0 2rem'
   },
   textWhite: {
     color: '#fff'

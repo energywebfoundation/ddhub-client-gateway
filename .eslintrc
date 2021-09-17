@@ -8,6 +8,7 @@
     "semi": [
       "error",
       "never"
-    ]
+    ],
+    "react/display-name": "off"
   }
 }

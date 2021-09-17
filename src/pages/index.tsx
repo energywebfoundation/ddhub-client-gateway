@@ -3,31 +3,22 @@ import Head from 'next/head'
 import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
 import swal from '@sweetalert/with-react'
 import { makeStyles } from '@material-ui/styles'
-import {
-  Typography,
-  Container,
-  Divider,
-  Theme,
-  Grid
-} from '@material-ui/core'
+import { Typography, Container, Divider, Theme, Grid } from '@material-ui/core'
 import { GatewayIdentityContainer } from '../components/GatewayIdentity/GatewayIdentityContainer'
 import { ProxyCertificateContainer } from '../components/ProxyCertificate/ProxyCertificateContainer'
 import Header from '../components/Header/Header'
 import { DsbApiService } from '../services/dsb-api.service'
 import { refreshState } from '../services/identity.service'
-import { useErrors } from '../hooks/useErrors'
 import { isAuthorized } from '../services/auth.service'
-import { ErrorCode, Option, Result, serializeError, Storage } from '../utils'
+import { ErrorBodySerialized, ErrorCode, Option, Result, serializeError, Storage } from '../utils'
 
 type Props = {
-  health: Result < boolean, string >
-  state: Result < Storage, string >
+  health: Result<boolean, ErrorBodySerialized>
+  state: Result<Storage, ErrorBodySerialized>
   auth: Option<string>
 }
 
-export async function getServerSideProps(
-  context: GetServerSidePropsContext
-): Promise<{
+export async function getServerSideProps(context: GetServerSidePropsContext): Promise<{
   props: Props
 }> {
   const authHeader = context.req.headers.authorization
@@ -45,14 +36,14 @@ export async function getServerSideProps(
   } else {
     if (err.message === ErrorCode.UNAUTHORIZED) {
       context.res.statusCode = 401
-      context.res.setHeader("WWW-Authenticate", "Basic realm=\"Authorization Required\"")
+      context.res.setHeader('WWW-Authenticate', 'Basic realm="Authorization Required"')
     } else {
       context.res.statusCode = 403
     }
     return {
       props: {
-        health: { err: err.message },
-        state: { err: err.message },
+        health: {},
+        state: {},
         auth: { none: true }
       }
     }
@@ -61,14 +52,12 @@ export async function getServerSideProps(
 
 export default function Home({ health, state, auth }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const classes = useStyles()
-  const errors = useErrors()
 
   useEffect(() => {
     if (health.err) {
-      swal('Error', errors(health.err), 'error')
+      swal('Error', health.err.reason, 'error')
     }
-  }, [health, state, errors])
-
+  }, [health, state])
 
   return (
     <div>
@@ -85,11 +74,11 @@ export default function Home({ health, state, auth }: InferGetServerSidePropsTyp
           <section className={classes.connectionStatus}>
             <Typography variant="h4">Connection Status </Typography>
             <Typography variant="caption" className={classes.connectionStatusPaper}>
-                { health.ok ? 'ONLINE' : `ERROR [${health.err}]` }
+              {health.ok ? 'ONLINE' : `ERROR [${health.err?.code}]`}
             </Typography>
           </section>
 
-          <Divider className={classes.divider}/>
+          <Divider className={classes.divider} />
 
           {state.ok && (
             <section className={classes.main}>
@@ -102,10 +91,7 @@ export default function Home({ health, state, auth }: InferGetServerSidePropsTyp
                   />
                 </Grid>
                 <Grid item xs={12} md={6}>
-                  <ProxyCertificateContainer
-                    certificate={state.ok?.certificate}
-                    auth={auth.some}
-                  />
+                  <ProxyCertificateContainer certificate={state.ok?.certificate} auth={auth.some} />
                 </Grid>
               </Grid>
             </section>

@@ -6,6 +6,6 @@
         "noEmit": false,
     },
     "include": [
-        "src/server.ts",
+        "src/index.ts",
     ]
 }

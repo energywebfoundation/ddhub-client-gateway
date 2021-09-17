@@ -16,11 +16,18 @@ COPY --from=deps /app/node_modules ./node_modules
 RUN yarn build
 
 # DSB Container
-FROM 098061033856.dkr.ecr.us-east-1.amazonaws.com/ew-dos-dsb-ecr:3598aac0-11b3-420e-a06b-892baaacd7a6
+# FROM 098061033856.dkr.ecr.us-east-1.amazonaws.com/ew-dos-dsb-ecr:76dd12d0-6536-4cf4-9f1a-ad90a5366c20
 
-RUN mkdir -p /var/deployment/apps/dsb-client-gateway
+# Independent Container
+FROM node:14-alpine as runner
+
+RUN addgroup -g 1001 -S nodejs
+RUN adduser -S dsb -u 1001
+
+# RUN mkdir -p /var/deployment/apps/dsb-client-gateway
 
 WORKDIR /var/deployment/apps/dsb-client-gateway
+RUN chown dsb /var/deployment/apps/dsb-client-gateway
 
 COPY --from=builder /app/next.config.js ./next.config.js
 COPY --from=builder /app/public ./public
@@ -30,13 +37,20 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/.env ./.env
 COPY --from=builder /app/.env.production ./.env.production
+COPY --from=builder /app/sentry.client.config.js ./sentry.client.config.js
+COPY --from=builder /app/sentry.server.config.js ./sentry.server.config.js
+#COPY --from=builder /app/.sentryclirc ./.sentryclirc
+
+USER dsb
 
 RUN echo '{}' > ./in-memory.json
 
-WORKDIR /var/deployment/apps
+# WORKDIR /var/deployment/apps
+#RUN export SENTRY_CLI=./node_modules/.bin/sentry-cli
 
-COPY --from=builder /app/docker/ecosystem.config.js ./ecosystem.config.js
+# COPY --from=builder /app/docker/ecosystem.config.js ./ecosystem.config.js
 
+ENV NODE_ENV production
 ENV NEXT_TELEMETRY_DISABLED 1
 
-ENTRYPOINT [ "./dsb-client-gateway/node_modules/.bin/pm2", "start", "./ecosystem.config.js", "--attach" ]
+ENTRYPOINT [ "./dist/index.js" ]

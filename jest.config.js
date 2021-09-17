@@ -8,4 +8,4 @@ module.exports = {
   transformIgnorePatterns: [
     'node_modules/(?!(ethereum-cryptography)/)',
   ]
-};
+}

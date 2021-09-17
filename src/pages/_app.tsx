@@ -1,16 +1,15 @@
 import { useEffect, Fragment } from 'react'
 import '../styles/globals.css'
 import type { AppProps } from 'next/app'
-import Router from "next/router"
-import NProgress from "nprogress"
+import Router from 'next/router'
+import NProgress from 'nprogress'
 import PropTypes from 'prop-types'
 import Head from 'next/head'
-import "nprogress/nprogress.css"
+import 'nprogress/nprogress.css'
 import { ThemeProvider } from '@material-ui/core/styles'
 import CssBaseline from '@material-ui/core/CssBaseline'
 import theme from '../styles/theme/theme'
 function MyApp({ Component, pageProps }: AppProps) {
-
   useEffect(() => {
     // Remove the server-side injected CSS.
     const jssStyles = document.querySelector('#jss-server-side')
@@ -18,9 +17,9 @@ function MyApp({ Component, pageProps }: AppProps) {
       jssStyles?.parentElement?.removeChild(jssStyles)
     }
     NProgress.configure({ showSpinner: false })
-    Router.events.on("routeChangeStart", () => NProgress.start())
-    Router.events.on("routeChangeComplete", () => NProgress.done())
-    Router.events.on("routeChangeError", () => NProgress.done())
+    Router.events.on('routeChangeStart', () => NProgress.start())
+    Router.events.on('routeChangeComplete', () => NProgress.done())
+    Router.events.on('routeChangeError', () => NProgress.done())
   }, [])
 
   return (
@@ -39,7 +38,7 @@ function MyApp({ Component, pageProps }: AppProps) {
 
 MyApp.propTypes = {
   Component: PropTypes.elementType.isRequired,
-  pageProps: PropTypes.object.isRequired,
+  pageProps: PropTypes.object.isRequired
 }
 
 export default MyApp
