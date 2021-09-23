@@ -9,7 +9,7 @@ const defaults = {
   websocket: 'NONE',
   chainId: '73799',
   rpcUrl: 'https://volta-rpc.energyweb.org/',
-  cacheServerUrl: 'https://identitycache-dev.energyweb.org/',
+  cacheServerUrl: 'https://identitycache-dev.energyweb.org/v1/',
   eventServerUrl: 'https://identityevents-dev.energyweb.org/',
   inMemoryDbFilename: 'in-memory.json',
   parentNamespace: 'dsb.apps.energyweb.iam.ewc',
