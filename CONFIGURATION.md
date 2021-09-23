@@ -145,7 +145,7 @@ transactions to. Should match the network given in `CHAIN_ID`.
 Sets the Energy Web IAM cache server URL, used to cache identities (as it
 can be expensive to rely only on querying smart contract data).
 
-**Default**: `https://identitycache-dev.energyweb.org/`
+**Default**: `https://identitycache-dev.energyweb.org/v1/`
 
 ### `EVENT_SERVER_URL` [optional]
 
@@ -174,7 +174,7 @@ Sentry is an optional feature and it is used to capture error capturing logs, tr
 
 ### `SENTRY_URL` [optional]
 
-For every partner different sentry url will be same 
+For every partner different sentry url will be same
 
 **Default**: `https://sentry.io/`
 
@@ -205,6 +205,3 @@ Sentry cli uses this token for authentication while building the project
 Data Source Name (DSN) when you create a project to start monitoring events in your app.
 
 A DSN tells a Sentry SDK where to send events so the events are associated with the correct project.
-
-
-
