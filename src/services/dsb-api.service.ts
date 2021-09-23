@@ -20,6 +20,7 @@ import {
 } from '../utils'
 import { signProof } from './identity.service'
 import { getEnrolment } from './storage.service'
+import { captureMessage } from '@sentry/nextjs'
 
 export class DsbApiService {
   private static instance?: DsbApiService
@@ -80,6 +81,15 @@ export class DsbApiService {
       })
       switch (res.status) {
         case 201:
+          if (process.env.NEXT_PUBLIC_SENTRY_ENABLED === 'true' && process.env.SENTRY_LOG_MESSAGE === 'true') {
+            const messagePayload = {
+              fcqn: data.fqcn,
+              topic: data.topic,
+              transactionId: data.transactionId,
+              id: await res.text(),
+            }
+            captureMessage(JSON.stringify(messagePayload))
+          }
           return { ok: { id: await res.text() } }
         case 400:
           const { message: payloadErrorMessage } = await res.json()
@@ -120,6 +130,13 @@ export class DsbApiService {
       })
       switch (res.status) {
         case 200:
+          if (process.env.NEXT_PUBLIC_SENTRY_ENABLED === 'true' && process.env.SENTRY_LOG_MESSAGE === 'true') {
+            const messageResponsePayload = {
+              query: query,
+              messages: (await res.json()).map((msg: any) => this.translateIdempotencyKey(msg, false))
+            }
+            captureMessage(JSON.stringify(messageResponsePayload))
+          }
           return {
             ok: (await res.json()).map((msg: any) => this.translateIdempotencyKey(msg, false))
           }

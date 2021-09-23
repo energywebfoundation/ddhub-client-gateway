@@ -65,7 +65,10 @@ async function forPOST(req: NextApiRequest, res: NextApiResponse<Response>): Pro
       res.status(err.statusCode ?? 500).send({ err: err.body })
     } else {
       const error = new UnknownError(err)
-      captureException(error)
+      if (process.env.NEXT_PUBLIC_SENTRY_ENABLED === 'true' && process.env.SENTRY_LOG_ERROR === 'true') {
+        const error = new UnknownError(err)
+        captureException(error)
+      }
       res.status(500).send({ err: new UnknownError(err).body })
     }
   }
