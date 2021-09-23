@@ -130,15 +130,17 @@ export class DsbApiService {
       })
       switch (res.status) {
         case 200:
+          const response = await res.json()
+          
           if (process.env.NEXT_PUBLIC_SENTRY_ENABLED === 'true' && process.env.SENTRY_LOG_MESSAGE === 'true') {
             const messageResponsePayload = {
               query: query,
-              messages: (await res.json()).map((msg: any) => this.translateIdempotencyKey(msg, false))
+              messages: response.map((msg: any) => this.translateIdempotencyKey(msg, false))
             }
             captureMessage(JSON.stringify(messageResponsePayload))
           }
           return {
-            ok: (await res.json()).map((msg: any) => this.translateIdempotencyKey(msg, false))
+            ok: response.map((msg: any) => this.translateIdempotencyKey(msg, false))
           }
         case 401:
           // not logged in
