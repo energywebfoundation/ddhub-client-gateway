@@ -41,6 +41,21 @@ If you want to run sentry in docker image then please include the following envi
 -e NEXT_PUBLIC_SENTRY_ENABLED=true -e NEXT_PUBLIC_SENTRY_DSN=<SENTRY_DSN>
 ``` 
 
+There are 2 options availbale for sentry logs(message logs and error logs) if you want to enable only error logs 
+
+```
+-e SENTRY_LOG_ERROR=true
+``` 
+
+if you want to enable only message logs 
+```
+-e SENTRY_LOG_MESSAGE=true
+``` 
+if you want to enable both message logs and error logs 
+```
+-e SENTRY_LOG_MESSAGE=true -e SENTRY_LOG_ERROR=true
+``` 
+
 ### Configuration
 
 The DSB Client Gateway can be configured in a number of ways.
