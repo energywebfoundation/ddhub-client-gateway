@@ -13,7 +13,7 @@ const defaults = {
   eventServerUrl: 'https://identityevents-dev.energyweb.org/',
   inMemoryDbFilename: 'in-memory.json',
   parentNamespace: 'dsb.apps.energyweb.iam.ewc',
-  dsbBaseUrl: 'http://dsb-dev.energyweb.org',
+  dsbBaseUrl: 'https://dsb-demo.energyweb.org',
   websocketReconnect: 'true',
   websocketReconnectTimeout: '10000',
   websocketReconnectMaxRetries: '10',
