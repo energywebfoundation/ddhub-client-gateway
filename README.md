@@ -35,11 +35,7 @@ Make sure that the file exists on the host filesystem first.
 See [here](https://docs.docker.com/engine/reference/run/#volume-shared-filesystems)
 for full documentation.
 
-If you want to run sentry in docker image then please include the following environment variables while running the docker container
-
-```
--e NEXT_PUBLIC_SENTRY_ENABLED=true -e NEXT_PUBLIC_SENTRY_DSN=<SENTRY_DSN>
-``` 
+### Sentry 
 
 There are 2 options availbale for sentry logs(message logs and error logs) if you want to enable only error logs 
 

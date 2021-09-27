@@ -4,7 +4,7 @@ import InfoIcon from '@material-ui/icons/Info'
 import swal from 'sweetalert'
 import { CustomInput } from '../../components/CustomInput/CustomInput'
 import { EnrolmentState, snip, StringType } from '../../utils'
-import * as Sentry from '@sentry/nextjs'
+
 
 type GatewayIdentityProps = {
   did?: string
@@ -114,8 +114,6 @@ export const GatewayIdentity = ({
           disabled={isLoading}
           onClick={() => {
             if (!privateKey) {
-              //for testing purpose
-              Sentry.captureMessage('No private key set')
               return swal('Error', 'No private key set', 'error')
             }
             setPrivatekey('')

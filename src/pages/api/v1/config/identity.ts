@@ -12,14 +12,14 @@ import {
   NoPrivateKeyError,
   UnknownError
 } from '../../../../utils'
-import { captureException, withSentry } from '@sentry/nextjs'
+import { captureException, withSentry, captureMessage } from '@sentry/nextjs'
 
 type Response =
   | {
-      address: string
-      publicKey: string
-      balance: BalanceState
-    }
+    address: string
+    publicKey: string
+    balance: BalanceState
+  }
   | { err: ErrorBody }
 
 const handler = async (req: NextApiRequest, res: NextApiResponse<Response>) => {
@@ -91,6 +91,11 @@ async function forPOST(req: NextApiRequest, res: NextApiResponse<Response>) {
       throw saveError
     }
     await deleteEnrolment()
+    // for testing remove it afterwards
+    if (process.env.NEXT_PUBLIC_SENTRY_ENABLED === 'true' &&
+      process.env.SENTRY_LOG_MESSAGE === 'true') {
+      captureMessage('Private key saved. If not already funded, visit https://voltafaucet.energyweb.org')
+    }
     return res.status(200).send(publicIdentity)
   } catch (err) {
     if (err instanceof GatewayError) {
