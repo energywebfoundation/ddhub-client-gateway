@@ -16,11 +16,13 @@ import {
   DSBLoginError,
   DSBForbiddenError,
   DSBChannelNotFoundError,
-  DSBChannelUnauthorizedError
+  DSBChannelUnauthorizedError,
 } from '../utils'
 import { signProof } from './identity.service'
-import { getEnrolment } from './storage.service'
+import { getCertificate, getEnrolment } from './storage.service'
 import { captureMessage } from '@sentry/nextjs'
+import { Agent } from 'https'
+import axios from 'axios'
 
 export class DsbApiService {
   private static instance?: DsbApiService
@@ -46,13 +48,25 @@ export class DsbApiService {
    */
   public async getHealth(): Promise<Result> {
     const url = joinUrl(config.dsb.baseUrl, 'health')
+    const { some: tls } = await getCertificate()
+    let httpsAgent: Agent | undefined
+    if (tls) {
+      httpsAgent = new Agent({
+        cert: tls.cert.value,
+        key: tls.key?.value,
+        ca: tls.ca?.value
+      })
+    }
     try {
-      const res: Response = await fetch(url)
-      const data: { status: 'ok' | 'error'; error: any } = await res.json()
-      if (data.status !== 'ok') {
-        return { err: new DSBHealthError(data.error) }
+      const res = await axios.get(url, { httpsAgent })
+      if (res.status === 200) {
+        const data: { status: 'ok' | 'error'; error: any } = res.data
+        if (data.status !== 'ok') {
+          return { err: new DSBHealthError(data.error) }
+        }
+        return { ok: true }
       }
-      return { ok: true }
+      return { err: new DSBRequestError(res.statusText) }
     } catch (err) {
       return {
         err: new DSBRequestError(err instanceof Error ? err.message : (err as any))
@@ -131,7 +145,7 @@ export class DsbApiService {
       switch (res.status) {
         case 200:
           const response = (await res.json()).map((msg: any) => this.translateIdempotencyKey(msg, false))
-          
+
           if (process.env.NEXT_PUBLIC_SENTRY_ENABLED === 'true' && process.env.SENTRY_LOG_MESSAGE === 'true') {
             const messageResponsePayload = {
               query: query,

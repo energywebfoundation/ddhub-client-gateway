@@ -23,6 +23,7 @@
     "axios": "^0.21.1",
     "babel-plugin-styled-components": "^1.13.2",
     "ethers": "^5.4.2",
+    "formidable": "^1.2.2",
     "iam-client-lib": "^3.0.0-alpha.38",
     "nats.ws": "^1.2.0",
     "next": "^11.1.2",
@@ -37,6 +38,7 @@
     "websocket": "^1.0.34"
   },
   "devDependencies": {
+    "@types/formidable": "^1.2.4",
     "@types/jest": "^26.0.24",
     "@types/react": "17.0.15",
     "@types/swagger-ui-react": "^3.35.2",

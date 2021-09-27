@@ -22,16 +22,21 @@ export type Enrolment = {
   state: EnrolmentState
 }
 
-export type Certificate = {
-  clientId: string
-  tenantId: string
-  clientSecret: string
+export type File = {
+  name: string
+  value: string
+}
+
+export type CertificateFiles = {
+  cert: File
+  key?: File
+  ca?: File
 }
 
 export type Storage = {
   identity?: Identity
   enrolment?: Enrolment
-  certificate?: Certificate
+  certificate?: CertificateFiles
 }
 
 export type SendMessageData = {
