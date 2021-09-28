@@ -6,6 +6,7 @@ import { ErrorBody, ErrorCode, Result, File as CertFile } from '../../../../util
 import { isAuthorized } from '../../../../services/auth.service'
 import { withSentry } from '@sentry/nextjs'
 import { writeCertificate } from '../../../../services/storage.service'
+import { DsbApiService } from '../../../../services/dsb-api.service'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse<Result<boolean, ErrorBody>>) => {
   if (req.method !== 'POST') {
@@ -46,13 +47,34 @@ async function forPOST(
             }
           }))
         }
-        const { err } = await writeCertificate({
+        const key = await parseFile(files.key)
+        if (!key) {
+          return resolve(res.status(400).send({
+            err: {
+              code: ErrorCode.INVALID_FILE,
+              reason: 'Private key file not provided'
+            }
+          }))
+        }
+        const { err: writeErr } = await writeCertificate({
           cert,
-          key: await parseFile(files.key),
+          key,
           ca: await parseFile(files.ca)
         })
-        if (err) {
-          throw err
+        if (writeErr) {
+          throw writeErr
+        }
+        DsbApiService.init().removeTLS()
+        const { err: healthErr } = await DsbApiService.init().getHealth()
+        if (healthErr) {
+          return resolve(res.status(502).send({
+            err: {
+              code: ErrorCode.DSB_REQUEST_FAILED,
+              reason:
+                'Saved certificate but mTLS authentication failed with status: ' +
+                `${healthErr.statusCode} - ${healthErr.body.reason}`
+            }
+          }))
         }
         resolve(res.status(200).send({ ok: true }))
       } catch (err) {

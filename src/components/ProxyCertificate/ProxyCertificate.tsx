@@ -28,8 +28,8 @@ export const ProxyCertificate = ({
         <div className={classes.credentialsHeader}>
           <Typography variant="h6">OUTBOUND CERTIFICATE</Typography>
           <Tooltip
-            title="Configure the certificate used for mTLS authentication (if using a message broker
-              inside a secure environment)."
+            title="Configure the certificate (public and private key) used for mTLS authentication
+            (if using a message broker inside a secure environment)."
           >
             <InfoIcon />
           </Tooltip>
@@ -57,7 +57,7 @@ export const ProxyCertificate = ({
             </div>
           </div>
           <div className={classes.formGroup}>
-            <Typography className={classes.formLabel} variant="caption">PRIVATE KEY (optional)</Typography>
+            <Typography className={classes.formLabel} variant="caption">PRIVATE KEY</Typography>
             <div className={classes.fileInput}>
               <CustomInput placeholder={privateKey?.name ?? certificate?.key?.name ?? 'Upload a .pem file'} disabled />
               <Button

@@ -2,7 +2,6 @@ import { config } from '../config'
 import {
   ErrorCode,
   GetMessageOptions,
-  joinUrl,
   Message,
   Result,
   SendMessageData,
@@ -22,11 +21,13 @@ import { signProof } from './identity.service'
 import { getCertificate, getEnrolment } from './storage.service'
 import { captureMessage } from '@sentry/nextjs'
 import { Agent } from 'https'
-import axios from 'axios'
+import axios, { AxiosInstance } from 'axios'
 
 export class DsbApiService {
   private static instance?: DsbApiService
+  private api: AxiosInstance
   private authToken?: string
+  private httpsAgent?: Agent
 
   /**
    * Initialize the DsbAPIService
@@ -41,24 +42,29 @@ export class DsbApiService {
     return DsbApiService.instance
   }
 
+  constructor() {
+    this.api = axios.create({
+      baseURL: config.dsb.baseUrl,
+      validateStatus: () => true // no throw
+    })
+  }
+
+  /**
+   * In case TLS request does not work, reset
+   */
+  public removeTLS() {
+    this.httpsAgent = undefined
+  }
+
   /**
    * Performs health check on DSB Message Broker
    *
    * @returns true if up
    */
   public async getHealth(): Promise<Result> {
-    const url = joinUrl(config.dsb.baseUrl, 'health')
-    const { some: tls } = await getCertificate()
-    let httpsAgent: Agent | undefined
-    if (tls) {
-      httpsAgent = new Agent({
-        cert: tls.cert.value,
-        key: tls.key?.value,
-        ca: tls.ca?.value
-      })
-    }
+    await this.useTLS()
     try {
-      const res = await axios.get(url, { httpsAgent })
+      const res = await this.api.get('/health', { httpsAgent: this.httpsAgent })
       if (res.status === 200) {
         const data: { status: 'ok' | 'error'; error: any } = res.data
         if (data.status !== 'ok') {
@@ -66,7 +72,9 @@ export class DsbApiService {
         }
         return { ok: true }
       }
-      return { err: new DSBRequestError(res.statusText) }
+      return {
+        err: new DSBForbiddenError(`Cannot access message broker: ${res.status} ${res.statusText} - ${res.data}`)
+      }
     } catch (err) {
       return {
         err: new DSBRequestError(err instanceof Error ? err.message : (err as any))
@@ -80,18 +88,20 @@ export class DsbApiService {
    * @returns
    */
   public async sendMessage(data: SendMessageData): Promise<Result<SendMessageResult>> {
+    await this.useTLS()
     try {
       if (!this.authToken) {
         throw Error(ErrorCode.DSB_UNAUTHORIZED)
       }
-      const url = joinUrl(config.dsb.baseUrl, 'message')
-      const res = await fetch(url, {
+      const res = await this.api.request({
+        url: '/message',
         method: 'POST',
+        httpsAgent: this.httpsAgent,
         headers: {
           Authorization: `Bearer ${this.authToken}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(this.translateIdempotencyKey(data, true))
+        data: JSON.stringify(this.translateIdempotencyKey(data, true))
       })
       switch (res.status) {
         case 201:
@@ -100,16 +110,16 @@ export class DsbApiService {
               fcqn: data.fqcn,
               topic: data.topic,
               transactionId: data.transactionId,
-              id: await res.text(),
+              id: res.data,
             }
             captureMessage(JSON.stringify(messagePayload))
           }
-          return { ok: { id: await res.text() } }
+          return { ok: { id: res.data } }
         case 400:
-          const { message: payloadErrorMessage } = await res.json()
+          const { message: payloadErrorMessage } = await res.data
           throw new DSBPayloadError(payloadErrorMessage)
         case 401:
-          const unauthorizedMessage = (await res.json()).message
+          const unauthorizedMessage = res.data.message
           // login error
           if (unauthorizedMessage === 'Unauthorized') {
             throw Error(ErrorCode.DSB_UNAUTHORIZED)
@@ -121,7 +131,7 @@ export class DsbApiService {
         case 403:
           throw new DSBForbiddenError(`Must be enroled as a DSB user to access messages`)
         case 404:
-          throw new DSBChannelNotFoundError((await res.json()).message)
+          throw new DSBChannelNotFoundError(res.data.message)
         default:
           throw new DSBRequestError(`${res.status} ${res.statusText}`)
       }
@@ -131,24 +141,25 @@ export class DsbApiService {
   }
 
   public async getMessages(options: GetMessageOptions): Promise<Result<Message[]>> {
+    await this.useTLS()
     try {
-      let query = `fqcn=${options.fqcn}`
-      query += options.amount ? `&amount=${options.amount}` : ''
-      query += options.clientId ? `&clientId=${options.clientId}` : ''
-
-      const url = joinUrl(config.dsb.baseUrl, `message?${query}`)
-      const res = await fetch(url, {
+      if (!this.authToken) {
+        throw Error(ErrorCode.DSB_UNAUTHORIZED)
+      }
+      const res = await this.api.get('/message', {
+        params: options,
+        httpsAgent: this.httpsAgent,
         headers: {
           Authorization: `Bearer ${this.authToken}`
         }
       })
       switch (res.status) {
         case 200:
-          const response = (await res.json()).map((msg: any) => this.translateIdempotencyKey(msg, false))
+          const response = (res.data).map((msg: any) => this.translateIdempotencyKey(msg, false))
 
           if (process.env.NEXT_PUBLIC_SENTRY_ENABLED === 'true' && process.env.SENTRY_LOG_MESSAGE === 'true') {
             const messageResponsePayload = {
-              query: query,
+              query: options,
               messages: response
             }
             captureMessage(JSON.stringify(messageResponsePayload))
@@ -158,7 +169,7 @@ export class DsbApiService {
           }
         case 401:
           // not logged in
-          const unauthorizedMessage = (await res.json()).message
+          const unauthorizedMessage = res.data.message
           if (unauthorizedMessage === 'Unauthorized') {
             throw Error(ErrorCode.DSB_UNAUTHORIZED)
           }
@@ -169,7 +180,7 @@ export class DsbApiService {
         case 403:
           throw new DSBForbiddenError(`Must be enroled as a DSB user to access messages`)
         case 404:
-          throw new DSBChannelNotFoundError((await res.json()).message)
+          throw new DSBChannelNotFoundError(res.data.message)
         default:
           throw new DSBRequestError(`${res.status} ${res.statusText}`)
       }
@@ -184,16 +195,20 @@ export class DsbApiService {
    * @returns list of channels
    */
   public async getChannels(): Promise<Result<Channel[]>> {
+    await this.useTLS()
     try {
-      const url = joinUrl(config.dsb.baseUrl, `/channel/pubsub`)
-      const res = await fetch(url, {
+      if (!this.authToken) {
+        throw Error(ErrorCode.DSB_UNAUTHORIZED)
+      }
+      const res = await this.api.get('/channel/pubsub', {
+        httpsAgent: this.httpsAgent,
         headers: {
           Authorization: `Bearer ${this.authToken}`
         }
       })
       switch (res.status) {
         case 200:
-          return { ok: await res.json() }
+          return { ok: res.data }
         case 401:
           throw Error(ErrorCode.DSB_UNAUTHORIZED)
         case 403:
@@ -289,21 +304,21 @@ export class DsbApiService {
       return { err: proofError }
     }
     try {
-      const url = joinUrl(config.dsb.baseUrl, '/auth/login')
-      const res = await fetch(url, {
+      const res = await this.api.request({
+        url: '/auth/login',
         method: 'POST',
+        httpsAgent: this.httpsAgent,
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ identityToken })
+        data: JSON.stringify({ identityToken })
       })
       if (res.status !== 200) {
         return { err: new DSBLoginError(`${res.status} ${res.statusText}`) }
       }
-      const data: { token: string } = await res.json()
       // todo: verify signature
-      this.authToken = data.token
-      return { ok: data.token }
+      this.authToken = res.data.token
+      return { ok: res.data.token }
     } catch (err) {
       return {
         err: new DSBRequestError(err instanceof Error ? err.message : (err as string))
@@ -356,6 +371,24 @@ export class DsbApiService {
         ...body,
         transactionId
       }
+    }
+  }
+
+  /**
+   * Loads client certificates
+   */
+  private async useTLS(): Promise<void> {
+    if (this.httpsAgent) {
+      return
+    }
+    const { some: tls } = await getCertificate()
+    if (tls) {
+      this.httpsAgent = new Agent({
+        cert: tls.cert.value,
+        key: tls.key?.value,
+        ca: tls.ca?.value
+      })
+      console.log('loaded tls')
     }
   }
 }
