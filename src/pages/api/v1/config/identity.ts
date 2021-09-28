@@ -91,11 +91,6 @@ async function forPOST(req: NextApiRequest, res: NextApiResponse<Response>) {
       throw saveError
     }
     await deleteEnrolment()
-    // for testing remove it afterwards
-    if (process.env.NEXT_PUBLIC_SENTRY_ENABLED === 'true' &&
-      process.env.SENTRY_LOG_MESSAGE === 'true') {
-      captureMessage('Private key saved. If not already funded, visit https://voltafaucet.energyweb.org')
-    }
     return res.status(200).send(publicIdentity)
   } catch (err) {
     if (err instanceof GatewayError) {
