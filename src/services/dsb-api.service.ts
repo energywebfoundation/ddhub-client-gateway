@@ -388,7 +388,6 @@ export class DsbApiService {
         key: tls.key?.value,
         ca: tls.ca?.value
       })
-      console.log('loaded tls')
     }
   }
 }
