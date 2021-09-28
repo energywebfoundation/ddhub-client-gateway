@@ -12,14 +12,14 @@ import {
   NoPrivateKeyError,
   UnknownError
 } from '../../../../utils'
-import { captureException, withSentry } from '@sentry/nextjs'
+import { captureException, withSentry, captureMessage } from '@sentry/nextjs'
 
 type Response =
   | {
-      address: string
-      publicKey: string
-      balance: BalanceState
-    }
+    address: string
+    publicKey: string
+    balance: BalanceState
+  }
   | { err: ErrorBody }
 
 const handler = async (req: NextApiRequest, res: NextApiResponse<Response>) => {
