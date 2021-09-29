@@ -238,7 +238,7 @@ export class DSBPayloadError extends GatewayError {
   constructor(errorMessage: any[]) {
     const [reason, error] = errorMessage
     super({
-      statusCode: HttpError.BAD_REQUEST,
+      statusCode: HttpError.UNPROCESSABLE_ENTITY,
       code: ErrorCode.DSB_INVALID_PAYLOAD,
       reason,
       additionalInformation: error
