@@ -37,6 +37,7 @@ yarn-error.log*
 ewc.prv
 vc.cert
 in-memory.json
+*.pem
 
 /.vscode
 /dist

@@ -29,7 +29,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext): Pr
     return {
       props: {
         health: serializeError(health),
-        state: serializeError(state),
+        state: serializeError(state), // todo: remove private data
         auth: authHeader ? { some: authHeader } : { none: true }
       }
     }

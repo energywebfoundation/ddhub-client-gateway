@@ -21,7 +21,12 @@ export const UploadContainer = ({ auth, channels }: UploadContainerProps) => {
       const res = await axios.post(
         `/api/v1/upload?fqcn=${fqcn}&topic=${topic}`,
         formData,
-        auth ? { headers: { Authorization: `Bearer ${auth}`, 'content-type': 'multipart/form-data' } } : undefined
+        {
+          headers: {
+            Authorization: auth ? `Bearer ${auth}` : undefined,
+            'content-type': 'multipart/form-data'
+          }
+        }
       )
       const { id, transactionId } = res.data
       swal(`Success: ${id}`, `File uploaded with transaction ID\n${transactionId}`, 'success')

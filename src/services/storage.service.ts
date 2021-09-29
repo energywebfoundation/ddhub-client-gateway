@@ -1,6 +1,8 @@
 import { promises as fs } from 'fs'
 import { config } from '../config'
-import { Certificate, Enrolment, ErrorCode, Identity, Option, Result, Storage } from '../utils'
+import { CertificateFiles, Enrolment, ErrorCode, Identity, Option, Result, Storage } from '../utils'
+
+// TODO: cache reads
 
 // SETTERS
 
@@ -24,7 +26,7 @@ export async function writeEnrolment(enrolment: Enrolment): Promise<Result<boole
   }
 }
 
-export async function writeCertificate(certificate: Certificate): Promise<Result<boolean, Error>> {
+export async function writeCertificate(certificate: CertificateFiles): Promise<Result<boolean, Error>> {
   try {
     const { some: storage } = await getStorage()
     await fs.writeFile(config.storage.inMemoryDbFile, JSON.stringify({ ...storage, certificate }, null, 2))
@@ -66,7 +68,7 @@ export async function getEnrolment(): Promise<Option<Enrolment>> {
   return { none: true }
 }
 
-export async function getCertificate(): Promise<Option<Certificate>> {
+export async function getCertificate(): Promise<Option<CertificateFiles>> {
   const { some: storage } = await getStorage()
   if (storage && storage.certificate) {
     return { some: storage.certificate }

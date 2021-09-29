@@ -1,62 +1,100 @@
 import { useState } from 'react'
-import { Button, makeStyles, Theme, Typography } from '@material-ui/core'
+import { Button, makeStyles, Theme, Tooltip, Typography } from '@material-ui/core'
 import InfoIcon from '@material-ui/icons/Info'
-import { CustomInput } from '../../components/CustomInput/CustomInput'
+import swal from 'sweetalert'
+import { CustomInput } from '../CustomInput/CustomInput'
+import { CertificateFiles } from '../../utils'
 
 type ProxyCertificateProps = {
-  originalClientId: string
-  originalTenantId: string
+  certificate?: CertificateFiles
   isLoading: boolean
-  onSubmit: (clientId: string, tenantId: string, clientSecret: string) => void
+  onSubmit: (cert: File, key: File, ca?: File) => void
 }
 
 export const ProxyCertificate = ({
-  originalClientId,
-  originalTenantId,
+  certificate,
   isLoading,
   onSubmit
 }: ProxyCertificateProps) => {
   const classes = useStyles()
 
-  const [clientId, setClientId] = useState(originalClientId)
-  const [tenantId, setTenantId] = useState(originalTenantId)
-  const [clientSecret, setClientSecret] = useState('')
+  const [cert, setCert] = useState<File>()
+  const [privateKey, setPrivateKey] = useState<File>()
+  const [ca, setCa] = useState<File>()
 
   return (
     <div className={classes.credentials}>
       <div className={classes.formGroup}>
         <div className={classes.credentialsHeader}>
           <Typography variant="h6">OUTBOUND CERTIFICATE</Typography>
-          <InfoIcon />
+          <Tooltip
+            title="Configure the certificate (public and private key) used for mTLS authentication
+            (if using a message broker inside a secure environment)."
+          >
+            <InfoIcon />
+          </Tooltip>
         </div>
 
         <div>
           <div className={classes.formGroup}>
-            <Typography variant="caption">AZURE CLIENT ID</Typography>
-            <CustomInput
-              placeholder="AZURE_CLIENT_ID"
-              fullWidth
-              value={clientId}
-              onChange={(e) => setClientId(e.target.value)}
-            />
+            <Typography className={classes.formLabel} variant="caption">CERTIFICATE</Typography>
+            <div className={classes.fileInput}>
+              <CustomInput placeholder={cert?.name ?? certificate?.cert.name ?? 'Upload a .pem file'} disabled />
+              <Button
+                variant="outlined"
+                color="secondary"
+                className={classes.fileButton}
+                component="label"
+              >
+                Browse
+                <input
+                  type="file"
+                  hidden
+                  accept=".pem"
+                  onChange={(e) => setCert(e.target.files?.[0])}
+                />
+              </Button>
+            </div>
           </div>
           <div className={classes.formGroup}>
-            <Typography variant="caption">AZURE TENANT ID</Typography>
-            <CustomInput
-              placeholder="AZURE_TENANT_ID"
-              fullWidth
-              value={tenantId}
-              onChange={(e) => setTenantId(e.target.value)}
-            />
+            <Typography className={classes.formLabel} variant="caption">PRIVATE KEY</Typography>
+            <div className={classes.fileInput}>
+              <CustomInput placeholder={privateKey?.name ?? certificate?.key?.name ?? 'Upload a .pem file'} disabled />
+              <Button
+                variant="outlined"
+                color="secondary"
+                className={classes.fileButton}
+                component="label"
+              >
+                Browse
+                <input
+                  type="file"
+                  hidden
+                  accept=".pem"
+                  onChange={(e) => setPrivateKey(e.target.files?.[0])}
+                />
+              </Button>
+            </div>
           </div>
           <div className={classes.formGroup}>
-            <Typography variant="caption">AZURE CLIENT SECRET</Typography>
-            <CustomInput
-              placeholder="AZURE_CLIENT_SECRET"
-              fullWidth
-              value={clientSecret}
-              onChange={(e) => setClientSecret(e.target.value)}
-            />
+            <Typography className={classes.formLabel} variant="caption">CA CERTIFICATE (optional)</Typography>
+            <div className={classes.fileInput}>
+              <CustomInput placeholder={ca?.name ?? certificate?.ca?.name ?? 'Upload a .crt file'} disabled />
+              <Button
+                variant="outlined"
+                color="secondary"
+                className={classes.fileButton}
+                component="label"
+              >
+                Browse
+                <input
+                  type="file"
+                  hidden
+                  accept=".pem, .ca-bundle, .crt"
+                  onChange={(e) => setCa(e.target.files?.[0])}
+                />
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -66,7 +104,12 @@ export const ProxyCertificate = ({
           color="secondary"
           fullWidth
           disabled={isLoading}
-          onClick={() => onSubmit(clientId, tenantId, clientSecret)}
+          onClick={() => {
+            if (!cert || !privateKey) {
+              return swal('Error', 'Public certificate and private key are required.')
+            }
+            onSubmit(cert, privateKey, ca)
+          }}
         >
           Save
         </Button>
@@ -99,14 +142,15 @@ const useStyles = makeStyles((theme: Theme) => ({
 
     '& span': {
       fontSize: '.8rem',
-      marginBottom: '.3rem'
-    },
-    '& *': {
-      color: '#fff'
     },
     '& input': {
-      width: '100%'
+      color: '#fff',
+      width: '230px'
     }
+  },
+  formLabel: {
+    color: '#fff',
+    marginBottom: '.3rem'
   },
   buttonGroup: {
     marginTop: '1rem',
@@ -115,5 +159,15 @@ const useStyles = makeStyles((theme: Theme) => ({
       padding: '.7rem',
       marginBottom: '1rem'
     }
+  },
+  fileInput: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
+  fileButton: {
+    // marginTop: theme.spacing(3),
+    // padding: '.7rem'
   }
 }))
