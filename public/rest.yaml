@@ -133,13 +133,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SendMessageSuccess'
-        '400':
-          description: The message was rejected by the message broker (e.g. the payload
-            does not match the schema)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '401':
           description: Unauthorized to access the message broker or channel
           content:
@@ -176,6 +169,13 @@ paths:
                 err:
                   code: DSB::CHANNEL_NOT_FOUND
                   reason: Channel or topic does not exist
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: The message was rejected by the message broker (e.g. the payload
+            does not match the schema)
+          content:
+            application/json:
               schema:
                 $ref: '#/components/schemas/Error'
         '502':
