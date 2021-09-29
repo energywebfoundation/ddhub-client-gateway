@@ -25,10 +25,22 @@ export const DownloadContainer = ({ auth, channels }: DownloadContainerProps) =>
         `/api/v1/message?${query}`,
         auth ? { headers: { Authorization: `Bearer ${auth}`, 'content-type': 'application/json' } } : undefined
       )
-      const messages  = res.data
+
+      const channelData = channels?.filter((channel) => {
+       return channel.fqcn === fqcn && channel.topics && channel.topics.length > 0
+      })
+
+      console.log('channelData', channelData)
+
+      const fileType = channelData && channelData.length > 0 ? 'json': 'txt'
+
+      console.log('fileType', fileType)
+
+      const messages = res.data
+
       console.log('messages', messages)
 
-      swal(`Success`,`File downloaded Succesfully`, 'success')
+      swal(`Success`, `File downloaded Succesfully`, 'success')
     } catch (err) {
       if (axios.isAxiosError(err)) {
         swal('Error', err.response?.data?.err?.reason, 'error')
