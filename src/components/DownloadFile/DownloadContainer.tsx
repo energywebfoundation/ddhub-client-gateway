@@ -30,19 +30,23 @@ export const DownloadContainer = ({ auth, channels }: DownloadContainerProps) =>
       // })
       // const fileType = channelData && channelData.length > 0 ? 'json' : 'txt'
 
-      // console.log('fileType', fileType)
-
       const res = await axios.get(
         `/api/v1/download?${query}`,
         auth ? { headers: { Authorization: `Bearer ${auth}`, 'content-type': 'application/json' } } : undefined
       )
 
-      const json = JSON.parse(res.data)
+      let payload
+      try {
+        payload = JSON.parse(res.data[0])
+      } catch (error) {
+        payload = res.data[0]
+      }
 
-      const fileType = json ? 'json' : 'txt'
+      const fileType = typeof payload === 'object' ? 'json' : 'txt'
       const fileName = `messages.${fileType}`
-      const type = json ? 'application/json' : 'application/txt'
-      const blob = new Blob([json], { type: type })
+      const type = typeof payload === 'object' ? 'application/json' : 'application/text'
+
+      const blob = new Blob([res.data], { type: type })
       const url = await window.URL.createObjectURL(blob)
       const tempLink = document.createElement('a')
       tempLink.href = url
