@@ -252,7 +252,11 @@ export async function initIAM(privateKey: string): Promise<Result<IAM>> {
     setCacheClientOptions(config.iam.chainId, {
       url: config.iam.cacheServerUrl
     })
-    await iam.initializeConnection()
+    await iam.initializeConnection({
+      createDocument: true,
+      initCacheServer: false
+    })
+    await iam.connectToCacheServer()
     return { ok: iam }
   } catch (err) {
     if (err instanceof Error) {
