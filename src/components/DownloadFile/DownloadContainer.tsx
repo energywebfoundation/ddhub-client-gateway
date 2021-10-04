@@ -23,12 +23,11 @@ export const DownloadContainer = ({ auth, channels }: DownloadContainerProps) =>
       query += amount ? `&amount=${amount}` : ''
       query += clientId ? `&clientId=${clientId}` : ''
 
+      //@todo check file type when select by topic is available
+
       // const channelData = channels?.filter((channel) => {
       //   return channel.fqcn === fqcn && channel.topics && channel.topics.length > 0
       // })
-
-    
-
       // const fileType = channelData && channelData.length > 0 ? 'json' : 'txt'
 
       // console.log('fileType', fileType)
@@ -38,9 +37,12 @@ export const DownloadContainer = ({ auth, channels }: DownloadContainerProps) =>
         auth ? { headers: { Authorization: `Bearer ${auth}`, 'content-type': 'application/json' } } : undefined
       )
 
-      const fileName = "messages.txt"
-      const json = JSON.stringify(res.data)
-      const blob = new Blob([json], { type: 'application/json' })
+      const json = JSON.parse(res.data)
+
+      const fileType = json ? 'json' : 'txt'
+      const fileName = `messages.${fileType}`
+      const type = json ? 'application/json' : 'application/txt'
+      const blob = new Blob([json], { type: type })
       const url = await window.URL.createObjectURL(blob)
       const tempLink = document.createElement('a')
       tempLink.href = url
