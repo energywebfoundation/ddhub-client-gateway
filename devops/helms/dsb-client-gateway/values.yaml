@@ -1,11 +1,11 @@
-dsb-client-gateway: 
+dsb-client-gateway:
   replicaCount: 1
 
   clientgateway:
     config:
-      nats_js_url: nats://20.83.92.252:4222
+      # nats_js_url: nats://20.83.92.252:4222
       # -- The URL of the DSB Message Broker you want to connect to. Trailing / allowed.
-      dsb_base_url: http://dsb-demo.energyweb.org
+      dsb_base_url: https://dsb-demo.energyweb.org
       # -- This allows the DSB Message Broker to be controlled by the DSB Client Gateway. In this situation, the identities of both components are shared. This means that a single private key is used for each component and, in addition to the user DSB role, the gateway will enrol itself as a messagebroker. If a DSB_CONTROL_TYPE is also provided, the gateway may spawn a process with the chosen method, in order to configure it (i.e. setting the same private key).
   image:
     repository: aemocontainerregistry.azurecr.io/dsb/client-gateway
