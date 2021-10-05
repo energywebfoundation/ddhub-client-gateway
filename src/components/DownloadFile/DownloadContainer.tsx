@@ -31,22 +31,27 @@ export const DownloadContainer = ({ auth, channels }: DownloadContainerProps) =>
       // const fileType = channelData && channelData.length > 0 ? 'json' : 'txt'
 
       const res = await axios.get(
-        `/api/v1/download?${query}`,
+        `/api/v1/message?${query}`,
         auth ? { headers: { Authorization: `Bearer ${auth}`, 'content-type': 'application/json' } } : undefined
       )
 
       let payload
+
+      if (res.data && Array.isArray(res.data) && res.data.length === 0) {
+        return swal('Error', `No recent messages to download`, 'error')
+      }
+
       try {
-        payload = JSON.parse(res.data[0])
+        payload = JSON.parse(res.data[0].payload)
       } catch (error) {
-        payload = res.data[0]
+        payload = res.data[0].payload
       }
 
       const fileType = typeof payload === 'object' ? 'json' : 'txt'
-      const fileName = `messages.${fileType}`
+      const fileName = `fqcn_${new Date().getTime()}.${fileType}`
       const type = typeof payload === 'object' ? 'application/json' : 'application/text'
 
-      const blob = new Blob([res.data], { type: type })
+      const blob = new Blob([res.data[0].payload], { type: type })
       const url = await window.URL.createObjectURL(blob)
       const tempLink = document.createElement('a')
       tempLink.href = url
@@ -58,7 +63,7 @@ export const DownloadContainer = ({ auth, channels }: DownloadContainerProps) =>
       if (axios.isAxiosError(err)) {
         swal('Error', err.response?.data?.err?.reason, 'error')
       } else {
-        swal('Error', `Could not set identity: ${err}`, 'error')
+        swal('Error', `No recent messages`, 'error')
       }
       setIsLoading(false)
     }
