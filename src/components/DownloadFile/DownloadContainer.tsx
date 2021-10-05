@@ -3,8 +3,10 @@ import { Channel } from '../../utils'
 import { useState } from 'react'
 import axios from 'axios'
 import swal from '@sweetalert/with-react'
-import * as fs from 'fs'
-import path from 'path'
+import {
+  UnknownError
+} from '../../utils'
+import { captureException } from '@sentry/nextjs'
 
 
 type DownloadContainerProps = {
@@ -38,7 +40,7 @@ export const DownloadContainer = ({ auth, channels }: DownloadContainerProps) =>
       let payload
 
       if (res.data && Array.isArray(res.data) && res.data.length === 0) {
-        return swal('Error', `No recent messages to download`, 'error')
+        return swal('Info', `No recent messages to download`, 'info')
       }
 
       try {
@@ -48,7 +50,7 @@ export const DownloadContainer = ({ auth, channels }: DownloadContainerProps) =>
       }
 
       const fileType = typeof payload === 'object' ? 'json' : 'txt'
-      const fileName = `fqcn_${new Date().getTime()}.${fileType}`
+      const fileName = `${fqcn}_${new Date().getTime()}.${fileType}`
       const type = typeof payload === 'object' ? 'application/json' : 'application/text'
 
       const blob = new Blob([res.data[0].payload], { type: type })
@@ -63,7 +65,9 @@ export const DownloadContainer = ({ auth, channels }: DownloadContainerProps) =>
       if (axios.isAxiosError(err)) {
         swal('Error', err.response?.data?.err?.reason, 'error')
       } else {
-        swal('Error', `No recent messages`, 'error')
+        const error = new UnknownError(err)
+        captureException(error)
+        swal('Error', `${new UnknownError(err).body}`, 'error')
       }
       setIsLoading(false)
     }
