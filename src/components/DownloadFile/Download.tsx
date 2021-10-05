@@ -4,12 +4,14 @@ import { Typography, Button, Theme, Grid, MenuItem, FormControl, Select } from '
 import { Info } from '@material-ui/icons'
 import { CustomInput } from '../../components/CustomInput/CustomInput'
 import { Channel } from '../../utils'
+import swal from 'sweetalert'
 
 type DownloadProps = {
-  channels: Channel[] | undefined
+  channels: Channel[] | undefined,
+  onDownload: (fqcn: string, amount: number, clientId?: string) => void
 }
 
-export const Download = ({ channels }: DownloadProps) => {
+export const Download = ({ channels, onDownload }: DownloadProps,) => {
   const classes = useStyles()
   const [channelName, setChannelName] = useState('')
 
@@ -45,7 +47,14 @@ export const Download = ({ channels }: DownloadProps) => {
 
           <Grid container spacing={2}>
             <Grid item xs={6} sm={5}>
-              <Button variant="outlined" color="secondary" fullWidth>
+              <Button variant="outlined" color="secondary" fullWidth
+                onClick={() => {
+                  if (!channelName) {
+                    return swal('Error', 'Please enter channel name', 'error')
+                  }
+                  onDownload(channelName, 1)
+                }}
+              >
                 Download recent
               </Button>
             </Grid>
