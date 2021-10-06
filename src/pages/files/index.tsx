@@ -9,11 +9,12 @@ import Header from '../../components/Header/Header'
 import { DownloadContainer } from '../../components/DownloadFile/DownloadContainer'
 import { DsbApiService } from '../../services/dsb-api.service'
 import { isAuthorized } from '../../services/auth.service'
-import { ErrorCode, Result, serializeError, Channel, ErrorBodySerialized } from '../../utils'
+import { ErrorCode, Result, serializeError, Channel, Option, ErrorBodySerialized } from '../../utils'
 
 type Props = {
   health: Result<boolean, ErrorBodySerialized>
   channels: Result<Channel[], ErrorBodySerialized>
+  auth: Option<string>
 }
 
 export async function getServerSideProps(context: GetServerSidePropsContext): Promise<{
@@ -27,7 +28,8 @@ export async function getServerSideProps(context: GetServerSidePropsContext): Pr
     return {
       props: {
         health: serializeError(health),
-        channels: serializeError(channels)
+        channels: serializeError(channels),
+        auth: authHeader ? { some: authHeader } : { none: true }
       }
     }
   } else {
@@ -40,13 +42,14 @@ export async function getServerSideProps(context: GetServerSidePropsContext): Pr
     return {
       props: {
         health: {},
-        channels: {}
+        channels: {},
+        auth: { none: true }
       }
     }
   }
 }
 
-export default function FileUpload({ health, channels }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function FileUpload({ health, channels, auth }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const classes = useStyles()
 
   useEffect(() => {
@@ -83,7 +86,7 @@ export default function FileUpload({ health, channels }: InferGetServerSideProps
             <Typography className={classes.textWhite} variant="h4">
               File Upload{' '}
             </Typography>
-            <UploadContainer channels={channels.ok} />
+            <UploadContainer auth={auth.some} channels={channels.ok} />
           </section>
 
           <Divider className={classes.divider} />
@@ -92,7 +95,7 @@ export default function FileUpload({ health, channels }: InferGetServerSideProps
             <Typography className={classes.textWhite} variant="h4">
               File Download{' '}
             </Typography>
-            <DownloadContainer channels={channels.ok} />
+            <DownloadContainer auth={auth.some} channels={channels.ok} />
           </section>
         </Container>
       </main>
