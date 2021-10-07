@@ -2,7 +2,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { DsbApiService } from '../../services/dsb-api.service'
 import { ErrorBody, errorOrElse } from '../../utils'
-import { withSentry } from '@sentry/nextjs'
+
 
 type Response = void | { err: ErrorBody }
 
@@ -14,4 +14,4 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<Response>) => {
   }
   return res.status(200).end()
 }
-export default withSentry(handler)
+export default handler
