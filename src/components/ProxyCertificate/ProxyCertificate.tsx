@@ -50,7 +50,7 @@ export const ProxyCertificate = ({
                 <input
                   type="file"
                   hidden
-                  accept=".pem"
+                  accept=".pem, .der, .cer"
                   onChange={(e) => setCert(e.target.files?.[0])}
                 />
               </Button>
@@ -70,7 +70,7 @@ export const ProxyCertificate = ({
                 <input
                   type="file"
                   hidden
-                  accept=".pem"
+                  accept=".pem, .der, .key"
                   onChange={(e) => setPrivateKey(e.target.files?.[0])}
                 />
               </Button>
@@ -90,7 +90,7 @@ export const ProxyCertificate = ({
                 <input
                   type="file"
                   hidden
-                  accept=".pem, .ca-bundle, .crt"
+                  accept=".pem, .ca-bundle, .crt, .der, .cer"
                   onChange={(e) => setCa(e.target.files?.[0])}
                 />
               </Button>
