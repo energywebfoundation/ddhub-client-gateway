@@ -8,7 +8,7 @@ The simplest way to run the gateway is via the public Docker container stored
 in the Azure container registry.
 
 ```
-docker run -p 3000:3000 -e NATS_JS_URL=nats://20.83.92.252:4222 aemocontainerregistry.azurecr.io/dsb/client-gateway:latest
+docker run -p 3000:3000 aemocontainerregistry.azurecr.io/dsb/client-gateway:latest
 ```
 
 The gateway UI can now be accessed on http://localhost:3000.
@@ -20,11 +20,13 @@ The gateway UI can now be accessed on http://localhost:3000.
 > Note: environment variables can be specified using `-e` flags. See
   [here](https://docs.docker.com/engine/reference/run/#env-environment-variables)
   for documentation.
+> Note: flags must be placed after `docker run` and before
+  `aemocontainerregistry.azurecr.io/dsb/client-gateway:latest` to work.
 ### Persisting Data
 
 By default, the gateway will not persist data configured during runtime
 (e.g. identity, cerficates). To do this, a Docker bind mount can be used with
-the following flag:
+the following flag (on macOS and linux):
 
 ```
 -v $(pwd)/in-memory.json:/var/deployment/apps/dsb-client-gateway/in-memory.json
@@ -35,22 +37,22 @@ Make sure that the file exists on the host filesystem first.
 See [here](https://docs.docker.com/engine/reference/run/#volume-shared-filesystems)
 for full documentation.
 
-### Sentry 
+### Sentry
 
-There are 2 options availbale for sentry logs(message logs and error logs) if you want to enable only error logs 
+There are 2 options availbale for sentry logs(message logs and error logs) if you want to enable only error logs
 
 ```
 -e SENTRY_LOG_ERROR=true
-``` 
+```
 
-if you want to enable only message logs 
+if you want to enable only message logs
 ```
 -e SENTRY_LOG_MESSAGE=true
-``` 
-if you want to enable both message logs and error logs 
+```
+if you want to enable both message logs and error logs
 ```
 -e SENTRY_LOG_MESSAGE=true -e SENTRY_LOG_ERROR=true
-``` 
+```
 
 ### Configuration
 
@@ -89,16 +91,7 @@ Be sure to now set your gateway's `WEBSOCKET_URL` to ws://localhost:5001/.
 With wscat running, you should be able to start receiving messages once the
 gateway's DSB enrolment is complete.
 
-### Sentry
 
-The gateway supports sentry integration for capturing logs, transactions, Performance Monitoring
-
-#### Install
-Sentry captures data by using an SDK within your application’s runtime.
-
-```
-yarn add @sentry/nextjs
-```
 ## Development
 
 Install dependencies:
