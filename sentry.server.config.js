@@ -10,7 +10,9 @@ if (process.env.NEXT_PUBLIC_SENTRY_ENABLED === 'true') {
   Sentry.init({
     dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
     // for deleting payload as it is sensitive info
+    ignoreUrls: ["/health"],
     beforeSend(event) {
+
       if (event?.request?.data) {
         const payloadForSentry = JSON.parse(event?.request?.data)
         delete payloadForSentry.payload
@@ -18,6 +20,7 @@ if (process.env.NEXT_PUBLIC_SENTRY_ENABLED === 'true') {
       }
       return event
     },
+
     // Adjust this value in production, or use tracesSampler for greater control
     tracesSampleRate: 1.0,
     // ...
