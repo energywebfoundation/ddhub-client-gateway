@@ -157,13 +157,14 @@ export class DsbApiService {
         case 200:
           const response = (res.data).map((msg: any) => this.translateIdempotencyKey(msg, false))
 
-          const responseForSentry = response.map((res) => {
-            delete res.payload
-            delete res.signature
-            return res
-          })
-
           if (process.env.NEXT_PUBLIC_SENTRY_ENABLED === 'true' && process.env.SENTRY_LOG_MESSAGE === 'true') {
+
+            const responseForSentry = response.map((res) => {
+              delete res.payload
+              delete res.signature
+              return res
+            })
+
             const messageResponsePayload = {
               query: options,
               messages: responseForSentry
