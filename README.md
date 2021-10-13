@@ -20,6 +20,7 @@ The gateway UI can now be accessed on http://localhost:3000.
 > Note: environment variables can be specified using `-e` flags. See
   [here](https://docs.docker.com/engine/reference/run/#env-environment-variables)
   for documentation.
+
 > Note: flags must be placed after `docker run` and before
   `aemocontainerregistry.azurecr.io/dsb/client-gateway:latest` to work.
 ### Persisting Data
