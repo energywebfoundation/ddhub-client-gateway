@@ -9,6 +9,20 @@ if (process.env.NEXT_PUBLIC_SENTRY_ENABLED === 'true') {
   console.log('server sentry is initializing')
   Sentry.init({
     dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
+    // for deleting payload as it is sensitive info
+    ignoreUrls: ["/api/health"],
+
+    beforeSend(event) {
+      console.log('server sentry is initializing')
+      console.log({ event: event })
+      if (event?.request?.data) {
+        const payloadForSentry = JSON.parse(event?.request?.data)
+        delete payloadForSentry.payload
+        event.request.data = payloadForSentry
+      }
+      return event
+    },
+
     // Adjust this value in production, or use tracesSampler for greater control
     tracesSampleRate: 1.0,
     // ...
