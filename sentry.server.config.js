@@ -28,7 +28,7 @@ if (process.env.NEXT_PUBLIC_SENTRY_ENABLED === 'true') {
         return 0
       } else {
         // Default sample rate for all others (replaces tracesSampleRate)
-        return 0.3
+        return 0.2
       }
     },
 
