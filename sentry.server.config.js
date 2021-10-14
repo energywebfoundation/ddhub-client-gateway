@@ -13,7 +13,6 @@ if (process.env.NEXT_PUBLIC_SENTRY_ENABLED === 'true') {
     // ignoreUrls: ["/health"],
 
     beforeSend(event) {
-      console.log('server sentry is initializing')
       if (event?.request?.data) {
         const payloadForSentry = JSON.parse(event?.request?.data)
         delete payloadForSentry.payload
