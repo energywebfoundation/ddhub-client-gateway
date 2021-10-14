@@ -10,7 +10,7 @@ if (process.env.NEXT_PUBLIC_SENTRY_ENABLED === 'true') {
   Sentry.init({
     dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
     // for deleting payload as it is sensitive info
-    ignoreUrls: ["/api/health"],
+    // ignoreUrls: ["/health"],
 
     beforeSend(event) {
       console.log('server sentry is initializing')
@@ -23,8 +23,13 @@ if (process.env.NEXT_PUBLIC_SENTRY_ENABLED === 'true') {
       return event
     },
 
-    // Adjust this value in production, or use tracesSampler for greater control
-    tracesSampleRate: 1.0,
+
+    /*Adjust this value in production, or use tracesSampler for greater control
+      Leaving the sample rate at 1.0 means that automatic instrumentation will send a 
+      transaction each time a user loads any page or navigates anywhere in your app, 
+      which is a lot of transactions. Sampling enables you to collect representative data 
+      without overwhelming either your system or your Sentry transaction quota. */
+    tracesSampleRate: 0.2,
     // ...
     // Note: if you want to override the automatic release value, do not set a
     // `release` value here - use the environment variable `SENTRY_RELEASE`, so
