@@ -21,13 +21,24 @@ if (process.env.NEXT_PUBLIC_SENTRY_ENABLED === 'true') {
       return event
     },
 
+    //since this function is here so it will have precedence over tracesSampleRate
+    tracesSampler: samplingContext => {
+      if (samplingContext.transactionContext.name === 'GET /api/health') {
+        // Drop this transaction, by setting its sample rate to 0%
+        return 0
+      } else {
+        // Default sample rate for all others (replaces tracesSampleRate)
+        return 0.3
+      }
+    },
 
     /*Adjust this value in production, or use tracesSampler for greater control
       Leaving the sample rate at 1.0 means that automatic instrumentation will send a 
       transaction each time a user loads any page or navigates anywhere in your app, 
       which is a lot of transactions. Sampling enables you to collect representative data 
       without overwhelming either your system or your Sentry transaction quota. */
-    tracesSampleRate: 0.2,
+
+    //tracesSampleRate: 0.2,
     // ...
     // Note: if you want to override the automatic release value, do not set a
     // `release` value here - use the environment variable `SENTRY_RELEASE`, so
