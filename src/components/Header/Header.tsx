@@ -37,7 +37,7 @@ export default function Header() {
           <p className={classes.divider}>•</p>
           <Typography>EW-DSB Client Gateway</Typography>
           <Typography className={classes.version} variant="caption">
-            v0.4.0
+            v0.5.0
           </Typography>
         </div>
       </Toolbar>
