@@ -23,7 +23,8 @@ if (process.env.NEXT_PUBLIC_SENTRY_ENABLED === 'true') {
 
     //since this function is here so it will have precedence over tracesSampleRate
     tracesSampler: samplingContext => {
-      if (samplingContext.transactionContext.name === 'GET /api/health') {
+      if (samplingContext.transactionContext.name === 'GET /api/health' ||
+        samplingContext.transactionContext.name === 'POST /api/v1/message') {
         // Drop this transaction, by setting its sample rate to 0%
         return 0
       } else {
