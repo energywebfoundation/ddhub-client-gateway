@@ -75,11 +75,19 @@ async function forPOST(
     } else {
       const error = new UnknownError(err)
       if (process.env.NEXT_PUBLIC_SENTRY_ENABLED === 'true' && process.env.SENTRY_LOG_ERROR === 'true') {
-        const error = new UnknownError(err)
         captureException(error)
       }
-      res.status(500).send({ err: new UnknownError(err).body })
+      res.status(500).send({ err: error.body })
     }
   }
 }
+
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: '16mb'
+    }
+  }
+}
+
 export default withSentry(handler)
