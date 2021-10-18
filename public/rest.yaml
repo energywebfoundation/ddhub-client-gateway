@@ -210,6 +210,14 @@ paths:
           description: Amount of messages that should be retrieved
           schema:
             type: number
+        - in: query
+          name: from
+          required: false
+          example: '2021-09-06T00:00:00Z'
+          description: Timstamp stating from which point messages should be read
+            (ISO 8601 UTC Datetime)
+          schema:
+            type: string
       responses:
         '200':
           description: The array of messages
