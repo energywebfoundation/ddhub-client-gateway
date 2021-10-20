@@ -159,7 +159,9 @@ export class DsbApiService {
 
           if (process.env.NEXT_PUBLIC_SENTRY_ENABLED === 'true' && process.env.SENTRY_LOG_MESSAGE === 'true') {
 
-            const responseForSentry = response.map((res) => {
+            let responseForSentry = JSON.parse(JSON.stringify(response)) // to deep clone array of objects
+
+            responseForSentry = responseForSentry.map((res) => {
               delete res.payload
               delete res.signature
               return res
