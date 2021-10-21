@@ -53,7 +53,8 @@ export const DownloadContainer = ({ auth, channels }: DownloadContainerProps) =>
       const fileName = `${fqcn}_${new Date().getTime()}.${fileType}`
       const type = typeof payload === 'object' ? 'application/json' : 'application/text'
 
-      const blob = new Blob([res.data[0].payload], { type: type })
+      // eslint-disable-next-line max-len
+      const blob = new Blob([`payload=${res.data[0].payload}`, `\ntransaction Id=${res.data[0].transactionId}`, `\nmesssage Id=${res.data[0].id}`], { type: type })
       const url = await window.URL.createObjectURL(blob)
       const tempLink = document.createElement('a')
       tempLink.href = url

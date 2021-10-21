@@ -75,7 +75,7 @@ async function forPOST(
     } else {
       const error = new UnknownError(err)
       if (process.env.NEXT_PUBLIC_SENTRY_ENABLED === 'true' && process.env.SENTRY_LOG_ERROR === 'true') {
-        captureException(error)
+        captureException(error.body)
       }
       res.status(500).send({ err: error.body })
     }
