@@ -54,9 +54,6 @@ export default function Home({ health, state, auth }: InferGetServerSidePropsTyp
   const classes = useStyles()
 
   useEffect(() => {
-    console.log('health.err', health)
-    console.log('state', state)
-    console.log('auth', auth)
     if (health.err) {
       swal('Error', health.err.reason, 'error')
     }
