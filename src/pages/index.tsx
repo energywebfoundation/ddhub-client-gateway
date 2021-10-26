@@ -34,7 +34,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext): Pr
       }
     }
   } else {
-    if (err.message === ErrorCode.UNAUTHORIZED) {
+    if (err.message === ErrorCode.UNAUTHORIZED || err.message === ErrorCode.FORBIDDEN) {
       context.res.statusCode = 401
       context.res.setHeader('WWW-Authenticate', 'Basic realm="Authorization Required"')
     } else {
@@ -54,6 +54,9 @@ export default function Home({ health, state, auth }: InferGetServerSidePropsTyp
   const classes = useStyles()
 
   useEffect(() => {
+    console.log('health.err', health)
+    console.log('state', state)
+    console.log('auth', auth)
     if (health.err) {
       swal('Error', health.err.reason, 'error')
     }
