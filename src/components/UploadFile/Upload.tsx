@@ -30,6 +30,7 @@ export const Upload = ({ channels, onUpload }: UploadProps) => {
     if (event.target.files && event.target.files[0]) {
       setFileName(event.target.files[0].name)
       setFile(event.target.files[0])
+      event.target.value = null
     }
   }
 
@@ -95,7 +96,7 @@ export const Upload = ({ channels, onUpload }: UploadProps) => {
             <Grid item xs={12} sm={5} md={3}>
               <Button variant="outlined" color="secondary" fullWidth className={classes.fileButton} component="label">
                 Browse
-                <input type="file" hidden accept=".txt, .xml, .csv, .json" onChange={uploadToClient} />
+                <input type="file" hidden accept=".txt, .xml, .csv, .json" onClick={uploadToClient} />
               </Button>
             </Grid>
             <Grid item xs={6} sm={5}>
