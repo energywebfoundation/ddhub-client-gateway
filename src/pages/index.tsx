@@ -34,11 +34,9 @@ export async function getServerSideProps(context: GetServerSidePropsContext): Pr
       }
     }
   } else {
-    if (err.message === ErrorCode.UNAUTHORIZED) {
+    if (err.message === ErrorCode.UNAUTHORIZED || err.message === ErrorCode.FORBIDDEN) {
       context.res.statusCode = 401
       context.res.setHeader('WWW-Authenticate', 'Basic realm="Authorization Required"')
-    } else {
-      context.res.statusCode = 403
     }
     return {
       props: {
