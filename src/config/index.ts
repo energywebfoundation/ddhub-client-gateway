@@ -51,7 +51,7 @@ export const config = {
     privateKey: process.env.PRIVATE_KEY
   },
   storage: {
-    inMemoryDbFile: path.join(process.cwd(), process.env.IN_MEMORY_DB_FILENAME ?? defaults.inMemoryDbFilename)
+    inMemoryDbFile: path.join(process.cwd(), 'data', process.env.IN_MEMORY_DB_FILENAME ?? defaults.inMemoryDbFilename)
   },
   dsb: {
     baseUrl: process.env.DSB_BASE_URL ?? defaults.dsbBaseUrl,

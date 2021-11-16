@@ -1,7 +1,7 @@
-const {IAM, setCacheClientOptions, NATS_EXCHANGE_TOPIC} = require('iam-client-lib')
-const {Wallet} = require('ethers')
+const { IAM, setCacheClientOptions, NATS_EXCHANGE_TOPIC } = require('iam-client-lib')
+const { Wallet } = require('ethers')
 
-const privateKey = require('../in-memory.json').identity.privateKey
+const privateKey = require('../data/in-memory.json').identity.privateKey
 const { JSONCodec, connect } = require('nats.ws')
 
 globalThis.WebSocket = require('websocket').w3cwebsocket
