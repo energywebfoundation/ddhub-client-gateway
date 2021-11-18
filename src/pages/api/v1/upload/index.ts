@@ -73,4 +73,13 @@ async function forPOST(req: NextApiRequest, res: NextApiResponse<Response>): Pro
     }
   }
 }
+
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: '8mb'
+    }
+  }
+}
+
 export default withSentry(handler)
