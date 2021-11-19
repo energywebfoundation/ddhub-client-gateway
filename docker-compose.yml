@@ -2,7 +2,8 @@ version: '3.9'
 services:
   dsb-client:
     image: 'aemocontainerregistry.azurecr.io/dsb/client-gateway:canary'
-    ports: '3000:3000'
+    ports:
+      - '3000:3000'
     environment:
       - NATS_JS_URL=nats://20.83.92.252:4222
     volumes:
