@@ -1,6 +1,7 @@
 import { promises as fs } from 'fs'
 import { config } from '../config'
 import { CertificateFiles, Enrolment, ErrorCode, Identity, Option, Result, Storage } from '../utils'
+import path from 'path'
 
 // TODO: cache reads
 
@@ -9,6 +10,15 @@ import { CertificateFiles, Enrolment, ErrorCode, Identity, Option, Result, Stora
 export async function writeIdentity(identity: Identity): Promise<Result<boolean, Error>> {
   try {
     const { some: storage } = await getStorage()
+
+    const dir = path.join(process.cwd(), 'data')
+
+    try {
+      await fs.access(dir)
+      //if directory present so don't make directory again
+    } catch {
+      await fs.mkdir(dir, 'data')
+    }
     await fs.writeFile(config.storage.inMemoryDbFile, JSON.stringify({ ...storage, identity }, null, 2))
     return { ok: true }
   } catch (err) {

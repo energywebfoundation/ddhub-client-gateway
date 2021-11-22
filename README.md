@@ -30,7 +30,7 @@ By default, the gateway will not persist data configured during runtime
 the following flag (on macOS and linux):
 
 ```
--v $(pwd)/in-memory.json:/var/deployment/apps/dsb-client-gateway/in-memory.json
+-v $(pwd)/data:/var/deployment/apps/dsb-client-gateway/data
 ```
 
 This will bind the container's `in-memory.json` file to the host filesystem.
