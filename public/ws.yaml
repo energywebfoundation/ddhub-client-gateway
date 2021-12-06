@@ -1,7 +1,7 @@
 asyncapi: '2.1.0'
 info:
   title: DSB Gateway WebSocket API
-  version: 0.5.1
+  version: 0.5.2
   description: The Gateway WebSocket API is an alternative to the REST interface, allowing for real-time messaging (particularly asynchronous responses).
 defaultContentType: application/json
 channels:
