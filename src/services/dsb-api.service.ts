@@ -16,6 +16,7 @@ import {
   DSBForbiddenError,
   DSBChannelNotFoundError,
   DSBChannelUnauthorizedError,
+  isGatewayError,
 } from '../utils'
 import { signProof } from './identity.service'
 import { getCertificate, getEnrolment } from './storage.service'
@@ -339,7 +340,7 @@ export class DsbApiService {
     err: unknown,
     retryFn: () => Promise<Result<T, GatewayError>>
   ): Promise<Result<T, GatewayError>> {
-    if (err instanceof GatewayError) {
+    if (isGatewayError(err)) {
       return { err }
     } else if (err instanceof Error) {
       if (err.message === ErrorCode.DSB_UNAUTHORIZED) {

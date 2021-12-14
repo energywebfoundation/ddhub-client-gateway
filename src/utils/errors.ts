@@ -71,6 +71,10 @@ export type ErrorBodySerialized = {
   additionalInformation?: any
 }
 
+export const isGatewayError = (error: unknown): error is GatewayError => {
+  return (error as GatewayError).statusCode !== undefined
+}
+
 /**
  * Custom Error class with additional user information
  */
@@ -236,12 +240,18 @@ export class DSBHealthError extends GatewayError {
 
 export class DSBPayloadError extends GatewayError {
   constructor(errorMessage: any[]) {
-    const [reason, error] = errorMessage
+    /**
+     * Previous behaviour had the DSB return an array of two items:
+     * string reason + detailed error. This changed at some point (perhaps
+     * due to an update to the schema validation dependency), so we try to
+     * preserve backwards-compat here in case.
+     */
+    const [reason, topicOrError, error] = errorMessage
     super({
       statusCode: HttpError.UNPROCESSABLE_ENTITY,
       code: ErrorCode.DSB_INVALID_PAYLOAD,
       reason,
-      additionalInformation: error
+      additionalInformation: error?.[0] ?? topicOrError
     })
   }
 }
