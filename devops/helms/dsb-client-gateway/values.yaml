@@ -38,3 +38,11 @@ dsb-client-gateway:
       - secretName: dsb-tls-secret
         hosts:
           - dsb-gateway.energyweb.org
+
+  pvc:
+    enabled: false
+    mountPath: /mnt/azure
+
+  probes:
+    liveness: true
+    readiness: true
