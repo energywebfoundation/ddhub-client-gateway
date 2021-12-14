@@ -6,7 +6,7 @@ import {
   client as WsClient,
   connection as WsClientConnection
 } from 'websocket'
-import { GatewayError, Message, SendMessageData, WebSocketClientOptions } from '../utils'
+import { isGatewayError, Message, SendMessageData, WebSocketClientOptions } from '../utils'
 import { isAuthorized } from './auth.service'
 import { DsbApiService } from './dsb-api.service'
 import { signPayload } from './identity.service'
@@ -85,14 +85,36 @@ export class WebSocketServer {
       const connection = req.accept('dsb-messages')
       connection.on('message', async (data) => {
         const message = parseMessage(data)
-        const { ok, err } = await DsbApiService.init().sendMessage(message)
-        if (!ok) {
-          connection.send(
-            JSON.stringify({
-              transactionId: message.transactionId,
-              err: err?.body
-            })
-          )
+        try {
+          const { ok: signature, err: signError } = await signPayload(message.payload)
+          if (!signature) {
+            throw signError
+          }
+          const { ok, err } = await DsbApiService.init().sendMessage({
+            ...message,
+            signature
+          })
+          if (!ok) {
+            throw err
+          }
+        } catch (err) {
+          if (message.transactionId) {
+            if (isGatewayError(err)) {
+              connection.send(
+                JSON.stringify({
+                  transactionId: message.transactionId,
+                  err: err.body
+                })
+              )
+            } else {
+              connection.send(
+                JSON.stringify({
+                  transactionId: message.transactionId,
+                  err: err instanceof Error ? err.message : err
+                })
+              )
+            }
+          }
         }
       })
     })
@@ -186,7 +208,7 @@ export class WebSocketClient {
         }
       } catch (err) {
         if (message.transactionId) {
-          if (err instanceof GatewayError) {
+          if (isGatewayError(err)) {
             this.connection.send(
               JSON.stringify({
                 transactionId: message.transactionId,
