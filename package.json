@@ -1,6 +1,6 @@
 {
   "name": "dsb-client-gateway",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "license": "GPL-3.0-or-later",
   "scripts": {
     "dev:next": "next dev",
