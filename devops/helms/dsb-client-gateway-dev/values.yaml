@@ -17,6 +17,9 @@ dsb-client-gateway:
   nameOverride: "dsb-client-gateway-dev"
   fullnameOverride: "dsb-client-gateway-dev"
 
+  podSecurityContext:
+    fsGroup: 2000
+
   service:
     type: ClusterIP
     port: 80
