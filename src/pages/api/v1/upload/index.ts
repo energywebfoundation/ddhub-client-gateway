@@ -5,7 +5,7 @@ import { ErrorBody, ErrorCode, GatewayError, SendMessageResult, Result, UnknownE
 import { isAuthorized } from '../../../../services/auth.service'
 import { DsbApiService } from '../../../../services/dsb-api.service'
 import { signPayload } from '../../../../services/identity.service'
-import { captureException, withSentry } from '@sentry/nextjs'
+// import { captureException, withSentry } from '@sentry/nextjs'
 const FormData = require('form-data')
 import axios from 'axios'
 import formidable from 'formidable'
@@ -39,7 +39,7 @@ async function forPOST(req: NextApiRequest, res: NextApiResponse<Result<boolean,
 
     const form = new formidable.IncomingForm()
 
-    form['uploadDir'] = __dirname, 'fu/'
+    form['uploadDir'] = __dirname
     form['keepExtensions'] = true
     form.parse(req, async (err, fields, files) => {
       try {
@@ -62,12 +62,12 @@ async function forPOST(req: NextApiRequest, res: NextApiResponse<Result<boolean,
           throw uploadError
         }
 
-        resolve(res.status(200).send({ ok: true }))
+        return resolve(res.status(200).send({ ok: true }))
       }
       catch (err) {
 
         if (err instanceof GatewayError) {
-          res.status(err.statusCode ?? 500).send({ err: err.body })
+          return resolve(res.status(err.statusCode ?? 500).send({ err: err.body }))
         } else {
 
           //@disabling sentry currently 
@@ -78,7 +78,7 @@ async function forPOST(req: NextApiRequest, res: NextApiResponse<Result<boolean,
             captureException(error)
           }*/
 
-          resolve(res.status(500).send({ err: new UnknownError(err).body }))
+          return resolve(res.status(500).send({ err: new UnknownError(err).body }))
         }
       }
     })
@@ -91,4 +91,4 @@ export const config = {
   },
 }
 
-export default withSentry(handler)
+export default handler

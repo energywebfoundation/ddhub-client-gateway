@@ -38,7 +38,7 @@ export const UploadContainer = ({ auth, channels, topics }: UploadContainerProps
       )
 
       const { transactionId } = res.data
-      swal(`Successfully Uploaded`, `File uploaded with transaction ID\n${transactionId}`, 'success')
+      swal(`Successful`, `File uploaded succesfully`, 'success')
     } catch (err) {
       if (axios.isAxiosError(err)) {
         swal('Error', err.response?.data?.err?.reason, 'error')
