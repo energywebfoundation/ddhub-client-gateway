@@ -8,23 +8,24 @@ import { Channel, Topic } from '../../utils'
 
 type UploadProps = {
   channels?: Channel[]
+  topics?: Topic[],
   onUpload: (file: File, channelName: string, topic: string) => void
 }
 
-export const Upload = ({ channels, onUpload }: UploadProps) => {
+export const Upload = ({ channels, topics, onUpload }: UploadProps) => {
   const classes = useStyles()
 
   const [file, setFile] = useState<File>()
   const [fileName, setFileName] = useState('')
   const [topicName, setTopicName] = useState('')
   const [channelName, setChannelName] = useState('')
-  const [topics, setTopics] = useState<Topic[]>()
+  // const [topics, setTopics] = useState<Topic[]>()
 
   useEffect(() => {
-    const channel = channels?.find((channel) => channel.fqcn == channelName)
+    // const channel = channels?.find((channel) => channel.fqcn == channelName)
     setTopicName('')
-    setTopics(channel?.topics ?? [])
-  }, [channelName, channels])
+    // setTopics(topics ?? [])
+  }, [channelName, channels, topics])
 
   const uploadToClient = (event) => {
     if (event.target.files && event.target.files[0]) {
@@ -107,6 +108,9 @@ export const Upload = ({ channels, onUpload }: UploadProps) => {
                 onClick={() => {
                   if (!channelName) {
                     return swal('Error', 'Please enter channel name', 'error')
+                  }
+                  if (!topicName) {
+                    return swal('Error', 'Please enter topic name', 'error')
                   }
                   if (!file) {
                     return swal('Error', 'No file uploaded', 'error')

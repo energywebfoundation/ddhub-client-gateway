@@ -16,13 +16,16 @@ import {
   DSBForbiddenError,
   DSBChannelNotFoundError,
   DSBChannelUnauthorizedError,
+  DSBFileUploadError,
   isGatewayError,
+  Topic
 } from '../utils'
 import { signProof } from './identity.service'
 import { getCertificate, getEnrolment } from './storage.service'
 import { captureMessage } from '@sentry/nextjs'
 import { Agent } from 'https'
 import axios, { AxiosInstance } from 'axios'
+const FormData = require('form-data')
 
 export class DsbApiService {
   private static instance?: DsbApiService
@@ -65,10 +68,12 @@ export class DsbApiService {
   public async getHealth(): Promise<Result> {
     await this.useTLS()
     try {
-      const res = await this.api.get('/health', { httpsAgent: this.httpsAgent })
+      const res = await this.api.get('/q/health', { httpsAgent: this.httpsAgent })
+
       if (res.status === 200) {
-        const data: { status: 'ok' | 'error'; error: any } = res.data
-        if (data.status !== 'ok') {
+        const data: { status: 'UP' | 'error'; error: any } = res.data
+
+        if (data.status !== 'UP') {
           return { err: new DSBHealthError(data.error) }
         }
         return { ok: true }
@@ -141,6 +146,56 @@ export class DsbApiService {
     }
   }
 
+
+
+  public async uploadFile(fileData: FormData, headers): Promise<Result> {
+
+
+    // await this.useTLS()
+    try {
+      // commenting Authentication temporarily
+
+      // if (!this.authToken) {
+      //   throw Error(ErrorCode.DSB_UNAUTHORIZED)
+      // }
+
+      const res = await this.api.post('/message/upload', fileData, {
+        maxContentLength: Infinity,
+        maxBodyLength: Infinity,
+        headers: headers
+      })
+
+
+      if (res.status === 200) {
+        const data: {
+          returnCode: '00' | 'error'; error: any
+          returnMessage: 'Success'
+        } = res.data
+
+        if (data.returnCode !== '00' || data.returnMessage !== 'Success') {
+          return { err: new DSBFileUploadError(data) }
+        }
+        return { ok: true }
+      }
+
+      return {
+        err: new DSBForbiddenError(`Cannot access message broker: ${res.status} - ${res.data}`)
+      }
+
+    } catch (err) {
+      console.log('err', err)
+      return {
+        err: new DSBRequestError(err instanceof Error ? err.message : (err as any))
+      }
+    }
+
+  }
+
+
+
+
+
+
   public async getMessages(options: GetMessageOptions): Promise<Result<Message[]>> {
     await this.useTLS()
     try {
@@ -205,17 +260,22 @@ export class DsbApiService {
    * @returns list of channels
    */
   public async getChannels(): Promise<Result<Channel[]>> {
+
     await this.useTLS()
     try {
-      if (!this.authToken) {
-        throw Error(ErrorCode.DSB_UNAUTHORIZED)
-      }
+      // comenting Authentication temporarily
+
+      // if (!this.authToken) {
+      //   throw Error(ErrorCode.DSB_UNAUTHORIZED)
+      // }
+
       const res = await this.api.get('/channel/pubsub', {
         httpsAgent: this.httpsAgent,
-        headers: {
-          Authorization: `Bearer ${this.authToken}`
-        }
+        // headers: {
+        //   Authorization: `Bearer ${this.authToken}`
+        // }
       })
+
       switch (res.status) {
         case 200:
           return { ok: res.data }
@@ -228,6 +288,38 @@ export class DsbApiService {
       }
     } catch (err) {
       return this.handleError(err, async () => this.getChannels())
+    }
+  }
+
+  public async getTopics(): Promise<Result<Topic[]>> {
+
+    await this.useTLS()
+    try {
+      // comenting Authentication temporarily
+
+      // if (!this.authToken) {
+      //   throw Error(ErrorCode.DSB_UNAUTHORIZED)
+      // }
+
+      const res = await this.api.get('/topic/list', {
+        httpsAgent: this.httpsAgent,
+        // headers: {
+        //   Authorization: `Bearer ${this.authToken}`
+        // }
+      })
+
+      switch (res.status) {
+        case 200:
+          return { ok: res.data }
+        case 401:
+          throw Error(ErrorCode.DSB_UNAUTHORIZED)
+        case 403:
+          throw new DSBForbiddenError(`Must be enroled as a DSB user to access messages`)
+        default:
+          throw new DSBRequestError(`${res.status} ${res.statusText}`)
+      }
+    } catch (err) {
+      return this.handleError(err, async () => this.getTopics())
     }
   }
 

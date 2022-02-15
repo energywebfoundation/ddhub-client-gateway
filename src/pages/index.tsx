@@ -13,7 +13,7 @@ import { isAuthorized } from '../services/auth.service'
 import { ErrorBodySerialized, ErrorCode, Option, Result, serializeError, Storage } from '../utils'
 
 type Props = {
-  health: Result<boolean, ErrorBodySerialized>
+  // health: Result<boolean, ErrorBodySerialized>
   state: Result<Storage, ErrorBodySerialized>
   auth: Option<string>
 }
@@ -24,11 +24,11 @@ export async function getServerSideProps(context: GetServerSidePropsContext): Pr
   const authHeader = context.req.headers.authorization
   const { err } = isAuthorized(authHeader)
   if (!err) {
-    const health = await DsbApiService.init().getHealth()
+    // const health = await DsbApiService.init().getHealth()
     const state = await refreshState()
     return {
       props: {
-        health: serializeError(health),
+        // health: serializeError(health),
         state: serializeError(state), // todo: remove private data
         auth: authHeader ? { some: authHeader } : { none: true }
       }
@@ -40,7 +40,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext): Pr
     }
     return {
       props: {
-        health: {},
+        // health: {},
         state: {},
         auth: { none: true }
       }
@@ -48,14 +48,14 @@ export async function getServerSideProps(context: GetServerSidePropsContext): Pr
   }
 }
 
-export default function Home({ health, state, auth }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function Home({ state, auth }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const classes = useStyles()
 
   useEffect(() => {
-    if (health.err) {
-      swal('Error', health.err.reason, 'error')
-    }
-  }, [health, state])
+    // if (health.err) {
+    //   swal('Error', health.err.reason, 'error')
+    // }
+  }, [state])
 
   return (
     <div>
@@ -69,12 +69,12 @@ export default function Home({ health, state, auth }: InferGetServerSidePropsTyp
         <Header />
 
         <Container maxWidth="md">
-          <section className={classes.connectionStatus}>
+          {/* <section className={classes.connectionStatus}>
             <Typography variant="h4">Connection Status </Typography>
             <Typography variant="caption" className={classes.connectionStatusPaper}>
               {health.ok ? 'ONLINE' : `ERROR [${health.err?.code}]`}
             </Typography>
-          </section>
+          </section> */}
 
           <Divider className={classes.divider} />
 
