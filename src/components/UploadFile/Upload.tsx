@@ -9,7 +9,7 @@ import { Channel, Topic } from '../../utils'
 type UploadProps = {
   channels?: Channel[]
   topics?: Topic[],
-  onUpload: (file: File, channelName: string, topic: string) => void
+  onUpload: (file: File, channelName: string, topic: Topic) => void
 }
 
 export const Upload = ({ channels, topics, onUpload }: UploadProps) => {
@@ -115,7 +115,15 @@ export const Upload = ({ channels, topics, onUpload }: UploadProps) => {
                   if (!file) {
                     return swal('Error', 'No file uploaded', 'error')
                   }
-                  onUpload(file, channelName, topicName)
+
+
+                  let selectedTopic = topics?.find((topic) => topic.namespace === topicName)
+
+                  if (!selectedTopic) {
+                    return swal('Error', 'No topic id for the selected topic', 'error')
+                  }
+
+                  onUpload(file, channelName, selectedTopic)
                 }}
               >
                 Upload

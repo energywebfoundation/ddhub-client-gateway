@@ -7,9 +7,8 @@ import { DsbApiService } from '../../../../services/dsb-api.service'
 import { signPayload } from '../../../../services/identity.service'
 // import { captureException, withSentry } from '@sentry/nextjs'
 const FormData = require('form-data')
-import axios from 'axios'
+
 import formidable from 'formidable'
-import { headers } from 'nats.ws'
 const fs = require('fs')
 
 type Response = ({ transactionId: string }) | { err: ErrorBody }

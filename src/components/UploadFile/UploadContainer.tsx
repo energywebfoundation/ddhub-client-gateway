@@ -14,7 +14,7 @@ type UploadContainerProps = {
 export const UploadContainer = ({ auth, channels, topics }: UploadContainerProps) => {
   const [isLoading, setIsLoading] = useState(false)
 
-  const handleUpload = async (file: File, fqcn: string, topic: string) => {
+  const handleUpload = async (file: File, fqcn: string, topic: Topic) => {
     setIsLoading(true)
 
 
@@ -23,11 +23,11 @@ export const UploadContainer = ({ auth, channels, topics }: UploadContainerProps
     formData.append('fileName', file.name)
     formData.append('fqcn', fqcn)
     formData.append('signature', 'ssss')
-    formData.append('topicId', '6205d2affce4e863261e529a')
+    formData.append('topicId', topic.id)
 
     try {
       const res = await axios.post(
-        `/api/v1/upload?fqcn=${fqcn}&topic=${topic}`,
+        `/api/v1/upload`,
         formData,
         {
           headers: {
@@ -37,7 +37,6 @@ export const UploadContainer = ({ auth, channels, topics }: UploadContainerProps
         }
       )
 
-      const { transactionId } = res.data
       swal(`Successful`, `File uploaded succesfully`, 'success')
     } catch (err) {
       if (axios.isAxiosError(err)) {
