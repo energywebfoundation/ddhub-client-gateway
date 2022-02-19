@@ -84,10 +84,5 @@ async function forPOST(req: NextApiRequest, res: NextApiResponse<Result<boolean,
   })
 }
 
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-}
 
 export default handler

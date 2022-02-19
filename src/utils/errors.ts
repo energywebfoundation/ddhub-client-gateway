@@ -250,6 +250,17 @@ export class DSBFileUploadError extends GatewayError {
   }
 }
 
+export class DSBFileDownloadError extends GatewayError {
+  constructor(error: any) {
+    super({
+      statusCode: HttpError.UNPROCESSABLE_ENTITY,
+      code: error.returnCode,
+      reason: error.returnMessage,
+      // additionalInformation: error
+    })
+  }
+}
+
 export class DSBPayloadError extends GatewayError {
   constructor(errorMessage: any[]) {
     /**

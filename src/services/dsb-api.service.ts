@@ -17,6 +17,7 @@ import {
   DSBChannelNotFoundError,
   DSBChannelUnauthorizedError,
   DSBFileUploadError,
+  DSBFileDownloadError,
   isGatewayError,
   Topic
 } from '../utils'
@@ -68,7 +69,7 @@ export class DsbApiService {
   public async getHealth(): Promise<Result> {
     await this.useTLS()
     try {
-      const res = await this.api.get('/q/health', { httpsAgent: this.httpsAgent })
+      const res = await this.api.get('/health', { httpsAgent: this.httpsAgent })
 
       if (res.status === 200) {
         const data: { status: 'UP' | 'error'; error: any } = res.data
@@ -150,15 +151,7 @@ export class DsbApiService {
 
   public async uploadFile(fileData: FormData, headers): Promise<Result> {
 
-
-    // await this.useTLS()
     try {
-      // commenting Authentication temporarily
-
-      // if (!this.authToken) {
-      //   throw Error(ErrorCode.DSB_UNAUTHORIZED)
-      // }
-
       const res = await this.api.post('/message/upload', fileData, {
         maxContentLength: Infinity,
         maxBodyLength: Infinity,
@@ -192,9 +185,37 @@ export class DsbApiService {
   }
 
 
+  public async downloadFile(fileId: string): Promise<Result<string>> {
 
+    console.log('dsb service called')
 
+    try {
+      const res = await this.api.get(`/message/download?fileId=${fileId}`)
 
+      if (res.status === 200) {
+        const data: {
+          returnCode: '00' | 'error'; error: any
+          returnMessage: 'Success'
+        } = res.data
+
+        if (data.returnCode !== '00' || data.returnMessage !== 'Success') {
+          return { err: new DSBFileDownloadError(data) }
+        }
+        return { ok: res.data }
+      }
+
+      return {
+        err: new DSBForbiddenError(`Cannot access message broker: ${res.status} - ${res.data}`)
+      }
+
+    } catch (err) {
+      console.log('err', err)
+      return {
+        err: new DSBRequestError(err instanceof Error ? err.message : (err as any))
+      }
+    }
+
+  }
 
   public async getMessages(options: GetMessageOptions): Promise<Result<Message[]>> {
     await this.useTLS()
@@ -263,17 +284,8 @@ export class DsbApiService {
 
     await this.useTLS()
     try {
-      // comenting Authentication temporarily
-
-      // if (!this.authToken) {
-      //   throw Error(ErrorCode.DSB_UNAUTHORIZED)
-      // }
-
       const res = await this.api.get('/channel/pubsub', {
-        httpsAgent: this.httpsAgent,
-        // headers: {
-        //   Authorization: `Bearer ${this.authToken}`
-        // }
+        httpsAgent: this.httpsAgent
       })
 
       switch (res.status) {
@@ -295,17 +307,8 @@ export class DsbApiService {
 
     await this.useTLS()
     try {
-      // comenting Authentication temporarily
-
-      // if (!this.authToken) {
-      //   throw Error(ErrorCode.DSB_UNAUTHORIZED)
-      // }
-
       const res = await this.api.get('/topic/list', {
         httpsAgent: this.httpsAgent,
-        // headers: {
-        //   Authorization: `Bearer ${this.authToken}`
-        // }
       })
 
       switch (res.status) {

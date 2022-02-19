@@ -19,12 +19,10 @@ export const Upload = ({ channels, topics, onUpload }: UploadProps) => {
   const [fileName, setFileName] = useState('')
   const [topicName, setTopicName] = useState('')
   const [channelName, setChannelName] = useState('')
-  // const [topics, setTopics] = useState<Topic[]>()
+
 
   useEffect(() => {
-    // const channel = channels?.find((channel) => channel.fqcn == channelName)
     setTopicName('')
-    // setTopics(topics ?? [])
   }, [channelName, channels, topics])
 
   const uploadToClient = (event) => {
