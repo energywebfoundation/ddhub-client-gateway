@@ -1,1 +1,18 @@
-{}
+{
+  "identity": {
+    "address": "0xfd6b809B81cAEbc3EAB0d33f0211E5934621b2D2",
+    "publicKey": "0x04418680d619402b8e37664dff03126c37fca41f6b08e90885a81da0cd39101a57652c5bda0b8805b3350a2a108278b5a61e651c1bed28e48a0a08690870af98ed",
+    "balance": "OK",
+    "privateKey": "0xa25d4be1fd85328bdcaed0b0b9298b94e86dc2890b3ad91177d1931d00ea630a"
+  },
+  "enrolment": {
+    "state": {
+      "approved": false,
+      "waiting": false,
+      "roles": {
+        "user": "NO_CLAIM"
+      }
+    },
+    "did": "did:ethr:0xfd6b809B81cAEbc3EAB0d33f0211E5934621b2D2"
+  }
+}

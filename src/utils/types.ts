@@ -1,4 +1,5 @@
 import { GatewayError } from './errors'
+const FormData = require('form-data')
 
 export type Result<T = boolean, E = GatewayError> = {
   ok?: T
@@ -83,8 +84,11 @@ export type Channel = {
 }
 
 export type Topic = {
+  id: string
   namespace: string
   schema: object | string
+  schemaType: string
+  version: string
 }
 
 export enum RoleState {
@@ -134,6 +138,7 @@ export enum EventEmitMode {
   SINGLE = 'SINGLE',
   BULK = 'BULK'
 }
+
 
 export type EnrolmentManager = {
   /**

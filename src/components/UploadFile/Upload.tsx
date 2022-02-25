@@ -8,23 +8,22 @@ import { Channel, Topic } from '../../utils'
 
 type UploadProps = {
   channels?: Channel[]
-  onUpload: (file: File, channelName: string, topic: string) => void
+  topics?: Topic[],
+  onUpload: (file: File, channelName: string, topic: Topic) => void
 }
 
-export const Upload = ({ channels, onUpload }: UploadProps) => {
+export const Upload = ({ channels, topics, onUpload }: UploadProps) => {
   const classes = useStyles()
 
   const [file, setFile] = useState<File>()
   const [fileName, setFileName] = useState('')
   const [topicName, setTopicName] = useState('')
   const [channelName, setChannelName] = useState('')
-  const [topics, setTopics] = useState<Topic[]>()
+
 
   useEffect(() => {
-    const channel = channels?.find((channel) => channel.fqcn == channelName)
     setTopicName('')
-    setTopics(channel?.topics ?? [])
-  }, [channelName, channels])
+  }, [channelName, channels, topics])
 
   const uploadToClient = (event) => {
     if (event.target.files && event.target.files[0]) {
@@ -108,10 +107,21 @@ export const Upload = ({ channels, onUpload }: UploadProps) => {
                   if (!channelName) {
                     return swal('Error', 'Please enter channel name', 'error')
                   }
+                  if (!topicName) {
+                    return swal('Error', 'Please enter topic name', 'error')
+                  }
                   if (!file) {
                     return swal('Error', 'No file uploaded', 'error')
                   }
-                  onUpload(file, channelName, topicName)
+
+
+                  let selectedTopic = topics?.find((topic) => topic.namespace === topicName)
+
+                  if (!selectedTopic) {
+                    return swal('Error', 'No topic id for the selected topic', 'error')
+                  }
+
+                  onUpload(file, channelName, selectedTopic)
                 }}
               >
                 Upload

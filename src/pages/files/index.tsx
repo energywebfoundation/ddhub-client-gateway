@@ -9,11 +9,12 @@ import Header from '../../components/Header/Header'
 import { DownloadContainer } from '../../components/DownloadFile/DownloadContainer'
 import { DsbApiService } from '../../services/dsb-api.service'
 import { isAuthorized } from '../../services/auth.service'
-import { ErrorCode, Result, serializeError, Channel, Option, ErrorBodySerialized } from '../../utils'
+import { ErrorCode, Result, serializeError, Channel, Option, ErrorBodySerialized, Topic } from '../../utils'
 
 type Props = {
   health: Result<boolean, ErrorBodySerialized>
   channels: Result<Channel[], ErrorBodySerialized>
+  topics: Result<Topic[], ErrorBodySerialized>
   auth: Option<string>
 }
 
@@ -25,10 +26,13 @@ export async function getServerSideProps(context: GetServerSidePropsContext): Pr
   if (!err) {
     const health = await DsbApiService.init().getHealth()
     const channels = await DsbApiService.init().getChannels()
+    const topics = await DsbApiService.init().getTopics()
+
     return {
       props: {
         health: serializeError(health),
         channels: serializeError(channels),
+        topics: serializeError(topics),
         auth: authHeader ? { some: authHeader } : { none: true }
       }
     }
@@ -43,13 +47,15 @@ export async function getServerSideProps(context: GetServerSidePropsContext): Pr
       props: {
         health: {},
         channels: {},
+        topics: {},
         auth: { none: true }
       }
     }
   }
 }
 
-export default function FileUpload({ health, channels, auth }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function FileUpload({ health, channels, topics, auth }:
+  InferGetServerSidePropsType<typeof getServerSideProps>) {
   const classes = useStyles()
 
   useEffect(() => {
@@ -57,9 +63,16 @@ export default function FileUpload({ health, channels, auth }: InferGetServerSid
       return swal('Error', health.err.reason, 'error')
     }
     if (channels.err) {
+      console.log('channels.err', channels.err)
       return swal('Error', channels.err.reason, 'error')
     }
-  }, [health, channels])
+
+    if (topics.err) {
+      console.log('channels.err', channels.err)
+      return swal('Error', topics.err.reason, 'error')
+    }
+
+  }, [health, channels, topics])
 
   return (
     <div>
@@ -86,7 +99,7 @@ export default function FileUpload({ health, channels, auth }: InferGetServerSid
             <Typography className={classes.textWhite} variant="h4">
               File Upload{' '}
             </Typography>
-            <UploadContainer auth={auth.some} channels={channels.ok} />
+            <UploadContainer auth={auth.some} channels={channels.ok} topics={topics.ok} />
           </section>
 
           <Divider className={classes.divider} />
