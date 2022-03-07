@@ -14,11 +14,13 @@ import { TerminusModule } from '@nestjs/terminus';
 import { HealthController } from './modules/health/health.controller';
 import { ScheduleModule } from '@nestjs/schedule';
 import { UtilsModule } from './modules/utils/utils.module';
+import { configValidate } from './modules/utils/config.validate';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      validate: configValidate,
     }),
     MulterModule.register({
       dest: './files',

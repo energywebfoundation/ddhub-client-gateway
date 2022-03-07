@@ -5,37 +5,49 @@ import {
   ClaimsService,
   DidRegistry,
   initWithPrivateKeySigner,
-  setCacheConfig, setChainConfig,
-  SignerService
+  setCacheConfig,
+  setChainConfig,
+  SignerService,
 } from 'iam-client-lib';
 
 @Injectable()
 export class IamFactoryService {
   public async initialize(
     privateKey: string,
-    configService: ConfigService,
+    configService: ConfigService
   ): Promise<{
-    cacheClient: CacheClient,
-    didRegistry: DidRegistry,
-    claimsService: ClaimsService,
-    signerService: SignerService,
+    cacheClient: CacheClient;
+    didRegistry: DidRegistry;
+    claimsService: ClaimsService;
+    signerService: SignerService;
   }> {
     const chainId = configService.get<number>('CHAIN_ID', 73799);
-    const rpcUrl = configService.get<string>('RPC_URL', 'https://volta-rpc.energyweb.org/');
-    const cacheServerUrl = configService.get<string>('CACHE_SERVER_URL', 'https://identitycache-dev.energyweb.org/v1');
+    const rpcUrl = configService.get<string>(
+      'RPC_URL',
+      'https://volta-rpc.energyweb.org/'
+    );
+    const cacheServerUrl = configService.get<string>(
+      'CACHE_SERVER_URL',
+      'https://identitycache-dev.energyweb.org/v1'
+    );
 
-    const { connectToCacheServer, signerService } = await initWithPrivateKeySigner(privateKey, rpcUrl);
+    const { connectToCacheServer, signerService } =
+      await initWithPrivateKeySigner(privateKey, rpcUrl);
 
     setChainConfig(73799, {
-      claimManagerAddress: '0x5339adE9332A604A1c957B9bC1C6eee0Bcf7a031'
-    })
+      claimManagerAddress: configService.get<string>(
+        'CLAIM_MANAGER_ADDRESS',
+        '0x5339adE9332A604A1c957B9bC1C6eee0Bcf7a031'
+      ),
+    });
 
     setCacheConfig(chainId, {
-      url: cacheServerUrl
+      url: cacheServerUrl,
     });
 
     try {
-      const { cacheClient, connectToDidRegistry } = await connectToCacheServer();
+      const { cacheClient, connectToDidRegistry } =
+        await connectToCacheServer();
 
       const { claimsService, didRegistry } = await connectToDidRegistry();
 

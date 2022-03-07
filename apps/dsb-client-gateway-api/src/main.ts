@@ -9,6 +9,7 @@ import { WsAdapter } from '@nestjs/platform-ws';
 
 import { AppModule } from './app/app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -19,6 +20,8 @@ async function bootstrap() {
 
   app.setGlobalPrefix(globalPrefix);
   app.useGlobalPipes(new ValidationPipe());
+
+  const configService = app.get<ConfigService>(ConfigService);
 
   const config = new DocumentBuilder()
     .setTitle('DSB Client Gateway')
@@ -31,7 +34,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);
 
-  const port = process.env.PORT || 3333;
+  const port = configService.get<number>('PORT');
 
   await app.listen(port);
 
