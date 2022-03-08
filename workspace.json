@@ -2,6 +2,7 @@
   "version": 2,
   "projects": {
     "dsb-client-gateway-api": "apps/dsb-client-gateway-api",
+    "dsb-client-gateway-errors": "libs/dsb-client-gateway-errors",
     "dsb-client-gateway-frontend": "apps/dsb-client-gateway-frontend",
     "dsb-client-gateway-frontend-e2e": "apps/dsb-client-gateway-frontend-e2e"
   }

@@ -1,21 +1,25 @@
-import { useEffect, useState } from 'react'
-import { Button, makeStyles, Theme, Tooltip, Typography } from '@material-ui/core'
-import InfoIcon from '@material-ui/icons/Info'
-import swal from 'sweetalert'
-import { CustomInput } from '../../components/CustomInput/CustomInput'
-import { EnrolmentState, snip, StringType } from '../../utils'
-
+import { useEffect, useState } from 'react';
+import {
+  Button,
+  makeStyles,
+  Theme,
+  Tooltip,
+  Typography,
+} from '@material-ui/core';
+import InfoIcon from '@material-ui/icons/Info';
+import { CustomInput } from '../../components/CustomInput/CustomInput';
+import { EnrolmentState, snip, StringType } from '../../utils';
 
 type GatewayIdentityProps = {
-  did?: string
-  address: string
-  balance?: boolean
-  enroled?: EnrolmentState
-  isLoading: boolean
-  onCreate: (privateKey?: string) => void
-  onEnrol: () => void
-  onKeyCreate: () => void
-}
+  did?: string;
+  address: string;
+  balance?: boolean;
+  enroled?: EnrolmentState;
+  isLoading: boolean;
+  onCreate: (privateKey?: string) => void;
+  onEnrol: () => void;
+  onKeyCreate: () => void;
+};
 
 export const GatewayIdentity = ({
   did,
@@ -25,31 +29,31 @@ export const GatewayIdentity = ({
   isLoading,
   onCreate,
   onEnrol,
-  onKeyCreate
+  onKeyCreate,
 }: GatewayIdentityProps) => {
-  const classes = useStyles()
-  const [privateKey, setPrivatekey] = useState('')
-  const [statusText, setStatusText] = useState('')
-  const [showEnrolButton, setShowEnrolButton] = useState(false)
+  const classes = useStyles();
+  const [privateKey, setPrivatekey] = useState('');
+  const [statusText, setStatusText] = useState('');
+  const [showEnrolButton, setShowEnrolButton] = useState(false);
 
   useEffect(() => {
     if (enroled?.approved) {
-      setShowEnrolButton(false)
-      return setStatusText('Enrolment complete')
+      setShowEnrolButton(false);
+      return setStatusText('Enrolment complete');
     }
     if (enroled?.waiting) {
-      setShowEnrolButton(false)
-      return setStatusText('Awaiting approval')
+      setShowEnrolButton(false);
+      return setStatusText('Awaiting approval');
     }
     if (address && !did) {
-      setShowEnrolButton(true)
+      setShowEnrolButton(true);
       if (!balance) {
-        return setStatusText('Funds required')
+        return setStatusText('Funds required');
       } else {
-        return setStatusText('Ready to enrol')
+        return setStatusText('Ready to enrol');
       }
     }
-  }, [did, address, balance, enroled])
+  }, [did, address, balance, enroled]);
 
   return (
     <div className={classes.credentials}>
@@ -81,7 +85,11 @@ export const GatewayIdentity = ({
 
         <div className={classes.formGroup}>
           <Typography variant="caption">PRIVATE KEY</Typography>
-          <CustomInput fullWidth value={privateKey} onChange={(e) => setPrivatekey(e.target.value)} />
+          <CustomInput
+            fullWidth
+            value={privateKey}
+            onChange={(e) => setPrivatekey(e.target.value)}
+          />
         </div>
       </div>
       <div className={classes.buttonGroup}>
@@ -103,8 +111,8 @@ export const GatewayIdentity = ({
           fullWidth
           disabled={isLoading}
           onClick={() => {
-            setPrivatekey('')
-            onCreate()
+            setPrivatekey('');
+            onCreate();
           }}
         >
           Generate Keys
@@ -114,26 +122,14 @@ export const GatewayIdentity = ({
           color="secondary"
           fullWidth
           disabled={isLoading}
-          onClick={() => {
-            setPrivatekey('')
-            onCreate()
-          }}
-        >
-          Derive Encryption Keys
-        </Button>
-        <Button
-          variant="outlined"
-          color="secondary"
-          fullWidth
-          disabled={isLoading}
-          onClick={() => onKeyCreate()}
+          onClick={() => onCreate()}
         >
           Save private key
         </Button>
       </div>
     </div>
-  )
-}
+  );
+};
 
 const useStyles = makeStyles((theme: Theme) => ({
   credentials: {
@@ -142,21 +138,21 @@ const useStyles = makeStyles((theme: Theme) => ({
     height: '550px',
     display: 'flex',
     flexDirection: 'column',
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
   },
   credentialsHeader: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
     color: '#fff',
-    marginBottom: '1rem'
+    marginBottom: '1rem',
   },
   description: {
     margin: '1rem 0',
-    color: '#ccc'
+    color: '#ccc',
   },
   id: {
-    fontSize: '.9rem'
+    fontSize: '.9rem',
   },
   formGroup: {
     display: 'flex',
@@ -166,21 +162,21 @@ const useStyles = makeStyles((theme: Theme) => ({
 
     '& span': {
       fontSize: '.8rem',
-      marginBottom: '.3rem'
+      marginBottom: '.3rem',
     },
     '& *': {
-      color: '#fff'
+      color: '#fff',
     },
     '& input': {
-      width: '100%'
-    }
+      width: '100%',
+    },
   },
   buttonGroup: {
     marginTop: '1rem',
 
     '& button': {
       padding: '.7rem',
-      marginBottom: '1rem'
-    }
-  }
-}))
+      marginBottom: '1rem',
+    },
+  },
+}));

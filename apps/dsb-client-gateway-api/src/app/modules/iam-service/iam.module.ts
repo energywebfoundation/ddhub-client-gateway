@@ -5,6 +5,6 @@ import { IamService } from './service/iam.service';
 @Global()
 @Module({
   providers: [IamFactoryService, IamService],
-  exports: [IamService]
+  exports: [IamService],
 })
 export class IamModule {}

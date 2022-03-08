@@ -6,7 +6,7 @@ import {
   DIDAttribute,
   DidRegistry,
   RegistrationTypes,
-  SignerService
+  SignerService,
 } from 'iam-client-lib';
 import { IamFactoryService } from './iam-factory.service';
 import { ConfigService } from '@nestjs/config';
@@ -25,8 +25,7 @@ export class IamService {
   constructor(
     protected readonly iamFactoryService: IamFactoryService,
     protected readonly configService: ConfigService
-  ) {
-  }
+  ) {}
 
   public async setVerificationMethod(
     publicKey: string,
@@ -43,18 +42,16 @@ export class IamService {
           type: KeyType.Secp256k1,
           tag,
           publicKey,
-        }
-      }
-    })
+        },
+      },
+    });
   }
 
-  public async setup(
-    privateKey: string
-  ) {
-    const { cacheClient, didRegistry, signerService, claimsService } = await this.iamFactoryService.initialize(
-      privateKey,
-      this.configService
-    );
+  public async setup(privateKey: string) {
+    this.logger.log('Initializing IAM connection');
+
+    const { cacheClient, didRegistry, signerService, claimsService } =
+      await this.iamFactoryService.initialize(privateKey, this.configService);
 
     this.cacheClient = cacheClient;
     this.didRegistry = didRegistry;
@@ -66,21 +63,26 @@ export class IamService {
     return this.claimsService.getClaimById(id);
   }
 
-  public getClaimsByRequester(did: string, namespace: string): Promise<Claim[]> {
+  public getClaimsByRequester(
+    did: string,
+    namespace: string
+  ): Promise<Claim[]> {
     return this.cacheClient.getClaimsByRequester(did, {
-      namespace
+      namespace,
     });
   }
 
-  public async decodeJWTToken(token: string): Promise<{ [key: string]: Claim }> {
+  public async decodeJWTToken(
+    token: string
+  ): Promise<{ [key: string]: Claim }> {
     return (await this.didRegistry.decodeJWTToken({
-      token
+      token,
     })) as Promise<{ [key: string]: Claim }>;
   }
 
   public async publishPublicClaim(token: string): Promise<void> {
     await this.claimsService.publishPublicClaim({
-      token
+      token,
     });
   }
 
@@ -89,16 +91,19 @@ export class IamService {
       claim: {
         claimType: claim,
         claimTypeVersion: 1,
-        fields: []
+        fields: [],
       },
-      registrationTypes: [RegistrationTypes.OnChain, RegistrationTypes.OffChain]
+      registrationTypes: [
+        RegistrationTypes.OnChain,
+        RegistrationTypes.OffChain,
+      ],
     });
   }
 
   public getDid(did?: string, includeClaims = false) {
     return this.didRegistry.getDidDocument({
       did,
-      includeClaims
+      includeClaims,
     });
   }
 

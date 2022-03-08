@@ -1,12 +1,16 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { CertificateDetails, EncryptionKeys, SecretsEngineService } from '../secrets-engine.interface';
+import {
+  CertificateDetails,
+  EncryptionKeys,
+  SecretsEngineService,
+} from '../secrets-engine.interface';
 import { ConfigService } from '@nestjs/config';
 import nv from 'node-vault';
 
 enum PATHS {
   IDENTITY_PRIVATE_KEY = 'dsb/identity/privateKey',
   CERTIFICATE = 'dsb/certificate',
-  KEYS = 'dsb/keys'
+  KEYS = 'dsb/keys',
 }
 
 @Injectable()
@@ -15,9 +19,7 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
 
   protected client: nv.client;
 
-  constructor(
-    protected readonly configService: ConfigService
-  ) {
+  constructor(protected readonly configService: ConfigService) {
     super();
   }
 
@@ -25,7 +27,7 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
     this.client = nv({
       apiVersion: 'v1',
       endpoint: this.configService.get('VAULT_ENDPOINT'),
-      token: this.configService.get('VAULT_TOKEN', 'root')
+      token: this.configService.get('VAULT_TOKEN', 'root'),
     });
 
     const { initialized } = await this.client.initialized();
@@ -38,14 +40,17 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
 
     await this.client.init({
       secret_shares: 1,
-      secret_threshold: 1
+      secret_threshold: 1,
     });
 
     this.logger.log('VAULT connection initialized');
   }
 
   public async getCertificateDetails(): Promise<CertificateDetails> {
-    return this.client.read(PATHS.CERTIFICATE)
+    this.logger.log('Retrieving certificate');
+
+    return this.client
+      .read(PATHS.CERTIFICATE)
       .then(({ data }) => data)
       .catch((err) => {
         this.logger.error(err.message);
@@ -55,7 +60,8 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
   }
 
   public async getEncryptionKeys(): Promise<EncryptionKeys | null> {
-    return this.client.read(PATHS.KEYS)
+    return this.client
+      .read(PATHS.KEYS)
       .then(({ data }) => data)
       .catch((err) => {
         this.logger.error(err.message);
@@ -67,7 +73,8 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
   public async getPrivateKey(): Promise<string> {
     this.logger.log('Retrieving private key');
 
-    return this.client.read(PATHS.IDENTITY_PRIVATE_KEY)
+    return this.client
+      .read(PATHS.IDENTITY_PRIVATE_KEY)
       .then(({ data }) => data.key)
       .catch((err) => {
         this.logger.error(err.message);
@@ -78,7 +85,9 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
       });
   }
 
-  public async setCertificateDetails(certificateDetails: CertificateDetails): Promise<void> {
+  public async setCertificateDetails(
+    certificateDetails: CertificateDetails
+  ): Promise<void> {
     await this.client.write(PATHS.CERTIFICATE, certificateDetails);
 
     this.logger.log('Writing certificate');

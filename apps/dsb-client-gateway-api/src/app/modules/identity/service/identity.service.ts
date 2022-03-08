@@ -4,6 +4,7 @@ import { StorageService } from '../../storage/service/storage.service';
 import { Identity } from '../../storage/storage.interface';
 import { IamService } from '../../iam-service/service/iam.service';
 import { SecretsEngineService } from '../../secrets-engine/secrets-engine.interface';
+import { NoPrivateKeyException } from '../../storage/exceptions/no-private-key.exception';
 
 @Injectable()
 export class IdentityService {
@@ -15,7 +16,11 @@ export class IdentityService {
   ) {}
 
   public async getIdentity(): Promise<Identity> {
-    const identity = this.storageService.getIdentity();
+    const identity: Identity | null = this.storageService.getIdentity();
+
+    if (!identity) {
+      throw new NoPrivateKeyException();
+    }
 
     const balanceState = await this.ethersService.getBalance(identity.address);
 

@@ -41,8 +41,6 @@ export async function getServerSideProps(
     const channels = await DsbApiService.init().getChannels();
     const topics = await DsbApiService.init().getTopics();
 
-    console.log(health, channels);
-
     return {
       props: {
         health: serializeError(health),

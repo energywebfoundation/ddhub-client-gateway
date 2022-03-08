@@ -4,7 +4,7 @@ import { Enrolment, Identity } from '../storage.interface';
 
 enum COLLECTIONS {
   IDENTITY = 'identity',
-  ENROLMENT = 'enrolment'
+  ENROLMENT = 'enrolment',
 }
 
 @Injectable()
@@ -26,7 +26,7 @@ export class StorageService {
     this.removeEnrolment();
 
     this.client.getCollection(COLLECTIONS.ENROLMENT).insert({
-      value: enrolment
+      value: enrolment,
     });
 
     this.logger.log('Stored enrolment');
@@ -37,9 +37,11 @@ export class StorageService {
 
     this.createCollectionIfNotExists(COLLECTIONS.ENROLMENT);
 
-    const results = this.client.getCollection(COLLECTIONS.ENROLMENT).find()
+    const results = this.client.getCollection(COLLECTIONS.ENROLMENT).find();
 
-    results.forEach((result) => this.client.getCollection(COLLECTIONS.ENROLMENT).remove(result));
+    results.forEach((result) =>
+      this.client.getCollection(COLLECTIONS.ENROLMENT).remove(result)
+    );
   }
 
   public getEnrolment(): Enrolment | null {
@@ -47,7 +49,7 @@ export class StorageService {
 
     const results = this.client.getCollection(COLLECTIONS.ENROLMENT).find();
 
-    if(results.length) {
+    if (results.length) {
       return results[0].value as any;
     }
 
@@ -59,7 +61,7 @@ export class StorageService {
 
     const results = this.client.getCollection(COLLECTIONS.IDENTITY).find();
 
-    if(results.length) {
+    if (results.length) {
       return results[0].value as any;
     }
 
@@ -71,9 +73,11 @@ export class StorageService {
 
     this.createCollectionIfNotExists(COLLECTIONS.IDENTITY);
 
-    const results = this.client.getCollection(COLLECTIONS.IDENTITY).find()
+    const results = this.client.getCollection(COLLECTIONS.IDENTITY).find();
 
-    results.forEach((result) => this.client.getCollection(COLLECTIONS.IDENTITY).remove(result));
+    results.forEach((result) =>
+      this.client.getCollection(COLLECTIONS.IDENTITY).remove(result)
+    );
   }
 
   public writeIdentity(identity: Identity): void {
@@ -82,7 +86,7 @@ export class StorageService {
     this.removeIdentity();
 
     this.client.getCollection(COLLECTIONS.IDENTITY).insert({
-      value: identity
+      value: identity,
     });
 
     this.logger.log('Stored identity');

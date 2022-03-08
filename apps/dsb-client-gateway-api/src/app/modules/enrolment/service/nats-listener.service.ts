@@ -5,14 +5,14 @@ import { IamService } from '../../iam-service/service/iam.service';
 import { connect, JSONCodec } from 'nats.ws';
 import { ConfigService } from '@nestjs/config';
 import { EnrolmentState, RoleState } from '../../storage/storage.interface';
-import { Claim, ClaimEventType, IClaimIssuance, IClaimRequest } from 'iam-client-lib';
+import { Claim, ClaimEventType } from 'iam-client-lib';
 import { StorageService } from '../../storage/service/storage.service';
 
 globalThis.WebSocket = w3cwebsocket as any;
 
 export enum EnrolmentEvents {
   AWAIT_APPROVAL = 'await_approval',
-  APPROVED = 'approved'
+  APPROVED = 'approved',
 }
 
 // export const USER_ROLE = `user.roles.${PARENT_NAMESPACE}`
@@ -29,7 +29,10 @@ export class NatsListenerService {
     protected readonly configService: ConfigService,
     protected readonly storageService: StorageService
   ) {
-    this.parentNamespace = this.configService.get<string>('PARENT_NAMESPACE', 'dsb.apps.energyweb.iam.ewc');
+    this.parentNamespace = this.configService.get<string>(
+      'PARENT_NAMESPACE',
+      'dsb.apps.energyweb.iam.ewc'
+    );
     this.userRole = `user.roles.${this.parentNamespace}`;
   }
 
@@ -42,7 +45,14 @@ export class NatsListenerService {
   }
 
   public async getState() {
-    const claims = await this.iamService.getClaimsByRequester(this.iamService.getDIDAddress(), this.parentNamespace);
+    if (!this.iamService) {
+      return;
+    }
+
+    const claims = await this.iamService.getClaimsByRequester(
+      this.iamService.getDIDAddress(),
+      this.parentNamespace
+    );
 
     const state = this.getStateFromClaims(claims);
 
@@ -62,12 +72,14 @@ export class NatsListenerService {
       approved: false,
       waiting: false,
       roles: {
-        user: RoleState.NO_CLAIM
-      }
+        user: RoleState.NO_CLAIM,
+      },
     };
     for (const { claimType, isAccepted } of claims) {
       if (claimType === this.userRole) {
-        state.roles.user = isAccepted ? RoleState.APPROVED : RoleState.AWAITING_APPROVAL;
+        state.roles.user = isAccepted
+          ? RoleState.APPROVED
+          : RoleState.AWAITING_APPROVAL;
       }
       state.approved = state.roles.user === RoleState.APPROVED;
       state.waiting = state.roles.user === RoleState.AWAITING_APPROVAL;
@@ -78,21 +90,25 @@ export class NatsListenerService {
   public init() {
     this.events = new EventEmitter.EventEmitter();
 
-    const PARENT_NAMESPACE = this.configService.get<string>('PARENT_NAMESPACE', 'dsb.apps.energyweb.iam.ewc');
+    const PARENT_NAMESPACE = this.configService.get<string>(
+      'PARENT_NAMESPACE',
+      'dsb.apps.energyweb.iam.ewc'
+    );
     const USER_ROLE = `user.roles.${PARENT_NAMESPACE}`;
 
-    const eventsUrl = this.configService.get<string>('EVENT_SERVER_URL', 'identityevents-dev.energyweb.org');
-
+    const eventsUrl = this.configService.get<string>(
+      'EVENT_SERVER_URL',
+      'identityevents-dev.energyweb.org'
+    );
 
     this.events.on(EnrolmentEvents.AWAIT_APPROVAL, async () => {
       const state: EnrolmentState = {
         approved: false,
         waiting: true,
         roles: {
-          user: RoleState.AWAITING_APPROVAL
-        }
+          user: RoleState.AWAITING_APPROVAL,
+        },
       };
-
 
       this.logger.log(`Connecting to ${eventsUrl}`);
 
@@ -100,11 +116,16 @@ export class NatsListenerService {
 
       const did = this.iamService.getDIDAddress();
 
-      const topic = `${ClaimEventType.ISSUE_CREDENTIAL}.claim-exchange.${did}.${this.configService.get<string>('NATS_ENV_NAME', 'ewf-dev')}`;
+      const topic = `${
+        ClaimEventType.ISSUE_CREDENTIAL
+      }.claim-exchange.${did}.${this.configService.get<string>(
+        'NATS_ENV_NAME',
+        'ewf-dev'
+      )}`;
 
       this.logger.log('Listening for claim exchange', topic);
 
-      const jc = JSONCodec<{ type: string, claimId: string }>();
+      const jc = JSONCodec<{ type: string; claimId: string }>();
 
       const sub = nc.subscribe(topic);
 
@@ -118,9 +139,11 @@ export class NatsListenerService {
             continue;
           }
 
-          const claim = await this.iamService.getClaimById(claimMessage.claimId);
+          const claim = await this.iamService.getClaimById(
+            claimMessage.claimId
+          );
 
-          if(!claim) {
+          if (!claim) {
             this.logger.warn(`Claim does not exists`, claimMessage);
 
             continue;
@@ -135,27 +158,38 @@ export class NatsListenerService {
           if (claim.issuedToken) {
             this.logger.log(`[${count}] Received claim has been issued`);
 
-            const decodedToken = await this.iamService.decodeJWTToken(claim.issuedToken);
+            const decodedToken = await this.iamService.decodeJWTToken(
+              claim.issuedToken
+            );
 
             if (decodedToken.claimData.claimType === USER_ROLE) {
-              this.logger.log(`[${count}] Received issued claim is ${this.userRole}`);
+              this.logger.log(
+                `[${count}] Received issued claim is ${this.userRole}`
+              );
               await this.iamService.publishPublicClaim(claim.issuedToken);
-              this.logger.log(`[${count}] Synced ${this.userRole} claim to DID Document`);
+              this.logger.log(
+                `[${count}] Synced ${this.userRole} claim to DID Document`
+              );
               state.roles.user = RoleState.APPROVED;
             }
           }
 
           if (state.roles.user === RoleState.APPROVED && sub) {
-            this.logger.log('All roles have been approved and synced to DID Document');
+            this.logger.log(
+              'All roles have been approved and synced to DID Document'
+            );
 
             state.approved = true;
             state.waiting = false;
 
-            await this.storageService.writeEnrolment({ state, did: claim.requester });
+            await this.storageService.writeEnrolment({
+              state,
+              did: claim.requester,
+            });
             await nc.drain();
             await nc.close();
 
-            this.events.emit('approved')
+            this.events.emit('approved');
           }
         }
       } catch (e) {

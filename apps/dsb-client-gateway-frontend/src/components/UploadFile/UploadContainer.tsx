@@ -4,6 +4,8 @@ import axios from 'axios';
 import swal from '@sweetalert/with-react';
 import { Channel, Topic } from '../../utils';
 
+axios.defaults.baseURL = process.env.NEXT_PUBLIC_SERVER_BASE_URL + '/api';
+
 type UploadContainerProps = {
   auth?: string;
   channels: Channel[] | undefined;
@@ -29,7 +31,7 @@ export const UploadContainer = ({
     formData.append('topicId', topic.id);
 
     try {
-      const res = await axios.post(`/api/v1/upload`, formData, {
+      const res = await axios.post(`/v1/dsb/file/upload`, formData, {
         headers: {
           Authorization: auth ? `Bearer ${auth}` : undefined,
           'content-type': 'multipart/form-data',

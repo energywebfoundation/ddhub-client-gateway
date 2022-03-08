@@ -1,10 +1,12 @@
 import {
+  MessageBody,
   OnGatewayConnection,
   OnGatewayInit,
+  SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-import { WebSocket, WebSocketServer as Server } from 'ws';
+import { MessageEvent, WebSocket, WebSocketServer as Server } from 'ws';
 import { Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { WebSocketImplementation } from '../message.const';
@@ -46,6 +48,10 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayInit {
     // Also Auth Guards do not work with HandleConnection, that's why we are not using Guards
     server.on('connection', (socket, request) => {
       socket['request'] = request;
+
+      socket.onmessage = (event: MessageEvent) => {
+        console.log(event);
+      };
     });
   }
 
@@ -86,7 +92,8 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayInit {
     this.logger.log('New client connected');
   }
 
-  private isAuthorized(socket: WebSocket): boolean {
-    return true;
+  @SubscribeMessage('message')
+  public async handleMessage(@MessageBody() data): Promise<void> {
+    console.log(data);
   }
 }

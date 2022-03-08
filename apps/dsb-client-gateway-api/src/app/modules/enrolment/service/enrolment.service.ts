@@ -64,6 +64,19 @@ export class EnrolmentService implements OnModuleInit {
 
     if (!enrolment) {
       await this.initEnrolment();
+
+      throw new NoPrivateKeyException();
+
+      // return {
+      //   did: null,
+      //   state: {
+      //     approved: false,
+      //     waiting: false,
+      //     roles: {
+      //       user: RoleState.NO_CLAIM,
+      //     },
+      //   },
+      // };
     }
 
     return this.storageService.getEnrolment();
@@ -72,6 +85,10 @@ export class EnrolmentService implements OnModuleInit {
   public async initEnrolment(): Promise<any> {
     const { address } = await this.storageService.getIdentity();
     const did = this.iamService.getDIDAddress();
+
+    if (!did) {
+      return;
+    }
 
     if (!address) {
       throw new NoPrivateKeyException();

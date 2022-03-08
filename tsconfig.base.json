@@ -15,7 +15,11 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "esModuleInterop": true,
-    "paths": {}
+    "paths": {
+      "@dsb-client-gateway/dsb-client-gateway-errors": [
+        "libs/dsb-client-gateway-errors/src/index.ts"
+      ]
+    }
   },
   "exclude": ["node_modules", "tmp"]
 }

@@ -83,8 +83,8 @@ export const Upload = ({ channels, topics, onUpload }: UploadProps) => {
                   fullWidth
                 >
                   {topics?.map((topic) => (
-                    <MenuItem key={topic.namespace} value={topic.namespace}>
-                      {topic.namespace}
+                    <MenuItem key={topic.id} value={topic.id}>
+                      {topic.name}
                     </MenuItem>
                   ))}
                 </Select>
@@ -137,7 +137,7 @@ export const Upload = ({ channels, topics, onUpload }: UploadProps) => {
                   }
 
                   const selectedTopic = topics?.find(
-                    (topic) => topic.namespace === topicName
+                    (topic) => topic.id === topicName
                   );
 
                   if (!selectedTopic) {

@@ -59,11 +59,12 @@ export class DsbApiService {
       formData.append('fqcn', fqcn);
       formData.append('signature', signature);
       formData.append('topicId', topicId);
+      formData.append('topicVersion', '1.0.0');
 
       const { data } = await promiseRetry(async (retry, attempt) => {
         return lastValueFrom(
           this.httpService.post(
-            'https://ddhub-dev.energyweb.org/message/upload',
+            'https://aemovc.eastus.cloudapp.azure.com/message/upload',
             formData,
             {
               maxContentLength: Infinity,
@@ -84,10 +85,25 @@ export class DsbApiService {
     }
   }
 
-  public async getTopics(): Promise<TopicData[]> {
+  public async getTopics(ownerDID?: string): Promise<TopicData[]> {
+    if (!ownerDID) {
+      const enrolment = this.storageService.getEnrolment();
+
+      console.log(enrolment);
+
+      if (!enrolment) {
+        return [];
+      }
+
+      ownerDID = enrolment.did;
+    }
+
     const { data } = await promiseRetry(async (retry, attempt) => {
       return lastValueFrom(
-        this.httpService.get('https://ddhub-dev.energyweb.org/topic/list', {
+        this.httpService.get('https://aemovc.eastus.cloudapp.azure.com/topic', {
+          params: {
+            owner: ownerDID,
+          },
           httpsAgent: this.getTLS(),
           headers: {
             Authorization: `Bearer ${this.authToken}`,
@@ -166,7 +182,12 @@ export class DsbApiService {
   }
 
   protected async handleRequestWithRetry(e, retry): Promise<any> {
-    console.log(e);
+    if (!e.response) {
+      this.logger.error(e);
+
+      return;
+    }
+
     const { status } = e.response;
 
     this.logger.error(e);
