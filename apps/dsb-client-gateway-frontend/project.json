@@ -1,0 +1,56 @@
+{
+  "root": "apps/dsb-client-gateway-frontend",
+  "sourceRoot": "apps/dsb-client-gateway-frontend",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "executor": "@nrwl/next:build",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "root": "apps/dsb-client-gateway-frontend",
+        "outputPath": "dist/apps/dsb-client-gateway-frontend"
+      },
+      "configurations": {
+        "production": {}
+      }
+    },
+    "serve": {
+      "executor": "@nrwl/next:server",
+      "options": {
+        "buildTarget": "dsb-client-gateway-frontend:build",
+        "dev": true
+      },
+      "configurations": {
+        "production": {
+          "buildTarget": "dsb-client-gateway-frontend:build:production",
+          "dev": false
+        }
+      }
+    },
+    "export": {
+      "executor": "@nrwl/next:export",
+      "options": {
+        "buildTarget": "dsb-client-gateway-frontend:build:production"
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/apps/dsb-client-gateway-frontend"],
+      "options": {
+        "jestConfig": "apps/dsb-client-gateway-frontend/jest.config.js",
+        "passWithNoTests": true
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": [
+          "apps/dsb-client-gateway-frontend/**/*.{ts,tsx,js,jsx}"
+        ]
+      }
+    }
+  },
+  "tags": []
+}

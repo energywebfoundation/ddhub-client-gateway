@@ -1,154 +1,94 @@
-# DSB Client Gateway
-
-The DSB Client Gateway acts as a client to the DSB, enabling easier integration.
-
-## Quickstart
-
-The simplest way to run the gateway is via the public Docker container stored
-in the Azure container registry.
-
-```
-docker run -p 3000:3000 aemocontainerregistry.azurecr.io/dsb/client-gateway:latest
-```
-
-The gateway UI can now be accessed on http://localhost:3000.
-
-> Note: use the `--init` flag if passing SIGINT signals (ctrl+c) to the container
-  fails. See [here](https://docs.docker.com/engine/reference/run/#specify-an-init-process)
-  for documentation.
-
-> Note: environment variables can be specified using `-e` flags. See
-  [here](https://docs.docker.com/engine/reference/run/#env-environment-variables)
-  for documentation.
-
-> Note: flags must be placed after `docker run` and before
-  `aemocontainerregistry.azurecr.io/dsb/client-gateway:latest` to work.
-### Persisting Data
-
-By default, the gateway will not persist data configured during runtime
-(e.g. identity, cerficates). To do this, a Docker bind mount can be used with
-the following flag (on macOS and linux):
-
-```
--v $(pwd)/data:/var/deployment/apps/dsb-client-gateway/data
-```
-
-This will bind the container's `in-memory.json` file to the host filesystem.
-Make sure that the file exists on the host filesystem first.
-See [here](https://docs.docker.com/engine/reference/run/#volume-shared-filesystems)
-for full documentation.
-
-### Sentry
-
-There are 2 options availbale for sentry logs(message logs and error logs) if you want to enable only error logs
-
-```
--e SENTRY_LOG_ERROR=true
-```
-
-if you want to enable only message logs
-```
--e SENTRY_LOG_MESSAGE=true
-```
-if you want to enable both message logs and error logs
-```
--e SENTRY_LOG_MESSAGE=true -e SENTRY_LOG_ERROR=true
-```
-
-### Configuration
-
-The DSB Client Gateway can be configured in a number of ways.
-
-For the full configuration options see [Configuration](./CONFIGURATION.md).
-
-### Testing WebSockets
-
-The gateway supports WebSockets for bidirectional communication. You can use
-[wscat](https://github.com/websockets/wscat) to easily receiving and sending
-messages over WebSockets.
-
-If running the gateway in WebSocket server mode, connect via
-```
-wscat --connect ws://localhost:3000/events --subprotocol dsb-messages
-```
-
-If you have configured the gateway to use basic authentication, supply the
-following flag in addition to the above command
-```
---auth {username}:{password}
-```
-
-If running the gateway in WebSocket client mode, start a server with
-```
-wscat --listen 5001
-```
-
-Be sure to now set your gateway's `WEBSOCKET_URL` to ws://localhost:5001/.
-
-> Note: if running the Docker container, replace localhost with
-  host.docker.internal (windows, macOS). On Linux run the container with
-  `--net=host` to directly access localhost.
-
-With wscat running, you should be able to start receiving messages once the
-gateway's DSB enrolment is complete.
 
 
-## Development
+# DsbClientGateway
 
-Install dependencies:
-```
-yarn
-```
+This project was generated using [Nx](https://nx.dev).
 
-Run the development server:
+<p style="text-align: center;"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="450"></p>
 
-```bash
-yarn dev
-```
+🔎 **Smart, Fast and Extensible Build System**
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Adding capabilities to your workspace
+
+Nx supports many plugins which add capabilities for developing different types of applications and different tools.
+
+These capabilities include generating applications, libraries, etc as well as the devtools to test, and build projects as well.
+
+Below are our core plugins:
+
+- [React](https://reactjs.org)
+  - `npm install --save-dev @nrwl/react`
+- Web (no framework frontends)
+  - `npm install --save-dev @nrwl/web`
+- [Angular](https://angular.io)
+  - `npm install --save-dev @nrwl/angular`
+- [Nest](https://nestjs.com)
+  - `npm install --save-dev @nrwl/nest`
+- [Express](https://expressjs.com)
+  - `npm install --save-dev @nrwl/express`
+- [Node](https://nodejs.org)
+  - `npm install --save-dev @nrwl/node`
+
+There are also many [community plugins](https://nx.dev/community) you could add.
+
+## Generate an application
+
+Run `nx g @nrwl/react:app my-app` to generate an application.
+
+> You can use any of the plugins above to generate applications as well.
+
+When using Nx, you can create multiple applications and libraries in the same workspace.
+
+## Generate a library
+
+Run `nx g @nrwl/react:lib my-lib` to generate a library.
+
+> You can also use any of the plugins above to generate libraries as well.
+
+Libraries are shareable across libraries and applications. They can be imported from `@dsb-client-gateway/mylib`.
+
+## Development server
+
+Run `nx serve my-app` for a dev server. Navigate to http://localhost:4200/. The app will automatically reload if you change any of the source files.
+
+## Code scaffolding
+
+Run `nx g @nrwl/react:component my-component --project=my-app` to generate a new component.
+
+## Build
+
+Run `nx build my-app` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
+
+## Running unit tests
+
+Run `nx test my-app` to execute the unit tests via [Jest](https://jestjs.io).
+
+Run `nx affected:test` to execute the unit tests affected by a change.
+
+## Running end-to-end tests
+
+Run `ng e2e my-app` to execute the end-to-end tests via [Cypress](https://www.cypress.io).
+
+Run `nx affected:e2e` to execute the end-to-end tests affected by a change.
+
+## Understand your workspace
+
+Run `nx graph` to see a diagram of the dependencies of your projects.
+
+## Further help
+
+Visit the [Nx Documentation](https://nx.dev) to learn more.
 
 
-### Config
 
-- `.env` -> applies to all environments
-- `.env.development` -> points to a running instance of DSB
-- `.env.production` -> points to an instance of DSB on localhost
-- `.env.test` -> applies only on `yarn test`
-- `.env.local` -> local overrides (do not commit to source control)
+## ☁ Nx Cloud
 
-### Building the Container
+### Distributed Computation Caching & Distributed Task Execution
 
-This gateway is currently being shipped as a single docker container. To build
-the image:
+<p style="text-align: center;"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-cloud-card.png"></p>
 
-```sh
-# using access credentials
-aws configure
+Nx Cloud pairs with Nx in order to enable you to build and test code more rapidly, by up to 10 times. Even teams that are new to Nx can connect to Nx Cloud and start saving time instantly.
 
-# login to ecr (so we can fetch latest dsb base image)
-aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 098061033856.dkr.ecr.us-east-1.amazonaws.com
+Teams using Nx gain the advantage of building full-stack applications with their preferred framework alongside Nx’s advanced code generation and project dependency graph, plus a unified experience for both frontend and backend developers.
 
-# build the container
-docker build -t dsb-client-gateway .
-```
-
-## Updating REST/WebSocket Documentation
-
-Please keep the documentation up to date! Unfortunately, this is manual right now.
-
-### REST (OpenAPI)
-
-Visit https://editor.swagger.io/ or run locally (localhost:8080):
-
-```
-docker pull swaggerapi/swagger-editor
-docker run -p 8080:8080 swaggerapi/swagger-editor
-```
-
-Now import the existing specification (`public/rest.yaml`) to begin editing.
-
-### WebSocket (AsyncAPI)
-
-Visit https://playground.asyncapi.io/ and import the existing specification
-(`public/ws.yaml`) to begin editing.
+Visit [Nx Cloud](https://nx.app/) to learn more.

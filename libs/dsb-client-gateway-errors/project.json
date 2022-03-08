@@ -1,0 +1,23 @@
+{
+  "root": "libs/dsb-client-gateway-errors",
+  "sourceRoot": "libs/dsb-client-gateway-errors/src",
+  "projectType": "library",
+  "targets": {
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/dsb-client-gateway-errors/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/libs/dsb-client-gateway-errors"],
+      "options": {
+        "jestConfig": "libs/dsb-client-gateway-errors/jest.config.js",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": []
+}

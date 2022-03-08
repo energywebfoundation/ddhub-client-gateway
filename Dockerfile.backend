@@ -1,0 +1,25 @@
+ARG IMAGE=node:14.17-alpine
+ARG NODE_ENV=production
+
+FROM $IMAGE as build
+
+WORKDIR /usr/app
+
+COPY . .
+
+ENV NODE_ENV $NODE_ENV
+
+RUN npm install --quiet --no-progress -g nx && \
+    npm ci --quiet --no-progress && \
+    nx build dsb-client-gateway-api
+
+FROM $IMAGE
+
+WORKDIR /usr/app
+
+USER node
+
+COPY --chown=node:node --from=build /usr/app/dist /usr/app/dist
+COPY --chown=node:node --from=build /usr/app/node_modules /usr/app/node_modules
+
+CMD ["node", "dist/main.js"]
