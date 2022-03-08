@@ -1,22 +1,24 @@
 import { Injectable } from '@nestjs/common';
 import { EthersService } from '../../utils/service/ethers.service';
-import { StorageService } from '../../storage/service/storage.service';
 import { Identity } from '../../storage/storage.interface';
 import { IamService } from '../../iam-service/service/iam.service';
 import { SecretsEngineService } from '../../secrets-engine/secrets-engine.interface';
 import { NoPrivateKeyException } from '../../storage/exceptions/no-private-key.exception';
+import { EnrolmentRepository } from '../../storage/repository/enrolment.repository';
+import { IdentityRepository } from '../../storage/repository/identity.repository';
 
 @Injectable()
 export class IdentityService {
   constructor(
     protected readonly ethersService: EthersService,
-    protected readonly storageService: StorageService,
+    protected readonly enrolmentRepository: EnrolmentRepository,
+    protected readonly identityRepository: IdentityRepository,
     protected readonly secretsEngineService: SecretsEngineService,
     protected readonly iamService: IamService
   ) {}
 
   public async getIdentity(): Promise<Identity> {
-    const identity: Identity | null = this.storageService.getIdentity();
+    const identity: Identity | null = this.identityRepository.getIdentity();
 
     if (!identity) {
       throw new NoPrivateKeyException();
@@ -43,10 +45,10 @@ export class IdentityService {
       address: wallet.address,
     };
 
-    await this.storageService.writeIdentity(publicIdentity);
+    await this.identityRepository.writeIdentity(publicIdentity);
     await this.secretsEngineService.setPrivateKey(privateKey);
     await this.iamService.setup(privateKey);
 
-    await this.storageService.removeEnrolment();
+    await this.enrolmentRepository.removeEnrolment();
   }
 }

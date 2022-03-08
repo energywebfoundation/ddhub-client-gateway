@@ -2,11 +2,11 @@ import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { SchedulerRegistry } from '@nestjs/schedule';
 import { DsbApiService } from './dsb-api.service';
 import { Channel, Message } from '../dsb-client.interface';
-import { StorageService } from '../../storage/service/storage.service';
 import { Enrolment } from '../../storage/storage.interface';
 import { ConfigService } from '@nestjs/config';
 import { WebSocketImplementation } from '../../message/message.const';
 import { MessageService } from '../../message/service/message.service';
+import { EnrolmentRepository } from '../../storage/repository/enrolment.repository';
 
 enum SCHEDULER_HANDLERS {
   MESSAGES = 'messages',
@@ -18,7 +18,7 @@ export class DsbMessagePoolingService implements OnModuleInit {
 
   constructor(
     protected readonly dsbApiService: DsbApiService,
-    protected readonly storageService: StorageService,
+    protected readonly enrolmentRepository: EnrolmentRepository,
     protected readonly configService: ConfigService,
     protected readonly schedulerRegistry: SchedulerRegistry,
     protected readonly messageService: MessageService
@@ -55,7 +55,8 @@ export class DsbMessagePoolingService implements OnModuleInit {
     try {
       this.schedulerRegistry.deleteTimeout(SCHEDULER_HANDLERS.MESSAGES);
 
-      const enrolment: Enrolment | null = this.storageService.getEnrolment();
+      const enrolment: Enrolment | null =
+        this.enrolmentRepository.getEnrolment();
 
       const isEnrolmentValid: boolean = this.validateEnrolment(enrolment);
 

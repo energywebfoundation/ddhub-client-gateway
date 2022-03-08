@@ -6,7 +6,7 @@ import { connect, JSONCodec } from 'nats.ws';
 import { ConfigService } from '@nestjs/config';
 import { EnrolmentState, RoleState } from '../../storage/storage.interface';
 import { Claim, ClaimEventType } from 'iam-client-lib';
-import { StorageService } from '../../storage/service/storage.service';
+import { EnrolmentRepository } from '../../storage/repository/enrolment.repository';
 
 globalThis.WebSocket = w3cwebsocket as any;
 
@@ -27,7 +27,7 @@ export class NatsListenerService {
   constructor(
     protected readonly iamService: IamService,
     protected readonly configService: ConfigService,
-    protected readonly storageService: StorageService
+    protected readonly enrolmentRepository: EnrolmentRepository
   ) {
     this.parentNamespace = this.configService.get<string>(
       'PARENT_NAMESPACE',
@@ -182,7 +182,7 @@ export class NatsListenerService {
             state.approved = true;
             state.waiting = false;
 
-            await this.storageService.writeEnrolment({
+            await this.enrolmentRepository.writeEnrolment({
               state,
               did: claim.requester,
             });

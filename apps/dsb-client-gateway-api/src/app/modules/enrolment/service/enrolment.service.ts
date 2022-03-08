@@ -5,9 +5,10 @@ import { NotEnoughBalanceException } from '../../identity/exceptions/not-enough-
 import { IamService } from '../../iam-service/service/iam.service';
 import { NatsListenerService } from './nats-listener.service';
 import { Enrolment } from '../../storage/storage.interface';
-import { StorageService } from '../../storage/service/storage.service';
 import { NoPrivateKeyException } from '../../storage/exceptions/no-private-key.exception';
 import { ConfigService } from '@nestjs/config';
+import { EnrolmentRepository } from '../../storage/repository/enrolment.repository';
+import { IdentityRepository } from '../../storage/repository/identity.repository';
 
 @Injectable()
 export class EnrolmentService implements OnModuleInit {
@@ -19,7 +20,8 @@ export class EnrolmentService implements OnModuleInit {
     protected readonly ethersService: EthersService,
     protected readonly iamService: IamService,
     protected readonly natsListenerService: NatsListenerService,
-    protected readonly storageService: StorageService,
+    protected readonly enrolmentRepository: EnrolmentRepository,
+    protected readonly identityRepository: IdentityRepository,
     protected readonly configService: ConfigService
   ) {}
 
@@ -45,7 +47,7 @@ export class EnrolmentService implements OnModuleInit {
 
     const state = await this.natsListenerService.getStateFromClaims(claims);
 
-    await this.storageService.writeEnrolment({
+    await this.enrolmentRepository.writeEnrolment({
       did,
       state,
     });
@@ -60,7 +62,7 @@ export class EnrolmentService implements OnModuleInit {
   }
 
   public async getEnrolment(): Promise<Enrolment> {
-    const enrolment = await this.storageService.getEnrolment();
+    const enrolment = await this.enrolmentRepository.getEnrolment();
 
     if (!enrolment) {
       await this.initEnrolment();
@@ -79,11 +81,11 @@ export class EnrolmentService implements OnModuleInit {
       // };
     }
 
-    return this.storageService.getEnrolment();
+    return this.enrolmentRepository.getEnrolment();
   }
 
   public async initEnrolment(): Promise<any> {
-    const { address } = await this.storageService.getIdentity();
+    const { address } = await this.identityRepository.getIdentity();
     const did = this.iamService.getDIDAddress();
 
     if (!did) {
@@ -106,7 +108,7 @@ export class EnrolmentService implements OnModuleInit {
     const state = await this.natsListenerService.getState();
 
     if (state.approved || state.waiting) {
-      await this.storageService.writeEnrolment({
+      await this.enrolmentRepository.writeEnrolment({
         state,
         did,
       });
@@ -121,7 +123,7 @@ export class EnrolmentService implements OnModuleInit {
 
     const updatedState = await this.natsListenerService.getState();
 
-    await this.storageService.writeEnrolment({
+    await this.enrolmentRepository.writeEnrolment({
       did,
       state: updatedState,
     });

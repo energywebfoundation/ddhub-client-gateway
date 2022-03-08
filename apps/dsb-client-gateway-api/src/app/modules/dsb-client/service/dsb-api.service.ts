@@ -4,7 +4,6 @@ import { HttpService } from '@nestjs/axios';
 import { Agent } from 'https';
 import { TlsAgentService } from './tls-agent.service';
 import { EthersService } from '../../utils/service/ethers.service';
-import { StorageService } from '../../storage/service/storage.service';
 import { IamService } from '../../iam-service/service/iam.service';
 import { lastValueFrom } from 'rxjs';
 import {
@@ -19,6 +18,7 @@ import { KeysService } from '../../keys/service/keys.service';
 import { v4 as uuidv4 } from 'uuid';
 import promiseRetry from 'promise-retry';
 import FormData from 'form-data';
+import { EnrolmentRepository } from '../../storage/repository/enrolment.repository';
 
 @Injectable()
 export class DsbApiService {
@@ -33,7 +33,7 @@ export class DsbApiService {
     protected readonly httpService: HttpService,
     protected readonly tlsAgentService: TlsAgentService,
     protected readonly ethersService: EthersService,
-    protected readonly storageService: StorageService,
+    protected readonly enrolmentRepository: EnrolmentRepository,
     protected readonly iamService: IamService,
     protected readonly secretsEngineService: SecretsEngineService,
     protected readonly keysService: KeysService
@@ -87,9 +87,7 @@ export class DsbApiService {
 
   public async getTopics(ownerDID?: string): Promise<TopicData[]> {
     if (!ownerDID) {
-      const enrolment = this.storageService.getEnrolment();
-
-      console.log(enrolment);
+      const enrolment = this.enrolmentRepository.getEnrolment();
 
       if (!enrolment) {
         return [];

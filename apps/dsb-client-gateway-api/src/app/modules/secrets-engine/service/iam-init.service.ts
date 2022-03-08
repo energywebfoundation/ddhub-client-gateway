@@ -1,7 +1,8 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { IamService } from '../../iam-service/service/iam.service';
 import { SecretsEngineService } from '../secrets-engine.interface';
-import { StorageService } from '../../storage/service/storage.service';
+import { EnrolmentRepository } from '../../storage/repository/enrolment.repository';
+import { IdentityRepository } from '../../storage/repository/identity.repository';
 
 @Injectable()
 export class IamInitService implements OnModuleInit {
@@ -10,15 +11,16 @@ export class IamInitService implements OnModuleInit {
   constructor(
     protected readonly iamService: IamService,
     protected readonly secretsEngine: SecretsEngineService,
-    protected readonly storageService: StorageService
+    protected readonly enrolmentRepository: EnrolmentRepository,
+    protected readonly identityRepository: IdentityRepository
   ) {}
 
   public async onModuleInit(): Promise<void> {
     const privateKey = await this.secretsEngine.getPrivateKey();
 
     if (!privateKey) {
-      await this.storageService.removeEnrolment();
-      await this.storageService.removeIdentity();
+      await this.enrolmentRepository.removeEnrolment();
+      await this.identityRepository.removeIdentity();
 
       return;
     }
