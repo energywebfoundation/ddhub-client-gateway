@@ -14,11 +14,11 @@ import {
   TopicData,
 } from '../dsb-client.interface';
 import { SecretsEngineService } from '../../secrets-engine/secrets-engine.interface';
-import { KeysService } from '../../keys/service/keys.service';
 import { v4 as uuidv4 } from 'uuid';
 import promiseRetry from 'promise-retry';
 import FormData from 'form-data';
 import { EnrolmentRepository } from '../../storage/repository/enrolment.repository';
+import { DidAuthService } from '../module/did-auth/service/did-auth.service';
 
 @Injectable()
 export class DsbApiService implements OnModuleInit {
@@ -40,7 +40,7 @@ export class DsbApiService implements OnModuleInit {
     protected readonly enrolmentRepository: EnrolmentRepository,
     protected readonly iamService: IamService,
     protected readonly secretsEngineService: SecretsEngineService,
-    protected readonly keysService: KeysService
+    protected readonly didAuthService: DidAuthService
   ) {
     this.baseUrl = this.configService.get<string>(
       'DSB_BASE_URL',
@@ -82,8 +82,6 @@ export class DsbApiService implements OnModuleInit {
           )
         ).catch((err) => this.handleRequestWithRetry(err, retry));
       });
-
-      console.log(data);
     } catch (e) {
       this.logger.error(e);
     }
@@ -193,6 +191,7 @@ export class DsbApiService implements OnModuleInit {
     const { status } = e.response;
 
     this.logger.error(e);
+    this.logger.error(e.response.data);
 
     if (
       status === HttpStatus.UNAUTHORIZED ||
@@ -232,42 +231,25 @@ export class DsbApiService implements OnModuleInit {
   }
 
   public async login(): Promise<void> {
-    await this.enableTLS();
-    this.logger.log('Attempting to login');
+    this.logger.log('Attempting to login to DID Auth Server');
 
-    const privateKey = await this.secretsEngineService.getPrivateKey();
+    const privateKey: string | null =
+      await this.secretsEngineService.getPrivateKey();
 
-    const proof = await this.ethersService.createProof(
+    if (!privateKey) {
+      this.logger.error('Private key is missing');
+
+      return;
+    }
+
+    await this.didAuthService.login(
       privateKey,
       this.iamService.getDIDAddress()
     );
 
-    const res = await lastValueFrom(
-      this.httpService.post(
-        this.baseUrl + '/auth/login',
-        {
-          identityToken: proof,
-        },
-        {
-          httpsAgent: this.getTLS(),
-        }
-      )
-    ).catch((e) => {
-      this.logger.error('Login failed');
+    this.logger.log('Login successful, attempting to init ext channel');
 
-      this.logger.error(e.message);
-      this.logger.error(e.response.data);
-
-      throw e;
-    });
-
-    // initExtChannel -> in case success and error?
-    // if success -> proceed
-    // if error -> log the error, if the error
-
-    this.logger.log('Login successful');
-
-    this.authToken = res.data.token;
+    await this.initExtChannel();
   }
 
   public async health(): Promise<{ statusCode: number; message?: string }> {
@@ -310,6 +292,42 @@ export class DsbApiService implements OnModuleInit {
         transactionId,
       };
     }
+  }
+
+  protected async initExtChannel(): Promise<void> {
+    try {
+      const { data } = await promiseRetry(async (retry, attempt) => {
+        return lastValueFrom(
+          this.httpService.post(
+            'https://aemovc.eastus.cloudapp.azure.com/channel/initExtChannel',
+            {
+              httpsAgent: this.getTLS(),
+            },
+            {
+              headers: {
+                ...this.getAuthHeader(),
+              },
+            }
+          )
+        ).catch((err) => this.handleRequestWithRetry(err, retry));
+      });
+
+      this.logger.log('Init ext channel successful');
+
+      return data;
+    } catch (e) {
+      this.logger.error(e);
+
+      if (e.response) {
+        this.logger.error(e.response.data);
+      }
+    }
+  }
+
+  protected getAuthHeader(): { Authorization: string } {
+    return {
+      Authorization: `Bearer ${this.didAuthService.getToken()}`,
+    };
   }
 
   protected getTLS(): Agent | null {

@@ -1,7 +1,7 @@
 version: '3'
 services:
   vault_dev:
-    image: hashicorp/vault:latest // aws, azure, gcp and vault
+    image: hashicorp/vault:latest
     restart: always
     volumes:
       - /vault/data
@@ -15,5 +15,4 @@ services:
       - IPC_LOCK
     container_name: vault_dev
     entrypoint: "vault server -dev"
-  did_auth:
-    image:
+
