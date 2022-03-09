@@ -89,6 +89,7 @@ export type Channel = {
 
 export type Topic = {
   id: string;
+  name: string;
   namespace: string;
   schema: object | string;
   schemaType: string;

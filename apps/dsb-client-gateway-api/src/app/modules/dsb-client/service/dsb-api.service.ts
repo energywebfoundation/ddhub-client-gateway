@@ -1,4 +1,4 @@
-import { HttpStatus, Injectable, Logger } from '@nestjs/common';
+import { HttpStatus, Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { HttpService } from '@nestjs/axios';
 import { Agent } from 'https';
@@ -21,12 +21,16 @@ import FormData from 'form-data';
 import { EnrolmentRepository } from '../../storage/repository/enrolment.repository';
 
 @Injectable()
-export class DsbApiService {
+export class DsbApiService implements OnModuleInit {
   private readonly logger = new Logger(DsbApiService.name);
 
   protected tls: Agent | null;
   protected authToken?: string;
   protected baseUrl: string;
+
+  public async onModuleInit(): Promise<void> {
+    await this.login();
+  }
 
   constructor(
     protected readonly configService: ConfigService,
@@ -256,6 +260,10 @@ export class DsbApiService {
 
       throw e;
     });
+
+    // initExtChannel -> in case success and error?
+    // if success -> proceed
+    // if error -> log the error, if the error
 
     this.logger.log('Login successful');
 

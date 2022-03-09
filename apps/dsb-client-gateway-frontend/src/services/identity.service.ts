@@ -41,8 +41,8 @@ export async function refreshState(): Promise<Result<Storage>> {
   const enrolment = await api.get('/api/v1/enrol').then(({ data }) => data);
 
   const storage: Storage = {
-    identity: {},
-    enrolment: {},
+    identity: {} as any,
+    enrolment: {} as any,
   };
 
   if (identity.address) {

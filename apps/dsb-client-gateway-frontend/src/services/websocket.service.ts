@@ -1,15 +1,20 @@
-import {Server} from 'http'
+import { Server } from 'http';
 import {
   client as WsClient,
   connection as WsClientConnection,
   IBinaryMessage,
   IUtf8Message,
-  server as WsServer
-} from 'websocket'
-import {isGatewayError, Message, SendMessageData, WebSocketClientOptions} from '../utils'
-import {isAuthorized} from './auth.service'
-import {DsbApiService} from './dsb-api.service'
-import {signPayload} from './identity.service'
+  server as WsServer,
+} from 'websocket';
+import {
+  isGatewayError,
+  Message,
+  SendMessageData,
+  WebSocketClientOptions,
+} from '../utils';
+import { isAuthorized } from './auth.service';
+import { DsbApiService } from './dsb-api.service';
+import { signPayload } from './identity.service';
 
 /**
  * Parse a websocket message into our domain transfer object (message request)
@@ -17,24 +22,26 @@ import {signPayload} from './identity.service'
  * @param message the UTF-8 or binary message from the WS connection
  * @returns Message DTO
  */
-const parseMessage = (message: IUtf8Message | IBinaryMessage): SendMessageData => {
+const parseMessage = (
+  message: IUtf8Message | IBinaryMessage
+): SendMessageData => {
   if (message.type === 'utf8') {
-    return JSON.parse(message.utf8Data)
+    return JSON.parse(message.utf8Data);
   }
-  return JSON.parse(message.binaryData.toString())
-}
+  return JSON.parse(message.binaryData.toString());
+};
 
 /**
  * WebSocket server implementation (singleton)
  */
 export class WebSocketServer {
-  private static instance?: WebSocketServer
-  private readonly ws: WsServer
+  private static instance?: WebSocketServer;
+  private readonly ws: WsServer;
 
   /**
    * WebSocket Protocol spoken by the server
    */
-  protocol = 'dsb-messages'
+  protocol = 'dsb-messages';
 
   /**
    * Instantiate an instance or retrieve existing instance of the server
@@ -44,10 +51,10 @@ export class WebSocketServer {
    */
   static init(server: Server, path: string): WebSocketServer {
     if (this.instance) {
-      return this.instance
+      return this.instance;
     }
-    this.instance = new WebSocketServer(server, path)
-    return this.instance
+    this.instance = new WebSocketServer(server, path);
+    return this.instance;
   }
 
   /**
@@ -55,47 +62,49 @@ export class WebSocketServer {
    */
   static get(): WebSocketServer {
     if (!this.instance) {
-      throw Error('Server not initialized yet!')
+      throw Error('Server not initialized yet!');
     }
-    return this.instance
+    return this.instance;
   }
 
   static destroy() {
-    this.instance = undefined
+    this.instance = undefined;
   }
 
   constructor(server: Server, public path: string) {
-    this.ws = new WsServer({ httpServer: server })
+    this.ws = new WsServer({ httpServer: server });
     this.ws.on('request', (req) => {
       // must be requesting {path} e.g. /events
       if (req.resource !== this.path) {
-        return req.reject(404)
+        return req.reject(404);
       }
       // must agree on the ws protocol
       if (!req.requestedProtocols.includes(this.protocol)) {
-        return req.reject(400, 'Protocol Not Supported')
+        return req.reject(400, 'Protocol Not Supported');
       }
       // must be authorized using basic auth
-      const { err } = isAuthorized(req.httpRequest.headers.authorization)
+      const { err } = isAuthorized(req.httpRequest.headers.authorization);
       if (err) {
-        return req.reject(401)
+        return req.reject(401);
       }
 
       // accept connection request and listen for messages
-      const connection = req.accept('dsb-messages')
+      const connection = req.accept('dsb-messages');
       connection.on('message', async (data) => {
-        const message = parseMessage(data)
+        const message = parseMessage(data);
         try {
-          const { ok: signature, err: signError } = await signPayload(message.payload)
+          const { ok: signature, err: signError } = await signPayload(
+            message.payload
+          );
           if (!signature) {
-            throw signError
+            throw signError;
           }
           const { ok, err } = await DsbApiService.init().sendMessage({
             ...message,
-            signature
-          })
+            signature,
+          });
           if (!ok) {
-            throw err
+            throw err;
           }
         } catch (err) {
           if (message.transactionId) {
@@ -103,21 +112,21 @@ export class WebSocketServer {
               connection.send(
                 JSON.stringify({
                   transactionId: message.transactionId,
-                  err: err.body
+                  err: err.body,
                 })
-              )
+              );
             } else {
               connection.send(
                 JSON.stringify({
                   transactionId: message.transactionId,
-                  err: err instanceof Error ? err.message : err
+                  err: err instanceof Error ? err.message : err,
                 })
-              )
+              );
             }
           }
         }
-      })
-    })
+      });
+    });
   }
 
   /**
@@ -127,7 +136,7 @@ export class WebSocketServer {
    * @param message message(s) as pulled/received from DSB message broker
    */
   emit(message: Message | Message[]) {
-    this.ws.broadcast(JSON.stringify(message))
+    this.ws.broadcast(JSON.stringify(message));
   }
 }
 
@@ -135,9 +144,9 @@ export class WebSocketServer {
  * WebSocket client implementation (singleton)
  */
 export class WebSocketClient {
-  private static instance?: WebSocketClient
+  private static instance?: WebSocketClient;
 
-  private retryCount = 0
+  private retryCount = 0;
 
   /**
    * Instantiate an instance or retrieve the existing client instance
@@ -148,22 +157,22 @@ export class WebSocketClient {
    */
   static async init(options: WebSocketClientOptions): Promise<WebSocketClient> {
     if (this.instance) {
-      return this.instance
+      return this.instance;
     }
     return new Promise((resolve, reject) => {
-      const ws = new WsClient()
-      ws.on('connectFailed', reject)
+      const ws = new WsClient();
+      ws.on('connectFailed', reject);
       ws.on('connect', (connection) => {
-        const client = new WebSocketClient(ws, connection, options)
-        this.instance = client
-        resolve(client)
-      })
+        const client = new WebSocketClient(ws, connection, options);
+        this.instance = client;
+        resolve(client);
+      });
       try {
-        ws.connect(options.url, options.protocol)
+        ws.connect(options.url, options.protocol);
       } catch (err) {
-        reject(err)
+        reject(err);
       }
-    })
+    });
   }
 
   /**
@@ -171,13 +180,13 @@ export class WebSocketClient {
    */
   static get(): WebSocketClient {
     if (!this.instance) {
-      throw Error('Client not initialized yet!')
+      throw Error('Client not initialized yet!');
     }
-    return this.instance
+    return this.instance;
   }
 
   static destroy() {
-    this.instance = undefined
+    this.instance = undefined;
   }
 
   constructor(
@@ -186,25 +195,28 @@ export class WebSocketClient {
     private options: WebSocketClientOptions
   ) {
     this.connection.on('error', async (err) => {
-      this.reconnect({ err: err.message })
-    })
+      this.reconnect({ err: err.message });
+    });
     this.connection.on('close', async (code, err) => {
-      this.reconnect({ err, code })
-    })
-    this.connection.on('message', dsbclientasync (data) => {
+      this.reconnect({ err, code });
+    });
+    this.connection.on('message', async (data) => {
       // todo: better parser
-      const message = parseMessage(data)
+      const message = parseMessage(data);
       try {
-        const { ok: signature, err: signError } = await signPayload(message.payload)
+        const { ok: signature, err: signError } = await signPayload(
+          message.payload
+        );
         if (!signature) {
-          throw signError
+          throw signError;
         }
-        const { ok: sent, err: sendError } = await DsbApiService.init().sendMessage({
-          ...message,
-          signature
-        })
+        const { ok: sent, err: sendError } =
+          await DsbApiService.init().sendMessage({
+            ...message,
+            signature,
+          });
         if (!sent) {
-          throw sendError
+          throw sendError;
         }
       } catch (err) {
         if (message.transactionId) {
@@ -212,24 +224,24 @@ export class WebSocketClient {
             this.connection.send(
               JSON.stringify({
                 transactionId: message.transactionId,
-                err: err.body
+                err: err.body,
               })
-            )
+            );
           } else {
             this.connection.send(
               JSON.stringify({
                 transactionId: message.transactionId,
-                err: err instanceof Error ? err.message : err
+                err: err instanceof Error ? err.message : err,
               })
-            )
+            );
           }
         }
       }
-    })
+    });
   }
 
-  isConnected(): Boolean {
-    return this.connection.connected
+  isConnected(): boolean {
+    return this.connection.connected;
   }
 
   /**
@@ -238,52 +250,57 @@ export class WebSocketClient {
    * @param message message DTO(s) as retreived from the DSB message broker
    */
   emit(message: Message | Message[]) {
-    this.connection.send(Buffer.from(JSON.stringify(message)))
+    this.connection.send(Buffer.from(JSON.stringify(message)));
   }
 
   /**
    * End the client connection
    */
   close() {
-    this.options.reconnect = false
-    this.connection.close()
+    this.options.reconnect = false;
+    this.connection.close();
   }
 
-  private async reconnect(reason?: { err: string; code?: number }): Promise<void> {
+  private async reconnect(reason?: {
+    err: string;
+    code?: number;
+  }): Promise<void> {
     if (!this.canReconnect()) {
-      return
+      return;
     }
     if (reason) {
-      console.log('WebSocket Client error:', reason.code, reason.err)
+      console.log('WebSocket Client error:', reason.code, reason.err);
     }
-    console.log(`WebSocket Client attempting reconnect [${this.retryCount}]...`)
+    console.log(
+      `WebSocket Client attempting reconnect [${this.retryCount}]...`
+    );
     return new Promise((resolve) => {
       this.ws.on('connectFailed', (err) => {
-        console.log('WebSocket Client failed to reconnect:', err.message)
-        this.reconnect()
-      })
+        console.log('WebSocket Client failed to reconnect:', err.message);
+        this.reconnect();
+      });
       this.ws.on('connect', (connection) => {
-        this.update(connection)
-        resolve()
-      })
-      const timeout = this.options.reconnectTimeout ?? 10 * 1000
+        this.update(connection);
+        resolve();
+      });
+      const timeout = this.options.reconnectTimeout ?? 10 * 1000;
       setTimeout(() => {
-        this.ws.connect(this.options.url, this.options.protocol)
-        this.retryCount += 1
-      }, timeout)
-    })
+        this.ws.connect(this.options.url, this.options.protocol);
+        this.retryCount += 1;
+      }, timeout);
+    });
   }
 
   private update(connection: WsClientConnection) {
-    this.retryCount = 0
-    this.connection = connection
+    this.retryCount = 0;
+    this.connection = connection;
   }
 
-  private canReconnect(): Boolean {
+  private canReconnect(): boolean {
     if (!this.options.reconnect) {
-      return false
+      return false;
     }
-    const maxRetries = this.options.reconnectMaxRetries ?? 10
-    return this.retryCount < maxRetries
+    const maxRetries = this.options.reconnectMaxRetries ?? 10;
+    return this.retryCount < maxRetries;
   }
 }
