@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { HttpModule } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { DidAuthService } from './service/did-auth.service';
+import { DidAuthApiService } from './service/did-auth-api.service';
 
 @Module({
   imports: [
@@ -20,7 +21,7 @@ import { DidAuthService } from './service/did-auth.service';
       inject: [ConfigService],
     }),
   ],
-  providers: [DidAuthService],
+  providers: [DidAuthService, DidAuthApiService],
   exports: [DidAuthService],
 })
 export class DidAuthModule {}
