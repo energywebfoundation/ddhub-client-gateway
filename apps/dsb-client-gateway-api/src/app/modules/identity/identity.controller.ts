@@ -3,9 +3,11 @@ import { IdentityService } from './service/identity.service';
 import { Identity } from '../storage/storage.interface';
 import { CreateIdentityDto } from './dto/create-identity.dto';
 import { DigestGuard } from '../utils/guards/digest.guard';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('identity')
 @UseGuards(DigestGuard)
+@ApiTags('configuration', 'identity')
 export class IdentityController {
   constructor(protected readonly identityService: IdentityService) {}
 

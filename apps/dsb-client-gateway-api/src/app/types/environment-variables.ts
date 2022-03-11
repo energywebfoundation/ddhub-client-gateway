@@ -103,6 +103,9 @@ export class EnvironmentVariables {
   @IsOptional()
   PASSWORD: string;
 
+  @IsString()
+  DID_AUTH_URL = 'http://localhost:8080';
+
   static isVaultEnabled(values: EnvironmentVariables): boolean {
     return values.SECRETS_ENGINE === SecretsEngine.VAULT;
   }

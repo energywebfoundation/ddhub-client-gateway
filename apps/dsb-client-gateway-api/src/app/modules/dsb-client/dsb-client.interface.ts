@@ -12,6 +12,20 @@ export interface TopicData {
   version: string;
 }
 
+export class ChannelDTO {
+  fqcn: string;
+  topics?: Topic[];
+  admins?: string[];
+  publishers?: string[];
+  subscribers?: string[];
+  maxMsgAge?: number;
+  maxMsgSize?: number;
+  createdBy: string;
+  createdDateTime: string;
+  modifiedBy?: string;
+  modifiedDateTime?: string;
+}
+
 export interface Channel {
   fqcn: string;
   topics?: Topic[];

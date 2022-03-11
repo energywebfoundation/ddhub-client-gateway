@@ -24,9 +24,11 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
   }
 
   public async onModuleInit(): Promise<void> {
+    const vaultEndpoint: string = this.configService.get('VAULT_ENDPOINT');
+
     this.client = nv({
       apiVersion: 'v1',
-      endpoint: this.configService.get('VAULT_ENDPOINT'),
+      endpoint: vaultEndpoint,
       token: this.configService.get('VAULT_TOKEN', 'root'),
     });
 

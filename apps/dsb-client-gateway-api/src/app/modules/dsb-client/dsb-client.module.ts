@@ -13,6 +13,8 @@ import { DsbMessagePoolingService } from './service/dsb-message-pooling.service'
 import { MessageModule } from '../message/message.module';
 import { DsbTopicsController } from './controller/dsb-topics.controller';
 import { DsbFilesController } from './controller/dsb-files.controller';
+import { DidAuthModule } from './module/did-auth/did-auth.module';
+import { DsbHealthController } from './controller/dsb-health.controller';
 
 @Module({
   imports: [
@@ -36,9 +38,11 @@ import { DsbFilesController } from './controller/dsb-files.controller';
     SecretsEngineModule,
     KeysModule,
     MessageModule,
+    DidAuthModule,
   ],
   providers: [DsbApiService, TlsAgentService, DsbMessagePoolingService],
   controllers: [
+    DsbHealthController,
     DsbChannelsController,
     DsbMessagesController,
     DsbTopicsController,
