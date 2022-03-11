@@ -18,7 +18,6 @@ type GatewayIdentityProps = {
   isLoading: boolean;
   onCreate: (privateKey?: string) => void;
   onEnrol: () => void;
-  onKeyCreate: () => void;
 };
 
 export const GatewayIdentity = ({
@@ -29,7 +28,6 @@ export const GatewayIdentity = ({
   isLoading,
   onCreate,
   onEnrol,
-  onKeyCreate,
 }: GatewayIdentityProps) => {
   const classes = useStyles();
   const [privateKey, setPrivatekey] = useState('');

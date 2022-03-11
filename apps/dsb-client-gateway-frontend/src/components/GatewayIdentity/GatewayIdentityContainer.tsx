@@ -58,8 +58,6 @@ export const GatewayIdentityContainer = ({
     setIsLoading(false);
   };
 
-  const handleKeyCreate = async () => {};
-
   const handleEnrol = async () => {
     setIsLoading(true);
     try {
@@ -95,7 +93,6 @@ export const GatewayIdentityContainer = ({
       isLoading={isLoading}
       onCreate={handleCreate}
       onEnrol={handleEnrol}
-      onKeyCreate={handleKeyCreate}
     />
   );
 };

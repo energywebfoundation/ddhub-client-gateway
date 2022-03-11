@@ -82,7 +82,7 @@ export const Upload = ({ channels, topics, onUpload }: UploadProps) => {
                   input={<CustomInput />}
                   fullWidth
                 >
-                  {topics?.map((topic) => (
+                  {topics?.map((topic: Topic) => (
                     <MenuItem key={topic.id} value={topic.id}>
                       {topic.name}
                     </MenuItem>
