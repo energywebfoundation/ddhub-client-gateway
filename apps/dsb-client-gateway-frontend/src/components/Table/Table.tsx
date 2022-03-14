@@ -97,7 +97,7 @@ type TableProps = {
     headers: ApplicationHeaderType[] | undefined
     dataRows: ApplicationType[] | TopicType[] | undefined
     location?: string | undefined
-    handleUpdateTopic: (body: TopicType) => void
+    handleUpdateTopic?: (body: TopicType) => void
 
 }
 
@@ -113,7 +113,6 @@ function Table({ headers, dataRows, location, handleUpdateTopic }: TableProps) {
     const handleClickOpen = () => {
         setOpenMenu(false)
         setOpenDialog(true)
-
     }
 
     // Function to get cell value
@@ -181,6 +180,10 @@ function Table({ headers, dataRows, location, handleUpdateTopic }: TableProps) {
         }),
         []
     )
+
+
+    // React.useMemo(() => cellValue, [cellValue])
+
 
     const defaultColumn = React.useMemo(
         () => ({
@@ -352,14 +355,14 @@ function Table({ headers, dataRows, location, handleUpdateTopic }: TableProps) {
                 ))}
             </Menu>
 
-            <SimpleDialog
+            {data && cellValue ? <SimpleDialog
                 data={cellValue}
                 onClose={handleClose}
                 open={openDialog}
                 dialogTitle={dialogTitle}
                 dialogText={dialogText}
                 handlePostOrUpdateTopic={handleUpdateTopic}
-            />
+            /> : null}
 
             <br />
 

@@ -26,7 +26,7 @@ type Props = {
     open: boolean
     dialogTitle: string
     dialogText: string
-    handlePostOrUpdateTopic: (body: TopicType) => void
+    handlePostOrUpdateTopic?: (body: TopicType) => void
 
 }
 
@@ -34,15 +34,15 @@ let schemaTypes = [
     { id: 1, schema: 'JSD7' },
     { id: 2, schema: 'JSD8' }
 ]
-
 export default function SimpleDialog(props: Props) {
     const { onClose, handlePostOrUpdateTopic, open, data, dialogTitle, dialogText } = props
 
-    let [jsonSchema, setJsonSchema] = React.useState(data?.schema)
-    let [topicName, setTopicName] = React.useState(data?.name)
-    let [version, setVersion] = React.useState(data?.version)
-    let [tags, setTags] = React.useState(data?.tags)
-    let [schemaType, setSchemaType] = React.useState(data?.schemaType)
+
+    let [jsonSchema, setJsonSchema] = React.useState(data?.schema || {})
+    let [topicName, setTopicName] = React.useState(data?.name || '')
+    let [version, setVersion] = React.useState(data?.name || '')
+    let [tags, setTags] = React.useState<string[]>(data?.tags || [])
+    let [schemaType, setSchemaType] = React.useState(data?.schemaType || '')
 
 
     const classes = useStyles()
@@ -104,7 +104,7 @@ export default function SimpleDialog(props: Props) {
                                         id="demo-customized-select"
                                         value={schemaType}
                                         onChange={(event: any) => setSchemaType(event.target.value)}
-                                        input={<CustomInput />}
+                                        // input={<CustomInput />}
                                         fullWidth
                                     >
                                         {schemaTypes?.map((schemaType) => (
@@ -124,16 +124,21 @@ export default function SimpleDialog(props: Props) {
 
                                 <div style={{ maxWidth: "1400px", maxHeight: "100%" }}>
                                     <JSONInput
-                                        placeholder={jsonSchema ? jsonSchema : {}} // data to display
+                                        placeholder={jsonSchema} // data to display
+
                                         theme="dark_vscode_tribute"
+                                        value={jsonSchema}
                                         // onKeyPressUpdate='false'
                                         // waitAfterKeyPress='1'
+
                                         locale={locale}
                                         colors={{
                                             error: "#DAA520"
                                             // overrides theme colors with whatever color value you want
                                         }}
-                                        onChange={(event: any) => setJsonSchema(event.json)}
+                                        onChange={(event: any) => {
+                                            setJsonSchema(event.jsObject)
+                                        }}
                                         height="550px"
                                     />
                                 </div>
@@ -190,7 +195,7 @@ export default function SimpleDialog(props: Props) {
                                         tags: ["vikas6"] // check how to take tags from user
                                     }
 
-                                    handlePostOrUpdateTopic(topicData)
+                                    handlePostOrUpdateTopic ? handlePostOrUpdateTopic(topicData) : null
 
                                 }}
                             >
