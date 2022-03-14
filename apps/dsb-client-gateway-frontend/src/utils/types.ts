@@ -90,7 +90,7 @@ export type Channel = {
 export type Topic = {
   id: string;
   name: string;
-  namespace: string;
+  owner: string;
   schema: object | string;
   schemaType: string;
   version: string;
@@ -137,6 +137,24 @@ export enum EventEmitMode {
   SINGLE = 'SINGLE',
   BULK = 'BULK',
 }
+
+export type Application = {
+  applicationLogo: string
+  applicationName: string
+  applicationNameSpace: string
+  topicsCount: number
+  modifiedDateTime?: string
+}
+
+
+export type ApplicationHeader = {
+  id?: string
+  Header?: string
+  accessor: string
+  filter?: string
+  Cell?: any
+}
+
 
 export type EnrolmentManager = {
   /**

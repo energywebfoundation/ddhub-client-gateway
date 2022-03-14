@@ -57,7 +57,10 @@
     "sweetalert": "^2.1.2",
     "tslib": "^2.0.0",
     "uuid": "^8.3.2",
-    "websocket": "^1.0.34"
+    "websocket": "^1.0.34",
+    "react-table": "^7.7.0",
+    "match-sorter": "^4.0.0",
+    "react-json-editor-ajrm": "^2.5.13"
   },
   "devDependencies": {
     "@material-ui/core": "^4.12.3",
