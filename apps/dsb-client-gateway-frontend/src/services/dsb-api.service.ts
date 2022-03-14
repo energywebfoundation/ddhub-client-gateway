@@ -15,6 +15,12 @@ import {
   SendMessageData,
   SendMessageResult,
   Topic,
+  GetTopicsOptions,
+  SendTopicData,
+  PostTopicResult,
+  DSBTopicUnauthorizedError,
+  DSBTopicNotFoundError
+
 } from '../utils';
 import { getEnrolment } from './storage.service';
 import { captureMessage } from '@sentry/nextjs';
@@ -214,32 +220,6 @@ export class DsbApiService {
     }
   }
 
-  public async getTopics(): Promise<Result<Topic[]>> {
-    try {
-      const res = await this.api.get('/api/v1/dsb/topics', {
-        httpsAgent: this.httpsAgent,
-        headers: {
-          Authorization: `Bearer ${this.authToken}`,
-        },
-      });
-
-      switch (res.status) {
-        case 200:
-          return { ok: res.data.records };
-        case 401:
-          throw Error(ErrorCode.DSB_UNAUTHORIZED);
-        case 403:
-          throw new DSBForbiddenError(
-            `Must be enroled as a DSB user to access messages`
-          );
-        default:
-          throw new DSBRequestError(`${res.status} ${res.statusText}`);
-      }
-    } catch (err) {
-      return this.handleError(err, async () => this.getTopics());
-    }
-  }
-
   /**
    * Gets the list of channels that the gateway has publish/subscribe rights to
    *
@@ -254,8 +234,6 @@ export class DsbApiService {
           Authorization: `Bearer ${this.authToken}`,
         },
       });
-
-      console.log(res.data);
 
       switch (res.status) {
         case 200:
@@ -273,6 +251,147 @@ export class DsbApiService {
       return this.handleError(err, async () => this.getChannels());
     }
   }
+
+
+
+  public async getTopics(options?: GetTopicsOptions): Promise<Result<Topic[]>> {
+
+    // await this.useTLS()
+    try {
+      const res = await this.api.get('/topic', {
+        httpsAgent: this.httpsAgent,
+        headers: {
+          // eslint-disable-next-line max-len
+          Authorization: `Bearer ${this.authToken}`
+        },
+        params: options
+      })
+      switch (res.status) {
+        case 200:
+          return { ok: res.data.records }
+        case 401:
+          throw Error(ErrorCode.DSB_UNAUTHORIZED)
+        case 403:
+          throw new DSBForbiddenError(`Must be enroled as a DSB user to access messages`)
+        default:
+          throw new DSBRequestError(`${res.status} ${res.statusText}`)
+      }
+    } catch (err) {
+      return this.handleError(err, async () => this.getTopics(options))
+    }
+  }
+
+  /**
+ * Sends a POST /postTopics request to the broker
+ *
+ * @returns
+ */
+  public async postTopics(data: SendTopicData): Promise<Result<PostTopicResult>> {
+    // await this.useTLS()
+    try {
+      // if (!this.authToken) {
+      //   throw Error(ErrorCode.DSB_UNAUTHORIZED)
+      // }
+      const res = await this.api.request({
+        url: '/topic',
+        method: 'POST',
+        httpsAgent: this.httpsAgent,
+        headers: {
+          // eslint-disable-next-line max-len
+          Authorization: `Bearer ${this.authToken}`,
+          'Content-Type': 'application/json'
+        },
+        data: data
+      })
+
+      switch (res.status) {
+        case 200:
+          return {
+            ok: res.data
+          }
+        case 400:
+          const { message: payloadErrorMessage } = await res.data
+          throw new DSBPayloadError(payloadErrorMessage)
+        case 401:
+          const unauthorizedMessage = res.data.message
+          // login error
+          if (unauthorizedMessage === 'Unauthorized') {
+            throw Error(ErrorCode.DSB_UNAUTHORIZED)
+          }
+          // topic not authorized
+          else {
+            throw new DSBTopicUnauthorizedError(unauthorizedMessage)
+          }
+        case 403:
+          throw new DSBForbiddenError(`Must be enroled as a DSB user to access messages`)
+        case 404:
+          throw new DSBTopicNotFoundError(res.data.message)
+        default:
+          throw new DSBRequestError(`${res.status} ${res.statusText}`)
+      }
+    } catch (err) {
+      return this.handleError(err, async () => this.postTopics(data))
+    }
+  }
+
+  /**
+* Sends a Update /Topics request to the broker
+*
+* @returns
+*/
+  public async updateTopics(data: SendTopicData): Promise<Result<PostTopicResult>> {
+    // await this.useTLS()
+    try {
+
+      // if (!this.authToken) {
+      //   throw Error(ErrorCode.DSB_UNAUTHORIZED)
+      // }
+
+      const res = await this.api.request({
+        url: '/topic',
+        method: 'PATCH',
+        httpsAgent: this.httpsAgent,
+        headers: {
+          // eslint-disable-next-line max-len
+          Authorization: `Bearer ${this.authToken}`,
+          'Content-Type': 'application/json'
+        },
+        data: data
+      })
+
+      switch (res.status) {
+        case 200:
+          return {
+            ok: res.data
+          }
+        case 400:
+          const { message: payloadErrorMessage } = await res.data
+          throw new DSBPayloadError(payloadErrorMessage)
+        case 401:
+          const unauthorizedMessage = res.data.message
+          // login error
+          if (unauthorizedMessage === 'Unauthorized') {
+            throw Error(ErrorCode.DSB_UNAUTHORIZED)
+          }
+          // topic not authorized
+          else {
+            throw new DSBTopicUnauthorizedError(unauthorizedMessage)
+          }
+        case 403:
+          throw new DSBForbiddenError(`Must be enroled as a DSB user to access messages`)
+        case 404:
+          throw new DSBTopicNotFoundError(res.data.message)
+        default:
+          throw new DSBRequestError(`${res.status} ${res.statusText}`)
+      }
+    } catch (err) {
+      return this.handleError(err, async () => this.postTopics(data))
+    }
+  }
+
+
+
+
 
   /**
    * Start polling for new messages on the DSB message broker. Note that this

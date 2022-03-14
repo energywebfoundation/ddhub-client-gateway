@@ -34,6 +34,7 @@ export enum ErrorCode {
   DSB_CHANNEL_NOT_FOUND = 'DSB::CHANNEL_NOT_FOUND',
   DSB_NO_SUBSCRIPTIONS = 'DSB::NO_SUBSCRIPTIONS',
   DSB_INVALID_PAYLOAD = 'DSB::INVALID_PAYLOAD',
+  DSB_TOPIC_UNAUTHORIZED = 'DSB::TOPIC_UNAUTHORIZED',
 
   // PM2 ERRORS
   PM2_NOT_CONFIGURED = 'PM2::NOT_CONFIGURED',
@@ -350,6 +351,27 @@ export class UnknownError extends GatewayError {
       statusCode: HttpError.INTERNAL_SERVER_ERROR,
       code: ErrorCode.UNKNOWN_ERROR,
       reason: err instanceof Error ? err.message : err
+    })
+  }
+}
+
+
+export class DSBTopicUnauthorizedError extends GatewayError {
+  constructor(reason: string) {
+    super({
+      statusCode: HttpError.UNAUTHORIZED,
+      code: ErrorCode.DSB_TOPIC_UNAUTHORIZED,
+      reason
+    })
+  }
+}
+
+export class DSBTopicNotFoundError extends GatewayError {
+  constructor(reason: string) {
+    super({
+      statusCode: HttpError.NOT_FOUND,
+      code: ErrorCode.DSB_CHANNEL_NOT_FOUND,
+      reason
     })
   }
 }

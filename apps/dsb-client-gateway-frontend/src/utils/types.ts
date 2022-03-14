@@ -155,6 +155,35 @@ export type ApplicationHeader = {
   Cell?: any
 }
 
+export type PostTopicResult = {
+  id: string
+  name: string
+  schemaType: string
+  schema: string
+  version: string
+  owner: string,
+  tags: string[]
+}
+
+
+export type GetTopicsOptions = {
+  limit?: number
+  name: string
+  owner: string
+  page?: number
+  tags?: string[]
+}
+
+export type SendTopicData = {
+  name: string
+  schemaType: string
+  schema: string
+  version: string
+  signature: string
+  owner: string
+  tags: string[]
+}
+
 
 export type EnrolmentManager = {
   /**
