@@ -13,8 +13,8 @@ import { ErrorCode, Result, serializeError, Channel, Option, ErrorBodySerialized
 import SimpleDialog from '../topicdialog'
 type Props = {
     health: Result<boolean, ErrorBodySerialized>
-    channels: Result<Channel[], ErrorBodySerialized>
-    topics: Result<Topic[], ErrorBodySerialized>
+    // channels: Result<Channel[], ErrorBodySerialized>
+    // topics: Result<Topic[], ErrorBodySerialized>
     auth: Option<string>
 }
 // take this data by calling API made by chris
@@ -69,13 +69,13 @@ export async function getServerSideProps(context: GetServerSidePropsContext): Pr
     const { err } = isAuthorized(authHeader)
     if (!err) {
         const health = await DsbApiService.init().getHealth()
-        const channels = await DsbApiService.init().getChannels()
-        const topics = await DsbApiService.init().getTopics()
+        // const channels = await DsbApiService.init().getChannels()
+        // const topics = await DsbApiService.init().getTopics()
         return {
             props: {
                 health: serializeError(health),
-                channels: serializeError(channels),
-                topics: serializeError(topics),
+                // channels: serializeError(channels),
+                // topics: serializeError(topics),
                 auth: authHeader ? { some: authHeader } : { none: true }
             }
         }
@@ -89,30 +89,16 @@ export async function getServerSideProps(context: GetServerSidePropsContext): Pr
         return {
             props: {
                 health: {},
-                channels: {},
-                topics: {},
+                // channels: {},
+                // topics: {},
                 auth: { none: true }
             }
         }
     }
 }
-export default function ListApplications({ health, channels, topics, auth }:
+export default function ListApplications({ health, auth }:
     InferGetServerSidePropsType<typeof getServerSideProps>) {
     const classes = useStyles()
-    const router = useRouter()
-    const isActive = (pathname: string) => (router.pathname === pathname ? classes.active : '')
-    const [open, setOpen] = useState(false)
-    const selectedValue = 'vikaskum660@gmail.com'
-    let data = {
-        dialogTitle: 'Create Topic',
-        dialogText: 'Provide Topic data with this form'
-    }
-    const handleClickOpen = () => {
-        setOpen(true)
-    }
-    const handleClose = (value) => {
-        setOpen(false)
-    }
     // useEffect(() => {
     //     if (health.err) {
     //         return swal('Error', health.err.reason, 'error')

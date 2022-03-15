@@ -17,7 +17,7 @@ type TopicProps = {
 // take this data by calling API made by chris
 
 
-export default function Topic({ applications, myDID }: TopicProps) {
+export default function Application({ applications, myDID }: TopicProps) {
     const classes = useStyles()
     return (
         <div >

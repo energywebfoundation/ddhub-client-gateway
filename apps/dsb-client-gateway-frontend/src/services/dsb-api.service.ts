@@ -9,6 +9,7 @@ import {
   ErrorCode,
   EventEmitMode,
   GatewayError,
+  isGatewayError,
   GetMessageOptions,
   Message,
   Result,
@@ -26,12 +27,14 @@ import { getEnrolment } from './storage.service';
 import { captureMessage } from '@sentry/nextjs';
 import { Agent } from 'https';
 import axios, { AxiosInstance } from 'axios';
+import { HttpService } from '@nestjs/axios';
 
 export class DsbApiService {
   private static instance?: DsbApiService;
   private api: AxiosInstance;
   private authToken?: string;
   private httpsAgent?: Agent;
+  private httpService: HttpService;
 
   /**
    * Initialize the DsbAPIService
@@ -258,13 +261,14 @@ export class DsbApiService {
 
     // await this.useTLS()
     try {
-      const res = await this.api.get('/topic', {
-        httpsAgent: this.httpsAgent,
+      const res = await this.api.get('https://aemovc.eastus.cloudapp.azure.com/topic', {
+        params: {
+          owner: options,
+        },
+        // httpsAgent: this.getTLS(),
         headers: {
-          // eslint-disable-next-line max-len
           Authorization: `Bearer ${this.authToken}`
         },
-        params: options
       })
       switch (res.status) {
         case 200:
@@ -513,22 +517,24 @@ export class DsbApiService {
     err: unknown,
     retryFn: () => Promise<Result<T, GatewayError>>
   ): Promise<Result<T, GatewayError>> {
-    // if (isGatewayError(err)) {
-    //   return { err }
-    // } else if (err instanceof Error) {
-    //   if (err.message === ErrorCode.DSB_UNAUTHORIZED) {
-    //     const { ok, err } = await this.login()
-    //     if (!ok) {
-    //       return { err }
-    //     }
-    //     return retryFn()
-    //   }
-    //   return {
-    //     err: new DSBRequestError(err.message)
-    //   }
-    // } else {
-    return { err: new GatewayError(err as any) };
-    // }
+
+    if (isGatewayError(err)) {
+      return { err }
+    } else if (err instanceof Error) {
+      if (err.message === ErrorCode.DSB_UNAUTHORIZED) {
+        //     const { ok, err } = await this.login()
+        //     if (!ok) {
+        //       return { err }
+        //     }
+        //     return retryFn()
+        //   }
+        return {
+          err: new DSBRequestError(err.message)
+        }
+      } else {
+        return { err: new GatewayError(err as any) };
+      }
+    }
   }
 
   /**
