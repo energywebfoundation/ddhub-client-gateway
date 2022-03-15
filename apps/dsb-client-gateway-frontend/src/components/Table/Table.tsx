@@ -1,9 +1,14 @@
-import React, { useState } from "react"
+import React, { useState } from 'react'
 import 'regenerator-runtime/runtime'
 import matchSorter from 'match-sorter'
-import { MenuItem, Menu, Theme, Icon } from "@material-ui/core"
+import { MenuItem, Menu, Theme, IconButton } from '@material-ui/core'
+import Pagination from '@material-ui/lab/Pagination'
+import MoreVertIcon from '@material-ui/icons/MoreVert'
+// import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward'
+// import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward'
 import { makeStyles } from '@material-ui/styles'
 import { useTable, useSortBy, usePagination, useFilters, useGlobalFilter, useAsyncDebounce } from 'react-table'
+import { CustomInput } from '../CustomInput/CustomInput'
 import {
     ApplicationHeader as ApplicationHeaderType,
     Application as ApplicationType,
@@ -13,12 +18,12 @@ import { useRouter } from 'next/router'
 import clsx from 'clsx'
 import Link from 'next/link'
 import SimpleDialog from '../../pages/topicdialog'
+import { FullscreenExitTwoTone } from '@material-ui/icons'
 
 const options = [
     {
         id: 1,
         name: 'View Details'
-
     },
     {
         id: 2,
@@ -27,62 +32,53 @@ const options = [
 
     {
         id: 3,
-        name: 'View ersion history'
-
+        name: 'View version history'
     },
     {
         id: 4,
         name: 'Remove'
-
     }
 ]
 
 function fuzzyTextFilterFn(rows, id, filterValue) {
-    return matchSorter(rows, filterValue, { keys: [row => row.values[id]] })
+    return matchSorter(rows, filterValue, { keys: [(row) => row.values[id]] })
 }
 
-
 // Define a default UI for filtering
-function GlobalFilter({
-    preGlobalFilteredRows,
-    globalFilter,
-    setGlobalFilter,
-}) {
+function GlobalFilter({ preGlobalFilteredRows, globalFilter, setGlobalFilter }) {
     const count = preGlobalFilteredRows.length
     const [value, setValue] = React.useState(globalFilter)
-    const onChange = useAsyncDebounce(value => {
+    const onChange = useAsyncDebounce((value) => {
         setGlobalFilter(value || undefined)
     }, 200)
 
     return (
-        <span>
-            Search:{' '}
-            <input
-                value={value || ""}
-                onChange={e => {
+        //   is it possible we can separate the search filter from table? or could add the button create here
+        <div>
+            Search{' '}
+            <CustomInput
+                value={value || ''}
+                onChange={(e) => {
                     setValue(e.target.value)
                     onChange(e.target.value)
                 }}
                 placeholder={`${count} records...`}
                 style={{
-                    fontSize: '1.1rem',
-                    border: '0',
+                    margin: '16px 0 16px 0'
                 }}
             />
-        </span>
+        </div>
     )
 }
 
 // Define a default UI for filtering
-function DefaultColumnFilter({
-    column: { filterValue, preFilteredRows, setFilter },
-}) {
+function DefaultColumnFilter({ column: { filterValue, preFilteredRows, setFilter } }) {
     const count = preFilteredRows.length
 
     return (
         <input
             value={filterValue || ''}
-            onChange={e => {
+            onChange={(e) => {
                 setFilter(e.target.value || '') // Set undefined to remove the filter entirely
             }}
             placeholder={`Search ${count} records...`}
@@ -91,23 +87,21 @@ function DefaultColumnFilter({
 }
 
 // Let the table remove the filter if the string is empty
-fuzzyTextFilterFn.autoRemove = val => !val
+fuzzyTextFilterFn.autoRemove = (val) => !val
 
 type TableProps = {
     headers: ApplicationHeaderType[] | undefined
     dataRows: ApplicationType[] | TopicType[] | undefined
     location?: string | undefined
     handleUpdateTopic?: (body: TopicType) => void
-
 }
 
 function Table({ headers, dataRows, location, handleUpdateTopic }: TableProps) {
-
     const router = useRouter()
     const isActive = (pathname: string) => (router.pathname === pathname ? classes.active : '')
     const [openMenu, setOpenMenu] = useState(false)
     const [openDialog, setOpenDialog] = useState(false)
-    const [filterInput, setFilterInput] = useState("")
+    const [filterInput, setFilterInput] = useState('')
     const [cellValue, setCellValue] = useState()
 
     const handleClickOpen = () => {
@@ -123,11 +117,9 @@ function Table({ headers, dataRows, location, handleUpdateTopic }: TableProps) {
     let dialogTitle = 'Update Topic'
     let dialogText = 'Update Topic data'
 
-
     const handleClose = (value) => {
         setOpenDialog(false)
     }
-
 
     if (dataRows === undefined) {
         dataRows = []
@@ -141,22 +133,40 @@ function Table({ headers, dataRows, location, handleUpdateTopic }: TableProps) {
         accessor: '',
         filter: 'false',
         Cell: (props) => {
-
             // currenty sending test change it to owner variable afterwards
             let owner = props.cell.row.values.applicationName
 
             if (location === 'Application') {
-                return <div>
-
-                    {owner ? <Link href={`/topics?owner=test`}>
-                        <a className={clsx(classes.navLink, isActive('/topics'))}><Icon>threeDotsIcon</Icon></a>
-                    </Link> :
-                        <a className={clsx(classes.navLink, isActive('/topics'))}><Icon>threeDotsIcon</Icon></a>}
-                </div>
+                return (
+                    <div>
+                        {owner ? (
+                            <Link href={`/topics?owner=test`}>
+                                <a className={clsx(classes.navLink, isActive('/topics'))}>
+                                    <IconButton>
+                                        <MoreVertIcon color="primary" />
+                                    </IconButton>
+                                </a>
+                            </Link>
+                        ) : (
+                            <a className={clsx(classes.navLink, isActive('/topics'))}>
+                                <IconButton>
+                                    <MoreVertIcon color="primary" />
+                                </IconButton>
+                            </a>
+                        )}
+                    </div>
+                )
             } else {
-                return (<button onClick={() => {
-                    setOpenMenu(true)
-                }}> More Options</button >)
+                return (
+                    <button
+                        onClick={() => {
+                            setOpenMenu(true)
+                        }}
+                    >
+                        {' '}
+                        More Options
+                    </button>
+                )
             }
         }
     })
@@ -168,32 +178,26 @@ function Table({ headers, dataRows, location, handleUpdateTopic }: TableProps) {
             // Or, override the default text filter to use
             // "startWith"
             text: (rows, id, filterValue) => {
-                return rows.filter(row => {
+                return rows.filter((row) => {
                     const rowValue = row.values[id]
                     return rowValue !== undefined
-                        ? String(rowValue)
-                            .toLowerCase()
-                            .startsWith(String(filterValue).toLowerCase())
+                        ? String(rowValue).toLowerCase().startsWith(String(filterValue).toLowerCase())
                         : true
                 })
-            },
+            }
         }),
         []
     )
-
-
-    // React.useMemo(() => cellValue, [cellValue])
-
 
     const defaultColumn = React.useMemo(
         () => ({
             // Let's set up our default Filter UI
-            Filter: DefaultColumnFilter,
+            Filter: DefaultColumnFilter
         }),
         []
     )
 
-    const handleFilterChange = e => {
+    const handleFilterChange = (e) => {
         const value = e.target.value || undefined
         setFilterInput(value)
     }
@@ -201,12 +205,7 @@ function Table({ headers, dataRows, location, handleUpdateTopic }: TableProps) {
     const classes = useStyles()
     const data = React.useMemo(() => dataRows, [dataRows])
 
-
-    const columns = React.useMemo(
-        () => newHeaders,
-        []
-    )
-
+    const columns = React.useMemo(() => newHeaders, [])
 
     const {
         getTableProps,
@@ -234,31 +233,32 @@ function Table({ headers, dataRows, location, handleUpdateTopic }: TableProps) {
         preGlobalFilteredRows,
         setGlobalFilter,
         visibleColumns
-
-    } = useTable({
-        defaultColumn, // Be sure to pass the defaultColumn option
-        filterTypes,
-        columns,
-        data,
-        initialState: { pageIndex: 0, pageSize: 3 }
-    },
+    } = useTable(
+        {
+            defaultColumn, // Be sure to pass the defaultColumn option
+            filterTypes,
+            columns,
+            data,
+            initialState: { pageIndex: 0, pageSize: 3 }
+        },
         useFilters,
         useGlobalFilter,
         useSortBy,
-        usePagination,
+        usePagination
     )
 
     return (
-
         <div>
-            <table className={classes.table}  {...getTableProps()}>
-
+            <table className={classes.table} {...getTableProps()}>
                 <thead>
                     <tr>
                         <th
                             colSpan={visibleColumns.length}
                             style={{
                                 textAlign: 'left',
+                                background: '#161D31',
+                                fontSize: '14px',
+                                fontWeight: 'normal'
                             }}
                         >
                             <GlobalFilter
@@ -272,63 +272,56 @@ function Table({ headers, dataRows, location, handleUpdateTopic }: TableProps) {
                     {headerGroups.map((headerGroup, index) => (
                         <tr key={index} {...headerGroup.getHeaderGroupProps()}>
                             {headerGroup.headers.map((column, key) => (
-                                <th key={key}
+                                <th
+                                    key={key}
                                     {...column.getHeaderProps(column.getSortByToggleProps())}
                                     style={{
-
                                         background: '#343E55',
                                         color: '#C6C9CE',
-                                        'textAlign': 'left',
-                                        'padding': '1em',
-                                        'fontSize': '12px',
-                                        'lineHeight': '14px',
-                                        'letterSpacing': '0.08em'
+                                        textAlign: 'left',
+                                        padding: '1em',
+                                        fontSize: '12px',
+                                        lineHeight: '14px',
+                                        letterSpacing: '0.08em',
+                                        fontWeight: '400'
                                     }}
                                 >
                                     {column.render('Header')}
                                     {/* Add a sort direction indicator */}
-                                    <span>
-                                        {column.isSorted
-                                            ? column.isSortedDesc
-                                                ? ' 🔽'
-                                                : ' 🔼'
-                                            : ''}
-                                    </span>
-
+                                    <span>{column.isSorted ? (column.isSortedDesc ? ' 🔽' : ' 🔼') : ''}</span>
+                                    {/* <ArrowDownwardIcon color="primary" fontSize="small" /> */}
+                                    {/* <ArrowUpwardIcon color="primary" fontSize="small" /> */}
                                 </th>
                             ))}
                         </tr>
                     ))}
-
                 </thead>
                 <tbody {...getTableBodyProps()}>
-
                     {page.map((row, index) => {
                         prepareRow(row)
                         return (
                             <tr key={index} {...row.getRowProps()}>
                                 {row.cells.map((cell, key) => {
                                     return (
-                                        <td key={key}
+                                        <td
+                                            key={key}
                                             onClick={() => getCellValue(cell)}
                                             {...cell.getCellProps()}
                                             style={{
                                                 color: '#C6C9CE',
-                                                background: '#2A3044',
-                                                'textAlign': 'left',
-                                                'fontFamily': 'Sequel Sans',
-                                                'fontStyle': 'normal',
-                                                'fontWeight': 'normal',
-                                                'fontSize': '14px',
-                                                'lineHeight': '17px',
-                                                'borderCollapse': 'separate',
-                                                'borderSpacing': '0 1em',
-                                                'padding': '1em'
-
+                                                textAlign: 'left',
+                                                fontFamily: 'Sequel Sans',
+                                                fontStyle: 'normal',
+                                                fontWeight: 'normal',
+                                                fontSize: '14px',
+                                                lineHeight: '17px',
+                                                borderCollapse: 'separate',
+                                                borderSpacing: '0 1em',
+                                                padding: '1em',
+                                                borderBottom: '1px solid #384151'
                                             }}
                                         >
                                             {cell.render('Cell')}
-
                                         </td>
                                     )
                                 })}
@@ -338,11 +331,7 @@ function Table({ headers, dataRows, location, handleUpdateTopic }: TableProps) {
                 </tbody>
             </table>
 
-            <Menu
-                key="menu"
-                open={openMenu}
-                onClose={e => setOpenMenu(false)}
-                style={{ marginRight: 'auto' }}>
+            <Menu key="menu" open={openMenu} onClose={(e) => setOpenMenu(false)} style={{ marginRight: 'auto' }}>
                 {options?.map((option) => (
                     <MenuItem
                         key={option.id}
@@ -351,7 +340,6 @@ function Table({ headers, dataRows, location, handleUpdateTopic }: TableProps) {
                     >
                         {option.name}
                     </MenuItem>
-
                 ))}
             </Menu>
 
@@ -364,57 +352,51 @@ function Table({ headers, dataRows, location, handleUpdateTopic }: TableProps) {
                 handlePostOrUpdateTopic={handleUpdateTopic}
             /> : null}
 
-            <br />
+            {/* <div className="pagination d-flex justify-content-between">
+        <div style={{ color: '#C6C9CE' }}>
+          Showing the first {state.pageSize} results of {page.length} rows
+        </div>
+        <div>
+          <button onClick={() => previousPage()} disabled={!canPreviousPage}>
+            {'<'}
+          </button>{' '}
+          <span style={{ color: '#C6C9CE' }}>
+            Page{' '}
+            <strong>
+              {state.pageIndex + 1} of {pageOptions.length}
+            </strong>{' '}
+          </span>
+          <button onClick={() => nextPage()} disabled={!canNextPage}>
+            {'>'}
+          </button>{' '}
+        </div>
+      </div> */}
 
-            <div className="pagination">
-
-                <button onClick={() => previousPage()} disabled={!canPreviousPage}>
-                    {'<'}
-                </button>{' '}
-
-                <span style={{ color: '#C6C9CE', }}>
-                    Page{' '}
-                    <strong>
-                        {state.pageIndex + 1} of {pageOptions.length}
-                    </strong>{' '}
-                </span>
-
-                <button onClick={() => nextPage()} disabled={!canNextPage}>
-                    {'>'}
-                </button>{' '}
-
+            <div className={classes.pagination}>
+                <div style={{ color: '#C6C9CE' }}>
+                    Showing the first {state.pageSize} results of {page.length} rows
+                </div>
+                <Pagination count={5} color="primary" />
             </div>
-
-            <br />
-            <div style={{ color: '#C6C9CE', }}>Showing the first {state.pageSize} results of {page.length} rows</div>
-
-        </div >
-
+        </div>
     )
 }
 
-
 const useStyles = makeStyles((theme: Theme) => ({
-
     table: {
-        width: "100%",
-        background: '#2A3044',
-        'border- radius': '6px',
-
+        width: '100%',
+        minWidth: 650,
+        background: theme.palette.primary.dark,
+        'border-spacing': '0',
     },
 
     rowText: {
-        position: 'absolute',
-        width: '69.87px',
-        height: '17px',
-        left: '415.59px',
-        top: '200px',
         'font- family': 'Sequel Sans',
         'font- style': 'normal',
         'font - weight': 'normal',
         'font - size': '14px',
         'line - height': '17px',
-        color: '#C6C9CE'
+        color: theme.palette.text.primary
     },
     test: {
         content: '2807',
@@ -424,11 +406,11 @@ const useStyles = makeStyles((theme: Theme) => ({
         width: '35px',
         height: '5px',
         'background-color': 'black',
-        'margin': '6px 0'
+        margin: '6px 0'
     },
     span: {
         color: 'darkolivegreen',
-        background: theme.palette.secondary.main,
+        background: theme.palette.secondary.main
     },
     navLink: {
         fontSize: '1rem',
@@ -440,6 +422,13 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
     active: {
         color: theme.palette.secondary.main
+    },
+    pagination: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        width: '100%',
+        padding: '15px 0'
     }
 }))
 

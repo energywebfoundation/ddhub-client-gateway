@@ -1,16 +1,7 @@
 import { makeStyles } from '@material-ui/styles'
 import { useState } from 'react'
-import {
-    Theme,
-    Typography,
-    withStyles,
-    Button
-
-} from '@material-ui/core'
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
+import { Theme, Typography, Button } from '@material-ui/core'
 import { Topic as TopicType } from '../../utils'
-import { JsonView, defaultStyles } from 'react-json-view-lite'
-import 'react-json-view-lite/dist/index.css'
 import Table from '../Table/Table'
 import SimpleDialog from '../../pages/topicdialog'
 
@@ -19,7 +10,7 @@ import { TOPIC_HEADERS as topicHeaders } from '../../utils'
 type TopicProps = {
     applicationName: string | string[] | undefined
     topics: TopicType[] | undefined
-    myDID?: string,
+    myDID?: string
     handlePostTopic: (body: TopicType) => void
     handleUpdateTopic: (body: TopicType) => void
 }
@@ -43,15 +34,11 @@ export default function Topic({ applicationName, topics, myDID, handlePostTopic,
             <section className={classes.connectionStatus}>
                 <Typography variant="h4">{applicationName}</Typography>
             </section>
-            <div style={{ display: "flex" }}>
+            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                 <section className={classes.searchText}>
-
-                    <Button style={{ justifyContent: 'flex-end' }}
-                        className={classes.connectionStatusPaper}
-                        onClick={handleClickOpen}>
+                    <Button style={{ justifyContent: 'flex-end' }} variant="contained" color="primary" onClick={handleClickOpen}>
                         Create
                     </Button>
-
                 </section>
 
                 <SimpleDialog
@@ -63,17 +50,12 @@ export default function Topic({ applicationName, topics, myDID, handlePostTopic,
                 />
             </div>
 
-            <Table
-                headers={topicHeaders}
-                dataRows={topics}
-                handleUpdateTopic={handleUpdateTopic}
-            />
+            <Table headers={topicHeaders} dataRows={topics} handleUpdateTopic={handleUpdateTopic} />
         </div>
     )
 }
 
 const useStyles = makeStyles((theme: Theme) => ({
-
     navbar: {
         position: 'absolute',
         background: '#293145',
@@ -126,15 +108,6 @@ const useStyles = makeStyles((theme: Theme) => ({
     jsonContainer: {
         fontFamily: 'monospace'
     },
-    connectionStatus: {
-        display: 'flex',
-        alignItems: 'center',
-        padding: '0 2rem',
-
-        '& *': {
-            color: '#fff'
-        }
-    },
     searchText: {
         display: 'flex',
         paddingTop: '1rem',
@@ -144,15 +117,13 @@ const useStyles = makeStyles((theme: Theme) => ({
             color: '#6E6B7B'
         }
     },
-    connectionStatusPaper: {
-        padding: '.5rem 1rem',
-        marginLeft: '1rem',
-        background: theme.palette.secondary.main,
-        borderRadius: '1rem',
+    connectionStatus: {
         display: 'flex',
         alignItems: 'center',
-        color: '#FFFFFF',
-        justifyContent: 'flex-end'
+        padding: '0 2rem',
 
-    },
+        '& *': {
+            color: '#fff'
+        }
+    }
 }))

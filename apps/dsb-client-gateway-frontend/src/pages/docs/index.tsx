@@ -12,14 +12,12 @@ import { useEffect } from 'react'
 import { useState } from 'react'
 import { ChannelContainer } from '../../components/Channels/ChannelsContainer'
 import { getEnrolment } from '../../services/storage.service'
-
 type Props = {
   health: Result<boolean, ErrorBodySerialized>
   channels: Result<Channel[], ErrorBodySerialized>
   did: Option<string>
   auth: Option<string>
 }
-
 export async function getServerSideProps(context: GetServerSidePropsContext): Promise<{
   props: Props
 }> {
@@ -27,9 +25,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext): Pr
   const { err } = isAuthorized(authHeader)
   if (!err) {
     const health = await DsbApiService.init().getHealth()
-
     const channels = await DsbApiService.init().getChannels()
-
     const enrolment = await getEnrolment()
     return {
       props: {
@@ -56,16 +52,13 @@ export async function getServerSideProps(context: GetServerSidePropsContext): Pr
     }
   }
 }
-
 export default function Documentation({
   health,
   channels,
   did
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const classes = useStyles()
-
   const [channelErrorText, setChannelErrorText] = useState<string>()
-
   useEffect(() => {
     if (channels.err) {
       swal('Error', channels.err.reason, 'error')
@@ -77,7 +70,6 @@ export default function Documentation({
       }
     }
   }, [channels])
-
   return (
     <div>
       <Head>
@@ -85,10 +77,8 @@ export default function Documentation({
         <meta name="description" content="EW-DSB Client Gateway" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-
       <main>
         <Header />
-
         <Container maxWidth="lg">
           <section className={classes.connectionStatus}>
             <Typography variant="h4">Connection Status </Typography>
@@ -96,39 +86,33 @@ export default function Documentation({
               {health.ok ? 'ONLINE' : `ERROR [${health.err?.code}]`}
             </Typography>
           </section>
-
           <Divider className={classes.divider} />
-
           <section className={classes.apiDocs}>
             <Typography variant="h4">API Documentation </Typography>
             <div className={classes.apiDocsLink}>
               <Link href="/docs/rest" passHref={true}>
-                <Button variant="outlined" color="secondary">
+                <Button variant="contained" color="primary">
                   REST API
                 </Button>
               </Link>
 
               <Link href="/docs/ws" passHref={true}>
-                <Button variant="outlined" color="secondary">
+                <Button variant="contained" color="primary">
                   WEBSOCKET API
                 </Button>
               </Link>
             </div>
           </section>
-
           <Divider className={classes.divider} />
-
           <section className={classes.main}>
             <Typography className={classes.textWhite} variant="h4">
               Available Channels
             </Typography>
-
             {channelErrorText && (
               <Typography className={classes.textWhite} variant="h6">
                 {channelErrorText}
               </Typography>
             )}
-
             {channels.ok?.map((channel) => (
               <ChannelContainer key={channel.fqcn} channel={channel} did={did?.some} />
             ))}
@@ -138,13 +122,11 @@ export default function Documentation({
     </div>
   )
 }
-
 const useStyles = makeStyles((theme: Theme) => ({
   connectionStatus: {
     display: 'flex',
     alignItems: 'center',
     padding: '0 2rem',
-
     '& *': {
       color: '#fff'
     }
@@ -152,13 +134,13 @@ const useStyles = makeStyles((theme: Theme) => ({
   connectionStatusPaper: {
     padding: '.5rem 1rem',
     marginLeft: '1rem',
-    background: theme.palette.secondary.main,
+    background: theme.palette.primary.main,
     borderRadius: '1rem',
     display: 'flex',
     alignItems: 'center'
   },
   divider: {
-    background: '#fff',
+    background: '#1E263C',
     margin: '3rem 0'
   },
   main: {
@@ -170,7 +152,6 @@ const useStyles = makeStyles((theme: Theme) => ({
   apiDocs: {
     margin: '2rem 0',
     padding: '0 2rem',
-
     '& *': {
       color: '#fff'
     }
@@ -179,7 +160,6 @@ const useStyles = makeStyles((theme: Theme) => ({
     display: 'flex',
     alignItems: 'center',
     flexDirection: 'column',
-
     '& a': {
       width: '35rem',
       fontSize: '1rem',

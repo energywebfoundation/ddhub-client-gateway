@@ -65,6 +65,8 @@
   "devDependencies": {
     "@material-ui/core": "^4.12.3",
     "@material-ui/icons": "^4.11.2",
+    "@material-ui/lab": "^4.0.0-alpha.60",
+    "@mui/icons-material": "^5.5.0",
     "@nestjs/schematics": "^8.0.0",
     "@nestjs/testing": "^8.2.6",
     "@nrwl/cli": "13.7.3",
