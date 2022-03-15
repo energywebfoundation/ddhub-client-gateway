@@ -6,7 +6,7 @@ import { makeStyles } from '@material-ui/styles'
 import { Typography, Container, Divider, Theme, Grid } from '@material-ui/core'
 import { GatewayIdentityContainer } from '../components/GatewayIdentity/GatewayIdentityContainer'
 import { ProxyCertificateContainer } from '../components/ProxyCertificate/ProxyCertificateContainer'
-import Header from '../components/Header/Header'
+import ResponsiveHeader from '../components/ResponsiveHeader/ResponsiveHeader'
 import { DsbApiService } from '../services/dsb-api.service'
 import { refreshState } from '../services/identity.service'
 import { isAuthorized } from '../services/auth.service'
@@ -60,7 +60,10 @@ export default function Home({ health, state, auth }: InferGetServerSidePropsTyp
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
-        <Header />
+        {/* <Header /> */}
+
+        <ResponsiveHeader />
+
         <Container maxWidth="md">
           <section className={classes.connectionStatus}>
             <Typography variant="h4">Connection Status </Typography>

@@ -6,7 +6,8 @@ import { makeStyles } from '@material-ui/styles'
 import { Container, Theme, } from '@material-ui/core'
 import swal from '@sweetalert/with-react'
 import { TopicContainer } from '../../components/Topics/TopicsContainer'
-import Header from '../../components/Header/Header'
+import ResponsiveHeader from '../../components/ResponsiveHeader/ResponsiveHeader'
+
 import { DsbApiService } from '../../services/dsb-api.service'
 import { isAuthorized } from '../../services/auth.service'
 import { ErrorCode, Result, serializeError, Channel, Option, ErrorBodySerialized, Topic } from '../../utils'
@@ -93,7 +94,7 @@ export default function ListTopics({ health, channels, topics, auth }:
             </Head>
 
             <main>
-                <Header />
+                <ResponsiveHeader />
                 <Container maxWidth="lg">
                     <section className={classes.table}>
                         <TopicContainer

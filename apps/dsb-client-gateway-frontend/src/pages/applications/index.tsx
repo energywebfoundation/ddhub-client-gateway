@@ -6,11 +6,12 @@ import { makeStyles } from '@material-ui/styles'
 import { Typography, Container, Divider, Theme, TextField, IconButton, Button } from '@material-ui/core'
 import swal from '@sweetalert/with-react'
 import { ApplicationContainer } from '../../components/Applications/ApplicationsContainer'
-import Header from '../../components/Header/Header'
+import ResponsiveHeader from '../../components/ResponsiveHeader/ResponsiveHeader'
 import { DsbApiService } from '../../services/dsb-api.service'
 import { isAuthorized } from '../../services/auth.service'
 import { ErrorCode, Result, serializeError, Channel, Option, ErrorBodySerialized, Topic } from '../../utils'
 import SimpleDialog from '../topicdialog'
+
 type Props = {
     health: Result<boolean, ErrorBodySerialized>
     // channels: Result<Channel[], ErrorBodySerialized>
@@ -120,7 +121,7 @@ export default function ListApplications({ health, auth }:
                 <link rel="icon" href="/favicon.ico" />
             </Head>
             <main>
-                <Header />
+                <ResponsiveHeader />
                 <Container maxWidth="lg">
                     <section className={classes.table}>
                         <ApplicationContainer auth={auth.some} applications={applicationsData} />

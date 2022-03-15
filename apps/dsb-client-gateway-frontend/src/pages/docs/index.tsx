@@ -4,7 +4,7 @@ import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'nex
 import { makeStyles } from '@material-ui/styles'
 import { Typography, Container, Divider, Theme, Button } from '@material-ui/core'
 import swal from '@sweetalert/with-react'
-import Header from '../../components/Header/Header'
+import ResponsiveHeader from '../../components/ResponsiveHeader/ResponsiveHeader'
 import { DsbApiService } from '../../services/dsb-api.service'
 import { isAuthorized } from '../../services/auth.service'
 import { Channel, ErrorBodySerialized, ErrorCode, Option, Result, serializeError } from '../../utils'
@@ -78,7 +78,7 @@ export default function Documentation({
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
-        <Header />
+        <ResponsiveHeader />
         <Container maxWidth="lg">
           <section className={classes.connectionStatus}>
             <Typography variant="h4">Connection Status </Typography>

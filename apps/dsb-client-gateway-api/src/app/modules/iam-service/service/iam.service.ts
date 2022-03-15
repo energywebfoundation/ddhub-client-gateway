@@ -7,6 +7,7 @@ import {
   DidRegistry,
   RegistrationTypes,
   SignerService,
+  IApp
 } from 'iam-client-lib';
 import { IamFactoryService } from './iam-factory.service';
 import { ConfigService } from '@nestjs/config';
@@ -25,7 +26,7 @@ export class IamService {
   constructor(
     protected readonly iamFactoryService: IamFactoryService,
     protected readonly configService: ConfigService
-  ) {}
+  ) { }
 
   public async setVerificationMethod(
     publicKey: string,
@@ -61,6 +62,10 @@ export class IamService {
 
   public getClaimById(id: string): Promise<Claim> {
     return this.claimsService.getClaimById(id);
+  }
+
+  public getApplicationsByOwner(ownerDid: string): Promise<IApp[]> {
+    return this.cacheClient.getApplicationsByOwner(ownerDid);
   }
 
   public getClaimsByRequester(

@@ -13,7 +13,7 @@ export class IamInitService implements OnModuleInit {
     protected readonly secretsEngine: SecretsEngineService,
     protected readonly enrolmentRepository: EnrolmentRepository,
     protected readonly identityRepository: IdentityRepository
-  ) {}
+  ) { }
 
   public async onModuleInit(): Promise<void> {
     const privateKey = await this.secretsEngine.getPrivateKey();
