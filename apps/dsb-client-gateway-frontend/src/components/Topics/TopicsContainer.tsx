@@ -20,7 +20,7 @@ export const TopicContainer = ({ applicationNameSpace, auth, topics, did }: Topi
 
         try {
             const res = await axios.post(
-                `/api/v1/topics`,
+                `/v1/dsb/topics`,
                 body,
                 {
                     headers: {
@@ -48,7 +48,7 @@ export const TopicContainer = ({ applicationNameSpace, auth, topics, did }: Topi
 
         try {
             const res = await axios.patch(
-                `/api/v1/topics`,
+                `/v1/dsb/topics`,
                 body,
                 {
                     headers: {

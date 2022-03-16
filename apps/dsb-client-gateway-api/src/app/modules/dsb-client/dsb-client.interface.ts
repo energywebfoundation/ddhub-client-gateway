@@ -1,16 +1,64 @@
+import { GatewayError } from '../../../../../dsb-client-gateway-frontend/src/utils';
+
 export interface Topic {
   namespace: string;
   schema: object | string;
 }
 
-export interface TopicData {
+export interface Topic {
   id: string;
-  namespace: string;
+  name: string;
   owner: string;
-  schema: string;
+  schema: object | string;
   schemaType: string;
+  tags: string[]
   version: string;
 }
+export type ApplicationDTO = {
+  applicationLogo: string
+  applicationName: string
+  applicationNameSpace: string
+  topicsCount: number
+  modifiedDateTime?: string
+}
+
+export type ApplicationHeader = {
+  id?: string
+  Header?: string
+  accessor: string
+  filter?: string
+  Cell?: any
+}
+
+export type TopicResultDTO = {
+  id: string
+  name: string
+  schemaType: string
+  schema: string
+  version: string
+  owner: string,
+  tags: string[]
+}
+
+
+export type GetTopicsOptions = {
+  limit?: number
+  name: string
+  owner: string
+  page?: number
+  tags?: string[]
+}
+
+export type SendTopicBodyDTO = {
+  name: string
+  schemaType: string
+  schema: string
+  version: string
+  signature: string
+  owner: string
+  tags: string[]
+}
+
 
 export class ChannelDTO {
   fqcn: string;
@@ -62,3 +110,8 @@ export interface Message {
   timestampNanos: number;
   transactionId?: string;
 }
+
+export type Result<T = boolean, E = GatewayError> = {
+  ok?: T;
+  err?: E;
+};
