@@ -46,6 +46,14 @@
         "jestConfig": "apps/dsb-client-gateway-api/jest.config.js",
         "passWithNoTests": true
       }
+    },
+    "test-e2e": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/apps/dsb-client-gateway-api"],
+      "options": {
+        "jestConfig": "apps/dsb-client-gateway-api/jest-e2e.json",
+        "passWithNoTests": true
+      }
     }
   },
   "tags": []

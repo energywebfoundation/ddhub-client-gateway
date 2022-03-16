@@ -15,6 +15,7 @@ import { HealthController } from './modules/health/health.controller';
 import { ScheduleModule } from '@nestjs/schedule';
 import { UtilsModule } from './modules/utils/utils.module';
 import { configValidate } from './modules/utils/config.validate';
+import { ChannelModule } from './modules/channel/channel.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { configValidate } from './modules/utils/config.validate';
     TerminusModule,
     ScheduleModule.forRoot(),
     UtilsModule,
+    ChannelModule,
   ],
   providers: [
     {

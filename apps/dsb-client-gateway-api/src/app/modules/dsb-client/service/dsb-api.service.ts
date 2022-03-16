@@ -12,6 +12,7 @@ import {
   SendMessageData,
   SendMessageResult,
   TopicData,
+  TopicDataResponse,
 } from '../dsb-client.interface';
 import { SecretsEngineService } from '../../secrets-engine/secrets-engine.interface';
 import { v4 as uuidv4 } from 'uuid';
@@ -75,7 +76,7 @@ export class DsbApiService implements OnModuleInit {
               maxBodyLength: Infinity,
               httpsAgent: this.getTLS(),
               headers: {
-                Authorization: `Bearer ${this.authToken}`,
+                Authorization: `Bearer ${this.didAuthService.getToken()}`,
                 ...formData.getHeaders(),
               },
             }
@@ -85,6 +86,28 @@ export class DsbApiService implements OnModuleInit {
     } catch (e) {
       this.logger.error(e);
     }
+  }
+
+  public async getTopicsByOwnerAndName(
+    name: string,
+    owner: string
+  ): Promise<TopicDataResponse> {
+    const { data } = await promiseRetry(async (retry, attempt) => {
+      return lastValueFrom(
+        this.httpService.get('http://localhost:8080/topic', {
+          params: {
+            owner,
+            name,
+          },
+          httpsAgent: this.getTLS(),
+          headers: {
+            Authorization: `Bearer ${this.didAuthService.getToken()}`,
+          },
+        })
+      ).catch((err) => this.handleRequestWithRetry(err, retry));
+    });
+
+    return data;
   }
 
   public async getTopics(ownerDID?: string): Promise<TopicData[]> {
@@ -106,7 +129,7 @@ export class DsbApiService implements OnModuleInit {
           },
           httpsAgent: this.getTLS(),
           headers: {
-            Authorization: `Bearer ${this.authToken}`,
+            Authorization: `Bearer ${this.didAuthService.getToken()}`,
           },
         })
       ).catch((err) => this.handleRequestWithRetry(err, retry));
@@ -133,7 +156,7 @@ export class DsbApiService implements OnModuleInit {
               amount,
             },
             headers: {
-              Authorization: `Bearer ${this.authToken}`,
+              Authorization: `Bearer ${this.didAuthService.getToken()}`,
             },
           })
         ).catch((err) => this.handleRequestWithRetry(err, retry));
@@ -170,7 +193,7 @@ export class DsbApiService implements OnModuleInit {
         this.httpService.post(this.baseUrl + '/message', requestData, {
           httpsAgent: this.getTLS(),
           headers: {
-            Authorization: `Bearer ${this.authToken}`,
+            Authorization: `Bearer ${this.didAuthService.getToken()}`,
           },
         })
       ).catch((err) => this.handleRequestWithRetry(err, retry));
