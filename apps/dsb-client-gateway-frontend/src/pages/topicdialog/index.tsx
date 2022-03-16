@@ -3,7 +3,8 @@ import PropTypes from 'prop-types'
 import Button from '@material-ui/core/Button'
 import DialogTitle from '@material-ui/core/DialogTitle'
 import Dialog from '@material-ui/core/Dialog'
-import { Typography, Theme, Grid, Select, FormControl, MenuItem } from '@material-ui/core'
+import { Typography, Theme, Grid, Select, FormControl, MenuItem, TextField, Chip } from '@material-ui/core'
+import Autocomplete from '@material-ui/lab/Autocomplete'
 import { CustomInput } from '../../components/CustomInput/CustomInput'
 import { makeStyles } from '@material-ui/styles'
 import JSONInput from 'react-json-editor-ajrm'
@@ -40,7 +41,7 @@ export default function SimpleDialog(props: Props) {
 
     let [jsonSchema, setJsonSchema] = React.useState(data?.schema || {})
     let [topicName, setTopicName] = React.useState(data?.name || '')
-    let [version, setVersion] = React.useState(data?.name || '')
+    let [version, setVersion] = React.useState(data?.version || '')
     let [tags, setTags] = React.useState<string[]>(data?.tags || [])
     let [schemaType, setSchemaType] = React.useState(data?.schemaType || '')
 
@@ -86,11 +87,37 @@ export default function SimpleDialog(props: Props) {
                         <Grid item xs={12} sm={7} md={9}>
                             <div className={classes.formGroup}>
                                 <Typography variant="caption">Tags</Typography>
-                                <CustomInput
-                                    placeholder='Tags'
-                                    value={tags}
-                                    onChange={(event: any) => setTags(event.target.value)}
-                                    fullWidth />
+                                <Autocomplete
+                                    multiple
+                                    id="tags-filled"
+                                    options={[]}
+                                    defaultValue={tags}
+                                    freeSolo
+                                    onChange={(e, value) => setTags(value)}
+                                    renderTags={(
+                                        value: any[],
+                                        getTagProps: (arg0: { index: any }) => JSX.IntrinsicAttributes
+                                    ) =>
+                                        value.map((option: any, index: any) => {
+                                            return (
+                                                <Chip
+                                                    key={index}
+                                                    variant="outlined"
+                                                    label={option}
+                                                    {...getTagProps({ index })}
+                                                />
+                                            );
+                                        })
+                                    }
+                                    renderInput={(params: any) => (
+
+                                        < TextField
+                                            {...params}
+                                        />
+                                    )}
+                                />
+
+
                             </div>
                         </Grid>
 
@@ -177,7 +204,7 @@ export default function SimpleDialog(props: Props) {
                                         return swal('Error', 'Please enter schema type', 'error')
                                     }
 
-                                    if (!tags) {
+                                    if (!tags || tags.length === 0) {
                                         return swal('Error', 'Please enter tags', 'error')
                                     }
 
@@ -192,7 +219,7 @@ export default function SimpleDialog(props: Props) {
                                         schema: JSON.stringify(jsonSchema),
                                         version: version,
                                         owner: topicName,
-                                        tags: ["vikas6"] // check how to take tags from user
+                                        tags: tags
                                     }
 
                                     handlePostOrUpdateTopic ? handlePostOrUpdateTopic(topicData) : null
