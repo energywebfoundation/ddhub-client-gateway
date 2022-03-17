@@ -22,9 +22,8 @@ import promiseRetry from 'promise-retry';
 import FormData from 'form-data';
 import { EnrolmentRepository } from '../../storage/repository/enrolment.repository';
 import { DidAuthService } from '../module/did-auth/service/did-auth.service';
-import { IApp } from 'iam-client-lib';
 import { IAppDefinition } from '@energyweb/iam-contracts'
-
+const qs = require('qs');
 
 @Injectable()
 export class DsbApiService implements OnModuleInit {
@@ -120,6 +119,34 @@ export class DsbApiService implements OnModuleInit {
 
     return data;
   }
+
+  public async getTopicsCountByOwner(owners: string[]): Promise<Topic[]> {
+
+
+    if (!owners || owners.length === 0) {
+      return [];
+    }
+
+    const { data } = await promiseRetry(async (retry, attempt) => {
+      return lastValueFrom(
+        this.httpService.get('https://aemovc.eastus.cloudapp.azure.com/topic/count', {
+          params: {
+            owner: owners,
+          },
+          paramsSerializer: function (params) {
+            return qs.stringify(params, { arrayFormat: 'repeat' })
+          },
+          httpsAgent: this.getTLS(),
+          headers: {
+            Authorization: `Bearer ${this.didAuthService.getToken()}`,
+          },
+        })
+      ).catch((err) => this.handleRequestWithRetry(err, retry));
+    });
+
+    return data;
+  }
+
 
 
 
@@ -300,9 +327,6 @@ export class DsbApiService implements OnModuleInit {
 
       return;
     }
-
-    this.logger.log('privateKey', privateKey)
-    this.logger.log('this.iamService.getDIDAddress()', this.iamService.getDIDAddress())
 
     await this.didAuthService.login(
       privateKey,

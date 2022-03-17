@@ -4,6 +4,7 @@ import {
   IsOptional,
   IsPositive,
   IsString,
+  IsArray
 } from 'class-validator';
 
 export class FileUploadBodyDto {
@@ -56,3 +57,10 @@ export class GetApplicationsQueryDto {
   @IsString()
   public ownerDid: string;
 }
+
+export class GetTopicsCountQueryDto {
+  @IsNotEmpty()
+  public owner: string[];
+}
+
+
