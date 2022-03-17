@@ -26,7 +26,6 @@ export class DsbApiService implements OnModuleInit {
   private readonly logger = new Logger(DsbApiService.name);
 
   protected tls: Agent | null;
-  protected authToken?: string;
   protected baseUrl: string;
 
   public async onModuleInit(): Promise<void> {
@@ -244,7 +243,7 @@ export class DsbApiService implements OnModuleInit {
         this.httpService.get(this.baseUrl + '/channel/pubsub', {
           httpsAgent: this.getTLS(),
           headers: {
-            Authorization: `Bearer ${this.authToken}`,
+            Authorization: `Bearer ${this.didAuthService.getToken()}`,
           },
         })
       ).catch((err) => this.handleRequestWithRetry(err, retry));

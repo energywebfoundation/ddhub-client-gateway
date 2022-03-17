@@ -62,7 +62,7 @@ export class ChannelConditionsDto {
     each: true,
   })
   @IsOptional()
-  @ArrayUnique((o) => o.topicName)
+  @ArrayUnique((o) => `${o.topicName}_${o.owner}`)
   @Type(() => TopicDto)
   @ApiProperty({
     description: 'Array of topics',

@@ -3,7 +3,7 @@
  * This is only a minimal backend to get started.
  */
 
-import { Logger, ValidationPipe } from '@nestjs/common';
+import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { WsAdapter } from '@nestjs/platform-ws';
 
@@ -19,7 +19,6 @@ async function bootstrap() {
   const globalPrefix = 'api/v1';
 
   app.setGlobalPrefix(globalPrefix);
-  app.useGlobalPipes(new ValidationPipe());
 
   const configService = app.get<ConfigService>(ConfigService);
 

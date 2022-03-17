@@ -17,7 +17,7 @@ jobs:
   build-be:
     name: Build Backend
     runs-on: ubuntu-latest
-#    needs: [cancel-previous]
+    needs: [cancel-previous]
     steps:
       - uses: actions/checkout@v2
         with:
@@ -47,10 +47,12 @@ jobs:
         run: npm install
       - name: Build
         run: nx build dsb-client-gateway-api
+      - name: Run tests
+        run: nx run dsb-client-gateway-api-e2e:test
   build-fe:
     name: Build Frontend
     runs-on: ubuntu-latest
-    #    needs: [cancel-previous]
+    needs: [cancel-previous]
     steps:
       - uses: actions/checkout@v2
         with:
