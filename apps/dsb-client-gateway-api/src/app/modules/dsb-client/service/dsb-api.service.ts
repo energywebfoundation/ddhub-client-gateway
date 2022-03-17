@@ -23,17 +23,8 @@ import FormData from 'form-data';
 import { EnrolmentRepository } from '../../storage/repository/enrolment.repository';
 import { DidAuthService } from '../module/did-auth/service/did-auth.service';
 import { IApp } from 'iam-client-lib';
+import { IAppDefinition } from '@energyweb/iam-contracts'
 
-import {
-  DSBTopicUnauthorizedError,
-  DSBTopicNotFoundError,
-  DSBForbiddenError,
-  DSBPayloadError,
-  DSBRequestError,
-  GatewayError,
-  isGatewayError,
-  ErrorCode
-} from '../../../../../../dsb-client-gateway-frontend/src/utils'
 
 @Injectable()
 export class DsbApiService implements OnModuleInit {
@@ -90,7 +81,7 @@ export class DsbApiService implements OnModuleInit {
               maxBodyLength: Infinity,
               httpsAgent: this.getTLS(),
               headers: {
-                Authorization: `Bearer ${this.authToken}`,
+                Authorization: `Bearer ${this.didAuthService.getToken()}`,
                 ...formData.getHeaders(),
               },
             }
@@ -121,7 +112,7 @@ export class DsbApiService implements OnModuleInit {
           },
           httpsAgent: this.getTLS(),
           headers: {
-            Authorization: `Bearer ${this.authToken}`,
+            Authorization: `Bearer ${this.didAuthService.getToken()}`,
           },
         })
       ).catch((err) => this.handleRequestWithRetry(err, retry));
@@ -145,7 +136,7 @@ export class DsbApiService implements OnModuleInit {
           data: data,
           httpsAgent: this.getTLS(),
           headers: {
-            Authorization: `Bearer ${this.authToken}`,
+            Authorization: `Bearer ${this.didAuthService.getToken()}`,
           },
         })
       ).catch((err) => this.handleRequestWithRetry(err, retry));
@@ -167,19 +158,22 @@ export class DsbApiService implements OnModuleInit {
           data: data,
           httpsAgent: this.getTLS(),
           headers: {
-            Authorization: `Bearer ${this.authToken}`,
+            Authorization: `Bearer ${this.didAuthService.getToken()}`,
           },
         })
-      ).catch((err) => this.handleRequestWithRetry(err, retry));
+      ).catch((err) => {
+
+        this.logger.error('result of updateTopics', err)
+        return this.handleRequestWithRetry(err, retry)
+
+      });
     });
+
+
 
     return result
 
   }
-
-
-
-
   public async getMessages(
     fqcn: string,
     from?: string,
@@ -198,7 +192,7 @@ export class DsbApiService implements OnModuleInit {
               amount,
             },
             headers: {
-              Authorization: `Bearer ${this.authToken}`,
+              Authorization: `Bearer ${this.didAuthService.getToken()}`,
             },
           })
         ).catch((err) => this.handleRequestWithRetry(err, retry));
@@ -235,7 +229,7 @@ export class DsbApiService implements OnModuleInit {
         this.httpService.post(this.baseUrl + '/message', requestData, {
           httpsAgent: this.getTLS(),
           headers: {
-            Authorization: `Bearer ${this.authToken}`,
+            Authorization: `Bearer ${this.didAuthService.getToken()}`,
           },
         })
       ).catch((err) => this.handleRequestWithRetry(err, retry));
@@ -286,7 +280,7 @@ export class DsbApiService implements OnModuleInit {
         this.httpService.get(this.baseUrl + '/channel/pubsub', {
           httpsAgent: this.getTLS(),
           headers: {
-            Authorization: `Bearer ${this.authToken}`,
+            Authorization: `Bearer ${this.didAuthService.getToken()}`,
           },
         })
       ).catch((err) => this.handleRequestWithRetry(err, retry));
@@ -306,6 +300,9 @@ export class DsbApiService implements OnModuleInit {
 
       return;
     }
+
+    this.logger.log('privateKey', privateKey)
+    this.logger.log('this.iamService.getDIDAddress()', this.iamService.getDIDAddress())
 
     await this.didAuthService.login(
       privateKey,
@@ -396,7 +393,7 @@ export class DsbApiService implements OnModuleInit {
   }
 
 
-  public async getApplicationsByOwner(ownerDid: string): Promise<Array<IApp>> {
+  public async getApplicationsByOwner(ownerDid: string): Promise<Array<IAppDefinition>> {
     await this.enableTLS();
     try {
       const data = await this.iamService.getApplicationsByOwner(ownerDid)

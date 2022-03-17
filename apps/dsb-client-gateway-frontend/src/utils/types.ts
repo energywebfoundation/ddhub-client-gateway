@@ -139,11 +139,10 @@ export enum EventEmitMode {
 }
 
 export type Application = {
-  applicationLogo: string
-  applicationName: string
-  applicationNameSpace: string
-  topicsCount: number
-  modifiedDateTime?: string
+  appName: string
+  logoUrl?: string
+  websiteUrl?: string
+  description?: string
 }
 
 

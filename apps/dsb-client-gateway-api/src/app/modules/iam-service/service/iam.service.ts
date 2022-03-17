@@ -9,6 +9,7 @@ import {
   SignerService,
   IApp
 } from 'iam-client-lib';
+import { IAppDefinition } from '@energyweb/iam-contracts'
 import { IamFactoryService } from './iam-factory.service';
 import { ConfigService } from '@nestjs/config';
 import { Encoding } from '@ew-did-registry/did-resolver-interface';
@@ -64,8 +65,26 @@ export class IamService {
     return this.claimsService.getClaimById(id);
   }
 
-  public getApplicationsByOwner(ownerDid: string): Promise<IApp[]> {
-    return this.cacheClient.getApplicationsByOwner(ownerDid);
+  public async getApplicationsByOwner(ownerDid: string): Promise<IAppDefinition[]> {
+
+    const didClaims = await this.cacheClient.getClaimsByRequester(ownerDid, { isAccepted: true })
+    const namespaceList = []
+    const applications: IAppDefinition[] = []
+
+    didClaims.forEach((didClaim) => {
+      if (didClaim.claimType.startsWith('topiccreator') && didClaim.namespace !== 'message.broker.app.namespace') {
+        namespaceList.push(didClaim.namespace)
+      }
+    })
+
+    await Promise.all(namespaceList.map(async (namespace: string) => {
+      const application = await this.cacheClient.getAppDefinition(namespace)
+      applications.push(application)
+    }))
+
+    const uniqueApplications = [...new Set(applications)]
+
+    return uniqueApplications
   }
 
   public getClaimsByRequester(

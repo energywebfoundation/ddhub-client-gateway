@@ -15,6 +15,7 @@ import { DsbTopicsController } from './controller/dsb-topics.controller';
 import { DsbFilesController } from './controller/dsb-files.controller';
 import { DidAuthModule } from './module/did-auth/did-auth.module';
 import { DsbHealthController } from './controller/dsb-health.controller';
+import { DsbApplicationsController } from './controller/dsb-applications.controller';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { DsbHealthController } from './controller/dsb-health.controller';
     DsbMessagesController,
     DsbTopicsController,
     DsbFilesController,
+    DsbApplicationsController
   ],
 })
-export class DsbClientModule {}
+export class DsbClientModule { }

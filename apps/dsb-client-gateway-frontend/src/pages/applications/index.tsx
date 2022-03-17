@@ -1,82 +1,35 @@
 import { useEffect, useState } from 'react'
 import Head from 'next/head'
-import { useRouter } from 'next/router'
 import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
 import { makeStyles } from '@material-ui/styles'
-import { Typography, Container, Divider, Theme, TextField, IconButton, Button } from '@material-ui/core'
+import { Container, Theme } from '@material-ui/core'
 import swal from '@sweetalert/with-react'
 import { ApplicationContainer } from '../../components/Applications/ApplicationsContainer'
 import ResponsiveHeader from '../../components/ResponsiveHeader/ResponsiveHeader'
-import { DsbApiService } from '../../services/dsb-api.service'
 import { isAuthorized } from '../../services/auth.service'
-import { ErrorCode, Result, serializeError, Channel, Option, ErrorBodySerialized, Topic } from '../../utils'
-import SimpleDialog from '../topicdialog'
+import { refreshState } from '../../services/identity.service'
+import { ErrorCode, Result, serializeError, Channel, Option, ErrorBodySerialized, Topic, Storage } from '../../utils'
+import axios from 'axios'
+import { IAppDefinition } from '@energyweb/iam-contracts'
 
 type Props = {
-    health: Result<boolean, ErrorBodySerialized>
-    // channels: Result<Channel[], ErrorBodySerialized>
-    // topics: Result<Topic[], ErrorBodySerialized>
+    state: Result<Storage, ErrorBodySerialized>
     auth: Option<string>
 }
-// take this data by calling API made by chris
-const applicationsData = [
-    {
-        applicationLogo: '',
-        applicationName: 'Application Name 1',
-        applicationNameSpace: 'edge.apps.aemo.iam.ewc',
-        topicsCount: 6,
-        modeifiedDateTime: '12/21/2021'
-    },
-    {
-        applicationLogo: '',
-        applicationName: 'Application Name 2',
-        applicationNameSpace: 'edge.apps.aemo.iam.ewc',
-        topicsCount: 6,
-        modeifiedDateTime: '12/21/2021'
-    },
-    {
-        applicationLogo: '',
-        applicationName: 'Application Name 3',
-        applicationNameSpace: 'edge.apps.aemo.iam.ewc',
-        topicsCount: 6,
-        modeifiedDateTime: '12/21/2021'
-    },
-    {
-        applicationLogo: '',
-        applicationName: 'Application Name 4',
-        applicationNameSpace: 'edge.apps.aemo.iam.ewc',
-        topicsCount: 6,
-        modeifiedDateTime: '12/21/2021'
-    },
-    {
-        applicationLogo: '',
-        applicationName: 'Application Name 5',
-        applicationNameSpace: 'edge.apps.aemo.iam.ewc',
-        topicsCount: 6,
-        modeifiedDateTime: '12/21/2021'
-    },
-    {
-        applicationLogo: '',
-        applicationName: 'Application Name 6',
-        applicationNameSpace: 'edge.apps.aemo.iam.ewc',
-        topicsCount: 6,
-        modeifiedDateTime: '12/21/2021'
-    }
-]
+
 export async function getServerSideProps(context: GetServerSidePropsContext): Promise<{
     props: Props
 }> {
     const authHeader = context.req.headers.authorization
     const { err } = isAuthorized(authHeader)
     if (!err) {
-        const health = await DsbApiService.init().getHealth()
-        // const channels = await DsbApiService.init().getChannels()
-        // const topics = await DsbApiService.init().getTopics()
+
+        const state = await refreshState()
+
+
         return {
             props: {
-                health: serializeError(health),
-                // channels: serializeError(channels),
-                // topics: serializeError(topics),
+                state: serializeError(state),
                 auth: authHeader ? { some: authHeader } : { none: true }
             }
         }
@@ -89,30 +42,51 @@ export async function getServerSideProps(context: GetServerSidePropsContext): Pr
         }
         return {
             props: {
-                health: {},
-                // channels: {},
-                // topics: {},
+                state: {},
                 auth: { none: true }
             }
         }
     }
 }
-export default function ListApplications({ health, auth }:
+export default function ListApplications({ state, auth }:
     InferGetServerSidePropsType<typeof getServerSideProps>) {
     const classes = useStyles()
-    // useEffect(() => {
-    //     if (health.err) {
-    //         return swal('Error', health.err.reason, 'error')
-    //     }
-    //     if (channels.err) {
-    //         console.log('channels.err', channels.err)
-    //         return swal('Error', channels.err.reason, 'error')
-    //     }
-    //     if (topics.err) {
-    //         console.log('channels.err', channels.err)
-    //         return swal('Error', topics.err.reason, 'error')
-    //     }
-    // }, [health, channels, topics])
+    const [applications, setApplications] = useState<IAppDefinition[]>([]);
+    const [health, setHealth] = useState<{ statusCode: number; message?: string }>();
+
+    useEffect(() => {
+        const did = state.ok?.enrolment?.did
+
+        async function getServerSideProps() {
+
+            const applicationsResponse = await axios.get(`/v1/dsb/applications`,
+                {
+                    headers: {
+                        Authorization: auth ? `Bearer ${auth}` : undefined,
+                        'content-type': 'application/json',
+                    },
+                    params: { ownerDid: did },
+                }
+            );
+
+            setApplications(applicationsResponse.data)
+
+
+            const healthResponse = await axios.get(`/v1/dsb/health`, {
+                headers: {
+                    Authorization: auth ? `Bearer ${auth}` : undefined,
+                    'content-type': 'application/json',
+                },
+            });
+            setHealth(healthResponse.data)
+
+        }
+
+        getServerSideProps()
+
+    }, [])
+
+
     return (
         <div>
             <Head>
@@ -124,7 +98,7 @@ export default function ListApplications({ health, auth }:
                 <ResponsiveHeader />
                 <Container maxWidth="lg">
                     <section className={classes.table}>
-                        <ApplicationContainer auth={auth.some} applications={applicationsData} />
+                        {applications ? <ApplicationContainer auth={auth.some} applications={applications} /> : null}
                     </section>
                 </Container>
             </main>

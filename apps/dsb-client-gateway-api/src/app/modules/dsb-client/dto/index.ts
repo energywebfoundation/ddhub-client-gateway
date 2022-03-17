@@ -50,3 +50,9 @@ export class GetMessagesQueryDto {
   @IsOptional()
   public clientId?: string;
 }
+
+export class GetApplicationsQueryDto {
+  @IsNotEmpty()
+  @IsString()
+  public ownerDid: string;
+}

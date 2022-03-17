@@ -14,14 +14,12 @@ type TopicProps = {
     myDID?: string
 }
 
-// take this data by calling API made by chris
-
-
 export default function Application({ applications, myDID }: TopicProps) {
+
+
     const classes = useStyles()
     return (
         <div >
-            {/* <div className={classes.navbar}></div> */}
             <Table
                 headers={applicationHeaders}
                 dataRows={applications}

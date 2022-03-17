@@ -31,7 +31,7 @@ export const TOPIC_HEADERS = [
 export const APPLICATIONS_HEADERS = [
     {
         Header: 'APPLICATION NAME',
-        accessor: 'applicationName',
+        accessor: 'appName',
         filter: 'includes',
     },
     {
@@ -42,10 +42,5 @@ export const APPLICATIONS_HEADERS = [
     {
         Header: 'NO. OF TOPICS',
         accessor: 'topicsCount',
-    },
-    {
-        Header: 'UPDATED DATE',
-        accessor: 'modeifiedDateTime',
-        filter: 'includes',
     }
 ]

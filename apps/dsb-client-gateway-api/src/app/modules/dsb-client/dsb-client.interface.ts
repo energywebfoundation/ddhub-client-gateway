@@ -14,7 +14,7 @@ export interface Topic {
   tags: string[]
   version: string;
 }
-export type ApplicationDTO = {
+export class ApplicationDTO {
   applicationLogo: string
   applicationName: string
   applicationNameSpace: string
