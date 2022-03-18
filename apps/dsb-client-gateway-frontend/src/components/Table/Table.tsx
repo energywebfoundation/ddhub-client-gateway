@@ -18,7 +18,8 @@ import { useRouter } from 'next/router'
 import clsx from 'clsx'
 import Link from 'next/link'
 import SimpleDialog from '../../pages/topicdialog'
-import { FullscreenExitTwoTone } from '@material-ui/icons'
+
+
 
 const options = [
     {
@@ -101,7 +102,6 @@ function Table({ headers, dataRows, location, handleUpdateTopic }: TableProps) {
     const isActive = (pathname: string) => (router.pathname === pathname ? classes.active : '')
     const [openMenu, setOpenMenu] = useState(false)
     const [openDialog, setOpenDialog] = useState(false)
-    const [filterInput, setFilterInput] = useState('')
     const [cellValue, setCellValue] = useState()
 
     const handleClickOpen = () => {
@@ -114,8 +114,8 @@ function Table({ headers, dataRows, location, handleUpdateTopic }: TableProps) {
         setCellValue(cell.row.original)
     }
 
-    let dialogTitle = 'Update Topic'
-    let dialogText = 'Update Topic data'
+    const dialogTitle = 'Update Topic'
+    const dialogText = 'Update Topic data'
 
     const handleClose = (value) => {
         setOpenDialog(false)
@@ -134,7 +134,7 @@ function Table({ headers, dataRows, location, handleUpdateTopic }: TableProps) {
         filter: 'false',
         Cell: (props) => {
             // currenty sending test change it to owner variable afterwards
-            let owner = props.cell.row.values.applicationName
+            const owner = props.cell.row.values.appName
 
             if (location === 'Application') {
                 return (
@@ -197,10 +197,7 @@ function Table({ headers, dataRows, location, handleUpdateTopic }: TableProps) {
         []
     )
 
-    const handleFilterChange = (e) => {
-        const value = e.target.value || undefined
-        setFilterInput(value)
-    }
+
 
     const classes = useStyles()
     const data = React.useMemo(() => dataRows, [dataRows])

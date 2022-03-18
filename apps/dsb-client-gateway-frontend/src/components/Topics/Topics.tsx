@@ -19,8 +19,8 @@ export default function Topic({ applicationName, topics, myDID, handlePostTopic,
     const classes = useStyles()
     const [open, setOpen] = useState(false)
 
-    let dialogTitle = 'Create Topic'
-    let dialogText = 'Provide Topic data with this form'
+    const dialogTitle = 'Create Topic'
+    const dialogText = 'Provide Topic data with this form'
     const handleClickOpen = () => {
         setOpen(true)
     }

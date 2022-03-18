@@ -7,7 +7,6 @@ import Hidden from "@material-ui/core/Hidden";
 import IconButton from "@material-ui/core/IconButton";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
-import ListItemText from "@material-ui/core/ListItemText";
 import MenuIcon from "@material-ui/icons/Menu";
 import CloseIcon from "@material-ui/icons/Close";
 import Toolbar from "@material-ui/core/Toolbar";
@@ -63,12 +62,6 @@ const useStyles = makeStyles((theme) => ({
 function ResponsiveDrawer() {
 
     const isActive = (pathname: string) => (router.pathname === pathname ? classes.active : '')
-
-    const dummyCategories = [
-        "files",
-        "docs",
-        "applications"
-    ];
 
     const classes = useStyles();
     const theme = useTheme();

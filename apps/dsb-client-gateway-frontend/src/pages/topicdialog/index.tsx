@@ -27,7 +27,7 @@ type Props = {
     open: boolean
     dialogTitle: string
     dialogText: string
-    handlePostOrUpdateTopic?: (body: TopicType) => void
+    handlePostOrUpdateTopic: (body: TopicType) => void
 }
 
 const schemaTypes = [
@@ -38,11 +38,11 @@ export default function SimpleDialog(props: Props) {
     const { onClose, handlePostOrUpdateTopic, open, data, dialogTitle, dialogText } = props
 
 
-    let [jsonSchema, setJsonSchema] = React.useState(data?.schema || {})
-    let [topicName, setTopicName] = React.useState(data?.name || '')
-    let [version, setVersion] = React.useState(data?.version || '')
-    let [tags, setTags] = React.useState<string[]>(data?.tags || [])
-    let [schemaType, setSchemaType] = React.useState(data?.schemaType || '')
+    const [jsonSchema, setJsonSchema] = React.useState(data?.schema || {})
+    const [topicName, setTopicName] = React.useState(data?.name || '')
+    const [version, setVersion] = React.useState(data?.version || '')
+    const [tags, setTags] = React.useState<string[]>(data?.tags || [])
+    const [schemaType, setSchemaType] = React.useState(data?.schemaType || '')
 
 
     const classes = useStyles()
@@ -211,7 +211,7 @@ export default function SimpleDialog(props: Props) {
                                         return swal('Error', 'Please enter Json Schema', 'error')
                                     }
 
-                                    let topicData = {
+                                    const topicData = {
                                         id: data?.id,
                                         name: topicName,
                                         schemaType: schemaType,
@@ -221,7 +221,7 @@ export default function SimpleDialog(props: Props) {
                                         tags: tags
                                     }
 
-                                    handlePostOrUpdateTopic ? handlePostOrUpdateTopic(topicData) : null
+                                    handlePostOrUpdateTopic(topicData)
 
                                 }}
                             >

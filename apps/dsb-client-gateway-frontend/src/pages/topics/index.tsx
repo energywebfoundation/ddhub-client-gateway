@@ -1,22 +1,19 @@
 import { useEffect, useState } from 'react'
 import Head from 'next/head'
-import { useRouter } from 'next/router'
 import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
 import { makeStyles } from '@material-ui/styles'
 import { Container, Theme, } from '@material-ui/core'
 import swal from '@sweetalert/with-react'
 import { TopicContainer } from '../../components/Topics/TopicsContainer'
 import ResponsiveHeader from '../../components/ResponsiveHeader/ResponsiveHeader'
-
-import { DsbApiService } from '../../services/dsb-api.service'
+import { refreshState } from '../../services/identity.service'
 import { isAuthorized } from '../../services/auth.service'
-import { ErrorCode, Result, serializeError, Channel, Option, ErrorBodySerialized, Topic } from '../../utils'
-
+import { ErrorCode, Option, Topic } from '../../utils'
+import axios from 'axios'
 
 type Props = {
-    health: Result<boolean, ErrorBodySerialized>
-    channels: Result<Channel[], ErrorBodySerialized>
-    topics: Result<Topic[], ErrorBodySerialized>
+    ownerDid: string
+    owner: string
     auth: Option<string>
 }
 
@@ -27,20 +24,19 @@ export async function getServerSideProps(context: GetServerSidePropsContext): Pr
     const authHeader = context.req.headers.authorization
     const owner = context.req['query'].owner
 
+
+
+
     const { err } = isAuthorized(authHeader)
+
+    const state = await refreshState()
+    const did = state.ok?.enrolment?.did
+
     if (!err) {
-
-        const health = await DsbApiService.init().getHealth()
-        const channels = await DsbApiService.init().getChannels()
-        const topics = await DsbApiService.init().getTopics(owner)
-
-
-
         return {
             props: {
-                health: serializeError(health),
-                channels: serializeError(channels),
-                topics: serializeError(topics),
+                owner: owner,
+                ownerDid: did,
                 auth: authHeader ? { some: authHeader } : { none: true }
             }
         }
@@ -53,9 +49,8 @@ export async function getServerSideProps(context: GetServerSidePropsContext): Pr
         }
         return {
             props: {
-                health: {},
-                channels: {},
-                topics: {},
+                owner: '',
+                ownerDid: '',
                 auth: { none: true }
             }
         }
@@ -63,27 +58,51 @@ export async function getServerSideProps(context: GetServerSidePropsContext): Pr
 }
 
 
-export default function ListTopics({ health, channels, topics, auth }:
+export default function ListTopics({ owner, ownerDid, auth }:
     InferGetServerSidePropsType<typeof getServerSideProps>) {
     const classes = useStyles()
-    const router = useRouter()
-    const { owner } = router.query
 
-    // useEffect(() => {
-    //     if (health.err) {
-    //         return swal('Error', health.err.reason, 'error')
-    //     }
-    //     if (channels.err) {
-    //         console.log('channels.err', channels.err)
-    //         return swal('Error', channels.err.reason, 'error')
-    //     }
+    const [topics, setTopics] = useState<Topic[]>();
+    const [health, setHealth] = useState('');
 
-    //     if (topics.err) {
-    //         console.log('channels.err', channels.err)
-    //         return swal('Error', topics.err.reason, 'error')
-    //     }
+    useEffect(() => {
 
-    // }, [health, channels, topics])
+        async function getServerSideProps() {
+
+            const topicsResponse = await axios.get(`/v1/dsb/topics`,
+                {
+                    headers: {
+                        Authorization: auth ? `Bearer ${auth}` : undefined,
+                        'content-type': 'application/json',
+                    },
+                    params: { ownerDid: ownerDid },
+                }
+            );
+
+            if (topicsResponse.status !== 200) {
+                return swal('Error', topicsResponse.data.reason, 'error')
+            }
+
+            setTopics(topicsResponse.data.records)
+
+
+            const healthResponse = await axios.get(`/v1/dsb/health`, {
+                headers: {
+                    Authorization: auth ? `Bearer ${auth}` : undefined,
+                    'content-type': 'application/json',
+                },
+            });
+
+            setHealth(healthResponse.data)
+
+            if (healthResponse.status !== 200) {
+                return swal('Error', healthResponse.data.reason, 'error')
+            }
+
+        }
+
+        getServerSideProps()
+    }, [auth, ownerDid])
 
     return (
         <div>
@@ -97,10 +116,10 @@ export default function ListTopics({ health, channels, topics, auth }:
                 <ResponsiveHeader />
                 <Container maxWidth="lg">
                     <section className={classes.table}>
-                        <TopicContainer
+                        {topics ? <TopicContainer
                             applicationNameSpace={owner}
                             auth={auth.some}
-                            topics={topics.ok} />
+                            topics={topics} /> : null}
                     </section>
 
                 </Container>

@@ -33,6 +33,6 @@ export class DsbTopicsController {
   public async updateTopics(
     @Body() data: SendTopicBodyDTO
   ) {
-    return this.dsbClientService.postTopics(data);
+    return this.dsbClientService.updateTopics(data);
   }
 }

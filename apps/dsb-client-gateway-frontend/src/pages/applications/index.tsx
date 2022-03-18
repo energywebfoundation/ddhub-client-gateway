@@ -8,7 +8,7 @@ import { ApplicationContainer } from '../../components/Applications/Applications
 import ResponsiveHeader from '../../components/ResponsiveHeader/ResponsiveHeader'
 import { isAuthorized } from '../../services/auth.service'
 import { refreshState } from '../../services/identity.service'
-import { ErrorCode, Result, serializeError, Channel, Option, ErrorBodySerialized, Topic, Storage } from '../../utils'
+import { ErrorCode, Result, serializeError, Option, ErrorBodySerialized, Storage } from '../../utils'
 import axios from 'axios'
 import { IAppDefinition } from '@energyweb/iam-contracts'
 
@@ -84,7 +84,7 @@ export default function ListApplications({ state, auth }:
 
         getServerSideProps()
 
-    }, [])
+    }, [auth, state])
 
 
     return (
