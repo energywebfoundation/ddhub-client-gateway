@@ -10,6 +10,10 @@ import ResponsiveHeader from '../components/ResponsiveHeader/ResponsiveHeader'
 import { DsbApiService } from '../services/dsb-api.service'
 import { refreshState } from '../services/identity.service'
 import { isAuthorized } from '../services/auth.service'
+import { Breadcrumbs } from '@material-ui/core'
+import { Home } from 'react-feather'
+import { NavigateNext } from '@material-ui/icons'
+import Link from 'next/link'
 import { ErrorBodySerialized, ErrorCode, Option, Result, serializeError, Storage } from '../utils'
 type Props = {
   health: Result<boolean, ErrorBodySerialized>
@@ -45,7 +49,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext): Pr
     }
   }
 }
-export default function Home({ health, state, auth }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function home({ health, state, auth }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const classes = useStyles()
   useEffect(() => {
     if (health.err) {
@@ -64,14 +68,21 @@ export default function Home({ health, state, auth }: InferGetServerSidePropsTyp
 
         <ResponsiveHeader />
 
-        <Container maxWidth="md">
+        <Container maxWidth="lg">
           <section className={classes.connectionStatus}>
-            <Typography variant="h4">Connection Status </Typography>
-            <Typography variant="caption" className={classes.connectionStatusPaper}>
+            <Typography variant="h5" className={classes.pageTitle}>Gateway Settings</Typography>
+            <Typography variant="h5">|</Typography>
+            {/* <Typography variant="caption" className={classes.connectionStatusPaper}>
               {health.ok ? 'ONLINE' : `ERROR [${health.err?.code}]`}
-            </Typography>
+            </Typography> */}
+            <Breadcrumbs separator={<NavigateNext fontSize="small" />}aria-label="breadcrumb" className={classes.breadCrumbs}>
+              <Link color="inherit" href="/">
+                <Home color='#A466FF' size={15} />
+              </Link>
+              <Typography color="text.primary">Gateway Settings</Typography>
+          </Breadcrumbs>
           </section>
-          <Divider className={classes.divider} />
+
           {state.ok && (
             <section className={classes.main}>
               <Grid container spacing={3}>
@@ -106,6 +117,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   connectionStatusPaper: {
     padding: '.5rem 1rem',
     marginLeft: '1rem',
+    marginRight: '1rem',
     background: theme.palette.primary.main,
     borderRadius: '1rem',
     display: 'flex',
@@ -117,5 +129,15 @@ const useStyles = makeStyles((theme: Theme) => ({
   main: {
     padding: '0 1rem',
     marginTop: '2rem'
+  },
+
+  pageTitle:{
+    marginRight: '1rem',
+    fontSize: '24px'
+  },
+
+  breadCrumbs: {
+    marginLeft: '1rem',
   }
+
 }))

@@ -15,31 +15,37 @@ import Typography from "@material-ui/core/Typography";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import Link from 'next/link'
 import clsx from 'clsx'
+import { Home, Box, File, FileText, Layers, MessageSquare, Mail, GitMerge } from 'react-feather'
 import { useRouter } from 'next/router'
+import { Divider } from "@material-ui/core";
 // import VisibleItemList from "../containers/VisibleItemList";
-const drawerWidth = 240;
+const drawerWidth = 260;
 const useStyles = makeStyles((theme) => ({
     root: {
         display: "flex"
     },
     drawer: {
-        [theme.breakpoints.up("sm")]: {
+        [theme.breakpoints.up("md")]: {
             width: drawerWidth,
             flexShrink: 0
         }
     },
     appBar: {
-        zIndex: theme.zIndex.drawer + 1
+        zIndex: theme.zIndex.drawer + 1,
+        backgroundColor: 'unset',
+        boxShadow: 'unset',
+        padding: '5px 0'
     },
     menuButton: {
         marginRight: theme.spacing(2),
-        [theme.breakpoints.up("sm")]: {
+        [theme.breakpoints.up("md")]: {
             display: "none"
         }
     },
     toolbar: theme.mixins.toolbar,
     drawerPaper: {
-        width: drawerWidth
+        width: drawerWidth,
+        padding: "15px"
     },
     content: {
         flexGrow: 1,
@@ -50,15 +56,46 @@ const useStyles = makeStyles((theme) => ({
         marginLeft: 0
     },
     navLink: {
-        fontSize: '1rem',
+        fontSize: '1.04rem',
+        height: '42px',
         '&:hover': {
-            textDecorationLine: 'underline',
-            color: theme.palette.secondary.main
+            background: 'none',
+            transform: 'translateX(5px)'
         }
     },
     active: {
-        color: theme.palette.secondary.main
+        color: "#ffffff",
+        background: theme.palette.primary.main,
+        borderRadius: '4px',
+        '&:hover': {
+            background: theme.palette.primary.main,
+            transform: 'none'
+        }
     },
+    iconDashboard: {
+        marginRight: "15px"
+    },
+
+    ListItemText: {
+        lineHeight: '1.25'
+    },
+
+    logo: {
+        height: '38px'
+    },
+
+    dividerColor: {
+        backgroundColor: "rgb(255 255 255 / 20%)",
+        margin: "15px 0px"
+    },
+
+    menuTitle:{
+        marginLeft: "20px",
+        marginBottom: "10px",
+        fontSize: "14px",
+        color: theme.palette.primary.main
+    }
+
 }));
 function ResponsiveDrawer() {
 
@@ -81,32 +118,63 @@ function ResponsiveDrawer() {
     const drawer = (
         <div>
             <List>
-
-                <ListItem button>
-                    <Link href="/">
-                        <a className={clsx(classes.navLink, isActive('/'))}>Admin</a>
-                    </Link>
+                <Link href="#" passHref >
+                <ListItem button className={clsx(classes.navLink, isActive('#'))} component="a">
+                    <Home className={classes.iconDashboard} size={20} />
+                    <ListItemText>Dashboard</ListItemText>
                 </ListItem>
+                </Link>
+            <Divider classes={{root: classes.dividerColor}}/>
+            </List>
 
-                <ListItem button>
-                    <Link href="/files">
-                        <a className={clsx(classes.navLink, isActive('/files'))}>Files</a>
-                    </Link>
+            <Typography classes={{root: classes.menuTitle}}>Admin</Typography>
+            <List>
+                <Link href="/" passHref >
+                <ListItem button className={clsx(classes.navLink, isActive('/'))} component="a">
+                    <Box className={classes.iconDashboard} size={20} />
+                    <ListItemText>Gateway Settings</ListItemText>
                 </ListItem>
+                </Link>
 
-
-                <ListItem button>
-                    <Link href="/docs">
-                        <a className={clsx(classes.navLink, isActive('/docs'))}>Docs</a>
-                    </Link>
+                <Link href="/applications" passHref>
+                <ListItem button className={clsx(classes.navLink, isActive('/applications'))} component="a">
+                    <Layers className={classes.iconDashboard} size={20} />
+                    <ListItemText>Apps and Topics</ListItemText>
                 </ListItem>
+                </Link>
 
-                <ListItem button>
-                    <Link href="/applications">
-                        <a className={clsx(classes.navLink, isActive('/applications'))}>Applications</a>
-                    </Link>
+                <Link href="#" passHref>
+                <ListItem button className={clsx(classes.navLink, isActive('#'))} component="a">
+                    <FileText className={classes.iconDashboard} size={20} />
+                    <ListItemText>Channels</ListItemText>
                 </ListItem>
+                </Link>
+                
+                <Divider classes={{root: classes.dividerColor}}/>
+            </List>
 
+            <Typography classes={{root: classes.menuTitle}}>Messaging</Typography>
+            <List>
+                <Link href="/docs" passHref >
+                <ListItem button className={clsx(classes.navLink, isActive('/docs'))} component="a">
+                    <GitMerge className={classes.iconDashboard} size={20} />
+                    <ListItemText>Integration APIs</ListItemText>
+                </ListItem>
+                </Link>
+
+                <Link href="/files" passHref >
+                <ListItem button className={clsx(classes.navLink, isActive('/files'))} component="a">
+                    <MessageSquare className={classes.iconDashboard} size={20} />
+                    <ListItemText>Data Messaging</ListItemText>
+                </ListItem>
+                </Link>
+
+                <Link href="#" passHref>
+                <ListItem button className={clsx(classes.navLink, isActive('#'))} component="a">
+                    <Mail className={classes.iconDashboard} size={20} />
+                    <ListItemText>Large Data Messaging</ListItemText>
+                </ListItem>
+                </Link>
 
             </List>
         </div>
@@ -125,9 +193,10 @@ function ResponsiveDrawer() {
                     >
                         <MenuIcon />
                     </IconButton>
-                    <Typography variant="h6" noWrap>
+                    {/* <Typography variant="h6" noWrap> 
                         Energy Web
-                    </Typography>
+                    </Typography>*/}
+                    <img src="ew-flex-logo.png" alt="logo" className={classes.logo} />
                 </Toolbar>
             </AppBar>
 
