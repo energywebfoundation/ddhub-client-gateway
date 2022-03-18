@@ -94,6 +94,7 @@ export type Topic = {
   schema: object | string;
   schemaType: string;
   version: string;
+  namespace?: string
 };
 
 export enum RoleState {
