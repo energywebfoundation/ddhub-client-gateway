@@ -28,10 +28,9 @@ type Props = {
     dialogTitle: string
     dialogText: string
     handlePostOrUpdateTopic?: (body: TopicType) => void
-
 }
 
-let schemaTypes = [
+const schemaTypes = [
     { id: 1, schema: 'JSD7' },
     { id: 2, schema: 'JSD8' }
 ]

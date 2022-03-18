@@ -36,7 +36,7 @@ export const APPLICATIONS_HEADERS = [
     },
     {
         Header: 'APPLICATION NAMESPACE',
-        accessor: 'applicationNameSpace',
+        accessor: 'namespace',
         filter: 'fuzzyText',
     },
     {

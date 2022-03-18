@@ -1,5 +1,6 @@
 import { Controller, Get, UseGuards, Body, Post, Patch, HttpStatus, Query, Param } from '@nestjs/common';
 import { DsbApiService } from '../service/dsb-api.service';
+import { IamService } from '../../../modules/iam-service/service/iam.service';
 import { DigestGuard } from '../../utils/guards/digest.guard';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ApplicationDTO } from '../dsb-client.interface';
@@ -10,7 +11,8 @@ import { GetApplicationsQueryDto } from '../dto';
 @ApiTags('applications', 'dsb')
 
 export class DsbApplicationsController {
-    constructor(protected readonly dsbClientService: DsbApiService) { }
+    constructor(protected readonly dsbClientService: DsbApiService,
+        protected readonly iamService: IamService) { }
 
     @Get('applications')
     @ApiOperation({
@@ -24,6 +26,14 @@ export class DsbApplicationsController {
     public async getApplications(
         @Query() { ownerDid }: GetApplicationsQueryDto
     ) {
-        return this.dsbClientService.getApplicationsByOwner(ownerDid);
+
+        const applications = await this.iamService.getApplicationsByOwner(ownerDid);
+        const nameSpaces = await applications.map((application) => application.namespace)
+        const topicsCount = await this.dsbClientService.getTopicsCountByOwner(nameSpaces)
+        const finalApllicationsResult = applications.map((application) => {
+            application.topicsCount = topicsCount[application.namespace] ? topicsCount[application.namespace] : 0
+            return application
+        })
+        return finalApllicationsResult
     }
 }

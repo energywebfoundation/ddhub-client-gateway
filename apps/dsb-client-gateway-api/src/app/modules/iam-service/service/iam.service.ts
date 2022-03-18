@@ -14,6 +14,7 @@ import { IamFactoryService } from './iam-factory.service';
 import { ConfigService } from '@nestjs/config';
 import { Encoding } from '@ew-did-registry/did-resolver-interface';
 import { KeyType } from '@ew-did-registry/keys';
+import { ApplicationDTO } from '../../dsb-client/dsb-client.interface'
 
 @Injectable()
 export class IamService {
@@ -65,7 +66,7 @@ export class IamService {
     return this.claimsService.getClaimById(id);
   }
 
-  public async getApplicationsByOwner(ownerDid: string): Promise<IAppDefinition[]> {
+  public async getApplicationsByOwner(ownerDid: string): Promise<ApplicationDTO[]> {
 
     const didClaims = await this.cacheClient.getClaimsByRequester(ownerDid, { isAccepted: true })
     const namespaceList = []
@@ -78,7 +79,8 @@ export class IamService {
     })
 
     await Promise.all(namespaceList.map(async (namespace: string) => {
-      const application = await this.cacheClient.getAppDefinition(namespace)
+      const application = await this.cacheClient.getAppDefinition(namespace) as ApplicationDTO
+      application.namespace = namespace
       applications.push(application)
     }))
 

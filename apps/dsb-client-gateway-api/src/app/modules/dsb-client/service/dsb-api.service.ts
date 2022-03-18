@@ -417,17 +417,7 @@ export class DsbApiService implements OnModuleInit {
   }
 
 
-  public async getApplicationsByOwner(ownerDid: string): Promise<Array<IAppDefinition>> {
-    await this.enableTLS();
-    try {
-      const data = await this.iamService.getApplicationsByOwner(ownerDid)
-      return data
-    } catch (e) {
-      if (e.response) {
-        this.logger.error(e);
-      }
-    }
-  }
+
 
 
 
