@@ -8,6 +8,7 @@ import {
   ArrayUnique,
   IsNumber
 } from 'class-validator';
+import { IsDID } from '../../utils/validator/decorators/IsDid';
 import { Topic } from '../dsb-client.interface';
 
 export class FileUploadBodyDto {
@@ -58,6 +59,10 @@ export class GetMessagesQueryDto {
 export class GetApplicationsQueryDto {
   @IsNotEmpty()
   @IsString()
+  @IsDID({
+    each: true,
+    message: 'Malformed DID',
+  })
   public ownerDid: string;
 }
 
