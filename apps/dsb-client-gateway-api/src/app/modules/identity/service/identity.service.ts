@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { EthersService } from '../../utils/service/ethers.service';
 import { Identity } from '../../storage/storage.interface';
 import { IamService } from '../../iam-service/service/iam.service';
@@ -9,6 +9,8 @@ import { IdentityRepository } from '../../storage/repository/identity.repository
 
 @Injectable()
 export class IdentityService {
+  protected readonly logger = new Logger(IdentityService.name);
+
   constructor(
     protected readonly ethersService: EthersService,
     protected readonly enrolmentRepository: EnrolmentRepository,
@@ -35,15 +37,22 @@ export class IdentityService {
   public async createIdentity(privateKey?: string): Promise<void> {
     privateKey = privateKey || this.ethersService.createPrivateKey();
 
+    this.logger.log('Creating wallet from private key');
+
     const wallet = this.ethersService.getWalletFromPrivateKey(privateKey);
 
     const balanceState = await this.ethersService.getBalance(wallet.address);
+
+    this.logger.log(`Balance state: ${balanceState}`);
 
     const publicIdentity: Identity = {
       publicKey: wallet.publicKey,
       balance: balanceState,
       address: wallet.address,
     };
+
+    this.logger.log(`Obtained identity`);
+    this.logger.log(publicIdentity);
 
     await this.identityRepository.writeIdentity(publicIdentity);
     await this.secretsEngineService.setPrivateKey(privateKey);

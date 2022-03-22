@@ -45,3 +45,4 @@ logical
 file
 core
 sys
+.env

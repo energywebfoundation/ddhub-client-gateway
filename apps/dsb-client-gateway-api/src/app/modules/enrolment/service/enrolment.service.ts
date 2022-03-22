@@ -68,24 +68,20 @@ export class EnrolmentService implements OnModuleInit {
       await this.initEnrolment();
 
       throw new NoPrivateKeyException();
-
-      // return {
-      //   did: null,
-      //   state: {
-      //     approved: false,
-      //     waiting: false,
-      //     roles: {
-      //       user: RoleState.NO_CLAIM,
-      //     },
-      //   },
-      // };
     }
 
     return this.enrolmentRepository.getEnrolment();
   }
 
   public async initEnrolment(): Promise<any> {
-    const { address } = await this.identityRepository.getIdentity();
+    const identity = await this.identityRepository.getIdentity();
+
+    if (!identity) {
+      return;
+    }
+
+    const { address } = identity;
+
     const did = this.iamService.getDIDAddress();
 
     if (!did) {

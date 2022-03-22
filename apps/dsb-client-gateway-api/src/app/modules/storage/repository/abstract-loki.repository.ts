@@ -1,16 +1,16 @@
 import { Injectable } from '@nestjs/common';
+import { LokiService } from '../service/loki.service';
 import loki from 'lokijs';
 
 @Injectable()
 export abstract class AbstractLokiRepository {
-  protected readonly client: loki;
+  public readonly client: loki;
 
-  protected constructor(protected readonly collection: string) {
-    this.client = new loki('data.db', {
-      autoload: true,
-      autosave: true,
-      autosaveInterval: 2000,
-    });
+  protected constructor(
+    protected readonly collection: string,
+    protected readonly lokiService: LokiService
+  ) {
+    this.client = lokiService.client;
   }
 
   protected createCollectionIfNotExists(name: string): void {

@@ -14,7 +14,7 @@ import {
   Topic,
   SendTopicBodyDTO,
   TopicResultDTO,
-  PaginatedResponse
+  TopicDataResponse,
 } from '../dsb-client.interface';
 import { SecretsEngineService } from '../../secrets-engine/secrets-engine.interface';
 import { v4 as uuidv4 } from 'uuid';
@@ -29,7 +29,6 @@ export class DsbApiService implements OnModuleInit {
   private readonly logger = new Logger(DsbApiService.name);
 
   protected tls: Agent | null;
-  protected authToken?: string;
   protected baseUrl: string;
 
   public async onModuleInit(): Promise<void> {
@@ -91,7 +90,30 @@ export class DsbApiService implements OnModuleInit {
     }
   }
 
-  public async getTopics(ownerDID?: string): Promise<PaginatedResponse> {
+
+  public async getTopicsByOwnerAndName(
+    name: string,
+    owner: string
+  ): Promise<TopicDataResponse> {
+    const { data } = await promiseRetry(async (retry, attempt) => {
+      return lastValueFrom(
+        this.httpService.get('http://localhost:8080/topic', {
+          params: {
+            owner,
+            name,
+          },
+          httpsAgent: this.getTLS(),
+          headers: {
+            Authorization: `Bearer ${this.didAuthService.getToken()}`,
+          },
+        })
+      ).catch((err) => this.handleRequestWithRetry(err, retry));
+    });
+
+    return data;
+  }
+
+  public async getTopics(ownerDID?: string): Promise<TopicDataResponse> {
     if (!ownerDID) {
       const enrolment = this.enrolmentRepository.getEnrolment();
 
@@ -115,7 +137,7 @@ export class DsbApiService implements OnModuleInit {
           },
           httpsAgent: this.getTLS(),
           headers: {
-            Authorization: `Bearer ${this.didAuthService.getToken()}`
+            Authorization: `Bearer ${this.didAuthService.getToken()}`,
           },
         })
       ).catch((err) => this.handleRequestWithRetry(err, retry));

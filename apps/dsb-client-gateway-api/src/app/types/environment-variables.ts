@@ -106,6 +106,18 @@ export class EnvironmentVariables {
   @IsString()
   DID_AUTH_URL = 'http://localhost:8080';
 
+  @IsPositive()
+  @IsOptional()
+  MAX_RETRIES = 10;
+
+  @IsPositive()
+  @IsOptional()
+  RETRY_FACTOR = 2;
+
+  @IsPositive()
+  @IsOptional()
+  TIMEOUT = 1000;
+
   static isVaultEnabled(values: EnvironmentVariables): boolean {
     return values.SECRETS_ENGINE === SecretsEngine.VAULT;
   }
