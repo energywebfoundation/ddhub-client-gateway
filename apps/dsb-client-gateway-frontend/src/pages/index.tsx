@@ -3,7 +3,7 @@ import Head from 'next/head'
 import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
 import swal from '@sweetalert/with-react'
 import { makeStyles } from '@material-ui/styles'
-import { Typography, Container, Divider, Theme, Grid } from '@material-ui/core'
+import { Typography, Container, Theme, Grid } from '@material-ui/core'
 import { GatewayIdentityContainer } from '../components/GatewayIdentity/GatewayIdentityContainer'
 import { ProxyCertificateContainer } from '../components/ProxyCertificate/ProxyCertificateContainer'
 import ResponsiveHeader from '../components/ResponsiveHeader/ResponsiveHeader'
@@ -64,17 +64,12 @@ export default function home({ health, state, auth }: InferGetServerSidePropsTyp
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
-        {/* <Header /> */}
-
         <ResponsiveHeader />
 
         <Container maxWidth="lg">
           <section className={classes.connectionStatus}>
             <Typography variant="h5" className={classes.pageTitle}>Gateway Settings</Typography>
             <Typography variant="h5">|</Typography>
-            {/* <Typography variant="caption" className={classes.connectionStatusPaper}>
-              {health.ok ? 'ONLINE' : `ERROR [${health.err?.code}]`}
-            </Typography> */}
             <Breadcrumbs separator={<NavigateNext fontSize="small" />}aria-label="breadcrumb" className={classes.breadCrumbs}>
               <Link color="inherit" href="/">
                 <Home color='#A466FF' size={15} />

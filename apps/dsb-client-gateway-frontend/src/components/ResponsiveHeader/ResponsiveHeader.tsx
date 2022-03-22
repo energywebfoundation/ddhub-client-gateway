@@ -18,8 +18,7 @@ import clsx from 'clsx'
 import { Home, Box, File, FileText, Layers, MessageSquare, Mail, GitMerge } from 'react-feather'
 import { useRouter } from 'next/router'
 import { Divider } from "@material-ui/core";
-// import VisibleItemList from "../containers/VisibleItemList";
-const drawerWidth = 260;
+const drawerWidth = 264;
 const useStyles = makeStyles((theme) => ({
     root: {
         display: "flex"
@@ -193,9 +192,6 @@ function ResponsiveDrawer() {
                     >
                         <MenuIcon />
                     </IconButton>
-                    {/* <Typography variant="h6" noWrap> 
-                        Energy Web
-                    </Typography>*/}
                     <img src="ew-flex-logo.png" alt="logo" className={classes.logo} />
                 </Toolbar>
             </AppBar>
