@@ -14,6 +14,13 @@ export interface Topic {
   tags: string[]
   version: string;
 }
+
+export interface PaginatedResponse {
+  count: number
+  limit: number
+  page: number
+  records: Topic[]
+}
 export class ApplicationDTO implements IAppDefinition {
   appName: string
   logoUrl?: string

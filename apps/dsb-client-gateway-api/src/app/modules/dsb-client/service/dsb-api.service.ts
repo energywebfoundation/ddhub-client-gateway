@@ -14,7 +14,8 @@ import {
   Topic,
   SendTopicBodyDTO,
   TopicResultDTO,
-  Result
+  Result,
+  PaginatedResponse
 } from '../dsb-client.interface';
 import { SecretsEngineService } from '../../secrets-engine/secrets-engine.interface';
 import { v4 as uuidv4 } from 'uuid';
@@ -22,7 +23,6 @@ import promiseRetry from 'promise-retry';
 import FormData from 'form-data';
 import { EnrolmentRepository } from '../../storage/repository/enrolment.repository';
 import { DidAuthService } from '../module/did-auth/service/did-auth.service';
-import { IAppDefinition } from '@energyweb/iam-contracts'
 const qs = require('qs');
 
 @Injectable()
@@ -92,12 +92,17 @@ export class DsbApiService implements OnModuleInit {
     }
   }
 
-  public async getTopics(ownerDID?: string): Promise<Topic[]> {
+  public async getTopics(ownerDID?: string): Promise<PaginatedResponse> {
     if (!ownerDID) {
       const enrolment = this.enrolmentRepository.getEnrolment();
 
       if (!enrolment) {
-        return [];
+        return {
+          count: 0,
+          limit: 0,
+          page: 1,
+          records: []
+        };
       }
 
       ownerDID = enrolment.did;
@@ -111,7 +116,7 @@ export class DsbApiService implements OnModuleInit {
           },
           httpsAgent: this.getTLS(),
           headers: {
-            Authorization: `Bearer ${this.didAuthService.getToken()}`,
+            Authorization: `Bearer ${this.didAuthService.getToken()}`
           },
         })
       ).catch((err) => this.handleRequestWithRetry(err, retry));
@@ -138,7 +143,7 @@ export class DsbApiService implements OnModuleInit {
           },
           httpsAgent: this.getTLS(),
           headers: {
-            Authorization: `Bearer ${this.didAuthService.getToken()}`,
+            Authorization: `Bearer ${this.didAuthService.getToken()}`
           },
         })
       ).catch((err) => this.handleRequestWithRetry(err, retry));
@@ -147,9 +152,6 @@ export class DsbApiService implements OnModuleInit {
     return data;
   }
 
-
-
-
   /**
    * Sends a POST /postTopics request to the broker
    *
@@ -157,19 +159,20 @@ export class DsbApiService implements OnModuleInit {
    */
   public async postTopics(data: SendTopicBodyDTO): Promise<Result<Topic>> {
 
-    const { result } = await promiseRetry(async (retry, attempt) => {
+    const result = await promiseRetry(async (retry, attempt) => {
       return lastValueFrom(
-        this.httpService.post('https://aemovc.eastus.cloudapp.azure.com/topic', {
-          data: data,
-          httpsAgent: this.getTLS(),
-          headers: {
-            Authorization: `Bearer ${this.didAuthService.getToken()}`,
-          },
-        })
+        this.httpService.post('https://aemovc.eastus.cloudapp.azure.com/topic',
+          data,
+          {
+            httpsAgent: this.getTLS(),
+            headers: {
+              Authorization: `Bearer ${this.didAuthService.getToken()}`
+            }
+          })
       ).catch((err) => this.handleRequestWithRetry(err, retry));
     });
 
-    return result
+    return result.data
   }
 
   /**
@@ -179,26 +182,20 @@ export class DsbApiService implements OnModuleInit {
   */
   public async updateTopics(data: SendTopicBodyDTO): Promise<Result<TopicResultDTO>> {
 
-    const { result } = await promiseRetry(async (retry, attempt) => {
+    const result = await promiseRetry(async (retry, attempt) => {
       return lastValueFrom(
-        this.httpService.patch('https://aemovc.eastus.cloudapp.azure.com/topic', {
-          data: data,
-          httpsAgent: this.getTLS(),
-          headers: {
-            Authorization: `Bearer ${this.didAuthService.getToken()}`,
-          },
-        })
-      ).catch((err) => {
-
-        this.logger.error('result of updateTopics', err)
-        return this.handleRequestWithRetry(err, retry)
-
-      });
+        this.httpService.patch('https://aemovc.eastus.cloudapp.azure.com/topic',
+          data,
+          {
+            httpsAgent: this.getTLS(),
+            headers: {
+              Authorization: `Bearer ${this.didAuthService.getToken()}`
+            },
+          })
+      ).catch((err) => this.handleRequestWithRetry(err, retry));
     });
 
-
-
-    return result
+    return result.data
 
   }
   public async getMessages(
@@ -286,8 +283,8 @@ export class DsbApiService implements OnModuleInit {
       this.logger.log('Unauthorized, attempting to login');
 
       await this.login();
-
-      return retry();
+      // return retry()
+      throw new Error(e);
     }
 
     if (status === HttpStatus.FORBIDDEN) {
@@ -296,7 +293,8 @@ export class DsbApiService implements OnModuleInit {
       throw new Error();
     }
 
-    return retry();
+    throw new Error(e);
+    // return retry();
   }
 
   public async getChannels(): Promise<Channel[]> {
