@@ -70,12 +70,10 @@ export default function home({ health, state, auth }: InferGetServerSidePropsTyp
           <section className={classes.connectionStatus}>
             <Typography variant="h5" className={classes.pageTitle}>Gateway Settings</Typography>
             <Typography variant="h5">|</Typography>
-            <Breadcrumbs separator={<NavigateNext fontSize="small" />}aria-label="breadcrumb" className={classes.breadCrumbs}>
-              <Link color="inherit" href="/">
-                <Home color='#A466FF' size={15} />
-              </Link>
-              <Typography color="text.primary">Gateway Settings</Typography>
-          </Breadcrumbs>
+            <Breadcrumbs separator={<NavigateNext fontSize="small" />} aria-label="breadcrumb" className={classes.breadCrumbs}>
+              <Home color='#A466FF' size={15} />
+              <Typography color="primary">Gateway Settings</Typography>
+            </Breadcrumbs>
           </section>
 
           {state.ok && (
@@ -126,7 +124,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     marginTop: '2rem'
   },
 
-  pageTitle:{
+  pageTitle: {
     marginRight: '1rem',
     fontSize: '24px'
   },
