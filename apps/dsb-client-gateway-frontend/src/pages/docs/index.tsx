@@ -11,6 +11,9 @@ import { Channel, ErrorBodySerialized, ErrorCode, Option, Result, serializeError
 import { useEffect } from 'react'
 import { useState } from 'react'
 import { ChannelContainer } from '../../components/Channels/ChannelsContainer'
+import { Breadcrumbs } from '@material-ui/core'
+import { Home } from 'react-feather'
+import { NavigateNext } from '@material-ui/icons'
 import { getEnrolment } from '../../services/storage.service'
 type Props = {
   health: Result<boolean, ErrorBodySerialized>
@@ -81,14 +84,21 @@ export default function Documentation({
         <ResponsiveHeader />
         <Container maxWidth="lg">
           <section className={classes.connectionStatus}>
-            <Typography variant="h4">Connection Status </Typography>
-            <Typography variant="caption" className={classes.connectionStatusPaper}>
+          <Typography variant="h5" className={classes.pageTitle}>Integration APIs</Typography>
+            <Typography variant="h5">|</Typography>
+            {/* <Typography variant="caption" className={classes.connectionStatusPaper}>
               {health.ok ? 'ONLINE' : `ERROR [${health.err?.code}]`}
-            </Typography>
+            </Typography> */}
+            <Breadcrumbs separator={<NavigateNext fontSize="small" />}aria-label="breadcrumb" className={classes.breadCrumbs}>
+              <Link color="inherit" href="/">
+                <Home color='#A466FF' size={15} />
+              </Link>
+              <Typography color="text.primary">Integration APIs</Typography>
+          </Breadcrumbs>
           </section>
           <Divider className={classes.divider} />
           <section className={classes.apiDocs}>
-            <Typography variant="h4">API Documentation </Typography>
+            <Typography variant="h5">API Documentation </Typography>
             <div className={classes.apiDocsLink}>
               <Link href="/docs/rest" passHref={true}>
                 <Button variant="contained" color="primary">
@@ -105,7 +115,7 @@ export default function Documentation({
           </section>
           <Divider className={classes.divider} />
           <section className={classes.main}>
-            <Typography className={classes.textWhite} variant="h4">
+            <Typography className={classes.textWhite} variant="h5">
               Available Channels
             </Typography>
             {channelErrorText && (
@@ -134,6 +144,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   connectionStatusPaper: {
     padding: '.5rem 1rem',
     marginLeft: '1rem',
+    marginRight: '1rem',
     background: theme.palette.primary.main,
     borderRadius: '1rem',
     display: 'flex',
@@ -166,5 +177,15 @@ const useStyles = makeStyles((theme: Theme) => ({
       marginTop: '1rem',
       padding: '0.5rem'
     }
+  },
+  
+  pageTitle:{
+    marginRight: '1rem',
+    fontSize: '24px'
+  },
+
+  breadCrumbs: {
+    marginLeft: '1rem',
   }
+
 }))

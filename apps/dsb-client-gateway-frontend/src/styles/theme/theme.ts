@@ -1,6 +1,7 @@
 import { createTheme } from '@material-ui/core/styles'
 import { red } from '@material-ui/core/colors'
 // Create a theme instance.
+
 const theme = createTheme({
   palette: {
     primary: {
@@ -26,6 +27,7 @@ const theme = createTheme({
     },
     action: {
       hover: '#CC98FF',
+      selected: '#A466FF'
     },
     text: {
       primary: '#CED1D5',
@@ -33,7 +35,7 @@ const theme = createTheme({
     },
     background: {
       default: '#161D31',
-      paper: '#848484',
+      paper: '#293145'
     }
   }
 })

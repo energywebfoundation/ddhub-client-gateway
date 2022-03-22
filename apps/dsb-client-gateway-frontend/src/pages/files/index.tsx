@@ -11,6 +11,10 @@ import ResponsiveHeader from '../../components/ResponsiveHeader/ResponsiveHeader
 import { DownloadContainer } from '../../components/DownloadFile/DownloadContainer'
 import { DsbApiService } from '../../services/dsb-api.service'
 import { isAuthorized } from '../../services/auth.service'
+import { Breadcrumbs } from '@material-ui/core'
+import { Home } from 'react-feather'
+import { NavigateNext } from '@material-ui/icons'
+import Link from 'next/link'
 import { ErrorCode, Result, serializeError, Channel, Option, ErrorBodySerialized, Topic } from '../../utils'
 type Props = {
   health: Result<boolean, ErrorBodySerialized>
@@ -79,21 +83,28 @@ export default function FileUpload({ health, channels, topics, auth }:
         <ResponsiveHeader />
         <Container maxWidth="lg">
           <section className={classes.connectionStatus}>
-            <Typography variant="h4">Connection Status </Typography>
-            <Typography variant="caption" className={classes.connectionStatusPaper}>
+            <Typography variant="h5" className={classes.pageTitle}>Data Messaging</Typography>
+            <Typography variant="h5">|</Typography>
+            {/* <Typography variant="caption" className={classes.connectionStatusPaper}>
               {health.ok ? 'ONLINE' : `ERROR [${health.err?.code}]`}
-            </Typography>
+            </Typography> */}
+            <Breadcrumbs separator={<NavigateNext fontSize="small" />}aria-label="breadcrumb" className={classes.breadCrumbs}>
+              <Link color="inherit" href="/">
+                <Home color='#A466FF' size={15} />
+              </Link>
+              <Typography color="text.primary">Data Messaging</Typography>
+          </Breadcrumbs>
           </section>
           <Divider className={classes.divider} />
           <section className={classes.main}>
-            <Typography className={classes.textWhite} variant="h4">
+            <Typography className={classes.textWhite} variant="h5">
               File Upload{' '}
             </Typography>
             <UploadContainer auth={auth.some} channels={channels.ok} topics={topics.ok} />
           </section>
           <Divider className={classes.divider} />
           <section className={classes.main}>
-            <Typography className={classes.textWhite} variant="h4">
+            <Typography className={classes.textWhite} variant="h5">
               File Download{' '}
             </Typography>
             <DownloadContainer auth={auth.some} channels={channels.ok} />
@@ -115,6 +126,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   connectionStatusPaper: {
     padding: '.5rem 1rem',
     marginLeft: '1rem',
+    marginRight: '1rem',
     background: theme.palette.primary.main,
     borderRadius: '1rem',
     display: 'flex',
@@ -126,6 +138,14 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   main: {
     padding: '0 2rem'
+  },
+  pageTitle:{
+    marginRight: '1rem',
+    fontSize: '24px'
+  },
+
+  breadCrumbs: {
+    marginLeft: '1rem',
   },
   textWhite: {
     color: '#fff'
