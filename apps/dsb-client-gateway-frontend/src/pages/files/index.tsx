@@ -88,12 +88,10 @@ export default function FileUpload({ health, channels, topics, auth }:
             {/* <Typography variant="caption" className={classes.connectionStatusPaper}>
               {health.ok ? 'ONLINE' : `ERROR [${health.err?.code}]`}
             </Typography> */}
-            <Breadcrumbs separator={<NavigateNext fontSize="small" />}aria-label="breadcrumb" className={classes.breadCrumbs}>
-              <Link color="inherit" href="/">
-                <Home color='#A466FF' size={15} />
-              </Link>
-              <Typography color="text.primary">Data Messaging</Typography>
-          </Breadcrumbs>
+            <Breadcrumbs separator={<NavigateNext fontSize="small" />} aria-label="breadcrumb" className={classes.breadCrumbs}>
+              <Home color='#A466FF' size={15} />
+              <Typography color="primary">Data Messaging</Typography>
+            </Breadcrumbs>
           </section>
           <Divider className={classes.divider} />
           <section className={classes.main}>
@@ -139,7 +137,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   main: {
     padding: '0 2rem'
   },
-  pageTitle:{
+  pageTitle: {
     marginRight: '1rem',
     fontSize: '24px'
   },
