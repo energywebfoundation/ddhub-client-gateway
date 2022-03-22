@@ -7,6 +7,7 @@ import Hidden from "@material-ui/core/Hidden";
 import IconButton from "@material-ui/core/IconButton";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
+import ListItemText from "@material-ui/core/ListItemText";
 import MenuIcon from "@material-ui/icons/Menu";
 import CloseIcon from "@material-ui/icons/Close";
 import Toolbar from "@material-ui/core/Toolbar";
@@ -87,7 +88,7 @@ const useStyles = makeStyles((theme) => ({
         margin: "15px 0px"
     },
 
-    menuTitle:{
+    menuTitle: {
         marginLeft: "20px",
         marginBottom: "10px",
         fontSize: "14px",
@@ -111,61 +112,61 @@ function ResponsiveDrawer() {
         <div>
             <List>
                 <Link href="#" passHref >
-                <ListItem button className={clsx(classes.navLink, isActive('#'))} component="a">
-                    <Home className={classes.iconDashboard} size={20} />
-                    <ListItemText>Dashboard</ListItemText>
-                </ListItem>
+                    <ListItem button className={clsx(classes.navLink, isActive('#'))} component="a">
+                        <Home className={classes.iconDashboard} size={20} />
+                        <ListItemText>Dashboard</ListItemText>
+                    </ListItem>
                 </Link>
-            <Divider classes={{root: classes.dividerColor}}/>
+                <Divider classes={{ root: classes.dividerColor }} />
             </List>
 
-            <Typography classes={{root: classes.menuTitle}}>Admin</Typography>
+            <Typography classes={{ root: classes.menuTitle }}>Admin</Typography>
             <List>
                 <Link href="/" passHref >
-                <ListItem button className={clsx(classes.navLink, isActive('/'))} component="a">
-                    <Box className={classes.iconDashboard} size={20} />
-                    <ListItemText>Gateway Settings</ListItemText>
-                </ListItem>
+                    <ListItem button className={clsx(classes.navLink, isActive('/'))} component="a">
+                        <Box className={classes.iconDashboard} size={20} />
+                        <ListItemText>Gateway Settings</ListItemText>
+                    </ListItem>
                 </Link>
 
                 <Link href="/applications" passHref>
-                <ListItem button className={clsx(classes.navLink, isActive('/applications'))} component="a">
-                    <Layers className={classes.iconDashboard} size={20} />
-                    <ListItemText>Apps and Topics</ListItemText>
-                </ListItem>
+                    <ListItem button className={clsx(classes.navLink, isActive('/applications'))} component="a">
+                        <Layers className={classes.iconDashboard} size={20} />
+                        <ListItemText>Apps and Topics</ListItemText>
+                    </ListItem>
                 </Link>
 
                 <Link href="#" passHref>
-                <ListItem button className={clsx(classes.navLink, isActive('#'))} component="a">
-                    <FileText className={classes.iconDashboard} size={20} />
-                    <ListItemText>Channels</ListItemText>
-                </ListItem>
+                    <ListItem button className={clsx(classes.navLink, isActive('#'))} component="a">
+                        <FileText className={classes.iconDashboard} size={20} />
+                        <ListItemText>Channels</ListItemText>
+                    </ListItem>
                 </Link>
-                
-                <Divider classes={{root: classes.dividerColor}}/>
+
+                <Divider classes={{ root: classes.dividerColor }} />
             </List>
 
-            <Typography classes={{root: classes.menuTitle}}>Messaging</Typography>
+            <Typography classes={{ root: classes.menuTitle }}>Messaging</Typography>
             <List>
                 <Link href="/docs" passHref >
-                <ListItem button className={clsx(classes.navLink, isActive('/docs'))} component="a">
-                    <GitMerge className={classes.iconDashboard} size={20} />
-                    <ListItemText>Integration APIs</ListItemText>
-                </ListItem>
+                    <ListItem button className={clsx(classes.navLink, isActive('/docs'))} component="a">
+                        <GitMerge className={classes.iconDashboard} size={20} />
+                        <ListItemText>Integration APIs</ListItemText>
+                    </ListItem>
                 </Link>
 
                 <Link href="/files" passHref >
-                <ListItem button className={clsx(classes.navLink, isActive('/files'))} component="a">
-                    <MessageSquare className={classes.iconDashboard} size={20} />
-                    <ListItemText>Data Messaging</ListItemText>
-                </ListItem>
+                    <ListItem button className={clsx(classes.navLink, isActive('/files'))} component="a">
+                        <MessageSquare className={classes.iconDashboard} size={20} />
+                        <ListItemText>Data Messaging</ListItemText>
+                    </ListItem>
                 </Link>
 
                 <Link href="#" passHref>
-                <ListItem button className={clsx(classes.navLink, isActive('#'))} component="a">
-                    <Mail className={classes.iconDashboard} size={20} />
-                    <ListItemText>Large Data Messaging</ListItemText>
-                </ListItem>
+                    <ListItem button className={clsx(classes.navLink, isActive('#'))} component="a">
+                        <Mail className={classes.iconDashboard} size={20} />
+                        <ListItemText>Large Data Messaging</ListItemText>
+                    </ListItem>
                 </Link>
 
             </List>
