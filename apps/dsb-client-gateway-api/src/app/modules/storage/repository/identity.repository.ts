@@ -1,13 +1,14 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { AbstractLokiRepository } from './abstract-loki.repository';
 import { Identity } from '../storage.interface';
+import { LokiService } from '../service/loki.service';
 
 @Injectable()
 export class IdentityRepository extends AbstractLokiRepository {
   private readonly logger = new Logger(IdentityRepository.name);
 
-  constructor() {
-    super('identity');
+  constructor(protected readonly lokiService: LokiService) {
+    super('identity', lokiService);
   }
 
   public getIdentity(): Identity | null {

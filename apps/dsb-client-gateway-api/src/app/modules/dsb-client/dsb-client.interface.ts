@@ -3,6 +3,15 @@ export interface Topic {
   schema: object | string;
 }
 
+export interface PaginatedData<T> {
+  count: number;
+  limit: number;
+  page: number;
+  records: T[];
+}
+
+export type TopicDataResponse = PaginatedData<TopicData>;
+
 export interface TopicData {
   id: string;
   namespace: string;

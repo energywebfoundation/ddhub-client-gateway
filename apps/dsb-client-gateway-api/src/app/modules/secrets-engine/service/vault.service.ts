@@ -75,6 +75,12 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
   public async getPrivateKey(): Promise<string> {
     this.logger.log('Retrieving private key');
 
+    if (!this.client) {
+      this.logger.warn('Vault client not initialized');
+
+      return null;
+    }
+
     return this.client
       .read(PATHS.IDENTITY_PRIVATE_KEY)
       .then(({ data }) => data.key)

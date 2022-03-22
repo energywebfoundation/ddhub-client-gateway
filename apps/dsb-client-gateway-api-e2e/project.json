@@ -1,0 +1,23 @@
+{
+  "root": "apps/dsb-client-gateway-api-e2e",
+  "sourceRoot": "apps/dsb-client-gateway-api-e2e/src",
+  "projectType": "application",
+  "targets": {
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["apps/dsb-client-gateway-api-e2e/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/apps/dsb-client-gateway-api-e2e"],
+      "options": {
+        "jestConfig": "apps/dsb-client-gateway-api-e2e/jest.config.js",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": []
+}

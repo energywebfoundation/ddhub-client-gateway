@@ -48,5 +48,6 @@ import { DsbHealthController } from './controller/dsb-health.controller';
     DsbTopicsController,
     DsbFilesController,
   ],
+  exports: [DsbApiService],
 })
 export class DsbClientModule {}
