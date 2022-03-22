@@ -4,8 +4,11 @@ import {
   IsOptional,
   IsPositive,
   IsString,
-  IsArray
+  IsArray,
+  ArrayUnique,
+  IsNumber
 } from 'class-validator';
+import { Topic } from '../dsb-client.interface';
 
 export class FileUploadBodyDto {
   @IsString()
@@ -60,7 +63,23 @@ export class GetApplicationsQueryDto {
 
 export class GetTopicsCountQueryDto {
   @IsNotEmpty()
+  @ArrayUnique()
+  @IsString()
   public owner: string[];
+}
+
+export class PaginatedResponse {
+
+  @IsNumber()
+  public count: number;
+  @IsNumber()
+  public limit: number;
+  @IsNumber()
+  public page: number;
+  @ArrayUnique()
+  @IsArray()
+  public records: Topic[]
+
 }
 
 

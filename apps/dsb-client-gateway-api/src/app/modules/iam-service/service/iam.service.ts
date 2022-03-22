@@ -73,7 +73,7 @@ export class IamService {
     const applications: IAppDefinition[] = []
 
     didClaims.forEach((didClaim) => {
-      if (didClaim.claimType.startsWith('topiccreator') && didClaim.namespace !== 'message.broker.app.namespace') {
+      if (didClaim.claimType.startsWith('topiccreator') && didClaim.namespace !== this.configService.get('DID_CLAIM_NAMESPACE')) {
         namespaceList.push(didClaim.namespace)
       }
     })

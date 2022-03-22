@@ -14,7 +14,6 @@ import {
   Topic,
   SendTopicBodyDTO,
   TopicResultDTO,
-  Result,
   PaginatedResponse
 } from '../dsb-client.interface';
 import { SecretsEngineService } from '../../secrets-engine/secrets-engine.interface';
@@ -23,7 +22,7 @@ import promiseRetry from 'promise-retry';
 import FormData from 'form-data';
 import { EnrolmentRepository } from '../../storage/repository/enrolment.repository';
 import { DidAuthService } from '../module/did-auth/service/did-auth.service';
-const qs = require('qs');
+import qs from 'qs';
 
 @Injectable()
 export class DsbApiService implements OnModuleInit {
@@ -157,7 +156,7 @@ export class DsbApiService implements OnModuleInit {
    *
    * @returns
    */
-  public async postTopics(data: SendTopicBodyDTO): Promise<Result<Topic>> {
+  public async postTopics(data: SendTopicBodyDTO): Promise<Topic> {
 
     const result = await promiseRetry(async (retry, attempt) => {
       return lastValueFrom(
@@ -180,7 +179,7 @@ export class DsbApiService implements OnModuleInit {
   *
   * @returns
   */
-  public async updateTopics(data: SendTopicBodyDTO): Promise<Result<TopicResultDTO>> {
+  public async updateTopics(data: SendTopicBodyDTO): Promise<TopicResultDTO> {
 
     const result = await promiseRetry(async (retry, attempt) => {
       return lastValueFrom(

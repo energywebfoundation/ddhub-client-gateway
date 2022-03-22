@@ -30,7 +30,7 @@ export class ApplicationDTO implements IAppDefinition {
   topicsCount?: number
 }
 
-export type ApplicationHeader = {
+export interface ApplicationHeader {
   id?: string
   Header?: string
   accessor: string
@@ -118,9 +118,3 @@ export interface Message {
   timestampNanos: number;
   transactionId?: string;
 }
-
-
-export type Result<T = boolean, E = GatewayError> = {
-  ok?: T;
-  err?: E;
-};
