@@ -1,6 +1,6 @@
-import { makeStyles } from '@material-ui/styles'
+import { makeStyles } from '@mui/styles'
 import { useState } from 'react'
-import { Theme, Typography, Button } from '@material-ui/core'
+import { Theme, Typography, Button } from '@mui/material'
 import { Topic as TopicType } from '../../utils'
 import Table from '../Table/Table'
 import SimpleDialog from '../../pages/topicdialog'

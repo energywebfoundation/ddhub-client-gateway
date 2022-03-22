@@ -1,5 +1,5 @@
-import { makeStyles } from '@material-ui/styles'
-import { Theme, Link, Typography } from '@material-ui/core'
+import { makeStyles } from '@mui/styles'
+import { Theme, Link, Typography } from '@mui/material'
 
 export const Swagger = () => {
   const classes = useStyles()

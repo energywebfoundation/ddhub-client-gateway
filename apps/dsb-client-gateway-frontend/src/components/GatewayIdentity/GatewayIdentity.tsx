@@ -1,9 +1,16 @@
 import { useEffect, useState } from 'react'
-import { Button, makeStyles, Theme, Tooltip, Typography } from '@material-ui/core'
-import InfoIcon from '@material-ui/icons/Info'
 import swal from 'sweetalert'
-import { CustomInput } from '../../components/CustomInput/CustomInput'
-import { EnrolmentState, snip, StringType } from '../../utils'
+import {
+  Button,
+  Theme,
+  Tooltip,
+  Typography,
+} from '@mui/material';
+import InfoIcon from '@mui/icons-material/Info';
+import { CustomInput } from '../../components/CustomInput/CustomInput';
+import { EnrolmentState, snip, StringType } from '../../utils';
+import { makeStyles } from '@mui/styles';
+
 type GatewayIdentityProps = {
   did?: string
   address: string

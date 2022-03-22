@@ -1,9 +1,11 @@
 import { useState } from 'react'
-import { Button, makeStyles, Theme, Tooltip, Typography } from '@material-ui/core'
-import InfoIcon from '@material-ui/icons/Info'
+import { Button, Theme, Tooltip, Typography } from '@mui/material'
+import { makeStyles } from '@mui/styles'
 import swal from 'sweetalert'
 import { CustomInput } from '../CustomInput/CustomInput'
 import { CertificateFiles } from '../../utils'
+import InfoIcon from '@mui/icons-material/Info';
+
 type ProxyCertificateProps = {
   certificate?: CertificateFiles
   isLoading: boolean

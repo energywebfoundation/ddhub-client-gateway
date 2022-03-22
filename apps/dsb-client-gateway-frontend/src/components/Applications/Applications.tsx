@@ -1,7 +1,3 @@
-import { makeStyles } from '@material-ui/styles'
-import {
-    Theme,
-} from '@material-ui/core'
 import { Application as ApplicationType } from '../../utils'
 import 'react-json-view-lite/dist/index.css'
 import Table from '../Table/Table'

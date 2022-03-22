@@ -1,10 +1,18 @@
 import { useState, useEffect } from 'react'
-import { makeStyles } from '@material-ui/styles'
-import { Typography, Button, Theme, Grid, MenuItem, FormControl, Select } from '@material-ui/core'
-import { Info } from '@material-ui/icons'
-import { CustomInput } from '../CustomInput/CustomInput'
-import swal from 'sweetalert'
-import { Channel, Topic } from '../../utils'
+import { makeStyles } from '@mui/styles';
+import {
+  Button,
+  FormControl,
+  Grid,
+  MenuItem,
+  Select,
+  Theme,
+  Typography,
+} from '@mui/material';
+import { Info } from '@mui/icons-material';
+import { CustomInput } from '../CustomInput/CustomInput';
+import swal from 'sweetalert';
+import { Channel, Topic } from '../../utils';
 
 type UploadProps = {
   channels?: Channel[]

@@ -1,19 +1,18 @@
 import { useEffect } from 'react'
 import Head from 'next/head'
 import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
-import { makeStyles } from '@material-ui/styles'
-import { Typography, Container, Divider, Theme } from '@material-ui/core'
-import swal from '@sweetalert/with-react'
-import { UploadContainer } from '../../components/UploadFile/UploadContainer'
-
+import { makeStyles } from '@mui/styles';
+import { Container, Divider, Theme, Typography } from '@mui/material';
+import swal from '@sweetalert/with-react';
+import { UploadContainer } from '../../components/UploadFile/UploadContainer';
 import ResponsiveHeader from '../../components/ResponsiveHeader/ResponsiveHeader'
 
 import { DownloadContainer } from '../../components/DownloadFile/DownloadContainer'
 import { DsbApiService } from '../../services/dsb-api.service'
 import { isAuthorized } from '../../services/auth.service'
-import { Breadcrumbs } from '@material-ui/core'
+import { Breadcrumbs } from '@mui/material'
 import { Home } from 'react-feather'
-import { NavigateNext } from '@material-ui/icons'
+import { NavigateNext } from '@mui/icons-material'
 import Link from 'next/link'
 import { ErrorCode, Result, serializeError, Channel, Option, ErrorBodySerialized, Topic } from '../../utils'
 type Props = {

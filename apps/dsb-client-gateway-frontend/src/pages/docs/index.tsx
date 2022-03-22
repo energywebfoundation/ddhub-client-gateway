@@ -1,8 +1,8 @@
 import Head from 'next/head'
 import Link from 'next/link'
 import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
-import { makeStyles } from '@material-ui/styles'
-import { Typography, Container, Divider, Theme, Button } from '@material-ui/core'
+import { makeStyles } from '@mui/styles'
+import { Typography, Container, Divider, Theme, Button } from '@mui/material'
 import swal from '@sweetalert/with-react'
 import ResponsiveHeader from '../../components/ResponsiveHeader/ResponsiveHeader'
 import { DsbApiService } from '../../services/dsb-api.service'
@@ -11,11 +11,10 @@ import { Channel, ErrorBodySerialized, ErrorCode, Option, Result, serializeError
 import { useEffect } from 'react'
 import { useState } from 'react'
 import { ChannelContainer } from '../../components/Channels/ChannelsContainer'
-import { Breadcrumbs } from '@material-ui/core'
+import { Breadcrumbs } from '@mui/material'
 import { Home } from 'react-feather'
-import { NavigateNext } from '@material-ui/icons'
+import { NavigateNext } from '@mui/icons-material'
 import { getEnrolment } from '../../services/storage.service'
-// import Link from '@material-ui/core/Link'
 
 type Props = {
   health: Result<boolean, ErrorBodySerialized>
