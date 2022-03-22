@@ -1,5 +1,5 @@
 import Head from 'next/head'
-// import Link from 'next/link'
+import Link from 'next/link'
 import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
 import { makeStyles } from '@material-ui/styles'
 import { Typography, Container, Divider, Theme, Button } from '@material-ui/core'
@@ -15,7 +15,7 @@ import { Breadcrumbs } from '@material-ui/core'
 import { Home } from 'react-feather'
 import { NavigateNext } from '@material-ui/icons'
 import { getEnrolment } from '../../services/storage.service'
-import Link from '@material-ui/core/Link'
+// import Link from '@material-ui/core/Link'
 
 type Props = {
   health: Result<boolean, ErrorBodySerialized>
@@ -92,16 +92,16 @@ export default function Documentation({
               {health.ok ? 'ONLINE' : `ERROR [${health.err?.code}]`}
             </Typography> */}
             <Breadcrumbs separator={<NavigateNext fontSize="small" />} aria-label="breadcrumb" className={classes.breadCrumbs}>
-              <Link color="inherit" href="/">
-                <Home color='#A466FF' size={15} />
-              </Link>
+              {/* <Link color="inherit" href="/"> */}
+              <Home color='#A466FF' size={15} />
+              {/* </Link> */}
               <Typography color="primary">Integration APIs</Typography>
             </Breadcrumbs>
           </section>
           <Divider className={classes.divider} />
           <section className={classes.apiDocs}>
             <Typography variant="h5">API Documentation </Typography>
-            {/* <div className={classes.apiDocsLink}>
+            <div className={classes.apiDocsLink}>
               <Link href="/docs/rest" passHref={true}>
                 <Button variant="contained" color="primary">
                   REST API
@@ -113,7 +113,7 @@ export default function Documentation({
                   WEBSOCKET API
                 </Button>
               </Link>
-            </div> */}
+            </div>
           </section>
           <Divider className={classes.divider} />
           <section className={classes.main}>
