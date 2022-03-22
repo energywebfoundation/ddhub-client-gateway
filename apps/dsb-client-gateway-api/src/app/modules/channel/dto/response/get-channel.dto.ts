@@ -52,7 +52,7 @@ export class GetChannelResponseDto {
     type: String,
     example: 'channel.name',
   })
-  channelName: string;
+  fqcn: string;
 
   @ApiProperty({
     description: 'Channel type',
@@ -65,4 +65,30 @@ export class GetChannelResponseDto {
     description: 'Channel conditions',
   })
   conditions: ChannelConditions;
+}
+
+export class GetChannelQualifiedDidsDto {
+  @ApiProperty({
+    description: 'Channel name / fqcn',
+    example: 'channel.name',
+    type: String,
+  })
+  fqcn: string;
+
+  @ApiProperty({
+    description: 'List of qualified dids',
+    example: [
+      'did:ethr:volta:0x09Df5d33f1242E1b8aA5E0E0F6BfA687E6846993',
+      'did:ethr:volta:0x3Ce3B60427b4Bf0Ce366d9963BeC5ef3CBD06ad5',
+    ],
+    type: [String],
+  })
+  qualifiedDids: string[];
+
+  @ApiProperty({
+    description: 'Last update time',
+    example: '2022-03-22T14:27:00.027Z',
+    type: String,
+  })
+  updatedAt: string;
 }

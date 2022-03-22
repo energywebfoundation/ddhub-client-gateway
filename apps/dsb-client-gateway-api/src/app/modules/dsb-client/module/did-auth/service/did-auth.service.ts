@@ -23,10 +23,16 @@ export class DidAuthService {
   public async login(privateKey: string, did: string): Promise<void> {
     this.logger.log('Attempting to login');
 
+    console.log('private key', privateKey);
+
     const proof = await this.ethersService.createProof(privateKey, did);
 
     const { access_token, refresh_token } = await promiseRetry(
       async (retry, attempt) => {
+        if (attempt > 3) {
+          throw new Error('NO MORE RETRIES BOY');
+        }
+
         return this.didAuthApiService.login(proof).catch(async (e) => {
           if (this.refreshToken) {
             const refreshTokenData: DidAuthResponse | null =

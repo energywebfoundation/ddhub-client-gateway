@@ -6,7 +6,6 @@ module.exports = {
       tsconfig: '<rootDir>/tsconfig.spec.json',
     },
   },
-  globalSetup: '<rootDir>/jestGlobalSetup.js',
   testEnvironment: 'node',
   transform: {
     '^.+\\.[tj]s$': 'ts-jest',

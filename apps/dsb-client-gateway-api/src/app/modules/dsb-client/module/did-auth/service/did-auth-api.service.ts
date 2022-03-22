@@ -10,20 +10,31 @@ export class DidAuthApiService {
   constructor(protected readonly httpService: HttpService) {}
 
   public async login(identityToken: string): Promise<DidAuthResponse> {
-    const { data } = await lastValueFrom(
-      this.httpService.post<DidAuthResponse>('/auth/login', {
-        identityToken,
-      })
-    ).catch((e) => {
-      this.logger.error('Login failed');
+    console.log('token', identityToken);
 
-      this.logger.error(e.message);
-      this.logger.error(e.response.data);
+    return {
+      refresh_token:
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjhhYzI5NTY1LWI4M2EtNDJmYi1hZTRhLTA0MzA0OTVmMTAxYSIsImRpZCI6ImRpZDpldGhyOnZvbHRhOjB4ZmQ2YjgwOUI4MWNBRWJjM0VBQjBkMzNmMDIxMUU1OTM0NjIxYjJEMiIsInJvbGVzIjpbXSwiaWF0IjoxNjQ3MjY0MDI3LCJleHAiOjE2NDcyNjQwMzJ9.OUWbswHTmzXbQZXWyy1y_N3TOzZRYOCLCFqlD7oC0kk',
+      access_token:
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjhhYzI5NTY1LWI4M2EtNDJmYi1hZTRhLTA0MzA0OTVmMTAxYSIsImRpZCI6ImRpZDpldGhyOnZvbHRhOjB4ZmQ2YjgwOUI4MWNBRWJjM0VBQjBkMzNmMDIxMUU1OTM0NjIxYjJEMiIsInJvbGVzIjpbXSwiaWF0IjoxNjQ3MjY0MDI3LCJleHAiOjE2NDcyNjQwMzJ9.OUWbswHTmzXbQZXWyy1y_N3TOzZRYOCLCFqlD7oC0kk',
+      type: 'Bearer',
+      expires_in: 6000,
+    };
 
-      throw e;
-    });
-
-    return data;
+    // const { data } = await lastValueFrom(
+    //   this.httpService.post<DidAuthResponse>('/auth/login', {
+    //     identityToken,
+    //   })
+    // ).catch((e) => {
+    //   this.logger.error('Login failed');
+    //
+    //   this.logger.error(e.message);
+    //   this.logger.error(e.response.data);
+    //
+    //   throw e;
+    // });
+    //
+    // return data;
   }
 
   public async refreshToken(

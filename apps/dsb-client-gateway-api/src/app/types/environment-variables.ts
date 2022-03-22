@@ -1,4 +1,5 @@
 import {
+  IsBoolean,
   IsEnum,
   IsNumber,
   IsOptional,
@@ -117,6 +118,10 @@ export class EnvironmentVariables {
   @IsPositive()
   @IsOptional()
   TIMEOUT = 1000;
+
+  @IsBoolean()
+  @Transform(EnvironmentVariables.transformBoolean('SCHEDULED_JOBS'))
+  SCHEDULED_JOBS = true;
 
   static isVaultEnabled(values: EnvironmentVariables): boolean {
     return values.SECRETS_ENGINE === SecretsEngine.VAULT;

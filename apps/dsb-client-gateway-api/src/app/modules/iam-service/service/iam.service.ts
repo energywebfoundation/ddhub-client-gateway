@@ -19,6 +19,7 @@ export class IamService {
   private claimsService: ClaimsService;
   private didRegistry: DidRegistry;
   private signerService: SignerService;
+  private initialized = false;
 
   private readonly logger = new Logger(IamService.name);
 
@@ -47,6 +48,10 @@ export class IamService {
     });
   }
 
+  public async getEnrolledDids(roleName: string): Promise<string[]> {
+    return this.cacheClient.getDIDsForRole(roleName);
+  }
+
   public async setup(privateKey: string) {
     this.logger.log('Initializing IAM connection');
 
@@ -57,6 +62,12 @@ export class IamService {
     this.didRegistry = didRegistry;
     this.signerService = signerService;
     this.claimsService = claimsService;
+
+    this.initialized = true;
+  }
+
+  public isInitialized(): boolean {
+    return this.initialized;
   }
 
   public getClaimById(id: string): Promise<Claim> {

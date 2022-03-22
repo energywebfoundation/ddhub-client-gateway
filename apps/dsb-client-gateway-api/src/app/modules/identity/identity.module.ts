@@ -8,6 +8,7 @@ import { SecretsEngineModule } from '../secrets-engine/secrets-engine.module';
 @Module({
   imports: [UtilsModule, StorageModule, SecretsEngineModule],
   providers: [IdentityService],
-  controllers: [IdentityController]
+  controllers: [IdentityController],
+  exports: [IdentityService],
 })
 export class IdentityModule {}

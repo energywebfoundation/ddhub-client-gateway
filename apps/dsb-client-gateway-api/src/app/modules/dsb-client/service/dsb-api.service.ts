@@ -13,6 +13,7 @@ import {
   SendMessageResult,
   TopicData,
   TopicDataResponse,
+  TopicVersionResponse,
 } from '../dsb-client.interface';
 import { SecretsEngineService } from '../../secrets-engine/secrets-engine.interface';
 import { v4 as uuidv4 } from 'uuid';
@@ -20,6 +21,9 @@ import promiseRetry from 'promise-retry';
 import FormData from 'form-data';
 import { EnrolmentRepository } from '../../storage/repository/enrolment.repository';
 import { DidAuthService } from '../module/did-auth/service/did-auth.service';
+import { SchedulerRegistry } from '@nestjs/schedule';
+import * as qs from 'qs';
+import 'multer';
 
 @Injectable()
 export class DsbApiService implements OnModuleInit {
@@ -29,7 +33,9 @@ export class DsbApiService implements OnModuleInit {
   protected baseUrl: string;
 
   public async onModuleInit(): Promise<void> {
-    await this.login();
+    await this.login().catch((e) => {
+      this.logger.error(`Login failed`, e);
+    });
   }
 
   constructor(
@@ -40,12 +46,80 @@ export class DsbApiService implements OnModuleInit {
     protected readonly enrolmentRepository: EnrolmentRepository,
     protected readonly iamService: IamService,
     protected readonly secretsEngineService: SecretsEngineService,
-    protected readonly didAuthService: DidAuthService
+    protected readonly didAuthService: DidAuthService,
+    protected readonly schedulerRegistry: SchedulerRegistry
   ) {
     this.baseUrl = this.configService.get<string>(
       'DSB_BASE_URL',
       'https://dsb-dev.energyweb.org'
     );
+  }
+
+  public async getDIDsFromRoles(
+    roles: string[],
+    searchType: 'ANY'
+  ): Promise<string[]> {
+    const { data } = await promiseRetry(async (retry, attempt) => {
+      return lastValueFrom(
+        this.httpService.get(this.baseUrl + '/role/list', {
+          params: {
+            roles,
+            searchType,
+          },
+          paramsSerializer: (params) => {
+            return qs.stringify(params, { arrayFormat: 'repeat' });
+          },
+          httpsAgent: this.getTLS(),
+          headers: {
+            Authorization: `Bearer ${this.didAuthService.getToken()}`,
+          },
+        })
+      ).catch((err) => this.handleRequestWithRetry(err, retry));
+    });
+
+    return data.dids;
+  }
+
+  public async getTopicVersions(
+    topicId: string
+  ): Promise<TopicVersionResponse> {
+    const { data } = await promiseRetry(async (retry, attempt) => {
+      return lastValueFrom(
+        this.httpService.get(this.baseUrl + `/topic/${topicId}/version`, {
+          httpsAgent: this.getTLS(),
+          headers: {
+            Authorization: `Bearer ${this.didAuthService.getToken()}`,
+          },
+        })
+      ).catch((err) => this.handleRequestWithRetry(err, retry));
+    });
+
+    console.log(data);
+
+    return data;
+  }
+
+  public async checkIfDIDHasRoles(
+    did: string,
+    roles: string[]
+  ): Promise<boolean> {
+    const { data } = await promiseRetry(async (retry, attempt) => {
+      console.log(this.didAuthService.getToken());
+      return lastValueFrom(
+        this.httpService.get(this.baseUrl + '/role/check', {
+          params: {
+            did,
+            roles,
+          },
+          httpsAgent: this.getTLS(),
+          headers: {
+            Authorization: `Bearer ${this.didAuthService.getToken()}`,
+          },
+        })
+      ).catch((err) => this.handleRequestWithRetry(err, retry));
+    });
+
+    return data;
   }
 
   public async uploadFile(
@@ -215,10 +289,7 @@ export class DsbApiService implements OnModuleInit {
     this.logger.error(e);
     this.logger.error(e.response.data);
 
-    if (
-      status === HttpStatus.UNAUTHORIZED ||
-      status === HttpStatus.INTERNAL_SERVER_ERROR
-    ) {
+    if (status === HttpStatus.UNAUTHORIZED) {
       this.logger.log('Unauthorized, attempting to login');
 
       await this.login();
