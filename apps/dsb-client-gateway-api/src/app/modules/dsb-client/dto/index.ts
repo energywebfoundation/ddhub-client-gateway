@@ -4,7 +4,12 @@ import {
   IsOptional,
   IsPositive,
   IsString,
+  IsArray,
+  ArrayUnique,
+  IsNumber
 } from 'class-validator';
+import { IsDID } from '../../utils/validator/decorators/IsDid';
+import { Topic } from '../dsb-client.interface';
 
 export class FileUploadBodyDto {
   @IsString()
@@ -50,3 +55,36 @@ export class GetMessagesQueryDto {
   @IsOptional()
   public clientId?: string;
 }
+
+export class GetApplicationsQueryDto {
+  @IsNotEmpty()
+  @IsString()
+  @IsDID({
+    each: true,
+    message: 'Malformed DID',
+  })
+  public ownerDid: string;
+}
+
+export class GetTopicsCountQueryDto {
+  @IsNotEmpty()
+  @ArrayUnique()
+  @IsString()
+  public owner: string[];
+}
+
+export class PaginatedResponse {
+
+  @IsNumber()
+  public count: number;
+  @IsNumber()
+  public limit: number;
+  @IsNumber()
+  public page: number;
+  @ArrayUnique()
+  @IsArray()
+  public records: Topic[]
+
+}
+
+

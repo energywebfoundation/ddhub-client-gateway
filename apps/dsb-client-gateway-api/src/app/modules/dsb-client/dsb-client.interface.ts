@@ -1,7 +1,11 @@
+
+import { IAppDefinition } from '@energyweb/iam-contracts'
 export interface Topic {
   namespace: string;
   schema: object | string;
 }
+
+
 
 export interface PaginatedData<T> {
   count: number;
@@ -13,13 +17,63 @@ export interface PaginatedData<T> {
 export type TopicDataResponse = PaginatedData<TopicData>;
 
 export interface TopicData {
+
   id: string;
-  namespace: string;
+  name: string;
   owner: string;
-  schema: string;
+  schema: object | string;
   schemaType: string;
+  tags: string[]
   version: string;
 }
+
+
+export class ApplicationDTO implements IAppDefinition {
+  appName: string
+  logoUrl?: string
+  websiteUrl?: string
+  description?: string
+  namespace?: string
+  topicsCount?: number
+}
+
+export interface ApplicationHeader {
+  id?: string
+  Header?: string
+  accessor: string
+  filter?: string
+  Cell?: any
+}
+
+export type TopicResultDTO = {
+  id: string
+  name: string
+  schemaType: string
+  schema: string
+  version: string
+  owner: string,
+  tags: string[]
+}
+
+
+export type GetTopicsOptions = {
+  limit?: number
+  name: string
+  owner: string
+  page?: number
+  tags?: string[]
+}
+
+export type SendTopicBodyDTO = {
+  name: string
+  schemaType: string
+  schema: string
+  version: string
+  signature: string
+  owner: string
+  tags: string[]
+}
+
 
 export class ChannelDTO {
   fqcn: string;

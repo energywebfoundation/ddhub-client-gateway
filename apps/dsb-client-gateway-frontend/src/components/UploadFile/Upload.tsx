@@ -1,44 +1,37 @@
-import { useEffect, useState } from 'react';
-import { makeStyles } from '@material-ui/styles';
-import {
-  Button,
-  FormControl,
-  Grid,
-  MenuItem,
-  Select,
-  Theme,
-  Typography,
-} from '@material-ui/core';
-import { Info } from '@material-ui/icons';
-import { CustomInput } from '../CustomInput/CustomInput';
-import swal from 'sweetalert';
-import { Channel, Topic } from '../../utils';
+import { useState, useEffect } from 'react'
+import { makeStyles } from '@material-ui/styles'
+import { Typography, Button, Theme, Grid, MenuItem, FormControl, Select } from '@material-ui/core'
+import { Info } from '@material-ui/icons'
+import { CustomInput } from '../CustomInput/CustomInput'
+import swal from 'sweetalert'
+import { Channel, Topic } from '../../utils'
 
 type UploadProps = {
-  channels?: Channel[];
-  topics?: Topic[];
-  onUpload: (file: File, channelName: string, topic: Topic) => void;
-};
+  channels?: Channel[]
+  topics?: Topic[],
+  onUpload: (file: File, channelName: string, topic: Topic) => void
+}
 
 export const Upload = ({ channels, topics, onUpload }: UploadProps) => {
-  const classes = useStyles();
+  const classes = useStyles()
 
-  const [file, setFile] = useState<File>();
-  const [fileName, setFileName] = useState('');
-  const [topicName, setTopicName] = useState('');
-  const [channelName, setChannelName] = useState('');
+  const [file, setFile] = useState<File>()
+  const [fileName, setFileName] = useState('')
+  const [topicName, setTopicName] = useState('')
+  const [channelName, setChannelName] = useState('')
+
 
   useEffect(() => {
-    setTopicName('');
-  }, [channelName, channels, topics]);
+    setTopicName('')
+  }, [channelName, channels, topics])
 
   const uploadToClient = (event) => {
     if (event.target.files && event.target.files[0]) {
-      setFileName(event.target.files[0].name);
-      setFile(event.target.files[0]);
-      event.target.value = null;
+      setFileName(event.target.files[0].name)
+      setFile(event.target.files[0])
+      event.target.value = null
     }
-  };
+  }
 
   return (
     <section className={classes.upload}>
@@ -82,9 +75,9 @@ export const Upload = ({ channels, topics, onUpload }: UploadProps) => {
                   input={<CustomInput />}
                   fullWidth
                 >
-                  {topics?.map((topic: Topic) => (
-                    <MenuItem key={topic.id} value={topic.id}>
-                      {topic.name}
+                  {topics?.map((topic) => (
+                    <MenuItem key={topic.namespace} value={topic.namespace}>
+                      {topic.namespace}
                     </MenuItem>
                   ))}
                 </Select>
@@ -96,28 +89,13 @@ export const Upload = ({ channels, topics, onUpload }: UploadProps) => {
             <Grid item xs={12} sm={7} md={9}>
               <div className={classes.formGroup}>
                 <Typography variant="caption">FILE</Typography>
-                <CustomInput
-                  placeholder={fileName ? fileName : 'No file chosen'}
-                  fullWidth
-                  disabled
-                />
+                <CustomInput placeholder={fileName ? fileName : 'No file chosen'} fullWidth disabled />
               </div>
             </Grid>
             <Grid item xs={12} sm={5} md={3}>
-              <Button
-                variant="outlined"
-                color="secondary"
-                fullWidth
-                className={classes.fileButton}
-                component="label"
-              >
+              <Button variant="outlined" color="secondary" fullWidth className={classes.fileButton} component="label">
                 Browse
-                <input
-                  type="file"
-                  hidden
-                  accept=".txt, .xml, .csv, .json"
-                  onClick={uploadToClient}
-                />
+                <input type="file" hidden accept=".txt, .xml, .csv, .json" onClick={uploadToClient} />
               </Button>
             </Grid>
             <Grid item xs={6} sm={5}>
@@ -127,28 +105,23 @@ export const Upload = ({ channels, topics, onUpload }: UploadProps) => {
                 fullWidth
                 onClick={() => {
                   if (!channelName) {
-                    return swal('Error', 'Please enter channel name', 'error');
+                    return swal('Error', 'Please enter channel name', 'error')
                   }
                   if (!topicName) {
-                    return swal('Error', 'Please enter topic name', 'error');
+                    return swal('Error', 'Please enter topic name', 'error')
                   }
                   if (!file) {
-                    return swal('Error', 'No file uploaded', 'error');
+                    return swal('Error', 'No file uploaded', 'error')
                   }
 
-                  const selectedTopic = topics?.find(
-                    (topic) => topic.id === topicName
-                  );
+
+                  const selectedTopic = topics?.find((topic) => topic.namespace === topicName)
 
                   if (!selectedTopic) {
-                    return swal(
-                      'Error',
-                      'No topic id for the selected topic',
-                      'error'
-                    );
+                    return swal('Error', 'No topic id for the selected topic', 'error')
                   }
 
-                  onUpload(file, channelName, selectedTopic);
+                  onUpload(file, channelName, selectedTopic)
                 }}
               >
                 Upload
@@ -158,26 +131,26 @@ export const Upload = ({ channels, topics, onUpload }: UploadProps) => {
         </Grid>
       </div>
     </section>
-  );
-};
+  )
+}
 
 const useStyles = makeStyles((theme: Theme) => ({
   upload: {
     border: '1px solid #fff',
     padding: theme.spacing(6),
-    margin: theme.spacing(3, 1),
+    margin: theme.spacing(3, 1)
   },
   uploadHeader: {
     textAlign: 'right',
-    color: '#fff',
+    color: '#fff'
   },
   form: {
     marginTop: '1rem',
 
     '& button': {
       padding: '.7rem',
-      marginBottom: '1rem',
-    },
+      marginBottom: '1rem'
+    }
   },
   formGroup: {
     display: 'flex',
@@ -187,20 +160,20 @@ const useStyles = makeStyles((theme: Theme) => ({
 
     '& span': {
       fontSize: '.8rem',
-      marginBottom: '.3rem',
+      marginBottom: '.3rem'
     },
     '& *': {
-      color: '#fff',
+      color: '#fff'
     },
     '& input': {
-      width: '100%',
-    },
+      width: '100%'
+    }
   },
   errorText: {
-    color: theme.palette.error.main,
+    color: theme.palette.error.main
   },
   fileButton: {
     marginTop: theme.spacing(3),
-    padding: '.5rem',
-  },
-}));
+    padding: '.5rem'
+  }
+}))

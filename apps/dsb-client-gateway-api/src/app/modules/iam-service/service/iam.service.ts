@@ -7,11 +7,14 @@ import {
   DidRegistry,
   RegistrationTypes,
   SignerService,
+  IApp
 } from 'iam-client-lib';
+import { IAppDefinition } from '@energyweb/iam-contracts'
 import { IamFactoryService } from './iam-factory.service';
 import { ConfigService } from '@nestjs/config';
 import { Encoding } from '@ew-did-registry/did-resolver-interface';
 import { KeyType } from '@ew-did-registry/keys';
+import { ApplicationDTO } from '../../dsb-client/dsb-client.interface'
 
 @Injectable()
 export class IamService {
@@ -25,7 +28,7 @@ export class IamService {
   constructor(
     protected readonly iamFactoryService: IamFactoryService,
     protected readonly configService: ConfigService
-  ) {}
+  ) { }
 
   public async setVerificationMethod(
     publicKey: string,
@@ -61,6 +64,29 @@ export class IamService {
 
   public getClaimById(id: string): Promise<Claim> {
     return this.claimsService.getClaimById(id);
+  }
+
+  public async getApplicationsByOwner(ownerDid: string): Promise<ApplicationDTO[]> {
+
+    const didClaims = await this.cacheClient.getClaimsByRequester(ownerDid, { isAccepted: true })
+    const namespaceList = []
+    const applications: IAppDefinition[] = []
+
+    didClaims.forEach((didClaim) => {
+      if (didClaim.claimType.startsWith('topiccreator') && didClaim.namespace !== this.configService.get('DID_CLAIM_NAMESPACE')) {
+        namespaceList.push(didClaim.namespace)
+      }
+    })
+
+    await Promise.all(namespaceList.map(async (namespace: string) => {
+      const application = await this.cacheClient.getAppDefinition(namespace) as ApplicationDTO
+      application.namespace = namespace
+      applications.push(application)
+    }))
+
+    const uniqueApplications = [...new Set(applications)]
+
+    return uniqueApplications
   }
 
   public getClaimsByRequester(
