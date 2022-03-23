@@ -167,8 +167,6 @@ export class ChannelService {
         owner
       );
 
-      console.log(receivedTopics);
-
       if (receivedTopics.records.length !== 1) {
         this.logger.warn(
           `Topic ${topicName} with owner ${owner} does not exists`
