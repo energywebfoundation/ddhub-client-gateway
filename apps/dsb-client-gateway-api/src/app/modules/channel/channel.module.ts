@@ -9,6 +9,8 @@ import { IdentityModule } from '../identity/identity.module';
 import { ChannelDidCacheService } from './service/channel-did-cache.service';
 import { RefreshTopicsCacheHandler } from './service/refresh-topics-cache.handler';
 import { RefreshTopicsCacheCronService } from './service/refresh-topics-cache-cron.service';
+import { TopicRepository } from './repository/topic.repository';
+import { TopicService } from './service/topic.service';
 
 @Module({
   imports: [CqrsModule, DsbClientModule, StorageModule, IdentityModule],
@@ -18,8 +20,10 @@ import { RefreshTopicsCacheCronService } from './service/refresh-topics-cache-cr
     ChannelDidCacheService,
     RefreshTopicsCacheHandler,
     RefreshTopicsCacheCronService,
+    TopicRepository,
+    TopicService,
   ],
   controllers: [ChannelController],
-  exports: [ChannelService],
+  exports: [ChannelService, TopicService],
 })
 export class ChannelModule {}

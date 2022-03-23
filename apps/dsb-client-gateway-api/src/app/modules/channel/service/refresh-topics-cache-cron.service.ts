@@ -3,6 +3,7 @@ import { CommandBus } from '@nestjs/cqrs';
 import { ConfigService } from '@nestjs/config';
 import { SchedulerRegistry } from '@nestjs/schedule';
 import { CronJob } from 'cron';
+import { RefreshTopicsCacheCommand } from '../command/refresh-topics-cache.command';
 
 @Injectable()
 export class RefreshTopicsCacheCronService implements OnModuleInit {
@@ -30,6 +31,8 @@ export class RefreshTopicsCacheCronService implements OnModuleInit {
 
     const job = new CronJob(`*/5 * * * *`, async () => {
       this.logger.log(`${jobName} CRON job triggered`);
+
+      await this.commandBus.execute(new RefreshTopicsCacheCommand());
     });
 
     const jobName = 'REFRESH_TOPICS_CACHE';

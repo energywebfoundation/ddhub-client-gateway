@@ -5,6 +5,7 @@ import { DsbApiService } from '../../dsb-client/service/dsb-api.service';
 import { IdentityService } from '../../identity/service/identity.service';
 import { ChannelEntity } from '../entity/channel.entity';
 import { TopicVersionResponse } from '../../dsb-client/dsb-client.interface';
+import { TopicRepository } from '../repository/topic.repository';
 
 @Injectable()
 export class ChannelDidCacheService {
@@ -14,7 +15,8 @@ export class ChannelDidCacheService {
     protected readonly iamService: IamService,
     protected readonly channelService: ChannelService,
     protected readonly dsbApiService: DsbApiService,
-    protected readonly identityService: IdentityService
+    protected readonly identityService: IdentityService,
+    protected readonly topicRepository: TopicRepository
   ) {}
 
   public async refreshChannelCache(): Promise<void> {
@@ -75,6 +77,10 @@ export class ChannelDidCacheService {
           topicId,
           topicVersions.records
         );
+
+        for (const topicVersion of topicVersions.records) {
+          await this.topicRepository.createOrUpdateTopic(topicVersion);
+        }
       }
     }
   }
