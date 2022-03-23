@@ -11,7 +11,7 @@ import { DsbApiService } from '../services/dsb-api.service'
 import { refreshState } from '../services/identity.service'
 import { isAuthorized } from '../services/auth.service'
 import { Breadcrumbs } from '@material-ui/core'
-import { Home } from 'react-feather'
+import { Home as HomeIcon } from 'react-feather'
 import { NavigateNext } from '@material-ui/icons'
 import Link from 'next/link'
 import { ErrorBodySerialized, ErrorCode, Option, Result, serializeError, Storage } from '../utils'
@@ -49,7 +49,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext): Pr
     }
   }
 }
-export default function home({ health, state, auth }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function Home({ health, state, auth }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const classes = useStyles()
   useEffect(() => {
     if (health.err) {
@@ -71,7 +71,7 @@ export default function home({ health, state, auth }: InferGetServerSidePropsTyp
             <Typography variant="h5" className={classes.pageTitle}>Gateway Settings</Typography>
             <Typography variant="h5">|</Typography>
             <Breadcrumbs separator={<NavigateNext fontSize="small" />} aria-label="breadcrumb" className={classes.breadCrumbs}>
-              <Home color='#A466FF' size={15} />
+              <HomeIcon color='#A466FF' size={15} />
               <Typography color="primary">Gateway Settings</Typography>
             </Breadcrumbs>
           </section>
