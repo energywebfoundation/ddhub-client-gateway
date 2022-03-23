@@ -4,7 +4,6 @@ import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'nex
 import { makeStyles } from 'tss-react/mui'
 import { Typography, Container, Divider, Button } from '@mui/material'
 import Swal from 'sweetalert2';
-import ResponsiveHeader from '../../components/ResponsiveHeader/ResponsiveHeader'
 import { DsbApiService } from '../../services/dsb-api.service'
 import { isAuthorized } from '../../services/auth.service'
 import { Channel, ErrorBodySerialized, ErrorCode, Option, Result, serializeError } from '../../utils'
@@ -82,7 +81,6 @@ export default function Documentation({
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
-        <ResponsiveHeader />
         <Container maxWidth="lg">
           <section className={classes.connectionStatus}>
             <Typography variant="h5" className={classes.pageTitle}>Integration APIs</Typography>
@@ -190,3 +188,4 @@ const useStyles = makeStyles()((theme) => ({
   }
 
 }))
+

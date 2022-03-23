@@ -72,7 +72,7 @@ const useStyles = makeStyles()(theme => ({
             transform: 'none'
         }
     },
-    iconDashboard: {
+    icon: {
         marginRight: "15px"
     },
 
@@ -95,11 +95,11 @@ const useStyles = makeStyles()(theme => ({
         fontSize: "14px",
         color: theme.palette.primary.main
     }
-  }));
 
-function ResponsiveDrawer() {
-  const { classes, theme } = useStyles();
+}));
 
+function Sidebar() {
+    const { classes, theme } = useStyles();
     const isActive = (pathname: string) => (router.pathname === pathname ? classes.active : '')
 
     const router = useRouter()
@@ -114,7 +114,7 @@ function ResponsiveDrawer() {
             <List>
                 <Link href="#" passHref >
                     <ListItem button className={clsx(classes.navLink, isActive('#'))} component="a">
-                        <Home className={classes.iconDashboard} size={20} />
+                        <Home className={classes.icon} size={20} />
                         <ListItemText>Dashboard</ListItemText>
                     </ListItem>
                 </Link>
@@ -125,21 +125,21 @@ function ResponsiveDrawer() {
             <List>
                 <Link href="/" passHref >
                     <ListItem button className={clsx(classes.navLink, isActive('/'))} component="a">
-                        <BoxIcon className={classes.iconDashboard} size={20} />
+                        <BoxIcon className={classes.icon} size={20} />
                         <ListItemText>Gateway Settings</ListItemText>
                     </ListItem>
                 </Link>
 
                 <Link href="/applications" passHref>
                     <ListItem button className={clsx(classes.navLink, isActive('/applications'))} component="a">
-                        <Layers className={classes.iconDashboard} size={20} />
+                        <Layers className={classes.icon} size={20} />
                         <ListItemText>Apps and Topics</ListItemText>
                     </ListItem>
                 </Link>
 
                 <Link href="#" passHref>
                     <ListItem button className={clsx(classes.navLink, isActive('#'))} component="a">
-                        <FileText className={classes.iconDashboard} size={20} />
+                        <FileText className={classes.icon} size={20} />
                         <ListItemText>Channels</ListItemText>
                     </ListItem>
                 </Link>
@@ -151,21 +151,21 @@ function ResponsiveDrawer() {
             <List>
                 <Link href="/docs" passHref >
                     <ListItem button className={clsx(classes.navLink, isActive('/docs'))} component="a">
-                        <GitMerge className={classes.iconDashboard} size={20} />
+                        <GitMerge className={classes.icon} size={20} />
                         <ListItemText>Integration APIs</ListItemText>
                     </ListItem>
                 </Link>
 
                 <Link href="/files" passHref >
                     <ListItem button className={clsx(classes.navLink, isActive('/files'))} component="a">
-                        <MessageSquare className={classes.iconDashboard} size={20} />
+                        <MessageSquare className={classes.icon} size={20} />
                         <ListItemText>Data Messaging</ListItemText>
                     </ListItem>
                 </Link>
 
                 <Link href="#" passHref>
                     <ListItem button className={clsx(classes.navLink, isActive('#'))} component="a">
-                        <Mail className={classes.iconDashboard} size={20} />
+                        <Mail className={classes.icon} size={20} />
                         <ListItemText>Large Data Messaging</ListItemText>
                     </ListItem>
                 </Link>
@@ -235,9 +235,9 @@ function ResponsiveDrawer() {
         </div>
     );
 }
-ResponsiveDrawer.propTypes = {
+Sidebar.propTypes = {
     // Injected by the documentation to work in an iframe.
     // You won't need it on your project.
     container: PropTypes.object
 };
-export default ResponsiveDrawer;
+export default Sidebar;
