@@ -15,10 +15,12 @@ import { DsbTopicsController } from './controller/dsb-topics.controller';
 import { DsbFilesController } from './controller/dsb-files.controller';
 import { DidAuthModule } from './module/did-auth/did-auth.module';
 import { DsbHealthController } from './controller/dsb-health.controller';
+import { CqrsModule } from '@nestjs/cqrs';
 import { DsbApplicationsController } from './controller/dsb-applications.controller';
 
 @Module({
   imports: [
+    CqrsModule,
     HttpModule.registerAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => {
@@ -52,4 +54,4 @@ import { DsbApplicationsController } from './controller/dsb-applications.control
   ],
   exports: [DsbApiService],
 })
-export class DsbClientModule { }
+export class DsbClientModule {}

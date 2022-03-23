@@ -19,7 +19,28 @@ export class IdentityService {
     protected readonly iamService: IamService
   ) {}
 
-  public async getIdentity(): Promise<Identity> {
+  public async identityReady(): Promise<boolean> {
+    const identity: Identity | null = await this.getIdentity();
+
+    return !!identity;
+  }
+
+  public async getIdentity(): Promise<Identity | null> {
+    const identity: Identity | null = this.identityRepository.getIdentity();
+
+    if (!identity) {
+      return null;
+    }
+
+    const balanceState = await this.ethersService.getBalance(identity.address);
+
+    return {
+      ...identity,
+      balance: balanceState,
+    };
+  }
+
+  public async getIdentityOrThrow(): Promise<Identity> {
     const identity: Identity | null = this.identityRepository.getIdentity();
 
     if (!identity) {

@@ -9,19 +9,24 @@ import { ChannelType } from '../../../dsb-client-gateway-api/src/app/modules/cha
 import { clearDatabase } from './utils/lokijs-utils';
 import { ChannelRepository } from '../../../dsb-client-gateway-api/src/app/modules/channel/repository/channel.repository';
 import { DsbClientGatewayErrors } from '@dsb-client-gateway/dsb-client-gateway-errors';
+import { ChannelDidCacheService } from '../../../dsb-client-gateway-api/src/app/modules/channel/service/channel-did-cache.service';
 
 jest.setTimeout(500000);
 
 const setupPrivateKey = async (app: INestApplication) => {
-  await request(app.getHttpServer()).post('/identity').send().expect(201);
+  await request(app.getHttpServer()).post('/identity').send().expect(200);
 };
 
 const dsbApiServiceMock = {
   getTopicsByOwnerAndName: jest.fn(),
 };
 
+const channelDidCacheService = {
+  refreshChannelCache: jest.fn(),
+};
+
 const requestBody: Partial<CreateChannelDto> = {
-  channelName: 'channelname',
+  fqcn: 'channelname',
   type: ChannelType.SUB,
   conditions: {
     dids: ['did:ethr:volta:0xfd6b809B81cAEbc3EAB0d33f0211E5934621b2D2'],
@@ -43,6 +48,8 @@ describe('ChannelController (E2E)', () => {
     const moduleRef = await Test.createTestingModule({
       imports: [AppModule],
     })
+      .overrideProvider(ChannelDidCacheService)
+      .useValue(channelDidCacheService)
       .overrideProvider(DsbApiService)
       .useValue(dsbApiServiceMock)
       .overrideProvider(IamFactoryService)

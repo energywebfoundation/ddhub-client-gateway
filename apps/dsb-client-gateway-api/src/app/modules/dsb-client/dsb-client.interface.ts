@@ -16,6 +16,17 @@ export interface PaginatedData<T> {
 
 export type TopicDataResponse = PaginatedData<TopicData>;
 
+export interface TopicVersion {
+  name: string;
+  owner: string;
+  schema: object;
+  schemaType: string;
+  tags: string[];
+  version: string;
+}
+
+export type TopicVersionResponse = PaginatedData<TopicVersion>;
+
 export interface TopicData {
 
   id: string;

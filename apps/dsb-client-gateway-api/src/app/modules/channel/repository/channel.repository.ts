@@ -2,6 +2,7 @@ import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { AbstractLokiRepository } from '../../storage/repository/abstract-loki.repository';
 import { ChannelEntity } from '../entity/channel.entity';
 import { LokiService } from '../../storage/service/loki.service';
+import { ChannelType } from '../channel.const';
 
 @Injectable()
 export class ChannelRepository
@@ -18,35 +19,45 @@ export class ChannelRepository
     this.createCollectionIfNotExists(this.collection);
   }
 
-  public createChannel(entity: ChannelEntity): void {
-    this.logger.log(`Creating channel ${entity.channelName}`);
+  public async createChannel(entity: ChannelEntity): Promise<void> {
+    this.logger.log(`Creating channel ${entity.fqcn}`);
 
     this.client.getCollection<ChannelEntity>(this.collection).insert(entity);
 
-    this.client.save();
+    await this.lokiService.save();
   }
 
   public getChannel(name: string): ChannelEntity | null {
     this.logger.debug(`Retrieving channel ${name}`);
 
     return this.client.getCollection<ChannelEntity>(this.collection).findOne({
-      channelName: name,
+      fqcn: name,
     });
   }
 
-  public updateChannel(entity: ChannelEntity): void {
-    this.logger.log(`Updating channel ${entity.channelName}`);
+  public getChannelsByType(type: ChannelType): ChannelEntity[] {
+    return this.client.getCollection<ChannelEntity>(this.collection).find({
+      type,
+    });
+  }
+
+  public async updateChannel(entity: ChannelEntity): Promise<void> {
+    this.logger.log(`Updating channel ${entity.fqcn}`);
 
     this.client.getCollection<ChannelEntity>(this.collection).update(entity);
 
-    this.client.save();
+    await this.lokiService.save();
   }
 
-  public delete(channelName: string): void {
+  public async delete(channelName: string): Promise<void> {
     this.client.getCollection<ChannelEntity>(this.collection).removeWhere({
-      channelName,
+      fqcn: channelName,
     });
 
-    this.client.save();
+    await this.lokiService.save();
+  }
+
+  public getAll(): ChannelEntity[] {
+    return this.client.getCollection<ChannelEntity>(this.collection).find({});
   }
 }

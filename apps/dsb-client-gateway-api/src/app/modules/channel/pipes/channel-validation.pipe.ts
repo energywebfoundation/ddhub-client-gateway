@@ -10,7 +10,7 @@ export class ChannelValidationPipe implements PipeTransform<unknown> {
 
   public transform(value: CreateChannelDto, metadata: ArgumentMetadata): any {
     const channel: ChannelEntity | null = this.channelService.getChannel(
-      value.channelName
+      value.fqcn
     );
 
     if (channel) {

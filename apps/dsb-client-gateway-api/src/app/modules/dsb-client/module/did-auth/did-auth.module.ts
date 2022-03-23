@@ -9,10 +9,7 @@ import { DidAuthApiService } from './service/did-auth-api.service';
     HttpModule.registerAsync({
       useFactory: (configService: ConfigService) => {
         return {
-          baseURL: configService.get<string>(
-            'DID_AUTH_URL',
-            'http://localhost:8080/'
-          ),
+          baseURL: configService.get<string>('DSB_BASE_URL'),
           headers: {
             'Content-Type': 'application/json',
           },

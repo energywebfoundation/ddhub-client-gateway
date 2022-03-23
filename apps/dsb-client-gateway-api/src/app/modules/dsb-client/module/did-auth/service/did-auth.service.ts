@@ -27,6 +27,10 @@ export class DidAuthService {
 
     const { access_token, refresh_token } = await promiseRetry(
       async (retry, attempt) => {
+        if (attempt > 3) {
+          throw new Error('NO MORE RETRIES BOY');
+        }
+
         return this.didAuthApiService.login(proof).catch(async (e) => {
           if (this.refreshToken) {
             const refreshTokenData: DidAuthResponse | null =

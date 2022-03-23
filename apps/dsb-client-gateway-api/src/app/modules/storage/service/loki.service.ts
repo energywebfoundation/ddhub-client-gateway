@@ -13,10 +13,31 @@ export class LokiService implements OnModuleInit {
     });
   }
 
+  public async save(): Promise<void> {
+    const promise = () =>
+      new Promise((resolve, reject) => {
+        this.client.save((err) => {
+          if (err) {
+            return reject(err);
+          }
+
+          return resolve(null);
+        });
+      });
+
+    await promise();
+  }
+
   public async onModuleInit(): Promise<void> {
     const promise = () =>
       new Promise((resolve, reject) => {
-        this.client.loadDatabase({}, () => {
+        this.client.loadDatabase({}, (err) => {
+          if (err) {
+            console.error(err);
+
+            reject(err);
+          }
+
           resolve(null);
         });
       });

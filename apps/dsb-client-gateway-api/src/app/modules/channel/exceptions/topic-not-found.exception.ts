@@ -1,7 +1,7 @@
-import { BadRequestException } from '@nestjs/common';
+import { NotFoundException } from '@nestjs/common';
 import { DsbClientGatewayErrors } from '@dsb-client-gateway/dsb-client-gateway-errors';
 
-export class TopicNotFoundException extends BadRequestException {
+export class TopicNotFoundException extends NotFoundException {
   public code: DsbClientGatewayErrors;
 
   constructor() {
