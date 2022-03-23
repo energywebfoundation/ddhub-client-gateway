@@ -14,7 +14,6 @@ export function IsValidChannelName(validationOptions?: ValidationOptions) {
       options: validationOptions,
       validator: {
         validate(value: any, args: ValidationArguments) {
-          console.log(value);
           if (typeof value === 'string' && value.length > 0) {
             return !!value.match(/^[a-z0-9.]{1,255}$/);
           }

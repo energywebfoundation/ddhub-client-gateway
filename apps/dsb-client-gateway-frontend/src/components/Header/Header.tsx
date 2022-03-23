@@ -33,6 +33,9 @@ export default function Header() {
             <Link href="/docs">
               <a className={clsx(classes.navLink, isActive('/docs'))}>Docs</a>
             </Link>
+            <Link href="/applications">
+              <a className={clsx(classes.navLink, isActive('/applications'))}>Applications</a>
+            </Link>
           </div>
           <p className={classes.divider}>•</p>
           <Typography>EW-DSB Client Gateway</Typography>
@@ -59,7 +62,6 @@ const useStyles = makeStyles((theme: Theme) => ({
   toolbar: {
     display: 'flex',
     justifyContent: 'space-between',
-
     '& > div': {
       display: 'flex',
       alignItems: 'center'
@@ -82,7 +84,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   nav: {
     display: 'flex',
-    width: '10rem',
+    width: '30rem',
     justifyContent: 'space-between'
   },
   navLink: {

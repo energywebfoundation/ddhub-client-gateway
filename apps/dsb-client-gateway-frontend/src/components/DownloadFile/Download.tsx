@@ -5,27 +5,23 @@ import { Info } from '@material-ui/icons'
 import { CustomInput } from '../../components/CustomInput/CustomInput'
 import { Channel } from '../../utils'
 import swal from 'sweetalert'
-
 type DownloadProps = {
   channels: Channel[] | undefined,
   onDownload: (fqcn: string, amount: number, clientId?: string) => void
 }
-
 export const Download = ({ channels, onDownload }: DownloadProps,) => {
   const classes = useStyles()
   const [channelName, setChannelName] = useState('')
-
   return (
     <section className={classes.download}>
       <div className={classes.downloadHeader}>
         <Info />
       </div>
-
       <div className={classes.form}>
         <Grid container>
           <Grid item xs={12} sm={7} md={9}>
             <div className={classes.formGroup}>
-              <Typography variant="caption">CHANNEL NAME</Typography>
+              <Typography variant="caption">Channel name</Typography>
               <FormControl>
                 <Select
                   labelId="channelLabel"
@@ -47,7 +43,7 @@ export const Download = ({ channels, onDownload }: DownloadProps,) => {
 
           <Grid container spacing={2}>
             <Grid item xs={6} sm={5}>
-              <Button variant="outlined" color="secondary" fullWidth
+              <Button variant="contained" color="primary" fullWidth
                 onClick={() => {
                   if (!channelName) {
                     return swal('Error', 'Please enter channel name', 'error')
@@ -67,7 +63,8 @@ export const Download = ({ channels, onDownload }: DownloadProps,) => {
 
 const useStyles = makeStyles((theme: Theme) => ({
   download: {
-    border: '1px solid #fff',
+    borderRadius: '6px',
+    background: theme.palette.primary.dark,
     padding: theme.spacing(6),
     margin: theme.spacing(3, 1)
   },
@@ -77,7 +74,6 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   form: {
     marginTop: '1rem',
-
     '& button': {
       padding: '.7rem',
       marginBottom: '1rem'
@@ -88,7 +84,6 @@ const useStyles = makeStyles((theme: Theme) => ({
     flexDirection: 'column',
     width: '100%',
     marginBottom: '2rem',
-
     '& span': {
       fontSize: '.8rem',
       marginBottom: '.3rem'

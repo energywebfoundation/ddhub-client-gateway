@@ -1,84 +1,61 @@
-import { useEffect } from 'react';
-import Head from 'next/head';
-import type {
-  GetServerSidePropsContext,
-  InferGetServerSidePropsType,
-} from 'next';
-import swal from '@sweetalert/with-react';
-import { makeStyles } from '@material-ui/styles';
-import { Container, Divider, Grid, Theme, Typography } from '@material-ui/core';
-import { GatewayIdentityContainer } from '../components/GatewayIdentity/GatewayIdentityContainer';
-import { ProxyCertificateContainer } from '../components/ProxyCertificate/ProxyCertificateContainer';
-import Header from '../components/Header/Header';
-import { DsbApiService } from '../services/dsb-api.service';
-import { refreshState } from '../services/identity.service';
-import { isAuthorized } from '../services/auth.service';
-import {
-  ErrorBodySerialized,
-  ErrorCode,
-  Option,
-  Result,
-  serializeError,
-  Storage,
-} from '../utils';
-
+import { useEffect } from 'react'
+import Head from 'next/head'
+import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
+import swal from '@sweetalert/with-react'
+import { makeStyles } from '@material-ui/styles'
+import { Typography, Container, Theme, Grid } from '@material-ui/core'
+import { GatewayIdentityContainer } from '../components/GatewayIdentity/GatewayIdentityContainer'
+import { ProxyCertificateContainer } from '../components/ProxyCertificate/ProxyCertificateContainer'
+import ResponsiveHeader from '../components/ResponsiveHeader/ResponsiveHeader'
+import { DsbApiService } from '../services/dsb-api.service'
+import { refreshState } from '../services/identity.service'
+import { isAuthorized } from '../services/auth.service'
+import { Breadcrumbs } from '@material-ui/core'
+import { Home } from 'react-feather'
+import { NavigateNext } from '@material-ui/icons'
+import Link from 'next/link'
+import { ErrorBodySerialized, ErrorCode, Option, Result, serializeError, Storage } from '../utils'
 type Props = {
-  health: Result<boolean, ErrorBodySerialized>;
-  state: Result<Storage, ErrorBodySerialized>;
-  auth: Option<string>;
-};
-
-export async function getServerSideProps(
-  context: GetServerSidePropsContext
-): Promise<{
-  props: Props;
+  health: Result<boolean, ErrorBodySerialized>
+  state: Result<Storage, ErrorBodySerialized>
+  auth: Option<string>
+}
+export async function getServerSideProps(context: GetServerSidePropsContext): Promise<{
+  props: Props
 }> {
-  const authHeader = context.req.headers.authorization;
-  const { err } = isAuthorized(authHeader);
+  const authHeader = context.req.headers.authorization
+  const { err } = isAuthorized(authHeader)
   if (!err) {
-    const health = await DsbApiService.init().getHealth();
-    const state = await refreshState();
+    const health = await DsbApiService.init().getHealth()
+    const state = await refreshState()
     return {
       props: {
         health: serializeError(health),
-        state: serializeError(state),
-        auth: authHeader ? { some: authHeader } : { none: true },
-      },
-    };
+        state: serializeError(state), // todo: remove private data
+        auth: authHeader ? { some: authHeader } : { none: true }
+      }
+    }
   } else {
-    if (
-      err.message === ErrorCode.UNAUTHORIZED ||
-      err.message === ErrorCode.FORBIDDEN
-    ) {
-      context.res.statusCode = 401;
-      context.res.setHeader(
-        'WWW-Authenticate',
-        'Basic realm="Authorization Required"'
-      );
+    if (err.message === ErrorCode.UNAUTHORIZED || err.message === ErrorCode.FORBIDDEN) {
+      context.res.statusCode = 401
+      context.res.setHeader('WWW-Authenticate', 'Basic realm="Authorization Required"')
     }
     return {
       props: {
         health: {},
         state: {},
-        auth: { none: true },
-      },
-    };
+        auth: { none: true }
+      }
+    }
   }
 }
-
-export default function Home({
-  health,
-  state,
-  auth,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  const classes = useStyles();
-
+export default function home({ health, state, auth }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  const classes = useStyles()
   useEffect(() => {
     if (health.err) {
-      swal('Error', health.err.reason, 'error');
+      swal('Error', health.err.reason, 'error')
     }
-  }, [health, state]);
-
+  }, [health, state])
   return (
     <div>
       <Head>
@@ -86,22 +63,18 @@ export default function Home({
         <meta name="description" content="EW-DSB Client Gateway" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-
       <main>
-        <Header />
+        <ResponsiveHeader />
 
-        <Container maxWidth="md">
+        <Container maxWidth="lg">
           <section className={classes.connectionStatus}>
-            <Typography variant="h4">Connection Status </Typography>
-            <Typography
-              variant="caption"
-              className={classes.connectionStatusPaper}
-            >
-              {health.ok ? 'ONLINE' : `ERROR [${health.err?.code}]`}
-            </Typography>
+            <Typography variant="h5" className={classes.pageTitle}>Gateway Settings</Typography>
+            <Typography variant="h5">|</Typography>
+            <Breadcrumbs separator={<NavigateNext fontSize="small" />} aria-label="breadcrumb" className={classes.breadCrumbs}>
+              <Home color='#A466FF' size={15} />
+              <Typography color="primary">Gateway Settings</Typography>
+            </Breadcrumbs>
           </section>
-
-          <Divider className={classes.divider} />
 
           {state.ok && (
             <section className={classes.main}>
@@ -114,10 +87,7 @@ export default function Home({
                   />
                 </Grid>
                 <Grid item xs={12} md={6}>
-                  <ProxyCertificateContainer
-                    certificate={state.ok?.certificate}
-                    auth={auth.some}
-                  />
+                  <ProxyCertificateContainer certificate={state.ok?.certificate} auth={auth.some} />
                 </Grid>
               </Grid>
             </section>
@@ -125,33 +95,42 @@ export default function Home({
         </Container>
       </main>
     </div>
-  );
+  )
 }
-
 const useStyles = makeStyles((theme: Theme) => ({
   connectionStatus: {
     display: 'flex',
     alignItems: 'center',
     padding: '0 1rem',
-
     '& *': {
-      color: '#fff',
+      color: '#fff'
     },
-    marginBottom: '2rem',
+    marginBottom: '2rem'
   },
   connectionStatusPaper: {
     padding: '.5rem 1rem',
     marginLeft: '1rem',
-    background: theme.palette.secondary.main,
+    marginRight: '1rem',
+    background: theme.palette.primary.main,
     borderRadius: '1rem',
     display: 'flex',
-    alignItems: 'center',
+    alignItems: 'center'
   },
   divider: {
-    background: '#fff',
+    background: '#1E263C'
   },
   main: {
     padding: '0 1rem',
-    marginTop: '2rem',
+    marginTop: '2rem'
   },
-}));
+
+  pageTitle: {
+    marginRight: '1rem',
+    fontSize: '24px'
+  },
+
+  breadCrumbs: {
+    marginLeft: '1rem',
+  }
+
+}))

@@ -90,10 +90,11 @@ export type Channel = {
 export type Topic = {
   id: string;
   name: string;
-  namespace: string;
+  owner: string;
   schema: object | string;
   schemaType: string;
   version: string;
+  namespace?: string
 };
 
 export enum RoleState {
@@ -137,6 +138,52 @@ export enum EventEmitMode {
   SINGLE = 'SINGLE',
   BULK = 'BULK',
 }
+
+export type Application = {
+  appName: string
+  logoUrl?: string
+  websiteUrl?: string
+  description?: string
+}
+
+
+export type ApplicationHeader = {
+  id?: string
+  Header?: string
+  accessor: string
+  filter?: string
+  Cell?: any
+}
+
+export type PostTopicResult = {
+  id: string
+  name: string
+  schemaType: string
+  schema: string
+  version: string
+  owner: string,
+  tags: string[]
+}
+
+
+export type GetTopicsOptions = {
+  limit?: number
+  name: string
+  owner: string
+  page?: number
+  tags?: string[]
+}
+
+export type SendTopicData = {
+  name: string
+  schemaType: string
+  schema: string
+  version: string
+  signature: string
+  owner: string
+  tags: string[]
+}
+
 
 export type EnrolmentManager = {
   /**

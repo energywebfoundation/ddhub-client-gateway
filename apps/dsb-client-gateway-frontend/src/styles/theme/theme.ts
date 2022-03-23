@@ -1,35 +1,42 @@
 import { createTheme } from '@material-ui/core/styles'
 import { red } from '@material-ui/core/colors'
-
 // Create a theme instance.
+
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#33CBCB',
-      light: '#5BD6D6',
-      dark: '#159393'
+      main: '#A466FF',
+      dark: '#293145'
     },
     secondary: {
-      main: '#A567FF',
-      light: '#B0ADDC',
-      dark: '#52446F'
+      main: '#F6AFAF',
+      light: '#FFC9CA',
+      dark: '#EC9A9A'
     },
     error: {
-      main: '#C82E2E'
+      main: '#FD1803'
     },
     warning: {
-      main: '#FFA501'
+      main: '#FF5A00'
     },
     success: {
-      main: '#0FB544'
+      main: '#2EB67D'
     },
     info: {
-      main: '#C1FFF9'
+      main: '#0B80DF'
+    },
+    action: {
+      hover: '#CC98FF',
+      selected: '#A466FF'
+    },
+    text: {
+      primary: '#CED1D5',
+      secondary: '#FFFFFF'
     },
     background: {
-      default: '#181423;'
+      default: '#161D31',
+      paper: '#293145'
     }
   }
 })
-
 export default theme

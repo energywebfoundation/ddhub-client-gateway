@@ -16,6 +16,7 @@ import { DsbFilesController } from './controller/dsb-files.controller';
 import { DidAuthModule } from './module/did-auth/did-auth.module';
 import { DsbHealthController } from './controller/dsb-health.controller';
 import { CqrsModule } from '@nestjs/cqrs';
+import { DsbApplicationsController } from './controller/dsb-applications.controller';
 
 @Module({
   imports: [
@@ -49,6 +50,7 @@ import { CqrsModule } from '@nestjs/cqrs';
     DsbMessagesController,
     DsbTopicsController,
     DsbFilesController,
+    DsbApplicationsController
   ],
   exports: [DsbApiService],
 })

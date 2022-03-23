@@ -4,25 +4,25 @@ import InfoIcon from '@material-ui/icons/Info'
 import swal from 'sweetalert'
 import { CustomInput } from '../CustomInput/CustomInput'
 import { CertificateFiles } from '../../utils'
-
 type ProxyCertificateProps = {
   certificate?: CertificateFiles
   isLoading: boolean
   onSubmit: (cert: File, key: File, ca?: File) => void
 }
-
-export const ProxyCertificate = ({ certificate, isLoading, onSubmit }: ProxyCertificateProps) => {
+export const ProxyCertificate = ({
+  certificate,
+  isLoading,
+  onSubmit
+}: ProxyCertificateProps) => {
   const classes = useStyles()
-
   const [cert, setCert] = useState<File>()
   const [privateKey, setPrivateKey] = useState<File>()
   const [ca, setCa] = useState<File>()
-
   return (
     <div className={classes.credentials}>
       <div className={classes.formGroup}>
         <div className={classes.credentialsHeader}>
-          <Typography variant="h6">OUTBOUND CERTIFICATE</Typography>
+          <Typography variant="h6">Outbound Certificate</Typography>
           <Tooltip
             title="Configure the certificate (public and private key) used for mTLS authentication
             (if using a message broker inside a secure environment)."
@@ -33,12 +33,15 @@ export const ProxyCertificate = ({ certificate, isLoading, onSubmit }: ProxyCert
 
         <div>
           <div className={classes.formGroup}>
-            <Typography className={classes.formLabel} variant="caption">
-              CERTIFICATE
-            </Typography>
+            <Typography className={classes.formLabel} variant="caption">Certificate</Typography>
             <div className={classes.fileInput}>
               <CustomInput placeholder={cert?.name ?? certificate?.cert.name ?? 'Upload a .pem file'} disabled />
-              <Button variant="outlined" color="secondary" className={classes.fileButton} component="label">
+              <Button
+                variant="contained"
+                color="primary"
+                className={classes.fileButton}
+                component="label"
+              >
                 Browse
                 <input
                   type="file"
@@ -50,12 +53,15 @@ export const ProxyCertificate = ({ certificate, isLoading, onSubmit }: ProxyCert
             </div>
           </div>
           <div className={classes.formGroup}>
-            <Typography className={classes.formLabel} variant="caption">
-              PRIVATE KEY
-            </Typography>
+            <Typography className={classes.formLabel} variant="caption">Private key</Typography>
             <div className={classes.fileInput}>
               <CustomInput placeholder={privateKey?.name ?? certificate?.key?.name ?? 'Upload a .pem file'} disabled />
-              <Button variant="outlined" color="secondary" className={classes.fileButton} component="label">
+              <Button
+                variant="contained"
+                color="primary"
+                className={classes.fileButton}
+                component="label"
+              >
                 Browse
                 <input
                   type="file"
@@ -67,12 +73,15 @@ export const ProxyCertificate = ({ certificate, isLoading, onSubmit }: ProxyCert
             </div>
           </div>
           <div className={classes.formGroup}>
-            <Typography className={classes.formLabel} variant="caption">
-              CA CERTIFICATE (optional)
-            </Typography>
+            <Typography className={classes.formLabel} variant="caption">CA Certificate (optional)</Typography>
             <div className={classes.fileInput}>
               <CustomInput placeholder={ca?.name ?? certificate?.ca?.name ?? 'Upload a .crt file'} disabled />
-              <Button variant="outlined" color="secondary" className={classes.fileButton} component="label">
+              <Button
+                variant="contained"
+                color="primary"
+                className={classes.fileButton}
+                component="label"
+              >
                 Browse
                 <input
                   type="file"
@@ -87,8 +96,8 @@ export const ProxyCertificate = ({ certificate, isLoading, onSubmit }: ProxyCert
       </div>
       <div className={classes.buttonGroup}>
         <Button
-          variant="outlined"
-          color="secondary"
+          variant="contained"
+          color="primary"
           fullWidth
           disabled={isLoading}
           onClick={() => {
@@ -107,7 +116,8 @@ export const ProxyCertificate = ({ certificate, isLoading, onSubmit }: ProxyCert
 
 const useStyles = makeStyles((theme: Theme) => ({
   credentials: {
-    border: '1px solid #fff',
+    borderRadius: '6px',
+    background: theme.palette.primary.dark,
     padding: '2rem',
     minHeight: '550px',
     display: 'flex',
@@ -126,9 +136,8 @@ const useStyles = makeStyles((theme: Theme) => ({
     flexDirection: 'column',
     width: '100%',
     marginBottom: '2rem',
-
     '& span': {
-      fontSize: '.8rem'
+      fontSize: '.8rem',
     },
     '& input': {
       color: '#fff',
@@ -141,7 +150,6 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   buttonGroup: {
     marginTop: '1rem',
-
     '& button': {
       padding: '.7rem',
       marginBottom: '1rem'
@@ -151,7 +159,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-between',
-    width: '100%'
+    width: '100%',
   },
   fileButton: {
     // marginTop: theme.spacing(3),

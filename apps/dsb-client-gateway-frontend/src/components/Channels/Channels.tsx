@@ -148,16 +148,3 @@ const useStyles = makeStyles((theme: Theme) => ({
   }
 }))
 
-const duration = 500
-
-const defaultStyle = {
-  transition: `transform 200ms, opacity ${duration}ms ease`,
-  opacity: 1
-}
-
-const transitionStyles = {
-  entering: { opacity: 0, display: 'block' },
-  entered: { opacity: 1 },
-  exiting: { opacity: 0 },
-  exited: { opacity: 0, display: 'none' }
-}

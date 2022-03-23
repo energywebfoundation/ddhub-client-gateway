@@ -23,8 +23,6 @@ export class DidAuthService {
   public async login(privateKey: string, did: string): Promise<void> {
     this.logger.log('Attempting to login');
 
-    console.log('private key', privateKey);
-
     const proof = await this.ethersService.createProof(privateKey, did);
 
     const { access_token, refresh_token } = await promiseRetry(
