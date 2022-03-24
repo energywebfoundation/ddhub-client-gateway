@@ -1,8 +1,8 @@
 import Head from 'next/head'
 import Link from 'next/link'
 import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
-import { makeStyles } from '@mui/styles'
-import { Typography, Container, Divider, Theme, Button } from '@mui/material'
+import { makeStyles } from 'tss-react/mui'
+import { Typography, Container, Divider, Button } from '@mui/material'
 import swal from '@sweetalert/with-react'
 import ResponsiveHeader from '../../components/ResponsiveHeader/ResponsiveHeader'
 import { DsbApiService } from '../../services/dsb-api.service'
@@ -61,7 +61,7 @@ export default function Documentation({
   channels,
   did
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  const classes = useStyles()
+  const { classes } = useStyles()
   const [channelErrorText, setChannelErrorText] = useState<string>()
   useEffect(() => {
     if (channels.err) {
@@ -133,7 +133,7 @@ export default function Documentation({
     </div>
   )
 }
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles()((theme) => ({
   connectionStatus: {
     display: 'flex',
     alignItems: 'center',

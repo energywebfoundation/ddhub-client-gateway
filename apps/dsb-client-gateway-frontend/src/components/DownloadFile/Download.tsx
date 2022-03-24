@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { makeStyles } from '@mui/styles'
-import { Typography, Button, Theme, Grid, MenuItem, FormControl, Select } from '@mui/material'
+import { makeStyles } from 'tss-react/mui';
+import { Typography, Button, Grid, MenuItem, FormControl, Select } from '@mui/material'
 import { Info } from '@mui/icons-material'
 import { CustomInput } from '../../components/CustomInput/CustomInput'
 import { Channel } from '../../utils'
@@ -10,7 +10,7 @@ type DownloadProps = {
   onDownload: (fqcn: string, amount: number, clientId?: string) => void
 }
 export const Download = ({ channels, onDownload }: DownloadProps,) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
   const [channelName, setChannelName] = useState('')
   return (
     <section className={classes.download}>
@@ -61,7 +61,7 @@ export const Download = ({ channels, onDownload }: DownloadProps,) => {
   )
 }
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles()((theme) => ({
   download: {
     borderRadius: '6px',
     background: theme.palette.primary.dark,

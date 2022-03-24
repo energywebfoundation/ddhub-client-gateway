@@ -1,6 +1,6 @@
-import { makeStyles } from '@mui/styles'
+import { makeStyles } from 'tss-react/mui';
 import { useState } from 'react'
-import { Theme, Typography, Button } from '@mui/material'
+import { Typography, Button } from '@mui/material'
 import { Topic as TopicType } from '../../utils'
 import Table from '../Table/Table'
 import SimpleDialog from '../../pages/topicdialog'
@@ -16,7 +16,7 @@ type TopicProps = {
 }
 
 export default function Topic({ applicationName, topics, myDID, handlePostTopic, handleUpdateTopic }: TopicProps) {
-    const classes = useStyles()
+    const { classes } = useStyles()
     const [open, setOpen] = useState(false)
 
     const dialogTitle = 'Create Topic'
@@ -55,7 +55,7 @@ export default function Topic({ applicationName, topics, myDID, handlePostTopic,
     )
 }
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles()((theme) => ({
     navbar: {
         position: 'absolute',
         background: '#293145',

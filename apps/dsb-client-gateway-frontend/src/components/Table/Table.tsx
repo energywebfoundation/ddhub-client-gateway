@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
 import 'regenerator-runtime/runtime'
 import matchSorter from 'match-sorter'
-import { MenuItem, Menu, Theme, IconButton } from '@mui/material'
-import Pagination from '@mui/lab/Pagination'
+import { MenuItem, Menu, IconButton } from '@mui/material'
+import { Pagination } from '@mui/material'
 import MoreVertIcon from '@mui/icons-material/MoreVert'
-import { makeStyles } from '@mui/styles'
+import { makeStyles } from 'tss-react/mui';
 import { useTable, useSortBy, usePagination, useFilters, useGlobalFilter, useAsyncDebounce } from 'react-table'
 import { CustomInput } from '../CustomInput/CustomInput'
 import {
@@ -197,7 +197,7 @@ function Table({ headers, dataRows, location, handleUpdateTopic }: TableProps) {
 
 
 
-    const classes = useStyles()
+    const { classes } = useStyles()
     const data = React.useMemo(() => dataRows, [dataRows])
 
     const columns = React.useMemo(() => newHeaders, [])
@@ -377,7 +377,7 @@ function Table({ headers, dataRows, location, handleUpdateTopic }: TableProps) {
     )
 }
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles()((theme) => ({
     table: {
         width: '100%',
         minWidth: 650,
@@ -394,7 +394,7 @@ const useStyles = makeStyles((theme: Theme) => ({
         color: theme.palette.text.primary
     },
     test: {
-        content: '2807',
+        'content': '"2807"',
         'font- size': '100px'
     },
     div: {

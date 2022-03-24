@@ -2,14 +2,13 @@ import { useEffect, useState } from 'react'
 import swal from 'sweetalert'
 import {
   Button,
-  Theme,
   Tooltip,
   Typography,
 } from '@mui/material';
 import InfoIcon from '@mui/icons-material/Info';
 import { CustomInput } from '../../components/CustomInput/CustomInput';
 import { EnrolmentState, snip, StringType } from '../../utils';
-import { makeStyles } from '@mui/styles';
+import { makeStyles } from 'tss-react/mui';
 
 type GatewayIdentityProps = {
   did?: string
@@ -29,7 +28,7 @@ export const GatewayIdentity = ({
   onCreate,
   onEnrol
 }: GatewayIdentityProps) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
   const [privateKey, setPrivatekey] = useState('')
   const [statusText, setStatusText] = useState('')
   const [showEnrolButton, setShowEnrolButton] = useState(false)
@@ -128,7 +127,7 @@ export const GatewayIdentity = ({
   )
 }
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles()((theme) => ({
   credentials: {
     borderRadius: '6px',
     background: theme.palette.primary.dark,

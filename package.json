@@ -5,15 +5,20 @@
   "scripts": {
     "start": "nx serve",
     "build": "nx build",
-    "test": "nx test"
+    "dev": "nx dev",
+    "test": "nx test",
+    "api": "nx serve dsb-client-gateway-api"
   },
   "private": true,
   "dependencies": {
     "@asyncapi/react-component": "^1.0.0-next.15",
     "@aws-sdk/client-ssm": "^3.51.0",
     "@aws-sdk/client-sts": "^3.51.0",
+    "@emotion/server": "^11.4.0",
     "@emotion/react": "^11.8.2",
     "@emotion/styled": "^11.8.1",
+    "tss-react": "3.6.0",
+    "@mui/lab": "^5.0.0-alpha.74",
     "@mui/icons-material": "^5.5.1",
     "@mui/material": "^5.5.2",
     "@mui/styles": "^5.5.1",
@@ -70,7 +75,6 @@
     "websocket": "^1.0.34"
   },
   "devDependencies": {
-    "@mui/lab": "^5.0.0-alpha.74",
     "@emotion/sheet": "^1.1.0",
     "@nestjs/schematics": "^8.0.0",
     "@nestjs/testing": "^8.2.6",

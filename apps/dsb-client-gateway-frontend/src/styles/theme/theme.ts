@@ -1,4 +1,4 @@
-import { createTheme, Theme, ThemeOptions } from '@mui/material/styles';
+import { createTheme, ThemeOptions } from '@mui/material/styles';
 
 // Create a theme instance.
 const dsbTheme: ThemeOptions = {
@@ -54,4 +54,4 @@ const dsbTheme: ThemeOptions = {
   },
 }
 
-export const theme: Theme = createTheme(dsbTheme);
+export const theme = createTheme(dsbTheme);

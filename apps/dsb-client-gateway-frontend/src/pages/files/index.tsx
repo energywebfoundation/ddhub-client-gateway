@@ -1,8 +1,8 @@
 import { useEffect } from 'react'
 import Head from 'next/head'
 import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
-import { makeStyles } from '@mui/styles';
-import { Container, Divider, Theme, Typography } from '@mui/material';
+import { makeStyles } from 'tss-react/mui';
+import { Container, Divider, Typography } from '@mui/material';
 import swal from '@sweetalert/with-react';
 import { UploadContainer } from '../../components/UploadFile/UploadContainer';
 import ResponsiveHeader from '../../components/ResponsiveHeader/ResponsiveHeader'
@@ -57,7 +57,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext): Pr
 }
 export default function FileUpload({ health, channels, topics, auth }:
   InferGetServerSidePropsType<typeof getServerSideProps>) {
-  const classes = useStyles()
+  const { classes } = useStyles()
   useEffect(() => {
     if (health.err) {
       return swal('Error', health.err.reason, 'error')
@@ -111,7 +111,7 @@ export default function FileUpload({ health, channels, topics, auth }:
     </div>
   )
 }
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles()((theme) => ({
   connectionStatus: {
     display: 'flex',
     alignItems: 'center',

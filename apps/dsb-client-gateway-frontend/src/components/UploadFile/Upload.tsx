@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react'
-import { makeStyles } from '@mui/styles';
+import { makeStyles } from 'tss-react/mui';
 import {
   Button,
   FormControl,
   Grid,
   MenuItem,
   Select,
-  Theme,
   Typography,
 } from '@mui/material';
 import { Info } from '@mui/icons-material';
@@ -21,7 +20,7 @@ type UploadProps = {
 }
 
 export const Upload = ({ channels, topics, onUpload }: UploadProps) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const [file, setFile] = useState<File>()
   const [fileName, setFileName] = useState('')
@@ -142,7 +141,7 @@ export const Upload = ({ channels, topics, onUpload }: UploadProps) => {
   )
 }
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles()((theme) => ({
   upload: {
     border: '1px solid #fff',
     padding: theme.spacing(6),

@@ -1,11 +1,10 @@
 import {
   makeStyles, withStyles
-} from '@mui/styles';
+} from 'tss-react/mui';
 import {
   Accordion,
   AccordionDetails,
   AccordionSummary as MuiAccordionSummary,
-  Theme,
   Typography,
 } from '@mui/material';
 import { Channel as ChannelType } from '../../utils';
@@ -17,7 +16,7 @@ type ChannelProps = {
   myDID?: string
 }
 
-const AccordionSummary = withStyles({
+const AccordionSummary = withStyles(MuiAccordionSummary, {
   root: {
     backgroundColor: 'rgba(0, 0, 0, .03)',
     borderBottom: '1px solid rgba(0, 0, 0, .125)',
@@ -33,10 +32,10 @@ const AccordionSummary = withStyles({
     }
   },
   expanded: {}
-})(MuiAccordionSummary);
+});
 
 export default function Channel({channel, myDID}: ChannelProps) {
-  const classes = useStyles();
+  const { classes } = useStyles();
 
   const isPubSub = () => {
     if (!myDID) {
@@ -101,7 +100,7 @@ export default function Channel({channel, myDID}: ChannelProps) {
   );
 }
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles()((theme) => ({
   container: {
     margin: '2rem'
   },

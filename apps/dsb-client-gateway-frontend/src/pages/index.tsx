@@ -4,11 +4,10 @@ import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'nex
 import ResponsiveHeader from '../components/ResponsiveHeader/ResponsiveHeader'
 import { Home } from 'react-feather'
 import { NavigateNext } from '@mui/icons-material'
-import Link from 'next/link'
 import { ErrorBodySerialized, ErrorCode, Option, Result, serializeError, Storage } from '../utils'
 import swal from '@sweetalert/with-react';
-import { makeStyles } from '@mui/styles';
-import { Container, Breadcrumbs, Grid, Theme, Typography } from '@mui/material';
+import { makeStyles } from 'tss-react/mui';
+import { Container, Breadcrumbs, Grid, Typography } from '@mui/material';
 import { GatewayIdentityContainer } from '../components/GatewayIdentity/GatewayIdentityContainer';
 import { ProxyCertificateContainer } from '../components/ProxyCertificate/ProxyCertificateContainer';
 import { DsbApiService } from '../services/dsb-api.service';
@@ -49,8 +48,8 @@ export async function getServerSideProps(context: GetServerSidePropsContext): Pr
     }
   }
 }
-export default function home({ health, state, auth }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  const classes = useStyles()
+export default function Index({ health, state, auth }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  const { classes } = useStyles()
   useEffect(() => {
     if (health.err) {
       swal('Error', health.err.reason, 'error')
@@ -97,7 +96,7 @@ export default function home({ health, state, auth }: InferGetServerSidePropsTyp
     </div>
   )
 }
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles()(theme => ({
   connectionStatus: {
     display: 'flex',
     alignItems: 'center',

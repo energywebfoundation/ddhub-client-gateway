@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import Head from 'next/head'
 import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
-import { makeStyles } from '@mui/styles'
-import { Container, Theme, } from '@mui/material'
+import { makeStyles } from 'tss-react/mui'
+import { Container } from '@mui/material'
 import swal from '@sweetalert/with-react'
 import { TopicContainer } from '../../components/Topics/TopicsContainer'
 import ResponsiveHeader from '../../components/ResponsiveHeader/ResponsiveHeader'
@@ -60,7 +60,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext): Pr
 
 export default function ListTopics({ owner, ownerDid, auth }:
     InferGetServerSidePropsType<typeof getServerSideProps>) {
-    const classes = useStyles()
+    const { classes } = useStyles()
 
     const [topics, setTopics] = useState<Topic[]>();
     const [health, setHealth] = useState('');
@@ -128,7 +128,7 @@ export default function ListTopics({ owner, ownerDid, auth }:
     )
 }
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles()((theme) => ({
     connectionStatus: {
         display: 'flex',
         alignItems: 'center',

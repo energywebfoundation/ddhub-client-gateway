@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { Button, Theme, Tooltip, Typography } from '@mui/material'
-import { makeStyles } from '@mui/styles'
+import { Button, Tooltip, Typography } from '@mui/material'
+import { makeStyles } from 'tss-react/mui';
 import swal from 'sweetalert'
 import { CustomInput } from '../CustomInput/CustomInput'
 import { CertificateFiles } from '../../utils'
@@ -16,7 +16,7 @@ export const ProxyCertificate = ({
   isLoading,
   onSubmit
 }: ProxyCertificateProps) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
   const [cert, setCert] = useState<File>()
   const [privateKey, setPrivateKey] = useState<File>()
   const [ca, setCa] = useState<File>()
@@ -116,7 +116,7 @@ export const ProxyCertificate = ({
   )
 }
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles()((theme) => ({
   credentials: {
     borderRadius: '6px',
     background: theme.palette.primary.dark,
