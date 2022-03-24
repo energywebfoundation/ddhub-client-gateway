@@ -57,20 +57,16 @@ export const useStyles = makeStyles()(theme => ({
   icon: {
     marginRight: "15px"
   },
-
   ListItemText: {
     lineHeight: '1.25'
   },
-
   logo: {
     height: '38px'
   },
-
   dividerColor: {
     backgroundColor: alpha(theme.palette.text.secondary, 0.2),
     margin: "15px 0px"
   },
-
   menuTitle: {
     marginLeft: "20px",
     marginBottom: "10px",
