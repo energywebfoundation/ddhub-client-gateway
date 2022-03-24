@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import axios from 'axios';
-import swal from '@sweetalert/with-react';
+import Swal from 'sweetalert2'
 import { GatewayIdentity } from './GatewayIdentity';
 import { BalanceState, Enrolment, EnrolmentState, Identity } from '../../utils';
 
@@ -43,16 +43,16 @@ export const GatewayIdentityContainer = ({
       setBalance(hasFunds(res.data.balance));
       setDid('');
       setEnroled(undefined);
-      swal(
+      Swal.fire(
         'Success',
         'Private key saved. If not already funded, visit https://voltafaucet.energyweb.org',
         'success'
       );
     } catch (err) {
       if (axios.isAxiosError(err)) {
-        swal('Error', err.response?.data?.err?.reason, 'error');
+        Swal.fire('Error', err.response?.data?.err?.reason, 'error');
       } else {
-        swal('Error', `Could not set identity: ${err}`, 'error');
+        Swal.fire('Error', `Could not set identity: ${err}`, 'error');
       }
     }
     setIsLoading(false);
@@ -68,7 +68,7 @@ export const GatewayIdentityContainer = ({
       );
       setDid(res.data.did);
       setEnroled(res.data.state);
-      swal(
+      Swal.fire(
         'Success',
         'Enrolment to DSB requested. The gateway is listening for approval and will automatically ' +
           "sync the approved claims to the configured DID's Document once notified.",
@@ -76,9 +76,9 @@ export const GatewayIdentityContainer = ({
       );
     } catch (err) {
       if (axios.isAxiosError(err)) {
-        swal('Enrolment Error', err.response?.data?.err?.reason, 'error');
+        Swal.fire('Enrolment Error', err.response?.data?.err?.reason, 'error');
       } else {
-        swal('Error', `Could not enrol: ${err}`, 'error');
+        Swal.fire('Error', `Could not enrol: ${err}`, 'error');
       }
     }
     setIsLoading(false);

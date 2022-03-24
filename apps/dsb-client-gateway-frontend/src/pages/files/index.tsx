@@ -1,19 +1,18 @@
 import { useEffect } from 'react'
 import Head from 'next/head'
 import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
-import { makeStyles } from '@material-ui/styles'
-import { Typography, Container, Divider, Theme } from '@material-ui/core'
-import swal from '@sweetalert/with-react'
-import { UploadContainer } from '../../components/UploadFile/UploadContainer'
-
+import { makeStyles } from 'tss-react/mui';
+import { Container, Divider, Typography } from '@mui/material';
+import Swal from 'sweetalert2'
+import { UploadContainer } from '../../components/UploadFile/UploadContainer';
 import ResponsiveHeader from '../../components/ResponsiveHeader/ResponsiveHeader'
 
 import { DownloadContainer } from '../../components/DownloadFile/DownloadContainer'
 import { DsbApiService } from '../../services/dsb-api.service'
 import { isAuthorized } from '../../services/auth.service'
-import { Breadcrumbs } from '@material-ui/core'
+import { Breadcrumbs } from '@mui/material'
 import { Home } from 'react-feather'
-import { NavigateNext } from '@material-ui/icons'
+import { NavigateNext } from '@mui/icons-material'
 import Link from 'next/link'
 import { ErrorCode, Result, serializeError, Channel, Option, ErrorBodySerialized, Topic } from '../../utils'
 type Props = {
@@ -58,18 +57,18 @@ export async function getServerSideProps(context: GetServerSidePropsContext): Pr
 }
 export default function FileUpload({ health, channels, topics, auth }:
   InferGetServerSidePropsType<typeof getServerSideProps>) {
-  const classes = useStyles()
+  const { classes } = useStyles()
   useEffect(() => {
     if (health.err) {
-      return swal('Error', health.err.reason, 'error')
+      Swal.fire('Error', health.err.reason, 'error')
     }
     if (channels.err) {
       console.log('channels.err', channels.err)
-      return swal('Error', channels.err.reason, 'error')
+      Swal.fire('Error', channels.err.reason, 'error')
     }
     if (topics.err) {
       console.log('channels.err', channels.err)
-      return swal('Error', topics.err.reason, 'error')
+      Swal.fire('Error', topics.err.reason, 'error')
     }
   }, [health, channels, topics])
   return (
@@ -112,7 +111,7 @@ export default function FileUpload({ health, channels, topics, auth }:
     </div>
   )
 }
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles()((theme) => ({
   connectionStatus: {
     display: 'flex',
     alignItems: 'center',

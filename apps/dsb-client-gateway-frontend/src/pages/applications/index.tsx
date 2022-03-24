@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react'
 import Head from 'next/head'
 import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
-import { makeStyles } from '@material-ui/styles'
-import { Container, Theme } from '@material-ui/core'
-import swal from '@sweetalert/with-react'
+import { makeStyles } from 'tss-react/mui'
+import { Container } from '@mui/material'
 import { ApplicationContainer } from '../../components/Applications/ApplicationsContainer'
 import ResponsiveHeader from '../../components/ResponsiveHeader/ResponsiveHeader'
 import { isAuthorized } from '../../services/auth.service'
@@ -50,7 +49,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext): Pr
 }
 export default function ListApplications({ state, auth }:
     InferGetServerSidePropsType<typeof getServerSideProps>) {
-    const classes = useStyles()
+    const { classes } = useStyles()
     const [applications, setApplications] = useState<IAppDefinition[]>([]);
     const [health, setHealth] = useState<{ statusCode: number; message?: string }>();
 
@@ -105,7 +104,7 @@ export default function ListApplications({ state, auth }:
         </div >
     )
 }
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles()((theme) => ({
     connectionStatus: {
         display: 'flex',
         alignItems: 'center',

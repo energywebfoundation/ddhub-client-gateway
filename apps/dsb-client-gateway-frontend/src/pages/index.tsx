@@ -1,20 +1,20 @@
 import { useEffect } from 'react'
 import Head from 'next/head'
 import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
-import swal from '@sweetalert/with-react'
-import { makeStyles } from '@material-ui/styles'
-import { Typography, Container, Theme, Grid } from '@material-ui/core'
-import { GatewayIdentityContainer } from '../components/GatewayIdentity/GatewayIdentityContainer'
-import { ProxyCertificateContainer } from '../components/ProxyCertificate/ProxyCertificateContainer'
 import ResponsiveHeader from '../components/ResponsiveHeader/ResponsiveHeader'
-import { DsbApiService } from '../services/dsb-api.service'
-import { refreshState } from '../services/identity.service'
-import { isAuthorized } from '../services/auth.service'
-import { Breadcrumbs } from '@material-ui/core'
+import { NavigateNext } from '@mui/icons-material'
 import { Home as HomeIcon } from 'react-feather'
-import { NavigateNext } from '@material-ui/icons'
 import Link from 'next/link'
 import { ErrorBodySerialized, ErrorCode, Option, Result, serializeError, Storage } from '../utils'
+import Swal from 'sweetalert2'
+import { makeStyles } from 'tss-react/mui';
+import { Container, Breadcrumbs, Grid, Typography } from '@mui/material';
+import { GatewayIdentityContainer } from '../components/GatewayIdentity/GatewayIdentityContainer';
+import { ProxyCertificateContainer } from '../components/ProxyCertificate/ProxyCertificateContainer';
+import { DsbApiService } from '../services/dsb-api.service';
+import { refreshState } from '../services/identity.service';
+import { isAuthorized } from '../services/auth.service';
+
 type Props = {
   health: Result<boolean, ErrorBodySerialized>
   state: Result<Storage, ErrorBodySerialized>
@@ -23,8 +23,8 @@ type Props = {
 export async function getServerSideProps(context: GetServerSidePropsContext): Promise<{
   props: Props
 }> {
-  const authHeader = context.req.headers.authorization
-  const { err } = isAuthorized(authHeader)
+  const authHeader = context.req.headers.authorization;
+  const { err } = isAuthorized(authHeader);
   if (!err) {
     const health = await DsbApiService.init().getHealth()
     const state = await refreshState()
@@ -49,19 +49,19 @@ export async function getServerSideProps(context: GetServerSidePropsContext): Pr
     }
   }
 }
-export default function Home({ health, state, auth }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  const classes = useStyles()
+export default function Index({ health, state, auth }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  const { classes } = useStyles()
   useEffect(() => {
     if (health.err) {
-      swal('Error', health.err.reason, 'error')
+      Swal.fire('Error', health.err.reason, 'error')
     }
   }, [health, state])
   return (
     <div>
       <Head>
         <title>EW-DSB Client Gateway</title>
-        <meta name="description" content="EW-DSB Client Gateway" />
-        <link rel="icon" href="/favicon.ico" />
+        <meta name="description" content="EW-DSB Client Gateway"/>
+        <link rel="icon" href="/favicon.ico"/>
       </Head>
       <main>
         <ResponsiveHeader />
@@ -97,7 +97,7 @@ export default function Home({ health, state, auth }: InferGetServerSidePropsTyp
     </div>
   )
 }
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles()(theme => ({
   connectionStatus: {
     display: 'flex',
     alignItems: 'center',

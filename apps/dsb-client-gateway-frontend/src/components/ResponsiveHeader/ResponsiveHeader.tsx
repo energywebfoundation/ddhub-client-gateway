@@ -1,25 +1,27 @@
 import React from "react";
 import PropTypes from "prop-types";
-import AppBar from "@material-ui/core/AppBar";
-import CssBaseline from "@material-ui/core/CssBaseline";
-import Drawer from "@material-ui/core/Drawer";
-import Hidden from "@material-ui/core/Hidden";
-import IconButton from "@material-ui/core/IconButton";
-import List from "@material-ui/core/List";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemText from "@material-ui/core/ListItemText";
-import MenuIcon from "@material-ui/icons/Menu";
-import CloseIcon from "@material-ui/icons/Close";
-import Toolbar from "@material-ui/core/Toolbar";
-import Typography from "@material-ui/core/Typography";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
+import AppBar from "@mui/material/AppBar";
+import CssBaseline from "@mui/material/CssBaseline";
+import Drawer from "@mui/material/Drawer";
+import Hidden from "@mui/material/Hidden";
+import IconButton from "@mui/material/IconButton";
+import Box from "@mui/material/Box";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemText from "@mui/material/ListItemText";
+import MenuIcon from "@mui/icons-material/Menu";
+import CloseIcon from "@mui/icons-material/Close";
+import Toolbar from "@mui/material/Toolbar";
+import Typography from "@mui/material/Typography";
+import { makeStyles } from 'tss-react/mui';
 import Link from 'next/link'
 import clsx from 'clsx'
-import { Home, Box, File, FileText, Layers, MessageSquare, Mail, GitMerge } from 'react-feather'
+import { Home, Box as BoxIcon, File, FileText, Layers, MessageSquare, Mail, GitMerge } from 'react-feather'
 import { useRouter } from 'next/router'
-import { Divider } from "@material-ui/core";
+import { Divider } from '@mui/material';
 const drawerWidth = 264;
-const useStyles = makeStyles((theme) => ({
+
+const useStyles = makeStyles()(theme => ({
     root: {
         display: "flex"
     },
@@ -41,7 +43,6 @@ const useStyles = makeStyles((theme) => ({
             display: "none"
         }
     },
-    toolbar: theme.mixins.toolbar,
     drawerPaper: {
         width: drawerWidth,
         padding: "15px"
@@ -94,20 +95,20 @@ const useStyles = makeStyles((theme) => ({
         fontSize: "14px",
         color: theme.palette.primary.main
     }
+  }));
 
-}));
 function ResponsiveDrawer() {
+  const { classes, theme } = useStyles();
 
     const isActive = (pathname: string) => (router.pathname === pathname ? classes.active : '')
 
-    const classes = useStyles();
-    const theme = useTheme();
     const router = useRouter()
 
     const [mobileOpen, setMobileOpen] = React.useState(false);
     function handleDrawerToggle() {
         setMobileOpen(!mobileOpen);
     }
+
     const drawer = (
         <div>
             <List>
@@ -124,7 +125,7 @@ function ResponsiveDrawer() {
             <List>
                 <Link href="/" passHref >
                     <ListItem button className={clsx(classes.navLink, isActive('/'))} component="a">
-                        <Box className={classes.iconDashboard} size={20} />
+                        <BoxIcon className={classes.iconDashboard} size={20} />
                         <ListItemText>Gateway Settings</ListItemText>
                     </ListItem>
                 </Link>
@@ -222,13 +223,13 @@ function ResponsiveDrawer() {
                             paper: classes.drawerPaper
                         }}
                     >
-                        <div className={classes.toolbar} />
+                        <Box sx={theme.mixins.toolbar} />
                         {drawer}
                     </Drawer>
                 </Hidden>
             </nav>
             <div className={classes.content}>
-                <div className={classes.toolbar} />
+                <Box sx={theme.mixins.toolbar} />
                 {/* <VisibleItemList /> */}
             </div>
         </div>
