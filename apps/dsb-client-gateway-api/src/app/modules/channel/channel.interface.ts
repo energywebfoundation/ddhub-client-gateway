@@ -11,4 +11,5 @@ export interface TopicVersionEntity {
   schemaType: string;
   tags: string[];
   version: string;
+  topicId: string;
 }
