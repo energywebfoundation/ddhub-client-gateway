@@ -9,6 +9,6 @@ export class KeysController {
 
   @Post('')
   public async derive(): Promise<void> {
-    await this.keysService.deriveKeys();
+    // await this.keysService.deriveKeys();
   }
 }
