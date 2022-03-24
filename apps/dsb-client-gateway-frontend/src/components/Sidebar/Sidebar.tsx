@@ -1,5 +1,4 @@
 import React from "react";
-import PropTypes from "prop-types";
 import AppBar from "@mui/material/AppBar";
 import CssBaseline from "@mui/material/CssBaseline";
 import Drawer from "@mui/material/Drawer";
@@ -13,93 +12,15 @@ import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-import { makeStyles } from 'tss-react/mui';
 import Link from 'next/link'
 import clsx from 'clsx'
-import { Home, Box as BoxIcon, File, FileText, Layers, MessageSquare, Mail, GitMerge } from 'react-feather'
+import { Home, Box as BoxIcon, FileText, Layers, MessageSquare, Mail, GitMerge } from 'react-feather'
 import { useRouter } from 'next/router'
 import { Divider } from '@mui/material';
-const drawerWidth = 264;
+import { useStyles } from "./Sidebar.styles";
 
-const useStyles = makeStyles()(theme => ({
-    root: {
-        display: "flex"
-    },
-    drawer: {
-        [theme.breakpoints.up("md")]: {
-            width: drawerWidth,
-            flexShrink: 0
-        }
-    },
-    appBar: {
-        zIndex: theme.zIndex.drawer + 1,
-        backgroundColor: 'unset',
-        boxShadow: 'unset',
-        padding: '5px 0'
-    },
-    menuButton: {
-        marginRight: theme.spacing(2),
-        [theme.breakpoints.up("md")]: {
-            display: "none"
-        }
-    },
-    drawerPaper: {
-        width: drawerWidth,
-        padding: "15px"
-    },
-    content: {
-        flexGrow: 1,
-        padding: theme.spacing(3)
-    },
-    closeMenuButton: {
-        marginRight: "auto",
-        marginLeft: 0
-    },
-    navLink: {
-        fontSize: '1.04rem',
-        height: '42px',
-        '&:hover': {
-            background: 'none',
-            transform: 'translateX(5px)'
-        }
-    },
-    active: {
-        color: "#ffffff",
-        background: theme.palette.primary.main,
-        borderRadius: '4px',
-        '&:hover': {
-            background: theme.palette.primary.main,
-            transform: 'none'
-        }
-    },
-    iconDashboard: {
-        marginRight: "15px"
-    },
-
-    ListItemText: {
-        lineHeight: '1.25'
-    },
-
-    logo: {
-        height: '38px'
-    },
-
-    dividerColor: {
-        backgroundColor: "rgb(255 255 255 / 20%)",
-        margin: "15px 0px"
-    },
-
-    menuTitle: {
-        marginLeft: "20px",
-        marginBottom: "10px",
-        fontSize: "14px",
-        color: theme.palette.primary.main
-    }
-  }));
-
-function ResponsiveDrawer() {
-  const { classes, theme } = useStyles();
-
+function Sidebar() {
+    const { classes, theme } = useStyles();
     const isActive = (pathname: string) => (router.pathname === pathname ? classes.active : '')
 
     const router = useRouter()
@@ -114,7 +35,7 @@ function ResponsiveDrawer() {
             <List>
                 <Link href="#" passHref >
                     <ListItem button className={clsx(classes.navLink, isActive('#'))} component="a">
-                        <Home className={classes.iconDashboard} size={20} />
+                        <Home className={classes.icon} size={20} />
                         <ListItemText>Dashboard</ListItemText>
                     </ListItem>
                 </Link>
@@ -125,21 +46,21 @@ function ResponsiveDrawer() {
             <List>
                 <Link href="/" passHref >
                     <ListItem button className={clsx(classes.navLink, isActive('/'))} component="a">
-                        <BoxIcon className={classes.iconDashboard} size={20} />
+                        <BoxIcon className={classes.icon} size={20} />
                         <ListItemText>Gateway Settings</ListItemText>
                     </ListItem>
                 </Link>
 
                 <Link href="/applications" passHref>
                     <ListItem button className={clsx(classes.navLink, isActive('/applications'))} component="a">
-                        <Layers className={classes.iconDashboard} size={20} />
+                        <Layers className={classes.icon} size={20} />
                         <ListItemText>Apps and Topics</ListItemText>
                     </ListItem>
                 </Link>
 
                 <Link href="#" passHref>
                     <ListItem button className={clsx(classes.navLink, isActive('#'))} component="a">
-                        <FileText className={classes.iconDashboard} size={20} />
+                        <FileText className={classes.icon} size={20} />
                         <ListItemText>Channels</ListItemText>
                     </ListItem>
                 </Link>
@@ -151,21 +72,21 @@ function ResponsiveDrawer() {
             <List>
                 <Link href="/docs" passHref >
                     <ListItem button className={clsx(classes.navLink, isActive('/docs'))} component="a">
-                        <GitMerge className={classes.iconDashboard} size={20} />
+                        <GitMerge className={classes.icon} size={20} />
                         <ListItemText>Integration APIs</ListItemText>
                     </ListItem>
                 </Link>
 
                 <Link href="/files" passHref >
                     <ListItem button className={clsx(classes.navLink, isActive('/files'))} component="a">
-                        <MessageSquare className={classes.iconDashboard} size={20} />
+                        <MessageSquare className={classes.icon} size={20} />
                         <ListItemText>Data Messaging</ListItemText>
                     </ListItem>
                 </Link>
 
                 <Link href="#" passHref>
                     <ListItem button className={clsx(classes.navLink, isActive('#'))} component="a">
-                        <Mail className={classes.iconDashboard} size={20} />
+                        <Mail className={classes.icon} size={20} />
                         <ListItemText>Large Data Messaging</ListItemText>
                     </ListItem>
                 </Link>
@@ -230,14 +151,9 @@ function ResponsiveDrawer() {
             </nav>
             <div className={classes.content}>
                 <Box sx={theme.mixins.toolbar} />
-                {/* <VisibleItemList /> */}
             </div>
         </div>
     );
 }
-ResponsiveDrawer.propTypes = {
-    // Injected by the documentation to work in an iframe.
-    // You won't need it on your project.
-    container: PropTypes.object
-};
-export default ResponsiveDrawer;
+
+export default Sidebar;

@@ -1,10 +1,8 @@
 import { useEffect } from 'react'
 import Head from 'next/head'
 import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
-import ResponsiveHeader from '../components/ResponsiveHeader/ResponsiveHeader'
 import { NavigateNext } from '@mui/icons-material'
 import { Home as HomeIcon } from 'react-feather'
-import Link from 'next/link'
 import { ErrorBodySerialized, ErrorCode, Option, Result, serializeError, Storage } from '../utils'
 import Swal from 'sweetalert2'
 import { makeStyles } from 'tss-react/mui';
@@ -64,8 +62,6 @@ export default function Index({ health, state, auth }: InferGetServerSidePropsTy
         <link rel="icon" href="/favicon.ico"/>
       </Head>
       <main>
-        <ResponsiveHeader />
-
         <Container maxWidth="lg">
           <section className={classes.connectionStatus}>
             <Typography variant="h5" className={classes.pageTitle}>Gateway Settings</Typography>

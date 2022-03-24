@@ -4,7 +4,6 @@ import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'nex
 import { makeStyles } from 'tss-react/mui'
 import { Container } from '@mui/material'
 import { ApplicationContainer } from '../../components/Applications/ApplicationsContainer'
-import ResponsiveHeader from '../../components/ResponsiveHeader/ResponsiveHeader'
 import { isAuthorized } from '../../services/auth.service'
 import { refreshState } from '../../services/identity.service'
 import { ErrorCode, Result, serializeError, Option, ErrorBodySerialized, Storage } from '../../utils'
@@ -94,7 +93,6 @@ export default function ListApplications({ state, auth }:
                 <link rel="icon" href="/favicon.ico" />
             </Head>
             <main>
-                <ResponsiveHeader />
                 <Container maxWidth="lg">
                     <section className={classes.table}>
                         {applications ? <ApplicationContainer auth={auth.some} applications={applications} /> : null}
@@ -160,3 +158,4 @@ const useStyles = makeStyles()((theme) => ({
         color: theme.palette.secondary.main
     }
 }))
+
