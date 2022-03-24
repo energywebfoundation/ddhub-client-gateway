@@ -1,24 +1,15 @@
-import Sidebar from "../Sidebar/Sidebar";
-import { makeStyles } from '@material-ui/core/styles';
+import Sidebar from '../Sidebar/Sidebar';
+import { useStyles } from './Layout.styles';
 
-/* eslint-disable-next-line */
 export interface LayoutProps {
-  children
+  children: React.ReactNode;
 }
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    display: 'flex',
-  },
-  content: {
-    flexGrow: 1
-  },
-}));
 export function Layout(props: LayoutProps) {
-  const classes = useStyles();
+  const {classes} = useStyles();
   return (
     <div className={classes.root}>
-      <Sidebar />
+      <Sidebar/>
       <div className={classes.content}>
         {props.children}
       </div>
