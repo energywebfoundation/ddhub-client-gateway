@@ -1,10 +1,17 @@
 import { useState, useEffect } from 'react'
-import { makeStyles } from '@material-ui/styles'
-import { Typography, Button, Theme, Grid, MenuItem, FormControl, Select } from '@material-ui/core'
-import { Info } from '@material-ui/icons'
-import { CustomInput } from '../CustomInput/CustomInput'
-import swal from 'sweetalert'
-import { Channel, Topic } from '../../utils'
+import { makeStyles } from 'tss-react/mui';
+import {
+  Button,
+  FormControl,
+  Grid,
+  MenuItem,
+  Select,
+  Typography,
+} from '@mui/material';
+import { Info } from '@mui/icons-material';
+import { CustomInput } from '../CustomInput/CustomInput';
+import Swal from 'sweetalert2';
+import { Channel, Topic } from '../../utils';
 
 type UploadProps = {
   channels?: Channel[]
@@ -13,7 +20,7 @@ type UploadProps = {
 }
 
 export const Upload = ({ channels, topics, onUpload }: UploadProps) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const [file, setFile] = useState<File>()
   const [fileName, setFileName] = useState('')
@@ -105,20 +112,20 @@ export const Upload = ({ channels, topics, onUpload }: UploadProps) => {
                 fullWidth
                 onClick={() => {
                   if (!channelName) {
-                    return swal('Error', 'Please enter channel name', 'error')
+                    return Swal.fire('Error', 'Please enter channel name', 'error')
                   }
                   if (!topicName) {
-                    return swal('Error', 'Please enter topic name', 'error')
+                    return Swal.fire('Error', 'Please enter topic name', 'error')
                   }
                   if (!file) {
-                    return swal('Error', 'No file uploaded', 'error')
+                    return Swal.fire('Error', 'No file uploaded', 'error')
                   }
 
 
                   const selectedTopic = topics?.find((topic) => topic.namespace === topicName)
 
                   if (!selectedTopic) {
-                    return swal('Error', 'No topic id for the selected topic', 'error')
+                    return Swal.fire('Error', 'No topic id for the selected topic', 'error')
                   }
 
                   onUpload(file, channelName, selectedTopic)
@@ -134,7 +141,7 @@ export const Upload = ({ channels, topics, onUpload }: UploadProps) => {
   )
 }
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles()((theme) => ({
   upload: {
     border: '1px solid #fff',
     padding: theme.spacing(6),

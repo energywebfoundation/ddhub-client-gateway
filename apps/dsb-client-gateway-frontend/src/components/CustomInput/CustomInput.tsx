@@ -1,12 +1,13 @@
-import { alpha, InputBase, Theme, withStyles } from '@material-ui/core'
-export const CustomInput = withStyles((theme: Theme) => ({
-  root: {
-    'label + &': {
-      marginTop: theme.spacing(3)
-    }
+import { alpha } from '@mui/material';
+import { styled } from '@mui/material/styles';
+import InputBase from '@mui/material/InputBase';
+
+export const CustomInput = styled(InputBase)(({theme}) => ({
+  'label + &': {
+    marginTop: theme.spacing(3)
   },
-  input: {
-    borderRadius: 5,
+  '& .MuiInputBase-input': {
+    borderRadius: 4,
     position: 'relative',
     backgroundColor: theme.palette.background.default,
     border: `1px solid ${theme.palette.background.paper}`,
@@ -19,4 +20,4 @@ export const CustomInput = withStyles((theme: Theme) => ({
       borderColor: theme.palette.primary.main
     }
   }
-}))(InputBase)
+}));

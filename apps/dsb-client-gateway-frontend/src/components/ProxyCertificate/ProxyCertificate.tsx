@@ -1,9 +1,11 @@
 import { useState } from 'react'
-import { Button, makeStyles, Theme, Tooltip, Typography } from '@material-ui/core'
-import InfoIcon from '@material-ui/icons/Info'
-import swal from 'sweetalert'
+import { Button, Tooltip, Typography } from '@mui/material'
+import { makeStyles } from 'tss-react/mui';
+import Swal from 'sweetalert2';
 import { CustomInput } from '../CustomInput/CustomInput'
 import { CertificateFiles } from '../../utils'
+import InfoIcon from '@mui/icons-material/Info';
+
 type ProxyCertificateProps = {
   certificate?: CertificateFiles
   isLoading: boolean
@@ -14,7 +16,7 @@ export const ProxyCertificate = ({
   isLoading,
   onSubmit
 }: ProxyCertificateProps) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
   const [cert, setCert] = useState<File>()
   const [privateKey, setPrivateKey] = useState<File>()
   const [ca, setCa] = useState<File>()
@@ -102,7 +104,7 @@ export const ProxyCertificate = ({
           disabled={isLoading}
           onClick={() => {
             if (!cert || !privateKey) {
-              return swal('Error', 'Public certificate and private key are required.')
+              return Swal.fire('Error', 'Public certificate and private key are required.')
             }
             onSubmit(cert, privateKey, ca)
           }}
@@ -114,7 +116,7 @@ export const ProxyCertificate = ({
   )
 }
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles()((theme) => ({
   credentials: {
     borderRadius: '6px',
     background: theme.palette.primary.dark,

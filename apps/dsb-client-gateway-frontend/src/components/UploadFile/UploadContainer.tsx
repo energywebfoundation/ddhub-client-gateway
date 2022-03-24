@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Upload } from './Upload';
 import axios from 'axios';
-import swal from '@sweetalert/with-react';
+import Swal from 'sweetalert2'
 import { Channel, Topic } from '../../utils';
 
 axios.defaults.baseURL = process.env.NEXT_PUBLIC_SERVER_BASE_URL + '/api';
@@ -38,12 +38,12 @@ export const UploadContainer = ({
         },
       });
 
-      swal(`Successful`, `File uploaded succesfully`, 'success');
+      Swal.fire(`Successful`, `File uploaded succesfully`, 'success');
     } catch (err) {
       if (axios.isAxiosError(err)) {
-        swal('Error', err.response?.data?.err?.reason, 'error');
+        Swal.fire('Error', err.response?.data?.err?.reason, 'error');
       } else {
-        swal('Error', `Could not set identity: ${err}`, 'error');
+        Swal.fire('Error', `Could not set identity: ${err}`, 'error');
       }
       setIsLoading(false);
     }

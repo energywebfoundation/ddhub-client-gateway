@@ -1,9 +1,9 @@
 import Head from 'next/head'
 import Link from 'next/link'
 import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
-import { makeStyles } from '@material-ui/styles'
-import { Typography, Container, Divider, Theme, Button } from '@material-ui/core'
-import swal from '@sweetalert/with-react'
+import { makeStyles } from 'tss-react/mui'
+import { Typography, Container, Divider, Button } from '@mui/material'
+import Swal from 'sweetalert2';
 import ResponsiveHeader from '../../components/ResponsiveHeader/ResponsiveHeader'
 import { DsbApiService } from '../../services/dsb-api.service'
 import { isAuthorized } from '../../services/auth.service'
@@ -11,11 +11,10 @@ import { Channel, ErrorBodySerialized, ErrorCode, Option, Result, serializeError
 import { useEffect } from 'react'
 import { useState } from 'react'
 import { ChannelContainer } from '../../components/Channels/ChannelsContainer'
-import { Breadcrumbs } from '@material-ui/core'
+import { Breadcrumbs } from '@mui/material'
 import { Home } from 'react-feather'
-import { NavigateNext } from '@material-ui/icons'
+import { NavigateNext } from '@mui/icons-material'
 import { getEnrolment } from '../../services/storage.service'
-// import Link from '@material-ui/core/Link'
 
 type Props = {
   health: Result<boolean, ErrorBodySerialized>
@@ -62,11 +61,11 @@ export default function Documentation({
   channels,
   did
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  const classes = useStyles()
+  const { classes } = useStyles()
   const [channelErrorText, setChannelErrorText] = useState<string>()
   useEffect(() => {
     if (channels.err) {
-      swal('Error', channels.err.reason, 'error')
+      Swal.fire('Error', channels.err.reason, 'error')
       setChannelErrorText('Error retrieving channels. Make sure your gateway is enroled first.')
     } else {
       const count = channels.ok?.length ?? 0
@@ -134,7 +133,7 @@ export default function Documentation({
     </div>
   )
 }
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles()((theme) => ({
   connectionStatus: {
     display: 'flex',
     alignItems: 'center',

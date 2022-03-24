@@ -24,7 +24,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-node@v2-beta
         with:
-          node-version: '14'
+          node-version: '16.10.0'
       - name: Setup app dependencies
         uses: actions/setup-node@v1
         with:
@@ -57,7 +57,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-node@v2-beta
         with:
-          node-version: '14'
+          node-version: '16.10.0'
       - name: Setup app dependencies
         uses: actions/setup-node@v1
         with:

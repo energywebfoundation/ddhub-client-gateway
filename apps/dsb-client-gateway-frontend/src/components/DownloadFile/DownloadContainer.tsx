@@ -2,7 +2,7 @@ import { Download } from './Download';
 import { Channel, UnknownError } from '../../utils';
 import { useState } from 'react';
 import axios from 'axios';
-import swal from '@sweetalert/with-react';
+import Swal from 'sweetalert2'
 import { captureException } from '@sentry/nextjs';
 
 type DownloadContainerProps = {
@@ -49,7 +49,7 @@ export const DownloadContainer = ({
       let payload;
 
       if (res.data && Array.isArray(res.data) && res.data.length === 0) {
-        return swal('Info', `No recent messages to download`, 'info');
+        return Swal.fire('Info', `No recent messages to download`, 'info');
       }
 
       try {
@@ -89,14 +89,14 @@ export const DownloadContainer = ({
       tempLink.setAttribute('download', fileName);
       tempLink.click();
 
-      swal(`Success`, `File downloaded Succesfully`, 'success');
+      Swal.fire(`Success`, `File downloaded Succesfully`, 'success');
     } catch (err) {
       if (axios.isAxiosError(err)) {
-        swal('Error', err.response?.data?.err?.reason, 'error');
+        Swal.fire('Error', err.response?.data?.err?.reason, 'error');
       } else {
         const error = new UnknownError(err);
         captureException(error);
-        swal('Error', `${new UnknownError(err).body}`, 'error');
+        Swal.fire('Error', `${new UnknownError(err).body}`, 'error');
       }
       setIsLoading(false);
     }

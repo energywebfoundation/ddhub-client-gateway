@@ -1,13 +1,13 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { makeStyles } from '@material-ui/styles'
-import { AppBar, Toolbar, Typography, Theme } from '@material-ui/core'
+import { makeStyles } from 'tss-react/mui';
+import { AppBar, Toolbar, Typography } from '@mui/material'
 import { useRouter } from 'next/router'
 import clsx from 'clsx'
 import logo from '../../../public/ew-flex-single-logo.png'
 
 export default function Header() {
-  const classes = useStyles()
+  const { classes } = useStyles()
   const router = useRouter()
 
   const isActive = (pathname: string) => (router.pathname === pathname ? classes.active : '')
@@ -48,7 +48,7 @@ export default function Header() {
   )
 }
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles()((theme) => ({
   appBar: {
     background: '#000',
     '& *': {
