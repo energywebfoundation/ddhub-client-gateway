@@ -1,4 +1,5 @@
 import { makeStyles } from 'tss-react/mui';
+import {alpha} from '@mui/material/styles';
 
 const drawerWidth = 264;
 
@@ -45,7 +46,7 @@ export const useStyles = makeStyles()(theme => ({
     }
   },
   active: {
-    color: "#ffffff",
+    color: theme.palette.text.secondary,
     background: theme.palette.primary.main,
     borderRadius: '4px',
     '&:hover': {
@@ -66,7 +67,7 @@ export const useStyles = makeStyles()(theme => ({
   },
 
   dividerColor: {
-    backgroundColor: "rgb(255 255 255 / 20%)",
+    backgroundColor: alpha(theme.palette.text.secondary, 0.2),
     margin: "15px 0px"
   },
 
