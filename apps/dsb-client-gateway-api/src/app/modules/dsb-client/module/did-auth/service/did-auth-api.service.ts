@@ -7,7 +7,7 @@ import { lastValueFrom } from 'rxjs';
 export class DidAuthApiService {
   private readonly logger = new Logger(DidAuthApiService.name);
 
-  constructor(protected readonly httpService: HttpService) { }
+  constructor(protected readonly httpService: HttpService) {}
 
   public async login(identityToken: string): Promise<DidAuthResponse> {
     const { data } = await lastValueFrom(

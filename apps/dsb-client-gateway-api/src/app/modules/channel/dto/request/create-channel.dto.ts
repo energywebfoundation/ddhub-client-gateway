@@ -82,12 +82,17 @@ export class CreateChannelDto {
     type: String,
     example: 'channel.name',
   })
-  channelName: string;
+  fqcn: string;
 
   @IsEnum(ChannelType)
   @ApiProperty({
     description: 'Channel type',
-    enum: [ChannelType.SUB, ChannelType.PUB],
+    enum: [
+      ChannelType.SUB,
+      ChannelType.PUB,
+      ChannelType.DOWNLOAD,
+      ChannelType.UPLOAD,
+    ],
     example: 'sub',
   })
   type: ChannelType;

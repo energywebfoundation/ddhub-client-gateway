@@ -1,4 +1,5 @@
 import { ChannelType } from '../channel.const';
+import { TopicVersion } from '../../dsb-client/dsb-client.interface';
 
 export class ChannelTopic {
   topicName: string;
@@ -10,10 +11,12 @@ export class ChannelConditions {
   dids: string[];
   roles: string[];
   topics: ChannelTopic[];
+  topicsVersions: { [topicId: string]: TopicVersion[] };
+  realDids: string[];
 }
 
 export class ChannelEntity {
-  channelName: string;
+  fqcn: string;
   type: ChannelType;
   conditions: ChannelConditions;
   createdAt: string;

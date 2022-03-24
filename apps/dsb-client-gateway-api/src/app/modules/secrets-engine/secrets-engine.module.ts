@@ -12,7 +12,7 @@ import { StorageModule } from '../storage/storage.module';
   providers: [
     {
       provide: SecretsEngineService,
-      useFactory: (configService: ConfigService) => {
+      useFactory: async (configService: ConfigService) => {
         const secretsEngine = configService.get('SECRETS_ENGINE');
 
         if (!secretsEngine) {

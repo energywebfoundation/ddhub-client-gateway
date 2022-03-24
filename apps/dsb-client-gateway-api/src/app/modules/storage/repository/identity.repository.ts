@@ -35,7 +35,7 @@ export class IdentityRepository extends AbstractLokiRepository {
     );
   }
 
-  public writeIdentity(identity: Identity): void {
+  public async writeIdentity(identity: Identity): Promise<void> {
     this.createCollectionIfNotExists(this.collection);
 
     this.removeIdentity();
@@ -43,6 +43,8 @@ export class IdentityRepository extends AbstractLokiRepository {
     this.client.getCollection(this.collection).insert({
       value: identity,
     });
+
+    await this.lokiService.save();
 
     this.logger.log('Stored identity');
   }

@@ -2,8 +2,9 @@ import { useEffect } from 'react'
 import Head from 'next/head'
 import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
 import ResponsiveHeader from '../components/ResponsiveHeader/ResponsiveHeader'
-import { Home } from 'react-feather'
 import { NavigateNext } from '@mui/icons-material'
+import { Home as HomeIcon } from 'react-feather'
+import Link from 'next/link'
 import { ErrorBodySerialized, ErrorCode, Option, Result, serializeError, Storage } from '../utils'
 import swal from '@sweetalert/with-react';
 import { makeStyles } from 'tss-react/mui';
@@ -70,7 +71,7 @@ export default function Index({ health, state, auth }: InferGetServerSidePropsTy
             <Typography variant="h5" className={classes.pageTitle}>Gateway Settings</Typography>
             <Typography variant="h5">|</Typography>
             <Breadcrumbs separator={<NavigateNext fontSize="small" />} aria-label="breadcrumb" className={classes.breadCrumbs}>
-              <Home color='#A466FF' size={15} />
+              <HomeIcon color='#A466FF' size={15} />
               <Typography color="primary">Gateway Settings</Typography>
             </Breadcrumbs>
           </section>
