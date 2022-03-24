@@ -10,7 +10,7 @@ import { CssBaseline } from '@mui/material';
 import createCache from "@emotion/cache";
 import '../styles/globals.css';
 import 'nprogress/nprogress.css';
-import Layout from '../components/Layout/Layout';
+import { Layout } from '../components/Layout';
 
 Axios.defaults.baseURL = process.env.NEXT_PUBLIC_SERVER_BASE_URL + '/api';
 
