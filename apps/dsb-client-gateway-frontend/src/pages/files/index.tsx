@@ -60,15 +60,15 @@ export default function FileUpload({ health, channels, topics, auth }:
   const { classes } = useStyles()
   useEffect(() => {
     if (health.err) {
-      return Swal.fire('Error', health.err.reason, 'error')
+      Swal.fire('Error', health.err.reason, 'error')
     }
     if (channels.err) {
       console.log('channels.err', channels.err)
-      return Swal.fire('Error', channels.err.reason, 'error')
+      Swal.fire('Error', channels.err.reason, 'error')
     }
     if (topics.err) {
       console.log('channels.err', channels.err)
-      return Swal.fire('Error', topics.err.reason, 'error')
+      Swal.fire('Error', topics.err.reason, 'error')
     }
   }, [health, channels, topics])
   return (
