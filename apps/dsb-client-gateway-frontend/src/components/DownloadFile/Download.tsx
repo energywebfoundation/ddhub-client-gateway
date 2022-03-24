@@ -4,7 +4,7 @@ import { Typography, Button, Grid, MenuItem, FormControl, Select } from '@mui/ma
 import { Info } from '@mui/icons-material'
 import { CustomInput } from '../../components/CustomInput/CustomInput'
 import { Channel } from '../../utils'
-import swal from 'sweetalert'
+import Swal from 'sweetalert2'
 type DownloadProps = {
   channels: Channel[] | undefined,
   onDownload: (fqcn: string, amount: number, clientId?: string) => void
@@ -46,7 +46,7 @@ export const Download = ({ channels, onDownload }: DownloadProps,) => {
               <Button variant="contained" color="primary" fullWidth
                 onClick={() => {
                   if (!channelName) {
-                    return swal('Error', 'Please enter channel name', 'error')
+                    return Swal.fire('Error', 'Please enter channel name', 'error')
                   }
                   onDownload(channelName, 1)
                 }}

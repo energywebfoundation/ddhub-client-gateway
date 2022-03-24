@@ -10,8 +10,7 @@ import { makeStyles } from 'tss-react/mui'
 import JSONInput from 'react-json-editor-ajrm'
 import locale from 'react-json-editor-ajrm/locale/en'
 import { Topic as TopicType } from '../../utils'
-import swal from '@sweetalert/with-react'
-
+import Swal from 'sweetalert2';
 
 type Props = {
     data?: {
@@ -193,22 +192,22 @@ export default function SimpleDialog(props: Props) {
                                 onClick={() => {
 
                                     if (!topicName) {
-                                        return swal('Error', 'Please enter topic name', 'error')
+                                        return Swal.fire('Error', 'Please enter topic name', 'error')
                                     }
                                     if (!version) {
-                                        return swal('Error', 'Please enter version', 'error')
+                                        return Swal.fire('Error', 'Please enter version', 'error')
                                     }
 
                                     if (!schemaType) {
-                                        return swal('Error', 'Please enter schema type', 'error')
+                                        return Swal.fire('Error', 'Please enter schema type', 'error')
                                     }
 
                                     if (!tags || tags.length === 0) {
-                                        return swal('Error', 'Please enter tags', 'error')
+                                        return Swal.fire('Error', 'Please enter tags', 'error')
                                     }
 
                                     if (!jsonSchema) {
-                                        return swal('Error', 'Please enter Json Schema', 'error')
+                                        return Swal.fire('Error', 'Please enter Json Schema', 'error')
                                     }
 
                                     const topicData = {

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import swal from '@sweetalert/with-react';
+import Swal from 'sweetalert2'
 import axios from 'axios';
 import { ProxyCertificate } from './ProxyCertificate';
 import { CertificateFiles } from '../../utils';
@@ -32,12 +32,12 @@ export const ProxyCertificateContainer = ({
           'content-type': 'multipart/form-data',
         },
       });
-      swal('Success', 'Certificate saved', 'success');
+      Swal.fire('Success', 'Certificate saved', 'success');
     } catch (err) {
       if (axios.isAxiosError(err)) {
-        swal('Error', err.response?.data?.err?.reason, 'error');
+        Swal.fire('Error', err.response?.data?.err?.reason, 'error');
       } else {
-        swal('Error', `Could not set identity: ${err}`, 'error');
+        Swal.fire('Error', `Could not set identity: ${err}`, 'error');
       }
     }
     setIsLoading(false);

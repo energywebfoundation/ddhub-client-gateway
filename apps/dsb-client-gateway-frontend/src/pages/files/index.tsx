@@ -3,7 +3,7 @@ import Head from 'next/head'
 import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
 import { makeStyles } from 'tss-react/mui';
 import { Container, Divider, Typography } from '@mui/material';
-import swal from '@sweetalert/with-react';
+import Swal from 'sweetalert2'
 import { UploadContainer } from '../../components/UploadFile/UploadContainer';
 import ResponsiveHeader from '../../components/ResponsiveHeader/ResponsiveHeader'
 
@@ -60,15 +60,15 @@ export default function FileUpload({ health, channels, topics, auth }:
   const { classes } = useStyles()
   useEffect(() => {
     if (health.err) {
-      return swal('Error', health.err.reason, 'error')
+      return Swal.fire('Error', health.err.reason, 'error')
     }
     if (channels.err) {
       console.log('channels.err', channels.err)
-      return swal('Error', channels.err.reason, 'error')
+      return Swal.fire('Error', channels.err.reason, 'error')
     }
     if (topics.err) {
       console.log('channels.err', channels.err)
-      return swal('Error', topics.err.reason, 'error')
+      return Swal.fire('Error', topics.err.reason, 'error')
     }
   }, [health, channels, topics])
   return (

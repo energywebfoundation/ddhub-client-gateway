@@ -3,7 +3,7 @@ import Link from 'next/link'
 import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
 import { makeStyles } from 'tss-react/mui'
 import { Typography, Container, Divider, Button } from '@mui/material'
-import swal from '@sweetalert/with-react'
+import Swal from 'sweetalert2';
 import ResponsiveHeader from '../../components/ResponsiveHeader/ResponsiveHeader'
 import { DsbApiService } from '../../services/dsb-api.service'
 import { isAuthorized } from '../../services/auth.service'
@@ -65,7 +65,7 @@ export default function Documentation({
   const [channelErrorText, setChannelErrorText] = useState<string>()
   useEffect(() => {
     if (channels.err) {
-      swal('Error', channels.err.reason, 'error')
+      Swal.fire('Error', channels.err.reason, 'error')
       setChannelErrorText('Error retrieving channels. Make sure your gateway is enroled first.')
     } else {
       const count = channels.ok?.length ?? 0

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import swal from 'sweetalert'
+import Swal from 'sweetalert2'
 import {
   Button,
   Tooltip,
@@ -114,7 +114,7 @@ export const GatewayIdentity = ({
           disabled={isLoading}
           onClick={() => {
             if (!privateKey) {
-              return swal('Error', 'No private key set', 'error')
+              return Swal.fire('Error', 'No private key set', 'error')
             }
             setPrivatekey('')
             onCreate(privateKey)

@@ -1,6 +1,6 @@
 import { Topic as TopicType } from '../../utils'
 import Topic from './Topics'
-import swal from '@sweetalert/with-react'
+import Swal from 'sweetalert2';
 import { useState } from 'react'
 import axios from 'axios'
 
@@ -31,12 +31,12 @@ export const TopicContainer = ({ applicationNameSpace, auth, topics, did }: Topi
             )
             console.log(res.data)
 
-            swal(`Success: `, `Topic Created Successfully`, 'success')
+            Swal.fire(`Success: `, `Topic Created Successfully`, 'success')
         } catch (err) {
             if (axios.isAxiosError(err)) {
-                swal('Error', err.response?.data?.err?.reason, 'error')
+                Swal.fire('Error', err.response?.data?.err?.reason, 'error')
             } else {
-                swal('Error', `Could not set identity: ${err}`, 'error')
+                Swal.fire('Error', `Could not set identity: ${err}`, 'error')
             }
             setIsLoading(false)
         }
@@ -59,12 +59,12 @@ export const TopicContainer = ({ applicationNameSpace, auth, topics, did }: Topi
             )
             console.log(res.data)
 
-            swal(`Success: `, `Topic Created Successfully`, 'success')
+            Swal.fire(`Success: `, `Topic Created Successfully`, 'success')
         } catch (err) {
             if (axios.isAxiosError(err)) {
-                swal('Error', err.response?.data?.err?.reason, 'error')
+                Swal.fire('Error', err.response?.data?.err?.reason, 'error')
             } else {
-                swal('Error', `Could not set identity: ${err}`, 'error')
+                Swal.fire('Error', `Could not set identity: ${err}`, 'error')
             }
             setIsLoading(false)
         }

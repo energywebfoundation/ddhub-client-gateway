@@ -6,7 +6,7 @@ import { NavigateNext } from '@mui/icons-material'
 import { Home as HomeIcon } from 'react-feather'
 import Link from 'next/link'
 import { ErrorBodySerialized, ErrorCode, Option, Result, serializeError, Storage } from '../utils'
-import swal from '@sweetalert/with-react';
+import Swal from 'sweetalert2'
 import { makeStyles } from 'tss-react/mui';
 import { Container, Breadcrumbs, Grid, Typography } from '@mui/material';
 import { GatewayIdentityContainer } from '../components/GatewayIdentity/GatewayIdentityContainer';
@@ -53,7 +53,7 @@ export default function Index({ health, state, auth }: InferGetServerSidePropsTy
   const { classes } = useStyles()
   useEffect(() => {
     if (health.err) {
-      swal('Error', health.err.reason, 'error')
+      Swal.fire('Error', health.err.reason, 'error')
     }
   }, [health, state])
   return (

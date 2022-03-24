@@ -10,7 +10,7 @@ import {
 } from '@mui/material';
 import { Info } from '@mui/icons-material';
 import { CustomInput } from '../CustomInput/CustomInput';
-import swal from 'sweetalert';
+import Swal from 'sweetalert2';
 import { Channel, Topic } from '../../utils';
 
 type UploadProps = {
@@ -112,20 +112,20 @@ export const Upload = ({ channels, topics, onUpload }: UploadProps) => {
                 fullWidth
                 onClick={() => {
                   if (!channelName) {
-                    return swal('Error', 'Please enter channel name', 'error')
+                    return Swal.fire('Error', 'Please enter channel name', 'error')
                   }
                   if (!topicName) {
-                    return swal('Error', 'Please enter topic name', 'error')
+                    return Swal.fire('Error', 'Please enter topic name', 'error')
                   }
                   if (!file) {
-                    return swal('Error', 'No file uploaded', 'error')
+                    return Swal.fire('Error', 'No file uploaded', 'error')
                   }
 
 
                   const selectedTopic = topics?.find((topic) => topic.namespace === topicName)
 
                   if (!selectedTopic) {
-                    return swal('Error', 'No topic id for the selected topic', 'error')
+                    return Swal.fire('Error', 'No topic id for the selected topic', 'error')
                   }
 
                   onUpload(file, channelName, selectedTopic)

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Button, Tooltip, Typography } from '@mui/material'
 import { makeStyles } from 'tss-react/mui';
-import swal from 'sweetalert'
+import Swal from 'sweetalert2';
 import { CustomInput } from '../CustomInput/CustomInput'
 import { CertificateFiles } from '../../utils'
 import InfoIcon from '@mui/icons-material/Info';
@@ -104,7 +104,7 @@ export const ProxyCertificate = ({
           disabled={isLoading}
           onClick={() => {
             if (!cert || !privateKey) {
-              return swal('Error', 'Public certificate and private key are required.')
+              return Swal.fire('Error', 'Public certificate and private key are required.')
             }
             onSubmit(cert, privateKey, ca)
           }}

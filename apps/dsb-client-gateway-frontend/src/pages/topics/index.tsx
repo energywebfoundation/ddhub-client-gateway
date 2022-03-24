@@ -3,7 +3,7 @@ import Head from 'next/head'
 import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
 import { makeStyles } from 'tss-react/mui'
 import { Container } from '@mui/material'
-import swal from '@sweetalert/with-react'
+import Swal from 'sweetalert2';
 import { TopicContainer } from '../../components/Topics/TopicsContainer'
 import ResponsiveHeader from '../../components/ResponsiveHeader/ResponsiveHeader'
 import { refreshState } from '../../services/identity.service'
@@ -80,7 +80,7 @@ export default function ListTopics({ owner, ownerDid, auth }:
             );
 
             if (topicsResponse.status !== 200) {
-                return swal('Error', topicsResponse.data.reason, 'error')
+                return Swal.fire('Error', topicsResponse.data.reason, 'error')
             }
 
             setTopics(topicsResponse.data.records)
@@ -96,7 +96,7 @@ export default function ListTopics({ owner, ownerDid, auth }:
             setHealth(healthResponse.data)
 
             if (healthResponse.status !== 200) {
-                return swal('Error', healthResponse.data.reason, 'error')
+                return Swal.fire('Error', healthResponse.data.reason, 'error')
             }
 
         }
