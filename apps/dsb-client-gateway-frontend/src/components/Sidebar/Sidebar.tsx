@@ -149,9 +149,6 @@ function Sidebar() {
                     </Drawer>
                 </Hidden>
             </nav>
-            <div className={classes.content}>
-                <Box sx={theme.mixins.toolbar} />
-            </div>
         </div>
     );
 }

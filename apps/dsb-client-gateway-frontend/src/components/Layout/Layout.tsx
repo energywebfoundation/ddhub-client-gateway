@@ -1,5 +1,6 @@
 import Sidebar from '../Sidebar/Sidebar';
 import { useStyles } from './Layout.styles';
+import Header from '../Header/Header';
 
 export interface LayoutProps {
   children: React.ReactNode;
@@ -11,6 +12,7 @@ export function Layout(props: LayoutProps) {
     <div className={classes.root}>
       <Sidebar/>
       <div className={classes.content}>
+        <Header />
         {props.children}
       </div>
     </div>
