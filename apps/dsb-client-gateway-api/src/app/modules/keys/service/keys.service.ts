@@ -41,6 +41,7 @@ export class KeysService implements OnModuleInit {
 
     if (!rootKey) {
       this.logger.log('Not deriving RSA key due to missing private key');
+      return;
     }
 
     const currentDate: number = +moment().format('YYYYMMDD');
