@@ -9,15 +9,15 @@ import { lastValueFrom } from 'rxjs';
 import {
   Channel,
   Message,
-  SendInetrnalMessageResponse,
-  SendInternalMessageRequestDTO,
   SendMessageData,
-  SendMessageResponse,
+  SendInternalMessageResponse,
   SendTopicBodyDTO,
   Topic,
   TopicDataResponse,
   TopicResultDTO,
   TopicVersionResponse,
+  SendInternalMessageRequestDTO,
+  SendMessageResponse,
 } from '../dsb-client.interface';
 import { SecretsEngineService } from '../../secrets-engine/secrets-engine.interface';
 
@@ -351,7 +351,7 @@ export class DsbApiService implements OnModuleInit {
     fqcn: string,
     clientGatewayMessageId: string,
     payload: string
-  ): Promise<SendInetrnalMessageResponse> {
+  ): Promise<SendInternalMessageResponse> {
     const requestData: SendInternalMessageRequestDTO = {
       fqcn,
       clientGatewayMessageId,

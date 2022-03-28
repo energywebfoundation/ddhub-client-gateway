@@ -1,11 +1,8 @@
-
-import { IAppDefinition } from '@energyweb/iam-contracts'
+import { IAppDefinition } from '@energyweb/iam-contracts';
 export interface Topic {
   namespace: string;
   schema: object | string;
 }
-
-
 
 export interface PaginatedData<T> {
   count: number;
@@ -23,69 +20,65 @@ export interface TopicVersion {
   schemaType: string;
   tags: string[];
   version: string;
-  topicId: string
+  topicId: string;
 }
 
 export type TopicVersionResponse = PaginatedData<TopicVersion>;
 
 export interface TopicData {
-
   id: string;
   name: string;
   owner: string;
   schema: object | string;
   schemaType: string;
-  tags: string[]
+  tags: string[];
   version: string;
 }
 
-
 export class ApplicationDTO implements IAppDefinition {
-  appName: string
-  logoUrl?: string
-  websiteUrl?: string
-  description?: string
-  namespace?: string
-  topicsCount?: number
+  appName: string;
+  logoUrl?: string;
+  websiteUrl?: string;
+  description?: string;
+  namespace?: string;
+  topicsCount?: number;
 }
 
 export interface ApplicationHeader {
-  id?: string
-  Header?: string
-  accessor: string
-  filter?: string
-  Cell?: any
+  id?: string;
+  Header?: string;
+  accessor: string;
+  filter?: string;
+  Cell?: any;
 }
 
 export type TopicResultDTO = {
-  id: string
-  name: string
-  schemaType: string
-  schema: string
-  version: string
-  owner: string,
-  tags: string[]
-}
-
+  id: string;
+  name: string;
+  schemaType: string;
+  schema: string;
+  version: string;
+  owner: string;
+  tags: string[];
+};
 
 export type GetTopicsOptions = {
-  limit?: number
-  name: string
-  owner: string
-  page?: number
-  tags?: string[]
-}
+  limit?: number;
+  name: string;
+  owner: string;
+  page?: number;
+  tags?: string[];
+};
 
 export type SendTopicBodyDTO = {
-  name: string
-  schemaType: string
-  schema: string
-  version: string
-  signature: string
-  owner: string
-  tags: string[]
-}
-
+  name: string;
+  schemaType: string;
+  schema: string;
+  version: string;
+  signature: string;
+  owner: string;
+  tags: string[];
+};
 
 export class ChannelDTO {
   fqcn: string;
@@ -116,49 +109,49 @@ export interface Channel {
 }
 
 export interface SendMessageData {
-  fqcns: string[]
-  payload: string
-  clientGatewayMessageId: string,
-  transactionId?: string
-  topicId: string
-  topicVersion: string
-  signature: string
+  fqcns: string[];
+  payload: string;
+  clientGatewayMessageId: string;
+  transactionId?: string;
+  topicId: string;
+  topicVersion: string;
+  signature: string;
 }
 export interface SendInternalMessageRequestDTO {
-  fqcn: string
-  clientGatewayMessageId: string
-  payload: string
+  fqcn: string;
+  clientGatewayMessageId: string;
+  payload: string;
 }
 
 export interface SendMessageSuccessResponse {
-  did: string
-  messageId: string
-  statusCode: number
+  did: string;
+  messageId: string;
+  statusCode: number;
   err: {
-    code: string
-    reason: string
-    additionalInformation: object
-  }
+    code: string;
+    reason: string;
+    additionalInformation: object;
+  };
 }
 export interface SendMessageFailedResponse {
-  did: string
-  messageId: string
-  statusCode: number
+  did: string;
+  messageId: string;
+  statusCode: number;
   err: {
-    code: string
-    reason: string
-    additionalInformation: object
-  }
+    code: string;
+    reason: string;
+    additionalInformation: object;
+  };
 }
 
-export interface SendInetrnalMessageResponse {
+export interface SendInternalMessageResponse {
   id: string;
 }
 export interface SendMessageResponse {
-  clientGatewayMessageId: string
-  did: string
-  success: SendMessageSuccessResponse[]
-  failed: SendMessageFailedResponse[]
+  clientGatewayMessageId: string;
+  did: string;
+  success: SendMessageSuccessResponse[];
+  failed: SendMessageFailedResponse[];
 }
 
 export interface SendMessageResult {
