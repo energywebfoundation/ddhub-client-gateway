@@ -346,7 +346,7 @@ export class DsbApiService implements OnModuleInit {
    *
    * @returns
    */
-  SendInternalMessageResponse;
+
   public async sendMessageInternal(
     fqcn: string,
     clientGatewayMessageId: string,
@@ -488,8 +488,6 @@ export class DsbApiService implements OnModuleInit {
   }
 
   protected async initExtChannel(): Promise<void> {
-    console.log(this.baseUrl + '/channel/initExtChannel');
-
     try {
       const { data } = await promiseRetry(async (retry, attempt) => {
         return lastValueFrom(

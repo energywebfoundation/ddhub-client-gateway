@@ -1,17 +1,30 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import {
+  Injectable,
+  NotImplementedException,
+  OnModuleInit,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { GetParameterCommand, ParameterType, PutParameterCommand, SSMClient } from '@aws-sdk/client-ssm';
-import { CertificateDetails, SecretsEngineService } from '../secrets-engine.interface';
+import {
+  GetParameterCommand,
+  ParameterType,
+  PutParameterCommand,
+  SSMClient,
+} from '@aws-sdk/client-ssm';
+import {
+  CertificateDetails,
+  SecretsEngineService,
+} from '../secrets-engine.interface';
 
 // @TODO - not fully implemented, needs testing
 @Injectable()
-export class AwsSsmService extends SecretsEngineService implements OnModuleInit {
+export class AwsSsmService
+  extends SecretsEngineService
+  implements OnModuleInit
+{
   protected client: SSMClient;
   protected readonly prefix: string;
 
-  constructor(
-    protected readonly configService: ConfigService,
-  ) {
+  constructor(protected readonly configService: ConfigService) {
     super();
     this.prefix = this.configService.get('AWS_SSM_PREFIX', '/dsb-gw/');
   }
@@ -20,6 +33,14 @@ export class AwsSsmService extends SecretsEngineService implements OnModuleInit 
     this.client = new SSMClient({
       region: this.configService.get('AWS_REGION'),
     });
+  }
+
+  getRSAPrivateKey(): Promise<string | null> {
+    throw new NotImplementedException();
+  }
+
+  setRSAPrivateKey(privateKey: string): Promise<void> {
+    throw new NotImplementedException();
   }
 
   public async getCertificateDetails(): Promise<CertificateDetails> {
@@ -35,20 +56,20 @@ export class AwsSsmService extends SecretsEngineService implements OnModuleInit 
       new GetParameterCommand({
         Name: `${this.prefix}/certificate/caCertificate`,
         WithDecryption: true,
-      })
+      }),
     ];
 
     const [privateKey, certificate, caCertificate] = await Promise.all([
       this.client.send(privateKeyCommand),
       this.client.send(certificateCommand),
-      this.client.send(caCertificateCommand)
+      this.client.send(caCertificateCommand),
     ]);
 
     return {
       privateKey: privateKey.Parameter.Value,
       certificate: certificate.Parameter.Value,
-      caCertificate: caCertificate.Parameter.Value
-    }
+      caCertificate: caCertificate.Parameter.Value,
+    };
   }
 
   getEncryptionKeys(): Promise<any> {
@@ -66,7 +87,11 @@ export class AwsSsmService extends SecretsEngineService implements OnModuleInit 
     return result.Parameter.Value;
   }
 
-  public async setCertificateDetails({ caCertificate, certificate, privateKey }: CertificateDetails): Promise<void> {
+  public async setCertificateDetails({
+    caCertificate,
+    certificate,
+    privateKey,
+  }: CertificateDetails): Promise<void> {
     const commands: PutParameterCommand[] = [
       new PutParameterCommand({
         Name: `${this.prefix}/certificate/privateKey`,
@@ -81,11 +106,13 @@ export class AwsSsmService extends SecretsEngineService implements OnModuleInit 
     ];
 
     if (caCertificate) {
-      commands.push(new PutParameterCommand({
-        Name: `${this.prefix}/certificate/caCertificate`,
-        Type: ParameterType.STRING,
-        Value: caCertificate,
-      }));
+      commands.push(
+        new PutParameterCommand({
+          Name: `${this.prefix}/certificate/caCertificate`,
+          Type: ParameterType.STRING,
+          Value: caCertificate,
+        })
+      );
     }
 
     await Promise.all(commands.map((command) => this.client.send(command)));

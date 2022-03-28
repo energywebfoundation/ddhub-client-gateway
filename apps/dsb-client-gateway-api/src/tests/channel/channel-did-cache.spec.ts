@@ -3,11 +3,16 @@ import { IamService } from '../../app/modules/iam-service/service/iam.service';
 import { ChannelService } from '../../app/modules/channel/service/channel.service';
 import { DsbApiService } from '../../app/modules/dsb-client/service/dsb-api.service';
 import { IdentityService } from '../../app/modules/identity/service/identity.service';
+import { TopicRepository } from '../../app/modules/channel/repository/topic.repository';
 
 jest.setTimeout(500000);
 
 const iamServiceMock = {
   isInitialized: jest.fn(),
+};
+
+const topicRepositoryMock = {
+  createOrUpdateTopic: jest.fn(),
 };
 
 const channelServiceMock = {
@@ -26,7 +31,7 @@ const identityServiceMock = {
 };
 
 const internalChannelMock = {
-  channelName: 'channel.name',
+  fqcn: 'channel.name',
   type: 'sub',
   conditions: {
     topics: [
@@ -81,7 +86,8 @@ describe('ChannelDidCacheService (SPEC)', () => {
       iamServiceMock as unknown as IamService,
       channelServiceMock as unknown as ChannelService,
       dsbApiServiceMock as unknown as DsbApiService,
-      identityServiceMock as unknown as IdentityService
+      identityServiceMock as unknown as IdentityService,
+      topicRepositoryMock as unknown as TopicRepository
     );
   });
 
@@ -191,7 +197,7 @@ describe('ChannelDidCacheService (SPEC)', () => {
 
       expect(channelServiceMock.updateChannelRealDids).toBeCalledTimes(1);
       expect(channelServiceMock.updateChannelRealDids).toBeCalledWith(
-        internalChannelMock.channelName,
+        internalChannelMock.fqcn,
         ['did:ethr:volta:0x3Ce3B60427b4Bf0Ce366d9963BeC5ef3CBD06ad5']
       );
     });

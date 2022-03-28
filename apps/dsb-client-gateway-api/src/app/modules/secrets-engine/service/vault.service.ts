@@ -11,6 +11,7 @@ enum PATHS {
   IDENTITY_PRIVATE_KEY = 'dsb/identity/privateKey',
   CERTIFICATE = 'dsb/certificate',
   KEYS = 'dsb/keys',
+  RSA_KEY = 'dsb/rsa_key',
 }
 
 @Injectable()
@@ -84,6 +85,35 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
     return this.client
       .read(PATHS.IDENTITY_PRIVATE_KEY)
       .then(({ data }) => data.key)
+      .catch((err) => {
+        this.logger.error(err.message);
+
+        this.logger.error(err);
+
+        return null;
+      });
+  }
+
+  public async setRSAPrivateKey(privateKey: string): Promise<void> {
+    this.logger.log('Attempting to write private RSA key');
+
+    await this.client.write(PATHS.RSA_KEY, { privateKey });
+
+    this.logger.log('Writing private RSA key');
+  }
+
+  public async getRSAPrivateKey(): Promise<string | null> {
+    this.logger.log('Retrieving private RSA key');
+
+    if (!this.client) {
+      this.logger.warn('Vault client not initialized');
+
+      return null;
+    }
+
+    return this.client
+      .read(PATHS.RSA_KEY)
+      .then(({ data }) => data.privateKey)
       .catch((err) => {
         this.logger.error(err.message);
 
