@@ -6,6 +6,8 @@ import { Wallet } from 'ethers';
 
 const secretsEngineServiceMock = {
   getPrivateKey: jest.fn(),
+  getRSAPrivateKey: jest.fn().mockImplementation(async () => 'key'),
+  setRSAPrivateKey: jest.fn(),
 };
 
 const iamServiceMock = {
@@ -78,9 +80,7 @@ describe('KeysService (SPEC)', () => {
         (Math.random() + 1).toString(36).substring(7);
 
       const rsaPassword = genRandomString();
-      const randomSymmetricKey = genRandomString();
-
-      const symmetricKey = (Math.random() + 1).toString(36).substring(7); // random string
+      const symmetricKey = genRandomString();
 
       const { privateKey, publicKey } = keysService.deriveRSAKey(rsaPassword);
 
@@ -101,8 +101,6 @@ describe('KeysService (SPEC)', () => {
         mockDid.id
       );
 
-      console.log(encryptedSymmetricKey);
-
       const decryptedSymmetricKey = keysService.decryptSymmetricKey(
         privateKey,
         encryptedSymmetricKey,
@@ -110,31 +108,6 @@ describe('KeysService (SPEC)', () => {
       );
 
       expect(symmetricKey).toEqual(decryptedSymmetricKey);
-    });
-  });
-
-  describe('deriveRSAKey', () => {
-    it('should create RSA Key', () => {
-      // This test actually checks if there is no collision between keys
-      const randomPrivateKey: string = Wallet.createRandom().privateKey;
-
-      secretsEngineServiceMock.getPrivateKey = jest
-        .fn()
-        .mockImplementation(async () => randomPrivateKey);
-
-      const derivedKey = keysService.getDerivedKey(randomPrivateKey);
-
-      const firstKey = keysService.deriveRSAKey(
-        derivedKey.privateKey.toString('hex')
-      );
-
-      const derivedSameKey = keysService.getDerivedKey(randomPrivateKey);
-
-      const secondKey = keysService.deriveRSAKey(
-        derivedSameKey.privateKey.toString('hex')
-      );
-
-      expect(firstKey).toEqual(secondKey);
     });
   });
 
@@ -214,6 +187,10 @@ describe('KeysService (SPEC)', () => {
       secretsEngineServiceMock.getPrivateKey = jest
         .fn()
         .mockImplementation(async () => randomPrivateKey);
+
+      secretsEngineServiceMock.getRSAPrivateKey = jest
+        .fn()
+        .mockImplementation(async () => null);
 
       await keysService.onModuleInit();
 

@@ -176,12 +176,17 @@ export class KeysService implements OnModuleInit {
     encryptedSymmetricKey: any,
     passphrase: string
   ): string {
+    const derivedPrivateKeyHash = crypto
+      .createHash('sha256')
+      .update(passphrase)
+      .digest('hex');
+
     return crypto
       .privateDecrypt(
         {
           key: privateKey,
           padding: this.rsaPadding,
-          passphrase: passphrase,
+          passphrase: derivedPrivateKeyHash,
         },
         Buffer.from(encryptedSymmetricKey, 'base64')
       )
@@ -206,28 +211,36 @@ export class KeysService implements OnModuleInit {
       return;
     }
 
-    const derivedKeyAtDay: HDKEY = this.getDerivedKey(rootKey);
+    const existingRSAKey: string | null =
+      await this.secretsEngineService.getRSAPrivateKey();
 
-    const { publicKey } = this.deriveRSAKey(
-      derivedKeyAtDay.publicKey.toString('hex')
-    );
+    if (existingRSAKey) {
+      this.logger.log('RSA key already generated');
+
+      return;
+    }
+
+    const { publicKey, privateKey } = this.deriveRSAKey(rootKey);
 
     await this.iamService.setVerificationMethod(
       publicKey,
       DIDPublicKeyTags.DSB_SYMMETRIC_ENCRYPTION
     );
 
+    await this.secretsEngineService.setRSAPrivateKey(privateKey);
+
     this.logger.log('Updated DID document with public key');
+    this.logger.debug(await this.iamService.getDid());
   }
 
   public deriveRSAKey(derivedKeyPrivateKey: string): {
     privateKey: string;
     publicKey: string;
   } {
-    // const derivedPrivateKeyHash = crypto
-    //   .createHash('sha256')
-    //   .update(derivedKeyPrivateKey)
-    //   .digest('hex');
+    const derivedPrivateKeyHash = crypto
+      .createHash('sha256')
+      .update(derivedKeyPrivateKey)
+      .digest('hex');
 
     const { publicKey, privateKey } = crypto.generateKeyPairSync('rsa', {
       modulusLength: 4096,
@@ -238,7 +251,7 @@ export class KeysService implements OnModuleInit {
       privateKeyEncoding: {
         type: 'pkcs1',
         format: 'pem',
-        passphrase: derivedKeyPrivateKey,
+        passphrase: derivedPrivateKeyHash,
         cipher: 'aes-256-cbc',
       },
     });

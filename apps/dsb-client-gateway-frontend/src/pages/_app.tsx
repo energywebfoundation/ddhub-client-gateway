@@ -10,6 +10,7 @@ import { CssBaseline } from '@mui/material';
 import createCache from "@emotion/cache";
 import '../styles/globals.css';
 import 'nprogress/nprogress.css';
+import { Layout } from '../components/Layout';
 
 Axios.defaults.baseURL = process.env.NEXT_PUBLIC_SERVER_BASE_URL + '/api';
 
@@ -41,7 +42,9 @@ function MyApp(props: MyAppProps) {
       </Head>
       <DDHubThemeProvider>
         <CssBaseline />
-        <Component {...pageProps} />
+        <Layout>
+          <Component {...pageProps} />
+        </Layout>
       </DDHubThemeProvider>
     </CacheProvider>
   );

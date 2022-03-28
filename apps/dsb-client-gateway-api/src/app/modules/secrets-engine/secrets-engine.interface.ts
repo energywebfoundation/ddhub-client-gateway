@@ -2,9 +2,11 @@ export abstract class SecretsEngineService {
   abstract setPrivateKey(privateKey: string): Promise<void>;
   abstract setCertificateDetails(details: CertificateDetails): Promise<void>;
   abstract setEncryptionKeys(keys: EncryptionKeys): Promise<void>;
+  abstract setRSAPrivateKey(privateKey: string): Promise<void>;
   abstract getPrivateKey(): Promise<string | null>;
   abstract getCertificateDetails(): Promise<CertificateDetails>;
   abstract getEncryptionKeys(): Promise<EncryptionKeys>;
+  abstract getRSAPrivateKey(): Promise<string | null>;
 }
 
 export interface CertificateDetails {
@@ -14,8 +16,8 @@ export interface CertificateDetails {
 }
 
 export interface EncryptionKeys {
-  createdAt,
-  privateDerivedKey,
-  publicMasterKey,
-  privateMasterKey
+  createdAt;
+  privateDerivedKey;
+  publicMasterKey;
+  privateMasterKey;
 }

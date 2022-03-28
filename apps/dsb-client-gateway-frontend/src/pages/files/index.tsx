@@ -5,7 +5,6 @@ import { makeStyles } from 'tss-react/mui';
 import { Container, Divider, Typography } from '@mui/material';
 import Swal from 'sweetalert2'
 import { UploadContainer } from '../../components/UploadFile/UploadContainer';
-import ResponsiveHeader from '../../components/ResponsiveHeader/ResponsiveHeader'
 
 import { DownloadContainer } from '../../components/DownloadFile/DownloadContainer'
 import { DsbApiService } from '../../services/dsb-api.service'
@@ -13,7 +12,6 @@ import { isAuthorized } from '../../services/auth.service'
 import { Breadcrumbs } from '@mui/material'
 import { Home } from 'react-feather'
 import { NavigateNext } from '@mui/icons-material'
-import Link from 'next/link'
 import { ErrorCode, Result, serializeError, Channel, Option, ErrorBodySerialized, Topic } from '../../utils'
 type Props = {
   health: Result<boolean, ErrorBodySerialized>
@@ -79,7 +77,6 @@ export default function FileUpload({ health, channels, topics, auth }:
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
-        <ResponsiveHeader />
         <Container maxWidth="lg">
           <section className={classes.connectionStatus}>
             <Typography variant="h5" className={classes.pageTitle}>Data Messaging</Typography>
@@ -148,3 +145,4 @@ const useStyles = makeStyles()((theme) => ({
     color: '#fff'
   }
 }))
+

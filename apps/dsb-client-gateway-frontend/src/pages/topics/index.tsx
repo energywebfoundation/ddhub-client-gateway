@@ -5,7 +5,6 @@ import { makeStyles } from 'tss-react/mui'
 import { Container } from '@mui/material'
 import Swal from 'sweetalert2';
 import { TopicContainer } from '../../components/Topics/TopicsContainer'
-import ResponsiveHeader from '../../components/ResponsiveHeader/ResponsiveHeader'
 import { refreshState } from '../../services/identity.service'
 import { isAuthorized } from '../../services/auth.service'
 import { ErrorCode, Option, Topic } from '../../utils'
@@ -113,7 +112,6 @@ export default function ListTopics({ owner, ownerDid, auth }:
             </Head>
 
             <main>
-                <ResponsiveHeader />
                 <Container maxWidth="lg">
                     <section className={classes.table}>
                         {topics ? <TopicContainer
