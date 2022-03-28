@@ -32,10 +32,19 @@ export class SendMessageBodyDto {
 
   @IsString()
   @IsNotEmpty()
-  public topic: string;
+  public topicName: string;
+
+  @IsString()
+  @IsNotEmpty()
+  public topicOwner: string;
+
+  @IsString()
+  @IsNotEmpty()
+  public transactionId: string;
 
   @IsNotEmpty()
   public payload: object;
+
 }
 
 export class GetMessagesQueryDto {

@@ -10,15 +10,17 @@ import {
   Channel,
   Message,
   SendMessageData,
-  SendMessageResult,
+  SendInetrnalMessageResponse,
   SendTopicBodyDTO,
   Topic,
   TopicDataResponse,
   TopicResultDTO,
   TopicVersionResponse,
+  SendInternalMessageRequestDTO,
+  SendMessageResponse
 } from '../dsb-client.interface';
 import { SecretsEngineService } from '../../secrets-engine/secrets-engine.interface';
-import { v4 as uuidv4 } from 'uuid';
+
 import promiseRetry from 'promise-retry';
 import FormData from 'form-data';
 import { EnrolmentRepository } from '../../storage/repository/enrolment.repository';
@@ -73,7 +75,7 @@ export class DsbApiService implements OnModuleInit {
           },
           httpsAgent: this.getTLS(),
           headers: {
-            Authorization: `Bearer ${this.didAuthService.getToken()}`,
+            Authorization: `Bearer ${this.didAuthService.getToken()}`
           },
         })
       ).catch((err) => this.handleRequestWithRetry(err, retry));
@@ -90,14 +92,11 @@ export class DsbApiService implements OnModuleInit {
         this.httpService.get(this.baseUrl + `/topics/${topicId}/version`, {
           httpsAgent: this.getTLS(),
           headers: {
-            Authorization: `Bearer ${this.didAuthService.getToken()}`,
+            Authorization: `Bearer ${this.didAuthService.getToken()}`
           },
         })
       ).catch((err) => this.handleRequestWithRetry(err, retry));
     });
-
-    console.log(data);
-
     return data;
   }
 
@@ -142,8 +141,7 @@ export class DsbApiService implements OnModuleInit {
 
       const { data } = await promiseRetry(async (retry, attempt) => {
         return lastValueFrom(
-          this.httpService.post(
-            'https://aemovc.eastus.cloudapp.azure.com/message/upload',
+          this.httpService.post(this.baseUrl + '/message/upload',
             formData,
             {
               maxContentLength: Infinity,
@@ -166,6 +164,7 @@ export class DsbApiService implements OnModuleInit {
     name: string,
     owner: string
   ): Promise<TopicDataResponse> {
+
     const { data } = await promiseRetry(async (retry, attempt) => {
       return lastValueFrom(
         this.httpService.get(this.baseUrl + '/topics', {
@@ -175,7 +174,7 @@ export class DsbApiService implements OnModuleInit {
           },
           httpsAgent: this.getTLS(),
           headers: {
-            Authorization: `Bearer ${this.didAuthService.getToken()}`,
+            Authorization: `Bearer ${this.didAuthService.getToken()}`
           },
         })
       ).catch((err) => this.handleRequestWithRetry(err, retry));
@@ -208,7 +207,7 @@ export class DsbApiService implements OnModuleInit {
           },
           httpsAgent: this.getTLS(),
           headers: {
-            Authorization: `Bearer ${this.didAuthService.getToken()}`,
+            Authorization: `Bearer ${this.didAuthService.getToken()}`
           },
         })
       ).catch((err) => this.handleRequestWithRetry(err, retry));
@@ -270,12 +269,14 @@ export class DsbApiService implements OnModuleInit {
   public async updateTopics(data: SendTopicBodyDTO): Promise<TopicResultDTO> {
     const result = await promiseRetry(async (retry, attempt) => {
       return lastValueFrom(
-        this.httpService.patch(this.baseUrl + '/topic', data, {
-          httpsAgent: this.getTLS(),
-          headers: {
-            Authorization: `Bearer ${this.didAuthService.getToken()}`,
-          },
-        })
+        this.httpService.patch(this.baseUrl + '/topics',
+          data,
+          {
+            httpsAgent: this.getTLS(),
+            headers: {
+              Authorization: `Bearer ${this.didAuthService.getToken()}`
+            },
+          })
       ).catch((err) => this.handleRequestWithRetry(err, retry));
     });
 
@@ -299,7 +300,7 @@ export class DsbApiService implements OnModuleInit {
               amount,
             },
             headers: {
-              Authorization: `Bearer ${this.didAuthService.getToken()}`,
+              Authorization: `Bearer ${this.didAuthService.getToken()}`
             },
           })
         ).catch((err) => this.handleRequestWithRetry(err, retry));
@@ -314,37 +315,73 @@ export class DsbApiService implements OnModuleInit {
   }
 
   public async sendMessage(
-    fqcn: string,
-    topic: string,
-    payload: object
-  ): Promise<SendMessageResult> {
-    const signature = 'asd';
-    const transactionId: string = uuidv4();
+    fqcns: string[],
+    payload: object,
+    topicId: string,
+    topicVersion: string,
+    signature: string,
+    clientGatewayMessageId: string,
+    transactionId?: string,
+
+  ): Promise<SendMessageResponse> {
 
     const messageData: SendMessageData = {
-      topic,
-      fqcn,
-      payload: JSON.stringify(payload),
+      fqcns,
       transactionId,
+      payload: JSON.stringify(payload),
+      topicId,
+      topicVersion,
       signature,
+      clientGatewayMessageId
     };
-
-    const requestData = this.translateIdempotencyKey(messageData, true);
 
     const { data } = await promiseRetry(async (retry, attempt) => {
       return lastValueFrom(
-        this.httpService.post(this.baseUrl + '/messages', requestData, {
+        this.httpService.post(this.baseUrl + '/messages', messageData, {
           httpsAgent: this.getTLS(),
           headers: {
-            Authorization: `Bearer ${this.didAuthService.getToken()}`,
+            Authorization: `Bearer ${this.didAuthService.getToken()}`
           },
         })
       ).catch((err) => this.handleRequestWithRetry(err, retry));
     });
 
-    return {
-      id: data,
+    return data
+
+  }
+
+
+  /**
+  * Sends a decryption ciphertext to each  qualified did
+  *
+  * @returns
+  */
+
+  public async sendMessageInternal(
+    fqcn: string,
+    clientGatewayMessageId: string,
+    payload: string
+  ): Promise<SendInetrnalMessageResponse> {
+
+    const requestData: SendInternalMessageRequestDTO = {
+      fqcn,
+      clientGatewayMessageId,
+      payload: JSON.stringify(payload)
     };
+
+    const { data } = await promiseRetry(async (retry, attempt) => {
+      return lastValueFrom(
+        this.httpService.post(this.baseUrl + '/messages/internal', requestData, {
+          httpsAgent: this.getTLS(),
+          headers: {
+            Authorization: `Bearer ${this.didAuthService.getToken()}`
+          },
+        })
+      ).catch((err) => this.handleRequestWithRetry(err, retry));
+    });
+
+    return data
+
   }
 
   protected async handleRequestWithRetry(e, retry): Promise<any> {
@@ -385,7 +422,7 @@ export class DsbApiService implements OnModuleInit {
         this.httpService.get(this.baseUrl + '/channel/pubsub', {
           httpsAgent: this.getTLS(),
           headers: {
-            Authorization: `Bearer ${this.didAuthService.getToken()}`,
+            Authorization: `Bearer ${this.didAuthService.getToken()}`
           },
         })
       ).catch((err) => this.handleRequestWithRetry(err, retry));
@@ -459,11 +496,14 @@ export class DsbApiService implements OnModuleInit {
   }
 
   protected async initExtChannel(): Promise<void> {
+
+    console.log(this.baseUrl + '/channel/initExtChannel')
+    
     try {
       const { data } = await promiseRetry(async (retry, attempt) => {
         return lastValueFrom(
           this.httpService.post(
-            'https://aemovc.eastus.cloudapp.azure.com/channel/initExtChannel',
+            this.baseUrl + '/channel/initExtChannel',
             {
               httpsAgent: this.getTLS(),
             },
@@ -490,7 +530,7 @@ export class DsbApiService implements OnModuleInit {
 
   protected getAuthHeader(): { Authorization: string } {
     return {
-      Authorization: `Bearer ${this.didAuthService.getToken()}`,
+      Authorization: `Bearer ${this.didAuthService.getToken()}`
     };
   }
 
