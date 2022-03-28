@@ -51,6 +51,13 @@ const dsbTheme: ThemeOptions = {
         },
       },
     },
+    MuiCard: {
+      styleOverrides: {
+        root: {
+          height: '100%'
+        }
+      }
+    }
   },
 }
 

@@ -10,9 +10,6 @@ import { Channel, ErrorBodySerialized, ErrorCode, Option, Result, serializeError
 import { useEffect } from 'react'
 import { useState } from 'react'
 import { ChannelContainer } from '../../components/Channels/ChannelsContainer'
-import { Breadcrumbs } from '@mui/material'
-import { Home } from 'react-feather'
-import { NavigateNext } from '@mui/icons-material'
 import { getEnrolment } from '../../services/storage.service'
 
 type Props = {
@@ -82,19 +79,6 @@ export default function Documentation({
       </Head>
       <main>
         <Container maxWidth="lg">
-          <section className={classes.connectionStatus}>
-            <Typography variant="h5" className={classes.pageTitle}>Integration APIs</Typography>
-            <Typography variant="h5">|</Typography>
-            {/* <Typography variant="caption" className={classes.connectionStatusPaper}>
-              {health.ok ? 'ONLINE' : `ERROR [${health.err?.code}]`}
-            </Typography> */}
-            <Breadcrumbs separator={<NavigateNext fontSize="small" />} aria-label="breadcrumb" className={classes.breadCrumbs}>
-              {/* <Link color="inherit" href="/"> */}
-              <Home color='#A466FF' size={15} />
-              {/* </Link> */}
-              <Typography color="primary">Integration APIs</Typography>
-            </Breadcrumbs>
-          </section>
           <Divider className={classes.divider} />
           <section className={classes.apiDocs}>
             <Typography variant="h5">API Documentation </Typography>

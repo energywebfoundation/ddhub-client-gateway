@@ -18,6 +18,7 @@ import { Home, Box as BoxIcon, FileText, Layers, MessageSquare, Mail, GitMerge }
 import { useRouter } from 'next/router'
 import { Divider } from '@mui/material';
 import { useStyles } from "./Sidebar.styles";
+import { routerConst } from '../../utils/router-const';
 
 function Sidebar() {
     const { classes, theme } = useStyles();
@@ -33,8 +34,8 @@ function Sidebar() {
     const drawer = (
         <div>
             <List>
-                <Link href="#" passHref >
-                    <ListItem button className={clsx(classes.navLink, isActive('#'))} component="a">
+                <Link href={routerConst.Dashboard} passHref >
+                    <ListItem button className={clsx(classes.navLink, isActive(routerConst.Dashboard))} component="a">
                         <Home className={classes.icon} size={20} />
                         <ListItemText>Dashboard</ListItemText>
                     </ListItem>
@@ -44,22 +45,22 @@ function Sidebar() {
 
             <Typography classes={{ root: classes.menuTitle }}>Admin</Typography>
             <List>
-                <Link href="/" passHref >
-                    <ListItem button className={clsx(classes.navLink, isActive('/'))} component="a">
+                <Link href={routerConst.GatewaySettings} passHref >
+                    <ListItem button className={clsx(classes.navLink, isActive(routerConst.GatewaySettings))} component="a">
                         <BoxIcon className={classes.icon} size={20} />
                         <ListItemText>Gateway Settings</ListItemText>
                     </ListItem>
                 </Link>
 
-                <Link href="/applications" passHref>
-                    <ListItem button className={clsx(classes.navLink, isActive('/applications'))} component="a">
+                <Link href={routerConst.AppsAndTopics} passHref>
+                    <ListItem button className={clsx(classes.navLink, isActive(routerConst.AppsAndTopics))} component="a">
                         <Layers className={classes.icon} size={20} />
                         <ListItemText>Apps and Topics</ListItemText>
                     </ListItem>
                 </Link>
 
-                <Link href="#" passHref>
-                    <ListItem button className={clsx(classes.navLink, isActive('#'))} component="a">
+                <Link href={routerConst.Channels} passHref>
+                    <ListItem button className={clsx(classes.navLink, isActive(routerConst.Channels))} component="a">
                         <FileText className={classes.icon} size={20} />
                         <ListItemText>Channels</ListItemText>
                     </ListItem>
@@ -70,8 +71,8 @@ function Sidebar() {
 
             <Typography classes={{ root: classes.menuTitle }}>Messaging</Typography>
             <List>
-                <Link href="/docs" passHref >
-                    <ListItem button className={clsx(classes.navLink, isActive('/docs'))} component="a">
+                <Link href={routerConst.IntegrationAPIs} passHref >
+                    <ListItem button className={clsx(classes.navLink, isActive(routerConst.IntegrationAPIs))} component="a">
                         <GitMerge className={classes.icon} size={20} />
                         <ListItemText>Integration APIs</ListItemText>
                     </ListItem>
