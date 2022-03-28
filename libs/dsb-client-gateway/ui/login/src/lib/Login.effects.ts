@@ -16,7 +16,6 @@ export const usePrivateKeyEffects = () => {
     const accountStatus = checkAccountStatus(res);
 
     setUserData({
-      loggedIn: false,
       accountStatus
     });
 
