@@ -23,6 +23,7 @@ export interface TopicVersion {
   schemaType: string;
   tags: string[];
   version: string;
+  topicId: string
 }
 
 export type TopicVersionResponse = PaginatedData<TopicVersion>;
@@ -115,11 +116,49 @@ export interface Channel {
 }
 
 export interface SendMessageData {
-  fqcn: string;
-  topic: string;
-  payload: string;
-  transactionId?: string;
-  signature: string;
+  fqcns: string[]
+  payload: string
+  clientGatewayMessageId: string,
+  transactionId?: string
+  topicId: string
+  topicVersion: string
+  signature: string
+}
+export interface SendInternalMessageRequestDTO {
+  fqcn: string
+  clientGatewayMessageId: string
+  payload: string
+}
+
+export interface SendMessageSuccessResponse {
+  did: string
+  messageId: string
+  statusCode: number
+  err: {
+    code: string
+    reason: string
+    additionalInformation: object
+  }
+}
+export interface SendMessageFailedResponse {
+  did: string
+  messageId: string
+  statusCode: number
+  err: {
+    code: string
+    reason: string
+    additionalInformation: object
+  }
+}
+
+export interface SendInetrnalMessageResponse {
+  id: string;
+}
+export interface SendMessageResponse {
+  clientGatewayMessageId: string
+  did: string
+  success: SendMessageSuccessResponse[]
+  failed: SendMessageFailedResponse[]
 }
 
 export interface SendMessageResult {
