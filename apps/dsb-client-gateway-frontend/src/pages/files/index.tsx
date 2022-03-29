@@ -1,74 +1,11 @@
-import { useEffect } from 'react'
-import Head from 'next/head'
-import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
+import Head from 'next/head';
 import { makeStyles } from 'tss-react/mui';
-import { Container, Divider, Typography } from '@mui/material';
-import Swal from 'sweetalert2'
-import { UploadContainer } from '../../components/UploadFile/UploadContainer';
+import { Breadcrumbs, Container, Divider, Typography } from '@mui/material';
+import { Home } from 'react-feather';
+import { NavigateNext } from '@mui/icons-material';
 
-import { DownloadContainer } from '../../components/DownloadFile/DownloadContainer'
-import { DsbApiService } from '../../services/dsb-api.service'
-import { isAuthorized } from '../../services/auth.service'
-import { Breadcrumbs } from '@mui/material'
-import { Home } from 'react-feather'
-import { NavigateNext } from '@mui/icons-material'
-import { ErrorCode, Result, serializeError, Channel, Option, ErrorBodySerialized, Topic } from '../../utils'
-type Props = {
-  health: Result<boolean, ErrorBodySerialized>
-  channels: Result<Channel[], ErrorBodySerialized>
-  topics: Result<Topic[], ErrorBodySerialized>
-  auth: Option<string>
-}
-export async function getServerSideProps(context: GetServerSidePropsContext): Promise<{
-  props: Props
-}> {
-  const authHeader = context.req.headers.authorization
-  const { err } = isAuthorized(authHeader)
-  if (!err) {
-    const health = await DsbApiService.init().getHealth()
-    const channels = await DsbApiService.init().getChannels()
-    const topics = await DsbApiService.init().getTopics()
-    return {
-      props: {
-        health: serializeError(health),
-        channels: serializeError(channels),
-        topics: serializeError(topics),
-        auth: authHeader ? { some: authHeader } : { none: true }
-      }
-    }
-  } else {
-    if (err.message === ErrorCode.UNAUTHORIZED) {
-      context.res.statusCode = 401
-      context.res.setHeader('WWW-Authenticate', 'Basic realm="Authorization Required"')
-    } else {
-      context.res.statusCode = 403
-    }
-    return {
-      props: {
-        health: {},
-        channels: {},
-        topics: {},
-        auth: { none: true }
-      }
-    }
-  }
-}
-export default function FileUpload({ health, channels, topics, auth }:
-  InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function FileUpload() {
   const { classes } = useStyles()
-  useEffect(() => {
-    if (health.err) {
-      Swal.fire('Error', health.err.reason, 'error')
-    }
-    if (channels.err) {
-      console.log('channels.err', channels.err)
-      Swal.fire('Error', channels.err.reason, 'error')
-    }
-    if (topics.err) {
-      console.log('channels.err', channels.err)
-      Swal.fire('Error', topics.err.reason, 'error')
-    }
-  }, [health, channels, topics])
   return (
     <div>
       <Head>
@@ -94,14 +31,14 @@ export default function FileUpload({ health, channels, topics, auth }:
             <Typography className={classes.textWhite} variant="h5">
               File Upload{' '}
             </Typography>
-            <UploadContainer auth={auth.some} channels={channels.ok} topics={topics.ok} />
+            {/*<UploadContainer auth={auth.some} channels={channels.ok} topics={topics.ok} />*/}
           </section>
           <Divider className={classes.divider} />
           <section className={classes.main}>
             <Typography className={classes.textWhite} variant="h5">
               File Download{' '}
             </Typography>
-            <DownloadContainer auth={auth.some} channels={channels.ok} />
+            {/*<DownloadContainer auth={auth.some} channels={channels.ok} />*/}
           </section>
         </Container>
       </main>

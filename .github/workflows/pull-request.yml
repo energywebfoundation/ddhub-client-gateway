@@ -81,5 +81,5 @@ jobs:
       - name: Install dependencies
         run: npm install
       - name: Build
-        run: nx build dsb-client-gateway-frontend\
+        run: nx export dsb-client-gateway-frontend
 
