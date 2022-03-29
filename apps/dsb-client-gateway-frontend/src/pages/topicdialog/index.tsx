@@ -1,17 +1,16 @@
 import * as React from 'react'
 import PropTypes from 'prop-types'
-import Button from '@material-ui/core/Button'
-import DialogTitle from '@material-ui/core/DialogTitle'
-import Dialog from '@material-ui/core/Dialog'
-import { Typography, Theme, Grid, Select, FormControl, MenuItem, TextField, Chip } from '@material-ui/core'
-import Autocomplete from '@material-ui/lab/Autocomplete'
+import Button from '@mui/material/Button'
+import DialogTitle from '@mui/material/DialogTitle'
+import Dialog from '@mui/material/Dialog'
+import { Typography, Grid, Select, FormControl, MenuItem, TextField, Chip } from '@mui/material'
+import Autocomplete from '@mui/lab/Autocomplete'
 import { CustomInput } from '../../components/CustomInput/CustomInput'
-import { makeStyles } from '@material-ui/styles'
+import { makeStyles } from 'tss-react/mui'
 import JSONInput from 'react-json-editor-ajrm'
 import locale from 'react-json-editor-ajrm/locale/en'
 import { Topic as TopicType } from '../../utils'
-import swal from '@sweetalert/with-react'
-
+import Swal from 'sweetalert2';
 
 type Props = {
     data?: {
@@ -45,7 +44,7 @@ export default function SimpleDialog(props: Props) {
     const [schemaType, setSchemaType] = React.useState(data?.schemaType || '')
 
 
-    const classes = useStyles()
+    const { classes } = useStyles()
 
     const handleClose = () => {
         onClose()
@@ -193,22 +192,22 @@ export default function SimpleDialog(props: Props) {
                                 onClick={() => {
 
                                     if (!topicName) {
-                                        return swal('Error', 'Please enter topic name', 'error')
+                                        return Swal.fire('Error', 'Please enter topic name', 'error')
                                     }
                                     if (!version) {
-                                        return swal('Error', 'Please enter version', 'error')
+                                        return Swal.fire('Error', 'Please enter version', 'error')
                                     }
 
                                     if (!schemaType) {
-                                        return swal('Error', 'Please enter schema type', 'error')
+                                        return Swal.fire('Error', 'Please enter schema type', 'error')
                                     }
 
                                     if (!tags || tags.length === 0) {
-                                        return swal('Error', 'Please enter tags', 'error')
+                                        return Swal.fire('Error', 'Please enter tags', 'error')
                                     }
 
                                     if (!jsonSchema) {
-                                        return swal('Error', 'Please enter Json Schema', 'error')
+                                        return Swal.fire('Error', 'Please enter Json Schema', 'error')
                                     }
 
                                     const topicData = {
@@ -241,7 +240,7 @@ SimpleDialog.propTypes = {
     open: PropTypes.bool.isRequired
 }
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles()((theme) => ({
 
     dialog: {
         // width: 800,

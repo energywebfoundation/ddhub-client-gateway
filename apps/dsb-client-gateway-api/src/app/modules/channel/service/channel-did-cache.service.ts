@@ -79,7 +79,7 @@ export class ChannelDidCacheService {
         );
 
         for (const topicVersion of topicVersions.records) {
-          await this.topicRepository.createOrUpdateTopic(topicVersion);
+          await this.topicRepository.createOrUpdateTopic(topicVersion, topicId);
         }
       }
     }

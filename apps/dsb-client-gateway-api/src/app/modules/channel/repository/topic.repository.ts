@@ -1,6 +1,7 @@
 import { AbstractLokiRepository } from '../../storage/repository/abstract-loki.repository';
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { LokiService } from '../../storage/service/loki.service';
+import { TopicVersionEntity } from '../channel.interface';
 import { TopicVersion } from '../../dsb-client/dsb-client.interface';
 
 @Injectable()
@@ -18,8 +19,11 @@ export class TopicRepository
     this.createCollectionIfNotExists(this.collection);
   }
 
-  public async createOrUpdateTopic(data: TopicVersion): Promise<void> {
-    const currentTopic: TopicVersion | null = this.getTopic(
+  public async createOrUpdateTopic(
+    data: TopicVersion,
+    topicId: string
+  ): Promise<void> {
+    const currentTopic: TopicVersionEntity | null = this.getTopic(
       data.name,
       data.owner,
       data.version
@@ -29,10 +33,11 @@ export class TopicRepository
       const newObject = {
         ...currentTopic,
         ...data,
+        topicId,
       };
 
       this.client
-        .getCollection<TopicVersion>(this.collection)
+        .getCollection<TopicVersionEntity>(this.collection)
         .update(newObject);
 
       await this.client.save();
@@ -40,7 +45,10 @@ export class TopicRepository
       return;
     }
 
-    this.client.getCollection<TopicVersion>(this.collection).insert(data);
+    this.client.getCollection<TopicVersionEntity>(this.collection).insert({
+      ...data,
+      topicId,
+    });
 
     await this.lokiService.save();
   }
@@ -49,11 +57,13 @@ export class TopicRepository
     name: string,
     owner: string,
     version: string
-  ): TopicVersion | null {
-    return this.client.getCollection<TopicVersion>(this.collection).findOne({
-      name,
-      owner,
-      version,
-    });
+  ): TopicVersionEntity | null {
+    return this.client
+      .getCollection<TopicVersionEntity>(this.collection)
+      .findOne({
+        name,
+        owner,
+        version,
+      });
   }
 }

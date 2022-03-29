@@ -1,77 +1,11 @@
-import { useEffect } from 'react'
-import Head from 'next/head'
-import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
-import { makeStyles } from '@material-ui/styles'
-import { Typography, Container, Divider, Theme } from '@material-ui/core'
-import swal from '@sweetalert/with-react'
-import { UploadContainer } from '../../components/UploadFile/UploadContainer'
+import Head from 'next/head';
+import { makeStyles } from 'tss-react/mui';
+import { Breadcrumbs, Container, Divider, Typography } from '@mui/material';
+import { Home } from 'react-feather';
+import { NavigateNext } from '@mui/icons-material';
 
-import ResponsiveHeader from '../../components/ResponsiveHeader/ResponsiveHeader'
-
-import { DownloadContainer } from '../../components/DownloadFile/DownloadContainer'
-import { DsbApiService } from '../../services/dsb-api.service'
-import { isAuthorized } from '../../services/auth.service'
-import { Breadcrumbs } from '@material-ui/core'
-import { Home } from 'react-feather'
-import { NavigateNext } from '@material-ui/icons'
-import Link from 'next/link'
-import { ErrorCode, Result, serializeError, Channel, Option, ErrorBodySerialized, Topic } from '../../utils'
-type Props = {
-  health: Result<boolean, ErrorBodySerialized>
-  channels: Result<Channel[], ErrorBodySerialized>
-  topics: Result<Topic[], ErrorBodySerialized>
-  auth: Option<string>
-}
-export async function getServerSideProps(context: GetServerSidePropsContext): Promise<{
-  props: Props
-}> {
-  const authHeader = context.req.headers.authorization
-  const { err } = isAuthorized(authHeader)
-  if (!err) {
-    const health = await DsbApiService.init().getHealth()
-    const channels = await DsbApiService.init().getChannels()
-    const topics = await DsbApiService.init().getTopics()
-    return {
-      props: {
-        health: serializeError(health),
-        channels: serializeError(channels),
-        topics: serializeError(topics),
-        auth: authHeader ? { some: authHeader } : { none: true }
-      }
-    }
-  } else {
-    if (err.message === ErrorCode.UNAUTHORIZED) {
-      context.res.statusCode = 401
-      context.res.setHeader('WWW-Authenticate', 'Basic realm="Authorization Required"')
-    } else {
-      context.res.statusCode = 403
-    }
-    return {
-      props: {
-        health: {},
-        channels: {},
-        topics: {},
-        auth: { none: true }
-      }
-    }
-  }
-}
-export default function FileUpload({ health, channels, topics, auth }:
-  InferGetServerSidePropsType<typeof getServerSideProps>) {
-  const classes = useStyles()
-  useEffect(() => {
-    if (health.err) {
-      return swal('Error', health.err.reason, 'error')
-    }
-    if (channels.err) {
-      console.log('channels.err', channels.err)
-      return swal('Error', channels.err.reason, 'error')
-    }
-    if (topics.err) {
-      console.log('channels.err', channels.err)
-      return swal('Error', topics.err.reason, 'error')
-    }
-  }, [health, channels, topics])
+export default function FileUpload() {
+  const { classes } = useStyles()
   return (
     <div>
       <Head>
@@ -80,7 +14,6 @@ export default function FileUpload({ health, channels, topics, auth }:
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
-        <ResponsiveHeader />
         <Container maxWidth="lg">
           <section className={classes.connectionStatus}>
             <Typography variant="h5" className={classes.pageTitle}>Data Messaging</Typography>
@@ -98,21 +31,21 @@ export default function FileUpload({ health, channels, topics, auth }:
             <Typography className={classes.textWhite} variant="h5">
               File Upload{' '}
             </Typography>
-            <UploadContainer auth={auth.some} channels={channels.ok} topics={topics.ok} />
+            {/*<UploadContainer auth={auth.some} channels={channels.ok} topics={topics.ok} />*/}
           </section>
           <Divider className={classes.divider} />
           <section className={classes.main}>
             <Typography className={classes.textWhite} variant="h5">
               File Download{' '}
             </Typography>
-            <DownloadContainer auth={auth.some} channels={channels.ok} />
+            {/*<DownloadContainer auth={auth.some} channels={channels.ok} />*/}
           </section>
         </Container>
       </main>
     </div>
   )
 }
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles()((theme) => ({
   connectionStatus: {
     display: 'flex',
     alignItems: 'center',
@@ -149,3 +82,4 @@ const useStyles = makeStyles((theme: Theme) => ({
     color: '#fff'
   }
 }))
+

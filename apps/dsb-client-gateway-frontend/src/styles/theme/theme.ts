@@ -1,8 +1,7 @@
-import { createTheme } from '@material-ui/core/styles'
-import { red } from '@material-ui/core/colors'
-// Create a theme instance.
+import { createTheme, ThemeOptions } from '@mui/material/styles';
 
-const theme = createTheme({
+// Create a theme instance.
+const dsbTheme: ThemeOptions = {
   palette: {
     primary: {
       main: '#A466FF',
@@ -37,6 +36,29 @@ const theme = createTheme({
       default: '#161D31',
       paper: '#293145'
     }
-  }
-})
-export default theme
+  },
+  typography: {
+    fontFamily: 'Rajdhani'
+  },
+  components: {
+    // Name of the component
+    MuiDrawer: {
+      styleOverrides: {
+        // Name of the slot
+        root: {
+          // Some CSS
+          backgroundColor: '#181423',
+        },
+      },
+    },
+    MuiCard: {
+      styleOverrides: {
+        root: {
+          height: '100%'
+        }
+      }
+    }
+  },
+}
+
+export const theme = createTheme(dsbTheme);

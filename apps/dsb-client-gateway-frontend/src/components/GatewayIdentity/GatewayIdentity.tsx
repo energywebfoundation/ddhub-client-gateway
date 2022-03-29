@@ -1,9 +1,15 @@
 import { useEffect, useState } from 'react'
-import { Button, makeStyles, Theme, Tooltip, Typography } from '@material-ui/core'
-import InfoIcon from '@material-ui/icons/Info'
-import swal from 'sweetalert'
-import { CustomInput } from '../../components/CustomInput/CustomInput'
-import { EnrolmentState, snip, StringType } from '../../utils'
+import Swal from 'sweetalert2'
+import {
+  Button,
+  Tooltip,
+  Typography,
+} from '@mui/material';
+import InfoIcon from '@mui/icons-material/Info';
+import { CustomInput } from '../../components/CustomInput/CustomInput';
+import { EnrolmentState, snip, StringType } from '../../utils';
+import { makeStyles } from 'tss-react/mui';
+
 type GatewayIdentityProps = {
   did?: string
   address: string
@@ -22,7 +28,7 @@ export const GatewayIdentity = ({
   onCreate,
   onEnrol
 }: GatewayIdentityProps) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
   const [privateKey, setPrivatekey] = useState('')
   const [statusText, setStatusText] = useState('')
   const [showEnrolButton, setShowEnrolButton] = useState(false)
@@ -108,7 +114,7 @@ export const GatewayIdentity = ({
           disabled={isLoading}
           onClick={() => {
             if (!privateKey) {
-              return swal('Error', 'No private key set', 'error')
+              return Swal.fire('Error', 'No private key set', 'error')
             }
             setPrivatekey('')
             onCreate(privateKey)
@@ -121,7 +127,7 @@ export const GatewayIdentity = ({
   )
 }
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles()((theme) => ({
   credentials: {
     borderRadius: '6px',
     background: theme.palette.primary.dark,

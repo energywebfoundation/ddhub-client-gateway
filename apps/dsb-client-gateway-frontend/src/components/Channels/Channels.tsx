@@ -1,23 +1,22 @@
-import { makeStyles } from '@material-ui/styles'
+import {
+  makeStyles, withStyles
+} from 'tss-react/mui';
 import {
   Accordion,
   AccordionDetails,
   AccordionSummary as MuiAccordionSummary,
-  Theme,
   Typography,
-  withStyles
-} from '@material-ui/core'
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
-import { Channel as ChannelType } from '../../utils'
-import { JsonView, defaultStyles } from 'react-json-view-lite'
-import 'react-json-view-lite/dist/index.css'
+} from '@mui/material';
+import { Channel as ChannelType } from '../../utils';
+import { JsonView, defaultStyles } from 'react-json-view-lite';
+import 'react-json-view-lite/dist/index.css';
 
 type ChannelProps = {
   channel: ChannelType
   myDID?: string
 }
 
-const AccordionSummary = withStyles({
+const AccordionSummary = withStyles(MuiAccordionSummary, {
   root: {
     backgroundColor: 'rgba(0, 0, 0, .03)',
     borderBottom: '1px solid rgba(0, 0, 0, .125)',
@@ -33,32 +32,32 @@ const AccordionSummary = withStyles({
     }
   },
   expanded: {}
-})(MuiAccordionSummary)
+});
 
-export default function Channel({ channel, myDID }: ChannelProps) {
-  const classes = useStyles()
+export default function Channel({channel, myDID}: ChannelProps) {
+  const { classes } = useStyles();
 
   const isPubSub = () => {
     if (!myDID) {
-      return
+      return;
     }
-    const pub = channel.publishers?.includes(myDID)
-    const sub = channel.subscribers?.includes(myDID)
+    const pub = channel.publishers?.includes(myDID);
+    const sub = channel.subscribers?.includes(myDID);
     if (pub && sub) {
-      return 'pub/sub'
+      return 'pub/sub';
     }
     if (pub) {
-      return 'pub'
+      return 'pub';
     }
     if (sub) {
-      return 'sub'
+      return 'sub';
     }
-  }
+  };
 
   return (
     <div className={classes.container}>
       <Accordion className={classes.accordion}>
-        <AccordionSummary className={classes.accordionTitle} expandIcon={<ExpandMoreIcon />}>
+        <AccordionSummary className={classes.accordionTitle}>
           <Typography className={classes.name} variant="h5">
             {channel.fqcn}
           </Typography>
@@ -77,7 +76,7 @@ export default function Channel({ channel, myDID }: ChannelProps) {
           <div>
             {channel.topics?.map((topic) => (
               <Accordion key={topic.namespace}>
-                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <AccordionSummary>
                   <Typography className={classes.name} variant="h6">
                     {topic.namespace}
                   </Typography>
@@ -98,10 +97,10 @@ export default function Channel({ channel, myDID }: ChannelProps) {
         </AccordionDetails>
       </Accordion>
     </div>
-  )
+  );
 }
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles()((theme) => ({
   container: {
     margin: '2rem'
   },
@@ -146,5 +145,5 @@ const useStyles = makeStyles((theme: Theme) => ({
   jsonContainer: {
     fontFamily: 'monospace'
   }
-}))
+}));
 

@@ -1,16 +1,16 @@
 import { useState } from 'react'
-import { makeStyles } from '@material-ui/styles'
-import { Typography, Button, Theme, Grid, MenuItem, FormControl, Select } from '@material-ui/core'
-import { Info } from '@material-ui/icons'
+import { makeStyles } from 'tss-react/mui';
+import { Typography, Button, Grid, MenuItem, FormControl, Select } from '@mui/material'
+import { Info } from '@mui/icons-material'
 import { CustomInput } from '../../components/CustomInput/CustomInput'
 import { Channel } from '../../utils'
-import swal from 'sweetalert'
+import Swal from 'sweetalert2'
 type DownloadProps = {
   channels: Channel[] | undefined,
   onDownload: (fqcn: string, amount: number, clientId?: string) => void
 }
 export const Download = ({ channels, onDownload }: DownloadProps,) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
   const [channelName, setChannelName] = useState('')
   return (
     <section className={classes.download}>
@@ -46,7 +46,7 @@ export const Download = ({ channels, onDownload }: DownloadProps,) => {
               <Button variant="contained" color="primary" fullWidth
                 onClick={() => {
                   if (!channelName) {
-                    return swal('Error', 'Please enter channel name', 'error')
+                    return Swal.fire('Error', 'Please enter channel name', 'error')
                   }
                   onDownload(channelName, 1)
                 }}
@@ -61,7 +61,7 @@ export const Download = ({ channels, onDownload }: DownloadProps,) => {
   )
 }
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles()((theme) => ({
   download: {
     borderRadius: '6px',
     background: theme.palette.primary.dark,
