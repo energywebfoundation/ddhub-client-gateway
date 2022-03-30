@@ -26,4 +26,14 @@ export class KeysRepository
 
     this.logger.debug(`Added key entity`, entity);
   }
+
+  public getSymmetricKey(
+    senderDid: string,
+    messageId: string
+  ): KeysEntity | null {
+    return this.client.getCollection<KeysEntity>(this.collection).findOne({
+      messageId,
+      senderDid,
+    });
+  }
 }
