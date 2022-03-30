@@ -1,75 +1,12 @@
-import Head from 'next/head'
-import Link from 'next/link'
-import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
-import { makeStyles } from 'tss-react/mui'
-import { Typography, Container, Divider, Button } from '@mui/material'
-import Swal from 'sweetalert2';
-import { DsbApiService } from '../../services/dsb-api.service'
-import { isAuthorized } from '../../services/auth.service'
-import { Channel, ErrorBodySerialized, ErrorCode, Option, Result, serializeError } from '../../utils'
-import { useEffect } from 'react'
-import { useState } from 'react'
-import { ChannelContainer } from '../../components/Channels/ChannelsContainer'
-import { getEnrolment } from '../../services/storage.service'
+import Head from 'next/head';
+import Link from 'next/link';
+import { makeStyles } from 'tss-react/mui';
+import { Button, Container, Divider, Typography } from '@mui/material';
+import { useState } from 'react';
 
-type Props = {
-  health: Result<boolean, ErrorBodySerialized>
-  channels: Result<Channel[], ErrorBodySerialized>
-  did: Option<string>
-  auth: Option<string>
-}
-export async function getServerSideProps(context: GetServerSidePropsContext): Promise<{
-  props: Props
-}> {
-  const authHeader = context.req.headers.authorization
-  const { err } = isAuthorized(authHeader)
-  if (!err) {
-    const health = await DsbApiService.init().getHealth()
-    const channels = await DsbApiService.init().getChannels()
-    const enrolment = await getEnrolment()
-    return {
-      props: {
-        health: serializeError(health),
-        channels: serializeError(channels),
-        did: enrolment?.some?.did ? { some: enrolment?.some.did } : { none: true },
-        auth: authHeader ? { some: authHeader } : { none: true }
-      }
-    }
-  } else {
-    if (err.message === ErrorCode.UNAUTHORIZED) {
-      context.res.statusCode = 401
-      context.res.setHeader('WWW-Authenticate', 'Basic realm="Authorization Required"')
-    } else {
-      context.res.statusCode = 403
-    }
-    return {
-      props: {
-        health: {},
-        channels: {},
-        did: { none: true },
-        auth: { none: true }
-      }
-    }
-  }
-}
-export default function Documentation({
-  health,
-  channels,
-  did
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function Documentation() {
   const { classes } = useStyles()
   const [channelErrorText, setChannelErrorText] = useState<string>()
-  useEffect(() => {
-    if (channels.err) {
-      Swal.fire('Error', channels.err.reason, 'error')
-      setChannelErrorText('Error retrieving channels. Make sure your gateway is enroled first.')
-    } else {
-      const count = channels.ok?.length ?? 0
-      if (count === 0) {
-        setChannelErrorText('No channels found with publish or subscribe rights.')
-      }
-    }
-  }, [channels])
   return (
     <div>
       <Head>
@@ -106,9 +43,9 @@ export default function Documentation({
                 {channelErrorText}
               </Typography>
             )}
-            {channels.ok?.map((channel) => (
-              <ChannelContainer key={channel.fqcn} channel={channel} did={did?.some} />
-            ))}
+            {/*{channels.ok?.map((channel) => (*/}
+            {/*  <ChannelContainer key={channel.fqcn} channel={channel} did={did?.some} />*/}
+            {/*))}*/}
           </section>
         </Container>
       </main>
@@ -161,15 +98,12 @@ const useStyles = makeStyles()((theme) => ({
       padding: '0.5rem'
     }
   },
-
   pageTitle: {
     marginRight: '1rem',
     fontSize: '24px'
   },
-
   breadCrumbs: {
     marginLeft: '1rem',
   }
-
 }))
 

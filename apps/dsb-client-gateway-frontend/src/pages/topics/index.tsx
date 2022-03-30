@@ -1,107 +1,14 @@
-import { useEffect, useState } from 'react'
-import Head from 'next/head'
-import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
-import { makeStyles } from 'tss-react/mui'
-import { Container } from '@mui/material'
-import Swal from 'sweetalert2';
-import { TopicContainer } from '../../components/Topics/TopicsContainer'
-import { refreshState } from '../../services/identity.service'
-import { isAuthorized } from '../../services/auth.service'
-import { ErrorCode, Option, Topic } from '../../utils'
-import axios from 'axios'
+import { useState } from 'react';
+import Head from 'next/head';
+import { makeStyles } from 'tss-react/mui';
+import { Container } from '@mui/material';
+import { TopicContainer } from '../../components/Topics/TopicsContainer';
+import { Topic } from '../../utils';
 
-type Props = {
-    ownerDid: string
-    owner: string
-    auth: Option<string>
-}
-
-export async function getServerSideProps(context: GetServerSidePropsContext): Promise<{
-    props: Props
-}> {
-
-    const authHeader = context.req.headers.authorization
-    const owner = context.req['query'].owner
-
-
-
-
-    const { err } = isAuthorized(authHeader)
-
-    const state = await refreshState()
-    const did = state.ok?.enrolment?.did
-
-    if (!err) {
-        return {
-            props: {
-                owner: owner,
-                ownerDid: did,
-                auth: authHeader ? { some: authHeader } : { none: true }
-            }
-        }
-    } else {
-        if (err.message === ErrorCode.UNAUTHORIZED) {
-            context.res.statusCode = 401
-            context.res.setHeader('WWW-Authenticate', 'Basic realm="Authorization Required"')
-        } else {
-            context.res.statusCode = 403
-        }
-        return {
-            props: {
-                owner: '',
-                ownerDid: '',
-                auth: { none: true }
-            }
-        }
-    }
-}
-
-
-export default function ListTopics({ owner, ownerDid, auth }:
-    InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function ListTopics({ owner, ownerDid, auth }) {
     const { classes } = useStyles()
 
     const [topics, setTopics] = useState<Topic[]>();
-    const [health, setHealth] = useState('');
-
-    useEffect(() => {
-
-        async function getServerSideProps() {
-
-            const topicsResponse = await axios.get(`/v1/dsb/topics`,
-                {
-                    headers: {
-                        Authorization: auth ? `Bearer ${auth}` : undefined,
-                        'content-type': 'application/json',
-                    },
-                    params: { ownerDid: ownerDid },
-                }
-            );
-
-            if (topicsResponse.status !== 200) {
-                return Swal.fire('Error', topicsResponse.data.reason, 'error')
-            }
-
-            setTopics(topicsResponse.data.records)
-
-
-            const healthResponse = await axios.get(`/v1/dsb/health`, {
-                headers: {
-                    Authorization: auth ? `Bearer ${auth}` : undefined,
-                    'content-type': 'application/json',
-                },
-            });
-
-            setHealth(healthResponse.data)
-
-            if (healthResponse.status !== 200) {
-                return Swal.fire('Error', healthResponse.data.reason, 'error')
-            }
-
-        }
-
-        getServerSideProps()
-    }, [auth, ownerDid])
 
     return (
         <div>
