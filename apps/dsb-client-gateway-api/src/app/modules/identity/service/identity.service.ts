@@ -17,7 +17,7 @@ export class IdentityService {
     protected readonly identityRepository: IdentityRepository,
     protected readonly secretsEngineService: SecretsEngineService,
     protected readonly iamService: IamService
-  ) { }
+  ) {}
 
   public async identityReady(): Promise<boolean> {
     const identity: Identity | null = await this.getIdentity();
@@ -82,24 +82,20 @@ export class IdentityService {
     await this.enrolmentRepository.removeEnrolment();
   }
 
-
   /**
    *
    * @param payload message paylaod stringified
    * @returns signature (string of concatenated r+s+v)
    */
   public async signPayload(payload: string): Promise<string> {
-
     this.logger.debug('signing payload');
     this.logger.debug('fetching private key');
-    const privateKey = await this.secretsEngineService.getPrivateKey()
+    const privateKey = await this.secretsEngineService.getPrivateKey();
     if (!privateKey) {
       throw new NoPrivateKeyException();
     }
 
-    const signer = this.ethersService.getWalletFromPrivateKey(privateKey)
+    const signer = this.ethersService.getWalletFromPrivateKey(privateKey);
     return signer.signMessage(payload);
   }
-
-
 }
