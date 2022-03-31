@@ -2,12 +2,16 @@ import * as crypto from 'crypto';
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { IamService } from '../../iam-service/service/iam.service';
 import { SecretsEngineService } from '../../secrets-engine/secrets-engine.interface';
-import HDKEY from 'hdkey';
 import { DIDPublicKeyTags } from '../keys.const';
-import moment from 'moment';
 import { KeysRepository } from '../repository/keys.repository';
-import { ec } from 'elliptic';
-import BN from 'bn.js';
+import { KeysEntity } from '../keys.interface';
+import { EthersService } from '../../utils/service/ethers.service';
+import {
+  id,
+  joinSignature,
+  recoverPublicKey,
+  SigningKey,
+} from 'ethers/lib/utils';
 
 @Injectable()
 export class KeysService implements OnModuleInit {
@@ -20,7 +24,8 @@ export class KeysService implements OnModuleInit {
   constructor(
     protected readonly secretsEngineService: SecretsEngineService,
     protected readonly iamService: IamService,
-    protected readonly keysRepository: KeysRepository
+    protected readonly keysRepository: KeysRepository,
+    protected readonly ethersService: EthersService
   ) {}
 
   public async storeKeysForMessage(
@@ -35,27 +40,30 @@ export class KeysService implements OnModuleInit {
     });
   }
 
-  public computeSharedKey(
-    privateKey: string,
-    receiverPublicKey: string
-  ): Buffer {
-    const senderECDH = crypto.createECDH(this.curve);
+  public getSymmetricKey(
+    senderDid: string,
+    clientGatewayMessageId: string
+  ): KeysEntity {
+    return this.keysRepository.getSymmetricKey(
+      senderDid,
+      clientGatewayMessageId
+    );
+  }
 
-    senderECDH.setPrivateKey(privateKey, 'hex');
-
-    return senderECDH.computeSecret(receiverPublicKey, 'hex');
+  public generateRandomKey(): string {
+    return crypto.randomBytes(32).toString('hex');
   }
 
   public encryptMessage(
     message: string | Buffer,
-    computedSharedKey: Buffer,
+    computedSharedKey: string,
     inputEncoding: 'binary' | 'utf-8'
   ): string {
     const iv: Buffer = crypto.randomBytes(16);
 
     const cipher = crypto.createCipheriv(
       this.symmetricAlgorithm,
-      computedSharedKey,
+      Buffer.from(computedSharedKey, 'hex'),
       iv
     );
 
@@ -66,70 +74,94 @@ export class KeysService implements OnModuleInit {
     );
   }
 
-  public createSignature(encryptedData: string, privateKey: Buffer): string {
-    const EC = new ec(this.curve);
+  public createSignature(encryptedData: string, privateKey: string): string {
+    const signingKey = new SigningKey(privateKey);
 
-    const keyPair = EC.keyFromPrivate(privateKey);
-
-    const { result, reason } = keyPair.validate();
-
-    if (!result) {
-      this.logger.log('Failed to create elliptic', reason);
-    }
-
-    const hash = crypto
-      .createHash(this.hashAlgorithm)
-      .update(encryptedData)
-      .digest('hex');
-
-    const signature = keyPair.sign(hash, 'hex', {
-      canonical: true,
-      pers: true,
-    });
-
-    return signature.r.toString(16, 64) + signature.s.toString(16, 64);
+    return joinSignature(signingKey.signDigest(id(encryptedData)));
   }
 
-  public verifySignature(
-    senderPublicKey: Buffer,
+  public async verifySignature(
+    senderDid: string,
     signature: string,
     encryptedData: string
-  ): boolean {
-    const EC = new ec(this.curve);
+  ): Promise<boolean> {
+    const did = await this.iamService.getDid(senderDid);
 
-    const keyPair = EC.keyFromPublic(senderPublicKey);
-    const hash = crypto
-      .createHash(this.hashAlgorithm)
-      .update(encryptedData)
-      .digest('hex');
+    if (!did) {
+      this.logger.error(`${senderDid} is invalid DID`);
 
-    const r = new BN(signature.slice(0, 64), 16).toString('hex');
-    const s = new BN(signature.slice(64, 128), 16).toString('hex');
+      return false;
+    }
 
-    return keyPair.verify(hash, { r, s });
+    const key = did.publicKey.find(({ id }) => {
+      return id === `${senderDid}#${DIDPublicKeyTags.DSB_SIGNATURE_KEY}`;
+    });
+
+    if (!key) {
+      this.logger.error(
+        `Sender does not have public key configured on path ${senderDid}#${DIDPublicKeyTags.DSB_SIGNATURE_KEY}`
+      );
+
+      return false;
+    }
+
+    const recoveredPublicKey = recoverPublicKey(id(encryptedData), signature);
+
+    return recoveredPublicKey === key.publicKeyHex;
   }
 
-  public decryptMessage(
-    message: string,
-    receiverPrivateKey: string,
-    senderPublicKey: string
-  ): string {
-    const [iv, encryptedData] = message.split(':');
+  public async decryptMessage(
+    encryptedMessage: string,
+    clientGatewayMessageId: string,
+    senderDid: string
+  ): Promise<string | null> {
+    const symmetricKey: KeysEntity | null = this.getSymmetricKey(
+      senderDid,
+      clientGatewayMessageId
+    );
 
-    const receiver = crypto.createECDH(this.curve);
-    receiver.setPrivateKey(receiverPrivateKey, 'hex');
+    if (!symmetricKey) {
+      this.logger.error(
+        `${senderDid}:${clientGatewayMessageId} does not have symmetric key`
+      );
 
-    const computedSharedKey = receiver.computeSecret(senderPublicKey, 'hex');
+      return null;
+    }
 
-    const receiverDecipher = crypto.createDecipheriv(
+    const [iv, encryptedData] = encryptedMessage.split(':');
+    const privateKey: string | null =
+      await this.secretsEngineService.getRSAPrivateKey();
+
+    if (!privateKey) {
+      this.logger.error('No private RSA key to decrypt');
+
+      return null;
+    }
+
+    const rootKey: string | null =
+      await this.secretsEngineService.getPrivateKey();
+
+    if (!rootKey) {
+      this.logger.error('No root key');
+
+      return null;
+    }
+
+    const decryptedKey: string = this.decryptSymmetricKey(
+      privateKey,
+      symmetricKey.encryptedSymmetricKey,
+      rootKey
+    );
+
+    const decipher = crypto.createDecipheriv(
       this.symmetricAlgorithm,
-      computedSharedKey,
+      Buffer.from(decryptedKey, 'hex'),
       Buffer.from(iv, 'hex')
     );
 
-    let decrypted = receiverDecipher.update(encryptedData, 'hex', 'utf-8');
+    let decrypted = decipher.update(encryptedData, 'hex', 'utf-8');
 
-    decrypted = decrypted + receiverDecipher.final('utf-8');
+    decrypted = decrypted + decipher.final('utf-8');
 
     return decrypted;
   }
@@ -154,7 +186,7 @@ export class KeysService implements OnModuleInit {
 
     if (!key) {
       this.logger.error(
-        `Receiver ${receiverDid} has no public key with ${DIDPublicKeyTags.DSB_SYMMETRIC_ENCRYPTION}`
+        `Receiver ${receiverDid} has no public key with ${receiverDid}#${DIDPublicKeyTags.DSB_SYMMETRIC_ENCRYPTION}`
       );
 
       return;
@@ -193,14 +225,6 @@ export class KeysService implements OnModuleInit {
       .toString();
   }
 
-  public getDerivedKey(rootKey: string): HDKEY {
-    const currentDate: number = +moment().format('YYYYMMDD');
-
-    const masterSeed = HDKEY.fromMasterSeed(Buffer.from(rootKey, 'hex'));
-
-    return masterSeed.derive(`m/44' /246' /0' /${currentDate}`);
-  }
-
   public async onModuleInit(): Promise<void> {
     const rootKey: string | null =
       await this.secretsEngineService.getPrivateKey();
@@ -210,6 +234,15 @@ export class KeysService implements OnModuleInit {
 
       return;
     }
+
+    const wallet = this.ethersService.getWalletFromPrivateKey(rootKey);
+
+    await this.iamService.setVerificationMethod(
+      wallet.publicKey,
+      DIDPublicKeyTags.DSB_SIGNATURE_KEY
+    );
+
+    this.logger.debug(await this.iamService.getDid());
 
     const existingRSAKey: string | null =
       await this.secretsEngineService.getRSAPrivateKey();
