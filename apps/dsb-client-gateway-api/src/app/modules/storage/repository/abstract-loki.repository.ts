@@ -3,7 +3,7 @@ import { LokiService } from '../service/loki.service';
 import loki from 'lokijs';
 
 @Injectable()
-export abstract class AbstractLokiRepository {
+export abstract class AbstractLokiRepository<T extends object = any> {
   public readonly client: loki;
 
   protected constructor(
@@ -19,5 +19,9 @@ export abstract class AbstractLokiRepository {
     if (collection === null) {
       this.client.addCollection(name);
     }
+  }
+
+  protected getCollection(): loki.Collection<T> {
+    return this.client.getCollection<T>(this.collection);
   }
 }

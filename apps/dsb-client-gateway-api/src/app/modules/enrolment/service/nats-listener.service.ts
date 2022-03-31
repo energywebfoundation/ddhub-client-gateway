@@ -56,17 +56,7 @@ export class NatsListenerService {
       this.parentNamespace
     );
 
-    const state = this.getStateFromClaims(claims);
-
-    if (state.waiting) {
-      // this.events.emit(EnrolmentEvents.AWAIT_APPROVAL);
-    }
-
-    if (state.approved) {
-      // this.events.emit(EnrolmentEvents.APPROVED);
-    }
-
-    return state;
+    return this.getStateFromClaims(claims);
   }
 
   public getStateFromClaims(claims: Claim[]): EnrolmentState {

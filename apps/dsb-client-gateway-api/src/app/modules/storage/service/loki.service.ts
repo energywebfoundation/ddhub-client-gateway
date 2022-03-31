@@ -1,8 +1,12 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import {
+  Injectable,
+  OnApplicationShutdown,
+  OnModuleInit,
+} from '@nestjs/common';
 import loki from 'lokijs';
 
 @Injectable()
-export class LokiService implements OnModuleInit {
+export class LokiService implements OnModuleInit, OnApplicationShutdown {
   public readonly client: loki;
 
   constructor() {
@@ -11,6 +15,10 @@ export class LokiService implements OnModuleInit {
       autosave: true,
       autosaveInterval: 2000,
     });
+  }
+
+  public async onApplicationShutdown(signal?: string): Promise<void> {
+    await this.save();
   }
 
   public async save(): Promise<void> {

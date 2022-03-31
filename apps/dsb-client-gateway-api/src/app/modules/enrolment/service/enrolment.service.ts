@@ -17,6 +17,8 @@ import { ConfigService } from '@nestjs/config';
 import { EnrolmentRepository } from '../../storage/repository/enrolment.repository';
 import { BalanceState } from '../../utils/balance.const';
 import { IdentityService } from '../../identity/service/identity.service';
+import { IdentityNotReadyException } from '../../identity/exceptions/identity-not-ready.exception';
+import { NotEnoughBalanceException } from '../../identity/exceptions/not-enough-balance.exception';
 
 @Injectable()
 export class EnrolmentService implements OnModuleInit {
@@ -56,18 +58,16 @@ export class EnrolmentService implements OnModuleInit {
 
     const state = await this.natsListenerService.getStateFromClaims(claims);
 
+    this.logger.log('Existing state', state);
+
     await this.enrolmentRepository.writeEnrolment({
       did,
       state,
     });
 
-    if (state.waiting) {
-      this.logger.log('Initializing enrolment on bootstrap');
-
-      await this.initEnrolment().catch((e) => {
-        this.logger.error('Error during enrolment', e);
-      });
-    }
+    await this.initEnrolment().catch((e) => {
+      this.logger.error('Error during enrolment', e);
+    });
   }
 
   public getEnrolment(): Enrolment | null {
@@ -75,7 +75,7 @@ export class EnrolmentService implements OnModuleInit {
 
     if (!enrolment) {
       return {
-        did: null,
+        did: this.iamService.getDIDAddress(),
         state: {
           roles: {
             user: RoleState.NO_CLAIM,
@@ -93,9 +93,7 @@ export class EnrolmentService implements OnModuleInit {
     const identity = await this.identityService.getIdentity();
 
     if (!identity) {
-      this.logger.error('No identity found');
-
-      return null;
+      throw new IdentityNotReadyException('identity');
     }
 
     const did = this.iamService.getDIDAddress();
@@ -103,7 +101,7 @@ export class EnrolmentService implements OnModuleInit {
     if (!did) {
       this.logger.error('DID could not be obtained');
 
-      return null;
+      throw new IdentityNotReadyException('did');
     }
 
     const { address, balance } = identity;
@@ -112,7 +110,7 @@ export class EnrolmentService implements OnModuleInit {
       await this.natsListenerService.getState();
 
     if (!existingState) {
-      return null;
+      throw new IdentityNotReadyException('enrolment-state');
     }
 
     if (existingState.approved) {
@@ -129,9 +127,7 @@ export class EnrolmentService implements OnModuleInit {
     }
 
     if (balance === BalanceState.NONE) {
-      this.logger.error(`Identity has no balance ${address}`);
-
-      return;
+      throw new NotEnoughBalanceException(address);
     }
 
     if (existingState.roles.user === RoleState.NO_CLAIM) {
@@ -141,68 +137,9 @@ export class EnrolmentService implements OnModuleInit {
     this.natsListenerService.init();
     this.natsListenerService.startListening();
 
-    // if (!identity) {
-    //   return;
-    // }
-    //
-    // const { address } = identity;
-    //
-    // const did = this.iamService.getDIDAddress();
-    //
-    // if (!did) {
-    //   return;
-    // }
-    //
-    // if (!address) {
-    //   throw new NoPrivateKeyException();
-    // }
-    //
-    // const balance = await this.ethersService.getBalance(address);
-    //
-    // if (balance === BalanceState.NONE) {
-    //   this.logger.error(`Account does not have enough balance ${address}`);
-    //
-    //   return {
-    //     did,
-    //     state: {
-    //       roles: {
-    //         user: RoleState.NO_CLAIM,
-    //       },
-    //       waiting: false,
-    //       approved: false,
-    //     },
-    //   };
-    // }
-    //
-    // this.natsListenerService.init();
-    // this.natsListenerService.startListening();
-    //
-    // const state = await this.natsListenerService.getState();
-    //
-    // if (state.approved || state.waiting) {
-    //   await this.enrolmentRepository.writeEnrolment({
-    //     state,
-    //     did,
-    //   });
-    //
-    //   return {
-    //     did,
-    //     state,
-    //   };
-    // }
-    //
-    // await this.natsListenerService.createClaim();
-    //
-    // const updatedState = await this.natsListenerService.getState();
-    //
-    // await this.enrolmentRepository.writeEnrolment({
-    //   did,
-    //   state: updatedState,
-    // });
-    //
-    // return {
-    //   did,
-    //   state,
-    // };
+    return {
+      did: this.iamService.getDIDAddress(),
+      state: await this.natsListenerService.getState(),
+    };
   }
 }
