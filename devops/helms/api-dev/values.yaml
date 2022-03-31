@@ -1,0 +1,137 @@
+# Default values for ddhub-client-gateway-api.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+ddhub-client-gateway-api:
+  replicaCount: 1
+
+  clientgateway:
+    config:
+      # -- Define the port the gateway will run on.
+      port: 3333
+      # -- Select WebSocket mode depending on architecture (i.e. preference for inbound or outbound connections). By default, the gateway will run a WebSocket server on /events. However, it can also operate as a client with additional configuration (see below). Alternatively, this functionality can be turned off. Options: SERVER, CLIENT, NONE
+      websocket: NONE
+      # -- Sets the URL of the WebSocket server the client should try to connect to. Required if WEBSOCKET is set to CLIENT.
+      websocket_url: ""
+      # -- Sets the protocol the WebSocket client should request access to. Acceptable protocols are defined by the WebSocket server, however, this can also be left undefined. Note that if WEBSOCKET is set to SERVER this variable is ignored. The server will only accept connection requests on the dsb-messages protocol.
+      websocket_protocol: ""
+      # -- Define whether the WebSocket client should reconnect on connection error/close.
+      websocket_reconnect: false
+      # -- Define the interval between receiving a connection error/close and attempting to reconnect, in milliseconds.
+      websocket_reconnect_timeout: 10000
+      # -- Define how many times the WebSocket client should attempt reconnection with the server upon receving connection error/close.
+      websocket_reconnect_max_retries: 10
+      # -- Defines the format for messages pushed over a real-time communication channel. If bulk mode is chosen, messages will be sent as an array. At every 1 second interval, the gateway will emit an array of the latest messages received. If single mode is chosen, messages will be sent individually. Options: BULK, SINGLE
+      events_emit_mode: BULK
+      # -- Defines how many events should be pushed per second, regardless of mode chosen (see above).
+      events_max_per_second: 2
+      # -- The URL of the DSB Message Broker you want to connect to. Trailing / allowed.
+      dsb_base_url: https://dsb-demo.energyweb.org
+      # -- Sets the chain ID of the blockchain network. Options: 73799 (Volta), 246 (EWC)
+      chain_id: 73799
+      # -- Sets the blockchain RPC node to connect to retreive state from and submit transactions to. Should match the network given in CHAIN_ID.
+      rpc_url: https://volta-rpc.energyweb.org/
+      # -- Sets the Energy Web IAM cache server URL, used to cache identities (as it can be expensive to rely only on querying smart contract data).
+      cache_server_url: https://identitycache-staging.energyweb.org/v1
+      # -- Sets the Energy Web IAM events server URL, used to receive notification of approved DSB role claims.
+      event_server_url: https://identitycache-staging.energyweb.org/
+      # -- Sets the Energy Web IAM application namespace. DSB related roles, such as user and messagebroker should fall under this namespace.
+      parent_namespace: dsb.apps.energyweb.iam.ewc
+      secret_engine: vault
+      vault_endpoint: http://vault.ddhub-dev.svc:8200
+      # -- Enable basic auth. (Once enabled, associated secret is required, eg: "ddhub-client-gateway-api-secret")
+      basic_auth_enabled: false
+      node_env: test
+  image:
+    # repository: 098061033856.dkr.ecr.us-east-1.amazonaws.com/ew-dos-dsb-ecr
+    repository: aemocontainerregistry.azurecr.io/ddhub-client-gateway-backend
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: d72a180a-6a08-43a3-a756-f2eea3958ad1
+
+  imagePullSecrets: []
+  nameOverride: "ddhub-client-gateway-api-dev"
+  fullnameOverride: "ddhub-client-gateway-api-dev"
+
+  serviceAccount:
+    # Specifies whether a service account should be created
+    create: true
+    # Annotations to add to the service account
+    annotations: {}
+    # The name of the service account to use.
+    # If not set and create is true, a name is generated using the fullname template
+    name: ""
+
+  podAnnotations: {}
+
+  podSecurityContext: {}
+    # fsGroup: 2000
+
+  securityContext: {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
+
+  service:
+    type: ClusterIP
+    port: 80
+
+  ingress:
+    enabled: true
+    annotations: {kubernetes.io/ingress.class: azure/application-gateway, appgw.ingress.kubernetes.io/ssl-redirect: "true"}
+      # kubernetes.io/tls-acme: "true"
+    hosts:
+      - host: ddhub-gateway-api-dev.energyweb.org
+        paths:
+        - path: /*
+          pathType: Prefix
+          backend:
+            serviceName: ddhub-client-gateway-api
+            servicePort: 80
+    tls:
+      - secretName: dsb-tls-secret
+        hosts:
+          - ddhub-gateway-api-dev.energyweb.org
+
+  resources: {}
+    # We usually recommend not to specify default resources and to leave this as a conscious
+    # choice for the user. This also increases chances charts run on environments with little
+    # resources, such as Minikube. If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 100
+    targetCPUUtilizationPercentage: 80
+    # targetMemoryUtilizationPercentage: 80
+
+  nodeSelector: {}
+
+  tolerations: []
+
+  affinity: {}
+
+  pvc:
+    enabled: false
+    storageClassName: default
+    accessMode: ReadWriteOnce
+    capacity: 1Gi
+    mountPath: /mnt/azure
+
+  existingClaim:
+    enabled: false
+    claimName: my-claim
+    mountPath: /mnt/claim
+
+  probes: 
+    liveness: true
+    readiness: true
