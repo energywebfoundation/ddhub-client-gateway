@@ -1,82 +1,59 @@
-import Head from 'next/head';
-import { NavigateNext } from '@mui/icons-material';
-import { Home as HomeIcon } from 'react-feather';
 import { makeStyles } from 'tss-react/mui';
-import { Breadcrumbs, Container, Grid, Typography } from '@mui/material';
+import { Container, Grid, Stack, Typography } from '@mui/material';
+import React from 'react';
+import Login from '../components/Login/Login';
 
 export default function Index() {
-  const { classes } = useStyles()
+  const {classes} = useStyles();
   return (
-    <div>
-      <Head>
-        <title>EW-DSB Client Gateway</title>
-        <meta name="description" content="EW-DSB Client Gateway"/>
-        <link rel="icon" href="/favicon.ico"/>
-      </Head>
-      <main>
-        <Container maxWidth="lg">
-          <section className={classes.connectionStatus}>
-            <Typography variant="h5" className={classes.pageTitle}>Gateway Settings</Typography>
-            <Typography variant="h5">|</Typography>
-            <Breadcrumbs separator={<NavigateNext fontSize="small" />} aria-label="breadcrumb" className={classes.breadCrumbs}>
-              <HomeIcon color='#A466FF' size={15} />
-              <Typography color="primary">Gateway Settings</Typography>
-            </Breadcrumbs>
-          </section>
-
-            <section className={classes.main}>
-              <Grid container spacing={3}>
-                <Grid item xs={12} md={6}>
-                  {/*<GatewayIdentityContainer*/}
-                  {/*  identity={state.ok?.identity}*/}
-                  {/*  enrolment={state.ok?.enrolment}*/}
-                  {/*  auth={auth.some}*/}
-                  {/*/>*/}
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  {/*<ProxyCertificateContainer certificate={state.ok?.certificate} auth={auth.some} />*/}
-                </Grid>
+    <Grid container alignItems="stretch" style={{height: '100%'}}>
+      <Grid item xs={8} className={classes.leftSide}>
+        <Container style={{height: '100%'}}>
+          <Stack
+            style={{height: '100%'}}
+            direction="column"
+            justifyContent="space-between"
+            alignItems="flex-start"
+            spacing={2}
+          >
+            <div><img src="ew-flex-logo.png" alt="logo" className={classes.logo}/></div>
+            <Grid container style={{marginBottom: '75px'}}>
+              <Grid item xs={8}>
+                <Typography variant={'h4'}>
+                  Powering the <br/>
+                  <span className={classes.underline}>Zero Carbon</span> Economy
+                </Typography>
+                <Typography>
+                  We deploy digital operating systems for energy grids with our global community of more than 100 energy
+                  market participants. These systems make it simple, secure, and efficient for clean energy assets to
+                  support the grid of the future.
+                </Typography>
               </Grid>
-            </section>
+            </Grid>
+          </Stack>
         </Container>
-      </main>
-    </div>
-  )
+      </Grid>
+      <Grid item xs={4} justifyContent="center" alignItems='center' style={{display: 'flex'}}>
+        <Login />
+      </Grid>
+    </Grid>
+  );
 }
+
+Index.getLayout = function getLayout(page) {
+  return page;
+};
 const useStyles = makeStyles()(theme => ({
-  connectionStatus: {
-    display: 'flex',
-    alignItems: 'center',
-    padding: '0 1rem',
-    '& *': {
-      color: '#fff'
-    },
-    marginBottom: '2rem'
+  leftSide: {
+    backgroundImage: 'url(../img-welcome.png)',
+    backgroundRepeat: 'no-repeat',
+    backgroundSize: 'cover'
   },
-  connectionStatusPaper: {
-    padding: '.5rem 1rem',
-    marginLeft: '1rem',
-    marginRight: '1rem',
-    background: theme.palette.primary.main,
-    borderRadius: '1rem',
-    display: 'flex',
-    alignItems: 'center'
+  logo: {
+    height: '70px',
+    margin: '27px'
   },
-  divider: {
-    background: '#1E263C'
-  },
-  main: {
-    padding: '0 1rem',
-    marginTop: '2rem'
-  },
-
-  pageTitle: {
-    marginRight: '1rem',
-    fontSize: '24px'
-  },
-
-  breadCrumbs: {
-    marginLeft: '1rem',
+  underline: {
+    textDecoration: 'underline'
   }
-
-}))
+}));
