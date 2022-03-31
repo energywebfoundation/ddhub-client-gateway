@@ -47,7 +47,7 @@ export class ChannelDidCacheService {
       );
 
       if (!rolesForDIDs.length) {
-        this.logger.error(
+        this.logger.warn(
           `There is no single DID for listed roles`,
           internalChannel.conditions.roles
         );

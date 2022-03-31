@@ -35,7 +35,11 @@ export class ChannelRepository
     });
   }
 
-  public getChannelsByType(type: ChannelType): ChannelEntity[] {
+  public getChannelsByType(type?: ChannelType): ChannelEntity[] {
+    if (!type) {
+      return this.client.getCollection<ChannelEntity>(this.collection).find({});
+    }
+
     return this.client.getCollection<ChannelEntity>(this.collection).find({
       type,
     });

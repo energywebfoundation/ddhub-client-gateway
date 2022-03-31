@@ -4,16 +4,16 @@ export enum RoleState {
   NO_CLAIM = 'NO_CLAIM',
   AWAITING_APPROVAL = 'AWAITING_APPROVAL',
   APPROVED = 'APPROVED',
-  NOT_WANTED = 'NOT_WANTED' // if gateway is not controlling message broker
+  NOT_WANTED = 'NOT_WANTED', // if gateway is not controlling message broker
 }
 
 export type EnrolmentState = {
-  approved: boolean
-  waiting: boolean
+  approved: boolean;
+  waiting: boolean;
   roles: {
-    user: RoleState
-  }
-}
+    user: RoleState;
+  };
+};
 
 export interface Identity {
   address: string;
@@ -22,7 +22,7 @@ export interface Identity {
 }
 
 export interface Enrolment {
-  did: string;
+  did: string | null;
   state: EnrolmentState;
 }
 

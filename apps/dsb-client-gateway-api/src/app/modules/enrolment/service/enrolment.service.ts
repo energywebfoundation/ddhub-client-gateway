@@ -1,14 +1,22 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import {
+  forwardRef,
+  Inject,
+  Injectable,
+  Logger,
+  OnModuleInit,
+} from '@nestjs/common';
 import { EthersService } from '../../utils/service/ethers.service';
-import { BalanceState } from '../../utils/balance.const';
-import { NotEnoughBalanceException } from '../../identity/exceptions/not-enough-balance.exception';
 import { IamService } from '../../iam-service/service/iam.service';
 import { NatsListenerService } from './nats-listener.service';
-import { Enrolment } from '../../storage/storage.interface';
-import { NoPrivateKeyException } from '../../storage/exceptions/no-private-key.exception';
+import {
+  Enrolment,
+  EnrolmentState,
+  RoleState,
+} from '../../storage/storage.interface';
 import { ConfigService } from '@nestjs/config';
 import { EnrolmentRepository } from '../../storage/repository/enrolment.repository';
-import { IdentityRepository } from '../../storage/repository/identity.repository';
+import { BalanceState } from '../../utils/balance.const';
+import { IdentityService } from '../../identity/service/identity.service';
 
 @Injectable()
 export class EnrolmentService implements OnModuleInit {
@@ -21,7 +29,8 @@ export class EnrolmentService implements OnModuleInit {
     protected readonly iamService: IamService,
     protected readonly natsListenerService: NatsListenerService,
     protected readonly enrolmentRepository: EnrolmentRepository,
-    protected readonly identityRepository: IdentityRepository,
+    @Inject(forwardRef(() => IdentityService))
+    protected readonly identityService: IdentityService,
     protected readonly configService: ConfigService
   ) {}
 
@@ -61,72 +70,139 @@ export class EnrolmentService implements OnModuleInit {
     }
   }
 
-  public async getEnrolment(): Promise<Enrolment> {
-    const enrolment = await this.enrolmentRepository.getEnrolment();
+  public getEnrolment(): Enrolment | null {
+    const enrolment: Enrolment | null = this.enrolmentRepository.getEnrolment();
 
     if (!enrolment) {
-      await this.initEnrolment();
-
-      throw new NoPrivateKeyException();
+      return {
+        did: null,
+        state: {
+          roles: {
+            user: RoleState.NO_CLAIM,
+          },
+          waiting: false,
+          approved: false,
+        },
+      };
     }
 
-    return this.enrolmentRepository.getEnrolment();
+    return enrolment;
   }
 
-  public async initEnrolment(): Promise<any> {
-    const identity = await this.identityRepository.getIdentity();
+  public async initEnrolment(): Promise<Enrolment | null> {
+    const identity = await this.identityService.getIdentity();
 
     if (!identity) {
-      return;
-    }
+      this.logger.error('No identity found');
 
-    const { address } = identity;
+      return null;
+    }
 
     const did = this.iamService.getDIDAddress();
 
     if (!did) {
+      this.logger.error('DID could not be obtained');
+
+      return null;
+    }
+
+    const { address, balance } = identity;
+
+    const existingState: EnrolmentState =
+      await this.natsListenerService.getState();
+
+    if (!existingState) {
+      return null;
+    }
+
+    if (existingState.approved) {
+      const enrolment: Enrolment = {
+        state: existingState,
+        did,
+      };
+
+      await this.enrolmentRepository.writeEnrolment(enrolment);
+
+      this.logger.log('Enrolment successfully synchronized');
+
+      return enrolment;
+    }
+
+    if (balance === BalanceState.NONE) {
+      this.logger.error(`Identity has no balance ${address}`);
+
       return;
     }
 
-    if (!address) {
-      throw new NoPrivateKeyException();
-    }
-
-    const balance = await this.ethersService.getBalance(address);
-
-    if (balance === BalanceState.NONE) {
-      throw new NotEnoughBalanceException();
+    if (existingState.roles.user === RoleState.NO_CLAIM) {
+      await this.natsListenerService.createClaim();
     }
 
     this.natsListenerService.init();
     this.natsListenerService.startListening();
 
-    const state = await this.natsListenerService.getState();
-
-    if (state.approved || state.waiting) {
-      await this.enrolmentRepository.writeEnrolment({
-        state,
-        did,
-      });
-
-      return {
-        did,
-        state,
-      };
-    }
-
-    await this.natsListenerService.createClaim();
-
-    const updatedState = await this.natsListenerService.getState();
-
-    await this.enrolmentRepository.writeEnrolment({
-      did,
-      state: updatedState,
-    });
-
-    return {
-      did,
-      state,
-    };
+    // if (!identity) {
+    //   return;
+    // }
+    //
+    // const { address } = identity;
+    //
+    // const did = this.iamService.getDIDAddress();
+    //
+    // if (!did) {
+    //   return;
+    // }
+    //
+    // if (!address) {
+    //   throw new NoPrivateKeyException();
+    // }
+    //
+    // const balance = await this.ethersService.getBalance(address);
+    //
+    // if (balance === BalanceState.NONE) {
+    //   this.logger.error(`Account does not have enough balance ${address}`);
+    //
+    //   return {
+    //     did,
+    //     state: {
+    //       roles: {
+    //         user: RoleState.NO_CLAIM,
+    //       },
+    //       waiting: false,
+    //       approved: false,
+    //     },
+    //   };
+    // }
+    //
+    // this.natsListenerService.init();
+    // this.natsListenerService.startListening();
+    //
+    // const state = await this.natsListenerService.getState();
+    //
+    // if (state.approved || state.waiting) {
+    //   await this.enrolmentRepository.writeEnrolment({
+    //     state,
+    //     did,
+    //   });
+    //
+    //   return {
+    //     did,
+    //     state,
+    //   };
+    // }
+    //
+    // await this.natsListenerService.createClaim();
+    //
+    // const updatedState = await this.natsListenerService.getState();
+    //
+    // await this.enrolmentRepository.writeEnrolment({
+    //   did,
+    //   state: updatedState,
+    // });
+    //
+    // return {
+    //   did,
+    //   state,
+    // };
   }
 }

@@ -1,11 +1,13 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { EthersService } from '../../utils/service/ethers.service';
-import { Identity } from '../../storage/storage.interface';
+import { Enrolment, Identity } from '../../storage/storage.interface';
 import { IamService } from '../../iam-service/service/iam.service';
 import { SecretsEngineService } from '../../secrets-engine/secrets-engine.interface';
 import { NoPrivateKeyException } from '../../storage/exceptions/no-private-key.exception';
 import { EnrolmentRepository } from '../../storage/repository/enrolment.repository';
 import { IdentityRepository } from '../../storage/repository/identity.repository';
+import { EnrolmentService } from '../../enrolment/service/enrolment.service';
+import { IdentityWithEnrolment } from '../identity.interface';
 
 @Injectable()
 export class IdentityService {
@@ -16,8 +18,21 @@ export class IdentityService {
     protected readonly enrolmentRepository: EnrolmentRepository,
     protected readonly identityRepository: IdentityRepository,
     protected readonly secretsEngineService: SecretsEngineService,
-    protected readonly iamService: IamService
-  ) { }
+    protected readonly iamService: IamService,
+    protected readonly enrolmentService: EnrolmentService
+  ) {}
+
+  public async getIdentityWithEnrolment(): Promise<IdentityWithEnrolment> {
+    const [identity, enrolment]: [Identity, Enrolment] = await Promise.all([
+      this.getIdentity(),
+      this.enrolmentService.getEnrolment(),
+    ]);
+
+    return {
+      ...identity,
+      enrolment,
+    };
+  }
 
   public async identityReady(): Promise<boolean> {
     const identity: Identity | null = await this.getIdentity();
@@ -80,8 +95,9 @@ export class IdentityService {
     await this.iamService.setup(privateKey);
 
     await this.enrolmentRepository.removeEnrolment();
-  }
 
+    await this.enrolmentService.initEnrolment();
+  }
 
   /**
    *
@@ -89,17 +105,14 @@ export class IdentityService {
    * @returns signature (string of concatenated r+s+v)
    */
   public async signPayload(payload: string): Promise<string> {
-
     this.logger.debug('signing payload');
     this.logger.debug('fetching private key');
-    const privateKey = await this.secretsEngineService.getPrivateKey()
+    const privateKey = await this.secretsEngineService.getPrivateKey();
     if (!privateKey) {
       throw new NoPrivateKeyException();
     }
 
-    const signer = this.ethersService.getWalletFromPrivateKey(privateKey)
+    const signer = this.ethersService.getWalletFromPrivateKey(privateKey);
     return signer.signMessage(payload);
   }
-
-
 }

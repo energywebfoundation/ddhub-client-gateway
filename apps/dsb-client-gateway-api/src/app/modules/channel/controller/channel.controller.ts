@@ -27,6 +27,7 @@ import {
 import { LokiMetadataStripInterceptor } from '../../utils/interceptors/loki-metadata-strip.interceptor';
 import { ChannelDidCacheService } from '../service/channel-did-cache.service';
 import { ChannelEntity } from '../entity/channel.entity';
+import { UpdateChannelDto } from '../dto/request/update-channel.dto';
 
 @Controller('channel')
 @ApiTags('internal-channels')
@@ -41,6 +42,7 @@ export class ChannelController {
   @ApiResponse({
     status: HttpStatus.CREATED,
     description: 'Channel successfully created',
+    type: () => ChannelEntity,
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
@@ -54,8 +56,10 @@ export class ChannelController {
   @HttpCode(HttpStatus.CREATED)
   public async create(
     @Body(ChannelValidationPipe) dto: CreateChannelDto
-  ): Promise<void> {
+  ): Promise<ChannelEntity> {
     await this.channelService.createChannel(dto);
+
+    return this.channelService.getChannelOrThrow(dto.fqcn);
   }
 
   @Get('/:fqcn')
@@ -131,10 +135,11 @@ export class ChannelController {
     await this.channelService.deleteChannelOrThrow(fqcn);
   }
 
-  @Put()
+  @Put('/:fqcn')
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Channel successfully updated',
+    type: () => ChannelEntity,
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
@@ -146,8 +151,13 @@ export class ChannelController {
     description: 'Unauthorized',
   })
   @HttpCode(HttpStatus.OK)
-  public async update(@Body() dto: CreateChannelDto): Promise<void> {
-    await this.channelService.updateChannel(dto);
+  public async update(
+    @Body() dto: UpdateChannelDto,
+    @Param() { fqcn }: GetChannelParamsDto
+  ): Promise<ChannelEntity> {
+    await this.channelService.updateChannel(dto, fqcn);
+
+    return this.channelService.getChannelOrThrow(fqcn);
   }
 
   @Post('refresh')

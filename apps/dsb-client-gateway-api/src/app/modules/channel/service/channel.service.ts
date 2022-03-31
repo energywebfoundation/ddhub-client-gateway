@@ -3,7 +3,6 @@ import { ChannelRepository } from '../repository/channel.repository';
 import { ChannelEntity, ChannelTopic } from '../entity/channel.entity';
 import { CreateChannelDto, TopicDto } from '../dto/request/create-channel.dto';
 import { DsbApiService } from '../../dsb-client/service/dsb-api.service';
-import { TopicNotFoundException } from '../exceptions/topic-not-found.exception';
 import { TopicData, TopicVersion } from '../../dsb-client/dsb-client.interface';
 import { ChannelNotFoundException } from '../exceptions/channel-not-found.exception';
 import moment from 'moment';
@@ -12,6 +11,7 @@ import { CommandBus } from '@nestjs/cqrs';
 import { RefreshTopicsCacheCommand } from '../command/refresh-topics-cache.command';
 import { ChannelQualifiedDids } from '../channel.interface';
 import { ChannelType } from '../channel.const';
+import { UpdateChannelDto } from '../dto/request/update-channel.dto';
 
 @Injectable()
 export class ChannelService {
@@ -35,10 +35,6 @@ export class ChannelService {
     const topicsWithIds: ChannelTopic[] = await this.getTopicsWithIds(
       payload.conditions.topics
     );
-
-    if (topicsWithIds.length === 0) {
-      throw new TopicNotFoundException();
-    }
 
     const creationDate: string = moment().toISOString();
 
@@ -122,11 +118,14 @@ export class ChannelService {
     await this.commandBus.execute(new RefreshTopicsCacheCommand());
   }
 
-  public async updateChannel(dto: CreateChannelDto): Promise<void> {
-    const channel: ChannelEntity = this.getChannelOrThrow(dto.fqcn);
+  public async updateChannel(
+    dto: UpdateChannelDto,
+    fqcn: string
+  ): Promise<void> {
+    const channel: ChannelEntity = this.getChannelOrThrow(fqcn);
 
     const hasChangedRestrictedFields: boolean =
-      channel.type !== dto.type || channel.fqcn !== dto.fqcn;
+      channel.type !== dto.type || channel.fqcn !== fqcn;
 
     if (hasChangedRestrictedFields) {
       throw new ChannelUpdateRestrictedFieldsException();
@@ -135,10 +134,6 @@ export class ChannelService {
     const topicsWithIds: ChannelTopic[] = await this.getTopicsWithIds(
       dto.conditions.topics
     );
-
-    if (topicsWithIds.length === 0) {
-      throw new TopicNotFoundException();
-    }
 
     const updateDate: string = moment().toISOString();
 
@@ -187,7 +182,7 @@ export class ChannelService {
     return topicsToReturn;
   }
 
-  public getChannelsByType(type: ChannelType): ChannelEntity[] {
+  public getChannelsByType(type?: ChannelType): ChannelEntity[] {
     return this.channelRepository.getChannelsByType(type);
   }
 }

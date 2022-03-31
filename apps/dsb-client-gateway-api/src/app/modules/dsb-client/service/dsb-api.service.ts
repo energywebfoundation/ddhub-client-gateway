@@ -9,15 +9,15 @@ import { lastValueFrom } from 'rxjs';
 import {
   Channel,
   Message,
-  SendMessageData,
+  SendInternalMessageRequestDTO,
   SendInternalMessageResponse,
+  SendMessageData,
+  SendMessageResponse,
   SendTopicBodyDTO,
   Topic,
   TopicDataResponse,
   TopicResultDTO,
   TopicVersionResponse,
-  SendInternalMessageRequestDTO,
-  SendMessageResponse,
 } from '../dsb-client.interface';
 import { SecretsEngineService } from '../../secrets-engine/secrets-engine.interface';
 
@@ -63,6 +63,10 @@ export class DsbApiService implements OnModuleInit {
     roles: string[],
     searchType: 'ANY'
   ): Promise<string[]> {
+    if (roles.length === 0) {
+      return [];
+    }
+
     const { data } = await promiseRetry(async (retry, attempt) => {
       return lastValueFrom(
         this.httpService.get(this.baseUrl + '/roles/list', {
@@ -370,13 +374,23 @@ export class DsbApiService implements OnModuleInit {
             },
           }
         )
-      ).catch((err) => this.handleRequestWithRetry(err, retry));
+      ).catch((err) => this.handleRequestWithRetry(err, retry, attempt));
     });
 
     return data;
   }
 
-  protected async handleRequestWithRetry(e, retry): Promise<any> {
+  protected async handleRequestWithRetry(
+    e,
+    retry,
+    attempt?: number
+  ): Promise<any> {
+    attempt++;
+
+    if (attempt && attempt > 3) {
+      throw e;
+    }
+
     if (!e.response) {
       this.logger.error(e);
 
@@ -490,6 +504,8 @@ export class DsbApiService implements OnModuleInit {
   protected async initExtChannel(): Promise<void> {
     try {
       const { data } = await promiseRetry(async (retry, attempt) => {
+        console.log(attempt);
+
         return lastValueFrom(
           this.httpService.post(
             this.baseUrl + '/channel/initExtChannel',
@@ -502,7 +518,15 @@ export class DsbApiService implements OnModuleInit {
               },
             }
           )
-        ).catch((err) => this.handleRequestWithRetry(err, retry));
+        ).catch((err) => {
+          if (err.response.data.returnCode === '10') {
+            this.logger.error('Unauthorized to initExtChannel');
+
+            throw err;
+          }
+
+          return this.handleRequestWithRetry(err, retry, attempt);
+        });
       });
 
       this.logger.log('Init ext channel successful');

@@ -28,6 +28,7 @@ export class DidAuthService {
     const { access_token, refresh_token } = await promiseRetry(
       async (retry, attempt) => {
         if (attempt > 3) {
+          console.error('DDDd');
           throw new Error('NO MORE RETRIES BOY');
         }
 
