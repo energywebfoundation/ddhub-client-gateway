@@ -19,7 +19,7 @@ export class ChannelDidCacheService {
     protected readonly topicRepository: TopicRepository
   ) {}
 
-  public async refreshChannelCache(): Promise<void> {
+  public async refreshChannelCache(fqcn: string): Promise<void> {
     if (!this.iamService.isInitialized()) {
       this.logger.warn('IAM connection is not initialized, skipping');
 
@@ -34,53 +34,46 @@ export class ChannelDidCacheService {
       return;
     }
 
-    const internalChannels: ChannelEntity[] = this.channelService.getChannels();
+    const internalChannel: ChannelEntity =
+      this.channelService.getChannelOrThrow(fqcn);
 
-    if (internalChannels.length === 0) {
-      this.logger.log('No internal channels, job not running');
+    const rolesForDIDs: string[] = await this.dsbApiService.getDIDsFromRoles(
+      internalChannel.conditions.roles,
+      'ANY'
+    );
+
+    if (!rolesForDIDs.length) {
+      this.logger.warn(
+        `There is no single DID for listed roles`,
+        internalChannel.conditions.roles
+      );
+    } else {
+      this.logger.log(`Updating DIDs for ${internalChannel.fqcn}`);
+
+      await this.channelService.updateChannelQualifiedDids(
+        internalChannel.fqcn,
+        rolesForDIDs
+      );
     }
 
-    for (const internalChannel of internalChannels) {
-      const rolesForDIDs: string[] = await this.dsbApiService.getDIDsFromRoles(
-        internalChannel.conditions.roles,
-        'ANY'
-      );
+    for (const { topicId } of internalChannel.conditions.topics) {
+      const topicVersions: TopicVersionResponse =
+        await this.dsbApiService.getTopicVersions(topicId);
 
-      if (!rolesForDIDs.length) {
-        this.logger.warn(
-          `There is no single DID for listed roles`,
-          internalChannel.conditions.roles
-        );
-      } else {
-        this.logger.log(`Updating DIDs for ${internalChannel.fqcn}`);
+      if (topicVersions.records.length === 0) {
+        this.logger.warn(`Topic with id ${topicId} does not have any versions`);
 
-        await this.channelService.updateChannelRealDids(
-          internalChannel.fqcn,
-          rolesForDIDs
-        );
+        continue;
       }
 
-      for (const { topicId } of internalChannel.conditions.topics) {
-        const topicVersions: TopicVersionResponse =
-          await this.dsbApiService.getTopicVersions(topicId);
+      await this.channelService.updateChannelTopic(
+        internalChannel.fqcn,
+        topicId,
+        topicVersions.records
+      );
 
-        if (topicVersions.records.length === 0) {
-          this.logger.warn(
-            `Topic with id ${topicId} does not have any versions`
-          );
-
-          continue;
-        }
-
-        await this.channelService.updateChannelTopic(
-          internalChannel.fqcn,
-          topicId,
-          topicVersions.records
-        );
-
-        for (const topicVersion of topicVersions.records) {
-          await this.topicRepository.createOrUpdateTopic(topicVersion, topicId);
-        }
+      for (const topicVersion of topicVersions.records) {
+        await this.topicRepository.createOrUpdateTopic(topicVersion, topicId);
       }
     }
   }

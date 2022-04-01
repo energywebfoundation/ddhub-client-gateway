@@ -13,6 +13,7 @@ import { CreateIdentityDto } from './dto/create-identity.dto';
 import { DigestGuard } from '../utils/guards/digest.guard';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { IdentityWithEnrolment } from './identity.interface';
+import { ClaimsResponseDto } from './dto/claims-response.dto';
 
 @Controller('identity')
 @UseGuards(DigestGuard)
@@ -36,6 +37,11 @@ export class IdentityController {
   })
   public async get(): Promise<IdentityWithEnrolment> {
     return this.identityService.getIdentityWithEnrolment();
+  }
+
+  @Get('/claims')
+  public async getClaims(): Promise<ClaimsResponseDto> {
+    return this.identityService.getClaims();
   }
 
   @Post()

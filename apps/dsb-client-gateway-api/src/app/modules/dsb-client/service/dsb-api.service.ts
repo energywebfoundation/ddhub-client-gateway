@@ -5,7 +5,7 @@ import { Agent } from 'https';
 import { TlsAgentService } from './tls-agent.service';
 import { EthersService } from '../../utils/service/ethers.service';
 import { IamService } from '../../iam-service/service/iam.service';
-import { lastValueFrom } from 'rxjs';
+import { lastValueFrom, Observable } from 'rxjs';
 import {
   Channel,
   Message,
@@ -25,9 +25,16 @@ import promiseRetry from 'promise-retry';
 import FormData from 'form-data';
 import { EnrolmentRepository } from '../../storage/repository/enrolment.repository';
 import { DidAuthService } from '../module/did-auth/service/did-auth.service';
-import { SchedulerRegistry } from '@nestjs/schedule';
 import * as qs from 'qs';
 import 'multer';
+import { RetryConfigService } from '../../utils/service/retry-config.service';
+import { AxiosResponse } from '@nestjs/terminus/dist/health-indicator/http/axios.interfaces';
+import { isAxiosError } from '@nestjs/terminus/dist/utils';
+
+export interface RetryOptions {
+  stopOnStatusCodes?: HttpStatus[];
+  stopOnResponseCodes?: string[];
+}
 
 @Injectable()
 export class DsbApiService implements OnModuleInit {
@@ -51,12 +58,25 @@ export class DsbApiService implements OnModuleInit {
     protected readonly iamService: IamService,
     protected readonly secretsEngineService: SecretsEngineService,
     protected readonly didAuthService: DidAuthService,
-    protected readonly schedulerRegistry: SchedulerRegistry
+    protected readonly retryConfigService: RetryConfigService
   ) {
     this.baseUrl = this.configService.get<string>(
       'DSB_BASE_URL',
       'https://dsb-dev.energyweb.org'
     );
+  }
+
+  protected async request<T>(
+    requestFn: Observable<AxiosResponse<T>>,
+    retryOptions: RetryOptions = {}
+  ): Promise<T> {
+    const { data } = await promiseRetry<AxiosResponse<T>>(async (retry) => {
+      return lastValueFrom(requestFn).catch((err) =>
+        this.handleRequestWithRetry(err, retry, retryOptions)
+      );
+    }, this.retryConfigService.config);
+
+    return data;
   }
 
   public async getDIDsFromRoles(
@@ -383,41 +403,58 @@ export class DsbApiService implements OnModuleInit {
   protected async handleRequestWithRetry(
     e,
     retry,
-    attempt?: number
+    options: RetryOptions = {}
   ): Promise<any> {
-    attempt++;
+    const defaults = {
+      retryAttempts: this.configService.get<number>('RET'),
+      stopOnStatusCodes: [HttpStatus.FORBIDDEN],
+      stopOnResponseCodes: [],
+      ...options,
+    };
 
-    if (attempt && attempt > 3) {
+    if (!isAxiosError(e)) {
+      this.logger.error('Request failed due to unknown error', e);
+
       throw e;
-    }
-
-    if (!e.response) {
-      this.logger.error(e);
-
-      return;
     }
 
     const { status } = e.response;
 
-    this.logger.error(e.request.path);
+    this.logger.error('Request failed', e.request.path);
     this.logger.error(e.response.data);
+
+    if (defaults.stopOnStatusCodes.includes(status)) {
+      this.logger.error(
+        'Request stopped because of stopOnResponseCodes rule',
+        status,
+        defaults.stopOnStatusCodes
+      );
+
+      throw e;
+    }
+
+    if (
+      e.response.data.returnCode &&
+      defaults.stopOnResponseCodes.includes(e.response.data.returnCode)
+    ) {
+      this.logger.error(
+        'Request stopped because of stopOnResponseCodes rule',
+        e.response.data.returnCode,
+        defaults.stopOnResponseCodes
+      );
+
+      throw e;
+    }
 
     if (status === HttpStatus.UNAUTHORIZED) {
       this.logger.log('Unauthorized, attempting to login');
 
       await this.login();
-      // return retry()
-      throw new Error(e);
+
+      return retry();
     }
 
-    if (status === HttpStatus.FORBIDDEN) {
-      this.logger.error(`Request forbidden`);
-
-      throw new Error();
-    }
-
-    throw new Error(e);
-    // return retry();
+    return retry();
   }
 
   public async getChannels(): Promise<Channel[]> {
@@ -503,41 +540,26 @@ export class DsbApiService implements OnModuleInit {
 
   protected async initExtChannel(): Promise<void> {
     try {
-      const { data } = await promiseRetry(async (retry, attempt) => {
-        console.log(attempt);
-
-        return lastValueFrom(
-          this.httpService.post(
-            this.baseUrl + '/channel/initExtChannel',
-            {
-              httpsAgent: this.getTLS(),
+      await this.request<null>(
+        this.httpService.post(
+          this.baseUrl + '/channel/initExtChannel',
+          {
+            httpsAgent: this.getTLS(),
+          },
+          {
+            headers: {
+              ...this.getAuthHeader(),
             },
-            {
-              headers: {
-                ...this.getAuthHeader(),
-              },
-            }
-          )
-        ).catch((err) => {
-          if (err.response.data.returnCode === '10') {
-            this.logger.error('Unauthorized to initExtChannel');
-
-            throw err;
           }
-
-          return this.handleRequestWithRetry(err, retry, attempt);
-        });
-      });
+        ),
+        {
+          stopOnResponseCodes: ['10'],
+        }
+      );
 
       this.logger.log('Init ext channel successful');
-
-      return data;
     } catch (e) {
-      this.logger.error(e);
-
-      if (e.response) {
-        this.logger.error(e.response.data);
-      }
+      this.logger.error('Init ext channel failed', e);
     }
   }
 

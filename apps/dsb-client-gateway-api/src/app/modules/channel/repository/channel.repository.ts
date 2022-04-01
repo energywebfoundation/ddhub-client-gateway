@@ -16,7 +16,7 @@ export class ChannelRepository
   }
 
   public onModuleInit(): void {
-    this.createCollectionIfNotExists(this.collection);
+    this.createCollectionIfNotExists(this.collection, ['fqcn']);
   }
 
   public async createChannel(entity: ChannelEntity): Promise<void> {
@@ -30,9 +30,11 @@ export class ChannelRepository
   public getChannel(name: string): ChannelEntity | null {
     this.logger.debug(`Retrieving channel ${name}`);
 
-    return this.client.getCollection<ChannelEntity>(this.collection).findOne({
-      fqcn: name,
-    });
+    return this.client
+      .getCollection<ChannelEntity>(this.collection)
+      .findObject({
+        fqcn: name,
+      });
   }
 
   public getChannelsByType(type?: ChannelType): ChannelEntity[] {
@@ -48,7 +50,10 @@ export class ChannelRepository
   public async updateChannel(entity: ChannelEntity): Promise<void> {
     this.logger.log(`Updating channel ${entity.fqcn}`);
 
-    this.client.getCollection<ChannelEntity>(this.collection).update(entity);
+    this.client.getCollection<ChannelEntity>(this.collection).updateWhere(
+      ({ fqcn }) => fqcn === entity.fqcn,
+      (obj) => obj
+    );
 
     await this.lokiService.save();
   }

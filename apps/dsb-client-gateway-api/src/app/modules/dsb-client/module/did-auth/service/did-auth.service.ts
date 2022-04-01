@@ -27,6 +27,8 @@ export class DidAuthService {
 
     const { access_token, refresh_token } = await promiseRetry(
       async (retry, attempt) => {
+        console.log('attempt', attempt);
+
         if (attempt > 3) {
           console.error('DDDd');
           throw new Error('NO MORE RETRIES BOY');
@@ -41,16 +43,16 @@ export class DidAuthService {
               this.refreshToken = null;
               this.accessToken = null;
 
-              return retry();
+              return retry(e);
             }
 
             this.refreshToken = refreshTokenData.refresh_token;
             this.accessToken = refreshTokenData.access_token;
 
-            return retry();
+            return retry(e);
           }
 
-          return retry();
+          return retry(e);
         });
       }
     );

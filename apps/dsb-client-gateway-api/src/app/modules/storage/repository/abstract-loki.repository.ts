@@ -13,11 +13,16 @@ export abstract class AbstractLokiRepository<T extends object = any> {
     this.client = lokiService.client;
   }
 
-  protected createCollectionIfNotExists(name: string): void {
+  protected createCollectionIfNotExists(
+    name: string,
+    indices: string[] = []
+  ): void {
     const collection = this.client.getCollection(name);
 
     if (collection === null) {
-      this.client.addCollection(name);
+      this.client.addCollection(name, {
+        indices,
+      });
     }
   }
 

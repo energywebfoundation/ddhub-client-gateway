@@ -30,6 +30,14 @@ export class IamService {
     protected readonly configService: ConfigService
   ) {}
 
+  public async getClaims(): Promise<Claim[]> {
+    return this.cacheClient.getClaimsBySubject(this.getDIDAddress());
+  }
+
+  public async getUserClaimsFromDID() {
+    return this.claimsService.getUserClaims();
+  }
+
   public async setVerificationMethod(
     publicKey: string,
     tag = 'dsb'

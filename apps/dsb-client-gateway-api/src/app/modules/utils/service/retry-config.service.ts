@@ -1,15 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { OperationOptions } from 'retry';
 
 @Injectable()
 export class RetryConfigService {
   constructor(protected readonly configService: ConfigService) {}
 
-  get config(): {
-    retries: number;
-    factor: number;
-    minTimeout: number;
-  } {
+  get config(): OperationOptions {
     return {
       factor: this.configService.get<number>('RETRY_FACTOR', 2),
       retries: this.configService.get<number>('MAX_RETRIES', 10),

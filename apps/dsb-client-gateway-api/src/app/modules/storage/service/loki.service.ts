@@ -13,7 +13,7 @@ export class LokiService implements OnModuleInit, OnApplicationShutdown {
     this.client = new loki('data.db', {
       autoload: true,
       autosave: true,
-      autosaveInterval: 2000,
+      serializationMethod: 'pretty',
     });
   }
 
@@ -24,7 +24,7 @@ export class LokiService implements OnModuleInit, OnApplicationShutdown {
   public async save(): Promise<void> {
     const promise = () =>
       new Promise((resolve, reject) => {
-        this.client.save((err) => {
+        this.client.saveDatabase((err) => {
           if (err) {
             return reject(err);
           }
