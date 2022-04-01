@@ -2,7 +2,8 @@ import { useState } from 'react';
 import axios from 'axios';
 import Swal from 'sweetalert2'
 import { GatewayIdentity } from './GatewayIdentity';
-import { BalanceState, Enrolment, EnrolmentState, Identity } from '../../utils';
+import { Identity } from '../../utils';
+import { BalanceState, Enrolment, EnrolmentState } from '@dsb-client-gateway/dsb-client-gateway/identity/models';
 
 type GatewayIdentityContainerProps = {
   identity?: Identity;

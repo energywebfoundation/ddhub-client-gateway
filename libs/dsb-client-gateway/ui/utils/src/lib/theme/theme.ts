@@ -64,6 +64,13 @@ const dsbTheme: ThemeOptions = {
           width: '100%'
         }
       }
+    },
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+          width: '100%'
+        }
+      }
     }
   },
 }

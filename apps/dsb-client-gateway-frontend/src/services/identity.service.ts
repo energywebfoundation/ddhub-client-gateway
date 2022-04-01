@@ -1,14 +1,13 @@
 import { Wallet } from 'ethers';
 import {
-  EnrolmentState,
   NoPrivateKeyError,
   Result,
-  RoleState,
   Storage,
 } from '../utils';
 import { config } from '../config';
 import { getIdentity } from './storage.service';
 import axios from 'axios';
+import { EnrolmentState, RoleState } from '@dsb-client-gateway/dsb-client-gateway/identity/models';
 
 /**
  *
@@ -16,15 +15,15 @@ import axios from 'axios';
  * @returns signature (string of concatenated r+s+v)
  */
 export async function signPayload(payload: string): Promise<Result<string>> {
-  const { some: identity } = await getIdentity();
+  const {some: identity} = await getIdentity();
   console.log('signing payload');
 
   if (!identity) {
-    return { err: new NoPrivateKeyError() };
+    return {err: new NoPrivateKeyError()};
   }
   const signer = new Wallet(identity.privateKey);
   const sig = await signer.signMessage(payload);
-  return { ok: sig };
+  return {ok: sig};
 }
 
 /**
@@ -36,9 +35,9 @@ export async function refreshState(): Promise<Result<Storage>> {
     validateStatus: () => true, // no throw
   });
 
-  const identity = await api.get('/api/v1/identity').then(({ data }) => data);
+  const identity = await api.get('/api/v1/identity').then(({data}) => data);
 
-  const enrolment = await api.get('/api/v1/enrol').then(({ data }) => data);
+  const enrolment = await api.get('/api/v1/enrol').then(({data}) => data);
 
   const storage: Storage = {
     identity: {} as any,
@@ -72,7 +71,7 @@ export async function refreshState(): Promise<Result<Storage>> {
  *
  * @returns true if is approved
  */
-export function isApproved({ roles }: EnrolmentState): boolean {
+export function isApproved({roles}: EnrolmentState): boolean {
   return roles.user === RoleState.APPROVED;
   // return config.dsb.controllable
   //   ? roles.messagebroker === RoleState.APPROVED && roles.user === RoleState.APPROVED
