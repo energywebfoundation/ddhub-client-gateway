@@ -1,4 +1,5 @@
 import { GatewayError } from './errors';
+import { BalanceState, Enrolment, EnrolmentState } from '@dsb-client-gateway/dsb-client-gateway/identity/models';
 
 export type Result<T = boolean, E = GatewayError> = {
   ok?: T;
@@ -15,11 +16,6 @@ export type Identity = {
   publicKey: string;
   privateKey: string;
   balance: BalanceState;
-};
-
-export type Enrolment = {
-  did: string;
-  state: EnrolmentState;
 };
 
 export type File = {
@@ -95,28 +91,6 @@ export type Topic = {
   schemaType: string;
   version: string;
   namespace?: string
-};
-
-export enum RoleState {
-  NO_CLAIM = 'NO_CLAIM',
-  AWAITING_APPROVAL = 'AWAITING_APPROVAL',
-  APPROVED = 'APPROVED',
-  NOT_WANTED = 'NOT_WANTED', // if gateway is not controlling message broker
-}
-
-export enum BalanceState {
-  NONE = 'NONE',
-  LOW = 'LOW',
-  OK = 'OK',
-}
-
-export type EnrolmentState = {
-  approved: boolean;
-  waiting: boolean;
-  roles: {
-    user: RoleState;
-    // messagebroker: RoleState
-  };
 };
 
 export enum StringType {
