@@ -394,7 +394,7 @@ export class DsbApiService implements OnModuleInit {
             },
           }
         )
-      ).catch((err) => this.handleRequestWithRetry(err, retry, attempt));
+      ).catch((err) => this.handleRequestWithRetry(err, retry));
     });
 
     return data;

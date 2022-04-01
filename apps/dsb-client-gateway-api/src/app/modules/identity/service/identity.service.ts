@@ -66,7 +66,7 @@ export class IdentityService {
 
   public async getIdentityWithEnrolment(): Promise<IdentityWithEnrolment> {
     const [identity, enrolment]: [Identity, Enrolment] = await Promise.all([
-      this.getIdentity(),
+      this.getIdentity(true),
       this.enrolmentService.getEnrolment(),
     ]);
 
@@ -82,19 +82,33 @@ export class IdentityService {
     return !!identity;
   }
 
-  public async getIdentity(): Promise<Identity | null> {
-    const identity: Identity | null = this.identityRepository.getIdentity();
+  public async getIdentity(refreshBalance = false): Promise<Identity | null> {
+    if (refreshBalance) {
+      const rootKey: string | null =
+        await this.secretsEngineService.getPrivateKey();
 
-    if (!identity) {
-      return null;
+      if (!rootKey) {
+        throw new NoPrivateKeyException();
+      }
+
+      const wallet = this.ethersService.getWalletFromPrivateKey(rootKey);
+
+      const balanceState = await this.ethersService.getBalance(wallet.address);
+
+      return {
+        publicKey: wallet.publicKey,
+        balance: balanceState,
+        address: wallet.address,
+      };
     }
 
-    const balanceState = await this.ethersService.getBalance(identity.address);
+    const identity = this.identityRepository.getIdentity();
 
-    return {
-      ...identity,
-      balance: balanceState,
-    };
+    if (!identity) {
+      throw new NoPrivateKeyException();
+    }
+
+    return identity;
   }
 
   public async getIdentityOrThrow(): Promise<Identity> {
