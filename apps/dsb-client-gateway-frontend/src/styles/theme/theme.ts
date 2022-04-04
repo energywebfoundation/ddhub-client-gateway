@@ -57,6 +57,13 @@ const dsbTheme: ThemeOptions = {
           height: '100%'
         }
       }
+    },
+    MuiInputBase: {
+      styleOverrides: {
+        root: {
+          width: '100%'
+        }
+      }
     }
   },
 }

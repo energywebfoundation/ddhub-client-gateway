@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { AppProps } from 'next/app';
 import Router from 'next/router';
 import NProgress from 'nprogress';
@@ -7,7 +7,7 @@ import Axios from 'axios';
 import { DDHubThemeProvider } from '../styles/theme';
 import { CacheProvider, EmotionCache } from '@emotion/react';
 import { CssBaseline } from '@mui/material';
-import createCache from "@emotion/cache";
+import createCache from '@emotion/cache';
 import '../styles/globals.css';
 import 'nprogress/nprogress.css';
 import { Layout } from '../components/Layout';
@@ -15,14 +15,18 @@ import { Layout } from '../components/Layout';
 Axios.defaults.baseURL = process.env.NEXT_PUBLIC_SERVER_BASE_URL + '/api';
 
 let muiCache: EmotionCache | undefined = undefined;
-export const createMuiCache = () => muiCache = createCache({ "key": "mui", "prepend": true });
+export const createMuiCache = () => muiCache = createCache({'key': 'mui', 'prepend': true});
 
 export interface MyAppProps extends AppProps {
   emotionCache?: EmotionCache;
 }
 
 function MyApp(props: MyAppProps) {
-  const { Component, pageProps } = props;
+  const {Component, pageProps} = props;
+
+  const getLayout = (Component as any).getLayout  || ((page) => <Layout>
+    {page}
+  </Layout>)
 
   useEffect(() => {
     NProgress.configure({showSpinner: false});
@@ -42,9 +46,7 @@ function MyApp(props: MyAppProps) {
       </Head>
       <DDHubThemeProvider>
         <CssBaseline />
-        <Layout>
-          <Component {...pageProps} />
-        </Layout>
+        {getLayout(<Component {...pageProps} />)}
       </DDHubThemeProvider>
     </CacheProvider>
   );
