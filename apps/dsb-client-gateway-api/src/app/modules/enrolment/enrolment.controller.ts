@@ -1,6 +1,6 @@
 import { Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { EnrolmentService } from './service/enrolment.service';
-import { Enrolment } from '../storage/storage.interface';
+import { Enrolment } from '@dsb-client-gateway/dsb-client-gateway/identity/models';
 import { DigestGuard } from '../utils/guards/digest.guard';
 import { ApiTags } from '@nestjs/swagger';
 

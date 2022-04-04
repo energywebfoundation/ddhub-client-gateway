@@ -8,11 +8,10 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { IdentityService } from './service/identity.service';
-import { Identity } from '../storage/storage.interface';
 import { CreateIdentityDto } from './dto/create-identity.dto';
 import { DigestGuard } from '../utils/guards/digest.guard';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
-import { IdentityWithEnrolment } from './identity.interface';
+import { Identity, IdentityWithEnrolment } from '@dsb-client-gateway/dsb-client-gateway/identity/models';
 import { ClaimsResponseDto } from './dto/claims-response.dto';
 
 @Controller('identity')

@@ -1,4 +1,4 @@
-import { RoleState } from '../../storage/storage.interface';
+import { RoleState } from '@dsb-client-gateway/dsb-client-gateway/identity/models';
 
 export class ClaimResponseDto {
   namespace: string;

@@ -4,7 +4,7 @@ import * as EventEmitter from 'events';
 import { IamService } from '../../iam-service/service/iam.service';
 import { connect, JSONCodec } from 'nats.ws';
 import { ConfigService } from '@nestjs/config';
-import { EnrolmentState, RoleState } from '../../storage/storage.interface';
+import { EnrolmentState, RoleState } from '@dsb-client-gateway/dsb-client-gateway/identity/models';
 import { Claim, ClaimEventType } from 'iam-client-lib';
 import { EnrolmentRepository } from '../../storage/repository/enrolment.repository';
 

@@ -13,7 +13,7 @@ import {
   SigningKey,
 } from 'ethers/lib/utils';
 import { IdentityService } from '../../identity/service/identity.service';
-import { BalanceState } from '../../utils/balance.const';
+import { BalanceState } from '@dsb-client-gateway/dsb-client-gateway/identity/models';
 
 @Injectable()
 export class KeysService implements OnModuleInit {

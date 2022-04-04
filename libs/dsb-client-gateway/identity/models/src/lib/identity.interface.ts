@@ -1,5 +1,5 @@
-import { BalanceState } from '../utils/balance.const';
-import { Enrolment, RoleState } from '../storage/storage.interface';
+import { BalanceState } from './balance.enum';
+import { Enrolment, RoleState } from './dsb-client-gateway-identity-models';
 
 export interface IdentityWithEnrolment {
   address: string;
