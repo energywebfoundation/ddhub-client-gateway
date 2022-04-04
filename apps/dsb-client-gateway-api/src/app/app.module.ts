@@ -16,40 +16,50 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { UtilsModule } from './modules/utils/utils.module';
 import { configValidate } from './modules/utils/config.validate';
 import { ChannelModule } from './modules/channel/channel.module';
-import { MessageModule } from './modules/message/message.module'
+import { MessageModule } from './modules/message/message.module';
 
-@Module({
-  imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-      validate: configValidate,
-    }),
-    MulterModule.register({
-      dest: './files',
-    }),
-    IamModule,
-    IdentityModule,
-    EnrolmentModule,
-    CertificateModule,
-    SecretsEngineModule,
-    DsbClientModule,
-    KeysModule,
-    TerminusModule,
-    ScheduleModule.forRoot(),
-    UtilsModule,
-    ChannelModule,
-    MessageModule
-  ],
-  providers: [
-    {
-      provide: APP_FILTER,
-      useClass: AllExceptionsFilter,
-    },
-    {
-      provide: APP_PIPE,
-      useClass: ValidationPipe,
-    },
-  ],
-  controllers: [HealthController],
-})
-export class AppModule { }
+@Module({})
+export class AppModule {
+  static register({ shouldValidate = true }: { shouldValidate: boolean }) {
+    const imports = [
+      ConfigModule.forRoot({
+        isGlobal: true,
+        validate: shouldValidate && configValidate,
+      }),
+      MulterModule.register({
+        dest: './files',
+      }),
+      IamModule,
+      IdentityModule,
+      EnrolmentModule,
+      CertificateModule,
+      SecretsEngineModule,
+      DsbClientModule,
+      KeysModule,
+      TerminusModule,
+      ScheduleModule.forRoot(),
+      UtilsModule,
+      ChannelModule,
+      MessageModule,
+    ];
+
+    const providers = [
+      {
+        provide: APP_FILTER,
+        useClass: AllExceptionsFilter,
+      },
+      {
+        provide: APP_PIPE,
+        useClass: ValidationPipe,
+      },
+    ];
+    const controllers = [HealthController];
+
+    return {
+      module: AppModule,
+      imports,
+      providers,
+      controllers,
+    };
+  }
+}

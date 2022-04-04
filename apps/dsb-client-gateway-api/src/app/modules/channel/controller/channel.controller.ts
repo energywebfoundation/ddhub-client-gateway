@@ -102,7 +102,7 @@ export class ChannelController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Gives channels based on type from query',
-    type: () => [ChannelEntity],
+    type: [GetChannelResponseDto],
   })
   @ApiResponse({
     status: HttpStatus.UNAUTHORIZED,
@@ -110,7 +110,7 @@ export class ChannelController {
   })
   public async getByType(
     @Query() query: GetChannelByTypeQueryDto
-  ): Promise<ChannelEntity[]> {
+  ): Promise<GetChannelResponseDto[]> {
     return this.channelService.getChannelsByType(query.type);
   }
 
