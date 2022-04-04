@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { BigNumber, providers, utils, Wallet } from 'ethers';
-import { BalanceState } from '../balance.const';
+import { BalanceState } from '@dsb-client-gateway/dsb-client-gateway/identity/models';
 import { parseEther } from 'ethers/lib/utils';
 
 @Injectable()

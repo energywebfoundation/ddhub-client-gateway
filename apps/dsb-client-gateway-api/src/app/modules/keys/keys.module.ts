@@ -4,9 +4,10 @@ import { StorageModule } from '../storage/storage.module';
 import { SecretsEngineModule } from '../secrets-engine/secrets-engine.module';
 import { KeysController } from './keys.controller';
 import { KeysRepository } from './repository/keys.repository';
+import { IdentityModule } from '../identity/identity.module';
 
 @Module({
-  imports: [StorageModule, SecretsEngineModule],
+  imports: [StorageModule, SecretsEngineModule, IdentityModule],
   providers: [KeysService, KeysRepository],
   controllers: [KeysController],
   exports: [KeysService],
