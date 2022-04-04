@@ -1,7 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { EthersService } from '../../../../utils/service/ethers.service';
 import { DidAuthResponse } from '../did-auth.interface';
-import promiseRetry from 'promise-retry';
 import { DidAuthApiService } from './did-auth-api.service';
 
 @Injectable()
@@ -25,32 +24,30 @@ export class DidAuthService {
 
     const proof = await this.ethersService.createProof(privateKey, did);
 
-    const { access_token, refresh_token } = await promiseRetry(
-      async (retry, attempt) => {
-        return this.didAuthApiService.login(proof).catch(async (e) => {
-          if (this.refreshToken) {
-            const refreshTokenData: DidAuthResponse | null =
-              await this.didAuthApiService.refreshToken(this.refreshToken);
+    const response = await this.didAuthApiService
+      .login(proof)
+      .catch(async (e) => {
+        if (this.refreshToken) {
+          const refreshTokenData: DidAuthResponse | null =
+            await this.didAuthApiService.refreshToken(this.refreshToken);
 
-            if (!refreshTokenData) {
-              this.refreshToken = null;
-              this.accessToken = null;
+          if (!refreshTokenData) {
+            this.refreshToken = null;
+            this.accessToken = null;
 
-              return retry(e);
-            }
-
-            this.refreshToken = refreshTokenData.refresh_token;
-            this.accessToken = refreshTokenData.access_token;
-
-            return retry(e);
+            throw e;
           }
 
-          return retry(e);
-        });
-      }
-    );
+          this.refreshToken = refreshTokenData.refresh_token;
+          this.accessToken = refreshTokenData.access_token;
+        }
+      });
 
-    this.accessToken = access_token;
-    this.refreshToken = refresh_token;
+    if (!response) {
+      throw new Error();
+    }
+
+    this.accessToken = response.access_token;
+    this.refreshToken = response.refresh_token;
   }
 }

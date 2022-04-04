@@ -34,6 +34,7 @@ import { isAxiosError } from '@nestjs/terminus/dist/utils';
 export interface RetryOptions {
   stopOnStatusCodes?: HttpStatus[];
   stopOnResponseCodes?: string[];
+  retryWithAuth?: boolean;
 }
 
 @Injectable()
@@ -405,10 +406,10 @@ export class DsbApiService implements OnModuleInit {
     retry,
     options: RetryOptions = {}
   ): Promise<any> {
-    const defaults = {
-      retryAttempts: this.configService.get<number>('RET'),
+    const defaults: RetryOptions = {
       stopOnStatusCodes: [HttpStatus.FORBIDDEN],
       stopOnResponseCodes: [],
+      retryWithAuth: true,
       ...options,
     };
 
@@ -451,10 +452,10 @@ export class DsbApiService implements OnModuleInit {
 
       await this.login();
 
-      return retry();
+      return retry(e);
     }
 
-    return retry();
+    return retry(e);
   }
 
   public async getChannels(): Promise<Channel[]> {
@@ -486,10 +487,11 @@ export class DsbApiService implements OnModuleInit {
       return;
     }
 
-    await this.didAuthService.login(
-      privateKey,
-      this.iamService.getDIDAddress()
-    );
+    await promiseRetry(async (retry) => {
+      await this.didAuthService
+        .login(privateKey, this.iamService.getDIDAddress())
+        .catch((e) => retry(e));
+    }, this.retryConfigService.config);
 
     this.logger.log('Login successful, attempting to init ext channel');
 

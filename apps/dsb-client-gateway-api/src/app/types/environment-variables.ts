@@ -109,7 +109,7 @@ export class EnvironmentVariables {
 
   @IsPositive()
   @IsOptional()
-  MAX_RETRIES = 10;
+  MAX_RETRIES = 3;
 
   @IsPositive()
   @IsOptional()
