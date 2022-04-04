@@ -1,0 +1,29 @@
+{
+  "root": "apps/dsb-client-gateway-api-client",
+  "sourceRoot": "apps/dsb-client-gateway-api-client/src",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "executor": "@nrwl/workspace:run-commands",
+      "options": {
+        "cwd": "apps/dsb-client-gateway-api-client",
+        "command": "tsc -b tsconfig.json"
+      }
+    },
+    "build-schema": {
+      "executor": "@nrwl/workspace:run-commands",
+      "options": {
+        "cwd": "apps/dsb-client-gateway-api-client/src",
+        "command": "ts-node -r ./generateSchema.ts"
+      }
+    },
+    "generate": {
+      "executor": "@nrwl/workspace:run-commands",
+      "options": {
+        "cwd": "apps/dsb-client-gateway-api-client",
+        "command": "rm -rf ./src/client && orval && barrelsby -d ./src/client"
+      }
+    }
+  },
+  "tags": []
+}
