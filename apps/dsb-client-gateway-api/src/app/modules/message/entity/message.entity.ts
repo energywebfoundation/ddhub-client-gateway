@@ -19,7 +19,7 @@ export interface SendMessageFailedResponse {
   };
 }
 
-export interface recipients {
+export interface Recipients {
   total: number;
   sent: number;
   failed: number;
@@ -30,7 +30,7 @@ export interface SendInternalMessageResponse {
 }
 export interface SendMessageResponse {
   clientGatewayMessageId: string;
-  recipients: recipients;
+  recipients: Recipients;
   did: string;
   success: SendMessageSuccessResponse[];
   failed: SendMessageFailedResponse[];

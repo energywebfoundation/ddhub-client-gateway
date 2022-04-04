@@ -18,6 +18,8 @@ import {
   TopicVersionResponse,
   SendInternalMessageRequestDTO,
   SendMessageResponse,
+  ApplicationDTO,
+  SearchMessageResponseDto,
 } from '../dsb-client.interface';
 import { SecretsEngineService } from '../../secrets-engine/secrets-engine.interface';
 
@@ -124,24 +126,30 @@ export class DsbApiService implements OnModuleInit {
 
   public async uploadFile(
     file: Express.Multer.File,
-    fileName: string,
-    fqcn: string,
+    fqcns: string[],
+    topicId: string,
+    topicVersion: string,
     signature: string,
-    topicId: string
-  ): Promise<void> {
+    encryptedMessage: string,
+    clientGatewayMessageId: string,
+    transactionId?: string
+  ): Promise<SendMessageResponse> {
+    this.logger.log('Uploading File');
     try {
       const formData = new FormData();
 
-      formData.append('file', file.buffer);
-      formData.append('fileName', fileName);
-      formData.append('fqcn', fqcn);
+      formData.append('file', encryptedMessage);
+      formData.append('fileName', file.originalname);
+      formData.append('fqcns', fqcns.join(','));
       formData.append('signature', signature);
       formData.append('topicId', topicId);
-      formData.append('topicVersion', '1.0.0');
+      formData.append('topicVersion', topicVersion);
+      formData.append('clientGatewayMessageId', clientGatewayMessageId);
+      formData.append('transactionId', transactionId);
 
       const { data } = await promiseRetry(async (retry, attempt) => {
         return lastValueFrom(
-          this.httpService.post(this.baseUrl + '/message/upload', formData, {
+          this.httpService.post(this.baseUrl + '/messages/upload', formData, {
             maxContentLength: Infinity,
             maxBodyLength: Infinity,
             httpsAgent: this.getTLS(),
@@ -150,11 +158,33 @@ export class DsbApiService implements OnModuleInit {
               ...formData.getHeaders(),
             },
           })
-        ).catch((err) => this.handleRequestWithRetry(err, retry));
+        ).catch((err) => {
+          return this.handleRequestWithRetry(err, retry);
+        });
       });
+      this.logger.log('File Uploaded Successfully');
+      return data;
     } catch (e) {
       this.logger.error(e);
     }
+  }
+
+  public async downloadFile(fileId: string): Promise<any> {
+    const response = await promiseRetry(async (retry, attempt) => {
+      return lastValueFrom(
+        this.httpService.get(this.baseUrl + '/messages/download', {
+          params: {
+            fileId,
+          },
+          httpsAgent: this.getTLS(),
+          headers: {
+            Authorization: `Bearer ${this.didAuthService.getToken()}`,
+          },
+        })
+      ).catch((err) => this.handleRequestWithRetry(err, retry));
+    });
+
+    return response;
   }
 
   public async getTopicsByOwnerAndName(
@@ -179,27 +209,29 @@ export class DsbApiService implements OnModuleInit {
     return data;
   }
 
-  public async getTopics(ownerDID?: string): Promise<TopicDataResponse> {
-    if (!ownerDID) {
+  public async getApplicationsByOwnerAndRole(
+    roleName: string
+  ): Promise<ApplicationDTO[]> {
+    this.logger.debug('start: dsb API service getApplicationsByOwnerAndRole ');
+    try {
       const enrolment = this.enrolmentRepository.getEnrolment();
-
-      if (!enrolment) {
-        return {
-          count: 0,
-          limit: 0,
-          page: 1,
-          records: [],
-        };
-      }
-
-      ownerDID = enrolment.did;
+      const ownerDID = enrolment.did;
+      this.logger.debug('sucessfully fetched owner did');
+      return this.iamService.getApplicationsByOwnerAndRole(roleName, ownerDID);
+    } catch (e) {
+      this.logger.error('error while getting applications', e);
+      return e;
+    } finally {
+      this.logger.debug('end: dsb API service getApplicationsByOwnerAndRole');
     }
+  }
 
+  public async getTopics(owner: string): Promise<TopicDataResponse> {
     const { data } = await promiseRetry(async (retry, attempt) => {
       return lastValueFrom(
         this.httpService.get(this.baseUrl + '/topics', {
           params: {
-            owner: ownerDID,
+            owner: owner,
           },
           httpsAgent: this.getTLS(),
           headers: {
@@ -219,7 +251,7 @@ export class DsbApiService implements OnModuleInit {
 
     const { data } = await promiseRetry(async (retry, attempt) => {
       return lastValueFrom(
-        this.httpService.get(this.baseUrl + 'topics/count', {
+        this.httpService.get(this.baseUrl + '/topics/count', {
           params: {
             owner: owners,
           },
@@ -237,11 +269,6 @@ export class DsbApiService implements OnModuleInit {
     return data;
   }
 
-  /**
-   * Sends a POST /postTopics request to the broker
-   *
-   * @returns
-   */
   public async postTopics(data: SendTopicBodyDTO): Promise<Topic> {
     const result = await promiseRetry(async (retry, attempt) => {
       return lastValueFrom(
@@ -257,15 +284,10 @@ export class DsbApiService implements OnModuleInit {
     return result.data;
   }
 
-  /**
-   * Sends a Update /Topics request to the broker
-   *
-   * @returns
-   */
   public async updateTopics(data: SendTopicBodyDTO): Promise<TopicResultDTO> {
     const result = await promiseRetry(async (retry, attempt) => {
       return lastValueFrom(
-        this.httpService.patch(this.baseUrl + '/topics', data, {
+        this.httpService.put(this.baseUrl + '/topics', data, {
           httpsAgent: this.getTLS(),
           headers: {
             Authorization: `Bearer ${this.didAuthService.getToken()}`,
@@ -273,9 +295,36 @@ export class DsbApiService implements OnModuleInit {
         })
       ).catch((err) => this.handleRequestWithRetry(err, retry));
     });
-
     return result.data;
   }
+
+  public async messagesSearch(
+    topicId: string[],
+    senderId: string[],
+    clientId?: string,
+    from?: string,
+    amount?: number
+  ): Promise<SearchMessageResponseDto[]> {
+    const requestBody = {
+      topicId,
+      clientId,
+      amount,
+      from,
+      senderId,
+    };
+    const { data } = await promiseRetry(async (retry, attempt) => {
+      return lastValueFrom(
+        this.httpService.post(this.baseUrl + '/messages/search', requestBody, {
+          httpsAgent: this.getTLS(),
+          headers: {
+            Authorization: `Bearer ${this.didAuthService.getToken()}`,
+          },
+        })
+      ).catch((err) => this.handleRequestWithRetry(err, retry));
+    });
+    return data;
+  }
+
   public async getMessages(
     fqcn: string,
     from?: string,
@@ -310,7 +359,7 @@ export class DsbApiService implements OnModuleInit {
 
   public async sendMessage(
     fqcns: string[],
-    payload: object,
+    payload: string,
     topicId: string,
     topicVersion: string,
     signature: string,
@@ -337,6 +386,7 @@ export class DsbApiService implements OnModuleInit {
         })
       ).catch((err) => this.handleRequestWithRetry(err, retry));
     });
+    this.logger.log('Message Sent Successfully!', data.clientGatewayMessageId);
 
     return data;
   }
@@ -359,6 +409,8 @@ export class DsbApiService implements OnModuleInit {
     };
 
     const { data } = await promiseRetry(async (retry, attempt) => {
+      console.log(this.baseUrl + '/messages/internal');
+
       return lastValueFrom(
         this.httpService.post(
           this.baseUrl + '/messages/internal',
@@ -402,7 +454,15 @@ export class DsbApiService implements OnModuleInit {
       throw new Error();
     }
 
-    throw new Error(e);
+    e.statusCode = status;
+    e.message = e.response.data;
+
+    throw e;
+    // return {
+    //   statusCode: e.response.status,
+    //   message: e.response.data,
+    // };
+
     // return retry();
   }
 

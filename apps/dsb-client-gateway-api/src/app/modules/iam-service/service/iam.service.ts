@@ -76,9 +76,12 @@ export class IamService {
     return this.claimsService.getClaimById(id);
   }
 
-  public async getApplicationsByOwner(
+  public async getApplicationsByOwnerAndRole(
+    roleName: string,
     ownerDid: string
   ): Promise<ApplicationDTO[]> {
+    this.logger.debug('start: ApplicationsByOwnerAndRole');
+
     const didClaims = await this.cacheClient.getClaimsByRequester(ownerDid, {
       isAccepted: true,
     });
@@ -87,7 +90,7 @@ export class IamService {
 
     didClaims.forEach((didClaim) => {
       if (
-        didClaim.claimType.startsWith('topiccreator') &&
+        didClaim.claimType.startsWith(`${roleName}.`) &&
         didClaim.namespace !== this.configService.get('DID_CLAIM_NAMESPACE')
       ) {
         namespaceList.push(didClaim.namespace);
@@ -105,6 +108,8 @@ export class IamService {
     );
 
     const uniqueApplications = [...new Set(applications)];
+
+    this.logger.debug('end: ApplicationsByOwnerAndRole');
 
     return uniqueApplications;
   }

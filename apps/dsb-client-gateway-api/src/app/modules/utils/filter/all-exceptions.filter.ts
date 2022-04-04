@@ -27,6 +27,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
           reason: exception.response.message,
           statusCode: httpStatus,
           code: exception.code,
+          additionalDetails: exception.additionalDetails,
         },
         statusCode: httpStatus,
         timestamp: new Date().toISOString(),

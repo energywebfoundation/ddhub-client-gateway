@@ -75,7 +75,6 @@ export type SendTopicBodyDTO = {
   schemaType: string;
   schema: string;
   version: string;
-  signature: string;
   owner: string;
   tags: string[];
 };
@@ -147,11 +146,28 @@ export interface SendMessageFailedResponse {
 export interface SendInternalMessageResponse {
   id: string;
 }
+
+export interface Recipients {
+  total: number;
+  sent: number;
+  failed: number;
+}
+
+export interface details {
+  did?: string;
+  messageId?: string;
+  statusCode?: number;
+}
+
+export interface status {
+  details: details[];
+  name: string;
+}
 export interface SendMessageResponse {
   clientGatewayMessageId: string;
   did: string;
-  success: SendMessageSuccessResponse[];
-  failed: SendMessageFailedResponse[];
+  recipients: Recipients;
+  status: status[];
 }
 
 export interface SendMessageResult {
@@ -167,4 +183,21 @@ export interface Message {
   signature: string;
   timestampNanos: number;
   transactionId?: string;
+}
+
+export interface SearchMessageResponseDto {
+  messageId: string;
+  topicId: string;
+  topicVersion: string;
+  transactionId: string;
+  signature: string;
+  payload: string;
+  senderDid: string;
+  timestampNanos: string;
+  isFile: boolean;
+  clientGatewayMessageId: string;
+}
+
+export interface FileDownloadResposneDto {
+  file: string;
 }

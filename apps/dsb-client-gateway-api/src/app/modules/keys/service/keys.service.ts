@@ -87,6 +87,8 @@ export class KeysService implements OnModuleInit {
   ): Promise<boolean> {
     const did = await this.iamService.getDid(senderDid);
 
+    // console.log('did', did);
+
     if (!did) {
       this.logger.error(`${senderDid} is invalid DID`);
 
@@ -96,6 +98,8 @@ export class KeysService implements OnModuleInit {
     const key = did.publicKey.find(({ id }) => {
       return id === `${senderDid}#${DIDPublicKeyTags.DSB_SIGNATURE_KEY}`;
     });
+
+    // console.log('key', key);
 
     if (!key) {
       this.logger.error(
@@ -107,6 +111,8 @@ export class KeysService implements OnModuleInit {
 
     const recoveredPublicKey = recoverPublicKey(id(encryptedData), signature);
 
+    // console.log('recoveredPublicKey', recoveredPublicKey);
+
     return recoveredPublicKey === key.publicKeyHex;
   }
 
@@ -115,11 +121,12 @@ export class KeysService implements OnModuleInit {
     clientGatewayMessageId: string,
     senderDid: string
   ): Promise<string | null> {
-    const symmetricKey: KeysEntity | null = this.getSymmetricKey(
-      senderDid,
-      clientGatewayMessageId
-    );
+    console.log('encryptedMessage', encryptedMessage);
+    console.log('clientGatewayMessageId', clientGatewayMessageId);
+    console.log('senderDid', senderDid);
 
+    const symmetricKey: string | null =
+      'W+xoAQtzdANEoNe21elRCN6dInvLeKRkkYGZ6RvaNmHHUOnVywIMCP58T9Fx1BMrDHp+lLhi3NPK6aPqXR0Hl0btgFirXCpQw3WBK8arNDIs4oVAINooZe8l5MO6yR0PmjDyXpy44m1AkXXDXrEmnAnYKkosnEA7gdkbmWDWu8JMNsRJ9l2g5RA5rsZz5T9yd/xOEfXf/Ygd7iBVd4eYgyj0zu+PwYkwF1U1kUKnaf0+of5EX0UGiFZKa2PoqPxqNIDaPitsY5/l4uapSESs1RjDgs6T1G8iGiOXassNWDUNzi/gamIXfMri3XCOW+axGBA2iqX72cBct9K91jAsiL5sIp8tcoAmn7riIhvTZC2OgXAOdCEwmJa7RXdrlUcdNzBA7z/WmHW5ahtrha84JOJ3zxF0i+PUXR7/1lnPhWCW3cfz0WhNKGwnDvdgQwfV9ogrJ+lYqS+uR/cNLk9JQDcIteH4NyAxibPtcI30jEG2TBsc5P1mD2F92TRvPhBvYyv0v3/ARUXTEGidsFMG5qWQiFco3c9pgTs1nhhYHbo1iX1ip2x+KzP0tnTEMeQi38SMBcUvRIolRvKZ1YKPSoSonhAudGcwg4lSXMegQ3kuV5X2Whn/n1vKzYZYfyrSRWLhUO0ITH+lQJyo1H84FRbr2NUs8fWFPFjNQOs51K8=';
     if (!symmetricKey) {
       this.logger.error(
         `${senderDid}:${clientGatewayMessageId} does not have symmetric key`
@@ -149,9 +156,11 @@ export class KeysService implements OnModuleInit {
 
     const decryptedKey: string = this.decryptSymmetricKey(
       privateKey,
-      symmetricKey.encryptedSymmetricKey,
+      symmetricKey,
       rootKey
     );
+
+    console.log('decryptedKey', decryptedKey);
 
     const decipher = crypto.createDecipheriv(
       this.symmetricAlgorithm,
@@ -162,6 +171,8 @@ export class KeysService implements OnModuleInit {
     let decrypted = decipher.update(encryptedData, 'hex', 'utf-8');
 
     decrypted = decrypted + decipher.final('utf-8');
+
+    console.log('decrypted', decrypted);
 
     return decrypted;
   }

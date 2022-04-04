@@ -16,7 +16,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { UtilsModule } from './modules/utils/utils.module';
 import { configValidate } from './modules/utils/config.validate';
 import { ChannelModule } from './modules/channel/channel.module';
-import { MessageModule } from './modules/message/message.module'
+import { MessageModule } from './modules/message/message.module';
 
 @Module({
   imports: [
@@ -38,7 +38,7 @@ import { MessageModule } from './modules/message/message.module'
     ScheduleModule.forRoot(),
     UtilsModule,
     ChannelModule,
-    MessageModule
+    MessageModule,
   ],
   providers: [
     {
@@ -52,4 +52,4 @@ import { MessageModule } from './modules/message/message.module'
   ],
   controllers: [HealthController],
 })
-export class AppModule { }
+export class AppModule {}

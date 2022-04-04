@@ -9,6 +9,8 @@ import { ChannelModule } from '../channel/channel.module';
 import { StorageModule } from '../storage/storage.module';
 import { CqrsModule } from '@nestjs/cqrs';
 import { IdentityModule } from '../identity/identity.module';
+import { VaultService } from '../secrets-engine/service/vault.service';
+import { KeysModule } from '../keys/keys.module';
 
 @Module({
   imports: [
@@ -18,8 +20,9 @@ import { IdentityModule } from '../identity/identity.module';
     ChannelModule,
     IdentityModule,
     StorageModule,
+    KeysModule,
   ],
-  providers: [EventsGateway, MessageService, ChannelRepository],
+  providers: [EventsGateway, MessageService, VaultService],
   exports: [MessageService],
   controllers: [MessageControlller],
 })
