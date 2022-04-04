@@ -10,12 +10,12 @@ import { ApiTags } from '@nestjs/swagger';
 export class EnrolmentController {
   constructor(protected readonly enrolmentService: EnrolmentService) {}
 
-  @Get('')
+  @Get()
   public async get(): Promise<Enrolment> {
     return this.enrolmentService.getEnrolment();
   }
 
-  @Post('')
+  @Post()
   public async init() {
     return this.enrolmentService.initEnrolment();
   }

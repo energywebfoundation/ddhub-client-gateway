@@ -44,9 +44,11 @@ export class NatsListenerService {
     await this.iamService.requestClaim(this.userRole);
   }
 
-  public async getState() {
+  public async getState(): Promise<EnrolmentState | null> {
     if (!this.iamService) {
-      return;
+      this.logger.error('IAM is not initialized');
+
+      return null;
     }
 
     const claims = await this.iamService.getClaimsByRequester(
@@ -54,17 +56,7 @@ export class NatsListenerService {
       this.parentNamespace
     );
 
-    const state = this.getStateFromClaims(claims);
-
-    if (state.waiting) {
-      this.events.emit(EnrolmentEvents.AWAIT_APPROVAL);
-    }
-
-    if (state.approved) {
-      this.events.emit(EnrolmentEvents.APPROVED);
-    }
-
-    return state;
+    return this.getStateFromClaims(claims);
   }
 
   public getStateFromClaims(claims: Claim[]): EnrolmentState {
@@ -100,6 +92,10 @@ export class NatsListenerService {
       'EVENT_SERVER_URL',
       'identityevents-dev.energyweb.org'
     );
+
+    this.events.on(EnrolmentEvents.APPROVED, async () => {
+      this.logger.log('Enrolment approved');
+    });
 
     this.events.on(EnrolmentEvents.AWAIT_APPROVAL, async () => {
       const state: EnrolmentState = {

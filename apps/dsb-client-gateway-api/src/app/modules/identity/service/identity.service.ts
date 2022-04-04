@@ -1,11 +1,18 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { EthersService } from '../../utils/service/ethers.service';
-import { Identity } from '../../storage/storage.interface';
+import {
+  Enrolment,
+  Identity,
+  RoleState,
+} from '../../storage/storage.interface';
 import { IamService } from '../../iam-service/service/iam.service';
 import { SecretsEngineService } from '../../secrets-engine/secrets-engine.interface';
 import { NoPrivateKeyException } from '../../storage/exceptions/no-private-key.exception';
 import { EnrolmentRepository } from '../../storage/repository/enrolment.repository';
 import { IdentityRepository } from '../../storage/repository/identity.repository';
+import { EnrolmentService } from '../../enrolment/service/enrolment.service';
+import { Claims, IdentityWithEnrolment } from '../identity.interface';
+import { Claim } from 'iam-client-lib';
 
 @Injectable()
 export class IdentityService {
@@ -16,8 +23,58 @@ export class IdentityService {
     protected readonly enrolmentRepository: EnrolmentRepository,
     protected readonly identityRepository: IdentityRepository,
     protected readonly secretsEngineService: SecretsEngineService,
-    protected readonly iamService: IamService
+    protected readonly iamService: IamService,
+    protected readonly enrolmentService: EnrolmentService
   ) {}
+
+  public async getClaims(): Promise<Claims> {
+    const claims: Claim[] = await this.iamService.getClaims();
+    const synchronizedToDIDClaims =
+      await this.iamService.getUserClaimsFromDID();
+
+    const getClaimStatus = (claim: Claim): RoleState => {
+      if (claim.isAccepted) {
+        return RoleState.APPROVED;
+      }
+
+      if (claim.isRejected) {
+        return RoleState.REJECTED;
+      }
+
+      if (!claim.isAccepted && !claim.isRejected) {
+        return RoleState.AWAITING_APPROVAL;
+      }
+
+      return RoleState.UNKNOWN;
+    };
+
+    return {
+      did: this.iamService.getDIDAddress(),
+      claims: claims.map((claim) => {
+        return {
+          namespace: claim.claimType,
+          status: getClaimStatus(claim),
+          syncedToDidDoc:
+            synchronizedToDIDClaims.filter(
+              (synchronizedClaim) =>
+                synchronizedClaim.claimType === claim.claimType
+            ).length > 0,
+        };
+      }),
+    };
+  }
+
+  public async getIdentityWithEnrolment(): Promise<IdentityWithEnrolment> {
+    const [identity, enrolment]: [Identity, Enrolment] = await Promise.all([
+      this.getIdentity(true),
+      this.enrolmentService.getEnrolment(),
+    ]);
+
+    return {
+      ...identity,
+      enrolment,
+    };
+  }
 
   public async identityReady(): Promise<boolean> {
     const identity: Identity | null = await this.getIdentity();
@@ -25,19 +82,33 @@ export class IdentityService {
     return !!identity;
   }
 
-  public async getIdentity(): Promise<Identity | null> {
-    const identity: Identity | null = this.identityRepository.getIdentity();
+  public async getIdentity(refreshBalance = false): Promise<Identity | null> {
+    if (refreshBalance) {
+      const rootKey: string | null =
+        await this.secretsEngineService.getPrivateKey();
 
-    if (!identity) {
-      return null;
+      if (!rootKey) {
+        throw new NoPrivateKeyException();
+      }
+
+      const wallet = this.ethersService.getWalletFromPrivateKey(rootKey);
+
+      const balanceState = await this.ethersService.getBalance(wallet.address);
+
+      return {
+        publicKey: wallet.publicKey,
+        balance: balanceState,
+        address: wallet.address,
+      };
     }
 
-    const balanceState = await this.ethersService.getBalance(identity.address);
+    const identity = this.identityRepository.getIdentity();
 
-    return {
-      ...identity,
-      balance: balanceState,
-    };
+    if (!identity) {
+      throw new NoPrivateKeyException();
+    }
+
+    return identity;
   }
 
   public async getIdentityOrThrow(): Promise<Identity> {
@@ -80,6 +151,8 @@ export class IdentityService {
     await this.iamService.setup(privateKey);
 
     await this.enrolmentRepository.removeEnrolment();
+
+    await this.enrolmentService.initEnrolment();
   }
 
   /**

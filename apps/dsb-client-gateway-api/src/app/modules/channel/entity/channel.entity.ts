@@ -12,7 +12,7 @@ export class ChannelConditions {
   roles: string[];
   topics: ChannelTopic[];
   topicsVersions: { [topicId: string]: TopicVersion[] };
-  realDids: string[];
+  qualifiedDids: string[];
 }
 
 export class ChannelEntity {

@@ -3,15 +3,16 @@ import { ChannelRepository } from '../repository/channel.repository';
 import { ChannelEntity, ChannelTopic } from '../entity/channel.entity';
 import { CreateChannelDto, TopicDto } from '../dto/request/create-channel.dto';
 import { DsbApiService } from '../../dsb-client/service/dsb-api.service';
-import { TopicNotFoundException } from '../exceptions/topic-not-found.exception';
 import { TopicData, TopicVersion } from '../../dsb-client/dsb-client.interface';
 import { ChannelNotFoundException } from '../exceptions/channel-not-found.exception';
 import moment from 'moment';
 import { ChannelUpdateRestrictedFieldsException } from '../exceptions/channel-update-restricted-fields.exception';
 import { CommandBus } from '@nestjs/cqrs';
-import { RefreshTopicsCacheCommand } from '../command/refresh-topics-cache.command';
+import { RefreshAllChannelsCacheDataCommand } from '../command/refresh-all-channels-cache-data.command';
 import { ChannelQualifiedDids } from '../channel.interface';
 import { ChannelType } from '../channel.const';
+import { UpdateChannelDto } from '../dto/request/update-channel.dto';
+import { RefreshChannelCacheDataCommand } from '../command/refresh-channel-cache-data.command';
 
 @Injectable()
 export class ChannelService {
@@ -36,10 +37,6 @@ export class ChannelService {
       payload.conditions.topics
     );
 
-    if (topicsWithIds.length === 0) {
-      throw new TopicNotFoundException();
-    }
-
     const creationDate: string = moment().toISOString();
 
     await this.channelRepository.createChannel({
@@ -49,7 +46,7 @@ export class ChannelService {
         topics: topicsWithIds,
         dids: payload.conditions.dids,
         roles: payload.conditions.roles,
-        realDids: [],
+        qualifiedDids: [],
         topicsVersions: {},
       },
       createdAt: creationDate,
@@ -58,7 +55,9 @@ export class ChannelService {
 
     this.logger.log(`Channel with name ${payload.fqcn} created`);
 
-    await this.commandBus.execute(new RefreshTopicsCacheCommand());
+    await this.commandBus.execute(
+      new RefreshChannelCacheDataCommand(payload.fqcn)
+    );
   }
 
   public async updateChannelTopic(
@@ -76,13 +75,13 @@ export class ChannelService {
     await this.channelRepository.updateChannel(channel);
   }
 
-  public async updateChannelRealDids(
+  public async updateChannelQualifiedDids(
     channelName: string,
     dids: string[]
   ): Promise<void> {
     const channel: ChannelEntity = this.getChannel(channelName);
 
-    channel.conditions.realDids = dids;
+    channel.conditions.qualifiedDids = dids;
 
     await this.channelRepository.updateChannel(channel);
   }
@@ -93,7 +92,7 @@ export class ChannelService {
     return {
       qualifiedDids: [
         ...channel.conditions.dids,
-        ...channel.conditions.realDids,
+        ...channel.conditions.qualifiedDids,
       ],
       fqcn: channel.fqcn,
       updatedAt: channel.updatedAt,
@@ -119,14 +118,17 @@ export class ChannelService {
 
     await this.channelRepository.delete(channel.fqcn);
 
-    await this.commandBus.execute(new RefreshTopicsCacheCommand());
+    await this.commandBus.execute(new RefreshAllChannelsCacheDataCommand());
   }
 
-  public async updateChannel(dto: CreateChannelDto): Promise<void> {
-    const channel: ChannelEntity = this.getChannelOrThrow(dto.fqcn);
+  public async updateChannel(
+    dto: UpdateChannelDto,
+    fqcn: string
+  ): Promise<void> {
+    const channel: ChannelEntity = this.getChannelOrThrow(fqcn);
 
     const hasChangedRestrictedFields: boolean =
-      channel.type !== dto.type || channel.fqcn !== dto.fqcn;
+      channel.type !== dto.type || channel.fqcn !== fqcn;
 
     if (hasChangedRestrictedFields) {
       throw new ChannelUpdateRestrictedFieldsException();
@@ -135,10 +137,6 @@ export class ChannelService {
     const topicsWithIds: ChannelTopic[] = await this.getTopicsWithIds(
       dto.conditions.topics
     );
-
-    if (topicsWithIds.length === 0) {
-      throw new TopicNotFoundException();
-    }
 
     const updateDate: string = moment().toISOString();
 
@@ -153,7 +151,7 @@ export class ChannelService {
 
     await this.channelRepository.updateChannel(channel);
 
-    await this.commandBus.execute(new RefreshTopicsCacheCommand());
+    await this.commandBus.execute(new RefreshChannelCacheDataCommand(fqcn));
   }
 
   protected async getTopicsWithIds(
@@ -187,7 +185,7 @@ export class ChannelService {
     return topicsToReturn;
   }
 
-  public getChannelsByType(type: ChannelType): ChannelEntity[] {
+  public getChannelsByType(type?: ChannelType): ChannelEntity[] {
     return this.channelRepository.getChannelsByType(type);
   }
 }
