@@ -1,0 +1,23 @@
+{
+  "root": "libs/dsb-client-gateway-iam-client",
+  "sourceRoot": "libs/dsb-client-gateway-iam-client/src",
+  "projectType": "library",
+  "targets": {
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/dsb-client-gateway-iam-client/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/libs/dsb-client-gateway-iam-client"],
+      "options": {
+        "jestConfig": "libs/dsb-client-gateway-iam-client/jest.config.js",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": []
+}

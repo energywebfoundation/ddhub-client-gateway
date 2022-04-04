@@ -1,8 +1,8 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { IamService } from '../../iam-service/service/iam.service';
+import { IamService } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
 import { SecretsEngineService } from '../secrets-engine.interface';
-import { EnrolmentRepository } from '../../storage/repository/enrolment.repository';
-import { IdentityRepository } from '../../storage/repository/identity.repository';
+import { EnrolmentRepository } from '../../../../../apps/dsb-client-gateway-api/src/app/modules/storage/repository/enrolment.repository';
+import { IdentityRepository } from '../../../../../apps/dsb-client-gateway-api/src/app/modules/storage/repository/identity.repository';
 
 @Injectable()
 export class IamInitService implements OnModuleInit {
@@ -13,7 +13,7 @@ export class IamInitService implements OnModuleInit {
     protected readonly secretsEngine: SecretsEngineService,
     protected readonly enrolmentRepository: EnrolmentRepository,
     protected readonly identityRepository: IdentityRepository
-  ) { }
+  ) {}
 
   public async onModuleInit(): Promise<void> {
     const privateKey = await this.secretsEngine.getPrivateKey();

@@ -13,7 +13,7 @@ import { IamFactoryService } from './iam-factory.service';
 import { ConfigService } from '@nestjs/config';
 import { Encoding } from '@ew-did-registry/did-resolver-interface';
 import { KeyType } from '@ew-did-registry/keys';
-import { ApplicationDTO } from '../../dsb-client/dsb-client.interface';
+import { ApplicationDTO } from '../../../../../apps/dsb-client-gateway-api/src/app/modules/dsb-client/dsb-client.interface';
 
 @Injectable()
 export class IamService {
@@ -29,6 +29,10 @@ export class IamService {
     protected readonly iamFactoryService: IamFactoryService,
     protected readonly configService: ConfigService
   ) {}
+
+  public getDidRegistry(): DidRegistry | undefined {
+    return this.didRegistry;
+  }
 
   public async getClaims(): Promise<Claim[]> {
     return this.cacheClient.getClaimsBySubject(this.getDIDAddress());

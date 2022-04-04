@@ -5,7 +5,7 @@ import { AwsSsmService } from './service/aws-ssm.service';
 import { SecretsEngineService } from './secrets-engine.interface';
 import { VaultService } from './service/vault.service';
 import { IamInitService } from './service/iam-init.service';
-import { StorageModule } from '../storage/storage.module';
+import { StorageModule } from '../../../../apps/dsb-client-gateway-api/src/app/modules/storage/storage.module';
 
 @Module({
   imports: [StorageModule],

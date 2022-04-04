@@ -4,7 +4,7 @@ import { HttpService } from '@nestjs/axios';
 import { Agent } from 'https';
 import { TlsAgentService } from './tls-agent.service';
 import { EthersService } from '../../utils/service/ethers.service';
-import { IamService } from '../../iam-service/service/iam.service';
+import { IamService } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
 import { lastValueFrom, Observable } from 'rxjs';
 import {
   Channel,
@@ -19,7 +19,6 @@ import {
   TopicResultDTO,
   TopicVersionResponse,
 } from '../dsb-client.interface';
-import { SecretsEngineService } from '../../secrets-engine/secrets-engine.interface';
 
 import promiseRetry from 'promise-retry';
 import FormData from 'form-data';
@@ -30,6 +29,7 @@ import 'multer';
 import { RetryConfigService } from '../../utils/service/retry-config.service';
 import { AxiosResponse } from '@nestjs/terminus/dist/health-indicator/http/axios.interfaces';
 import { isAxiosError } from '@nestjs/terminus/dist/utils';
+import { SecretsEngineService } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
 
 export interface RetryOptions {
   stopOnStatusCodes?: HttpStatus[];
