@@ -9,9 +9,10 @@ import { DDHubThemeProvider } from '../styles/theme';
 import { CacheProvider, EmotionCache } from '@emotion/react';
 import { CssBaseline } from '@mui/material';
 import createCache from '@emotion/cache';
+import { Layout } from '../components/Layout';
+import { queryClientOptions } from '../utils';
 import '../styles/globals.css';
 import 'nprogress/nprogress.css';
-import { Layout } from '../components/Layout';
 
 Axios.defaults.baseURL = process.env.NEXT_PUBLIC_SERVER_BASE_URL;
 
@@ -25,7 +26,12 @@ export interface MyAppProps extends AppProps {
 
 function MyApp(props: MyAppProps) {
   const { Component, pageProps } = props;
-  const [queryClient] = React.useState(() => new QueryClient());
+  const [queryClient] = React.useState(
+    () =>
+      new QueryClient({
+        defaultOptions: queryClientOptions,
+      })
+  );
 
   const getLayout =
     (Component as any).getLayout || ((page) => <Layout>{page}</Layout>);
