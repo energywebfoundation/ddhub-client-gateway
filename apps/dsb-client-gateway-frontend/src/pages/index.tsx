@@ -1,24 +1,10 @@
 import { makeStyles } from 'tss-react/mui';
 import { Container, Grid, Stack, Typography } from '@mui/material';
-import {
-  useHealthControllerCheck,
-  useIdentityControllerPost,
-  HealthControllerCheck200
-} from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import React from 'react';
 import Login from '../components/Login/Login';
 
 export default function Index() {
   const { classes } = useStyles();
-  const { data, isLoading: healthLoading } = useHealthControllerCheck();
-
-  const health = data ?? {} as HealthControllerCheck200;
-
-  const { mutate, isLoading: identityLoading } = useIdentityControllerPost();
-
-  const identityHandler = () => {
-    mutate({ data: { privateKey: 'a25d4be1fd85328bdcaed0b0b9298b94e86dc2890b3ad91177d1931d00ea630a' } });
-  };
 
   return (
     <Grid container alignItems="stretch" style={{ height: '100%' }}>
@@ -31,7 +17,7 @@ export default function Index() {
             alignItems="flex-start"
             spacing={2}
           >
-            <div onClick={identityHandler}>
+            <div>
               <img src="ew-flex-logo.png" alt="logo" className={classes.logo} />
             </div>
             <Grid container style={{ marginBottom: '75px' }}>
