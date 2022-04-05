@@ -30,6 +30,14 @@ export class IamService {
     protected readonly configService: ConfigService
   ) {}
 
+  public async getClaims(): Promise<Claim[]> {
+    return this.cacheClient.getClaimsBySubject(this.getDIDAddress());
+  }
+
+  public async getUserClaimsFromDID() {
+    return this.claimsService.getUserClaims();
+  }
+
   public async setVerificationMethod(
     publicKey: string,
     tag = 'dsb'
@@ -133,7 +141,7 @@ export class IamService {
   }
 
   public async requestClaim(claim: string): Promise<void> {
-    await this.claimsService.createClaimRequest({
+    const claimObject = {
       claim: {
         claimType: claim,
         claimTypeVersion: 1,
@@ -143,7 +151,11 @@ export class IamService {
         RegistrationTypes.OnChain,
         RegistrationTypes.OffChain,
       ],
-    });
+    };
+
+    this.logger.log('Requesting claim', claimObject);
+
+    await this.claimsService.createClaimRequest(claimObject);
   }
 
   public getDid(did?: string, includeClaims = false) {

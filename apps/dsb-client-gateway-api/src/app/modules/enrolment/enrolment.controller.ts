@@ -1,6 +1,6 @@
 import { Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { EnrolmentService } from './service/enrolment.service';
-import { Enrolment } from '../storage/storage.interface';
+import { Enrolment } from '@dsb-client-gateway/dsb-client-gateway/identity/models';
 import { DigestGuard } from '../utils/guards/digest.guard';
 import { ApiTags } from '@nestjs/swagger';
 
@@ -10,12 +10,12 @@ import { ApiTags } from '@nestjs/swagger';
 export class EnrolmentController {
   constructor(protected readonly enrolmentService: EnrolmentService) {}
 
-  @Get('')
+  @Get()
   public async get(): Promise<Enrolment> {
     return this.enrolmentService.getEnrolment();
   }
 
-  @Post('')
+  @Post()
   public async init() {
     return this.enrolmentService.initEnrolment();
   }

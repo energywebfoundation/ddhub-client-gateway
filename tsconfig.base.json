@@ -24,6 +24,9 @@
       ],
       "@dsb-client-gateway/dsb-client-gateway-api-client": [
         "dist/apps/dsb-client-gateway-api-client/src/index"
+      ],
+      "@dsb-client-gateway/dsb-client-gateway/identity/models": [
+        "libs/dsb-client-gateway/identity/models/src/index.ts"
       ]
     }
   },

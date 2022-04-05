@@ -2,7 +2,7 @@ import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { SchedulerRegistry } from '@nestjs/schedule';
 import { DsbApiService } from './dsb-api.service';
 import { Channel, Message } from '../dsb-client.interface';
-import { Enrolment } from '../../storage/storage.interface';
+import { Enrolment } from '@dsb-client-gateway/dsb-client-gateway/identity/models';
 import { ConfigService } from '@nestjs/config';
 import { WebSocketImplementation } from '../../message/message.const';
 import { MessageService } from '../../message/service/message.service';

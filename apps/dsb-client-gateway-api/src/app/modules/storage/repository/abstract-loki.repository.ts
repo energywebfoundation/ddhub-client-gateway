@@ -3,7 +3,7 @@ import { LokiService } from '../service/loki.service';
 import loki from 'lokijs';
 
 @Injectable()
-export abstract class AbstractLokiRepository {
+export abstract class AbstractLokiRepository<T extends object = any> {
   public readonly client: loki;
 
   protected constructor(
@@ -13,11 +13,20 @@ export abstract class AbstractLokiRepository {
     this.client = lokiService.client;
   }
 
-  protected createCollectionIfNotExists(name: string): void {
+  protected createCollectionIfNotExists(
+    name: string,
+    indices: string[] = []
+  ): void {
     const collection = this.client.getCollection(name);
 
     if (collection === null) {
-      this.client.addCollection(name);
+      this.client.addCollection(name, {
+        indices,
+      });
     }
+  }
+
+  protected getCollection(): loki.Collection<T> {
+    return this.client.getCollection<T>(this.collection);
   }
 }
