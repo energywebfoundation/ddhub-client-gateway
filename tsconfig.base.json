@@ -28,6 +28,9 @@
       "@dsb-client-gateway/dsb-client-gateway-secrets-engine": [
         "libs/dsb-client-gateway-secrets-engine/src/index.ts"
       ],
+      "@dsb-client-gateway/dsb-client-gateway-storage": [
+        "libs/dsb-client-gateway-storage/src/index.ts"
+      ],
       "@dsb-client-gateway/dsb-client-gateway/identity/models": [
         "libs/dsb-client-gateway/identity/models/src/index.ts"
       ]

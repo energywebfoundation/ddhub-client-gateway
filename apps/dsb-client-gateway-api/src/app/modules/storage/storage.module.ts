@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
 import { EnrolmentRepository } from './repository/enrolment.repository';
 import { IdentityRepository } from './repository/identity.repository';
-import { LokiService } from './service/loki.service';
+import { DsbClientGatewayStorageModule } from '@dsb-client-gateway/dsb-client-gateway-storage';
 
 @Module({
-  providers: [EnrolmentRepository, IdentityRepository, LokiService],
-  exports: [EnrolmentRepository, IdentityRepository, LokiService],
+  imports: [DsbClientGatewayStorageModule],
+  providers: [EnrolmentRepository, IdentityRepository],
+  exports: [EnrolmentRepository, IdentityRepository],
 })
 export class StorageModule {}
