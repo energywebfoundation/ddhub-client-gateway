@@ -24,7 +24,7 @@ export class AppModule {
     const imports = [
       ConfigModule.forRoot({
         isGlobal: true,
-        validate: configValidate,
+        // validate: configValidate,
       }),
       MulterModule.register({
         dest: './files',

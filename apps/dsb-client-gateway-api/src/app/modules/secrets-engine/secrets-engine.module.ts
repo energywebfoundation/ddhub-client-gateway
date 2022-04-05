@@ -14,6 +14,7 @@ import { StorageModule } from '../storage/storage.module';
       provide: SecretsEngineService,
       useFactory: async (configService: ConfigService) => {
         const secretsEngine = configService.get('SECRETS_ENGINE');
+        console.log(secretsEngine, 'secretsEngine');
 
         if (!secretsEngine) {
           throw new Error('You need to specify secrets engine');
