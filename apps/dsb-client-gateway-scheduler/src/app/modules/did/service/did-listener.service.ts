@@ -1,5 +1,5 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { DidRegistryListenerService } from '../../../../../../../libs/dsb-client-gateway-did-registry/src/lib/service/did-registry-listener.service';
+import { DidRegistryListenerService } from '@dsb-client-gateway/dsb-client-gateway-did-registry';
 
 @Injectable()
 export class DidListenerService implements OnModuleInit {

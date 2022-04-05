@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Agent } from 'https';
-import { SecretsEngineService } from '../../../../../../../libs/dsb-client-gateway-secrets-engine/src/lib/secrets-engine.interface';
+import { SecretsEngineService } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
 
 @Injectable()
 export class TlsAgentService {

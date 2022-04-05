@@ -2,7 +2,7 @@ import { Module, ValidationPipe } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { IdentityModule } from './modules/identity/identity.module';
 import { EnrolmentModule } from './modules/enrolment/enrolment.module';
-import { IamModule } from '../../../../libs/dsb-client-gateway-iam-client/src/lib/iam.module';
+import { IamModule } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
 import { CertificateModule } from './modules/certificate/certificate.module';
 import { MulterModule } from '@nestjs/platform-express';
 import { DsbClientModule } from './modules/dsb-client/dsb-client.module';

@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { DidAttributeChangedCommand } from '../../../../../../../libs/dsb-client-gateway-did-registry/src/lib/command/did-attribute-changed.command';
-import { DidRepository } from '../../../../../../../libs/dsb-client-gateway-storage/src/lib/repository/did.repository';
+import { DidAttributeChangedCommand } from '@dsb-client-gateway/dsb-client-gateway-did-registry';
+import { DidRepository } from '@dsb-client-gateway/dsb-client-gateway-storage';
 import { IamService } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
 
 @CommandHandler(DidAttributeChangedCommand)

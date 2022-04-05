@@ -13,7 +13,7 @@ import { IamFactoryService } from './iam-factory.service';
 import { ConfigService } from '@nestjs/config';
 import { Encoding } from '@ew-did-registry/did-resolver-interface';
 import { KeyType } from '@ew-did-registry/keys';
-import { ApplicationDTO } from '../../../../../apps/dsb-client-gateway-api/src/app/modules/dsb-client/dsb-client.interface';
+import { ApplicationDTO } from '../iam.interface';
 
 @Injectable()
 export class IamService {
