@@ -20,11 +20,11 @@ import { MessageModule } from './modules/message/message.module';
 
 @Module({})
 export class AppModule {
-  static register() {
+  static register({ shouldValidate = true }: { shouldValidate: boolean }) {
     const imports = [
       ConfigModule.forRoot({
         isGlobal: true,
-        // validate: configValidate,
+        validate: shouldValidate && configValidate,
       }),
       MulterModule.register({
         dest: './files',

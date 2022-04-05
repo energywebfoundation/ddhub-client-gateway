@@ -12,7 +12,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule.register());
+  const app = await NestFactory.create(AppModule.register({ shouldValidate: true }));
 
   app.enableCors();
 
@@ -46,7 +46,7 @@ async function bootstrap() {
 }
 
 export const createDocument = async () => {
-  const app = await NestFactory.create(AppModule.register());
+  const app = await NestFactory.create(AppModule.register({ shouldValidate: false }));
   app.setGlobalPrefix('api/v1');
 
   const config = new DocumentBuilder()

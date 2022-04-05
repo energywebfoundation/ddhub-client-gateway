@@ -40,7 +40,6 @@ export class EnvironmentVariables {
   CLIENT_ID = 'WS_CONSUMER';
 
   @IsPositive()
-  @Transform(EnvironmentVariables.transformNumber('EVENTS_MAX_PER_SECOND'))
   EVENTS_MAX_PER_SECOND = 2;
 
   @IsString()
@@ -109,17 +108,14 @@ export class EnvironmentVariables {
   DID_AUTH_URL = 'http://localhost:8080';
 
   @IsPositive()
-  @Transform(EnvironmentVariables.transformNumber('MAX_RETRIES'))
   @IsOptional()
   MAX_RETRIES = 3;
 
   @IsPositive()
-  @Transform(EnvironmentVariables.transformNumber('RETRY_FACTOR'))
   @IsOptional()
   RETRY_FACTOR = 2;
 
   @IsPositive()
-  @Transform(EnvironmentVariables.transformNumber('TIMEOUT'))
   @IsOptional()
   TIMEOUT = 1000;
 
