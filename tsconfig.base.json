@@ -18,6 +18,12 @@
     "paths": {
       "@dsb-client-gateway/dsb-client-gateway-errors": [
         "libs/dsb-client-gateway-errors/src/index.ts"
+      ],
+      "@dsb-client-gateway/dsb-client-gateway-api": [
+        "apps/dsb-client-gateway-api/src/main.ts"
+      ],
+      "@dsb-client-gateway/dsb-client-gateway-api-client": [
+        "dist/apps/dsb-client-gateway-api-client/src/index"
       ]
     }
   },

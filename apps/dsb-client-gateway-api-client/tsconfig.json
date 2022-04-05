@@ -8,6 +8,7 @@
     "experimentalDecorators": true,
     "target": "es2015",
     "sourceMap": true,
+    "outDir": "../../dist",
     "incremental": true,
     "moduleResolution": "node",
     "esModuleInterop": true,
