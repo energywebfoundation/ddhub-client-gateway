@@ -121,12 +121,8 @@ export class KeysService implements OnModuleInit {
     clientGatewayMessageId: string,
     senderDid: string
   ): Promise<string | null> {
-    console.log('encryptedMessage', encryptedMessage);
-    console.log('clientGatewayMessageId', clientGatewayMessageId);
-    console.log('senderDid', senderDid);
-
     const symmetricKey: string | null =
-      'W+xoAQtzdANEoNe21elRCN6dInvLeKRkkYGZ6RvaNmHHUOnVywIMCP58T9Fx1BMrDHp+lLhi3NPK6aPqXR0Hl0btgFirXCpQw3WBK8arNDIs4oVAINooZe8l5MO6yR0PmjDyXpy44m1AkXXDXrEmnAnYKkosnEA7gdkbmWDWu8JMNsRJ9l2g5RA5rsZz5T9yd/xOEfXf/Ygd7iBVd4eYgyj0zu+PwYkwF1U1kUKnaf0+of5EX0UGiFZKa2PoqPxqNIDaPitsY5/l4uapSESs1RjDgs6T1G8iGiOXassNWDUNzi/gamIXfMri3XCOW+axGBA2iqX72cBct9K91jAsiL5sIp8tcoAmn7riIhvTZC2OgXAOdCEwmJa7RXdrlUcdNzBA7z/WmHW5ahtrha84JOJ3zxF0i+PUXR7/1lnPhWCW3cfz0WhNKGwnDvdgQwfV9ogrJ+lYqS+uR/cNLk9JQDcIteH4NyAxibPtcI30jEG2TBsc5P1mD2F92TRvPhBvYyv0v3/ARUXTEGidsFMG5qWQiFco3c9pgTs1nhhYHbo1iX1ip2x+KzP0tnTEMeQi38SMBcUvRIolRvKZ1YKPSoSonhAudGcwg4lSXMegQ3kuV5X2Whn/n1vKzYZYfyrSRWLhUO0ITH+lQJyo1H84FRbr2NUs8fWFPFjNQOs51K8=';
+      'NvRCzjYrhllVmX2EroJlc+10nUdtL+yQU/cpPWZXazImqHntt+O3xk911Oa639o48j5vMUv7ji3MuFAwafX/bYsL0ZNS9Xfgup9hFZqS57tfS2ydKhZkiI/W3wHbWSTmlB2h3mtwF3/Ux+9Ad3HrBToklJAJl2n3yjqwKFwXvYqswsKiR5e4ojcLN04+IEMrgxojEYYEjbCzR1gD9mdaaTEAQJgic7wBDQca3z9cCnN33jGVS0f9+5Csmb0X6KM8SLhlrA0ibxuhMnG4DIgw0mU4fMckTzU7v/dgBLY9d75wWlA97N1OViy8DbB85QFvp/KytIgNzHhlqeNc+OpRPXQPqu7skXclVNbvwElYwVtIsJC6zyYQP0hvXDtudgDf8nswW35HM1fLmSYKg6lam4/goAKyEdCFHug/L8AJLD9ZzOmyfBZtapcZlFOXgXkMG0UioAXWcblwR2mrgxvXK1UB3fUoOlej0zSEVm01qXXjGK9u0E0gRrtdutcWzPdzp4frTtpcY0aecxxCFrk0nc2ouiI4Uz2gDIiOFfB11/ZnKqVtDYVhGVJ/LpvMkXkXOmf+VTNEqJzh50bEg4QR8pnNA7WGjyovwZ6qdAf077WhvMfTkuGDErW4iwMvFJTvbbjdM2lAycjKBkHnsKaH3pIWbWYOSUEzQP0H5E+/W2o=';
     if (!symmetricKey) {
       this.logger.error(
         `${senderDid}:${clientGatewayMessageId} does not have symmetric key`
@@ -160,19 +156,18 @@ export class KeysService implements OnModuleInit {
       rootKey
     );
 
-    console.log('decryptedKey', decryptedKey);
-
     const decipher = crypto.createDecipheriv(
       this.symmetricAlgorithm,
-      Buffer.from(decryptedKey, 'hex'),
+      Buffer.from(
+        '7479377c81201eb89b90b11dda72bdc89b6473d6d1d60d4dad23c495b22e794d',
+        'hex'
+      ),
       Buffer.from(iv, 'hex')
     );
 
     let decrypted = decipher.update(encryptedData, 'hex', 'utf-8');
 
     decrypted = decrypted + decipher.final('utf-8');
-
-    console.log('decrypted', decrypted);
 
     return decrypted;
   }

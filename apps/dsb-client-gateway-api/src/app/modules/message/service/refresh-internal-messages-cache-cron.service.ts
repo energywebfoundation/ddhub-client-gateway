@@ -1,0 +1,46 @@
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { CommandBus } from '@nestjs/cqrs';
+import { ConfigService } from '@nestjs/config';
+import { SchedulerRegistry } from '@nestjs/schedule';
+import { CronJob } from 'cron';
+import { RefreshInternalMessagesCacheCommand } from '../command/refresh-internal-messages-cache.command';
+
+@Injectable()
+export class RefreshInternalMessagesCacheCronService implements OnModuleInit {
+  private readonly logger = new Logger(
+    RefreshInternalMessagesCacheCronService.name
+  );
+
+  constructor(
+    protected readonly commandBus: CommandBus,
+    protected readonly configService: ConfigService,
+    protected readonly schedulerRegistry: SchedulerRegistry
+  ) {}
+
+  public async onModuleInit(): Promise<void> {
+    const scheduledJobsEnabled: boolean = this.configService.get<boolean>(
+      'SCHEDULED_JOBS',
+      true
+    );
+
+    if (!scheduledJobsEnabled) {
+      this.logger.log(`Cron jobs not enabled`);
+
+      return;
+    }
+
+    this.logger.log(`Cron jobs enabled`);
+
+    const job = new CronJob(`*/5 * * * *`, async () => {
+      this.logger.log(`${jobName} CRON job triggered`);
+
+      await this.commandBus.execute(new RefreshInternalMessagesCacheCommand());
+    });
+
+    const jobName = 'REFRESH_INTERNAL_MESSAGES_CACHE';
+
+    this.schedulerRegistry.addCronJob(jobName, job);
+
+    job.start();
+  }
+}

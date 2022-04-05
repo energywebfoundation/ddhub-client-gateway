@@ -147,6 +147,15 @@ export interface SendInternalMessageResponse {
   id: string;
 }
 
+export interface GetInternalMessageResponse {
+  transactionId: string;
+  clientGatewayMessageId: string;
+  payload: string;
+  topicId: string;
+  topicVersion: string;
+  signature: string;
+  isFile: boolean;
+}
 export interface Recipients {
   total: number;
   sent: number;

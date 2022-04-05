@@ -20,6 +20,7 @@ import {
   SendMessageResponse,
   ApplicationDTO,
   SearchMessageResponseDto,
+  GetInternalMessageResponse,
 } from '../dsb-client.interface';
 import { SecretsEngineService } from '../../secrets-engine/secrets-engine.interface';
 
@@ -369,12 +370,14 @@ export class DsbApiService implements OnModuleInit {
     const messageData: SendMessageData = {
       fqcns,
       transactionId,
-      payload: JSON.stringify(payload),
+      payload: payload,
       topicId,
       topicVersion,
       signature,
       clientGatewayMessageId,
     };
+
+    console.log('messageData', messageData);
 
     const { data } = await promiseRetry(async (retry, attempt) => {
       return lastValueFrom(
@@ -391,12 +394,6 @@ export class DsbApiService implements OnModuleInit {
     return data;
   }
 
-  /**
-   * Sends a decryption ciphertext to each  qualified did
-   *
-   * @returns
-   */
-
   public async sendMessageInternal(
     fqcn: string,
     clientGatewayMessageId: string,
@@ -405,7 +402,7 @@ export class DsbApiService implements OnModuleInit {
     const requestData: SendInternalMessageRequestDTO = {
       fqcn,
       clientGatewayMessageId,
-      payload: JSON.stringify(payload),
+      payload: payload,
     };
 
     const { data } = await promiseRetry(async (retry, attempt) => {
@@ -422,6 +419,26 @@ export class DsbApiService implements OnModuleInit {
             },
           }
         )
+      ).catch((err) => this.handleRequestWithRetry(err, retry));
+    });
+
+    return data;
+  }
+
+  public async getInternalMessages(
+    clientId: string
+  ): Promise<GetInternalMessageResponse[]> {
+    const { data } = await promiseRetry(async (retry, attempt) => {
+      return lastValueFrom(
+        this.httpService.get(this.baseUrl + '/messages/internal', {
+          httpsAgent: this.getTLS(),
+          params: {
+            clientId,
+          },
+          headers: {
+            Authorization: `Bearer ${this.didAuthService.getToken()}`,
+          },
+        })
       ).catch((err) => this.handleRequestWithRetry(err, retry));
     });
 

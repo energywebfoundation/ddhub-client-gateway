@@ -1,4 +1,4 @@
-import { Injectable, Logger, StreamableFile } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { EventsGateway } from '../gateway/events.gateway';
 import { ConfigService } from '@nestjs/config';
 import { Message } from '../../dsb-client/dsb-client.interface';
@@ -7,10 +7,9 @@ import {
   SendMessageDto,
   uploadMessageBodyDto,
 } from '../dto/request/send-message.dto';
-
 import { GetMessagesDto } from '../dto/request/get-messages.dto';
-
-import { DownloadMessagesDto } from '../dto/request/download-file.dto';
+import { InternalMessageDto } from '../dto/response/get-internal-message.dto';
+import { InternalMessageRepository } from '../repository/internal-messages.repository';
 
 // import { SecretsEngineService } from '../../secrets-engine/secrets-engine.interface';
 import { ChannelService } from '../../channel/service/channel.service';
@@ -22,21 +21,22 @@ import { ChannelTypeNotPubException } from '../exceptions/channel-type-not-pub.e
 import { RecipientsNotFoundException } from '../exceptions/recipients-not-found-exception';
 import { MessagesNotFoundException } from '../exceptions/messages-not-found.exception';
 import { MessageSignatureNotValidException } from '../exceptions/messages-signature-not-valid.exception';
+import { InternalMessageNotFoundException } from '../exceptions/internal-message-exception';
 import {
   SendMessageResponse,
   SearchMessageResponseDto,
 } from '../message.interface';
 import { ChannelType } from '../../../modules/channel/channel.const';
 import { EnrolmentRepository } from '../../storage/repository/enrolment.repository';
-
 import { KeysService } from '../../keys/service/keys.service';
-
 import { VaultService } from '../../secrets-engine/service/vault.service';
 import { v4 as uuidv4 } from 'uuid';
-import { Blob } from 'buffer';
 import * as fs from 'fs';
-import { createReadStream } from 'fs';
 import { join } from 'path';
+import moment from 'moment';
+import { CommandBus } from '@nestjs/cqrs';
+import { RefreshInternalMessagesCacheCommand } from '../command/refresh-internal-messages-cache.command';
+import { InternalMessageEntity } from '../entity/message.entity';
 
 export enum EventEmitMode {
   SINGLE = 'SINGLE',
@@ -57,7 +57,9 @@ export class MessageService {
     protected readonly identityService: IdentityService,
     protected readonly keyService: KeysService,
     protected readonly enrolmentRepository: EnrolmentRepository,
-    protected readonly vaultService: VaultService
+    protected readonly vaultService: VaultService,
+    protected readonly internalMessageRepository: InternalMessageRepository,
+    protected readonly commandBus: CommandBus
   ) {}
 
   public async sendMessagesToSubscribers(
@@ -95,11 +97,9 @@ export class MessageService {
       dto.topicVersion
     );
 
-    console.log('topic', topic);
-
-    // if (!topic) {
-    //   throw new TopicNotFoundException('NOT Found');
-    // }
+    if (!topic) {
+      throw new TopicNotFoundException('NOT Found');
+    }
 
     const { qualifiedDids } = await this.channelService.getChannelQualifiedDids(
       dto.fqcn
@@ -129,14 +129,10 @@ export class MessageService {
     this.logger.log('generating Client Gateway Message Id');
     const clientGatewayMessageId: string = uuidv4();
 
-    console.log('clientGatewayMessageId', clientGatewayMessageId);
-
     this.logger.log('Generating Random Key');
     // const randomKey: string = await this.keyService.generateRandomKey();
     const randomKey: string =
       '7479377c81201eb89b90b11dda72bdc89b6473d6d1d60d4dad23c495b22e794d';
-
-    console.log('randomKey', randomKey);
 
     this.logger.log('Encrypting Payload');
 
@@ -160,10 +156,10 @@ export class MessageService {
 
     await Promise.all(
       qualifiedDids.map(async (recipientDid: string) => {
-        const encryptedSymmetricKey =
-          'NvRCzjYrhllVmX2EroJlc+10nUdtL+yQU/cpPWZXazImqHntt+O3xk911Oa639o48j5vMUv7ji3MuFAwafX/bYsL0ZNS9Xfgup9hFZqS57tfS2ydKhZkiI/W3wHbWSTmlB2h3mtwF3/Ux+9Ad3HrBToklJAJl2n3yjqwKFwXvYqswsKiR5e4ojcLN04+IEMrgxojEYYEjbCzR1gD9mdaaTEAQJgic7wBDQca3z9cCnN33jGVS0f9+5Csmb0X6KM8SLhlrA0ibxuhMnG4DIgw0mU4fMckTzU7v/dgBLY9d75wWlA97N1OViy8DbB85QFvp/KytIgNzHhlqeNc+OpRPXQPqu7skXclVNbvwElYwVtIsJC6zyYQP0hvXDtudgDf8nswW35HM1fLmSYKg6lam4/goAKyEdCFHug/L8AJLD9ZzOmyfBZtapcZlFOXgXkMG0UioAXWcblwR2mrgxvXK1UB3fUoOlej0zSEVm01qXXjGK9u0E0gRrtdutcWzPdzp4frTtpcY0aecxxCFrk0nc2ouiI4Uz2gDIiOFfB11/ZnKqVtDYVhGVJ/LpvMkXkXOmf+VTNEqJzh50bEg4QR8pnNA7WGjyovwZ6qdAf077WhvMfTkuGDErW4iwMvFJTvbbjdM2lAycjKBkHnsKaH3pIWbWYOSUEzQP0H5E+/W2o=';
-        console.log('encryptedSymmetricKey', encryptedSymmetricKey);
-
+        const encryptedSymmetricKey = await this.keyService.encryptSymmetricKey(
+          randomKey,
+          recipientDid
+        );
         await this.dsbApiService.sendMessageInternal(
           recipientDid,
           clientGatewayMessageId,
@@ -183,8 +179,8 @@ export class MessageService {
     return this.dsbApiService.sendMessage(
       qualifiedDids,
       encryptedMessage,
-      '62453a51ab8d1b108a880af7',
-      '2.0.0',
+      topic.topicId,
+      topic.version,
       signature,
       clientGatewayMessageId,
       dto.transactionId
@@ -206,14 +202,12 @@ export class MessageService {
         senderId,
         clientId,
         from,
-        1
+        100
       );
 
     if (messages.length === 0) {
       throw new MessagesNotFoundException();
     }
-
-    console.log('messages', messages);
 
     await Promise.all(
       messages.map(async (message: SearchMessageResponseDto) => {
@@ -221,7 +215,7 @@ export class MessageService {
           const isSignatureValid = await this.keyService.verifySignature(
             message.senderDid,
             message.signature,
-            message.payload.replace(/['"]+/g, '')
+            message.payload
           );
 
           this.logger.debug(
@@ -231,7 +225,7 @@ export class MessageService {
 
           if (isSignatureValid) {
             const decryptedMessage = await this.keyService.decryptMessage(
-              JSON.parse(message.payload),
+              message.payload,
               message.clientGatewayMessageId,
               message.senderDid
             );
@@ -281,9 +275,9 @@ export class MessageService {
       throw new RecipientsNotFoundException();
     }
 
-    // if (!topic) {
-    //   throw new TopicNotFoundException('TOPIC NOT FOUND');
-    // }
+    if (!topic) {
+      throw new TopicNotFoundException('TOPIC NOT FOUND');
+    }
 
     if (channel.type !== ChannelType.PUB) {
       throw new ChannelTypeNotPubException();
@@ -293,9 +287,9 @@ export class MessageService {
     const clientGatewayMessageId: string = uuidv4();
 
     this.logger.log('Generating Random Key');
-    const randomKey: string = await this.keyService.generateRandomKey();
-
-    console.log('randomKey', randomKey);
+    // const randomKey: string = await this.keyService.generateRandomKey();
+    const randomKey: string =
+      '7479377c81201eb89b90b11dda72bdc89b6473d6d1d60d4dad23c495b22e794d';
 
     this.logger.log('Encrypting Payload');
     const encryptedMessage = await this.keyService.encryptMessage(
@@ -313,8 +307,6 @@ export class MessageService {
       '0x' + privateKey
     );
 
-    console.log('signature', signature);
-
     this.logger.log(
       'Sending CipherText as Internal Message to all qualified dids'
     );
@@ -325,8 +317,6 @@ export class MessageService {
           randomKey,
           recipientDid
         );
-
-        console.log('decryptionCiphertext', decryptionCiphertext);
 
         await this.dsbApiService.sendMessageInternal(
           recipientDid,
@@ -342,13 +332,11 @@ export class MessageService {
       throw new Error(e);
     });
 
-    console.log('encryptedMessage', encryptedMessage);
-
     return this.dsbApiService.uploadFile(
       file,
       qualifiedDids,
-      '62453a51ab8d1b108a880af7',
-      '2.0.0',
+      topic.topicId,
+      topic.version,
       signature,
       encryptedMessage,
       clientGatewayMessageId,
@@ -359,15 +347,11 @@ export class MessageService {
   public async downloadMessages(fileId: string): Promise<string> {
     const fileResponse = await this.dsbApiService.downloadFile(fileId);
 
-    console.log('fileResponse', fileResponse);
-
     const isSignatureValid = await this.keyService.verifySignature(
       fileResponse.headers.ownerdid,
       fileResponse.headers.signature,
       fileResponse.data
     );
-
-    console.log('isSignatureValid', isSignatureValid);
 
     if (!isSignatureValid) {
       this.logger.error(`Signature Not Matched for File Id ${fileId}`);
@@ -386,8 +370,6 @@ export class MessageService {
         decryptedMessage
       );
 
-      console.log('decryptedMessage', decryptedMessage.toString());
-
       await fs.writeFileSync(
         __dirname + '/../../../test.csv', // take the file name from api response
         decryptedMessage.toString()
@@ -395,5 +377,77 @@ export class MessageService {
     }
 
     return join(__dirname + '/../../../test.csv');
+  }
+
+  public async createInternalMessage(
+    internalMessage: InternalMessageDto
+  ): Promise<void> {
+    this.logger.log(
+      `Attempting to create Internal Message ${internalMessage.clientGatewayMessageId}`
+    );
+
+    this.logger.debug(internalMessage);
+
+    const creationDate: string = moment().toISOString();
+
+    await this.internalMessageRepository.createInternalMessage({
+      transactionId: internalMessage.transactionId,
+      clientGatewayMessageId: internalMessage.clientGatewayMessageId,
+      payload: internalMessage.payload,
+      topicId: internalMessage.topicId,
+      topicVersion: internalMessage.topicVersion,
+      signature: internalMessage.signature,
+      isFile: internalMessage.isFile,
+      senderDid: internalMessage.senderDid,
+      createdAt: creationDate,
+      updatedAt: creationDate,
+    });
+
+    this.logger.log(
+      `Internal Message with clientGatewayMessageId ${internalMessage.clientGatewayMessageId} created`
+    );
+
+    await this.commandBus.execute(new RefreshInternalMessagesCacheCommand());
+  }
+
+  public getInternalMessage(
+    clientGatewayMessageId: string,
+    senderDid: string
+  ): InternalMessageEntity | null {
+    return this.internalMessageRepository.getInternalMessage(
+      clientGatewayMessageId,
+      senderDid
+    );
+  }
+
+  public getInternalMessageorThrow(
+    clientGatewayMessageId: string,
+    senderDid: string
+  ): InternalMessageEntity {
+    const internalMessage: InternalMessageEntity | null =
+      this.getInternalMessage(clientGatewayMessageId, senderDid);
+
+    if (!internalMessage) {
+      throw new InternalMessageNotFoundException('');
+    }
+
+    return internalMessage;
+  }
+
+  public async deleteInternalMessageorThrow(
+    clientGatewayMessageId: string,
+    senderDid: string
+  ): Promise<void> {
+    const channel = this.getInternalMessageorThrow(
+      clientGatewayMessageId,
+      senderDid
+    );
+
+    await this.internalMessageRepository.delete(
+      clientGatewayMessageId,
+      senderDid
+    );
+
+    await this.commandBus.execute(new RefreshInternalMessagesCacheCommand());
   }
 }

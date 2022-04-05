@@ -82,7 +82,8 @@ export class MessageControlller {
   ): Promise<StreamableFile> {
     await this.messageService.downloadMessages(fileId);
     res.set({
-      'Content-Type': 'text/plain',
+      'Content-Type': 'multipart/form-data',
+      'Content-Disposition': 'attachment; filename="package.csv"',
     });
 
     // shift this logic to service

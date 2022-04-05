@@ -35,3 +35,16 @@ export interface SendMessageResponse {
   success: SendMessageSuccessResponse[];
   failed: SendMessageFailedResponse[];
 }
+
+export interface InternalMessageEntity {
+  transactionId: string;
+  clientGatewayMessageId: string;
+  payload: string;
+  topicId: string;
+  topicVersion: string;
+  signature: string;
+  isFile: boolean;
+  senderDid?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
