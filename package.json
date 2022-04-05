@@ -6,6 +6,7 @@
     "start": "nx serve",
     "build": "npm run build:client && nx build",
     "build:client": "nx run dsb-client-gateway-api-client:build-all",
+    "export": "npm run build:client && nx export dsb-client-gateway-frontend",
     "test": "nx test"
   },
   "private": true,
@@ -98,6 +99,7 @@
     "@types/lokijs": "^1.5.7",
     "@types/multer": "^1.4.7",
     "@types/node": "16.11.7",
+    "@types/promise-retry": "^1.1.3",
     "@types/react": "17.0.30",
     "@types/react-dom": "17.0.9",
     "@types/swagger-ui-react": "^4.1.1",

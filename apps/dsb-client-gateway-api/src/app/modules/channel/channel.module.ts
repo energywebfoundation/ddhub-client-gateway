@@ -7,10 +7,11 @@ import { StorageModule } from '../storage/storage.module';
 import { CqrsModule } from '@nestjs/cqrs';
 import { IdentityModule } from '../identity/identity.module';
 import { ChannelDidCacheService } from './service/channel-did-cache.service';
-import { RefreshTopicsCacheHandler } from './service/refresh-topics-cache.handler';
+import { RefreshAllChannelsCacheDataHandler } from './handlers/refresh-all-channels-cache-data.handler';
 import { RefreshTopicsCacheCronService } from './service/refresh-topics-cache-cron.service';
 import { TopicRepository } from './repository/topic.repository';
 import { TopicService } from './service/topic.service';
+import { RefreshChannelCacheDataHandler } from './handlers/refresh-channel-cache-data.handler';
 
 @Module({
   imports: [CqrsModule, DsbClientModule, StorageModule, IdentityModule],
@@ -18,8 +19,9 @@ import { TopicService } from './service/topic.service';
     ChannelRepository,
     ChannelService,
     ChannelDidCacheService,
-    RefreshTopicsCacheHandler,
+    RefreshAllChannelsCacheDataHandler,
     RefreshTopicsCacheCronService,
+    RefreshChannelCacheDataHandler,
     TopicRepository,
     TopicService,
   ],

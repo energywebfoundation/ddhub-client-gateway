@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { providers } from 'ethers';
 import { AuthService } from './service/auth.service';
 import { DigestGuard } from './guards/digest.guard';
+import { RetryConfigService } from './service/retry-config.service';
 
 @Global()
 @Module({
@@ -24,7 +25,8 @@ import { DigestGuard } from './guards/digest.guard';
     },
     AuthService,
     DigestGuard,
+    RetryConfigService,
   ],
-  exports: [EthersService, AuthService],
+  exports: [EthersService, AuthService, RetryConfigService],
 })
 export class UtilsModule {}

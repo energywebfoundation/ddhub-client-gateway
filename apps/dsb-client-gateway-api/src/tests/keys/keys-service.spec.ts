@@ -4,6 +4,7 @@ import { IamService } from '../../app/modules/iam-service/service/iam.service';
 import { KeysRepository } from '../../app/modules/keys/repository/keys.repository';
 import { Wallet } from 'ethers';
 import { EthersService } from '../../app/modules/utils/service/ethers.service';
+import { IdentityService } from '../../app/modules/identity/service/identity.service';
 
 const secretsEngineServiceMock = {
   getPrivateKey: jest.fn(),
@@ -127,6 +128,13 @@ const mockDid = {
   proof: null,
   updated: null,
 };
+
+const identityServiceMock = {
+  getIdentity: jest.fn().mockImplementation(async () => ({
+    balance: 'OK',
+  })),
+};
+
 describe('KeysService (SPEC)', () => {
   let keysService: KeysService;
 
@@ -137,7 +145,8 @@ describe('KeysService (SPEC)', () => {
       secretsEngineServiceMock as unknown as SecretsEngineService,
       iamServiceMock as unknown as IamService,
       keysRepositoryMock as unknown as KeysRepository,
-      mockEthersService as unknown as EthersService
+      mockEthersService as unknown as EthersService,
+      identityServiceMock as unknown as IdentityService
     );
   });
 
