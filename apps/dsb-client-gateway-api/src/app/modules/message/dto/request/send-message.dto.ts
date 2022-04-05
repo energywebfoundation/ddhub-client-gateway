@@ -57,13 +57,13 @@ export class SendMessageDto {
   })
   transactionId: string;
 
-  @IsObject()
+  @IsString()
   @IsNotEmpty()
   @ApiProperty({
-    example: { data: 49 },
+    example: '{ data: 49 }',
     description: 'Payload to be sent to message',
   })
-  payload: object;
+  payload: string;
 }
 
 export class uploadMessageBodyDto {

@@ -37,13 +37,13 @@ export interface SendMessageResponse {
 }
 
 export interface InternalMessageEntity {
-  transactionId: string;
+  transactionId: string; // rm
   clientGatewayMessageId: string;
   payload: string;
-  topicId: string;
-  topicVersion: string;
-  signature: string;
-  isFile: boolean;
+  topicId: string; // remve this
+  topicVersion: string; // remove this
+  signature: string; // remove this
+  isFile: boolean; // remove this
   senderDid?: string;
   createdAt?: string;
   updatedAt?: string;

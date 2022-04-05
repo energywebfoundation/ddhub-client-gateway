@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { AbstractLokiRepository } from './abstract-loki.repository';
-import { Enrolment } from '../storage.interface';
+import { Enrolment } from '@dsb-client-gateway/dsb-client-gateway/identity/models';
 import { LokiService } from '../service/loki.service';
 
 @Injectable()

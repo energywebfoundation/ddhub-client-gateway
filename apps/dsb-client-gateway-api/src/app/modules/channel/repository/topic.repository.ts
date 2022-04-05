@@ -23,6 +23,8 @@ export class TopicRepository
     data: TopicVersion,
     topicId: string
   ): Promise<void> {
+    this.logger.debug('Updating topic', data, topicId);
+
     const currentTopic: TopicVersionEntity | null = this.getTopic(
       data.name,
       data.owner,
@@ -40,7 +42,7 @@ export class TopicRepository
         .getCollection<TopicVersionEntity>(this.collection)
         .update(newObject);
 
-      await this.client.save();
+      await this.lokiService.save();
 
       return;
     }
@@ -56,7 +58,7 @@ export class TopicRepository
   public getTopic(
     name: string,
     owner: string,
-    version: string
+    version?: string
   ): TopicVersionEntity | null {
     return this.client
       .getCollection<TopicVersionEntity>(this.collection)

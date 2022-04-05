@@ -49,7 +49,25 @@ export interface SearchMessageResponseDto {
   signature: string;
   payload: string;
   senderDid: string;
-  timestampNanos: string;
+  timestampNanos: number;
   isFile: boolean;
   clientGatewayMessageId: string;
+}
+
+export interface Decryption {
+  status: boolean;
+  errorMessage?: string;
+}
+export interface GetMessageResponse {
+  id: string;
+  topicName: string;
+  topicOwner: string;
+  topicVersion: string;
+  payload: string;
+  signature: string;
+  sender: string;
+  timestampNanos: number;
+  transactionId: string;
+  signatureValid: boolean;
+  decryption: Decryption;
 }

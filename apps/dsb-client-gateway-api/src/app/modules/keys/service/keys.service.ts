@@ -12,20 +12,21 @@ import {
   recoverPublicKey,
   SigningKey,
 } from 'ethers/lib/utils';
+import { IdentityService } from '../../identity/service/identity.service';
+import { BalanceState } from '@dsb-client-gateway/dsb-client-gateway/identity/models';
 
 @Injectable()
 export class KeysService implements OnModuleInit {
   private readonly logger = new Logger(KeysService.name);
-  private readonly curve = 'secp256k1';
   private readonly symmetricAlgorithm = 'aes-256-cbc';
-  private readonly hashAlgorithm = 'sha256';
   private readonly rsaPadding = crypto.constants.RSA_PKCS1_PADDING;
 
   constructor(
     protected readonly secretsEngineService: SecretsEngineService,
     protected readonly iamService: IamService,
     protected readonly keysRepository: KeysRepository,
-    protected readonly ethersService: EthersService
+    protected readonly ethersService: EthersService,
+    protected readonly identityService: IdentityService
   ) {}
 
   public async storeKeysForMessage(
@@ -237,6 +238,23 @@ export class KeysService implements OnModuleInit {
 
     if (!rootKey) {
       this.logger.log('Not deriving RSA key due to missing private key');
+
+      return;
+    }
+
+    const identity = await this.identityService.getIdentity();
+
+    if (!identity) {
+      this.logger.error('Identity is not created or ready');
+
+      return;
+    }
+
+    if (identity.balance === BalanceState.NONE) {
+      this.logger.error(
+        'Not updating keys as balance is none',
+        identity.address
+      );
 
       return;
     }

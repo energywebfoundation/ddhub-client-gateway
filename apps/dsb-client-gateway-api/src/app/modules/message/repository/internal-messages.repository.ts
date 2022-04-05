@@ -18,7 +18,9 @@ export class InternalMessageRepository
     this.createCollectionIfNotExists(this.collection);
   }
 
-  public async createInternalMessage(
+  // change to getSymmetricKey, updateSymmetricKey
+
+  public async saveInternalMessage(
     entity: InternalMessageEntity
   ): Promise<void> {
     this.logger.log(

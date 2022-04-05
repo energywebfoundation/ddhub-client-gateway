@@ -19,12 +19,13 @@ import { IsSchemaValid } from '../../utils/validator/decorators/IsSchemaValid';
 import { TopicNotFoundException } from '../exceptions/topic-not-found.exception';
 import { ChannelTypeNotPubException } from '../exceptions/channel-type-not-pub.exception';
 import { RecipientsNotFoundException } from '../exceptions/recipients-not-found-exception';
-import { MessagesNotFoundException } from '../exceptions/messages-not-found.exception';
 import { MessageSignatureNotValidException } from '../exceptions/messages-signature-not-valid.exception';
 import { InternalMessageNotFoundException } from '../exceptions/internal-message-exception';
+import { TopicOwnerTopicNameRequiredException } from '../exceptions/topic-owner-and-topic-name-required.exception';
 import {
   SendMessageResponse,
   SearchMessageResponseDto,
+  GetMessageResponse,
 } from '../message.interface';
 import { ChannelType } from '../../../modules/channel/channel.const';
 import { EnrolmentRepository } from '../../storage/repository/enrolment.repository';
@@ -101,9 +102,7 @@ export class MessageService {
       throw new TopicNotFoundException('NOT Found');
     }
 
-    const { qualifiedDids } = await this.channelService.getChannelQualifiedDids(
-      dto.fqcn
-    );
+    const qualifiedDids = channel.conditions.qualifiedDids;
 
     if (qualifiedDids.length === 0) {
       throw new RecipientsNotFoundException();
@@ -114,17 +113,7 @@ export class MessageService {
     }
 
     this.logger.log('Validating schema');
-    IsSchemaValid(
-      {
-        type: 'object',
-        properties: {
-          data: {
-            type: 'number',
-          },
-        },
-      },
-      dto.payload
-    );
+    IsSchemaValid(topic.schemaType, topic.schema, dto.payload);
 
     this.logger.log('generating Client Gateway Message Id');
     const clientGatewayMessageId: string = uuidv4();
@@ -137,7 +126,7 @@ export class MessageService {
     this.logger.log('Encrypting Payload');
 
     const encryptedMessage = await this.keyService.encryptMessage(
-      JSON.stringify(dto.payload),
+      dto.payload,
       randomKey,
       'utf-8' // put it const file
     );
@@ -188,30 +177,65 @@ export class MessageService {
   }
 
   public async getMessages({
-    topicId,
-    clientId,
-    amount,
+    fqcn,
     from,
-    senderId,
-  }: GetMessagesDto): Promise<any> {
-    const encryptedMessageResponse: Array<unknown> = [];
+    amount,
+    topicName,
+    topicOwner,
+    clientId,
+  }: GetMessagesDto): Promise<GetMessageResponse[]> {
+    const getMessagesResponse: Array<GetMessageResponse> = [];
 
-    const messages: SearchMessageResponseDto[] =
-      await this.dsbApiService.messagesSearch(
-        topicId,
-        senderId,
-        clientId,
-        from,
-        100
-      );
+    const channel = await this.channelService.getChannelOrThrow(fqcn);
 
-    if (messages.length === 0) {
-      throw new MessagesNotFoundException();
+    // topic owner and topic name should be present
+    if ((topicOwner && !topicName) || (!topicOwner && topicName)) {
+      throw new TopicOwnerTopicNameRequiredException('');
     }
 
-    await Promise.all(
+    //Get Topic Ids
+    let topicIds = [];
+    if (!topicName && !topicOwner) {
+      topicIds = channel.conditions.topics.map((topic) => topic.topicId);
+    } else {
+      const topic = await this.topicService.getTopic(topicName, topicOwner);
+      topicIds.push(topic.topicId);
+    }
+
+    // call message search
+    const messages: Array<SearchMessageResponseDto> =
+      await this.dsbApiService.messagesSearch(
+        topicIds,
+        channel.conditions.qualifiedDids,
+        clientId,
+        from,
+        amount
+      );
+
+    //no messages then return empty array
+    if (messages.length === 0) {
+      return [];
+    }
+
+    //validate signature and decrypt messages
+    await Promise.allSettled(
       messages.map(async (message: SearchMessageResponseDto) => {
+        const result: GetMessageResponse = {
+          id: message.messageId,
+          topicName: topicName,
+          topicOwner: topicOwner,
+          topicVersion: message.topicVersion,
+          payload: message.payload,
+          signature: message.signature,
+          sender: message.senderDid,
+          timestampNanos: message.timestampNanos,
+          transactionId: message.transactionId,
+          signatureValid: false,
+          decryption: { status: true },
+        };
+
         if (!message.isFile) {
+          //signature validation
           const isSignatureValid = await this.keyService.verifySignature(
             message.senderDid,
             message.signature,
@@ -224,37 +248,33 @@ export class MessageService {
           );
 
           if (isSignatureValid) {
-            const decryptedMessage = await this.keyService.decryptMessage(
-              message.payload,
-              message.clientGatewayMessageId,
-              message.senderDid
-            );
+            result.signatureValid = true;
 
-            this.logger.debug(
-              `decrypting Message for message with id ${message.messageId}`,
-              decryptedMessage
-            );
+            try {
+              const decryptedMessage = await this.keyService.decryptMessage(
+                message.payload,
+                message.clientGatewayMessageId,
+                message.senderDid
+              );
 
-            encryptedMessageResponse.push(decryptedMessage);
-          } else {
-            this.logger.error(
-              `Signature Not Matched for Message Id ${message.messageId}`
-            );
-            throw new MessageSignatureNotValidException(
-              `Signature Not Matched for Message Id ${message.messageId}`
-            );
+              result.payload = decryptedMessage;
+
+              this.logger.debug(
+                `decrypting Message for message with id ${message.messageId}`,
+                decryptedMessage
+              );
+            } catch (error) {
+              result.decryption.status = false;
+              result.decryption.errorMessage = JSON.stringify(error);
+            }
           }
         }
-      })
-    ).catch((e) => {
-      this.logger.error(
-        'Error while signature validationn or decrypting message',
-        e
-      );
-      throw new Error(e);
-    });
 
-    return encryptedMessageResponse;
+        getMessagesResponse.push(result);
+      })
+    );
+
+    return getMessagesResponse;
   }
 
   public async uploadMessage(
@@ -279,7 +299,7 @@ export class MessageService {
       throw new TopicNotFoundException('TOPIC NOT FOUND');
     }
 
-    if (channel.type !== ChannelType.PUB) {
+    if (channel.type !== ChannelType.UPLOAD) {
       throw new ChannelTypeNotPubException();
     }
 
@@ -390,7 +410,7 @@ export class MessageService {
 
     const creationDate: string = moment().toISOString();
 
-    await this.internalMessageRepository.createInternalMessage({
+    await this.internalMessageRepository.saveInternalMessage({
       transactionId: internalMessage.transactionId,
       clientGatewayMessageId: internalMessage.clientGatewayMessageId,
       payload: internalMessage.payload,

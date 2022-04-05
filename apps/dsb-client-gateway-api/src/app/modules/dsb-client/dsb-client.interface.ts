@@ -202,7 +202,7 @@ export interface SearchMessageResponseDto {
   signature: string;
   payload: string;
   senderDid: string;
-  timestampNanos: string;
+  timestampNanos: number;
   isFile: boolean;
   clientGatewayMessageId: string;
 }

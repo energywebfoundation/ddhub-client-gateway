@@ -8,32 +8,23 @@ import {
 import { ApiProperty } from '@nestjs/swagger';
 
 export class GetMessagesDto {
-  @IsArray()
+  @IsString()
   @IsNotEmpty()
   @ApiProperty({
     type: String,
-    example: ['62453a51ab8d1b108a880af7', '62453a51ab8d1b108a880af6'],
-    description: 'Array of Topic Ids',
+    example: 'channel.name',
+    description: 'channel name',
   })
-  topicId: string[];
-
-  @IsArray()
-  @IsNotEmpty()
-  @ApiProperty({
-    type: String,
-    example: ['did:ethr:volta:0x03830466Ce257f9B798B0f27359D7639dFB6457D'],
-    description: 'Array of Sender Ids',
-  })
-  senderId: string[];
+  fqcn: string;
 
   @IsString()
   @IsOptional()
   @ApiProperty({
     type: String,
-    example: 'bb2686d2-97be-436b-8869-f4de5b280c9a',
-    description: 'client Id',
+    description: 'date from which messages to be fetched',
+    example: '2022-03-31T09:48:44.357Z',
   })
-  clientId: string;
+  from: string;
 
   @IsOptional()
   @ApiProperty({
@@ -47,8 +38,26 @@ export class GetMessagesDto {
   @IsOptional()
   @ApiProperty({
     type: String,
-    description: 'date from which messages to be fetched',
-    example: '2022-03-31T09:48:44.357Z',
+    example: 'getOperatingEnvelope',
+    description: 'topic name',
   })
-  from: string;
+  topicName: string;
+
+  @IsString()
+  @IsOptional()
+  @ApiProperty({
+    type: String,
+    example: 'torta.apps.eggplant.vege.iam.ewc',
+    description: 'application namespace',
+  })
+  topicOwner: string;
+
+  @IsString()
+  @IsOptional()
+  @ApiProperty({
+    type: String,
+    example: 'test2',
+    description: 'cursor for pointing to messages',
+  })
+  clientId: string;
 }

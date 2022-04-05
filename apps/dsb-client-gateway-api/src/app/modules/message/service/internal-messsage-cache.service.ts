@@ -17,12 +17,14 @@ export class InternalMessageCacheService {
 
   public async refreshInternalMessageCache(): Promise<void> {
     const internalMesssages: InternalMessageEntity[] =
-      await this.dsbApiService.getInternalMessages('mb-default');
+      await this.dsbApiService.getInternalMessages('mb-default'); //set client id as something unique (address)
 
     console.log('internalMesssages', internalMesssages);
 
     if (internalMesssages.length === 0) {
       this.logger.log('No internal Messages, job not running');
     }
+
+    //continue running cron
   }
 }

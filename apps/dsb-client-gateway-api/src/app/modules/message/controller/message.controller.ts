@@ -24,6 +24,8 @@ import { DownloadMessagesDto } from '../dto/request/download-file.dto';
 import { MessageService } from '../service/message.service';
 import { DigestGuard } from '../../utils/guards/digest.guard';
 import { SendMessagelResponseDto } from '../dto/response/send-message.dto';
+
+import { GetMessagesResponseDto } from '../dto/response/get-message-response.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { createReadStream } from 'fs';
 import * as fs from 'fs';
@@ -39,7 +41,7 @@ export class MessageControlller {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Message recieved successfully',
-    type: () => SendMessagelResponseDto,
+    type: () => GetMessagesResponseDto,
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
@@ -55,7 +57,7 @@ export class MessageControlller {
     description: 'Messages Not found',
   })
   @HttpCode(HttpStatus.OK)
-  public async getMessage(@Query() dto: GetMessagesDto): Promise<void> {
+  public async getMessage(@Query() dto: GetMessagesDto): Promise<Array<any>> {
     return this.messageService.getMessages(dto);
   }
 
