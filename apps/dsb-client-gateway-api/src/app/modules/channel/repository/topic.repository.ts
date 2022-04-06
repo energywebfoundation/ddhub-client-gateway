@@ -1,8 +1,10 @@
-import { AbstractLokiRepository } from '../../storage/repository/abstract-loki.repository';
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { LokiService } from '../../storage/service/loki.service';
 import { TopicVersionEntity } from '../channel.interface';
 import { TopicVersion } from '../../dsb-client/dsb-client.interface';
+import {
+  AbstractLokiRepository,
+  LokiService,
+} from '@dsb-client-gateway/dsb-client-gateway-storage';
 
 @Injectable()
 export class TopicRepository

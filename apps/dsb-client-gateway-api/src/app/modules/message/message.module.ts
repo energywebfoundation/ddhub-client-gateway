@@ -6,9 +6,9 @@ import { UtilsModule } from '../utils/utils.module';
 import { MessageControlller } from './controller/message.controller';
 import { DsbClientModule } from '../dsb-client/dsb-client.module';
 import { ChannelModule } from '../channel/channel.module';
-import { StorageModule } from '../storage/storage.module';
 import { CqrsModule } from '@nestjs/cqrs';
 import { IdentityModule } from '../identity/identity.module';
+import { DsbClientGatewayStorageModule } from '@dsb-client-gateway/dsb-client-gateway-storage';
 
 @Module({
   imports: [
@@ -17,7 +17,7 @@ import { IdentityModule } from '../identity/identity.module';
     UtilsModule,
     ChannelModule,
     IdentityModule,
-    StorageModule,
+    DsbClientGatewayStorageModule,
   ],
   providers: [EventsGateway, MessageService, ChannelRepository],
   exports: [MessageService],

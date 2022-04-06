@@ -1,7 +1,7 @@
 node_modules
 db_dumps
 config
-dist
+# dist
 docs
 editors
 devops
