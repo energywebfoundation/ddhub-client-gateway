@@ -79,8 +79,6 @@ export class MessageControlller {
     @Query() { fileId }: DownloadMessagesDto,
     @Response({ passthrough: true }) res
   ): Promise<StreamableFile> {
-    await this.messageService.downloadMessages(fileId);
-
     const file: DownloadMessageResponse =
       await this.messageService.downloadMessages(fileId);
 

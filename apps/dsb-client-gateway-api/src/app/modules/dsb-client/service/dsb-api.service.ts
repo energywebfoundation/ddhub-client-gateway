@@ -524,7 +524,8 @@ export class DsbApiService implements OnModuleInit {
       return retry(e);
     }
 
-    return retry(e);
+    // return retry(e);
+    throw e;
   }
 
   public async getChannels(): Promise<Channel[]> {

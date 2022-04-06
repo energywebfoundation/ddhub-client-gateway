@@ -23,6 +23,8 @@ import { MessageSignatureNotValidException } from '../exceptions/messages-signat
 import { InternalMessageNotFoundException } from '../exceptions/internal-message-exception';
 import { TopicOwnerTopicNameRequiredException } from '../exceptions/topic-owner-and-topic-name-required.exception';
 import { MessageDecryptionFailedException } from '../exceptions/message-decryption-failed.exception';
+import { FileSizeException } from '../exceptions/file-size.exception';
+import { FIleTypeNotSupportedException } from '../exceptions/file-type-not-supported.exception';
 import {
   SendMessageResponse,
   SearchMessageResponseDto,
@@ -145,7 +147,7 @@ export class MessageService {
 
     this.logger.log('Sending CipherText as Internal Message');
 
-    await Promise.all(
+    await Promise.allSettled(
       qualifiedDids.map(async (recipientDid: string) => {
         const encryptedSymmetricKey = await this.keyService.encryptSymmetricKey(
           randomKey,
@@ -282,21 +284,40 @@ export class MessageService {
     file: Express.Multer.File,
     dto: uploadMessageBodyDto
   ): Promise<SendMessageResponse> {
+    console.log('file', file);
+
+    // file validations
+
+    // if (file.originalname.split('.')[1] !== 'csv') {
+    //   throw new FIleTypeNotSupportedException('');
+    // }
+
+    //.env
+    if (file.size > 100000000) {
+      throw new FileSizeException('');
+    }
+
+    //Check if internal channel exists
     const channel = await this.channelService.getChannelOrThrow(dto.fqcn);
+
+    //System gets topic details from cache
     const topic = await this.topicService.getTopic(
       dto.topicName,
       dto.topicOwner,
       dto.topicVersion
     );
 
-    const qualifiedDids = channel.conditions.qualifiedDids;
-
-    if (qualifiedDids.length === 0) {
-      throw new RecipientsNotFoundException();
-    }
-
+    //Check if topic exists
     if (!topic) {
       throw new TopicNotFoundException('TOPIC NOT FOUND');
+    }
+
+    //System gets internal channel details
+    const qualifiedDids = channel.conditions.qualifiedDids;
+
+    // return error if no recipients
+    if (qualifiedDids.length === 0) {
+      throw new RecipientsNotFoundException();
     }
 
     if (channel.type !== ChannelType.UPLOAD) {
@@ -318,6 +339,11 @@ export class MessageService {
       'utf-8'
     );
 
+    await fs.writeFileSync(
+      __dirname + '/../../../' + 'encryptedMessage.txt',
+      Buffer.from(encryptedMessage)
+    );
+
     this.logger.log('fetching private key');
     const privateKey = await this.vaultService.getPrivateKey();
 
@@ -331,7 +357,7 @@ export class MessageService {
       'Sending CipherText as Internal Message to all qualified dids'
     );
 
-    await Promise.all(
+    await Promise.allSettled(
       qualifiedDids.map(async (recipientDid: string) => {
         const decryptionCiphertext = await this.keyService.encryptSymmetricKey(
           randomKey,
@@ -344,14 +370,9 @@ export class MessageService {
           decryptionCiphertext
         );
       })
-    ).catch((e) => {
-      this.logger.error(
-        'Error while Sending CipherText as Internal Message to recipients',
-        e
-      );
-      throw new Error(e);
-    });
+    );
 
+    //uploading file
     return this.dsbApiService.uploadFile(
       file,
       qualifiedDids,
@@ -383,14 +404,14 @@ export class MessageService {
 
     // Return error that signature is invalid
     if (!isSignatureValid) {
-      this.logger.error(`Signature Not Matched for File Id ${fileId}`);
+      this.logger.error(`Signature not matched for file id: ${fileId}`);
       throw new MessageSignatureNotValidException(
-        `Signature Not Matched for File Id ${fileId}`
+        `Signature not matched for file id: ${fileId}`
       );
     } else {
-      let decryptedMessage;
-      let decryptionSucesssfull;
-      let decrypted;
+      let decryptedMessage: string;
+      let decryptionSucesssfull: boolean;
+      let decrypted: any;
 
       try {
         // Decrypting File Content
@@ -401,9 +422,15 @@ export class MessageService {
           fileResponse.headers.clientgatewaymessageid,
           fileResponse.headers.ownerdid
         );
+
+        this.logger.debug(`Completed decryption for file id:${fileId}`);
       } catch (e) {
         decryptionSucesssfull = false;
         throw new MessageDecryptionFailedException(JSON.stringify(e));
+      }
+
+      if (!decryptedMessage) {
+        throw new MessageDecryptionFailedException('');
       }
 
       try {

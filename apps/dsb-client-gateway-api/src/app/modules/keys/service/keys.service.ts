@@ -110,11 +110,16 @@ export class KeysService implements OnModuleInit {
       return false;
     }
 
-    const recoveredPublicKey = recoverPublicKey(id(encryptedData), signature);
-
-    // console.log('recoveredPublicKey', recoveredPublicKey);
-
-    return recoveredPublicKey === key.publicKeyHex;
+    try {
+      const recoveredPublicKey = recoverPublicKey(id(encryptedData), signature);
+      return recoveredPublicKey === key.publicKeyHex;
+    } catch (e) {
+      this.logger.error(
+        `error ocurred while recoverPublicKey in verify signature`,
+        e
+      );
+      return false;
+    }
   }
 
   public async decryptMessage(

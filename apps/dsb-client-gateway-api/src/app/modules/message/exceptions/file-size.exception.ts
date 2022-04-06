@@ -1,11 +1,11 @@
 import { BadRequestException } from '@nestjs/common';
 import { DsbClientGatewayErrors } from '@dsb-client-gateway/dsb-client-gateway-errors';
 
-export class MessageSignatureNotValidException extends BadRequestException {
+export class FileSizeException extends BadRequestException {
   public code: DsbClientGatewayErrors;
 
   constructor(public readonly additionalDetails) {
-    super('Signature verfication failed.');
-    this.code = DsbClientGatewayErrors.SIGNATURE_DOES_NOT_MATCH;
+    super('File Size greater then 100 MB not allowed.');
+    this.code = DsbClientGatewayErrors.FILE_SIZE_GREATER_THEN_100_MB;
   }
 }
