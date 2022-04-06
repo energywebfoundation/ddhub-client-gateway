@@ -1,25 +1,27 @@
-ARG IMAGE=node:14.17-alpine
+ARG IMAGE=node:16.10-alpine
 ARG NODE_ENV=production
 
-FROM $IMAGE as build
-WORKDIR /usr/app
+# FROM $IMAGE as build
+# WORKDIR /usr/app
 
-COPY . .
+# COPY . .
 
-ENV NODE_ENV $NODE_ENV
+# ENV NODE_ENV $NODE_ENV
 
-RUN npm install --quiet --no-progress -g nx && \
-    npm ci --quiet --no-progress && \
-    nx build dsb-client-gateway-api && \
-    npm prune --production
+# RUN npm install --quiet --no-progress -g nx && \
+#     npm ci --quiet --no-progress && \
+#     nx build dsb-client-gateway-api
 
 FROM $IMAGE
 
+ENV NODE_ENV=$NODE_ENV
+
+COPY --chown=node:node dist/apps/dsb-client-gateway-api/* /usr/app/
+COPY --chown=node:node package-lock.json /usr/app/
+
 WORKDIR /usr/app
+RUN npm ci --production
 
 USER node
 
-COPY --chown=node:node --from=build /usr/app/dist /usr/app/dist
-COPY --chown=node:node --from=build /usr/app/node_modules /usr/app/node_modules
-
-CMD ["node", "dist/apps/dsb-client-gateway-api/main.js"]
+CMD ["node", "main.js"]
