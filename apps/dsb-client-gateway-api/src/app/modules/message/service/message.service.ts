@@ -284,16 +284,12 @@ export class MessageService {
     file: Express.Multer.File,
     dto: uploadMessageBodyDto
   ): Promise<SendMessageResponse> {
-    console.log('file', file);
-
     // file validations
+    if (!file.originalname.match(/\.(csv)$/)) {
+      throw new FIleTypeNotSupportedException('');
+    }
 
-    // if (file.originalname.split('.')[1] !== 'csv') {
-    //   throw new FIleTypeNotSupportedException('');
-    // }
-
-    //.env
-    if (file.size > 100000000) {
+    if (file.size > this.configService.get('MAX_FILE_SIZE')) {
       throw new FileSizeException('');
     }
 
@@ -442,15 +438,18 @@ export class MessageService {
         );
       }
 
+      const dir = __dirname + '/../../../files/';
+
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir);
+      }
+
       // writing the data to a file
-      await fs.writeFileSync(
-        __dirname + '/../../../' + fileName,
-        Buffer.from(decrypted.data)
-      );
+      await fs.writeFileSync(dir + fileName, Buffer.from(decrypted.data));
     }
 
     return {
-      filePath: join(__dirname + '/../../../' + fileName),
+      filePath: join(__dirname + '/../../../files/' + fileName),
       fileName: fileName,
       sender: fileResponse.headers.ownerdid,
       signature: fileResponse.headers.signature,

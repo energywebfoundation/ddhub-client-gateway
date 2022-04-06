@@ -28,7 +28,6 @@ import { GetMessagesResponseDto } from '../dto/response/get-message-response.dto
 import { DownloadMessageResponse } from '../entity/message.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
 import * as fs from 'fs';
-import * as path from 'path';
 
 @Controller('messages')
 @UseGuards(DigestGuard)
@@ -150,7 +149,7 @@ export class MessageControlller {
   })
   @HttpCode(HttpStatus.CREATED)
   @ApiConsumes('multipart/form-data')
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(FileInterceptor('file', {}))
   public async uploadFile(
     @UploadedFile('file') file: Express.Multer.File,
     @Body() dto: uploadMessageBodyDto
