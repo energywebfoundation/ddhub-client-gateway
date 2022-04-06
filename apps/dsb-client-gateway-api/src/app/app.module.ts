@@ -2,12 +2,12 @@ import { Module, ValidationPipe } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { IdentityModule } from './modules/identity/identity.module';
 import { EnrolmentModule } from './modules/enrolment/enrolment.module';
-import { IamModule } from './modules/iam-service/iam.module';
+import { IamModule } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
 import { CertificateModule } from './modules/certificate/certificate.module';
 import { MulterModule } from '@nestjs/platform-express';
 import { DsbClientModule } from './modules/dsb-client/dsb-client.module';
 import { KeysModule } from './modules/keys/keys.module';
-import { SecretsEngineModule } from './modules/secrets-engine/secrets-engine.module';
+import { SecretsEngineModule } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
 import { APP_FILTER, APP_PIPE } from '@nestjs/core';
 import { AllExceptionsFilter } from './modules/utils/filter/all-exceptions.filter';
 import { TerminusModule } from '@nestjs/terminus';
@@ -16,7 +16,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { UtilsModule } from './modules/utils/utils.module';
 import { configValidate } from './modules/utils/config.validate';
 import { ChannelModule } from './modules/channel/channel.module';
-import { MessageModule } from './modules/message/message.module'
+import { MessageModule } from './modules/message/message.module';
 
 @Module({
   imports: [
@@ -38,7 +38,7 @@ import { MessageModule } from './modules/message/message.module'
     ScheduleModule.forRoot(),
     UtilsModule,
     ChannelModule,
-    MessageModule
+    MessageModule,
   ],
   providers: [
     {
@@ -52,4 +52,4 @@ import { MessageModule } from './modules/message/message.module'
   ],
   controllers: [HealthController],
 })
-export class AppModule { }
+export class AppModule {}

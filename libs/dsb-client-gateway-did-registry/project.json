@@ -1,0 +1,33 @@
+{
+  "root": "libs/dsb-client-gateway-did-registry",
+  "sourceRoot": "libs/dsb-client-gateway-did-registry/src",
+  "projectType": "library",
+  "targets": {
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/dsb-client-gateway-did-registry/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/libs/dsb-client-gateway-did-registry"],
+      "options": {
+        "jestConfig": "libs/dsb-client-gateway-did-registry/jest.config.js",
+        "passWithNoTests": true
+      }
+    },
+    "typechain": {
+      "executor": "@nrwl/workspace:run-commands",
+      "options": {
+        "commands": [
+          "typechain --target ethers-v5 --out-dir src/lib/ethers 'src/abi/EthereumDIDRegistry.json'"
+        ],
+        "cwd": "libs/dsb-client-gateway-did-registry",
+        "parallel": false
+      }
+    }
+  },
+  "tags": []
+}

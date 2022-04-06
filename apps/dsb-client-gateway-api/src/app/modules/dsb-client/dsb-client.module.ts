@@ -6,7 +6,6 @@ import { UtilsModule } from '../utils/utils.module';
 import { DsbChannelsController } from './controller/dsb-channels.controller';
 import { DsbApiService } from './service/dsb-api.service';
 import { TlsAgentService } from './service/tls-agent.service';
-import { SecretsEngineModule } from '../secrets-engine/secrets-engine.module';
 import { KeysModule } from '../keys/keys.module';
 import { DsbMessagesController } from './controller/dsb-messages.controller';
 import { DsbTopicsController } from './controller/dsb-topics.controller';
@@ -15,7 +14,7 @@ import { DidAuthModule } from './module/did-auth/did-auth.module';
 import { DsbHealthController } from './controller/dsb-health.controller';
 import { CqrsModule } from '@nestjs/cqrs';
 import { DsbApplicationsController } from './controller/dsb-applications.controller';
-
+import { SecretsEngineModule } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
 
 @Module({
   imports: [
@@ -39,7 +38,7 @@ import { DsbApplicationsController } from './controller/dsb-applications.control
     UtilsModule,
     SecretsEngineModule,
     KeysModule,
-    DidAuthModule
+    DidAuthModule,
   ],
   providers: [DsbApiService, TlsAgentService],
   controllers: [
@@ -48,8 +47,8 @@ import { DsbApplicationsController } from './controller/dsb-applications.control
     DsbMessagesController,
     DsbTopicsController,
     DsbFilesController,
-    DsbApplicationsController
+    DsbApplicationsController,
   ],
   exports: [DsbApiService],
 })
-export class DsbClientModule { }
+export class DsbClientModule {}
