@@ -1,12 +1,12 @@
 module.exports = {
   apiClient: {
       input: {
-          target: './src/schema.yaml'
+          target: './schema.yaml'
       },
       output: {
           mode: 'single',
           client: 'react-query',
-          target: './src/client',
+          target: './src/lib/client',
           override: {
               mutator: './src/response-type.ts'
           }

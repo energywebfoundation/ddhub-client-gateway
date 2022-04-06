@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as Yaml from 'json-to-pretty-yaml';
-import { createDocument } from '@dsb-client-gateway/dsb-client-gateway-api';
+import { createDocument } from './main';
 
 export const generateSchema = async () => {
   const document = await createDocument();
@@ -9,7 +9,10 @@ export const generateSchema = async () => {
     document.components.schemas = {};
   }
 
-  fs.writeFileSync('./schema.yaml', Yaml.stringify(document));
+  fs.writeFileSync(
+    '../../libs/dsb-client-gateway-api-client/schema.yaml',
+    Yaml.stringify(document)
+  );
 };
 
 (async () => {
