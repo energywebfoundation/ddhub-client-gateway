@@ -48,3 +48,11 @@ export interface InternalMessageEntity {
   createdAt?: string;
   updatedAt?: string;
 }
+
+export interface DownloadMessageResponse {
+  filePath: string;
+  fileName: string;
+  sender: string;
+  signature: string;
+  clientGatewayMessageId: string;
+}

@@ -24,10 +24,9 @@ import { DownloadMessagesDto } from '../dto/request/download-file.dto';
 import { MessageService } from '../service/message.service';
 import { DigestGuard } from '../../utils/guards/digest.guard';
 import { SendMessagelResponseDto } from '../dto/response/send-message.dto';
-
 import { GetMessagesResponseDto } from '../dto/response/get-message-response.dto';
+import { DownloadMessageResponse } from '../entity/message.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { createReadStream } from 'fs';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -65,7 +64,6 @@ export class MessageControlller {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Message Dwonloaded successfully',
-    // type: () => SendMessagelResponseDto, // make type of file download
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
@@ -79,26 +77,32 @@ export class MessageControlller {
   @HttpCode(HttpStatus.OK)
   public async downloadMessage(
     @Query() { fileId }: DownloadMessagesDto,
-    @Req() req,
     @Response({ passthrough: true }) res
   ): Promise<StreamableFile> {
     await this.messageService.downloadMessages(fileId);
+
+    const file: DownloadMessageResponse =
+      await this.messageService.downloadMessages(fileId);
+
     res.set({
       'Content-Type': 'multipart/form-data',
-      'Content-Disposition': 'attachment; filename="package.csv"',
+      'Content-Disposition': `attachment; filename=${file.fileName}`,
+      sender: file.sender,
+      signature: file.signature,
+      clientGatewayMessageId: file.clientGatewayMessageId,
     });
 
-    // shift this logic to service
-
-    const file = await this.messageService.downloadMessages(fileId);
-    const readStream = fs.createReadStream(file);
-    readStream.on('data', (chunk) => console.log(chunk)); // <--- the data log gets printed
-    readStream.on('end', () => console.log('done'));
-    readStream.on('error', (err) => {
-      console.error(err);
-    });
-
-    return new StreamableFile(readStream);
+    try {
+      const readStream = fs.createReadStream(file.filePath);
+      readStream.on('data', (chunk) => console.log(chunk));
+      readStream.on('end', () => console.log('done'));
+      readStream.on('error', (err) => {
+        console.error('error in readtream', err);
+      });
+      return new StreamableFile(readStream);
+    } catch (e) {
+      console.error('error in catch directly', e);
+    }
   }
 
   @Post('/')

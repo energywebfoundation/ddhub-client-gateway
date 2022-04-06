@@ -21,9 +21,6 @@ function validateJSONSchema(schema: object, payload: string) {
   let validate: any;
   let valid: boolean;
 
-  console.log('schema', schema);
-  console.log('payload', payload);
-
   try {
     const jsonPayload = JSON.parse(payload);
     validate = ajv.compile(schema);

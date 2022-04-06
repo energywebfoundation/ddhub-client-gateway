@@ -22,10 +22,12 @@ import { RecipientsNotFoundException } from '../exceptions/recipients-not-found-
 import { MessageSignatureNotValidException } from '../exceptions/messages-signature-not-valid.exception';
 import { InternalMessageNotFoundException } from '../exceptions/internal-message-exception';
 import { TopicOwnerTopicNameRequiredException } from '../exceptions/topic-owner-and-topic-name-required.exception';
+import { MessageDecryptionFailedException } from '../exceptions/message-decryption-failed.exception';
 import {
   SendMessageResponse,
   SearchMessageResponseDto,
   GetMessageResponse,
+  DownloadMessageResponse,
 } from '../message.interface';
 import { ChannelType } from '../../../modules/channel/channel.const';
 import { EnrolmentRepository } from '../../storage/repository/enrolment.repository';
@@ -260,8 +262,7 @@ export class MessageService {
               result.payload = decryptedMessage;
 
               this.logger.debug(
-                `decrypting Message for message with id ${message.messageId}`,
-                decryptedMessage
+                `decrypting Message for message with id ${message.messageId}`
               );
             } catch (error) {
               result.decryption.status = false;
@@ -287,9 +288,8 @@ export class MessageService {
       dto.topicOwner,
       dto.topicVersion
     );
-    const { qualifiedDids } = await this.channelService.getChannelQualifiedDids(
-      dto.fqcn
-    );
+
+    const qualifiedDids = channel.conditions.qualifiedDids;
 
     if (qualifiedDids.length === 0) {
       throw new RecipientsNotFoundException();
@@ -364,39 +364,71 @@ export class MessageService {
     );
   }
 
-  public async downloadMessages(fileId: string): Promise<string> {
+  public async downloadMessages(
+    fileId: string
+  ): Promise<DownloadMessageResponse> {
+    //Calling download file API of message broker
     const fileResponse = await this.dsbApiService.downloadFile(fileId);
+    //getting file name from headers
+    const fileName = fileResponse.headers['content-disposition']
+      .split('=')[1]
+      .replaceAll('"', '');
 
+    //Verifying signature
     const isSignatureValid = await this.keyService.verifySignature(
       fileResponse.headers.ownerdid,
       fileResponse.headers.signature,
       fileResponse.data
     );
 
+    // Return error that signature is invalid
     if (!isSignatureValid) {
       this.logger.error(`Signature Not Matched for File Id ${fileId}`);
       throw new MessageSignatureNotValidException(
         `Signature Not Matched for File Id ${fileId}`
       );
     } else {
-      const decryptedMessage = await this.keyService.decryptMessage(
-        fileResponse.data,
-        fileResponse.headers.clientgatewaymessageid,
-        fileResponse.headers.ownerdid
-      );
+      let decryptedMessage;
+      let decryptionSucesssfull;
+      let decrypted;
 
-      this.logger.debug(
-        `decrypting Message for File Id  ${fileId}`,
-        decryptedMessage
-      );
+      try {
+        // Decrypting File Content
+        this.logger.debug(`decrypting Message for File Id  ${fileId}`);
 
+        decryptedMessage = await this.keyService.decryptMessage(
+          fileResponse.data,
+          fileResponse.headers.clientgatewaymessageid,
+          fileResponse.headers.ownerdid
+        );
+      } catch (e) {
+        decryptionSucesssfull = false;
+        throw new MessageDecryptionFailedException(JSON.stringify(e));
+      }
+
+      try {
+        // Parsing Decrypted data
+        decrypted = JSON.parse(decryptedMessage);
+      } catch (e) {
+        throw new MessageDecryptionFailedException(
+          'Decryted Message cannot be parsed to JSON object.'
+        );
+      }
+
+      // writing the data to a file
       await fs.writeFileSync(
-        __dirname + '/../../../test.csv', // take the file name from api response
-        decryptedMessage.toString()
+        __dirname + '/../../../' + fileName,
+        Buffer.from(decrypted.data)
       );
     }
 
-    return join(__dirname + '/../../../test.csv');
+    return {
+      filePath: join(__dirname + '/../../../' + fileName),
+      fileName: fileName,
+      sender: fileResponse.headers.ownerdid,
+      signature: fileResponse.headers.signature,
+      clientGatewayMessageId: fileResponse.headers.clientgatewaymessageid,
+    };
   }
 
   public async createInternalMessage(

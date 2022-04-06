@@ -430,8 +430,6 @@ export class DsbApiService implements OnModuleInit {
       payload: payload,
     };
 
-    console.log('payload', payload);
-
     const { data } = await promiseRetry(async (retry, attempt) => {
       console.log(this.baseUrl + '/messages/internal');
 

@@ -71,3 +71,11 @@ export interface GetMessageResponse {
   signatureValid: boolean;
   decryption: Decryption;
 }
+
+export interface DownloadMessageResponse {
+  filePath: string;
+  fileName: string;
+  sender: string;
+  signature: string;
+  clientGatewayMessageId: string;
+}
