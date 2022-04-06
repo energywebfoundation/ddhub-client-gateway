@@ -10,7 +10,8 @@
         "outputPath": "dist/apps/dsb-client-gateway-api",
         "main": "apps/dsb-client-gateway-api/src/main.ts",
         "tsConfig": "apps/dsb-client-gateway-api/tsconfig.app.json",
-        "assets": ["apps/dsb-client-gateway-api/src/assets"]
+        "assets": ["apps/dsb-client-gateway-api/src/assets"],
+        "generatePackageJson": true
       },
       "configurations": {
         "production": {

@@ -1,0 +1,23 @@
+{
+  "root": "libs/dsb-client-gateway-storage",
+  "sourceRoot": "libs/dsb-client-gateway-storage/src",
+  "projectType": "library",
+  "targets": {
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/dsb-client-gateway-storage/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/libs/dsb-client-gateway-storage"],
+      "options": {
+        "jestConfig": "libs/dsb-client-gateway-storage/jest.config.js",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": []
+}

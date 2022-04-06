@@ -1,4 +1,3 @@
-import { IAppDefinition } from '@energyweb/iam-contracts';
 export interface Topic {
   namespace: string;
   schema: object | string;
@@ -33,15 +32,6 @@ export interface TopicData {
   schemaType: string;
   tags: string[];
   version: string;
-}
-
-export class ApplicationDTO implements IAppDefinition {
-  appName: string;
-  logoUrl?: string;
-  websiteUrl?: string;
-  description?: string;
-  namespace?: string;
-  topicsCount?: number;
 }
 
 export interface ApplicationHeader {

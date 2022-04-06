@@ -89,11 +89,15 @@ export class ChannelService {
   public getChannelQualifiedDids(fqcn: string): ChannelQualifiedDids {
     const channel: ChannelEntity = this.getChannelOrThrow(fqcn);
 
-    return {
-      qualifiedDids: [
+    const uniqueDids: string[] = [
+      ...new Set([
         ...channel.conditions.dids,
         ...channel.conditions.qualifiedDids,
-      ],
+      ]),
+    ];
+
+    return {
+      qualifiedDids: uniqueDids,
       fqcn: channel.fqcn,
       updatedAt: channel.updatedAt,
     };

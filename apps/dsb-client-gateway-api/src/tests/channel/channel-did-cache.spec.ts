@@ -1,5 +1,5 @@
 import { ChannelDidCacheService } from '../../app/modules/channel/service/channel-did-cache.service';
-import { IamService } from '../../app/modules/iam-service/service/iam.service';
+import { IamService } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
 import { ChannelService } from '../../app/modules/channel/service/channel.service';
 import { DsbApiService } from '../../app/modules/dsb-client/service/dsb-api.service';
 import { IdentityService } from '../../app/modules/identity/service/identity.service';

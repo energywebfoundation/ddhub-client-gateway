@@ -16,6 +16,9 @@
     "baseUrl": ".",
     "esModuleInterop": true,
     "paths": {
+      "@dsb-client-gateway/dsb-client-gateway-did-registry": [
+        "libs/dsb-client-gateway-did-registry/src/index.ts"
+      ],
       "@dsb-client-gateway/dsb-client-gateway-errors": [
         "libs/dsb-client-gateway-errors/src/index.ts"
       ],
@@ -24,6 +27,15 @@
       ],
       "@dsb-client-gateway/dsb-client-gateway-api-client": [
         "dist/apps/dsb-client-gateway-api-client/src/index"
+      ],
+      "@dsb-client-gateway/dsb-client-gateway-iam-client": [
+        "libs/dsb-client-gateway-iam-client/src/index.ts"
+      ],
+      "@dsb-client-gateway/dsb-client-gateway-secrets-engine": [
+        "libs/dsb-client-gateway-secrets-engine/src/index.ts"
+      ],
+      "@dsb-client-gateway/dsb-client-gateway-storage": [
+        "libs/dsb-client-gateway-storage/src/index.ts"
       ],
       "@dsb-client-gateway/dsb-client-gateway/identity/models": [
         "libs/dsb-client-gateway/identity/models/src/index.ts"
