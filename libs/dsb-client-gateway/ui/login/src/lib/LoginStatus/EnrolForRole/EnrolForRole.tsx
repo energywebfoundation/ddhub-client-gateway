@@ -1,7 +1,5 @@
-import { Button, CircularProgress, Container, Stack, Typography } from '@mui/material';
+import { Button, Container, Stack, Typography } from '@mui/material';
 import { ErrorOutline } from '@mui/icons-material';
-import axios from 'axios';
-import { useState } from 'react';
 
 export interface EnrolForRoleProps {
   onEnrolmentSubmit: () => void
