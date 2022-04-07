@@ -39,7 +39,7 @@ ddhub-client-gateway-api:
       secret_engine: vault
       vault_endpoint: http://vault.ddhub-dev.svc:8200
       # -- Enable basic auth. (Once enabled, associated secret is required, eg: "ddhub-client-gateway-api-secret")
-      basic_auth_enabled: false
+      basic_auth_enabled: true
       node_env: test
   image:
     # repository: 098061033856.dkr.ecr.us-east-1.amazonaws.com/ew-dos-dsb-ecr
@@ -132,6 +132,6 @@ ddhub-client-gateway-api:
     claimName: my-claim
     mountPath: /mnt/claim
 
-  probes: 
+  probes:
     liveness: true
     readiness: true
