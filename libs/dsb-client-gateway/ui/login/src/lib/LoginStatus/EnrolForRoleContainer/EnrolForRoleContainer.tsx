@@ -1,20 +1,14 @@
-import { useState } from 'react';
 import RequestingEnrolment from '../RequestingEnrolment/RequestingEnrolment';
 import EnrolForRole from '../EnrolForRole/EnrolForRole';
-import { useEnrolmentControllerInit } from '@dsb-client-gateway/dsb-client-gateway-api-client';
+import { useEnrolForRole } from './EnrolForRoleContainer.effects';
 
 export function EnrolForRoleContainer() {
-  const [isEnrolRequested, setIsEnrolRequested] = useState(false);
-  const { mutate } = useEnrolmentControllerInit();
-  const onEnrolmentSubmit = () => {
-    mutate();
-    setIsEnrolRequested(true);
-  };
+  const {isEnrolRequested, enrolmentHandler} = useEnrolForRole();
 
   return (
     <>
       {isEnrolRequested ? (<RequestingEnrolment/>) : (
-        <EnrolForRole onEnrolmentSubmit={onEnrolmentSubmit}/>)}
+        <EnrolForRole onEnrolmentSubmit={enrolmentHandler}/>)}
     </>
   );
 }
