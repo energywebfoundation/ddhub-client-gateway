@@ -12,6 +12,7 @@
     "dsb-client-gateway-identity-models": "libs/dsb-client-gateway/identity/models",
     "dsb-client-gateway-scheduler": "apps/dsb-client-gateway-scheduler",
     "dsb-client-gateway-secrets-engine": "libs/dsb-client-gateway-secrets-engine",
-    "dsb-client-gateway-storage": "libs/dsb-client-gateway-storage"
+    "dsb-client-gateway-storage": "libs/dsb-client-gateway-storage",
+    "ui-core": "libs/ui/core"
   }
 }
