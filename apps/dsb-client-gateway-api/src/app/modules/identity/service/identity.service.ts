@@ -122,10 +122,6 @@ export class IdentityService {
     await this.iamService.setup(privateKey);
 
     await this.enrolmentService.deleteEnrolment();
-
-    await this.enrolmentService
-      .startListening()
-      .catch((e) => this.logger.error(e));
   }
 
   /**
