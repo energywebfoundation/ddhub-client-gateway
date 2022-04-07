@@ -16,6 +16,7 @@ import {
 } from 'ethers/lib/utils';
 import { IdentityService } from '../../identity/service/identity.service';
 import { BalanceState } from '@dsb-client-gateway/dsb-client-gateway/identity/models';
+import { IamInitService } from '../../identity/service/iam-init.service';
 
 @Injectable()
 export class KeysService implements OnModuleInit {
@@ -30,7 +31,8 @@ export class KeysService implements OnModuleInit {
     protected readonly ethersService: EthersService,
     protected readonly identityService: IdentityService,
     protected readonly symmetricKeysRepository: SymmetricKeysRepository,
-    protected readonly symmetricKeysCacheService: SymmetricKeysCacheService
+    protected readonly symmetricKeysCacheService: SymmetricKeysCacheService,
+    protected readonly iamInitService: IamInitService
   ) {}
 
   public async storeKeysForMessage(): Promise<void> {
@@ -127,7 +129,7 @@ export class KeysService implements OnModuleInit {
     clientGatewayMessageId: string,
     senderDid: string
   ): Promise<string | null> {
-    let symmetricKey: KeysEntity | null = await this.getSymmetricKey(
+    const symmetricKey: KeysEntity | null = await this.getSymmetricKey(
       senderDid,
       clientGatewayMessageId
     );
@@ -264,6 +266,7 @@ export class KeysService implements OnModuleInit {
 
     const wallet = this.ethersService.getWalletFromPrivateKey(rootKey);
 
+    await this.iamInitService.onModuleInit();
     await this.iamService.setVerificationMethod(
       wallet.publicKey,
       DIDPublicKeyTags.DSB_SIGNATURE_KEY

@@ -48,7 +48,6 @@ export class MessageService {
   protected readonly logger = new Logger(MessageService.name);
 
   constructor(
-    // protected readonly secretsEngineService: secretsEngineService,
     protected readonly secretsEngineService: SecretsEngineService,
     protected readonly gateway: EventsGateway,
     protected readonly configService: ConfigService,
@@ -57,7 +56,6 @@ export class MessageService {
     protected readonly topicService: TopicService,
     protected readonly identityService: IdentityService,
     protected readonly keyService: KeysService,
-    // protected readonly secretsEngineService: secretsEngineService,
     protected readonly internalMessageRepository: SymmetricKeysRepository,
     protected readonly commandBus: CommandBus,
     protected readonly symmetricKeysCacheService: SymmetricKeysCacheService
@@ -324,20 +322,13 @@ export class MessageService {
     const clientGatewayMessageId: string = uuidv4();
 
     this.logger.log('Generating Random Key');
-    // const randomKey: string = await this.keyService.generateRandomKey();
-    const randomKey: string =
-      '7479377c81201eb89b90b11dda72bdc89b6473d6d1d60d4dad23c495b22e794d';
+    const randomKey: string = await this.keyService.generateRandomKey();
 
     this.logger.log('Encrypting Payload');
     const encryptedMessage = await this.keyService.encryptMessage(
       JSON.stringify(file.buffer),
       randomKey,
       'utf-8'
-    );
-
-    await fs.writeFileSync(
-      __dirname + '/../../../' + 'encryptedMessage.txt',
-      Buffer.from(encryptedMessage)
     );
 
     this.logger.log('fetching private key');
@@ -387,9 +378,11 @@ export class MessageService {
     //Calling download file API of message broker
     const fileResponse = await this.dsbApiService.downloadFile(fileId);
     //getting file name from headers
-    const fileName = fileResponse.headers['content-disposition']
-      .split('=')[1]
-      .replaceAll('"', '');
+    let fileName = fileResponse.headers['content-disposition'].split('=')[1];
+
+    console.log('fileName', fileName);
+    console.log(typeof fileName);
+    fileName = fileName.replace(/"/g, '');
 
     //Verifying signature
     const isSignatureValid = await this.keyService.verifySignature(

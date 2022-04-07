@@ -22,7 +22,6 @@ import { SecretsEngineModule } from '@dsb-client-gateway/dsb-client-gateway-secr
     CqrsModule,
     UtilsModule,
     ChannelModule,
-
     IdentityModule,
     SecretsEngineModule,
     DsbClientGatewayStorageModule,

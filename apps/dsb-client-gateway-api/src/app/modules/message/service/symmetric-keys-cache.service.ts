@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { MessageService } from './message.service';
+
 import { DsbApiService } from '../../dsb-client/service/dsb-api.service';
 import { SymmetricKeyEntity } from '../entity/message.entity';
 import { SymmetricKeysRepository } from '../repository/symmetric-keys.repository';
@@ -19,6 +19,7 @@ export class SymmetricKeysCacheService {
     const symmetricKeys: SymmetricKeyEntity[] =
       await this.dsbApiService.getSymmetricKeys({
         clientId: this.configService.get('CLIENT_ID'),
+        amount: this.configService.get('AMOUNT_OF_SYMMETRIC_KEYS_FETCHED'),
       });
 
     this.logger.log('internalMesssages', symmetricKeys);
