@@ -5,7 +5,7 @@ import { useEnrolmentControllerInit } from '@dsb-client-gateway/dsb-client-gatew
 
 export function EnrolForRoleContainer() {
   const [isEnrolRequested, setIsEnrolRequested] = useState(false);
-  const {mutate} = useEnrolmentControllerInit({mutation: {onError: error => console.log(error)}});
+  const { mutate } = useEnrolmentControllerInit();
   const onEnrolmentSubmit = () => {
     mutate();
     setIsEnrolRequested(true);
