@@ -1,4 +1,4 @@
-import { routerConst } from '@dsb-client-gateway/dsb-client-gateway/ui/utils';
+import { routerConst } from '@dsb-client-gateway/ui/utils';
 
 export const mapUrlToBreadcrumbs = new Map<string, string[]>()
   .set(routerConst.Dashboard, ['Dashboard'])
