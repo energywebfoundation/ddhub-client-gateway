@@ -3,32 +3,32 @@ import {
   Injectable,
   Logger,
   OnApplicationBootstrap,
-  OnModuleInit,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { HttpService } from '@nestjs/axios';
 import { Agent } from 'https';
 import { TlsAgentService } from './tls-agent.service';
 import { EthersService } from '../../utils/service/ethers.service';
-import { IamService } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
+import {
+  ApplicationDTO,
+  IamService,
+} from '@dsb-client-gateway/dsb-client-gateway-iam-client';
 import { lastValueFrom, Observable } from 'rxjs';
 import {
   Channel,
+  GetInternalMessageResponse,
   Message,
+  SearchMessageResponseDto,
+  SendInternalMessageRequestDTO,
   SendInternalMessageResponse,
   SendMessageData,
+  SendMessageResponse,
   SendTopicBodyDTO,
   Topic,
   TopicDataResponse,
   TopicResultDTO,
   TopicVersionResponse,
-  SendInternalMessageRequestDTO,
-  SendMessageResponse,
-  SearchMessageResponseDto,
-  GetInternalMessageResponse,
 } from '../dsb-client.interface';
-
-import { ApplicationDTO } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
 
 import promiseRetry from 'promise-retry';
 import FormData from 'form-data';
@@ -40,6 +40,7 @@ import { RetryConfigService } from '../../utils/service/retry-config.service';
 import { AxiosResponse } from '@nestjs/terminus/dist/health-indicator/http/axios.interfaces';
 import { isAxiosError } from '@nestjs/terminus/dist/utils';
 import { SecretsEngineService } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
+import { RoleStatus } from '@dsb-client-gateway/dsb-client-gateway/identity/models';
 
 export interface RetryOptions {
   stopOnStatusCodes?: HttpStatus[];
@@ -546,6 +547,27 @@ export class DsbApiService implements OnApplicationBootstrap {
   }
 
   public async login(): Promise<void> {
+    const enrolment = this.enrolmentRepository.getEnrolment();
+
+    console.log(enrolment);
+
+    if (!enrolment) {
+      this.logger.warn('Stopping login, enrolment is not enabled');
+
+      return;
+    }
+
+    const hasRequiredRoles =
+      enrolment.roles.filter(
+        (role) => role.required === true && role.status !== RoleStatus.SYNCED
+      ).length > 0;
+
+    if (hasRequiredRoles) {
+      this.logger.warn('Stopping login, roles are missing');
+
+      return;
+    }
+
     this.logger.log('Attempting to login to DID Auth Server');
 
     const privateKey: string | null =
