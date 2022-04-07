@@ -1,139 +1,92 @@
-import { forwardRef, Inject, Injectable, Logger, OnModuleInit, } from '@nestjs/common';
-import { EthersService } from '../../utils/service/ethers.service';
-import { IamService } from '../../iam-service/service/iam.service';
-import { NatsListenerService } from './nats-listener.service';
-import { ConfigService } from '@nestjs/config';
+import { Injectable } from '@nestjs/common';
+import {
+  Enrolment,
+  Role,
+  RoleStatus,
+} from '@dsb-client-gateway/dsb-client-gateway/identity/models';
 import { EnrolmentRepository } from '../../storage/repository/enrolment.repository';
 import {
-  BalanceState,
-  Enrolment,
-  EnrolmentState,
-  RoleState
-} from '@dsb-client-gateway/dsb-client-gateway/identity/models';
-import { IdentityService } from '../../identity/service/identity.service';
-import { IdentityNotReadyException } from '../../identity/exceptions/identity-not-ready.exception';
-import { NotEnoughBalanceException } from '../../identity/exceptions/not-enough-balance.exception';
+  Claim,
+  IamService,
+} from '@dsb-client-gateway/dsb-client-gateway-iam-client';
+import { ConfigService } from '@nestjs/config';
+import { RoleListenerService } from './role-listener.service';
 
 @Injectable()
-export class EnrolmentService implements OnModuleInit {
-  private readonly logger = new Logger(EnrolmentService.name);
-  private parentNamespace: string;
-  private userRole: string;
-
+export class EnrolmentService {
   constructor(
-    protected readonly ethersService: EthersService,
     protected readonly iamService: IamService,
-    protected readonly natsListenerService: NatsListenerService,
-    protected readonly enrolmentRepository: EnrolmentRepository,
-    @Inject(forwardRef(() => IdentityService))
-    protected readonly identityService: IdentityService,
-    protected readonly configService: ConfigService
+    protected readonly configService: ConfigService,
+    protected readonly roleListenerService: RoleListenerService,
+    protected readonly enrolmentRepository: EnrolmentRepository
   ) {}
 
-  public async onModuleInit(): Promise<void> {
-    this.parentNamespace = this.configService.get<string>(
-      'PARENT_NAMESPACE',
-      'dsb.apps.energyweb.iam.ewc'
-    );
-    this.userRole = `user.roles.${this.parentNamespace}`;
-
-    const did = this.iamService.getDIDAddress();
-
-    if (!did) {
-      this.logger.log('IAM not initialized to get enrolment');
-
-      return;
-    }
-
-    const claims = await this.iamService.getClaimsByRequester(
-      did,
-      this.parentNamespace
-    );
-
-    const state = await this.natsListenerService.getStateFromClaims(claims);
-
-    this.logger.log('Existing state', state);
-
-    await this.enrolmentRepository.writeEnrolment({
-      did,
-      state,
-    });
-
-    await this.initEnrolment().catch((e) => {
-      this.logger.error('Error during enrolment', e);
-    });
+  public deleteEnrolment(): void {
+    this.enrolmentRepository.removeEnrolment();
   }
 
-  public getEnrolment(): Enrolment | null {
-    const enrolment: Enrolment | null = this.enrolmentRepository.getEnrolment();
+  public async startListening(): Promise<void> {
+    await this.roleListenerService.startListening();
+  }
 
-    if (!enrolment) {
-      return {
-        did: this.iamService.getDIDAddress(),
-        state: {
-          roles: {
-            user: RoleState.NO_CLAIM,
-          },
-          waiting: false,
-          approved: false,
-        },
-      };
+  public async get(): Promise<Enrolment> {
+    const currentEnrolment: Enrolment | null =
+      this.enrolmentRepository.getEnrolment();
+
+    if (!currentEnrolment) {
+      const createdEnrolment: Enrolment = await this.generateEnrolment();
+
+      await this.enrolmentRepository.writeEnrolment(createdEnrolment);
+
+      return createdEnrolment;
     }
+
+    return currentEnrolment;
+  }
+
+  public async generateEnrolment(): Promise<Enrolment> {
+    const existingClaimsWithStatus: Claim[] =
+      await this.iamService.getClaimsWithStatus();
+    const requiredRoles: string[] = this.getRequiredRoles();
+
+    const claimsToRoles: Role[] = existingClaimsWithStatus.map((claim) => {
+      return {
+        namespace: claim.namespace,
+        status: claim.syncedToDidDoc ? RoleStatus.SYNCED : claim.status,
+        required: requiredRoles.includes(claim.namespace),
+      };
+    });
+
+    requiredRoles.forEach((requiredRole: string) => {
+      const exists = claimsToRoles.find(
+        ({ namespace }: Role) => namespace === requiredRole
+      );
+
+      if (!exists) {
+        claimsToRoles.push({
+          status: RoleStatus.NOT_ENROLLED,
+          namespace: requiredRole,
+          required: true,
+        });
+      }
+    });
+
+    const enrolment: Enrolment = {
+      did: this.iamService.getDIDAddress(),
+      roles: claimsToRoles,
+    };
+
+    await this.enrolmentRepository.writeEnrolment(enrolment);
 
     return enrolment;
   }
 
-  public async initEnrolment(): Promise<Enrolment | null> {
-    const identity = await this.identityService.getIdentity();
+  public getRequiredRoles(): string[] {
+    const parentNamespace: string = this.configService.get<string>(
+      'PARENT_NAMESPACE',
+      'dsb.apps.energyweb.iam.ewc'
+    );
 
-    if (!identity) {
-      throw new IdentityNotReadyException('identity');
-    }
-
-    const did = this.iamService.getDIDAddress();
-
-    if (!did) {
-      this.logger.error('DID could not be obtained');
-
-      throw new IdentityNotReadyException('did');
-    }
-
-    const { address, balance } = identity;
-
-    const existingState: EnrolmentState =
-      await this.natsListenerService.getState();
-
-    if (!existingState) {
-      throw new IdentityNotReadyException('enrolment-state');
-    }
-
-    if (existingState.approved) {
-      const enrolment: Enrolment = {
-        state: existingState,
-        did,
-      };
-
-      await this.enrolmentRepository.writeEnrolment(enrolment);
-
-      this.logger.log('Enrolment successfully synchronized');
-
-      return enrolment;
-    }
-
-    if (balance === BalanceState.NONE) {
-      throw new NotEnoughBalanceException(address);
-    }
-
-    if (existingState.roles.user === RoleState.NO_CLAIM) {
-      await this.natsListenerService.createClaim();
-    }
-
-    this.natsListenerService.init();
-    this.natsListenerService.startListening();
-
-    return {
-      did: this.iamService.getDIDAddress(),
-      state: await this.natsListenerService.getState(),
-    };
+    return [`user.roles.${parentNamespace}`];
   }
 }

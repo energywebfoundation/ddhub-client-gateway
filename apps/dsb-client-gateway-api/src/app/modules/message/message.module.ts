@@ -6,22 +6,23 @@ import { UtilsModule } from '../utils/utils.module';
 import { MessageControlller } from './controller/message.controller';
 import { DsbClientModule } from '../dsb-client/dsb-client.module';
 import { ChannelModule } from '../channel/channel.module';
-import { StorageModule } from '../storage/storage.module';
 import { CqrsModule } from '@nestjs/cqrs';
 import { IdentityModule } from '../identity/identity.module';
-import { VaultService } from '../secrets-engine/service/vault.service';
+import { DsbClientGatewayStorageModule } from '@dsb-client-gateway/dsb-client-gateway-storage';
 import { KeysModule } from '../keys/keys.module';
 import { SymmetricKeysCacheService } from './service/symmetric-keys-cache.service';
 import { RefreshSymmetricKeysCacheHandler } from './service/refresh-symmetric-keys-cache.handler';
 import { RefreshSymmetricKeysCacheCronService } from './service/refresh-symmetric-keys-cache-cron.service';
+import { VaultService } from 'libs/dsb-client-gateway-secrets-engine/src/lib/service/vault.service';
 
 @Module({
   imports: [
+    DsbClientModule,
     CqrsModule,
     UtilsModule,
     ChannelModule,
     IdentityModule,
-    StorageModule,
+    DsbClientGatewayStorageModule,
     KeysModule,
     DsbClientModule,
   ],

@@ -1,0 +1,23 @@
+{
+  "root": "libs/dsb-client-gateway-secrets-engine",
+  "sourceRoot": "libs/dsb-client-gateway-secrets-engine/src",
+  "projectType": "library",
+  "targets": {
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/dsb-client-gateway-secrets-engine/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/libs/dsb-client-gateway-secrets-engine"],
+      "options": {
+        "jestConfig": "libs/dsb-client-gateway-secrets-engine/jest.config.js",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": []
+}

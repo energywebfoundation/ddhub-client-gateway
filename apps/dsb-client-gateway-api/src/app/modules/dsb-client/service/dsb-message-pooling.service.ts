@@ -139,6 +139,7 @@ export class DsbMessagePoolingService implements OnModuleInit {
   }
 
   private validateEnrolment(enrolment: Enrolment | null): boolean {
-    return !!enrolment?.state.approved;
+    // @TODO - do we need this service?
+    return false;
   }
 }

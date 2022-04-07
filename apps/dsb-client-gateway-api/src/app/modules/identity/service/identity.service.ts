@@ -1,19 +1,19 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { EthersService } from '../../utils/service/ethers.service';
-import { IamService } from '../../iam-service/service/iam.service';
-import { SecretsEngineService } from '../../secrets-engine/secrets-engine.interface';
+import {
+  Claims,
+  IamService,
+} from '@dsb-client-gateway/dsb-client-gateway-iam-client';
 import { NoPrivateKeyException } from '../../storage/exceptions/no-private-key.exception';
 import { EnrolmentRepository } from '../../storage/repository/enrolment.repository';
 import { IdentityRepository } from '../../storage/repository/identity.repository';
 import { EnrolmentService } from '../../enrolment/service/enrolment.service';
 import {
-  Claims,
   Enrolment,
   Identity,
   IdentityWithEnrolment,
-  RoleState
 } from '@dsb-client-gateway/dsb-client-gateway/identity/models';
-import { Claim } from 'iam-client-lib';
+import { SecretsEngineService } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
 
 @Injectable()
 export class IdentityService {
@@ -29,46 +29,16 @@ export class IdentityService {
   ) {}
 
   public async getClaims(): Promise<Claims> {
-    const claims: Claim[] = await this.iamService.getClaims();
-    const synchronizedToDIDClaims =
-      await this.iamService.getUserClaimsFromDID();
-
-    const getClaimStatus = (claim: Claim): RoleState => {
-      if (claim.isAccepted) {
-        return RoleState.APPROVED;
-      }
-
-      if (claim.isRejected) {
-        return RoleState.REJECTED;
-      }
-
-      if (!claim.isAccepted && !claim.isRejected) {
-        return RoleState.AWAITING_APPROVAL;
-      }
-
-      return RoleState.UNKNOWN;
-    };
-
     return {
       did: this.iamService.getDIDAddress(),
-      claims: claims.map((claim) => {
-        return {
-          namespace: claim.claimType,
-          status: getClaimStatus(claim),
-          syncedToDidDoc:
-            synchronizedToDIDClaims.filter(
-              (synchronizedClaim) =>
-                synchronizedClaim.claimType === claim.claimType
-            ).length > 0,
-        };
-      }),
+      claims: await this.iamService.getClaimsWithStatus(),
     };
   }
 
   public async getIdentityWithEnrolment(): Promise<IdentityWithEnrolment> {
     const [identity, enrolment]: [Identity, Enrolment] = await Promise.all([
       this.getIdentity(true),
-      this.enrolmentService.getEnrolment(),
+      this.enrolmentService.get(),
     ]);
 
     return {
@@ -83,8 +53,8 @@ export class IdentityService {
     return !!identity;
   }
 
-  public async getIdentity(refreshBalance = false): Promise<Identity | null> {
-    if (refreshBalance) {
+  public async getIdentity(forceRefresh = false): Promise<Identity | null> {
+    if (forceRefresh) {
       const rootKey: string | null =
         await this.secretsEngineService.getPrivateKey();
 
@@ -106,7 +76,7 @@ export class IdentityService {
     const identity = this.identityRepository.getIdentity();
 
     if (!identity) {
-      throw new NoPrivateKeyException();
+      return this.getIdentity(true);
     }
 
     return identity;
@@ -151,9 +121,11 @@ export class IdentityService {
     await this.secretsEngineService.setPrivateKey(privateKey);
     await this.iamService.setup(privateKey);
 
-    await this.enrolmentRepository.removeEnrolment();
+    await this.enrolmentService.deleteEnrolment();
 
-    await this.enrolmentService.initEnrolment();
+    await this.enrolmentService
+      .startListening()
+      .catch((e) => this.logger.error(e));
   }
 
   /**

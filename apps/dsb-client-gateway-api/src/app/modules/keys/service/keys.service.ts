@@ -1,7 +1,7 @@
 import * as crypto from 'crypto';
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { IamService } from '../../iam-service/service/iam.service';
-import { SecretsEngineService } from '../../secrets-engine/secrets-engine.interface';
+import { IamService } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
+import { SecretsEngineService } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
 import { DIDPublicKeyTags } from '../keys.const';
 import { KeysRepository } from '../repository/keys.repository';
 import { SymmetricKeysRepository } from '../../message/repository/symmetric-keys.repository';

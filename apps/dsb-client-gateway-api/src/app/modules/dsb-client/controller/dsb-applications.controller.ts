@@ -1,7 +1,9 @@
 import { Controller, Get, UseGuards, HttpStatus, Query } from '@nestjs/common';
 import { DigestGuard } from '../../utils/guards/digest.guard';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { ApplicationDTO } from '../dsb-client.interface';
+import {
+  ApplicationDTO,
+} from '@dsb-client-gateway/dsb-client-gateway-iam-client';
 import { GetApplicationsQueryDto } from '../dto';
 import { TopicService } from '../service/dsb-topic.service';
 
