@@ -3,12 +3,12 @@ import { CommandBus } from '@nestjs/cqrs';
 import { ConfigService } from '@nestjs/config';
 import { SchedulerRegistry } from '@nestjs/schedule';
 import { CronJob } from 'cron';
-import { RefreshInternalMessagesCacheCommand } from '../command/refresh-internal-messages-cache.command';
+import { RefreshSymmetricKeysCacheCommand } from '../command/refresh-symmetric-keys-cache.command';
 
 @Injectable()
-export class RefreshInternalMessagesCacheCronService implements OnModuleInit {
+export class RefreshSymmetricKeysCacheCronService implements OnModuleInit {
   private readonly logger = new Logger(
-    RefreshInternalMessagesCacheCronService.name
+    RefreshSymmetricKeysCacheCronService.name
   );
 
   constructor(
@@ -31,11 +31,13 @@ export class RefreshInternalMessagesCacheCronService implements OnModuleInit {
 
     this.logger.log(`Cron jobs enabled`);
 
-    const job = new CronJob(`*/5 * * * *`, async () => {
-      this.logger.log(`${jobName} CRON job triggered`);
-
-      await this.commandBus.execute(new RefreshInternalMessagesCacheCommand());
-    });
+    const job = new CronJob(
+      this.configService.get('REFRESH_SYMMETRIC_KEY_CRON_TIME'),
+      async () => {
+        this.logger.log(`${jobName} CRON job triggered`);
+        await this.commandBus.execute(new RefreshSymmetricKeysCacheCommand());
+      }
+    );
 
     const jobName = 'REFRESH_INTERNAL_MESSAGES_CACHE';
 

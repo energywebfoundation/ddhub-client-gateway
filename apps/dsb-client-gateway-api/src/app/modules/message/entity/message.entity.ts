@@ -36,15 +36,10 @@ export interface SendMessageResponse {
   failed: SendMessageFailedResponse[];
 }
 
-export interface InternalMessageEntity {
-  transactionId: string; // rm
+export interface SymmetricKeyEntity {
   clientGatewayMessageId: string;
   payload: string;
-  topicId: string; // remve this
-  topicVersion: string; // remove this
-  signature: string; // remove this
-  isFile: boolean; // remove this
-  senderDid?: string;
+  senderDid: string;
   createdAt?: string;
   updatedAt?: string;
 }

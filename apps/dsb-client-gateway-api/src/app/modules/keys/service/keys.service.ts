@@ -4,6 +4,8 @@ import { IamService } from '../../iam-service/service/iam.service';
 import { SecretsEngineService } from '../../secrets-engine/secrets-engine.interface';
 import { DIDPublicKeyTags } from '../keys.const';
 import { KeysRepository } from '../repository/keys.repository';
+import { SymmetricKeysRepository } from '../../message/repository/symmetric-keys.repository';
+import { SymmetricKeysCacheService } from '../../message/service/symmetric-keys-cache.service';
 import { KeysEntity } from '../keys.interface';
 import { EthersService } from '../../utils/service/ethers.service';
 import {
@@ -26,29 +28,31 @@ export class KeysService implements OnModuleInit {
     protected readonly iamService: IamService,
     protected readonly keysRepository: KeysRepository,
     protected readonly ethersService: EthersService,
-    protected readonly identityService: IdentityService
+    protected readonly identityService: IdentityService,
+    protected readonly symmetricKeysRepository: SymmetricKeysRepository,
+    protected readonly symmetricKeysCacheService: SymmetricKeysCacheService
   ) {}
 
-  public async storeKeysForMessage(
-    messageId: string,
-    senderDid: string,
-    encryptedSymmetricKey: string
-  ): Promise<void> {
-    await this.keysRepository.storeKeys({
-      messageId,
-      encryptedSymmetricKey,
-      senderDid,
-    });
+  public async storeKeysForMessage(): Promise<void> {
+    await this.symmetricKeysCacheService.refreshSymmetricKeysCache();
   }
 
-  public getSymmetricKey(
+  public async getSymmetricKey(
     senderDid: string,
     clientGatewayMessageId: string
-  ): KeysEntity {
-    return this.keysRepository.getSymmetricKey(
-      senderDid,
-      clientGatewayMessageId
+  ): Promise<KeysEntity> {
+    const symmetricKey = this.symmetricKeysRepository.getSymmetricKey(
+      clientGatewayMessageId,
+      senderDid
     );
+    if (!symmetricKey) {
+      await this.storeKeysForMessage();
+      return this.symmetricKeysRepository.getSymmetricKey(
+        clientGatewayMessageId,
+        senderDid
+      );
+    }
+    return symmetricKey;
   }
 
   public generateRandomKey(): string {
@@ -88,8 +92,6 @@ export class KeysService implements OnModuleInit {
   ): Promise<boolean> {
     const did = await this.iamService.getDid(senderDid);
 
-    // console.log('did', did);
-
     if (!did) {
       this.logger.error(`${senderDid} is invalid DID`);
 
@@ -99,8 +101,6 @@ export class KeysService implements OnModuleInit {
     const key = did.publicKey.find(({ id }) => {
       return id === `${senderDid}#${DIDPublicKeyTags.DSB_SIGNATURE_KEY}`;
     });
-
-    // console.log('key', key);
 
     if (!key) {
       this.logger.error(
@@ -127,13 +127,14 @@ export class KeysService implements OnModuleInit {
     clientGatewayMessageId: string,
     senderDid: string
   ): Promise<string | null> {
-    const symmetricKey: string | null =
-      'NvRCzjYrhllVmX2EroJlc+10nUdtL+yQU/cpPWZXazImqHntt+O3xk911Oa639o48j5vMUv7ji3MuFAwafX/bYsL0ZNS9Xfgup9hFZqS57tfS2ydKhZkiI/W3wHbWSTmlB2h3mtwF3/Ux+9Ad3HrBToklJAJl2n3yjqwKFwXvYqswsKiR5e4ojcLN04+IEMrgxojEYYEjbCzR1gD9mdaaTEAQJgic7wBDQca3z9cCnN33jGVS0f9+5Csmb0X6KM8SLhlrA0ibxuhMnG4DIgw0mU4fMckTzU7v/dgBLY9d75wWlA97N1OViy8DbB85QFvp/KytIgNzHhlqeNc+OpRPXQPqu7skXclVNbvwElYwVtIsJC6zyYQP0hvXDtudgDf8nswW35HM1fLmSYKg6lam4/goAKyEdCFHug/L8AJLD9ZzOmyfBZtapcZlFOXgXkMG0UioAXWcblwR2mrgxvXK1UB3fUoOlej0zSEVm01qXXjGK9u0E0gRrtdutcWzPdzp4frTtpcY0aecxxCFrk0nc2ouiI4Uz2gDIiOFfB11/ZnKqVtDYVhGVJ/LpvMkXkXOmf+VTNEqJzh50bEg4QR8pnNA7WGjyovwZ6qdAf077WhvMfTkuGDErW4iwMvFJTvbbjdM2lAycjKBkHnsKaH3pIWbWYOSUEzQP0H5E+/W2o=';
+    let symmetricKey: KeysEntity | null = await this.getSymmetricKey(
+      senderDid,
+      clientGatewayMessageId
+    );
     if (!symmetricKey) {
       this.logger.error(
         `${senderDid}:${clientGatewayMessageId} does not have symmetric key`
       );
-
       return null;
     }
 
@@ -158,16 +159,13 @@ export class KeysService implements OnModuleInit {
 
     const decryptedKey: string = this.decryptSymmetricKey(
       privateKey,
-      symmetricKey,
+      symmetricKey.payload,
       rootKey
     );
 
     const decipher = crypto.createDecipheriv(
       this.symmetricAlgorithm,
-      Buffer.from(
-        '7479377c81201eb89b90b11dda72bdc89b6473d6d1d60d4dad23c495b22e794d',
-        'hex'
-      ),
+      Buffer.from(decryptedKey, 'hex'),
       Buffer.from(iv, 'hex')
     );
 

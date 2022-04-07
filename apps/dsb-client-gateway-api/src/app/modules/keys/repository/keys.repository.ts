@@ -28,11 +28,11 @@ export class KeysRepository
   }
 
   public getSymmetricKey(
-    senderDid: string,
-    messageId: string
+    clientGatewayMessageId: string,
+    senderDid: string
   ): KeysEntity | null {
     return this.client.getCollection<KeysEntity>(this.collection).findOne({
-      messageId,
+      clientGatewayMessageId,
       senderDid,
     });
   }

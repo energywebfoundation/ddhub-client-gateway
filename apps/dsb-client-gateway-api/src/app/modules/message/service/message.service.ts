@@ -8,8 +8,8 @@ import {
   uploadMessageBodyDto,
 } from '../dto/request/send-message.dto';
 import { GetMessagesDto } from '../dto/request/get-messages.dto';
-import { InternalMessageDto } from '../dto/response/get-internal-message.dto';
-import { InternalMessageRepository } from '../repository/internal-messages.repository';
+import { SymmetricKeysRepository } from '../repository/symmetric-keys.repository';
+import { SymmetricKeysCacheService } from './symmetric-keys-cache.service';
 
 // import { SecretsEngineService } from '../../secrets-engine/secrets-engine.interface';
 import { ChannelService } from '../../channel/service/channel.service';
@@ -20,7 +20,6 @@ import { TopicNotFoundException } from '../exceptions/topic-not-found.exception'
 import { ChannelTypeNotPubException } from '../exceptions/channel-type-not-pub.exception';
 import { RecipientsNotFoundException } from '../exceptions/recipients-not-found-exception';
 import { MessageSignatureNotValidException } from '../exceptions/messages-signature-not-valid.exception';
-import { InternalMessageNotFoundException } from '../exceptions/internal-message-exception';
 import { TopicOwnerTopicNameRequiredException } from '../exceptions/topic-owner-and-topic-name-required.exception';
 import { MessageDecryptionFailedException } from '../exceptions/message-decryption-failed.exception';
 import { FileSizeException } from '../exceptions/file-size.exception';
@@ -38,10 +37,7 @@ import { VaultService } from '../../secrets-engine/service/vault.service';
 import { v4 as uuidv4 } from 'uuid';
 import * as fs from 'fs';
 import { join } from 'path';
-import moment from 'moment';
 import { CommandBus } from '@nestjs/cqrs';
-import { RefreshInternalMessagesCacheCommand } from '../command/refresh-internal-messages-cache.command';
-import { InternalMessageEntity } from '../entity/message.entity';
 
 export enum EventEmitMode {
   SINGLE = 'SINGLE',
@@ -63,8 +59,9 @@ export class MessageService {
     protected readonly keyService: KeysService,
     protected readonly enrolmentRepository: EnrolmentRepository,
     protected readonly vaultService: VaultService,
-    protected readonly internalMessageRepository: InternalMessageRepository,
-    protected readonly commandBus: CommandBus
+    protected readonly internalMessageRepository: SymmetricKeysRepository,
+    protected readonly commandBus: CommandBus,
+    protected readonly symmetricKeysCacheService: SymmetricKeysCacheService
   ) {}
 
   public async sendMessagesToSubscribers(
@@ -123,9 +120,7 @@ export class MessageService {
     const clientGatewayMessageId: string = uuidv4();
 
     this.logger.log('Generating Random Key');
-    // const randomKey: string = await this.keyService.generateRandomKey();
-    const randomKey: string =
-      '7479377c81201eb89b90b11dda72bdc89b6473d6d1d60d4dad23c495b22e794d';
+    const randomKey: string = await this.keyService.generateRandomKey();
 
     this.logger.log('Encrypting Payload');
 
@@ -261,7 +256,13 @@ export class MessageService {
                 message.senderDid
               );
 
-              result.payload = decryptedMessage;
+              if (!decryptedMessage) {
+                result.decryption.status = false;
+                result.decryption.errorMessage = 'Decryption failed.';
+                result.payload = '';
+              } else {
+                result.payload = decryptedMessage;
+              }
 
               this.logger.debug(
                 `decrypting Message for message with id ${message.messageId}`
@@ -455,77 +456,5 @@ export class MessageService {
       signature: fileResponse.headers.signature,
       clientGatewayMessageId: fileResponse.headers.clientgatewaymessageid,
     };
-  }
-
-  public async createInternalMessage(
-    internalMessage: InternalMessageDto
-  ): Promise<void> {
-    this.logger.log(
-      `Attempting to create Internal Message ${internalMessage.clientGatewayMessageId}`
-    );
-
-    this.logger.debug(internalMessage);
-
-    const creationDate: string = moment().toISOString();
-
-    await this.internalMessageRepository.saveInternalMessage({
-      transactionId: internalMessage.transactionId,
-      clientGatewayMessageId: internalMessage.clientGatewayMessageId,
-      payload: internalMessage.payload,
-      topicId: internalMessage.topicId,
-      topicVersion: internalMessage.topicVersion,
-      signature: internalMessage.signature,
-      isFile: internalMessage.isFile,
-      senderDid: internalMessage.senderDid,
-      createdAt: creationDate,
-      updatedAt: creationDate,
-    });
-
-    this.logger.log(
-      `Internal Message with clientGatewayMessageId ${internalMessage.clientGatewayMessageId} created`
-    );
-
-    await this.commandBus.execute(new RefreshInternalMessagesCacheCommand());
-  }
-
-  public getInternalMessage(
-    clientGatewayMessageId: string,
-    senderDid: string
-  ): InternalMessageEntity | null {
-    return this.internalMessageRepository.getInternalMessage(
-      clientGatewayMessageId,
-      senderDid
-    );
-  }
-
-  public getInternalMessageorThrow(
-    clientGatewayMessageId: string,
-    senderDid: string
-  ): InternalMessageEntity {
-    const internalMessage: InternalMessageEntity | null =
-      this.getInternalMessage(clientGatewayMessageId, senderDid);
-
-    if (!internalMessage) {
-      throw new InternalMessageNotFoundException('');
-    }
-
-    return internalMessage;
-  }
-
-  public async deleteInternalMessageorThrow(
-    clientGatewayMessageId: string,
-    senderDid: string
-  ): Promise<void> {
-    const channel = this.getInternalMessageorThrow(
-      clientGatewayMessageId,
-      senderDid
-    );
-
-    await this.internalMessageRepository.delete(
-      clientGatewayMessageId,
-      senderDid
-    );
-
-    await this.commandBus.execute(new RefreshInternalMessagesCacheCommand());
   }
 }

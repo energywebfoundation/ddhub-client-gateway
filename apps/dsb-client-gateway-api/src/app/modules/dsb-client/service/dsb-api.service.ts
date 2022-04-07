@@ -450,16 +450,11 @@ export class DsbApiService implements OnModuleInit {
     return data;
   }
 
-  public async getInternalMessages(
-    clientId: string
-  ): Promise<GetInternalMessageResponse[]> {
+  public async getSymmetricKeys(dto): Promise<GetInternalMessageResponse[]> {
     const { data } = await promiseRetry(async (retry, attempt) => {
       return lastValueFrom(
-        this.httpService.get(this.baseUrl + '/messages/internal', {
+        this.httpService.post(this.baseUrl + '/messages/internal/search', dto, {
           httpsAgent: this.getTLS(),
-          params: {
-            clientId,
-          },
           headers: {
             Authorization: `Bearer ${this.didAuthService.getToken()}`,
           },

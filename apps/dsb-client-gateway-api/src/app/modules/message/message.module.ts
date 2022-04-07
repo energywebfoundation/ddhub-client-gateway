@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { EventsGateway } from './gateway/events.gateway';
 import { MessageService } from './service/message.service';
-import { InternalMessageRepository } from './repository/internal-messages.repository';
+import { SymmetricKeysRepository } from './repository/symmetric-keys.repository';
 import { UtilsModule } from '../utils/utils.module';
 import { MessageControlller } from './controller/message.controller';
 import { DsbClientModule } from '../dsb-client/dsb-client.module';
@@ -11,9 +11,9 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { IdentityModule } from '../identity/identity.module';
 import { VaultService } from '../secrets-engine/service/vault.service';
 import { KeysModule } from '../keys/keys.module';
-import { InternalMessageCacheService } from './service/internal-messsage-cache.service';
-import { RefreshInternalMessagesCacheHandler } from './service/refresh-internal-messages-cache.handler';
-import { RefreshInternalMessagesCacheCronService } from './service/refresh-internal-messages-cache-cron.service';
+import { SymmetricKeysCacheService } from './service/symmetric-keys-cache.service';
+import { RefreshSymmetricKeysCacheHandler } from './service/refresh-symmetric-keys-cache.handler';
+import { RefreshSymmetricKeysCacheCronService } from './service/refresh-symmetric-keys-cache-cron.service';
 
 @Module({
   imports: [
@@ -26,13 +26,13 @@ import { RefreshInternalMessagesCacheCronService } from './service/refresh-inter
     DsbClientModule,
   ],
   providers: [
+    SymmetricKeysRepository,
     MessageService,
     VaultService,
     EventsGateway,
-    RefreshInternalMessagesCacheCronService,
-    InternalMessageRepository,
-    InternalMessageCacheService,
-    RefreshInternalMessagesCacheHandler,
+    RefreshSymmetricKeysCacheCronService,
+    RefreshSymmetricKeysCacheHandler,
+    SymmetricKeysCacheService,
   ],
   exports: [MessageService],
   controllers: [MessageControlller],

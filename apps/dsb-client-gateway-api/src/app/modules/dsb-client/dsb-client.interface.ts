@@ -151,6 +151,7 @@ export interface GetInternalMessageResponse {
   transactionId: string;
   clientGatewayMessageId: string;
   payload: string;
+  senderDid: string;
   topicId: string;
   topicVersion: string;
   signature: string;
