@@ -10,8 +10,6 @@ import {
 import { GetMessagesDto } from '../dto/request/get-messages.dto';
 import { SymmetricKeysRepository } from '../repository/symmetric-keys.repository';
 import { SymmetricKeysCacheService } from './symmetric-keys-cache.service';
-
-// import { SecretsEngineService } from '../../secrets-engine/secrets-engine.interface';
 import { ChannelService } from '../../channel/service/channel.service';
 import { TopicService } from '../../channel/service/topic.service';
 import { IdentityService } from '../../identity/service/identity.service';
@@ -31,13 +29,14 @@ import {
   DownloadMessageResponse,
 } from '../message.interface';
 import { ChannelType } from '../../../modules/channel/channel.const';
-import { EnrolmentRepository } from '../../storage/repository/enrolment.repository';
 import { KeysService } from '../../keys/service/keys.service';
-import { VaultService } from '../../secrets-engine/service/vault.service';
+// import { secretsEngineService } from 'libs/dsb-client-gateway-secrets-engine/src/lib/service/vault.service';
 import { v4 as uuidv4 } from 'uuid';
 import * as fs from 'fs';
 import { join } from 'path';
 import { CommandBus } from '@nestjs/cqrs';
+import { EncryptedMessageType } from '../../message/message.const';
+import { SecretsEngineService } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
 
 export enum EventEmitMode {
   SINGLE = 'SINGLE',
@@ -49,7 +48,8 @@ export class MessageService {
   protected readonly logger = new Logger(MessageService.name);
 
   constructor(
-    // protected readonly secretsEngineService: SecretsEngineService,
+    // protected readonly secretsEngineService: secretsEngineService,
+    protected readonly secretsEngineService: SecretsEngineService,
     protected readonly gateway: EventsGateway,
     protected readonly configService: ConfigService,
     protected readonly dsbApiService: DsbApiService,
@@ -57,8 +57,7 @@ export class MessageService {
     protected readonly topicService: TopicService,
     protected readonly identityService: IdentityService,
     protected readonly keyService: KeysService,
-    protected readonly enrolmentRepository: EnrolmentRepository,
-    protected readonly vaultService: VaultService,
+    // protected readonly secretsEngineService: secretsEngineService,
     protected readonly internalMessageRepository: SymmetricKeysRepository,
     protected readonly commandBus: CommandBus,
     protected readonly symmetricKeysCacheService: SymmetricKeysCacheService
@@ -127,11 +126,11 @@ export class MessageService {
     const encryptedMessage = await this.keyService.encryptMessage(
       dto.payload,
       randomKey,
-      'utf-8' // put it const file
+      EncryptedMessageType['UTF-8']
     );
 
     this.logger.log('fetching private key');
-    const privateKey = await this.vaultService.getPrivateKey();
+    const privateKey = await this.secretsEngineService.getPrivateKey();
 
     this.logger.log('Generating Signature');
 
@@ -342,7 +341,7 @@ export class MessageService {
     );
 
     this.logger.log('fetching private key');
-    const privateKey = await this.vaultService.getPrivateKey();
+    const privateKey = await this.secretsEngineService.getPrivateKey();
 
     this.logger.log('Generating Signature');
     const signature = await this.keyService.createSignature(

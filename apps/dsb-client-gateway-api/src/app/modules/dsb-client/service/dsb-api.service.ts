@@ -1,4 +1,10 @@
-import { HttpStatus, Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import {
+  HttpStatus,
+  Injectable,
+  Logger,
+  OnApplicationBootstrap,
+  OnModuleInit,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { HttpService } from '@nestjs/axios';
 import { Agent } from 'https';
@@ -18,10 +24,11 @@ import {
   TopicVersionResponse,
   SendInternalMessageRequestDTO,
   SendMessageResponse,
-  ApplicationDTO,
   SearchMessageResponseDto,
   GetInternalMessageResponse,
 } from '../dsb-client.interface';
+
+import { ApplicationDTO } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
 
 import promiseRetry from 'promise-retry';
 import FormData from 'form-data';
@@ -41,13 +48,13 @@ export interface RetryOptions {
 }
 
 @Injectable()
-export class DsbApiService implements OnModuleInit {
+export class DsbApiService implements OnApplicationBootstrap {
   private readonly logger = new Logger(DsbApiService.name);
 
   protected tls: Agent | null;
   protected baseUrl: string;
 
-  public async onModuleInit(): Promise<void> {
+  public async onApplicationBootstrap(): Promise<void> {
     await this.login().catch((e) => {
       this.logger.error(`Login failed`, e);
     });
@@ -401,8 +408,6 @@ export class DsbApiService implements OnModuleInit {
       signature,
       clientGatewayMessageId,
     };
-
-    console.log('messageData', messageData);
 
     const { data } = await promiseRetry(async (retry, attempt) => {
       return lastValueFrom(

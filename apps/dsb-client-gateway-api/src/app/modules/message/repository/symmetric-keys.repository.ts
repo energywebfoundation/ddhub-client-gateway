@@ -1,8 +1,12 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { AbstractLokiRepository } from '../../storage/repository/abstract-loki.repository';
 import { SymmetricKeyEntity } from '../entity/message.entity';
-import { LokiService } from '../../storage/service/loki.service';
+
 import moment from 'moment';
+
+import {
+  AbstractLokiRepository,
+  LokiService,
+} from '@dsb-client-gateway/dsb-client-gateway-storage';
 
 @Injectable()
 export class SymmetricKeysRepository

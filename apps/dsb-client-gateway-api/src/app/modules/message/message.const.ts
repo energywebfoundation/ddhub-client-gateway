@@ -11,3 +11,8 @@ export enum SchemaType {
   CSV = 'CSV',
   TSV = 'TSV',
 }
+
+export enum EncryptedMessageType {
+  'UTF-8' = 'utf-8',
+  BINARY = 'binary',
+}

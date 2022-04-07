@@ -13,27 +13,29 @@ import { KeysModule } from '../keys/keys.module';
 import { SymmetricKeysCacheService } from './service/symmetric-keys-cache.service';
 import { RefreshSymmetricKeysCacheHandler } from './service/refresh-symmetric-keys-cache.handler';
 import { RefreshSymmetricKeysCacheCronService } from './service/refresh-symmetric-keys-cache-cron.service';
-import { VaultService } from 'libs/dsb-client-gateway-secrets-engine/src/lib/service/vault.service';
-
+// import { VaultService } from 'libs/dsb-client-gateway-secrets-engine/src/lib/service/vault.service';
+// import { SecretsEngineService } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
+import { SecretsEngineModule } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
 @Module({
   imports: [
     DsbClientModule,
     CqrsModule,
     UtilsModule,
     ChannelModule,
+
     IdentityModule,
+    SecretsEngineModule,
     DsbClientGatewayStorageModule,
     KeysModule,
-    DsbClientModule,
   ],
   providers: [
     SymmetricKeysRepository,
-    MessageService,
-    VaultService,
+    // VaultService,
     EventsGateway,
     RefreshSymmetricKeysCacheCronService,
     RefreshSymmetricKeysCacheHandler,
     SymmetricKeysCacheService,
+    MessageService,
   ],
   exports: [MessageService],
   controllers: [MessageControlller],
