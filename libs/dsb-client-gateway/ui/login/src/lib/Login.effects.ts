@@ -3,7 +3,7 @@ import { UserDataContext } from './UserDataContext';
 import { checkAccountStatus } from './check-account-status/check-account-status';
 import { IdentityWithEnrolment, RoleStatus } from '@dsb-client-gateway/dsb-client-gateway/identity/models';
 import { useRouter } from 'next/router';
-import { routerConst } from '@dsb-client-gateway/dsb-client-gateway/ui/utils';
+import { routerConst } from '@dsb-client-gateway/ui/utils';
 import { useIdentityControllerPost } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 
 export const usePrivateKey = () => {

@@ -40,10 +40,10 @@
       "@dsb-client-gateway/dsb-client-gateway/identity/models": [
         "libs/dsb-client-gateway/identity/models/src/index.ts"
       ],
-      "@dsb-client-gateway/dsb-client-gateway/ui/login": [
+      "@dsb-client-gateway/ui/login": [
         "libs/dsb-client-gateway/ui/login/src/index.ts"
       ],
-      "@dsb-client-gateway/dsb-client-gateway/ui/utils": [
+      "@dsb-client-gateway/ui/utils": [
         "libs/dsb-client-gateway/ui/utils/src/index.ts"
       ]
     }
