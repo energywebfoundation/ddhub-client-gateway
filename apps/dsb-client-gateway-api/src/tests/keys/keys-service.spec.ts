@@ -1,6 +1,6 @@
 import { KeysService } from '../../app/modules/keys/service/keys.service';
-import { SecretsEngineService } from '../../app/modules/secrets-engine/secrets-engine.interface';
-import { IamService } from '../../app/modules/iam-service/service/iam.service';
+import { SecretsEngineService } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
+import { IamService } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
 import { KeysRepository } from '../../app/modules/keys/repository/keys.repository';
 import { Wallet } from 'ethers';
 import { EthersService } from '../../app/modules/utils/service/ethers.service';

@@ -3,7 +3,7 @@ import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { AppModule } from '../../../dsb-client-gateway-api/src/app/app.module';
 import { DsbApiService } from '../../../dsb-client-gateway-api/src/app/modules/dsb-client/service/dsb-api.service';
-import { IamFactoryService } from '../../../dsb-client-gateway-api/src/app/modules/iam-service/service/iam-factory.service';
+import { IamFactoryService } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
 import { CreateChannelDto } from '../../../dsb-client-gateway-api/src/app/modules/channel/dto/request/create-channel.dto';
 import { ChannelType } from '../../../dsb-client-gateway-api/src/app/modules/channel/channel.const';
 import { clearDatabase } from './utils/lokijs-utils';
