@@ -11,7 +11,6 @@ export const usePrivateKey = () => {
   const {userData, setUserData} = useContext(UserDataContext);
   const onSuccess = async (res: IdentityWithEnrolment) => {
     const accountStatus = checkAccountStatus(res);
-    console.log(res);
 
     setUserData({
       publicKey: res.publicKey,
@@ -28,20 +27,13 @@ export const usePrivateKey = () => {
   }
   const {mutate, isLoading} = useIdentityControllerPost({
     mutation: {
-      onSuccess: (res) => onSuccess(res as IdentityWithEnrolment),
-      onError: error => {
-        console.log(error);
-      }
+      onSuccess: (res) => onSuccess(res as IdentityWithEnrolment)
     }
   });
 
 
   const submit = async (privateKey: string) => {
-    try {
-      mutate({data: {privateKey}});
-    } catch (e) {
-      console.log(e);
-    }
+    mutate({data: {privateKey}});
   };
 
   return {isLoading, submit, status: userData.accountStatus};
