@@ -5,7 +5,8 @@
   "scripts": {
     "start": "nx serve",
     "build": "nx build",
-    "test": "nx test"
+    "test": "nx test",
+    "build:api": "nx build dsb-client-gateway-api"
   },
   "private": true,
   "dependencies": {
