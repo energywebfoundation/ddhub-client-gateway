@@ -56,13 +56,6 @@ export class RoleListenerService {
     const enrolment: Enrolment =
       await this.enrolmentService.generateEnrolment();
 
-    /**
-     * TODO:
-     * Handlowanie błędów balance
-     * Tworzenie rol on demand
-     * Przetestowanie tego
-     */
-
     const remainingRolesToEnrol = enrolment.roles.filter(
       (role) => role.required && role.status !== RoleStatus.SYNCED
     );

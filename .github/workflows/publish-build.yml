@@ -74,6 +74,20 @@ jobs:
           docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-backend:${{needs.unique_id.outputs.unique_id}}
           docker tag energyweb/ddhub-client-gateway-backend ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-backend:canary
           docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-backend:canary
+
+      - name: ArgoCD login
+        uses: clowdhaus/argo-cd-action/@main
+        id: argocd_login
+        with:
+          command: login ${{ secrets.ARGOCD_DEV_URL }}
+          options: --insecure --password ${{ secrets.ARGOCD_DEV_PASS }} --username ${{ secrets.ARGOCD_DEV_USERNAME }}
+
+      - name: ArgoCD overwrite image tag
+        uses: clowdhaus/argo-cd-action/@main
+        id: argocd_image_tag_overwrite
+        with:
+          command: app set ddhub-gateway-api-dev
+          options: -p ddhub-client-gateway-api.image.tag=${{needs.unique_id.outputs.unique_id}}
   build-fe:
     name: Build Frontend
     runs-on: ubuntu-latest
@@ -125,3 +139,17 @@ jobs:
           docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-frontend:${{needs.unique_id.outputs.unique_id}}
           docker tag energyweb/ddhub-client-gateway-frontend ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-frontend:canary
           docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-frontend:canary
+
+      - name: ArgoCD login
+        uses: clowdhaus/argo-cd-action/@main
+        id: argocd_login
+        with:
+          command: login ${{ secrets.ARGOCD_DEV_URL }}
+          options: --insecure --password ${{ secrets.ARGOCD_DEV_PASS }} --username ${{ secrets.ARGOCD_DEV_USERNAME }}
+
+      - name: ArgoCD overwrite image tag
+        uses: clowdhaus/argo-cd-action/@main
+        id: argocd_image_tag_overwrite
+        with:
+          command: app set ddhub-gateway-dev
+          options: -p ddhub-client-gateway-ui.image.tag=${{needs.unique_id.outputs.unique_id}}

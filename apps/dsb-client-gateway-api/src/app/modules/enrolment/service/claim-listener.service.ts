@@ -37,10 +37,7 @@ export class ClaimListenerService {
     this.eventEmitter = new EventEmitter();
     this.rolesToListen = roles;
 
-    const eventsUrl = this.configService.get<string>(
-      'EVENT_SERVER_URL',
-      'identityevents-dev.energyweb.org'
-    );
+    const eventsUrl = this.configService.get<string>('EVENT_SERVER_URL');
 
     const nc = await connect({
       servers: `wss://${eventsUrl}`,
