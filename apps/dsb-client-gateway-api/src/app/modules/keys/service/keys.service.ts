@@ -271,6 +271,8 @@ export class KeysService implements OnModuleInit {
     this.logger.log('Initializing IAM connection');
     await this.iamInitService.onModuleInit();
 
+    return;
+
     this.logger.log('Attempting to update signature key');
 
     await this.iamService.setVerificationMethod(
