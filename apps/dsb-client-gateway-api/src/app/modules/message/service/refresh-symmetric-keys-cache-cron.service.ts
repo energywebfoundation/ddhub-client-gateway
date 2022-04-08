@@ -1,4 +1,4 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { ConfigService } from '@nestjs/config';
 import { SchedulerRegistry } from '@nestjs/schedule';
@@ -6,7 +6,9 @@ import { CronJob } from 'cron';
 import { RefreshSymmetricKeysCacheCommand } from '../command/refresh-symmetric-keys-cache.command';
 
 @Injectable()
-export class RefreshSymmetricKeysCacheCronService implements OnModuleInit {
+export class RefreshSymmetricKeysCacheCronService
+  implements OnApplicationBootstrap
+{
   private readonly logger = new Logger(
     RefreshSymmetricKeysCacheCronService.name
   );
@@ -17,7 +19,7 @@ export class RefreshSymmetricKeysCacheCronService implements OnModuleInit {
     protected readonly schedulerRegistry: SchedulerRegistry
   ) {}
 
-  public async onModuleInit(): Promise<void> {
+  public async onApplicationBootstrap(): Promise<void> {
     const scheduledJobsEnabled: boolean = this.configService.get<boolean>(
       'SCHEDULED_JOBS',
       true
