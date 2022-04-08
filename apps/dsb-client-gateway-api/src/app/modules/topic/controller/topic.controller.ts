@@ -27,7 +27,7 @@ import {
 export class TopicsController {
   constructor(protected readonly dsbClientService: DsbApiService) {}
 
-  @Get('topics')
+  @Get('')
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Get Topics List',
@@ -41,7 +41,7 @@ export class TopicsController {
     return this.dsbClientService.getTopics(owner);
   }
 
-  @Get('topics/count')
+  @Get('/count')
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Get Topics Count by Owner',
@@ -53,7 +53,7 @@ export class TopicsController {
     return this.dsbClientService.getTopicsCountByOwner(owner);
   }
 
-  @Post('topics')
+  @Post('')
   @ApiResponse({
     status: HttpStatus.CREATED,
     description: 'Topic successfully created',
@@ -73,7 +73,7 @@ export class TopicsController {
     return this.dsbClientService.postTopics(data);
   }
 
-  @Put('topics')
+  @Put('/')
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Topic updated successfully',

@@ -120,12 +120,20 @@ export class SendTopicBodyDto {
 
   @IsString()
   @IsNotEmpty()
+  @IsEnum(SchemaType)
   @ApiProperty({
     description: 'schema type of the topic',
     type: String,
+    enum: [
+      SchemaType.JSD7,
+      SchemaType.XML,
+      SchemaType.XSD6,
+      SchemaType.CSV,
+      SchemaType.TSV,
+    ],
     example: 'JSD7',
   })
-  schemaType: string;
+  schemaType: SchemaType;
 
   @IsArray()
   @IsNotEmpty()
@@ -136,9 +144,9 @@ export class SendTopicBodyDto {
   })
   tags: string[];
 
-  @IsVersion({
-    message: 'Malformed Version',
-  })
+  // @IsVersion({
+  //   message: 'Malformed Version',
+  // })
   @IsString()
   @IsNotEmpty()
   @ApiProperty({

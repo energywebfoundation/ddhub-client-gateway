@@ -7,7 +7,6 @@ import { DsbApiService } from './service/dsb-api.service';
 import { TlsAgentService } from './service/tls-agent.service';
 import { KeysModule } from '../keys/keys.module';
 import { DidAuthModule } from './module/did-auth/did-auth.module';
-import { DsbHealthController } from './controller/dsb-health.controller';
 import { CqrsModule } from '@nestjs/cqrs';
 import { SecretsEngineModule } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
 
@@ -36,7 +35,6 @@ import { SecretsEngineModule } from '@dsb-client-gateway/dsb-client-gateway-secr
     DidAuthModule,
   ],
   providers: [DsbApiService, TlsAgentService],
-  controllers: [DsbHealthController],
   exports: [DsbApiService],
 })
 export class DsbClientModule {}
