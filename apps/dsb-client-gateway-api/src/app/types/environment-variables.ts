@@ -123,6 +123,29 @@ export class EnvironmentVariables {
   @Transform(EnvironmentVariables.transformBoolean('SCHEDULED_JOBS'))
   SCHEDULED_JOBS = true;
 
+  @IsString()
+  DID_CLAIM_NAMESPACE = 'message.broker.app.namespace';
+
+  @IsNumber()
+  @Transform(EnvironmentVariables.transformNumber('MAX_FILE_SIZE'))
+  MAX_FILE_SIZE = 100000000;
+
+  @IsString()
+  FILES_DIRECTORY = '/../../../files/';
+
+  @IsString()
+  SYMMETRIC_KEY_CLIENT_ID = 'test';
+
+  @IsPositive()
+  @IsNumber()
+  @Transform(
+    EnvironmentVariables.transformNumber('AMOUNT_OF_SYMMETRIC_KEYS_FETCHED')
+  )
+  AMOUNT_OF_SYMMETRIC_KEYS_FETCHED = 100;
+
+  @IsString()
+  REFRESH_SYMMETRIC_KEY_CRON_TIME = '*/2 * * * * *';
+
   static isVaultEnabled(values: EnvironmentVariables): boolean {
     return values.SECRETS_ENGINE === SecretsEngine.VAULT;
   }
