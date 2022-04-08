@@ -280,9 +280,7 @@ export class KeysService implements OnModuleInit {
 
     this.logger.log(`Updated ${wallet.address} signature key`);
 
-    console.log('Fetchign did');
     const did = await this.iamService.getDid();
-    console.log('fetched');
 
     const existingKeyInDid =
       did.publicKey.filter(
