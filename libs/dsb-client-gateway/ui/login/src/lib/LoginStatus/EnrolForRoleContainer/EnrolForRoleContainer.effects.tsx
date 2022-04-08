@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useEnrolmentControllerInit } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 
-export const useEnrolForRole = () => {
+export const useEnrolForRoleEffects = () => {
   const [isEnrolRequested, setIsEnrolRequested] = useState(false);
   const { mutate } = useEnrolmentControllerInit();
   const enrolmentHandler = () => {

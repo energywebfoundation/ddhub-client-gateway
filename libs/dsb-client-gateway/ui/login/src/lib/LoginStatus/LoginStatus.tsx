@@ -1,9 +1,9 @@
 import LoadingInfo from '../LoadingInfo/LoadingInfo';
-import { useLoginStatus } from './RequestingEnrolment/LoginStatus.effects';
+import { useLoginStatusEffects } from './RequestingEnrolment/LoginStatus.effects';
 
 
 export function LoginStatus() {
-  const {isLoading, statusFactory} = useLoginStatus();
+  const {isLoading, statusFactory} = useLoginStatusEffects();
 
   return (
     <>

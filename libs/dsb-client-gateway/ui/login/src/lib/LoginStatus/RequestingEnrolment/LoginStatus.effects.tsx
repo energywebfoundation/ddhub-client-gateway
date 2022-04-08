@@ -1,4 +1,4 @@
-import { usePrivateKey } from '../../Login.effects';
+import { usePrivateKeyEffects } from '../../Login.effects';
 import { AccountStatusEnum } from '../../check-account-status/check-account-status';
 import LoginForm from '../../LoginForm/LoginForm';
 import InsufficientFund from '../InsufficientFund/InsufficientFund';
@@ -8,8 +8,8 @@ import RequestingEnrolment from './RequestingEnrolment';
 import AwaitingSyncing from '../AwaitingSyncing/AwaitingSyncing';
 import ResetPrivateKey from '../../ResetPrivateKey/ResetPrivateKey';
 
-export const useLoginStatus = () => {
-  const {isLoading, submit, status} = usePrivateKey();
+export const useLoginStatusEffects = () => {
+  const {isLoading, submit, status} = usePrivateKeyEffects();
 
   const privateKeyHandler = (privateKey: string) => {
     submit(privateKey);

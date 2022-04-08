@@ -5,7 +5,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 
 const PRIVATE_KEY_FIELD = 'privateKey';
 
-export const useLoginForm = () => {
+export const useLoginFormEffects = () => {
   const validationSchema = Yup.object().shape({
     [PRIVATE_KEY_FIELD]: Yup.string().max(64, 'Maximum length is 64')
   });

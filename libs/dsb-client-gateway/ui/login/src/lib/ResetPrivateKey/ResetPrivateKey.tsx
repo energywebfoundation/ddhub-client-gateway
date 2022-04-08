@@ -1,8 +1,8 @@
 import { Button } from '@mui/material';
-import { useResetPrivateKey } from './ResetPrivateKey.effects';
+import { useResetPrivateKeyEffects } from './ResetPrivateKey.effects';
 
 export function ResetPrivateKey() {
-  const {resetPrivateKeyHandler} = useResetPrivateKey()
+  const {resetPrivateKeyHandler} = useResetPrivateKeyEffects()
 
   return (
     <Button

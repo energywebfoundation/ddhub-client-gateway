@@ -1,9 +1,9 @@
 import RequestingEnrolment from '../RequestingEnrolment/RequestingEnrolment';
 import EnrolForRole from '../EnrolForRole/EnrolForRole';
-import { useEnrolForRole } from './EnrolForRoleContainer.effects';
+import { useEnrolForRoleEffects } from './EnrolForRoleContainer.effects';
 
 export function EnrolForRoleContainer() {
-  const {isEnrolRequested, enrolmentHandler} = useEnrolForRole();
+  const {isEnrolRequested, enrolmentHandler} = useEnrolForRoleEffects();
 
   return (
     <>
