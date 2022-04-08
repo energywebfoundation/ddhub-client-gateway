@@ -13,3 +13,12 @@ export interface TopicVersionEntity {
   version: string;
   topicId: string;
 }
+
+export interface TopicEntity {
+  id: string;
+  name: string;
+  schemaType: string;
+  schema: object;
+  owner: string;
+  version: string;
+}

@@ -23,10 +23,10 @@ import { MessageDecryptionFailedException } from '../exceptions/message-decrypti
 import { FileSizeException } from '../exceptions/file-size.exception';
 import { FIleTypeNotSupportedException } from '../exceptions/file-type-not-supported.exception';
 import {
-  SendMessageResponse,
-  SearchMessageResponseDto,
-  GetMessageResponse,
   DownloadMessageResponse,
+  GetMessageResponse,
+  SearchMessageResponseDto,
+  SendMessageResponse,
 } from '../message.interface';
 import { ChannelType } from '../../../modules/channel/channel.const';
 import { KeysService } from '../../keys/service/keys.service';
@@ -37,6 +37,8 @@ import { join } from 'path';
 import { CommandBus } from '@nestjs/cqrs';
 import { EncryptedMessageType } from '../../message/message.const';
 import { SecretsEngineService } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
+import { TopicEntity } from '../../channel/channel.interface';
+import { ChannelEntity } from '../../channel/entity/channel.entity';
 
 export enum EventEmitMode {
   SINGLE = 'SINGLE',
@@ -163,7 +165,7 @@ export class MessageService {
     return this.dsbApiService.sendMessage(
       qualifiedDids,
       encryptedMessage,
-      topic.topicId,
+      topic.id,
       topic.version,
       signature,
       clientGatewayMessageId,
@@ -194,7 +196,16 @@ export class MessageService {
       topicIds = channel.conditions.topics.map((topic) => topic.topicId);
     } else {
       const topic = await this.topicService.getTopic(topicName, topicOwner);
-      topicIds.push(topic.topicId);
+
+      if (!topic) {
+        this.logger.error(
+          `Couldn't find topic - topicName: ${topicName}, owner: ${topicOwner}`
+        );
+
+        return [];
+      }
+
+      topicIds.push(topic.id);
     }
 
     // call message search
@@ -291,10 +302,12 @@ export class MessageService {
     }
 
     //Check if internal channel exists
-    const channel = await this.channelService.getChannelOrThrow(dto.fqcn);
+    const channel: ChannelEntity = await this.channelService.getChannelOrThrow(
+      dto.fqcn
+    );
 
     //System gets topic details from cache
-    const topic = await this.topicService.getTopic(
+    const topic: TopicEntity | null = await this.topicService.getTopic(
       dto.topicName,
       dto.topicOwner,
       dto.topicVersion
@@ -368,7 +381,7 @@ export class MessageService {
     return this.dsbApiService.uploadFile(
       file,
       qualifiedDids,
-      topic.topicId,
+      topic.id,
       topic.version,
       signature,
       encryptedMessage,

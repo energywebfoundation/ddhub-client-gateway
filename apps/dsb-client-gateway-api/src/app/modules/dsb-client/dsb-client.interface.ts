@@ -10,16 +10,20 @@ export interface PaginatedData<T> {
   records: T[];
 }
 
-export type TopicDataResponse = PaginatedData<TopicData>;
+export type TopicDataResponse = PaginatedData<Topic>;
 
-export interface TopicVersion {
+export interface Topic {
+  id: string;
   name: string;
   owner: string;
-  schema: object;
-  schemaType: string;
+  schemaType: string; // @TODO make this ENUM
   tags: string[];
+}
+
+export interface TopicVersion {
+  id: string;
+  schema: object;
   version: string;
-  topicId: string;
 }
 
 export type TopicVersionResponse = PaginatedData<TopicVersion>;

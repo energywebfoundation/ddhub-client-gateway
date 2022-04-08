@@ -27,6 +27,7 @@ import {
   Topic,
   TopicDataResponse,
   TopicResultDTO,
+  TopicVersion,
   TopicVersionResponse,
 } from '../dsb-client.interface';
 
@@ -772,5 +773,27 @@ export class DsbApiService implements OnApplicationBootstrap {
     this.tls.destroy();
 
     this.tls = null;
+  }
+
+  async getTopicById(topicId: string): Promise<TopicVersion | null> {
+    try {
+      const data = await this.request<any>(
+        this.httpService.get(this.baseUrl + '/topics/' + topicId + '/version', {
+          httpsAgent: this.getTLS(),
+          headers: {
+            ...this.getAuthHeader(),
+          },
+        }),
+        {
+          stopOnResponseCodes: ['10'],
+        }
+      );
+
+      return data;
+    } catch (e) {
+      this.logger.error(`Get topic with id ${topicId} failed`, e);
+
+      return null;
+    }
   }
 }
