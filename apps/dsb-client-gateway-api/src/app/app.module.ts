@@ -18,6 +18,8 @@ import { configValidate } from './modules/utils/config.validate';
 import { ChannelModule } from './modules/channel/channel.module';
 import { MessageModule } from './modules/message/message.module';
 
+import { ApplicationModule } from './modules/application/application.module';
+
 @Module({})
 export class AppModule {
   static register({ shouldValidate = true }: { shouldValidate: boolean }) {
@@ -41,6 +43,7 @@ export class AppModule {
       ChannelModule,
       MessageModule,
       KeysModule,
+      ApplicationModule,
     ];
 
     const providers = [

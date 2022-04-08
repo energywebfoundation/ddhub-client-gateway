@@ -3,12 +3,12 @@ import { DigestGuard } from '../../utils/guards/digest.guard';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { GetApplicationsQueryDto, ApplicationDTO } from '../dto';
-import { TopicService } from '../service/dsb-topic.service';
+import { TopicService } from '../service/topic.service';
 
-@Controller('dsb')
-@ApiTags('dsb')
+@Controller('applications')
+@ApiTags('Applications')
 @UseGuards(DigestGuard)
-export class DsbApplicationsController {
+export class ApplicationsController {
   constructor(protected readonly topicService: TopicService) {}
 
   @Get('applications')

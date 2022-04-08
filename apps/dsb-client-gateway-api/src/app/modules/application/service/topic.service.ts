@@ -1,6 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { Agent } from 'https';
-import { DsbApiService } from '../service/dsb-api.service';
+import { DsbApiService } from '../../dsb-client/service/dsb-api.service';
 
 @Injectable()
 export class TopicService {

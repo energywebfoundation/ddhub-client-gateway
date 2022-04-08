@@ -13,9 +13,7 @@ import { DsbFilesController } from './controller/dsb-files.controller';
 import { DidAuthModule } from './module/did-auth/did-auth.module';
 import { DsbHealthController } from './controller/dsb-health.controller';
 import { CqrsModule } from '@nestjs/cqrs';
-import { DsbApplicationsController } from './controller/dsb-applications.controller';
 import { SecretsEngineModule } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
-import { TopicService } from './service/dsb-topic.service';
 
 @Module({
   imports: [
@@ -41,14 +39,13 @@ import { TopicService } from './service/dsb-topic.service';
     KeysModule,
     DidAuthModule,
   ],
-  providers: [DsbApiService, TlsAgentService, TopicService],
+  providers: [DsbApiService, TlsAgentService],
   controllers: [
     DsbHealthController,
     DsbChannelsController,
     DsbMessagesController,
     DsbTopicsController,
     DsbFilesController,
-    DsbApplicationsController,
   ],
   exports: [DsbApiService],
 })

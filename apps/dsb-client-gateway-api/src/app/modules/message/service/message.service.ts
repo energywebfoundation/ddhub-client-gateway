@@ -145,6 +145,9 @@ export class MessageService {
           randomKey,
           recipientDid
         );
+
+        console.log('encryptedSymmetricKey', encryptedSymmetricKey);
+
         await this.dsbApiService.sendMessageInternal(
           recipientDid,
           clientGatewayMessageId,
