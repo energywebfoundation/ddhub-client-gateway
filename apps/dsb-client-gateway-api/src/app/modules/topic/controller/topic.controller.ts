@@ -4,13 +4,12 @@ import {
   UseGuards,
   Body,
   Post,
-  Patch,
   Query,
   HttpCode,
   HttpStatus,
   Put,
 } from '@nestjs/common';
-import { DsbApiService } from '../service/dsb-api.service';
+import { DsbApiService } from '../../dsb-client/service/dsb-api.service';
 import { DigestGuard } from '../../utils/guards/digest.guard';
 import { ApiTags, ApiResponse } from '@nestjs/swagger';
 import {
@@ -22,10 +21,10 @@ import {
   GetTopicsQueryDto,
 } from '../dto';
 
-@Controller('dsb')
+@Controller('topics')
 @UseGuards(DigestGuard)
-@ApiTags('dsb')
-export class DsbTopicsController {
+@ApiTags('Topics')
+export class TopicsController {
   constructor(protected readonly dsbClientService: DsbApiService) {}
 
   @Get('topics')
