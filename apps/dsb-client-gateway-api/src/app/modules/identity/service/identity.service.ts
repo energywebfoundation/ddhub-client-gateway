@@ -9,11 +9,14 @@ import { EnrolmentRepository } from '../../storage/repository/enrolment.reposito
 import { IdentityRepository } from '../../storage/repository/identity.repository';
 import { EnrolmentService } from '../../enrolment/service/enrolment.service';
 import {
+  BalanceState,
   Enrolment,
   Identity,
   IdentityWithEnrolment,
 } from '@dsb-client-gateway/dsb-client-gateway/identity/models';
 import { SecretsEngineService } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
+import { CommandBus } from '@nestjs/cqrs';
+import { RefreshKeysCommand } from '../../keys/command/refresh-keys.command';
 
 @Injectable()
 export class IdentityService {
@@ -25,7 +28,8 @@ export class IdentityService {
     protected readonly identityRepository: IdentityRepository,
     protected readonly secretsEngineService: SecretsEngineService,
     protected readonly iamService: IamService,
-    protected readonly enrolmentService: EnrolmentService
+    protected readonly enrolmentService: EnrolmentService,
+    protected readonly commandBus: CommandBus
   ) {}
 
   public async getClaims(): Promise<Claims> {
@@ -118,10 +122,21 @@ export class IdentityService {
     this.logger.log(publicIdentity);
 
     await this.identityRepository.writeIdentity(publicIdentity);
+
     await this.secretsEngineService.setPrivateKey(privateKey);
+
     await this.iamService.setup(privateKey);
 
     await this.enrolmentService.deleteEnrolment();
+    await this.enrolmentService.generateEnrolment();
+
+    if (balanceState === BalanceState.NONE) {
+      this.logger.warn(`No balance for ${wallet.address}, not deriving keys`);
+
+      return;
+    }
+
+    await this.commandBus.execute(new RefreshKeysCommand());
   }
 
   /**

@@ -3,7 +3,6 @@ import {
   Injectable,
   Logger,
   OnApplicationBootstrap,
-  OnModuleInit,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { HttpService } from '@nestjs/axios';
@@ -549,8 +548,6 @@ export class DsbApiService implements OnApplicationBootstrap {
 
   public async login(): Promise<void> {
     const enrolment = this.enrolmentRepository.getEnrolment();
-
-    console.log(enrolment);
 
     if (!enrolment) {
       this.logger.warn('Stopping login, enrolment is not enabled');

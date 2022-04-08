@@ -8,15 +8,22 @@ import { DsbClientGatewayStorageModule } from '@dsb-client-gateway/dsb-client-ga
 import { SymmetricKeysRepository } from '../message/repository/symmetric-keys.repository';
 import { SymmetricKeysCacheService } from '../message/service/symmetric-keys-cache.service';
 import { DsbClientModule } from '../dsb-client/dsb-client.module';
+import { RefreshKeysHandler } from './service/refresh-keys.handler';
 
 @Module({
-  imports: [DsbClientGatewayStorageModule, SecretsEngineModule, IdentityModule, forwardRef(() => DsbClientModule),],
-    providers: [
-      KeysService,
-      KeysRepository,
-      SymmetricKeysRepository,
-      SymmetricKeysCacheService,
-    ],
+  imports: [
+    DsbClientGatewayStorageModule,
+    SecretsEngineModule,
+    IdentityModule,
+    forwardRef(() => DsbClientModule),
+  ],
+  providers: [
+    KeysService,
+    KeysRepository,
+    SymmetricKeysRepository,
+    SymmetricKeysCacheService,
+    RefreshKeysHandler,
+  ],
   controllers: [KeysController],
   exports: [KeysService],
 })

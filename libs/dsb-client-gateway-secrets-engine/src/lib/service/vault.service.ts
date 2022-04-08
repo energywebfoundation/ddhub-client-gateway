@@ -77,7 +77,7 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
     this.logger.log('Retrieving private key');
 
     if (!this.client) {
-      this.logger.warn('Vault client not initialized');
+      this.logger.warn('Vault client not initialized during getPrivateKey');
 
       return null;
     }
