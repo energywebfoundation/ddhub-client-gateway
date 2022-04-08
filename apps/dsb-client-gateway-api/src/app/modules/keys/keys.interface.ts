@@ -1,5 +1,5 @@
 export interface KeysEntity {
-  messageId: string;
-  encryptedSymmetricKey: string;
+  clientGatewayMessageId: string;
+  payload: string;
   senderDid: string;
 }

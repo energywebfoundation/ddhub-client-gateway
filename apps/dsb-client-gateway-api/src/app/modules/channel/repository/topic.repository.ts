@@ -60,7 +60,7 @@ export class TopicRepository
   public getTopic(
     name: string,
     owner: string,
-    version: string
+    version?: string
   ): TopicVersionEntity | null {
     return this.client
       .getCollection<TopicVersionEntity>(this.collection)

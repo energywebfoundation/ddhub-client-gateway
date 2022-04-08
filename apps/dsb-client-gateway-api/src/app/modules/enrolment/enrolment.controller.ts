@@ -12,11 +12,11 @@ export class EnrolmentController {
 
   @Get()
   public async get(): Promise<Enrolment> {
-    return this.enrolmentService.getEnrolment();
+    return this.enrolmentService.get();
   }
 
   @Post()
   public async init() {
-    return this.enrolmentService.initEnrolment();
+    await this.enrolmentService.startListening();
   }
 }

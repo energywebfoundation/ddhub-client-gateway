@@ -11,8 +11,9 @@ import { IdentityService } from './service/identity.service';
 import { CreateIdentityDto } from './dto/create-identity.dto';
 import { DigestGuard } from '../utils/guards/digest.guard';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
-import { Identity, IdentityWithEnrolment } from '@dsb-client-gateway/dsb-client-gateway/identity/models';
+import { Identity } from '@dsb-client-gateway/dsb-client-gateway/identity/models';
 import { ClaimsResponseDto } from './dto/claims-response.dto';
+import { IdentityResponseDto } from './dto/identity-response.dto';
 
 @Controller('identity')
 @UseGuards(DigestGuard)
@@ -24,6 +25,7 @@ export class IdentityController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Identity data',
+    type: () => IdentityResponseDto,
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
@@ -34,11 +36,25 @@ export class IdentityController {
     status: HttpStatus.UNAUTHORIZED,
     description: 'Unauthorized',
   })
-  public async get(): Promise<IdentityWithEnrolment> {
+  public async get(): Promise<IdentityResponseDto> {
     return this.identityService.getIdentityWithEnrolment();
   }
 
   @Get('/claims')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Claims data',
+    type: () => ClaimsResponseDto,
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description:
+      'Validation failed or some requirements were not fully satisfied',
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Unauthorized',
+  })
   public async getClaims(): Promise<ClaimsResponseDto> {
     return this.identityService.getClaims();
   }
@@ -47,7 +63,7 @@ export class IdentityController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Identity successfully created',
-    type: () => CreateIdentityDto,
+    type: () => IdentityResponseDto,
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,

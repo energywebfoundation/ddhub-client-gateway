@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import {
   CacheClient,
-  Claim,
+  Claim as DIDClaim,
   ClaimsService,
   DIDAttribute,
   DidRegistry,
@@ -13,7 +13,8 @@ import { IamFactoryService } from './iam-factory.service';
 import { ConfigService } from '@nestjs/config';
 import { Encoding } from '@ew-did-registry/did-resolver-interface';
 import { KeyType } from '@ew-did-registry/keys';
-import { ApplicationDTO } from '../iam.interface';
+import { ApplicationDTO, Claim } from '../iam.interface';
+import { RoleStatus } from '@dsb-client-gateway/dsb-client-gateway/identity/models';
 
 @Injectable()
 export class IamService {
@@ -30,11 +31,44 @@ export class IamService {
     protected readonly configService: ConfigService
   ) {}
 
+  public async getClaimsWithStatus(): Promise<Claim[]> {
+    const claims: DIDClaim[] = await this.getClaims();
+    const synchronizedToDIDClaims = await this.getUserClaimsFromDID();
+
+    const getClaimStatus = (claim: DIDClaim): RoleStatus => {
+      if (claim.isAccepted) {
+        return RoleStatus.APPROVED;
+      }
+
+      if (claim.isRejected) {
+        return RoleStatus.REJECTED;
+      }
+
+      if (!claim.isAccepted && !claim.isRejected) {
+        return RoleStatus.AWAITING_APPROVAL;
+      }
+
+      return RoleStatus.NOT_ENROLLED;
+    };
+
+    return claims.map((claim) => {
+      return {
+        namespace: claim.claimType,
+        status: getClaimStatus(claim),
+        syncedToDidDoc:
+          synchronizedToDIDClaims.filter(
+            (synchronizedClaim) =>
+              synchronizedClaim.claimType === claim.claimType
+          ).length > 0,
+      };
+    });
+  }
+
   public getDidRegistry(): DidRegistry | undefined {
     return this.didRegistry;
   }
 
-  public async getClaims(): Promise<Claim[]> {
+  public async getClaims(): Promise<DIDClaim[]> {
     return this.cacheClient.getClaimsBySubject(this.getDIDAddress());
   }
 
@@ -84,13 +118,16 @@ export class IamService {
     return this.initialized;
   }
 
-  public getClaimById(id: string): Promise<Claim> {
+  public getClaimById(id: string): Promise<DIDClaim> {
     return this.claimsService.getClaimById(id);
   }
 
-  public async getApplicationsByOwner(
+  public async getApplicationsByOwnerAndRole(
+    roleName: string,
     ownerDid: string
   ): Promise<ApplicationDTO[]> {
+    this.logger.debug('start: ApplicationsByOwnerAndRole');
+
     const didClaims = await this.cacheClient.getClaimsByRequester(ownerDid, {
       isAccepted: true,
     });
@@ -99,7 +136,7 @@ export class IamService {
 
     didClaims.forEach((didClaim) => {
       if (
-        didClaim.claimType.startsWith('topiccreator') &&
+        didClaim.claimType.startsWith(`${roleName}.`) &&
         didClaim.namespace !== this.configService.get('DID_CLAIM_NAMESPACE')
       ) {
         namespaceList.push(didClaim.namespace);
@@ -118,6 +155,8 @@ export class IamService {
 
     const uniqueApplications = [...new Set(applications)];
 
+    this.logger.debug('end: ApplicationsByOwnerAndRole');
+
     return uniqueApplications;
   }
 
@@ -125,6 +164,8 @@ export class IamService {
     did: string,
     namespace: string
   ): Promise<Claim[]> {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     return this.cacheClient.getClaimsByRequester(did, {
       namespace,
     });
@@ -140,7 +181,7 @@ export class IamService {
 
   public async publishPublicClaim(token: string): Promise<void> {
     await this.claimsService.publishPublicClaim({
-      token,
+      claim: { token },
     });
   }
 

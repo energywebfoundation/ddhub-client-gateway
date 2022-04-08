@@ -23,7 +23,21 @@ export interface Identity {
   balance: BalanceState;
 }
 
+export enum RoleStatus {
+  NOT_ENROLLED = 'NOT_ENROLLED',
+  AWAITING_APPROVAL = 'AWAITING_APPROVAL',
+  APPROVED = 'APPROVED',
+  REJECTED = 'REJECTED',
+  SYNCED = 'SYNCED',
+}
+
+export interface Role {
+  namespace: string;
+  status: RoleStatus;
+  required: boolean;
+}
+
 export interface Enrolment {
   did: string | null;
-  state: EnrolmentState;
+  roles: Role[];
 }

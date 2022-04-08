@@ -5,7 +5,7 @@ import NProgress from 'nprogress';
 import Head from 'next/head';
 import Axios from 'axios';
 import { QueryClient, QueryClientProvider } from 'react-query';
-import { DDHubThemeProvider } from '../styles/theme';
+import { DDHubThemeProvider } from '@dsb-client-gateway/ui/utils';
 import { CacheProvider, EmotionCache } from '@emotion/react';
 import { CssBaseline } from '@mui/material';
 import createCache from '@emotion/cache';
@@ -13,6 +13,7 @@ import { Layout } from '../components/Layout';
 import { queryClientOptions } from '../utils';
 import '../styles/globals.css';
 import 'nprogress/nprogress.css';
+import { UserDataContext, useUserData } from '@dsb-client-gateway/ui/login';
 
 Axios.defaults.baseURL = process.env.NEXT_PUBLIC_SERVER_BASE_URL;
 
@@ -26,6 +27,7 @@ export interface MyAppProps extends AppProps {
 
 function MyApp(props: MyAppProps) {
   const { Component, pageProps } = props;
+  const {userDataValue} = useUserData();
   const [queryClient] = React.useState(
     () =>
       new QueryClient({
@@ -54,9 +56,11 @@ function MyApp(props: MyAppProps) {
       </Head>
       <DDHubThemeProvider>
         <CssBaseline />
-        <QueryClientProvider client={queryClient}>
-          {getLayout(<Component {...pageProps} />)}
-        </QueryClientProvider>
+        <UserDataContext.Provider value={userDataValue}>
+          <QueryClientProvider client={queryClient}>
+            {getLayout(<Component {...pageProps} />)}
+          </QueryClientProvider>
+        </UserDataContext.Provider>
       </DDHubThemeProvider>
     </CacheProvider>
   );
