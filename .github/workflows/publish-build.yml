@@ -3,6 +3,8 @@ name: Pull Request
 on:
   push:
     branches: [ ddhub-dev ]
+env:
+  SECRETS_ENGINE: vault
 
 jobs:
   cancel-previous:
