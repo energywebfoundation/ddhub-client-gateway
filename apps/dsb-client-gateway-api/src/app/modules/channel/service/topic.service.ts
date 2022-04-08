@@ -11,7 +11,7 @@ export class TopicService {
   public getTopic(
     name: string,
     owner: string,
-    version: string
+    version?: string
   ): TopicVersion | null {
     return this.topicRepository.getTopic(name, owner, version);
   }

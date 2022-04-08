@@ -15,6 +15,7 @@ import { DsbHealthController } from './controller/dsb-health.controller';
 import { CqrsModule } from '@nestjs/cqrs';
 import { DsbApplicationsController } from './controller/dsb-applications.controller';
 import { SecretsEngineModule } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
+import { TopicService } from './service/dsb-topic.service';
 
 @Module({
   imports: [
@@ -40,7 +41,7 @@ import { SecretsEngineModule } from '@dsb-client-gateway/dsb-client-gateway-secr
     KeysModule,
     DidAuthModule,
   ],
-  providers: [DsbApiService, TlsAgentService],
+  providers: [DsbApiService, TlsAgentService, TopicService],
   controllers: [
     DsbHealthController,
     DsbChannelsController,

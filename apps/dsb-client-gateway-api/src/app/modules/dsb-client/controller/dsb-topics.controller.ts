@@ -1,36 +1,56 @@
 import {
-  Controller, Get, UseGuards, Body, Post, Patch, Query, HttpCode,
+  Controller,
+  Get,
+  UseGuards,
+  Body,
+  Post,
+  Patch,
+  Query,
+  HttpCode,
   HttpStatus,
+  Put,
 } from '@nestjs/common';
 import { DsbApiService } from '../service/dsb-api.service';
 import { DigestGuard } from '../../utils/guards/digest.guard';
-import { ApiTags, ApiResponse, } from '@nestjs/swagger';
-import { SendTopicBodyDTO } from '../dsb-client.interface';
-import { GetTopicsCountQueryDto, PaginatedResponse } from '../dto';
+import { ApiTags, ApiResponse } from '@nestjs/swagger';
+import {
+  GetTopicsCountQueryDto,
+  PaginatedResponse,
+  TopicsCountResponse,
+  Topic,
+  SendTopicBodyDto,
+  GetTopicsQueryDto,
+} from '../dto';
 
 @Controller('dsb')
 @UseGuards(DigestGuard)
-@ApiTags('dsb', 'topics')
+@ApiTags('dsb')
 export class DsbTopicsController {
-  constructor(protected readonly dsbClientService: DsbApiService) { }
+  constructor(protected readonly dsbClientService: DsbApiService) {}
 
   @Get('topics')
   @ApiResponse({
     status: HttpStatus.OK,
-    description: 'Topics List',
+    description: 'Get Topics List',
     type: () => PaginatedResponse,
   })
   @ApiResponse({
     status: HttpStatus.UNAUTHORIZED,
     description: 'Unauthorized',
   })
-  public async getTopics() {
-    return this.dsbClientService.getTopics();
+  public async getTopics(@Query() { owner }: GetTopicsQueryDto) {
+    return this.dsbClientService.getTopics(owner);
   }
 
   @Get('topics/count')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Get Topics Count by Owner',
+    type: () => TopicsCountResponse,
+  })
   public async getTopicsCountByOwner(
-    @Query() { owner }: GetTopicsCountQueryDto) {
+    @Query() { owner }: GetTopicsCountQueryDto
+  ) {
     return this.dsbClientService.getTopicsCountByOwner(owner);
   }
 
@@ -38,6 +58,7 @@ export class DsbTopicsController {
   @ApiResponse({
     status: HttpStatus.CREATED,
     description: 'Topic successfully created',
+    type: () => Topic,
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
@@ -49,16 +70,15 @@ export class DsbTopicsController {
     description: 'Unauthorized',
   })
   @HttpCode(HttpStatus.CREATED)
-  public async postTopics(
-    @Body() data: SendTopicBodyDTO
-  ) {
+  public async postTopics(@Body() data: SendTopicBodyDto) {
     return this.dsbClientService.postTopics(data);
   }
 
-  @Patch('topics')
+  @Put('topics')
   @ApiResponse({
-    status: HttpStatus.CREATED,
+    status: HttpStatus.OK,
     description: 'Topic updated successfully',
+    type: () => Topic,
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
@@ -73,10 +93,8 @@ export class DsbTopicsController {
     status: HttpStatus.NOT_FOUND,
     description: 'Topic not found',
   })
-  @HttpCode(HttpStatus.CREATED)
-  public async updateTopics(
-    @Body() data: SendTopicBodyDTO
-  ) {
+  @HttpCode(HttpStatus.OK)
+  public async updateTopics(@Body() data: SendTopicBodyDto) {
     return this.dsbClientService.updateTopics(data);
   }
 }

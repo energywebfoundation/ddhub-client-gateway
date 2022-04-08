@@ -19,7 +19,7 @@ export interface SendMessageFailedResponse {
   };
 }
 
-export interface recipients {
+export interface Recipients {
   total: number;
   sent: number;
   failed: number;
@@ -30,8 +30,24 @@ export interface SendInternalMessageResponse {
 }
 export interface SendMessageResponse {
   clientGatewayMessageId: string;
-  recipients: recipients;
+  recipients: Recipients;
   did: string;
   success: SendMessageSuccessResponse[];
   failed: SendMessageFailedResponse[];
+}
+
+export interface SymmetricKeyEntity {
+  clientGatewayMessageId: string;
+  payload: string;
+  senderDid: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface DownloadMessageResponse {
+  filePath: string;
+  fileName: string;
+  sender: string;
+  signature: string;
+  clientGatewayMessageId: string;
 }

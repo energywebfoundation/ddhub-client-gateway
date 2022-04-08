@@ -11,6 +11,6 @@ import { IamInitService } from './service/iam-init.service';
   imports: [UtilsModule, StorageModule, SecretsEngineModule, EnrolmentModule],
   providers: [IdentityService, IamInitService],
   controllers: [IdentityController],
-  exports: [IdentityService],
+  exports: [IdentityService, IamInitService],
 })
 export class IdentityModule {}

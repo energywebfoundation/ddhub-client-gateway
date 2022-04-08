@@ -35,12 +35,12 @@ export class AppModule {
       CertificateModule,
       SecretsEngineModule,
       DsbClientModule,
-      KeysModule,
       TerminusModule,
       ScheduleModule.forRoot(),
       UtilsModule,
       ChannelModule,
       MessageModule,
+      KeysModule,
     ];
 
     const providers = [

@@ -24,6 +24,8 @@ export class DidAuthService {
 
     const proof = await this.ethersService.createProof(privateKey, did);
 
+    console.log(proof);
+
     const response = await this.didAuthApiService
       .login(proof)
       .catch(async (e) => {
