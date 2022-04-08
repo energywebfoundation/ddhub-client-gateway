@@ -202,7 +202,7 @@ describe('KeysService (SPEC)', () => {
     });
   });
 
-  describe('encryption flow', () => {
+  describe.skip('encryption flow', () => {
     it('encryption flow', async () => {
       const { privateKey: senderPrivateKey, publicKey: senderPublicKey } =
         Wallet.createRandom();
