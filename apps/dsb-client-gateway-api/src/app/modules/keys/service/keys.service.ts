@@ -238,6 +238,8 @@ export class KeysService implements OnModuleInit {
   }
 
   public async onModuleInit(): Promise<void> {
+    this.logger.log('Starting keys onModuleInit');
+
     const rootKey: string | null =
       await this.secretsEngineService.getPrivateKey();
 
@@ -266,18 +268,35 @@ export class KeysService implements OnModuleInit {
 
     const wallet = this.ethersService.getWalletFromPrivateKey(rootKey);
 
+    this.logger.log('Initializing IAM connection');
     await this.iamInitService.onModuleInit();
+
+    this.logger.log('Attempting to update signature key');
+
     await this.iamService.setVerificationMethod(
       wallet.publicKey,
       DIDPublicKeyTags.DSB_SIGNATURE_KEY
     );
 
-    this.logger.debug(await this.iamService.getDid());
+    this.logger.log(`Updated ${wallet.address} signature key`);
+
+    console.log('Fetchign did');
+    const did = await this.iamService.getDid();
+    console.log('fetched');
+
+    const existingKeyInDid =
+      did.publicKey.filter(
+        (c) =>
+          c.id ===
+          `${this.iamService.getDIDAddress()}#${
+            DIDPublicKeyTags.DSB_SYMMETRIC_ENCRYPTION
+          }`
+      ).length > 0;
 
     const existingRSAKey: string | null =
       await this.secretsEngineService.getRSAPrivateKey();
 
-    if (existingRSAKey) {
+    if (existingRSAKey && existingKeyInDid) {
       this.logger.log('RSA key already generated');
 
       return;
@@ -292,8 +311,7 @@ export class KeysService implements OnModuleInit {
 
     await this.secretsEngineService.setRSAPrivateKey(privateKey);
 
-    this.logger.log('Updated DID document with public key');
-    this.logger.debug(await this.iamService.getDid());
+    this.logger.log('Updated DID document with public RSA key');
   }
 
   public deriveRSAKey(derivedKeyPrivateKey: string): {
