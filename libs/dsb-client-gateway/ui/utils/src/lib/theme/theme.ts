@@ -38,10 +38,47 @@ const dsbTheme: ThemeOptions = {
     }
   },
   typography: {
-    fontFamily: 'Rajdhani'
+    fontFamily: 'Rajdhani',
+    body1: {
+      fontFamily: 'Bw Gradual',
+    },
+    body2: {
+      fontFamily: 'Sequel Sans',
+      letterSpacing: '0.4px'
+    }
   },
   components: {
     // Name of the component
+    MuiCssBaseline: {
+      styleOverrides: `
+        @font-face {
+          font-family: 'Sequel Sans';
+          font-style: normal;
+          src: url('/fonts/Sequel-Sans.ttf') format('truetype');
+        }
+        @font-face {
+          font-family: 'Bw Gradual';
+          font-style: normal;
+          font-display: swap;
+          font-weight: 400;
+          src: url('/fonts/BwGradual-Regular.woff2') format('woff2');
+        }
+        @font-face {
+          font-family: 'Bw Gradual';
+          font-style: normal;
+          font-display: swap;
+          font-weight: 500;
+          src: url('/fonts/BwGradual-Medium.woff2') format('woff2');
+        }
+        @font-face {
+          font-family: 'Bw Gradual';
+          font-style: normal;
+          font-display: swap;
+          font-weight: bold;
+          src: url('/fonts/BwGradual-Bold.woff2') format('woff2');
+        }
+      `,
+    },
     MuiDrawer: {
       styleOverrides: {
         // Name of the slot
