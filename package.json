@@ -61,6 +61,7 @@
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-feather": "^2.0.9",
+    "react-hook-form": "^7.29.0",
     "react-json-editor-ajrm": "^2.5.13",
     "react-json-view-lite": "^0.9.4",
     "react-query": "^3.34.19",
