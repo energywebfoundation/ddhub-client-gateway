@@ -68,10 +68,10 @@ export class SendMessageDto {
 
 export class uploadMessageBodyDto {
   @ApiProperty({
-    type: 'binary',
     description: 'File uploaded',
+    format: 'binary',
   })
-  file: 'binary';
+  file: string;
 
   @IsValidChannelName({
     message:
@@ -116,6 +116,7 @@ export class uploadMessageBodyDto {
   @IsOptional()
   @ApiProperty({
     type: String,
+    required: false,
     description: 'Transaction Id used to check Idempotency',
   })
   transactionId: string;

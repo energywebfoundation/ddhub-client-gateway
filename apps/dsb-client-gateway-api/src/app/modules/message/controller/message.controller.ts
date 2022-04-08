@@ -9,9 +9,7 @@ import {
   UploadedFile,
   Query,
   Get,
-  Res,
   StreamableFile,
-  Req,
   Response,
 } from '@nestjs/common';
 import { ApiConsumes, ApiResponse, ApiTags } from '@nestjs/swagger';

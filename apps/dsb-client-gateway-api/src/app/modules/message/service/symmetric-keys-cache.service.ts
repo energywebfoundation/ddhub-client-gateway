@@ -18,7 +18,7 @@ export class SymmetricKeysCacheService {
   public async refreshSymmetricKeysCache(): Promise<void> {
     const symmetricKeys: SymmetricKeyEntity[] =
       await this.dsbApiService.getSymmetricKeys({
-        clientId: this.configService.get('CLIENT_ID'),
+        clientId: this.configService.get('SYMMETRIC_KEY_CLIENT_ID'),
         amount: this.configService.get('AMOUNT_OF_SYMMETRIC_KEYS_FETCHED'),
       });
 
