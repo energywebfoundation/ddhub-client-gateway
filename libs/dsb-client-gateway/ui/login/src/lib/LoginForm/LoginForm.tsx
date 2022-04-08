@@ -1,13 +1,13 @@
 import { Button, TextField, Typography } from '@mui/material';
 import { LoginData } from '../login-data.interface';
-import { useLoginForm } from './LoginForm.effects';
+import { useLoginFormEffects } from './LoginForm.effects';
 
 export interface LoginFormProps {
   onPrivateKeySubmit: (privateKey: string) => void;
 }
 
 export function LoginForm(props: LoginFormProps) {
-  const {register, handleSubmit, errorMessage} = useLoginForm();
+  const {register, handleSubmit, errorMessage} = useLoginFormEffects();
 
   return (
     <form>

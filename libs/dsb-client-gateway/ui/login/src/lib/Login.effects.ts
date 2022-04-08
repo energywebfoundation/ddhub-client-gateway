@@ -6,7 +6,7 @@ import { useRouter } from 'next/router';
 import { routerConst } from '@dsb-client-gateway/ui/utils';
 import { useIdentityControllerPost } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 
-export const usePrivateKey = () => {
+export const usePrivateKeyEffects = () => {
   const router = useRouter();
   const {userData, setUserData} = useContext(UserDataContext);
   const onSuccess = async (res: IdentityWithEnrolment) => {

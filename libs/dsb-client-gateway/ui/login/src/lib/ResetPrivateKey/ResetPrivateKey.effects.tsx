@@ -4,7 +4,7 @@ import Swal from 'sweetalert2';
 import { theme } from '@dsb-client-gateway/ui/utils';
 import { AccountStatusEnum } from '../check-account-status/check-account-status';
 
-export const useResetPrivateKey = () => {
+export const useResetPrivateKeyEffects = () => {
   const {userData, setUserData} = useContext(UserDataContext);
 
   const resetPrivateKeyHandler = () => {
