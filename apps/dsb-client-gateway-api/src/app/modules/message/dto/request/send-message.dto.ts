@@ -68,7 +68,8 @@ export class SendMessageDto {
 
 export class uploadMessageBodyDto {
   @ApiProperty({
-    type: 'binary',
+    type: 'string',
+    format: 'binary',
     description: 'File uploaded',
   })
   file: 'binary';
