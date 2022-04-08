@@ -1,10 +1,8 @@
 import { Controller, Get, UseGuards, HttpStatus, Query } from '@nestjs/common';
 import { DigestGuard } from '../../utils/guards/digest.guard';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import {
-  ApplicationDTO,
-} from '@dsb-client-gateway/dsb-client-gateway-iam-client';
-import { GetApplicationsQueryDto } from '../dto';
+
+import { GetApplicationsQueryDto, ApplicationDTO } from '../dto';
 import { TopicService } from '../service/dsb-topic.service';
 
 @Controller('dsb')
@@ -19,7 +17,7 @@ export class DsbApplicationsController {
   })
   @ApiResponse({
     status: HttpStatus.OK,
-    type: ApplicationDTO,
+    type: [ApplicationDTO],
     description: 'List of applications',
   })
   public async getApplications(@Query() { roleName }: GetApplicationsQueryDto) {
