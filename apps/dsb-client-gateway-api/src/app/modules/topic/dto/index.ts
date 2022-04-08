@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { SchemaType } from '../topic.const';
 import {
   IsDateString,
   IsNotEmpty,
@@ -8,8 +9,10 @@ import {
   IsArray,
   ArrayUnique,
   IsNumber,
+  IsEnum,
 } from 'class-validator';
-
+import { IsVersion } from '../../utils/validator/decorators/IsVersion';
+import { IsValidTopicName } from '../../utils/validator/decorators/isValidTopicName';
 export class Topic {
   @IsString()
   @IsNotEmpty()
@@ -20,6 +23,10 @@ export class Topic {
   })
   id: string;
 
+  @IsValidTopicName({
+    message:
+      'Malformed topic name. Name should contain only alphanumeric lowercase letters, use . as a separator. Max length 255',
+  })
   @IsString()
   @IsNotEmpty()
   @ApiProperty({
@@ -43,18 +50,26 @@ export class Topic {
   @ApiProperty({
     description: 'schema of the topic',
     type: String,
-    example: '{\n        "data": "Vikas"\n    }',
+    example: JSON.stringify({ data: 'Vikas' }),
   })
   schema: string;
 
   @IsString()
   @IsNotEmpty()
+  @IsEnum(SchemaType)
   @ApiProperty({
     description: 'schema type of the topic',
     type: String,
+    enum: [
+      SchemaType.JSD7,
+      SchemaType.XML,
+      SchemaType.XSD6,
+      SchemaType.CSV,
+      SchemaType.TSV,
+    ],
     example: 'JSD7',
   })
-  schemaType: string;
+  schemaType: SchemaType;
 
   @IsString()
   @IsNotEmpty()
@@ -99,7 +114,7 @@ export class SendTopicBodyDto {
   @ApiProperty({
     description: 'schema of the topic',
     type: String,
-    example: '{\n        "data": "Vikas"\n    }',
+    example: JSON.stringify({ data: 'Vikas' }),
   })
   schema: string;
 
@@ -121,6 +136,9 @@ export class SendTopicBodyDto {
   })
   tags: string[];
 
+  @IsVersion({
+    message: 'Malformed Version',
+  })
   @IsString()
   @IsNotEmpty()
   @ApiProperty({
@@ -213,11 +231,4 @@ export class TopicsCountResponse {
     example: 2,
   })
   public owner: number;
-
-  @ApiProperty({
-    description: 'owner name',
-    type: Number,
-    example: 3,
-  })
-  public owner1: number;
 }

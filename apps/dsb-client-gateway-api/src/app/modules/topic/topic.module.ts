@@ -5,8 +5,6 @@ import { DsbClientGatewayStorageModule } from '@dsb-client-gateway/dsb-client-ga
 
 @Module({
   imports: [DsbClientModule, DsbClientGatewayStorageModule],
-  providers: [],
-  exports: [],
   controllers: [TopicsController],
 })
 export class TopicModule {}
