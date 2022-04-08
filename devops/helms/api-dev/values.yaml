@@ -31,9 +31,9 @@ ddhub-client-gateway-api:
       # -- Sets the blockchain RPC node to connect to retreive state from and submit transactions to. Should match the network given in CHAIN_ID.
       rpc_url: https://volta-rpc.energyweb.org/
       # -- Sets the Energy Web IAM cache server URL, used to cache identities (as it can be expensive to rely only on querying smart contract data).
-      cache_server_url: https://identitycache-staging.energyweb.org/v1
+      cache_server_url: https://identitycache-dev.energyweb.org/v1
       # -- Sets the Energy Web IAM events server URL, used to receive notification of approved DSB role claims.
-      event_server_url: https://identitycache-staging.energyweb.org/
+      event_server_url: https://identityevents-dev.energyweb.org
       # -- Sets the Energy Web IAM application namespace. DSB related roles, such as user and messagebroker should fall under this namespace.
       parent_namespace: ddhub.apps.energyweb.iam.ewc
       secret_engine: vault

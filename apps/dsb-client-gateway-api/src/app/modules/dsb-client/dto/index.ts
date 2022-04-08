@@ -181,6 +181,10 @@ export class GetMessagesQueryDto {
 export class GetApplicationsQueryDto {
   @IsNotEmpty()
   @IsString()
+  @ApiProperty({
+    example: 'topiccreator',
+    type: String,
+  })
   public roleName: string;
 }
 
@@ -188,12 +192,23 @@ export class GetTopicsCountQueryDto {
   @IsNotEmpty()
   @IsArray()
   @ArrayUnique()
+  @ApiProperty({
+    example: [
+      'ddhub.apps.energyweb.iam.ewc',
+      'torta.apps.eggplant.vege.iam.ewc',
+    ],
+    type: [String],
+  })
   public owner: string[];
 }
 
 export class GetTopicsQueryDto {
   @IsNotEmpty()
   @IsString()
+  @ApiProperty({
+    example: 'ddhub.apps.energyweb.iam.ewc',
+    type: String,
+  })
   public owner: string;
 }
 export class PaginatedResponse {
@@ -244,4 +259,59 @@ export class TopicsCountResponse {
     example: 3,
   })
   public owner1: number;
+}
+
+export class ApplicationDTO {
+  @IsString()
+  @ApiProperty({
+    description: 'app Name',
+    type: String,
+    example: 'application.something',
+  })
+  public appName: string;
+
+  @IsString()
+  @IsOptional()
+  @ApiProperty({
+    description: 'url of the logo',
+    type: String,
+    example: 'url of the logo',
+  })
+  public logoUrl?: string;
+
+  @IsString()
+  @IsOptional()
+  @ApiProperty({
+    description: 'url of the website',
+    type: String,
+    example: 'url of the website',
+  })
+  public websiteUrl?: string;
+
+  @IsString()
+  @IsOptional()
+  @ApiProperty({
+    description: 'description of the app',
+    type: String,
+    example: 'description',
+  })
+  public description?: string;
+
+  @IsString()
+  @IsOptional()
+  @ApiProperty({
+    description: 'application namespace',
+    type: String,
+    example: 'ddhub.apps.energyweb.iam.ewc',
+  })
+  public namespace?: string;
+
+  @IsString()
+  @IsOptional()
+  @ApiProperty({
+    description: 'number of topics',
+    type: Number,
+    example: '4',
+  })
+  public topicsCount?: number;
 }

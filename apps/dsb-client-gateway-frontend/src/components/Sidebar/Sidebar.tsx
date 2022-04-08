@@ -18,7 +18,7 @@ import { Home, Box as BoxIcon, FileText, Layers, MessageSquare, Mail, GitMerge }
 import { useRouter } from 'next/router'
 import { Divider } from '@mui/material';
 import { useStyles } from "./Sidebar.styles";
-import { routerConst } from '../../utils/router-const';
+import { routerConst } from '@dsb-client-gateway/ui/utils';
 
 function Sidebar() {
     const { classes, theme } = useStyles();
