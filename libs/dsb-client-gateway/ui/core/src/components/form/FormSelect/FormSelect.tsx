@@ -1,55 +1,37 @@
-import { TextFieldProps, InputBaseProps } from '@mui/material';
-import React, { PropsWithChildren, ReactElement } from 'react';
+import { FC } from 'react';
 import {
   Control,
   Controller,
   UseFormRegister,
+  FieldValues,
 } from 'react-hook-form';
 import { SelectAutocomplete } from '../SelectAutocomplete';
 import { SelectRegular } from '../SelectRegular';
-
-type FormSelectField<FormValuesType> = {
-  name: keyof FormValuesType;
-  label: string;
-  placeholder?: string;
-  required?: boolean;
-  options?: FormSelectOption[];
-  autocomplete?: boolean;
-  multiple?: boolean;
-  maxValues?: number;
-  textFieldProps?: TextFieldProps;
-  inputProps?: InputBaseProps['inputProps'];
-};
+import { GenericFormField } from '../../../containers/GenericForm'
 
 export type FormSelectOption = {
   value: string | number;
   label: string;
 };
 
-export interface FormSelectProps<FormValuesType> {
-  field: FormSelectField<FormValuesType>;
-  control: Control<FormValuesType>;
+export interface FormSelectProps {
+  field: GenericFormField;
+  control: Control<FieldValues>;
   errorExists?: boolean;
   errorText?: string;
   variant?: 'standard' | 'outlined' | 'filled';
   disabled?: boolean;
-  register?: UseFormRegister<FormValuesType>;
+  register?: UseFormRegister<FieldValues>;
 }
 
-export type TFormSelect = <FormValuesType>(
-  props: PropsWithChildren<FormSelectProps<FormValuesType>>
-) => ReactElement;
-
-export const FormSelect: TFormSelect = ({
+export const FormSelect: FC<FormSelectProps> = ({
   field,
   control,
   errorExists = false,
   errorText = '',
   variant = 'filled',
-  disabled = false,
-  register = null,
+  disabled = false
 }) => {
-
   return (
     <Controller
       key={`${field.name}`}
@@ -75,7 +57,6 @@ export const FormSelect: TFormSelect = ({
             onChange={onChange}
             variant={variant}
             disabled={disabled}
-            register={register}
           />
         );
       }}

@@ -15,6 +15,6 @@
     "dsb-client-gateway-storage": "libs/dsb-client-gateway-storage",
     "dsb-client-gateway-ui-login": "libs/dsb-client-gateway/ui/login",
     "dsb-client-gateway-ui-utils": "libs/dsb-client-gateway/ui/utils",
-    "ui-core": "libs/ui/core"
+    "ui-core": "libs/dsb-client-gateway/ui/core"
   }
 }

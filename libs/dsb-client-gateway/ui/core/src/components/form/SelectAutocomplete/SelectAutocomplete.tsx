@@ -1,29 +1,17 @@
-import React, { PropsWithChildren, ReactElement } from 'react';
+import { FC } from 'react';
 import {
   TextField,
   Autocomplete,
   Chip,
-  TextFieldProps,
-  InputBaseProps,
 } from '@mui/material';
 import { useSelectAutocompleteEffects } from './SelectAutocomplete.effects';
 import { FormSelectOption } from '../FormSelect';
+import { GenericFormField } from '../../../containers/GenericForm'
 
-export type SelectAutocompleteField<FormValuesType> = {
-  name: keyof FormValuesType;
-  label: string;
-  placeholder?: string;
-  required?: boolean;
-  options?: FormSelectOption[];
-  multiple?: boolean;
-  textFieldProps?: TextFieldProps;
-  inputProps?: InputBaseProps['inputProps'];
-};
-
-export interface SelectAutocompleteProps<FormValuesType = any> {
+export interface SelectAutocompleteProps {
   value: FormSelectOption[];
   onChange: (newValue: FormSelectOption[]) => void;
-  field: SelectAutocompleteField<FormValuesType>;
+  field: GenericFormField;
   errorExists?: boolean;
   errorText?: string;
   variant?: 'standard' | 'outlined' | 'filled';
@@ -31,11 +19,7 @@ export interface SelectAutocompleteProps<FormValuesType = any> {
   className?: string;
 }
 
-export type TSelectAutocomplete = <FormValuesType>(
-  props: PropsWithChildren<SelectAutocompleteProps<FormValuesType>>
-) => ReactElement;
-
-export const SelectAutocomplete: TSelectAutocomplete = ({
+export const SelectAutocomplete: FC<SelectAutocompleteProps> = ({
   value,
   field,
   onChange,
