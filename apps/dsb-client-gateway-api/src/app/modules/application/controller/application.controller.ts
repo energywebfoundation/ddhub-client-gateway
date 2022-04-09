@@ -11,7 +11,7 @@ import { TopicService } from '../service/topic.service';
 export class ApplicationsController {
   constructor(protected readonly topicService: TopicService) {}
 
-  @Get('applications')
+  @Get('')
   @ApiOperation({
     description: 'Gets Applications',
   })

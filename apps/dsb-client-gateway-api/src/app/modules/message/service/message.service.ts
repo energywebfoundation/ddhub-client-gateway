@@ -101,7 +101,6 @@ export class MessageService {
     }
 
     const qualifiedDids = channel.conditions.qualifiedDids;
-
     if (qualifiedDids.length === 0) {
       throw new RecipientsNotFoundException();
     }
@@ -346,11 +345,17 @@ export class MessageService {
 
     await Promise.allSettled(
       qualifiedDids.map(async (recipientDid: string) => {
+        this.logger.debug(
+          `generating encrypted symmetric key for recipientId: ${recipientDid} `
+        );
         const decryptionCiphertext = await this.keyService.encryptSymmetricKey(
           randomKey,
           recipientDid
         );
 
+        this.logger.debug(
+          `sending encrypted symmetric key for recipientId: ${recipientDid} `
+        );
         await this.dsbApiService.sendMessageInternal(
           recipientDid,
           clientGatewayMessageId,
@@ -377,11 +382,10 @@ export class MessageService {
   ): Promise<DownloadMessageResponse> {
     //Calling download file API of message broker
     const fileResponse = await this.dsbApiService.downloadFile(fileId);
+
     //getting file name from headers
     let fileName = fileResponse.headers['content-disposition'].split('=')[1];
 
-    console.log('fileName', fileName);
-    console.log(typeof fileName);
     fileName = fileName.replace(/"/g, '');
 
     //Verifying signature
@@ -399,7 +403,6 @@ export class MessageService {
       );
     } else {
       let decryptedMessage: string;
-      let decryptionSucesssfull: boolean;
       let decrypted: any;
 
       try {
@@ -414,7 +417,7 @@ export class MessageService {
 
         this.logger.debug(`Completed decryption for file id:${fileId}`);
       } catch (e) {
-        decryptionSucesssfull = false;
+        this.logger.debug(`Decryption failed for file id:${fileId}`);
         throw new MessageDecryptionFailedException(JSON.stringify(e));
       }
 
@@ -426,23 +429,29 @@ export class MessageService {
         // Parsing Decrypted data
         decrypted = JSON.parse(decryptedMessage);
       } catch (e) {
+        this.logger.debug(`Parsing failed for file id:${fileId}`);
         throw new MessageDecryptionFailedException(
           'Decryted Message cannot be parsed to JSON object.'
         );
       }
 
-      const dir = __dirname + '/../../../files/';
+      const dir = __dirname + this.configService.get('FILES_DIRECTORY');
 
+      this.logger.debug(`Making directory files if doesn't exist`);
       if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir);
       }
 
-      // writing the data to a file
+      this.logger.debug(
+        `Writing decrypted data to the file for file id:${fileId}`
+      );
       await fs.writeFileSync(dir + fileName, Buffer.from(decrypted.data));
     }
 
     return {
-      filePath: join(__dirname + '/../../../files/' + fileName),
+      filePath: join(
+        __dirname + this.configService.get('FILES_DIRECTORY') + fileName
+      ),
       fileName: fileName,
       sender: fileResponse.headers.ownerdid,
       signature: fileResponse.headers.signature,

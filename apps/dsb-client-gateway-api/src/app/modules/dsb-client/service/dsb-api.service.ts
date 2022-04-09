@@ -81,14 +81,17 @@ export class DsbApiService implements OnApplicationBootstrap {
   protected async request<T>(
     requestFn: Observable<AxiosResponse<T>>,
     retryOptions: RetryOptions = {}
-  ): Promise<T> {
-    const { data } = await promiseRetry<AxiosResponse<T>>(async (retry) => {
-      return lastValueFrom(requestFn).catch((err) =>
-        this.handleRequestWithRetry(err, retry, retryOptions)
-      );
-    }, this.retryConfigService.config);
+  ): Promise<{ data: T; headers: any }> {
+    const { data, headers } = await promiseRetry<AxiosResponse<T>>(
+      async (retry) => {
+        return lastValueFrom(requestFn).catch((err) =>
+          this.handleRequestWithRetry(err, retry, retryOptions)
+        );
+      },
+      this.retryConfigService.config
+    );
 
-    return data;
+    return { data, headers };
   }
 
   public async getDIDsFromRoles(
@@ -137,7 +140,7 @@ export class DsbApiService implements OnApplicationBootstrap {
       );
 
       this.logger.log('get Topic Versions successful');
-      return result;
+      return result.data;
     } catch (e) {
       this.logger.error('get Topic Versions failed', e);
       throw new Error(e);
@@ -166,7 +169,7 @@ export class DsbApiService implements OnApplicationBootstrap {
       );
 
       this.logger.log('check If DID Has Roles  successful');
-      return result;
+      return result.data;
     } catch (e) {
       this.logger.error('check If DID Has Roles  failed', e);
       throw new Error(e);
@@ -212,14 +215,16 @@ export class DsbApiService implements OnApplicationBootstrap {
       );
 
       this.logger.log('Upload File successful');
-      return result;
+      return result.data;
     } catch (e) {
       this.logger.error('Upload File failed', e);
       throw new Error(e);
     }
   }
 
-  public async downloadFile(fileId: string): Promise<any> {
+  public async downloadFile(
+    fileId: string
+  ): Promise<{ data: string; headers: any }> {
     try {
       const result = await this.request<null>(
         this.httpService.get(this.baseUrl + '/messages/download', {
@@ -236,10 +241,10 @@ export class DsbApiService implements OnApplicationBootstrap {
         }
       );
 
-      this.logger.log('Download File successful');
+      this.logger.log('Download File successful from MB');
       return result;
     } catch (e) {
-      this.logger.error('Download File failed', e);
+      this.logger.error('Download File failed from MB', e);
       throw new Error(e);
     }
   }
@@ -266,7 +271,7 @@ export class DsbApiService implements OnApplicationBootstrap {
       );
 
       this.logger.log('Download File successful');
-      return result;
+      return result.data;
     } catch (e) {
       this.logger.error('Download File failed', e);
       throw new Error(e);
@@ -308,7 +313,7 @@ export class DsbApiService implements OnApplicationBootstrap {
       );
 
       this.logger.log('Post Topics successful');
-      return result;
+      return result.data;
     } catch (e) {
       this.logger.error('Post Topics failed', e);
       throw new Error(e);
@@ -340,7 +345,7 @@ export class DsbApiService implements OnApplicationBootstrap {
       );
 
       this.logger.log('Get topics count by owner successful.');
-      return result;
+      return result.data;
     } catch (e) {
       this.logger.error('Get topics count by owner successful.', e);
       throw new Error(e);
@@ -363,7 +368,7 @@ export class DsbApiService implements OnApplicationBootstrap {
 
       this.logger.log('Post Topics successful');
       console.log('result', result);
-      return result;
+      return result.data;
     } catch (e) {
       this.logger.error('Post Topics failed', e);
       throw new Error(e);
@@ -386,7 +391,7 @@ export class DsbApiService implements OnApplicationBootstrap {
 
       this.logger.log('Update Topics successful');
 
-      return result;
+      return result.data;
     } catch (e) {
       this.logger.error('Update Topics failed', e);
       throw new Error(e);
@@ -407,6 +412,9 @@ export class DsbApiService implements OnApplicationBootstrap {
       from,
       senderId,
     };
+
+    console.log('requestBody', requestBody);
+
     try {
       const result = await this.request<null>(
         this.httpService.post(this.baseUrl + '/messages/search', requestBody, {
@@ -422,7 +430,7 @@ export class DsbApiService implements OnApplicationBootstrap {
 
       this.logger.log('Messages Search successful', result);
 
-      return result;
+      return result.data;
     } catch (e) {
       this.logger.error('Messages Search failed', e);
       throw new Error(e);
@@ -456,7 +464,7 @@ export class DsbApiService implements OnApplicationBootstrap {
 
       this.logger.log('Get Messages successful');
 
-      return result;
+      return result.data;
     } catch (e) {
       this.logger.error('Get Messages failed', e);
       throw new Error(e);
@@ -497,7 +505,7 @@ export class DsbApiService implements OnApplicationBootstrap {
 
       this.logger.log('Send Message successful', result);
 
-      return result;
+      return result.data;
     } catch (e) {
       this.logger.error('Send Message failed', e);
       throw new Error(e);
@@ -534,7 +542,7 @@ export class DsbApiService implements OnApplicationBootstrap {
 
       this.logger.log('Send Message internal successful');
 
-      return result;
+      return result.data;
     } catch (e) {
       this.logger.error('Send Message internal failed', e);
       throw new Error(e);
@@ -557,7 +565,7 @@ export class DsbApiService implements OnApplicationBootstrap {
 
       this.logger.log('Send Message internal successful');
 
-      return result;
+      return result.data;
     } catch (e) {
       this.logger.error('Send Message internal failed', e);
       throw new Error(e);
