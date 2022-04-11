@@ -359,7 +359,7 @@ export class MessageService {
     const encryptedMessage = this.keyService.encryptMessage(
       JSON.stringify(file.buffer),
       randomKey,
-      'utf-8'
+      EncryptedMessageType['UTF-8']
     );
 
     this.logger.log('fetching private key');
