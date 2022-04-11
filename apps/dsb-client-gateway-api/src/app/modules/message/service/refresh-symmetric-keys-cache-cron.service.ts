@@ -32,6 +32,7 @@ export class RefreshSymmetricKeysCacheCronService
     }
 
     this.logger.log(`Cron jobs enabled`);
+    const jobName = 'REFRESH_SYMMETRIC_KEYS_CACHE';
 
     const job = new CronJob(
       this.configService.get('REFRESH_SYMMETRIC_KEY_CRON_TIME'),
@@ -40,8 +41,6 @@ export class RefreshSymmetricKeysCacheCronService
         await this.commandBus.execute(new RefreshSymmetricKeysCacheCommand());
       }
     );
-
-    const jobName = 'REFRESH_INTERNAL_MESSAGES_CACHE';
 
     this.schedulerRegistry.addCronJob(jobName, job);
 
