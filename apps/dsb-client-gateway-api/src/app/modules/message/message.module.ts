@@ -14,6 +14,7 @@ import { SymmetricKeysCacheService } from './service/symmetric-keys-cache.servic
 import { RefreshSymmetricKeysCacheHandler } from './service/refresh-symmetric-keys-cache.handler';
 import { RefreshSymmetricKeysCacheCronService } from './service/refresh-symmetric-keys-cache-cron.service';
 import { SecretsEngineModule } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
+import { StorageModule } from '../storage/storage.module';
 @Module({
   imports: [
     DsbClientModule,
@@ -23,11 +24,11 @@ import { SecretsEngineModule } from '@dsb-client-gateway/dsb-client-gateway-secr
     IdentityModule,
     SecretsEngineModule,
     DsbClientGatewayStorageModule,
+    StorageModule,
     KeysModule,
   ],
   providers: [
     SymmetricKeysRepository,
-    // VaultService,
     EventsGateway,
     RefreshSymmetricKeysCacheCronService,
     RefreshSymmetricKeysCacheHandler,
