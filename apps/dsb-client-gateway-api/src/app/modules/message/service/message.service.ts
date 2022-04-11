@@ -22,6 +22,7 @@ import { TopicOwnerTopicNameRequiredException } from '../exceptions/topic-owner-
 import { MessageDecryptionFailedException } from '../exceptions/message-decryption-failed.exception';
 import { FileSizeException } from '../exceptions/file-size.exception';
 import { FIleTypeNotSupportedException } from '../exceptions/file-type-not-supported.exception';
+import { NoPrivateKeyException } from '../../storage/exceptions/no-private-key.exception';
 import {
   DownloadMessageResponse,
   GetMessageResponse,
@@ -98,7 +99,13 @@ export class MessageService {
       dto.topicVersion
     );
 
-    if (!topic) {
+    if (
+      !topic ||
+      !topic.id ||
+      !topic.schema ||
+      !topic.schemaType ||
+      !topic.version
+    ) {
       throw new TopicNotFoundException('NOT Found');
     }
 
@@ -118,11 +125,11 @@ export class MessageService {
     const clientGatewayMessageId: string = uuidv4();
 
     this.logger.log('Generating Random Key');
-    const randomKey: string = await this.keyService.generateRandomKey();
+    const randomKey: string = this.keyService.generateRandomKey();
 
     this.logger.log('Encrypting Payload');
 
-    const encryptedMessage = await this.keyService.encryptMessage(
+    const encryptedMessage = this.keyService.encryptMessage(
       dto.payload,
       randomKey,
       EncryptedMessageType['UTF-8']
@@ -131,9 +138,13 @@ export class MessageService {
     this.logger.log('fetching private key');
     const privateKey = await this.secretsEngineService.getPrivateKey();
 
+    if (!privateKey) {
+      throw new NoPrivateKeyException();
+    }
+
     this.logger.log('Generating Signature');
 
-    const signature = await this.keyService.createSignature(
+    const signature = this.keyService.createSignature(
       encryptedMessage,
       '0x' + privateKey
     );
@@ -315,8 +326,15 @@ export class MessageService {
     );
 
     //Check if topic exists
-    if (!topic) {
-      throw new TopicNotFoundException('TOPIC NOT FOUND');
+
+    if (
+      !topic ||
+      !topic.id ||
+      !topic.schema ||
+      !topic.schemaType ||
+      !topic.version
+    ) {
+      throw new TopicNotFoundException('NOT Found');
     }
 
     //System gets internal channel details
@@ -335,10 +353,10 @@ export class MessageService {
     const clientGatewayMessageId: string = uuidv4();
 
     this.logger.log('Generating Random Key');
-    const randomKey: string = await this.keyService.generateRandomKey();
+    const randomKey: string = this.keyService.generateRandomKey();
 
     this.logger.log('Encrypting Payload');
-    const encryptedMessage = await this.keyService.encryptMessage(
+    const encryptedMessage = this.keyService.encryptMessage(
       JSON.stringify(file.buffer),
       randomKey,
       'utf-8'
@@ -347,8 +365,12 @@ export class MessageService {
     this.logger.log('fetching private key');
     const privateKey = await this.secretsEngineService.getPrivateKey();
 
+    if (!privateKey) {
+      throw new NoPrivateKeyException();
+    }
+
     this.logger.log('Generating Signature');
-    const signature = await this.keyService.createSignature(
+    const signature = this.keyService.createSignature(
       encryptedMessage,
       '0x' + privateKey
     );
