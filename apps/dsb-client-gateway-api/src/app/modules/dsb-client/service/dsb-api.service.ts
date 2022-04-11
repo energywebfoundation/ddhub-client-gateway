@@ -413,8 +413,6 @@ export class DsbApiService implements OnApplicationBootstrap {
       senderId,
     };
 
-    console.log('requestBody', requestBody);
-
     try {
       const result = await this.request<null>(
         this.httpService.post(this.baseUrl + '/messages/search', requestBody, {
