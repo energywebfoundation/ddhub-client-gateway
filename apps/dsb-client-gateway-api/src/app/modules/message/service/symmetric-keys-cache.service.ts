@@ -61,7 +61,7 @@ export class SymmetricKeysCacheService {
       this.logger.log('symmetric keys', symmetricKeys);
 
       if (symmetricKeys.length === 0) {
-        this.logger.log('No internal Messages, job not running');
+        this.logger.log('No symmetric keys fetched from MB, job not running');
         return;
       }
 
