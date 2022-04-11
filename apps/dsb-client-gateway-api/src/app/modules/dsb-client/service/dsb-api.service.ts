@@ -284,8 +284,7 @@ export class DsbApiService implements OnApplicationBootstrap {
   ): Promise<ApplicationDTO[]> {
     this.logger.debug('start: dsb API service getApplicationsByOwnerAndRole ');
     try {
-      const enrolment = this.enrolmentRepository.getEnrolment();
-      const ownerDID = enrolment.did;
+      const ownerDID = this.iamService.getDIDAddress();
       this.logger.debug('sucessfully fetched owner did');
       return this.iamService.getApplicationsByOwnerAndRole(roleName, ownerDID);
     } catch (e) {
