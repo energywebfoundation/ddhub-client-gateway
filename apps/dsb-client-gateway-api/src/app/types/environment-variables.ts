@@ -121,7 +121,7 @@ export class EnvironmentVariables {
 
   @IsBoolean()
   @Transform(EnvironmentVariables.transformBoolean('SCHEDULED_JOBS'))
-  SCHEDULED_JOBS = true;
+  SCHEDULED_JOBS = false;
 
   @IsString()
   DID_CLAIM_NAMESPACE = 'message.broker.app.namespace';
