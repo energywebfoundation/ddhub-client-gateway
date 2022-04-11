@@ -1,3 +1,4 @@
+import { ApplicationDTO } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
 import { Injectable, Logger } from '@nestjs/common';
 import { DsbApiService } from '../../dsb-client/service/dsb-api.service';
 
@@ -8,28 +9,31 @@ export class TopicService {
 
   public async getApplications(roleName) {
     this.logger.debug('start: Topic Service getApplications ');
-    const applications =
+
+    let finalApllicationsResult: Array<ApplicationDTO> = [];
+    const applications: Array<ApplicationDTO> =
       await this.dsbClientService.getApplicationsByOwnerAndRole(roleName);
 
-    this.logger.debug('applications fetched successfully!');
+    this.logger.debug('applications fetched successfully.', applications);
 
-    const nameSpaces = await applications.map(
-      (application) => application.namespace
-    );
+    if (applications && applications.length > 0) {
+      const nameSpaces: string[] = await applications.map(
+        (application) => application.namespace
+      );
 
-    this.logger.debug('fetching topic count for applications!');
-    const topicsCount = await this.dsbClientService.getTopicsCountByOwner(
-      nameSpaces
-    );
+      this.logger.debug('fetching topic count for applications.');
+      const topicsCount = await this.dsbClientService.getTopicsCountByOwner(
+        nameSpaces
+      );
 
-    this.logger.debug('constructing final applications structure!');
-    const finalApllicationsResult = applications.map((application) => {
-      application.topicsCount = topicsCount[application.namespace]
-        ? topicsCount[application.namespace]
-        : 0;
-      return application;
-    });
-
+      this.logger.debug('constructing final applications structure.');
+      finalApllicationsResult = applications.map((application) => {
+        application.topicsCount = topicsCount[application.namespace]
+          ? topicsCount[application.namespace]
+          : 0;
+        return application;
+      });
+    }
     return finalApllicationsResult;
   }
 }

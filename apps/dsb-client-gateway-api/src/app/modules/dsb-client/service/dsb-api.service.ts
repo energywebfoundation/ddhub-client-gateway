@@ -289,7 +289,7 @@ export class DsbApiService implements OnApplicationBootstrap {
       return this.iamService.getApplicationsByOwnerAndRole(roleName, ownerDID);
     } catch (e) {
       this.logger.error('error while getting applications', e);
-      return e;
+      throw e;
     } finally {
       this.logger.debug('end: dsb API service getApplicationsByOwnerAndRole');
     }
