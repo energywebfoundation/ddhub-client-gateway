@@ -1,4 +1,5 @@
 export const routerConst = {
+  InitialPage: '/',
   Dashboard: '/dashboard',
   GatewaySettings: '/dashboard/gateway-settings',
   AppsAndTopics: '/applications',
