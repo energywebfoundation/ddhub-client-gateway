@@ -4,8 +4,12 @@ import { ChannelService } from './channel.service';
 import { DsbApiService } from '../../dsb-client/service/dsb-api.service';
 import { IdentityService } from '../../identity/service/identity.service';
 import { ChannelEntity } from '../entity/channel.entity';
-import { TopicVersionResponse } from '../../dsb-client/dsb-client.interface';
 import { TopicRepository } from '../repository/topic.repository';
+import {
+  Topic,
+  TopicVersion,
+  TopicVersionResponse,
+} from '../../dsb-client/dsb-client.interface';
 
 @Injectable()
 export class ChannelDidCacheService {
@@ -56,24 +60,62 @@ export class ChannelDidCacheService {
       );
     }
 
-    for (const { topicId } of internalChannel.conditions.topics) {
-      const topicVersions: TopicVersionResponse =
-        await this.dsbApiService.getTopicVersions(topicId);
+    for (const { topicId, topicName, owner } of internalChannel.conditions
+      .topics) {
+      const topicInformation = await this.dsbApiService.getTopicsByOwnerAndName(
+        topicName,
+        owner
+      );
 
-      if (topicVersions.records.length === 0) {
+      if (topicInformation.records.length === 0) {
         this.logger.warn(`Topic with id ${topicId} does not have any versions`);
 
         continue;
       }
 
+      const topic: Topic = topicInformation.records[0];
+
+      const topicVersion: TopicVersion | null =
+        await this.dsbApiService.getTopicById(topic.id);
+
+      if (!topicVersion) {
+        this.logger.error(
+          `Topic version is missing for topic with id ${topicId}`
+        );
+      }
+
+      const topicVersions: TopicVersionResponse =
+        await this.dsbApiService.getTopicVersions(topic.id);
+
+      this.logger.log(`Found ${topicVersions.records.length} topic versions`);
+
       await this.channelService.updateChannelTopic(
-        internalChannel.fqcn,
-        topicId,
-        topicVersions.records
+        fqcn,
+        topic.id,
+        topicVersions.records.map((topicVersion) => ({
+          id: topicVersion.id,
+          owner: topic.owner,
+          name: topic.name,
+          schemaType: topic.schemaType,
+          version: topicVersion.version,
+          schema: topicVersion.schema,
+        }))
       );
 
-      for (const topicVersion of topicVersions.records) {
-        await this.topicRepository.createOrUpdateTopic(topicVersion, topicId);
+      this.logger.log('Found topic', topic);
+
+      for (const { id, schema, version } of topicVersions.records) {
+        await this.topicRepository.createOrUpdateTopic(
+          {
+            id,
+            schema,
+            version,
+            owner: topic.owner,
+            name: topic.name,
+            schemaType: topic.schemaType,
+          },
+          id
+        );
       }
     }
   }
