@@ -1,6 +1,5 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { TopicVersionEntity } from '../channel.interface';
-import { TopicVersion } from '../../dsb-client/dsb-client.interface';
+import { TopicEntity } from '../channel.interface';
 import {
   AbstractLokiRepository,
   LokiService,
@@ -22,36 +21,34 @@ export class TopicRepository
   }
 
   public async createOrUpdateTopic(
-    data: TopicVersion,
+    data: TopicEntity,
     topicId: string
   ): Promise<void> {
     this.logger.debug('Updating topic', data, topicId);
 
-    const currentTopic: TopicVersionEntity | null = this.getTopic(
+    const currentTopic: TopicEntity | null = this.getTopic(
       data.name,
       data.owner,
       data.version
     );
 
     if (currentTopic) {
-      const newObject = {
+      const newObject: TopicEntity = {
         ...currentTopic,
         ...data,
-        topicId,
+        id: topicId,
       };
 
-      this.client
-        .getCollection<TopicVersionEntity>(this.collection)
-        .update(newObject);
+      this.client.getCollection<TopicEntity>(this.collection).update(newObject);
 
       await this.lokiService.save();
 
       return;
     }
 
-    this.client.getCollection<TopicVersionEntity>(this.collection).insert({
+    this.client.getCollection<TopicEntity>(this.collection).insert({
       ...data,
-      topicId,
+      id: topicId,
     });
 
     await this.lokiService.save();
@@ -61,13 +58,18 @@ export class TopicRepository
     name: string,
     owner: string,
     version?: string
-  ): TopicVersionEntity | null {
-    return this.client
-      .getCollection<TopicVersionEntity>(this.collection)
-      .findOne({
+  ): TopicEntity | null {
+    if (!version) {
+      return this.client.getCollection<TopicEntity>(this.collection).findOne({
         name,
         owner,
-        version,
       });
+    }
+
+    return this.client.getCollection<TopicEntity>(this.collection).findOne({
+      name,
+      owner,
+      version,
+    });
   }
 }

@@ -3,6 +3,8 @@ name: Pull Request
 on:
   push:
     branches: [ ddhub-dev ]
+env:
+  SECRETS_ENGINE: vault
 
 jobs:
   cancel-previous:
@@ -120,13 +122,13 @@ jobs:
       - name: Install dependencies
         run: npm install
       - name: Build
-        run: nx export dsb-client-gateway-frontend
+        run: npm run export
 
       - name: 'Login via Azure CLI'
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
-      
+
       - name: 'Build and push image (Front-end)'
         uses: azure/docker-login@v1
         with:
