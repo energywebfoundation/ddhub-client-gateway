@@ -17,7 +17,7 @@ export class TopicService {
     this.logger.debug('applications fetched successfully.', applications);
 
     if (applications && applications.length > 0) {
-      const nameSpaces: string[] = await applications.map(
+      const nameSpaces: string[] = applications.map(
         (application) => application.namespace
       );
 
