@@ -8,7 +8,7 @@ export function IsValidTopicName(validationOptions?: ValidationOptions) {
   // eslint-disable-next-line @typescript-eslint/ban-types
   return function (object: Object, propertyName: string) {
     registerDecorator({
-      name: 'IsValidChannelName',
+      name: 'IsValidTopicName',
       target: object.constructor,
       propertyName: propertyName,
       options: validationOptions,

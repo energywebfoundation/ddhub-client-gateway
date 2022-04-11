@@ -144,9 +144,9 @@ export class SendTopicBodyDto {
   })
   tags: string[];
 
-  // @IsVersion({
-  //   message: 'Malformed Version',
-  // })
+  @IsVersion({
+    message: 'Malformed Version',
+  })
   @IsString()
   @IsNotEmpty()
   @ApiProperty({
