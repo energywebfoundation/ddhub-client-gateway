@@ -43,7 +43,10 @@ export class ChannelDidCacheService {
 
     const rolesForDIDs: string[] = await this.dsbApiService.getDIDsFromRoles(
       internalChannel.conditions.roles,
-      'ANY'
+      'ANY',
+      {
+        retries: 1,
+      }
     );
 
     if (!rolesForDIDs.length) {

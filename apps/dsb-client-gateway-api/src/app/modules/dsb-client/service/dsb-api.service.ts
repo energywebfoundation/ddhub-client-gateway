@@ -42,6 +42,7 @@ import { AxiosResponse } from '@nestjs/terminus/dist/health-indicator/http/axios
 import { isAxiosError } from '@nestjs/terminus/dist/utils';
 import { SecretsEngineService } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
 import { RoleStatus } from '@dsb-client-gateway/dsb-client-gateway/identity/models';
+import { OperationOptions } from 'retry';
 
 export interface RetryOptions {
   stopOnStatusCodes?: HttpStatus[];
@@ -81,7 +82,8 @@ export class DsbApiService implements OnApplicationBootstrap {
 
   protected async request<T>(
     requestFn: Observable<AxiosResponse<T>>,
-    retryOptions: RetryOptions = {}
+    retryOptions: RetryOptions = {},
+    overrideRetryConfig?: OperationOptions
   ): Promise<{ data: T; headers: any }> {
     const { data, headers } = await promiseRetry<AxiosResponse<T>>(
       async (retry) => {
@@ -89,7 +91,10 @@ export class DsbApiService implements OnApplicationBootstrap {
           this.handleRequestWithRetry(err, retry, retryOptions)
         );
       },
-      this.retryConfigService.config
+      {
+        ...this.retryConfigService,
+        ...overrideRetryConfig,
+      }
     );
 
     return { data, headers };
@@ -97,29 +102,30 @@ export class DsbApiService implements OnApplicationBootstrap {
 
   public async getDIDsFromRoles(
     roles: string[],
-    searchType: 'ANY'
+    searchType: 'ANY',
+    overrideRetry?: OperationOptions
   ): Promise<string[]> {
     if (roles.length === 0) {
       return [];
     }
 
-    const { data } = await promiseRetry(async (retry, attempt) => {
-      return lastValueFrom(
-        this.httpService.get(this.baseUrl + '/roles/list', {
-          params: {
-            roles,
-            searchType,
-          },
-          paramsSerializer: (params) => {
-            return qs.stringify(params, { arrayFormat: 'repeat' });
-          },
-          httpsAgent: this.getTLS(),
-          headers: {
-            Authorization: `Bearer ${this.didAuthService.getToken()}`,
-          },
-        })
-      ).catch((err) => this.handleRequestWithRetry(err, retry));
-    });
+    const { data } = await this.request<{ dids: string[] }>(
+      this.httpService.get(this.baseUrl + '/roles/list', {
+        params: {
+          roles,
+          searchType,
+        },
+        paramsSerializer: (params) => {
+          return qs.stringify(params, { arrayFormat: 'repeat' });
+        },
+        httpsAgent: this.getTLS(),
+        headers: {
+          Authorization: `Bearer ${this.didAuthService.getToken()}`,
+        },
+      }),
+      {},
+      overrideRetry
+    );
 
     return data.dids;
   }
@@ -547,7 +553,10 @@ export class DsbApiService implements OnApplicationBootstrap {
     }
   }
 
-  public async getSymmetricKeys(dto): Promise<GetInternalMessageResponse[]> {
+  public async getSymmetricKeys(
+    dto,
+    overrideRetry?: OperationOptions
+  ): Promise<GetInternalMessageResponse[]> {
     try {
       const result = await this.request<null>(
         this.httpService.post(this.baseUrl + '/messages/internal/search', dto, {
@@ -558,14 +567,13 @@ export class DsbApiService implements OnApplicationBootstrap {
         }),
         {
           stopOnResponseCodes: ['10'],
-        }
+        },
+        overrideRetry
       );
-
-      this.logger.log('Send Message internal successful');
 
       return result.data;
     } catch (e) {
-      this.logger.error('Send Message internal failed', e);
+      this.logger.error('Get symmetric keys failed', e);
       throw new Error(e);
     }
   }
