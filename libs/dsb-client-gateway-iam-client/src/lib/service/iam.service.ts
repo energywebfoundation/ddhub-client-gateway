@@ -134,6 +134,8 @@ export class IamService {
     const namespaceList = [];
     const applications: IAppDefinition[] = [];
 
+    this.logger.debug('did claims fetched.');
+
     didClaims.forEach((didClaim) => {
       if (
         didClaim.claimType.startsWith(`${roleName}.`) &&
@@ -142,6 +144,12 @@ export class IamService {
         namespaceList.push(didClaim.namespace);
       }
     });
+
+    this.logger.debug(
+      `did claims with ${this.configService.get('DID_CLAIM_NAMESPACE')} removed`
+    );
+
+    this.logger.debug(`start: fetching application for all did claims.`);
 
     await Promise.all(
       namespaceList.map(async (namespace: string) => {
@@ -152,6 +160,8 @@ export class IamService {
         applications.push(application);
       })
     );
+
+    this.logger.debug(`end: fetching application for all did claims.`);
 
     const uniqueApplications = [...new Set(applications)];
 

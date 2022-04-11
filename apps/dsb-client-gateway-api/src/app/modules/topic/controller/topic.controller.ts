@@ -4,13 +4,12 @@ import {
   UseGuards,
   Body,
   Post,
-  Patch,
   Query,
   HttpCode,
   HttpStatus,
   Put,
 } from '@nestjs/common';
-import { DsbApiService } from '../service/dsb-api.service';
+import { DsbApiService } from '../../dsb-client/service/dsb-api.service';
 import { DigestGuard } from '../../utils/guards/digest.guard';
 import { ApiTags, ApiResponse } from '@nestjs/swagger';
 import {
@@ -22,13 +21,13 @@ import {
   GetTopicsQueryDto,
 } from '../dto';
 
-@Controller('dsb')
+@Controller('topics')
 @UseGuards(DigestGuard)
-@ApiTags('dsb')
-export class DsbTopicsController {
+@ApiTags('Topics')
+export class TopicsController {
   constructor(protected readonly dsbClientService: DsbApiService) {}
 
-  @Get('topics')
+  @Get('')
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Get Topics List',
@@ -42,7 +41,7 @@ export class DsbTopicsController {
     return this.dsbClientService.getTopics(owner);
   }
 
-  @Get('topics/count')
+  @Get('/count')
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Get Topics Count by Owner',
@@ -54,7 +53,7 @@ export class DsbTopicsController {
     return this.dsbClientService.getTopicsCountByOwner(owner);
   }
 
-  @Post('topics')
+  @Post('')
   @ApiResponse({
     status: HttpStatus.CREATED,
     description: 'Topic successfully created',
@@ -74,7 +73,7 @@ export class DsbTopicsController {
     return this.dsbClientService.postTopics(data);
   }
 
-  @Put('topics')
+  @Put('/')
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Topic updated successfully',

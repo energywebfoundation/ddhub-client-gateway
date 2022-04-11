@@ -17,6 +17,8 @@ import { UtilsModule } from './modules/utils/utils.module';
 import { configValidate } from './modules/utils/config.validate';
 import { ChannelModule } from './modules/channel/channel.module';
 import { MessageModule } from './modules/message/message.module';
+import { ApplicationModule } from './modules/application/application.module';
+import { TopicModule } from './modules/topic/topic.module';
 
 @Module({})
 export class AppModule {
@@ -41,6 +43,8 @@ export class AppModule {
       ChannelModule,
       MessageModule,
       KeysModule,
+      ApplicationModule,
+      TopicModule,
     ];
 
     const providers = [
