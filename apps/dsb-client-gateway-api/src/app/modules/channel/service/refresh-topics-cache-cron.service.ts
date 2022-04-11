@@ -1,4 +1,4 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { ConfigService } from '@nestjs/config';
 import { SchedulerRegistry } from '@nestjs/schedule';
@@ -6,7 +6,7 @@ import { CronJob } from 'cron';
 import { RefreshAllChannelsCacheDataCommand } from '../command/refresh-all-channels-cache-data.command';
 
 @Injectable()
-export class RefreshTopicsCacheCronService implements OnModuleInit {
+export class RefreshTopicsCacheCronService implements OnApplicationBootstrap {
   private readonly logger = new Logger(RefreshTopicsCacheCronService.name);
 
   constructor(
@@ -15,7 +15,7 @@ export class RefreshTopicsCacheCronService implements OnModuleInit {
     protected readonly schedulerRegistry: SchedulerRegistry
   ) {}
 
-  public async onModuleInit(): Promise<void> {
+  public async onApplicationBootstrap(): Promise<void> {
     const scheduledJobsEnabled: boolean = this.configService.get<boolean>(
       'SCHEDULED_JOBS',
       true

@@ -16,23 +16,34 @@ export class SymmetricKeysCacheService {
   ) {}
 
   public async refreshSymmetricKeysCache(): Promise<void> {
-    const symmetricKeys: SymmetricKeyEntity[] =
-      await this.dsbApiService.getSymmetricKeys({
-        clientId: this.configService.get('SYMMETRIC_KEY_CLIENT_ID'),
-        amount: this.configService.get('AMOUNT_OF_SYMMETRIC_KEYS_FETCHED'),
-      });
+    try {
+      const symmetricKeys: SymmetricKeyEntity[] =
+        await this.dsbApiService.getSymmetricKeys(
+          {
+            clientId: this.configService.get('SYMMETRIC_KEY_CLIENT_ID'),
+            amount: this.configService.get('AMOUNT_OF_SYMMETRIC_KEYS_FETCHED'),
+          },
+          {
+            retries: 1,
+          }
+        );
 
-    this.logger.log('internalMesssages', symmetricKeys);
+      this.logger.log('internalMesssages', symmetricKeys);
 
-    if (symmetricKeys.length === 0) {
-      this.logger.log('No internal Messages, job not running');
-      return;
-    }
+      if (symmetricKeys.length === 0) {
+        this.logger.log('No internal Messages, job not running');
+        return;
+      }
 
-    for (const symmetricKey of symmetricKeys) {
-      await this.symmetricKeysRepository.createOrUpdateSymmetricKey(
-        symmetricKey
-      );
+      for (const symmetricKey of symmetricKeys) {
+        await this.symmetricKeysRepository
+          .createOrUpdateSymmetricKey(symmetricKey)
+          .catch((e) => {
+            this.logger.error('Failed when saving symmetric key', e);
+          });
+      }
+    } catch (e) {
+      this.logger.error('Failed when fetching symmetric keys', e);
     }
   }
 }
