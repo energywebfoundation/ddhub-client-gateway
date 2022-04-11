@@ -13,7 +13,7 @@ import { Layout } from '../components/Layout';
 import { queryClientOptions } from '../utils';
 import '../styles/globals.css';
 import 'nprogress/nprogress.css';
-import { UserDataContext, useUserData } from '@dsb-client-gateway/ui/login';
+import { useCheckAccountOnInitEffects, UserDataContext, useUserData } from '@dsb-client-gateway/ui/login';
 
 Axios.defaults.baseURL = process.env.NEXT_PUBLIC_SERVER_BASE_URL;
 
@@ -23,6 +23,11 @@ export const createMuiCache = () =>
 
 export interface MyAppProps extends AppProps {
   emotionCache?: EmotionCache;
+}
+
+function InitializeAccountStatus(props) {
+  useCheckAccountOnInitEffects();
+  return <>{props.children}</>
 }
 
 function MyApp(props: MyAppProps) {
@@ -58,7 +63,9 @@ function MyApp(props: MyAppProps) {
         <CssBaseline />
         <UserDataContext.Provider value={userDataValue}>
           <QueryClientProvider client={queryClient}>
+            <InitializeAccountStatus>
             {getLayout(<Component {...pageProps} />)}
+            </InitializeAccountStatus>
           </QueryClientProvider>
         </UserDataContext.Provider>
       </DDHubThemeProvider>
