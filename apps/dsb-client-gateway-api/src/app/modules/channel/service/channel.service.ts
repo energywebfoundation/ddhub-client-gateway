@@ -3,13 +3,13 @@ import { ChannelRepository } from '../repository/channel.repository';
 import { ChannelEntity, ChannelTopic } from '../entity/channel.entity';
 import { CreateChannelDto, TopicDto } from '../dto/request/create-channel.dto';
 import { DsbApiService } from '../../dsb-client/service/dsb-api.service';
-import { TopicData, TopicVersion } from '../../dsb-client/dsb-client.interface';
+import { Topic } from '../../dsb-client/dsb-client.interface';
 import { ChannelNotFoundException } from '../exceptions/channel-not-found.exception';
 import moment from 'moment';
 import { ChannelUpdateRestrictedFieldsException } from '../exceptions/channel-update-restricted-fields.exception';
 import { CommandBus } from '@nestjs/cqrs';
 import { RefreshAllChannelsCacheDataCommand } from '../command/refresh-all-channels-cache-data.command';
-import { ChannelQualifiedDids } from '../channel.interface';
+import { ChannelQualifiedDids, TopicEntity } from '../channel.interface';
 import { ChannelType } from '../channel.const';
 import { UpdateChannelDto } from '../dto/request/update-channel.dto';
 import { RefreshChannelCacheDataCommand } from '../command/refresh-channel-cache-data.command';
@@ -63,7 +63,7 @@ export class ChannelService {
   public async updateChannelTopic(
     channelName: string,
     topicId: string,
-    topicVersions: TopicVersion[]
+    topicVersions: TopicEntity[]
   ): Promise<void> {
     const channel: ChannelEntity = this.getChannel(channelName);
 
@@ -148,7 +148,7 @@ export class ChannelService {
       ...channel.conditions,
       dids: dto.conditions.dids,
       roles: dto.conditions.roles,
-      topics: topicsWithIds,
+      topics: [],
     };
 
     channel.updatedAt = updateDate;
@@ -177,7 +177,7 @@ export class ChannelService {
         return [];
       }
 
-      const { id }: TopicData = receivedTopics.records[0];
+      const { id }: Topic = receivedTopics.records[0];
 
       topicsToReturn.push({
         topicName,
