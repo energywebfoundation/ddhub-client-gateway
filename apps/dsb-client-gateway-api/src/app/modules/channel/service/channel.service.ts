@@ -127,6 +127,7 @@ export class ChannelService {
     const channel = this.getChannelOrThrow(channelName);
 
     await this.channelRepository.delete(channel.fqcn);
+    await this.channelRepository.delete(channel.fqcn);
   }
 
   public async updateChannel(
