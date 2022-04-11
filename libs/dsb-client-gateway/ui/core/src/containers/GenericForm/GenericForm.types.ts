@@ -56,7 +56,6 @@ export interface GenericFormProps<FormValues = any> {
   buttonFullWidth?: boolean;
   buttonProps?: ButtonProps;
   buttonWrapperProps?: BoxProps;
-  buttonDisabled?: boolean;
   secondaryButtons?: GenericFormSecondaryButton[];
   formTitle?: string;
   formTitleVariant?: TypographyVariant;
@@ -65,7 +64,6 @@ export interface GenericFormProps<FormValues = any> {
   formInputsProps?: TextFieldProps;
   validationMode?: keyof ValidationMode;
   loading?: boolean;
-  acceptInitialValues?: boolean;
   formDisabled?: boolean;
 }
 
@@ -74,9 +72,7 @@ type GenericFormEffectsProps = Pick<
   | 'validationSchema'
   | 'initialValues'
   | 'submitHandler'
-  | 'buttonDisabled'
   | 'validationMode'
-  | 'acceptInitialValues'
 >;
 
 type GenericFormEffectsReturnType = {

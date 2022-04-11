@@ -22,10 +22,8 @@ export const GenericForm: FC<GenericFormProps> = memo(
     formClass,
     inputsVariant,
     formInputsProps,
-    buttonDisabled = false,
     validationMode = 'onBlur',
     loading = false,
-    acceptInitialValues = false,
     formDisabled = false,
     children,
   }) => {
@@ -39,9 +37,7 @@ export const GenericForm: FC<GenericFormProps> = memo(
       validationSchema,
       submitHandler,
       initialValues,
-      buttonDisabled,
-      validationMode,
-      acceptInitialValues,
+      validationMode
     });
 
     return (
