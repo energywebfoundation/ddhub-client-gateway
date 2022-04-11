@@ -776,7 +776,7 @@ export class DsbApiService implements OnApplicationBootstrap {
 
   async getTopicById(topicId: string): Promise<TopicVersion | null> {
     try {
-      const data = await this.request<any>(
+      const result = await this.request<any>(
         this.httpService.get(this.baseUrl + '/topics/' + topicId + '/version', {
           httpsAgent: this.getTLS(),
           headers: {
@@ -788,7 +788,7 @@ export class DsbApiService implements OnApplicationBootstrap {
         }
       );
 
-      return data;
+      return result.data;
     } catch (e) {
       this.logger.error(`Get topic with id ${topicId} failed`, e);
 
