@@ -1,28 +1,8 @@
 import { FC } from 'react';
-import {
-  Control,
-  Controller,
-  UseFormRegister,
-  FieldValues,
-} from 'react-hook-form';
+import { Controller } from 'react-hook-form';
 import { SelectAutocomplete } from '../SelectAutocomplete';
 import { SelectRegular } from '../SelectRegular';
-import { GenericFormField } from '../../../containers/GenericForm'
-
-export type FormSelectOption = {
-  value: string | number;
-  label: string;
-};
-
-export interface FormSelectProps {
-  field: GenericFormField;
-  control: Control<FieldValues>;
-  errorExists?: boolean;
-  errorText?: string;
-  variant?: 'standard' | 'outlined' | 'filled';
-  disabled?: boolean;
-  register?: UseFormRegister<FieldValues>;
-}
+import { FormSelectProps, FormSelectOption } from './FormSelect.types';
 
 export const FormSelect: FC<FormSelectProps> = ({
   field,
@@ -30,7 +10,7 @@ export const FormSelect: FC<FormSelectProps> = ({
   errorExists = false,
   errorText = '',
   variant = 'filled',
-  disabled = false
+  disabled = false,
 }) => {
   return (
     <Controller

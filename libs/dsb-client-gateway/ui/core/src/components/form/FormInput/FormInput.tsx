@@ -8,14 +8,10 @@ export const FormInput: FC<FormInputProps> = memo(
     register,
     errorExists = false,
     errorText = '',
-    isDirty = true,
     variant = 'standard',
     disabled = false
   }) => {
     const { ref, name, onBlur, onChange } = register(field.name as any);
-    const showEndAdornment = field.endAdornment?.isValidCheck
-      ? !errorExists && isDirty
-      : true;
 
     return (
       <Box {...field.formInputsWrapperProps}>
@@ -41,7 +37,7 @@ export const FormInput: FC<FormInputProps> = memo(
                 {field.startAdornment}
               </InputAdornment>
             ),
-            endAdornment: field.endAdornment?.element && showEndAdornment && (
+            endAdornment: field.endAdornment?.element && (
               <InputAdornment position="end">
                 {field.endAdornment?.element}
               </InputAdornment>

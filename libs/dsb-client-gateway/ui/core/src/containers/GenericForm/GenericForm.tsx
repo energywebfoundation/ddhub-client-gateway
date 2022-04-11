@@ -34,8 +34,7 @@ export const GenericForm: FC<GenericFormProps> = memo(
       register,
       onSubmit,
       errors,
-      submitButtonDisabled,
-      dirtyFields,
+      submitButtonDisabled
     } = useGenericFormEffects({
       validationSchema,
       submitHandler,
@@ -75,7 +74,6 @@ export const GenericForm: FC<GenericFormProps> = memo(
                 register={register}
                 errorExists={!isEmpty((errors as any)[field.name])}
                 errorText={(errors as any)[field.name]?.message ?? ''}
-                isDirty={!!(dirtyFields as any)[field.name]}
                 variant={inputsVariant}
                 {...formInputsProps}
               />

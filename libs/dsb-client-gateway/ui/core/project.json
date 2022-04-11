@@ -1,6 +1,6 @@
 {
-  "root": "libs/ui/core",
-  "sourceRoot": "libs/ui/core/src",
+  "root": "libs/dsb-client-gateway/ui/core",
+  "sourceRoot": "libs/dsb-client-gateway/ui/core/src",
   "projectType": "library",
   "tags": [],
   "targets": {
@@ -8,14 +8,14 @@
       "executor": "@nrwl/linter:eslint",
       "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": ["libs/ui/core/**/*.{ts,tsx,js,jsx}"]
+        "lintFilePatterns": ["libs/dsb-client-gateway/ui/core/**/*.{ts,tsx,js,jsx}"]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/ui/core"],
+      "outputs": ["coverage/libs/dsb-client-gateway/ui/core"],
       "options": {
-        "jestConfig": "libs/ui/core/jest.config.js",
+        "jestConfig": "libs/dsb-client-gateway/ui/core/jest.config.js",
         "passWithNoTests": true
       }
     }

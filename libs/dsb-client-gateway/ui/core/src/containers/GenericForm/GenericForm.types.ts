@@ -1,14 +1,22 @@
 import * as yup from 'yup';
-import { ReactNode } from 'react';
-import { FormSelectOption, FormInputProps } from '../../components/form';
+import { ReactNode, FormEventHandler } from 'react';
+import {
+  DeepMap,
+  FieldError,
+  UseFormReset,
+  ValidationMode,
+  UseFormRegister,
+  Control,
+  FieldValues,
+} from 'react-hook-form';
 import {
   TextFieldProps,
   InputBaseProps,
   BoxProps,
   ButtonProps,
-  TypographyVariant
+  TypographyVariant,
 } from '@mui/material';
-import { UseFormReset, ValidationMode } from 'react-hook-form';
+import { FormSelectOption, FormInputProps } from '../../components/form';
 
 export type GenericFormField = {
   name: string;
@@ -60,3 +68,25 @@ export interface GenericFormProps<FormValues = any> {
   acceptInitialValues?: boolean;
   formDisabled?: boolean;
 }
+
+type GenericFormEffectsProps = Pick<
+  GenericFormProps,
+  | 'validationSchema'
+  | 'initialValues'
+  | 'submitHandler'
+  | 'buttonDisabled'
+  | 'validationMode'
+  | 'acceptInitialValues'
+>;
+
+type GenericFormEffectsReturnType = {
+  register: UseFormRegister<FieldValues>;
+  onSubmit: FormEventHandler<HTMLFormElement>;
+  errors: DeepMap<any, FieldError>;
+  submitButtonDisabled: boolean;
+  control: Control<FieldValues>;
+};
+
+export type TGenericFormEffects = (
+  props: GenericFormEffectsProps
+) => GenericFormEffectsReturnType;

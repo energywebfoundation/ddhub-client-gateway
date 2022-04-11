@@ -82,7 +82,6 @@
     "yup": "^0.32.11"
   },
   "devDependencies": {
-    "@emotion/babel-plugin": "11.3.0",
     "@emotion/sheet": "^1.1.0",
     "@nestjs/schematics": "^8.0.0",
     "@nestjs/testing": "^8.2.6",
