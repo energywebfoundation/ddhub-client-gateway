@@ -49,19 +49,12 @@ export class ChannelDidCacheService {
       }
     );
 
-    if (!rolesForDIDs.length) {
-      this.logger.warn(
-        `There is no single DID for listed roles`,
-        internalChannel.conditions.roles
-      );
-    } else {
-      this.logger.log(`Updating DIDs for ${internalChannel.fqcn}`);
+    this.logger.log(`Updating DIDs for ${internalChannel.fqcn}`);
 
-      await this.channelService.updateChannelQualifiedDids(
-        internalChannel.fqcn,
-        rolesForDIDs
-      );
-    }
+    await this.channelService.updateChannelQualifiedDids(
+      internalChannel.fqcn,
+      rolesForDIDs
+    );
 
     for (const { topicId, topicName, owner } of internalChannel.conditions
       .topics) {
