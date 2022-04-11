@@ -8,6 +8,7 @@ const { withSentryConfig } = require('@sentry/nextjs');
 const moduleExports = {
   // Your existing module.exports
   reactStrictMode: true,
+  swcMinify: true,
   // required for our custom server
   // https://github.com/vercel/next.js/issues/7755
   webpack: (config, { isServer }) => {

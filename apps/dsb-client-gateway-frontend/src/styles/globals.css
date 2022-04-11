@@ -58,19 +58,38 @@ a {
   margin-bottom: 20px;
 }
 
-.swal2-button {
+.swal2-actions .swal2-styled.swal2-confirm {
   background-color: var(--primary-color);
   border: none !important;
   outline: none !important;
   border-radius: 5px;
-  padding: 12px 24px;
+  padding: 10px 24px;
 }
 
-.swal2-button:active {
+.swal2-confirm:active {
   background-color: var(--primary-dark-color) !important;
 }
 
-.swal2-button:not([disabled]):hover {
+.swal2-confirm:not([disabled]):hover {
   background-color: var(--primary-light-color) !important;
   box-shadow: 0px 4px 14px rgba(115, 103, 240, 0.38);
+}
+
+body.swal2-height-auto.swal2-height-auto {
+  height: 100% !important;
+}
+
+.swal2-actions {
+  flex-direction: row-reverse !important;
+}
+
+.swal2-actions .swal2-styled.swal2-cancel {
+  background: transparent !important;
+  border: 1px solid var(--primary-dark-color);
+  color: var(--primary-dark-color);
+  padding: 10px 24px;
+}
+
+.swal2-styled.swal2-cancel:focus {
+  box-shadow: none !important;
 }

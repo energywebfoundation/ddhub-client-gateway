@@ -1,7 +1,7 @@
 import { makeStyles } from 'tss-react/mui';
 import { Container, Grid, Stack, Typography } from '@mui/material';
 import React from 'react';
-import Login from '../components/Login/Login';
+import { Login } from '@dsb-client-gateway/ui/login';
 
 export default function Index() {
   const { classes } = useStyles();

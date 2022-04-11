@@ -4,6 +4,8 @@ import { IamService } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
 import { SecretsEngineService } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
 import { DIDPublicKeyTags } from '../keys.const';
 import { KeysRepository } from '../repository/keys.repository';
+import { SymmetricKeysRepository } from '../../message/repository/symmetric-keys.repository';
+import { SymmetricKeysCacheService } from '../../message/service/symmetric-keys-cache.service';
 import { KeysEntity } from '../keys.interface';
 import { EthersService } from '../../utils/service/ethers.service';
 import {
@@ -14,6 +16,7 @@ import {
 } from 'ethers/lib/utils';
 import { IdentityService } from '../../identity/service/identity.service';
 import { BalanceState } from '@dsb-client-gateway/dsb-client-gateway/identity/models';
+import { IamInitService } from '../../identity/service/iam-init.service';
 
 @Injectable()
 export class KeysService implements OnModuleInit {
@@ -26,29 +29,32 @@ export class KeysService implements OnModuleInit {
     protected readonly iamService: IamService,
     protected readonly keysRepository: KeysRepository,
     protected readonly ethersService: EthersService,
-    protected readonly identityService: IdentityService
+    protected readonly identityService: IdentityService,
+    protected readonly symmetricKeysRepository: SymmetricKeysRepository,
+    protected readonly symmetricKeysCacheService: SymmetricKeysCacheService,
+    protected readonly iamInitService: IamInitService
   ) {}
 
-  public async storeKeysForMessage(
-    messageId: string,
-    senderDid: string,
-    encryptedSymmetricKey: string
-  ): Promise<void> {
-    await this.keysRepository.storeKeys({
-      messageId,
-      encryptedSymmetricKey,
-      senderDid,
-    });
+  public async storeKeysForMessage(): Promise<void> {
+    await this.symmetricKeysCacheService.refreshSymmetricKeysCache();
   }
 
-  public getSymmetricKey(
+  public async getSymmetricKey(
     senderDid: string,
     clientGatewayMessageId: string
-  ): KeysEntity {
-    return this.keysRepository.getSymmetricKey(
-      senderDid,
-      clientGatewayMessageId
+  ): Promise<KeysEntity> {
+    const symmetricKey = this.symmetricKeysRepository.getSymmetricKey(
+      clientGatewayMessageId,
+      senderDid
     );
+    if (!symmetricKey) {
+      await this.storeKeysForMessage();
+      return this.symmetricKeysRepository.getSymmetricKey(
+        clientGatewayMessageId,
+        senderDid
+      );
+    }
+    return symmetricKey;
   }
 
   public generateRandomKey(): string {
@@ -106,9 +112,16 @@ export class KeysService implements OnModuleInit {
       return false;
     }
 
-    const recoveredPublicKey = recoverPublicKey(id(encryptedData), signature);
-
-    return recoveredPublicKey === key.publicKeyHex;
+    try {
+      const recoveredPublicKey = recoverPublicKey(id(encryptedData), signature);
+      return recoveredPublicKey === key.publicKeyHex;
+    } catch (e) {
+      this.logger.error(
+        `error ocurred while recoverPublicKey in verify signature`,
+        e
+      );
+      return false;
+    }
   }
 
   public async decryptMessage(
@@ -116,16 +129,14 @@ export class KeysService implements OnModuleInit {
     clientGatewayMessageId: string,
     senderDid: string
   ): Promise<string | null> {
-    const symmetricKey: KeysEntity | null = this.getSymmetricKey(
+    const symmetricKey: KeysEntity | null = await this.getSymmetricKey(
       senderDid,
       clientGatewayMessageId
     );
-
     if (!symmetricKey) {
       this.logger.error(
         `${senderDid}:${clientGatewayMessageId} does not have symmetric key`
       );
-
       return null;
     }
 
@@ -150,7 +161,7 @@ export class KeysService implements OnModuleInit {
 
     const decryptedKey: string = this.decryptSymmetricKey(
       privateKey,
-      symmetricKey.encryptedSymmetricKey,
+      symmetricKey.payload,
       rootKey
     );
 
@@ -227,6 +238,8 @@ export class KeysService implements OnModuleInit {
   }
 
   public async onModuleInit(): Promise<void> {
+    this.logger.log('Starting keys onModuleInit');
+
     const rootKey: string | null =
       await this.secretsEngineService.getPrivateKey();
 
@@ -255,17 +268,33 @@ export class KeysService implements OnModuleInit {
 
     const wallet = this.ethersService.getWalletFromPrivateKey(rootKey);
 
+    this.logger.log('Initializing IAM connection');
+    await this.iamInitService.onModuleInit();
+
+    this.logger.log('Attempting to update signature key');
+
     await this.iamService.setVerificationMethod(
       wallet.publicKey,
       DIDPublicKeyTags.DSB_SIGNATURE_KEY
     );
 
-    this.logger.debug(await this.iamService.getDid());
+    this.logger.log(`Updated ${wallet.address} signature key`);
+
+    const did = await this.iamService.getDid();
+
+    const existingKeyInDid =
+      did.publicKey.filter(
+        (c) =>
+          c.id ===
+          `${this.iamService.getDIDAddress()}#${
+            DIDPublicKeyTags.DSB_SYMMETRIC_ENCRYPTION
+          }`
+      ).length > 0;
 
     const existingRSAKey: string | null =
       await this.secretsEngineService.getRSAPrivateKey();
 
-    if (existingRSAKey) {
+    if (existingRSAKey && existingKeyInDid) {
       this.logger.log('RSA key already generated');
 
       return;
@@ -280,8 +309,7 @@ export class KeysService implements OnModuleInit {
 
     await this.secretsEngineService.setRSAPrivateKey(privateKey);
 
-    this.logger.log('Updated DID document with public key');
-    this.logger.debug(await this.iamService.getDid());
+    this.logger.log('Updated DID document with public RSA key');
   }
 
   public deriveRSAKey(derivedKeyPrivateKey: string): {

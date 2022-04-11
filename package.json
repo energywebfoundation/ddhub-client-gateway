@@ -7,6 +7,7 @@
     "build": "npm run build:client && nx build",
     "build:client": "nx run dsb-client-gateway-api-client:build-all",
     "export": "npm run build:client && nx export dsb-client-gateway-frontend",
+    "build:api": "nx build dsb-client-gateway-api",
     "test": "nx test"
   },
   "private": true,
@@ -17,6 +18,7 @@
     "@emotion/react": "^11.8.2",
     "@emotion/server": "^11.4.0",
     "@emotion/styled": "^11.8.1",
+    "@hookform/resolvers": "^2.8.8",
     "@ethersproject/providers": "^5.6.2",
     "@mui/icons-material": "^5.5.1",
     "@mui/lab": "^5.0.0-alpha.74",
@@ -48,7 +50,7 @@
     "form-data": "^4.0.0",
     "formidable": "^2.0.1",
     "hdkey": "^2.0.1",
-    "iam-client-lib": "^4.0.1",
+    "iam-client-lib": "^4.2.0",
     "lokijs": "^1.5.12",
     "match-sorter": "^4.0.0",
     "moment": "^2.29.1",
@@ -61,6 +63,7 @@
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-feather": "^2.0.9",
+    "react-hook-form": "^7.29.0",
     "react-json-editor-ajrm": "^2.5.13",
     "react-json-view-lite": "^0.9.4",
     "react-query": "^3.34.19",
@@ -75,7 +78,8 @@
     "tslib": "^2.0.0",
     "tss-react": "3.6.0",
     "uuid": "^8.3.2",
-    "websocket": "^1.0.34"
+    "websocket": "^1.0.34",
+    "yup": "^0.32.11"
   },
   "devDependencies": {
     "@emotion/sheet": "^1.1.0",
@@ -92,7 +96,7 @@
     "@nrwl/tao": "13.7.3",
     "@nrwl/web": "13.7.3",
     "@nrwl/workspace": "13.7.3",
-    "@swc/core-linux-x64-gnu": "^1.2.163",
+    "@swc/core": "^1.2.163",
     "@testing-library/react": "12.1.2",
     "@testing-library/react-hooks": "7.0.2",
     "@typechain/ethers-v5": "^10.0.0",
