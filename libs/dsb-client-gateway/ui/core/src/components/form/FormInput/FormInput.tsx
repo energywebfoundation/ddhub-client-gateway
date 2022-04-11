@@ -11,7 +11,7 @@ export const FormInput: FC<FormInputProps> = memo(
     variant = 'standard',
     disabled = false
   }) => {
-    const { ref, name, onBlur, onChange } = register(field.name as any);
+    const { ref, name, onBlur, onChange } = register(field.name);
 
     return (
       <Box {...field.formInputsWrapperProps}>

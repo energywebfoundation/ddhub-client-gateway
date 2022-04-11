@@ -15,7 +15,7 @@ export const FormSelect: FC<FormSelectProps> = ({
   return (
     <Controller
       key={`${field.name}`}
-      name={field.name as any}
+      name={field.name}
       control={control}
       render={({ field: { value, onChange } }) => {
         return field.autocomplete ? (

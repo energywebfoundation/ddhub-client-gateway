@@ -2,14 +2,14 @@ import { SyntheticEvent, useState } from 'react';
 import { GenericFormField } from '../../../containers';
 import { FormSelectOption } from '../FormSelect';
 
-export const useSelectAutocompleteEffects = <FormValuesType>(
+export const useSelectAutocompleteEffects = (
   onChange: (newValue: FormSelectOption[]) => void,
-  field: GenericFormField<FormValuesType>
+  field: GenericFormField
 ) => {
   const [textValue, setTextValue] = useState<string>('');
 
   const changeHandler = (
-    event: SyntheticEvent,
+    _event: SyntheticEvent,
     value: (string | FormSelectOption)[]
   ) => {
     const maxValues = field.multiple ? field.maxValues : 1;
@@ -22,8 +22,10 @@ export const useSelectAutocompleteEffects = <FormValuesType>(
     setTextValue('');
   };
 
+  const options = field.options || [];
+
   return {
-    options: field.options,
+    options,
     textValue,
     setTextValue,
     changeHandler,

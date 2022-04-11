@@ -25,7 +25,6 @@ export const SelectRegular: FC<SelectRegularProps> = ({
 }) => {
   const options = field.options || [];
   return (
-    <>
       <TextField
         select
         fullWidth
@@ -51,6 +50,5 @@ export const SelectRegular: FC<SelectRegularProps> = ({
           </MenuItem>
         ))}
       </TextField>
-    </>
   );
 };
