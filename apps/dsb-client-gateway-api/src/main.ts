@@ -12,11 +12,13 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule.register({ shouldValidate: true }));
+  const app = await NestFactory.create(
+    AppModule.register({ shouldValidate: true })
+  );
 
   app.enableCors();
 
-  const globalPrefix = 'api/v1';
+  const globalPrefix = 'api/v2';
 
   app.setGlobalPrefix(globalPrefix);
 
@@ -25,7 +27,7 @@ async function bootstrap() {
   const config = new DocumentBuilder()
     .setTitle('DSB Client Gateway')
     .setDescription('DSB Client Gateway')
-    .setVersion('1.0')
+    .setVersion('2.0')
     .setExternalDoc('Postman Collection', '/docs-json')
     .build();
 
@@ -46,15 +48,17 @@ async function bootstrap() {
 }
 
 export const createDocument = async () => {
-  const app = await NestFactory.create(AppModule.register({ shouldValidate: false }));
-  app.setGlobalPrefix('api/v1');
+  const app = await NestFactory.create(
+    AppModule.register({ shouldValidate: false })
+  );
+  app.setGlobalPrefix('api/v2');
 
   const config = new DocumentBuilder()
-  .setTitle('DSB Client Gateway')
-  .setDescription('DSB Client Gateway')
-  .setVersion('1.0')
-  .setExternalDoc('Postman Collection', '/docs-json')
-  .build();
+    .setTitle('DSB Client Gateway')
+    .setDescription('DSB Client Gateway')
+    .setVersion('2.0')
+    .setExternalDoc('Postman Collection', '/docs-json')
+    .build();
 
   return SwaggerModule.createDocument(app, config);
 };

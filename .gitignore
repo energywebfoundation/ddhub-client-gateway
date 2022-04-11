@@ -43,6 +43,5 @@ data.db
 cert
 logical
 file
-core
 sys
 .env
