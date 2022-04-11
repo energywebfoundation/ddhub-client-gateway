@@ -148,7 +148,7 @@ export class ChannelService {
       ...channel.conditions,
       dids: dto.conditions.dids,
       roles: dto.conditions.roles,
-      topics: [],
+      topics: topicsWithIds,
     };
 
     channel.updatedAt = updateDate;
