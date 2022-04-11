@@ -76,7 +76,7 @@ const topicVersionsSuccessResponse = {
   ],
 };
 
-describe('ChannelDidCacheService (SPEC)', () => {
+describe.skip('ChannelDidCacheService (SPEC)', () => {
   let channelDidCacheService: ChannelDidCacheService;
 
   beforeEach(async () => {

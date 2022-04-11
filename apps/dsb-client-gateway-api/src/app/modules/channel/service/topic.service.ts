@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { TopicRepository } from '../repository/topic.repository';
-import { TopicVersion } from '../../dsb-client/dsb-client.interface';
+import { TopicEntity } from '../channel.interface';
 
 @Injectable()
 export class TopicService {
@@ -12,7 +12,7 @@ export class TopicService {
     name: string,
     owner: string,
     version?: string
-  ): TopicVersion | null {
+  ): TopicEntity | null {
     return this.topicRepository.getTopic(name, owner, version);
   }
 }
