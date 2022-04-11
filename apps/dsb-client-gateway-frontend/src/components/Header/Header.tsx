@@ -1,16 +1,18 @@
 import { useStyles } from './Header.styles';
 import { didFormatMinifier } from '../../utils/did-format-minifier';
+import { useHeaderEffects } from './Header.effects';
 
 export function Header() {
   const {classes} = useStyles();
+  const {did} = useHeaderEffects();
 
   return (
     <div className={classes.root}>
       <div className={classes.content}>
-        <div>{didFormatMinifier('did:ethr:volta:00111333333444444555556666677701010')}</div>
+        <div>{didFormatMinifier(did)}</div>
         <div>Client gateway</div>
       </div>
-      <div className={classes.avatar} />
+      <div className={classes.avatar}/>
     </div>
   );
 }
