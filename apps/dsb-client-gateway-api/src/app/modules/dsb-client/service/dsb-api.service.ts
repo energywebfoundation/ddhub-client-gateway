@@ -301,12 +301,22 @@ export class DsbApiService implements OnApplicationBootstrap {
     }
   }
 
-  public async getTopics(owner: string): Promise<TopicDataResponse> {
+  public async getTopics(
+    limit: number,
+    name: string,
+    owner: string,
+    page: number,
+    tags: string[]
+  ): Promise<TopicDataResponse> {
     try {
-      const result = await this.request<null>(
+      const { data } = await this.request<null>(
         this.httpService.get(this.baseUrl + '/topics', {
           params: {
-            owner: owner,
+            limit,
+            name,
+            owner,
+            page,
+            tags,
           },
           httpsAgent: this.getTLS(),
           headers: {
@@ -318,10 +328,10 @@ export class DsbApiService implements OnApplicationBootstrap {
         }
       );
 
-      this.logger.log('Post Topics successful');
-      return result.data;
+      this.logger.log('Get Topics successful');
+      return data;
     } catch (e) {
-      this.logger.error('Post Topics failed', e);
+      this.logger.error('Get Topics failed', e);
       throw new Error(e);
     }
   }
@@ -381,10 +391,14 @@ export class DsbApiService implements OnApplicationBootstrap {
     }
   }
 
-  public async updateTopics(data: SendTopicBodyDTO): Promise<TopicResultDTO> {
+  public async updateTopics(
+    data: SendTopicBodyDTO,
+    id: string
+  ): Promise<TopicResultDTO> {
     try {
+      this.logger.log('Topic to be updated', data);
       const result = await this.request<null>(
-        this.httpService.put(this.baseUrl + '/topics', data, {
+        this.httpService.put(`${this.baseUrl}/topics/${id}`, data, {
           httpsAgent: this.getTLS(),
           headers: {
             ...this.getAuthHeader(),
@@ -400,6 +414,31 @@ export class DsbApiService implements OnApplicationBootstrap {
       return result.data;
     } catch (e) {
       this.logger.error('Update Topics failed', e);
+      throw new Error(e);
+    }
+  }
+
+  public async deleteTopic(id: string): Promise<TopicResultDTO> {
+    try {
+      this.logger.log('Topic to be deleted', id);
+      this.logger.log(`${this.baseUrl}/topics/${id}`);
+      const result = await this.request<null>(
+        this.httpService.delete(`${this.baseUrl}/topics/${id}`, {
+          httpsAgent: this.getTLS(),
+          headers: {
+            ...this.getAuthHeader(),
+          },
+        }),
+        {
+          stopOnResponseCodes: ['10'],
+        }
+      );
+
+      this.logger.log('Delete topic successful');
+
+      return result.data;
+    } catch (e) {
+      this.logger.error('Delete topic failed', e);
       throw new Error(e);
     }
   }

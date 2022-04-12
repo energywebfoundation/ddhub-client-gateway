@@ -65,11 +65,8 @@ export type GetTopicsOptions = {
 };
 
 export type SendTopicBodyDTO = {
-  name: string;
-  schemaType: string;
   schema: string;
   version: string;
-  owner: string;
   tags: string[];
 };
 
