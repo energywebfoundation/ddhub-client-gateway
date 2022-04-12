@@ -8,6 +8,8 @@ import {
   HttpCode,
   HttpStatus,
   Put,
+  Param,
+  Delete,
 } from '@nestjs/common';
 import { DsbApiService } from '../../dsb-client/service/dsb-api.service';
 import { DigestGuard } from '../../utils/guards/digest.guard';
@@ -19,6 +21,8 @@ import {
   Topic,
   SendTopicBodyDto,
   GetTopicsQueryDto,
+  GetTopicsParamsDto,
+  DeleteTopic,
 } from '../dto';
 
 @Controller('topics')
@@ -37,8 +41,10 @@ export class TopicsController {
     status: HttpStatus.UNAUTHORIZED,
     description: 'Unauthorized',
   })
-  public async getTopics(@Query() { owner }: GetTopicsQueryDto) {
-    return this.dsbClientService.getTopics(owner);
+  public async getTopics(
+    @Query() { limit, name, owner, page, tags }: GetTopicsQueryDto
+  ) {
+    return this.dsbClientService.getTopics(limit, name, owner, page, tags);
   }
 
   @Get('/count')
@@ -73,7 +79,7 @@ export class TopicsController {
     return this.dsbClientService.postTopics(data);
   }
 
-  @Put('/')
+  @Put('/:id')
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Topic updated successfully',
@@ -93,7 +99,34 @@ export class TopicsController {
     description: 'Topic not found',
   })
   @HttpCode(HttpStatus.OK)
-  public async updateTopics(@Body() data: SendTopicBodyDto) {
-    return this.dsbClientService.updateTopics(data);
+  public async updateTopics(
+    @Param() { id }: GetTopicsParamsDto,
+    @Body() data: SendTopicBodyDto
+  ) {
+    return this.dsbClientService.updateTopics(data, id);
+  }
+
+  @Delete('/:id')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Topic deleted successfully',
+    type: () => DeleteTopic,
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description:
+      'Validation failed or some requirements were not fully satisfied',
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Unauthorized',
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Topic not found',
+  })
+  @HttpCode(HttpStatus.OK)
+  public async deleteTopics(@Param() { id }: GetTopicsParamsDto) {
+    return this.dsbClientService.deleteTopic(id);
   }
 }
