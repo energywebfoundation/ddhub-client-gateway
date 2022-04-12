@@ -17,6 +17,7 @@ import {
 import { SecretsEngineService } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
 import { CommandBus } from '@nestjs/cqrs';
 import { RefreshKeysCommand } from '../../keys/command/refresh-keys.command';
+import { LoginCommand } from '../../dsb-client/module/did-auth/command/login.command';
 
 @Injectable()
 export class IdentityService {
@@ -137,6 +138,9 @@ export class IdentityService {
     }
 
     await this.commandBus.execute(new RefreshKeysCommand());
+    await this.commandBus.execute(
+      new LoginCommand(privateKey, this.iamService.getDIDAddress())
+    );
   }
 
   /**
