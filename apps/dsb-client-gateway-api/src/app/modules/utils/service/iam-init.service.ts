@@ -12,6 +12,8 @@ export class IamInitService implements OnModuleInit {
   ) {}
 
   public async onModuleInit(): Promise<void> {
+    this.logger.log('Attempting to init IAM using stored private key');
+
     const privateKey = await this.secretsEngine.getPrivateKey();
 
     this.logger.log('Initializing IAM using stored private key');

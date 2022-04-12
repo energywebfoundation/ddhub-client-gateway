@@ -8,9 +8,11 @@ import {
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { CertificateService } from './service/certificate.service';
 import { DigestGuard } from '../utils/guards/digest.guard';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('certificate')
 @UseGuards(DigestGuard)
+@ApiTags('Gateway Configuration')
 export class CertificateController {
   constructor(protected readonly certificateService: CertificateService) {}
 

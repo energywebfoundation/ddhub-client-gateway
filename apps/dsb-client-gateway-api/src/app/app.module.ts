@@ -31,11 +31,11 @@ export class AppModule {
       MulterModule.register({
         dest: './files',
       }),
+      SecretsEngineModule,
       IamModule,
       IdentityModule,
       EnrolmentModule,
       CertificateModule,
-      SecretsEngineModule,
       DsbClientModule,
       TerminusModule,
       ScheduleModule.forRoot(),

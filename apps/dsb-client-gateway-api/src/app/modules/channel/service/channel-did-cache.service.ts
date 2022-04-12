@@ -51,9 +51,13 @@ export class ChannelDidCacheService {
 
     this.logger.log(`Updating DIDs for ${internalChannel.fqcn}`);
 
+    const uniqueDids: string[] = [
+      ...new Set([...rolesForDIDs, ...internalChannel.conditions.dids]),
+    ];
+
     await this.channelService.updateChannelQualifiedDids(
       internalChannel.fqcn,
-      rolesForDIDs
+      uniqueDids
     );
 
     for (const { topicId, topicName, owner } of internalChannel.conditions
@@ -89,7 +93,7 @@ export class ChannelDidCacheService {
         fqcn,
         topic.id,
         topicVersions.records.map((topicVersion) => ({
-          id: topicVersion.id,
+          id: topic.id,
           owner: topic.owner,
           name: topic.name,
           schemaType: topic.schemaType,
@@ -100,17 +104,17 @@ export class ChannelDidCacheService {
 
       this.logger.log('Found topic', topic);
 
-      for (const { id, schema, version } of topicVersions.records) {
+      for (const { schema, version } of topicVersions.records) {
         await this.topicRepository.createOrUpdateTopic(
           {
-            id,
+            id: topic.id,
             schema,
             version,
             owner: topic.owner,
             name: topic.name,
             schemaType: topic.schemaType,
           },
-          id
+          topic.id
         );
       }
     }

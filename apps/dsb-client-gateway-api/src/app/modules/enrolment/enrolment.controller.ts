@@ -6,7 +6,7 @@ import { ApiTags } from '@nestjs/swagger';
 
 @Controller('enrol')
 @UseGuards(DigestGuard)
-@ApiTags('configuration', 'enrolment')
+@ApiTags('Enrolment')
 export class EnrolmentController {
   constructor(protected readonly enrolmentService: EnrolmentService) {}
 
