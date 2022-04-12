@@ -1,4 +1,4 @@
-import { useIdentity } from '../../utils/use-identity.effect';
+import { useIdentity } from '@dsb-client-gateway/ui/api-hooks';
 
 export const useHeaderEffects = () => {
   const {identity} = useIdentity();
