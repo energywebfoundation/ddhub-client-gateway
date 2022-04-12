@@ -5,7 +5,7 @@ import { ApiTags } from '@nestjs/swagger';
 
 @Controller('health')
 @UseGuards(DigestGuard)
-@ApiTags('health')
+@ApiTags('Health')
 export class HealthController {
   @Get()
   @HealthCheck()
