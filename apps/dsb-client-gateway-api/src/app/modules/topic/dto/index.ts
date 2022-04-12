@@ -164,7 +164,7 @@ export class GetTopicsQueryDto {
   })
   public limit: number;
 
-  @IsString()
+  @IsOptional()
   @ApiProperty({
     example: 'topic name',
     type: String,
@@ -181,6 +181,7 @@ export class GetTopicsQueryDto {
   })
   public owner: string;
 
+  @IsOptional()
   @ApiProperty({
     example: 1,
     default: 1,
@@ -190,7 +191,7 @@ export class GetTopicsQueryDto {
   @IsOptional()
   public page: number;
 
-  @IsArray()
+  @IsOptional()
   @ApiProperty({
     example: ['aggregator'],
     required: false,
