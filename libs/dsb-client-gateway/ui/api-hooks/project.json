@@ -1,0 +1,25 @@
+{
+  "root": "libs/dsb-client-gateway/ui/api-hooks",
+  "sourceRoot": "libs/dsb-client-gateway/ui/api-hooks/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": [
+          "libs/dsb-client-gateway/ui/api-hooks/**/*.{ts,tsx,js,jsx}"
+        ]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/libs/dsb-client-gateway/ui/api-hooks"],
+      "options": {
+        "jestConfig": "libs/dsb-client-gateway/ui/api-hooks/jest.config.js",
+        "passWithNoTests": true
+      }
+    }
+  }
+}

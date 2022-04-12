@@ -3,8 +3,7 @@ import React from 'react';
 import BrokerCard from '../../components/BrokerCard/BrokerCard';
 import Statistics from '../../components/Statistics/Statistics';
 
-export function Dashboard(props) {
-  console.log(props);
+export function Dashboard() {
   return (
     <Grid container spacing={2}>
       <Grid item xs={6}><BrokerCard/></Grid>
