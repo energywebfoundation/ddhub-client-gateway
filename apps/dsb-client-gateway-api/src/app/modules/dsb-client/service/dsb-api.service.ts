@@ -204,7 +204,10 @@ export class DsbApiService implements OnApplicationBootstrap {
       formData.append('topicId', topicId);
       formData.append('topicVersion', topicVersion);
       formData.append('clientGatewayMessageId', clientGatewayMessageId);
-      formData.append('transactionId', transactionId);
+
+      if (transactionId) {
+        formData.append('transactionId', transactionId);
+      }
 
       const result = await this.request<null>(
         this.httpService.post(this.baseUrl + '/messages/upload', formData, {
@@ -396,7 +399,7 @@ export class DsbApiService implements OnApplicationBootstrap {
     id: string
   ): Promise<TopicResultDTO> {
     try {
-      this.logger.log('Topic to be updated', data);
+      this.logger.log('topic to be updated', data);
       const result = await this.request<null>(
         this.httpService.put(`${this.baseUrl}/topics/${id}`, data, {
           httpsAgent: this.getTLS(),
@@ -420,8 +423,7 @@ export class DsbApiService implements OnApplicationBootstrap {
 
   public async deleteTopic(id: string): Promise<TopicResultDTO> {
     try {
-      this.logger.log('Topic to be deleted', id);
-      this.logger.log(`${this.baseUrl}/topics/${id}`);
+      this.logger.log('topic to be deleted', id);
       const result = await this.request<null>(
         this.httpService.delete(`${this.baseUrl}/topics/${id}`, {
           httpsAgent: this.getTLS(),
