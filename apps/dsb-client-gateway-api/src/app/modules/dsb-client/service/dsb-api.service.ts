@@ -453,7 +453,7 @@ export class DsbApiService implements OnApplicationBootstrap {
       this.logger.log(
         `topic to be deleted with version: ${version} and id:${id}`
       );
-      const { data } = await this.request<null>(
+      const { data } = await this.request<TopicResultDTO>(
         this.httpService.delete(
           `${this.baseUrl}/topics/${id}/version/${version}`,
           {
@@ -472,7 +472,10 @@ export class DsbApiService implements OnApplicationBootstrap {
 
       return data;
     } catch (e) {
-      this.logger.error('delete topic failed', e);
+      this.logger.error(
+        `delete topic with id ${id} and version ${version} failed`,
+        e
+      );
       throw new Error(e);
     }
   }
