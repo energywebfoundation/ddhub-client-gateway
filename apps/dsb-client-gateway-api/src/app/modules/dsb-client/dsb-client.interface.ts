@@ -70,6 +70,10 @@ export type SendTopicBodyDTO = {
   tags: string[];
 };
 
+export type UpdateTopicHistoryDTO = {
+  schema: string;
+};
+
 export class ChannelDTO {
   fqcn: string;
   topics?: Topic[];

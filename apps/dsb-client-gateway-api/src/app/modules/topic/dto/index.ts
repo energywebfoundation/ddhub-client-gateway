@@ -122,6 +122,24 @@ export class SendTopicBodyDto {
   tags: string[];
 }
 
+export class UpdateTopicHistoryBodyDto {
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({
+    description: 'schema of the topic',
+    type: String,
+    example: JSON.stringify({
+      type: 'object',
+      properties: {
+        data: {
+          type: 'number',
+        },
+      },
+    }),
+  })
+  schema: string;
+}
+
 export class GetMessagesQueryDto {
   @IsNotEmpty()
   @IsString()
@@ -152,6 +170,35 @@ export class GetTopicsCountQueryDto {
     type: [String],
   })
   public owner: string[];
+}
+
+export class GetTopicsSearchQueryDto {
+  @IsNotEmpty()
+  @IsString()
+  @ApiProperty({
+    example: 'keyword',
+    type: String,
+  })
+  public keyword: string;
+
+  @IsOptional()
+  @ApiProperty({
+    example: 1,
+    default: 0,
+    required: false,
+    type: Number,
+  })
+  public limit: number;
+
+  @IsOptional()
+  @ApiProperty({
+    example: 1,
+    default: 1,
+    required: false,
+    type: Number,
+  })
+  @IsOptional()
+  public page: number;
 }
 
 export class GetTopicsQueryDto {
@@ -251,6 +298,24 @@ export class GetTopicsParamsDto {
   })
   public id: string;
 }
+
+export class TopicsByIdAndVersionParamsDto {
+  @IsString()
+  @ApiProperty({
+    description: 'id of the topic',
+    type: String,
+    example: '62545547fe37f174d7715ff3',
+  })
+  public id: string;
+  @IsString()
+  @ApiProperty({
+    description: 'version of the topic',
+    type: String,
+    example: '2.0.0',
+  })
+  public versionNumber: string;
+}
+
 export class DeleteTopicsVersionParamsDto {
   @IsString()
   @ApiProperty({
