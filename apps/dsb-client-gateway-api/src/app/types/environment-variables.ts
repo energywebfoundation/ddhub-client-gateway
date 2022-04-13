@@ -18,6 +18,10 @@ export enum NODE_ENV {
   Test = 'test',
 }
 
+export enum OpenTelemetryExporters {
+  ZIPKIN = 'ZIPKIN',
+}
+
 export class EnvironmentVariables {
   @IsString()
   @IsEnum(NODE_ENV)
@@ -145,6 +149,22 @@ export class EnvironmentVariables {
 
   @IsString()
   REFRESH_SYMMETRIC_KEY_CRON_TIME = '*/2 * * * * *';
+
+  @IsBoolean()
+  @Transform(EnvironmentVariables.transformBoolean('OPENTELEMETRY_ENABLED'))
+  OPENTELEMETRY_ENABLED = true;
+
+  @IsEnum(OpenTelemetryExporters)
+  @ValidateIf(EnvironmentVariables.isOTELEnabled)
+  OPEN_TELEMETRY_EXPORTER = OpenTelemetryExporters.ZIPKIN;
+
+  static isOTELEnabled(values: EnvironmentVariables): boolean {
+    return values.OPENTELEMETRY_ENABLED;
+  }
+
+  static isZipkinExporter(values: EnvironmentVariables): boolean {
+    return values.OPEN_TELEMETRY_EXPORTER === OpenTelemetryExporters.ZIPKIN;
+  }
 
   static isVaultEnabled(values: EnvironmentVariables): boolean {
     return values.SECRETS_ENGINE === SecretsEngine.VAULT;
