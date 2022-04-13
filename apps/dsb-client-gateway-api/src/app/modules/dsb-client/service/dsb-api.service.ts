@@ -445,6 +445,38 @@ export class DsbApiService implements OnApplicationBootstrap {
     }
   }
 
+  public async deleteTopicByVersion(
+    id: string,
+    version: string
+  ): Promise<TopicResultDTO> {
+    try {
+      this.logger.log(
+        `topic to be deleted with version: ${version} and id:${id}`
+      );
+      const { data } = await this.request<null>(
+        this.httpService.delete(
+          `${this.baseUrl}/topics/${id}/version/${version}`,
+          {
+            httpsAgent: this.getTLS(),
+            headers: {
+              ...this.getAuthHeader(),
+            },
+          }
+        ),
+        {
+          stopOnResponseCodes: ['10'],
+        }
+      );
+
+      this.logger.log('delete topic successful');
+
+      return data;
+    } catch (e) {
+      this.logger.error('delete topic failed', e);
+      throw new Error(e);
+    }
+  }
+
   public async messagesSearch(
     topicId: string[],
     senderId: string[],
