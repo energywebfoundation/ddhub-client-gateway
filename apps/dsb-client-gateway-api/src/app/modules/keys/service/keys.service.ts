@@ -92,7 +92,7 @@ export class KeysService implements OnModuleInit {
     signature: string,
     encryptedData: string
   ): Promise<boolean> {
-    this.logger.log('fetching did');
+    this.logger.log('fetching did', senderDid);
     const did = await this.iamService.getDid(senderDid);
 
     if (!did) {
@@ -101,7 +101,7 @@ export class KeysService implements OnModuleInit {
       return false;
     }
 
-    this.logger.log('did fechted successully');
+    this.logger.log('did fechted successully', senderDid);
     const key = did.publicKey.find(({ id }) => {
       return id === `${senderDid}#${DIDPublicKeyTags.DSB_SIGNATURE_KEY}`;
     });
