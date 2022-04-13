@@ -23,6 +23,7 @@ import {
   GetTopicsQueryDto,
   GetTopicsParamsDto,
   DeleteTopic,
+  DeleteTopicsVersionParamsDto,
 } from '../dto';
 
 @Controller('topics')
@@ -128,5 +129,31 @@ export class TopicsController {
   @HttpCode(HttpStatus.OK)
   public async deleteTopics(@Param() { id }: GetTopicsParamsDto) {
     return this.dsbClientService.deleteTopic(id);
+  }
+
+  @Delete('/:id/version/:version')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Topic deleted successfully',
+    type: () => DeleteTopic,
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description:
+      'Validation failed or some requirements were not fully satisfied',
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Unauthorized',
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Topic not found',
+  })
+  @HttpCode(HttpStatus.OK)
+  public async deleteTopicsByVersion(
+    @Param() { id, version }: DeleteTopicsVersionParamsDto
+  ) {
+    return this.dsbClientService.deleteTopicByVersion(id, version);
   }
 }

@@ -251,6 +251,23 @@ export class GetTopicsParamsDto {
   })
   public id: string;
 }
+export class DeleteTopicsVersionParamsDto {
+  @IsString()
+  @ApiProperty({
+    description: 'id of the topic',
+    type: String,
+    example: '62545547fe37f174d7715ff3',
+  })
+  public id: string;
+
+  @IsString()
+  @ApiProperty({
+    description: 'version of the topic',
+    type: String,
+    example: '2.0.0',
+  })
+  public version: string;
+}
 
 export class DeleteTopic {
   @IsString()
