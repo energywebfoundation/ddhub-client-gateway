@@ -98,7 +98,7 @@ const dsbTheme: ThemeOptions = {
     MuiInputBase: {
       styleOverrides: {
         root: {
-          width: '100%'
+          // width: '100%'
         }
       }
     },
@@ -106,6 +106,13 @@ const dsbTheme: ThemeOptions = {
       styleOverrides: {
         root: {
           width: '100%'
+        }
+      }
+    },
+    MuiTableCell: {
+      styleOverrides: {
+        root: {
+          borderBottomColor: '#384151'
         }
       }
     }

@@ -1,1 +1,1 @@
-export * from './lib/dsb-client-gateway-ui-applications';
+export * from './lib/Applications';
