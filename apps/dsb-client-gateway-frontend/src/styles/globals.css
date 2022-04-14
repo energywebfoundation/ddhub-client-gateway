@@ -39,6 +39,10 @@ a {
   background: var(--background-color) !important;
 }
 
+.swal2-container.swal2-center {
+  z-index: 2000;
+}
+
 .swal2-title {
   font-size: 21px;
   font-weight: 400;
@@ -92,4 +96,24 @@ body.swal2-height-auto.swal2-height-auto {
 
 .swal2-styled.swal2-cancel:focus {
   box-shadow: none !important;
+}
+
+.monaco-scrollable-element>.invisible.vertical {
+  width: 5px !important;
+}
+
+.monaco-scrollable-element > .scrollbar.vertical > .slider {
+  width: 5px !important;
+  left: initial !important;
+  right: 0;
+}
+
+.monaco-scrollable-element > .scrollbar.horizontal > .slider {
+  height: 5px !important;
+  top: initial !important;
+  bottom: 0;
+}
+
+.decorationsOverviewRuler {
+  width: 5px !important;
 }
