@@ -47,13 +47,13 @@ a {
   font-size: 21px;
   font-weight: 400;
   color: var(--text-color) !important;
-  font-family: Bw Gradual;
+  font-family: Bw Gradual, sans-serif;
   font-style: normal;
   line-height: 25px;
 }
 
 #swal2-html-container {
-  font-family: Sequel Sans;
+  font-family: Sequel Sans, sans-serif;
   font-style: normal;
   font-weight: 400;
   font-size: 14px;
@@ -81,7 +81,7 @@ a {
   outline: none !important;
   border-radius: 5px;
   padding: 10px 24px;
-  font-family: Sequel Sans;
+  font-family: Sequel Sans, sans-serif;
   font-style: normal;
   font-weight: 405;
   font-size: 14px;
