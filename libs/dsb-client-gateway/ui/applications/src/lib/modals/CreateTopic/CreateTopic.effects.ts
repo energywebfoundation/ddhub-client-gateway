@@ -1,9 +1,8 @@
+import { useEffect } from 'react';
 import { useForm, SubmitHandler, FieldValues } from 'react-hook-form';
-
+import { useRouter } from 'next/router';
 import { FormSelectOption } from '@dsb-client-gateway/ui/core';
-import {
-  SendTopicBodyDto,
-} from '@dsb-client-gateway/dsb-client-gateway-api-client';
+import { Topic } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { useCreateTopic } from '@dsb-client-gateway/ui/api-hooks';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
@@ -13,10 +12,21 @@ import {
   ApplicationsModalsActionsEnum,
 } from '../../context';
 
+type TopicPost = Omit<Topic, 'id'>;
+
 export const useCreateTopicEffects = () => {
-  const initialValues: SendTopicBodyDto = {
+  const router = useRouter();
+  const {
+    createTopic: { open, hide, application },
+  } = useApplicationsModalsStore();
+  const dispatch = useApplicationsModalsDispatch();
+
+  const initialValues = {
+    name: '',
+    owner: '',
+    schemaType: '',
     schema: '',
-    tags: [],
+    tags: [] as string[],
     version: '',
   };
 
@@ -42,18 +52,21 @@ export const useCreateTopicEffects = () => {
     handleSubmit,
     watch,
     formState: { isValid },
-    reset
+    reset,
   } = useForm<FieldValues>({
     defaultValues: initialValues,
     resolver: yupResolver(validationSchema),
     mode: 'onChange',
   });
 
+  useEffect(() => {
+    reset({
+      owner: router.query['namespace'],
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [router]);
+
   const { createTopicHandler } = useCreateTopic();
-  const {
-    createTopic: { open, hide, application },
-  } = useApplicationsModalsStore();
-  const dispatch = useApplicationsModalsDispatch();
 
   const closeModal = () => {
     dispatch({
@@ -70,20 +83,26 @@ export const useCreateTopicEffects = () => {
   const hideModal = () => {
     dispatch({
       type: ApplicationsModalsActionsEnum.HIDE_CREATE_TOPIC,
-      payload: true
+      payload: true,
     });
   };
 
   const showModal = () => {
     dispatch({
       type: ApplicationsModalsActionsEnum.HIDE_CREATE_TOPIC,
-      payload: false
+      payload: false,
     });
   };
 
   const topicSubmitHandler: SubmitHandler<FieldValues> = (data) => {
-    const values = data as SendTopicBodyDto;
-    createTopicHandler(values as SendTopicBodyDto, closeModal);
+    const values = data as TopicPost;
+    const fomattedValues = {
+      ...values,
+      schemaType: schemaTypeOptions.find(
+        (option) => option.value === values.schemaType
+      ).label,
+    };
+    createTopicHandler(fomattedValues as TopicPost, closeModal);
   };
 
   const onSubmit = handleSubmit(topicSubmitHandler);
@@ -172,6 +191,6 @@ export const useCreateTopicEffects = () => {
     onSubmit,
     buttonDisabled,
     schemaTypeValue,
-    application
+    application,
   };
 };

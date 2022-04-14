@@ -43,10 +43,25 @@ a {
   z-index: 2000;
 }
 
-.swal2-title {
+#swal2-title {
   font-size: 21px;
   font-weight: 400;
   color: var(--text-color) !important;
+  font-family: 'Bw Gradual';
+  font-style: normal;
+  font-weight: 500;
+  font-size: 21px;
+  line-height: 25px;
+}
+
+#swal2-html-container {
+  font-family: 'Sequel Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 21px;
+  color: #939393;
+  margin-top: 7px;
 }
 
 .swal2-text {
@@ -68,6 +83,13 @@ a {
   outline: none !important;
   border-radius: 5px;
   padding: 10px 24px;
+  font-family: 'Sequel Sans';
+  font-style: normal;
+  font-weight: 405;
+  font-size: 14px;
+  line-height: 17px;
+  text-align: center;
+  letter-spacing: 0.4px;
 }
 
 .swal2-confirm:active {
@@ -75,8 +97,7 @@ a {
 }
 
 .swal2-confirm:not([disabled]):hover {
-  background-color: var(--primary-light-color) !important;
-  box-shadow: 0px 4px 14px rgba(115, 103, 240, 0.38);
+  background-color: #8351cc !important;
 }
 
 body.swal2-height-auto.swal2-height-auto {

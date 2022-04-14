@@ -7,16 +7,8 @@ import {
 export const useCreateTopic = () => {
   const { mutate } = useTopicsControllerPostTopics({
     mutation: {
-      onError: (error) => {
-        console.log(error);
-        return Swal.fire('Error', 'Error while creating topic', 'error');
-      },
-      onSuccess: () => {
-        return Swal.fire(
-          'Success',
-          'You have successfully created the topic',
-          'success'
-        );
+      onError: () => {
+        Swal.fire('Error', 'Error while creating topic', 'error');
       },
     },
   });
@@ -30,7 +22,15 @@ export const useCreateTopic = () => {
         data: values,
       },
       {
-        onSuccess: () => callback(),
+        onSuccess: () => {
+          Swal.fire({
+            title: 'Success',
+            icon: 'success',
+            text: 'You have successfully created the topic',
+            confirmButtonText: 'Dismiss',
+          });
+          callback();
+        },
       }
     );
   };
