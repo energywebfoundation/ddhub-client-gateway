@@ -14,6 +14,13 @@ import { queryClientOptions } from '../utils';
 import '../styles/globals.css';
 import 'nprogress/nprogress.css';
 import { useCheckAccountOnInitEffects, UserDataContext, useUserData } from '@dsb-client-gateway/ui/login';
+import { makeServer } from "../services/mock.service";
+
+const environment = process.env.NODE_ENV;
+
+if (environment !== "production") {
+  makeServer({ environment });
+}
 
 Axios.defaults.baseURL = process.env.NEXT_PUBLIC_SERVER_BASE_URL;
 
