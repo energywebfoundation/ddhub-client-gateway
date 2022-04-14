@@ -56,7 +56,7 @@ export const SelectRegular: FC<SelectRegularProps> = ({
           root: classes.root,
         }}
         SelectProps={{
-          renderValue: (value: any) => {
+          renderValue: (value) => {
             const label = options.find(
               (option) => option.value === value
             )?.label;
