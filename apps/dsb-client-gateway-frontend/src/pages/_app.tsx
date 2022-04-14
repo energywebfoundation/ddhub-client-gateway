@@ -13,7 +13,16 @@ import { Layout } from '../components/Layout';
 import { queryClientOptions } from '../utils';
 import '../styles/globals.css';
 import 'nprogress/nprogress.css';
-import { useCheckAccountOnInitEffects, UserDataContext, useUserData } from '@dsb-client-gateway/ui/login';
+import {
+  useCheckAccountOnInitEffects,
+  UserDataContext,
+  useUserData,
+} from '@dsb-client-gateway/ui/login';
+import { makeServer } from '../services/mock.service';
+
+const environment = process.env.NODE_ENV;
+
+makeServer({ environment, serverBaseUrl: process.env.NEXT_PUBLIC_SERVER_BASE_URL });
 
 Axios.defaults.baseURL = process.env.NEXT_PUBLIC_SERVER_BASE_URL;
 
@@ -27,12 +36,12 @@ export interface MyAppProps extends AppProps {
 
 function InitializeAccountStatus(props) {
   useCheckAccountOnInitEffects();
-  return <>{props.children}</>
+  return <>{props.children}</>;
 }
 
 function MyApp(props: MyAppProps) {
   const { Component, pageProps } = props;
-  const {userDataValue} = useUserData();
+  const { userDataValue } = useUserData();
   const [queryClient] = React.useState(
     () =>
       new QueryClient({
@@ -64,7 +73,7 @@ function MyApp(props: MyAppProps) {
         <UserDataContext.Provider value={userDataValue}>
           <QueryClientProvider client={queryClient}>
             <InitializeAccountStatus>
-            {getLayout(<Component {...pageProps} />)}
+              {getLayout(<Component {...pageProps} />)}
             </InitializeAccountStatus>
           </QueryClientProvider>
         </UserDataContext.Provider>

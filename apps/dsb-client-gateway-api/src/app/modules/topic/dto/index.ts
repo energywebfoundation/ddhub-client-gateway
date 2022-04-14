@@ -71,8 +71,9 @@ export class Topic {
   })
   schemaType: SchemaType;
 
-  @IsString()
+  @IsArray()
   @IsNotEmpty()
+  @ArrayUnique()
   @ApiProperty({
     description: 'tags of the topic',
     type: [String],
@@ -90,28 +91,7 @@ export class Topic {
   version: string;
 }
 
-export class SendTopicBodyDto {
-  @IsString()
-  @IsNotEmpty()
-  @ApiProperty({
-    description: 'schema of the topic',
-    type: String,
-    example: JSON.stringify({ data: 'Vikas' }),
-  })
-  schema: string;
-
-  @IsVersion({
-    message: 'Malformed Version',
-  })
-  @IsString()
-  @IsNotEmpty()
-  @ApiProperty({
-    description: 'version of the topic',
-    type: String,
-    example: '2.0.0',
-  })
-  version: string;
-
+export class UpdateTopicBodyDto {
   @IsArray()
   @IsNotEmpty()
   @ApiProperty({
@@ -120,6 +100,24 @@ export class SendTopicBodyDto {
     example: `["aggregator"]`,
   })
   tags: string[];
+}
+
+export class UpdateTopicHistoryBodyDto {
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({
+    description: 'schema of the topic',
+    type: String,
+    example: JSON.stringify({
+      type: 'object',
+      properties: {
+        data: {
+          type: 'number',
+        },
+      },
+    }),
+  })
+  schema: string;
 }
 
 export class GetMessagesQueryDto {
@@ -152,6 +150,35 @@ export class GetTopicsCountQueryDto {
     type: [String],
   })
   public owner: string[];
+}
+
+export class GetTopicsSearchQueryDto {
+  @IsNotEmpty()
+  @IsString()
+  @ApiProperty({
+    example: 'keyword',
+    type: String,
+  })
+  public keyword: string;
+
+  @IsOptional()
+  @ApiProperty({
+    example: 1,
+    default: 0,
+    required: false,
+    type: Number,
+  })
+  public limit: number;
+
+  @IsOptional()
+  @ApiProperty({
+    example: 1,
+    default: 1,
+    required: false,
+    type: Number,
+  })
+  @IsOptional()
+  public page: number;
 }
 
 export class GetTopicsQueryDto {
@@ -251,6 +278,25 @@ export class GetTopicsParamsDto {
   })
   public id: string;
 }
+
+export class TopicsByIdAndVersionParamsDto {
+  @IsString()
+  @ApiProperty({
+    description: 'id of the topic',
+    type: String,
+    example: '62545547fe37f174d7715ff3',
+  })
+  public id: string;
+
+  @IsString()
+  @ApiProperty({
+    description: 'version of the topic',
+    type: String,
+    example: '2.0.0',
+  })
+  public versionNumber: string;
+}
+
 export class DeleteTopicsVersionParamsDto {
   @IsString()
   @ApiProperty({
@@ -293,4 +339,80 @@ export class DeleteTopic {
     example: 'Success',
   })
   public returnMessage: string;
+}
+
+export class PostTopicBodyDto {
+  @IsValidTopicName({
+    message:
+      'Malformed topic name. Name should contain only alphanumeric lowercase letters, use . as a separator. Max length 255',
+  })
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({
+    description: 'name of the topic',
+    type: String,
+    example: 'topic16',
+  })
+  name: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @IsEnum(SchemaType)
+  @ApiProperty({
+    description: 'schema type of the topic',
+    type: String,
+    enum: [
+      SchemaType.JSD7,
+      SchemaType.XML,
+      SchemaType.XSD6,
+      SchemaType.CSV,
+      SchemaType.TSV,
+    ],
+    example: 'JSD7',
+  })
+  schemaType: SchemaType;
+
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({
+    description: 'schema of the topic',
+    type: String,
+    example: JSON.stringify({
+      type: 'object',
+      properties: {
+        data: {
+          type: 'number',
+        },
+      },
+    }),
+  })
+  schema: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({
+    description: 'version of the topic',
+    type: String,
+    example: '2.0.0',
+  })
+  version: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({
+    description: 'owner of the topic',
+    type: String,
+    example: 'Vikas',
+  })
+  owner: string;
+
+  @IsArray()
+  @IsNotEmpty()
+  @ArrayUnique()
+  @ApiProperty({
+    description: 'tags of the topic',
+    type: [String],
+    example: `["aggregator"]`,
+  })
+  tags: string[];
 }
