@@ -9,7 +9,7 @@ export const getIdentityControllerGetMock = () => ({
       {
         namespace: 'user.roles.dsb.apps.szostak.iam.ewc',
         required: true,
-        status: 'APPROVED',
+        status: 'SYNCED',
       },
     ],
   },
