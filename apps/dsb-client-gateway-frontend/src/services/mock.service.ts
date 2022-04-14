@@ -1,7 +1,7 @@
 import { createServer } from 'miragejs';
 import {
   getApplicationsControllerGetApplicationsMock,
-  getIdentityControllerGetMock
+  getIdentityControllerGetMock,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 
 export function makeServer({ environment = 'development' }) {
@@ -14,11 +14,11 @@ export function makeServer({ environment = 'development' }) {
       this.urlPrefix = 'http://localhost:3333';
 
       this.get('/applications', () => {
-        return getApplicationsControllerGetApplicationsMock()
+        return getApplicationsControllerGetApplicationsMock();
       });
 
       this.get('/identity', () => {
-        return getIdentityControllerGetMock()
+        return getIdentityControllerGetMock();
       });
     },
   });
