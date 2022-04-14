@@ -27,6 +27,7 @@ import {
   TopicsByIdAndVersionParamsDto,
   UpdateTopicHistoryBodyDto,
   GetTopicsSearchQueryDto,
+  PostTopicBodyDto,
 } from '../dto';
 
 @Controller('topics')
@@ -124,7 +125,7 @@ export class TopicsController {
     description: 'Unauthorized',
   })
   @HttpCode(HttpStatus.CREATED)
-  public async postTopics(@Body() data: UpdateTopicBodyDto) {
+  public async postTopics(@Body() data: PostTopicBodyDto) {
     return this.dsbClientService.postTopics(data);
   }
 
