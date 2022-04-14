@@ -78,4 +78,5 @@ export interface DownloadMessageResponse {
   sender: string;
   signature: string;
   clientGatewayMessageId: string;
+  data: Buffer;
 }

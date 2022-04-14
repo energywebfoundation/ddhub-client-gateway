@@ -418,6 +418,7 @@ export class MessageService {
   ): Promise<DownloadMessageResponse> {
     //Calling download file API of message broker
     const fileResponse = await this.dsbApiService.downloadFile(fileId);
+    let decrypted: any;
 
     //getting file name from headers
     let fileName = fileResponse.headers['content-disposition'].split('=')[1];
@@ -439,7 +440,6 @@ export class MessageService {
       );
     } else {
       let decryptedMessage: string;
-      let decrypted: any;
 
       try {
         // Decrypting File Content
@@ -471,17 +471,18 @@ export class MessageService {
         );
       }
 
-      const dir = __dirname + this.configService.get('FILES_DIRECTORY');
+      // const dir = __dirname + this.configService.get('FILES_DIRECTORY');
 
-      this.logger.debug(`Making directory files if doesn't exist`);
-      if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir);
-      }
+      // this.logger.debug(`Making directory files if doesn't exist`);
+      // if (!fs.existsSync(dir)) {
+      //   fs.mkdirSync(dir);
+      // }
 
-      this.logger.debug(
-        `Writing decrypted data to the file for file id:${fileId}`
-      );
-      await fs.writeFileSync(dir + fileName, Buffer.from(decrypted.data));
+      // this.logger.debug(
+      //   `Writing decrypted data to the file for file id:${fileId}`
+      // );
+
+      // await fs.writeFileSync(dir + fileName, Buffer.from(decrypted.data));
     }
 
     return {
@@ -492,6 +493,7 @@ export class MessageService {
       sender: fileResponse.headers.ownerdid,
       signature: fileResponse.headers.signature,
       clientGatewayMessageId: fileResponse.headers.clientgatewaymessageid,
+      data: Buffer.from(decrypted.data),
     };
   }
 }
