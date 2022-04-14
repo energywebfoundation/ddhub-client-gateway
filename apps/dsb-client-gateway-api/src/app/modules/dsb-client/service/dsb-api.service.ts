@@ -393,6 +393,7 @@ export class DsbApiService implements OnApplicationBootstrap {
     page?: number
   ): Promise<Topic[]> {
     if (!keyword) {
+      this.logger.debug(`no keyword given so returning empty array`);
       return [];
     }
 

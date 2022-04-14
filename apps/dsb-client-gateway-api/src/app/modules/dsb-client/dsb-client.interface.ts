@@ -46,7 +46,7 @@ export interface ApplicationHeader {
   Cell?: any;
 }
 
-export type TopicResultDTO = {
+export interface TopicResultDTO {
   id: string;
   name: string;
   schemaType: string;
@@ -54,25 +54,25 @@ export type TopicResultDTO = {
   version: string;
   owner: string;
   tags: string[];
-};
+}
 
-export type GetTopicsOptions = {
+export interface GetTopicsOptions {
   limit?: number;
   name: string;
   owner: string;
   page?: number;
   tags?: string[];
-};
+}
 
-export type SendTopicBodyDTO = {
+export interface SendTopicBodyDTO {
   schema: string;
   version: string;
   tags: string[];
-};
+}
 
-export type UpdateTopicHistoryDTO = {
+export interface UpdateTopicHistoryDTO {
   schema: string;
-};
+}
 
 export class ChannelDTO {
   fqcn: string;

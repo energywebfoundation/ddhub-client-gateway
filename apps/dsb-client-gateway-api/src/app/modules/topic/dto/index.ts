@@ -307,6 +307,7 @@ export class TopicsByIdAndVersionParamsDto {
     example: '62545547fe37f174d7715ff3',
   })
   public id: string;
+
   @IsString()
   @ApiProperty({
     description: 'version of the topic',
