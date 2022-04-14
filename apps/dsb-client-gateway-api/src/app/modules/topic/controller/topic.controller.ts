@@ -19,7 +19,7 @@ import {
   PaginatedResponse,
   TopicsCountResponse,
   Topic,
-  SendTopicBodyDto,
+  UpdateTopicBodyDto,
   GetTopicsQueryDto,
   GetTopicsParamsDto,
   DeleteTopic,
@@ -124,7 +124,7 @@ export class TopicsController {
     description: 'Unauthorized',
   })
   @HttpCode(HttpStatus.CREATED)
-  public async postTopics(@Body() data: SendTopicBodyDto) {
+  public async postTopics(@Body() data: UpdateTopicBodyDto) {
     return this.dsbClientService.postTopics(data);
   }
 
@@ -181,7 +181,7 @@ export class TopicsController {
   @HttpCode(HttpStatus.OK)
   public async updateTopics(
     @Param() { id }: GetTopicsParamsDto,
-    @Body() data: SendTopicBodyDto
+    @Body() data: UpdateTopicBodyDto
   ) {
     return this.dsbClientService.updateTopic(data, id);
   }

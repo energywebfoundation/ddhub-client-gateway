@@ -64,9 +64,7 @@ export interface GetTopicsOptions {
   tags?: string[];
 }
 
-export interface SendTopicBodyDTO {
-  schema: string;
-  version: string;
+export interface UpdateTopicBodyDTO {
   tags: string[];
 }
 

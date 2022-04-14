@@ -23,7 +23,7 @@ import {
   SendInternalMessageResponse,
   SendMessageData,
   SendMessageResponse,
-  SendTopicBodyDTO,
+  UpdateTopicBodyDTO,
   Topic,
   TopicDataResponse,
   TopicResultDTO,
@@ -478,7 +478,7 @@ export class DsbApiService implements OnApplicationBootstrap {
     }
   }
 
-  public async postTopics(topicData: SendTopicBodyDTO): Promise<Topic> {
+  public async postTopics(topicData: UpdateTopicBodyDTO): Promise<Topic> {
     try {
       const { data } = await this.request<null>(
         this.httpService.post(this.baseUrl + '/topics', topicData, {
@@ -502,7 +502,7 @@ export class DsbApiService implements OnApplicationBootstrap {
   }
 
   public async updateTopic(
-    data: SendTopicBodyDTO,
+    data: UpdateTopicBodyDTO,
     id: string
   ): Promise<TopicResultDTO> {
     try {

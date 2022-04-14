@@ -90,28 +90,7 @@ export class Topic {
   version: string;
 }
 
-export class SendTopicBodyDto {
-  @IsString()
-  @IsNotEmpty()
-  @ApiProperty({
-    description: 'schema of the topic',
-    type: String,
-    example: JSON.stringify({ data: 'Vikas' }),
-  })
-  schema: string;
-
-  @IsVersion({
-    message: 'Malformed Version',
-  })
-  @IsString()
-  @IsNotEmpty()
-  @ApiProperty({
-    description: 'version of the topic',
-    type: String,
-    example: '2.0.0',
-  })
-  version: string;
-
+export class UpdateTopicBodyDto {
   @IsArray()
   @IsNotEmpty()
   @ApiProperty({
