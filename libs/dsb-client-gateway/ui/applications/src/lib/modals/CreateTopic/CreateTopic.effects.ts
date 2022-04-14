@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useForm, SubmitHandler, FieldValues } from 'react-hook-form';
 import { useRouter } from 'next/router';
 import { FormSelectOption } from '@dsb-client-gateway/ui/core';
-import { Topic } from '@dsb-client-gateway/dsb-client-gateway-api-client';
+import { PostTopicBodyDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { useCreateTopic } from '@dsb-client-gateway/ui/api-hooks';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
@@ -11,8 +11,6 @@ import {
   useApplicationsModalsDispatch,
   ApplicationsModalsActionsEnum,
 } from '../../context';
-
-type TopicPost = Omit<Topic, 'id'>;
 
 export const useCreateTopicEffects = () => {
   const router = useRouter();
@@ -36,13 +34,7 @@ export const useCreateTopicEffects = () => {
       schema: yup.string().required(),
       schemaType: yup.string().required(),
       tags: yup.array().min(1).required(),
-      version: yup
-        .string()
-        .required()
-        .matches(
-          // regex from backend
-          /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(-(0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(\.(0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*)?(\+[0-9a-zA-Z-]+(\.[0-9a-zA-Z-]+)*)?$/
-        ),
+      version: yup.string().required(),
     })
     .required();
 
@@ -95,14 +87,14 @@ export const useCreateTopicEffects = () => {
   };
 
   const topicSubmitHandler: SubmitHandler<FieldValues> = (data) => {
-    const values = data as TopicPost;
+    const values = data as PostTopicBodyDto;
     const fomattedValues = {
       ...values,
       schemaType: schemaTypeOptions.find(
         (option) => option.value === values.schemaType
       ).label,
     };
-    createTopicHandler(fomattedValues as TopicPost, closeModal);
+    createTopicHandler(fomattedValues as PostTopicBodyDto, closeModal);
   };
 
   const onSubmit = handleSubmit(topicSubmitHandler);

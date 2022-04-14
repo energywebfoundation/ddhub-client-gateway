@@ -1,6 +1,6 @@
 import Swal from 'sweetalert2';
 import {
-  SendTopicBodyDto,
+  PostTopicBodyDto,
   useTopicsControllerPostTopics,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 
@@ -14,7 +14,7 @@ export const useCreateTopic = () => {
   });
 
   const createTopicHandler = (
-    values: SendTopicBodyDto,
+    values: PostTopicBodyDto,
     callback: () => void
   ) => {
     mutate(
