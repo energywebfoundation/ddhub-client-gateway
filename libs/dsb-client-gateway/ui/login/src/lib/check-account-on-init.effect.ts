@@ -6,14 +6,20 @@ import {
 import { useEffect } from 'react';
 import { useQueryClient } from 'react-query';
 import { useSetUserDataEffect } from './set-user-data.effect';
+import { useRouter } from 'next/router';
+import { routerConst } from '@dsb-client-gateway/ui/utils';
 
 
 export const useCheckAccountOnInitEffects = () => {
   const queryClient = useQueryClient();
   const {setUserData} = useSetUserDataEffect();
+  const router = useRouter();
   useEffect(() => {
     queryClient.fetchQuery(getIdentityControllerGetQueryKey(), identityControllerGet).then((res) => {
       setUserData(res as IdentityWithEnrolment);
-    }).catch(console.error);
+    }).catch(error => {
+      console.error(error);
+      router.push(routerConst.InitialPage);
+    });
   }, []);
 };
