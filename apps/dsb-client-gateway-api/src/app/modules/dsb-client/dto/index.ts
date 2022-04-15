@@ -18,7 +18,7 @@ export class Topic {
   @ApiProperty({
     description: 'id of the topic',
     type: String,
-    example: '622ac6325c890a2fd73cd081',
+    example: '62545547fe37f174d7715ff3',
   })
   id: string;
 
@@ -27,7 +27,7 @@ export class Topic {
   @ApiProperty({
     description: 'name of the topic',
     type: String,
-    example: 'topic16',
+    example: 'monthlyBakingRequests',
   })
   name: string;
 
@@ -36,7 +36,7 @@ export class Topic {
   @ApiProperty({
     description: 'owner of the topic',
     type: String,
-    example: 'Vikas',
+    example: 'mini.apps.sliced.carrot.vege.iam.ewc',
   })
   owner: string;
 
@@ -45,7 +45,14 @@ export class Topic {
   @ApiProperty({
     description: 'schema of the topic',
     type: String,
-    example: '{\n        "data": "Vikas"\n    }',
+    example: JSON.stringify({
+      type: 'object',
+      properties: {
+        data: {
+          type: 'number',
+        },
+      },
+    }),
   })
   schema: string;
 
@@ -72,7 +79,7 @@ export class Topic {
   @ApiProperty({
     description: 'version of the topic',
     type: String,
-    example: '2.0.0',
+    example: '1.0.9',
   })
   version: string;
 }
@@ -83,7 +90,7 @@ export class SendTopicBodyDto {
   @ApiProperty({
     description: 'name of the topic',
     type: String,
-    example: 'topic16',
+    example: 'Topic_JSON_V12',
   })
   name: string;
 
@@ -92,7 +99,7 @@ export class SendTopicBodyDto {
   @ApiProperty({
     description: 'owner of the topic',
     type: String,
-    example: 'Vikas',
+    example: 'torta.apps.eggplant.vege.iam.ewc',
   })
   owner: string;
 
@@ -101,7 +108,14 @@ export class SendTopicBodyDto {
   @ApiProperty({
     description: 'schema of the topic',
     type: String,
-    example: '{\n        "data": "Vikas"\n    }',
+    example: JSON.stringify({
+      type: 'object',
+      properties: {
+        data: {
+          type: 'number',
+        },
+      },
+    }),
   })
   schema: string;
 
@@ -128,7 +142,7 @@ export class SendTopicBodyDto {
   @ApiProperty({
     description: 'version of the topic',
     type: String,
-    example: '2.0.0',
+    example: '1.0.9',
   })
   version: string;
 }
