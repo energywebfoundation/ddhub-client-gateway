@@ -1,9 +1,9 @@
 import {
-  useApplicationsModalsDispatch,
-  ApplicationsModalsActionsEnum,
-} from '../context';
+  useTopicsModalsDispatch,
+  TopicsModalsActionsEnum,
+} from '../../context';
 
-export const useApplicationEffects = () => {
+export const useTopicsEffects = () => {
   // TODO: remove mock
   const applicationMock = {
     appName: 'Application name 1',
@@ -24,11 +24,11 @@ export const useApplicationEffects = () => {
     },
   ];
 
-  const dispatch = useApplicationsModalsDispatch();
+  const dispatch = useTopicsModalsDispatch();
 
   const openCreateTopic = () => {
     dispatch({
-      type: ApplicationsModalsActionsEnum.SHOW_CREATE_TOPIC,
+      type: TopicsModalsActionsEnum.SHOW_CREATE_TOPIC,
       payload: {
         open: true,
         hide: false,

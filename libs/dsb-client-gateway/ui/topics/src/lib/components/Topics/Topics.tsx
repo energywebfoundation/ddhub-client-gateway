@@ -1,12 +1,12 @@
 import { FC } from 'react';
 import { Typography, Button } from '@mui/material';
 import { TopicsList } from '../TopicsList';
-import { useApplicationEffects } from './Application.effects';
-import { useStyles } from './Application.styles';
+import { useTopicsEffects } from './Topics.effects';
+import { useStyles } from './Topics.styles';
 
-export const Application: FC = () => {
+export const Topics: FC = () => {
   const { classes } = useStyles();
-  const { openCreateTopic, application, topics } = useApplicationEffects();
+  const { openCreateTopic, application, topics } = useTopicsEffects();
 
   return (
     <section className={classes.table}>

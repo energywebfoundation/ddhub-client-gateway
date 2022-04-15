@@ -1,7 +1,7 @@
 import { ApplicationDTO } from '@dsb-client-gateway/dsb-client-gateway-api-client'
-import { ApplicationsModalsActionsEnum } from './reducer';
+import { TopicsModalsActionsEnum } from './reducer';
 
-export interface IApplicationsModalsStore {
+export interface ITopicsModalsStore {
   createTopic: {
     open: boolean;
     hide: boolean;
@@ -15,7 +15,7 @@ export interface IApplicationsModalsStore {
 }
 
 interface IShowCreateTopicAction {
-  type: ApplicationsModalsActionsEnum.SHOW_CREATE_TOPIC;
+  type: TopicsModalsActionsEnum.SHOW_CREATE_TOPIC;
   payload: {
     open: boolean;
     hide: boolean;
@@ -24,12 +24,12 @@ interface IShowCreateTopicAction {
 }
 
 interface IHideCreateTopicAction {
-  type: ApplicationsModalsActionsEnum.HIDE_CREATE_TOPIC;
+  type: TopicsModalsActionsEnum.HIDE_CREATE_TOPIC;
   payload: boolean;
 }
 
 interface IShowCancelAction {
-  type: ApplicationsModalsActionsEnum.SHOW_CANCEL;
+  type: TopicsModalsActionsEnum.SHOW_CANCEL;
   payload: {
     open: boolean;
     onConfirm: () => void;
@@ -37,7 +37,7 @@ interface IShowCancelAction {
   }
 }
 
-export type TApplicationsModalsAction =
+export type TTopicsModalsAction =
   | IShowCreateTopicAction
   | IHideCreateTopicAction
   | IShowCancelAction

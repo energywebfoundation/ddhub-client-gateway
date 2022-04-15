@@ -1,6 +1,6 @@
 import { makeStyles } from 'tss-react/mui';
 import { Container } from '@mui/material';
-import { AppsAndTopics } from '@dsb-client-gateway/ui/applications';
+import { Applications } from '@dsb-client-gateway/ui/applications';
 
 export default function ListApplications() {
   const {classes} = useStyles();
@@ -8,7 +8,7 @@ export default function ListApplications() {
     <div>
       <Container maxWidth="lg">
         <section className={classes.table}>
-           <AppsAndTopics />
+           <Applications />
         </section>
       </Container>
     </div>

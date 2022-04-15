@@ -1,0 +1,25 @@
+{
+  "root": "libs/dsb-client-gateway/ui/topics",
+  "sourceRoot": "libs/dsb-client-gateway/ui/topics/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": [
+          "libs/dsb-client-gateway/ui/topics/**/*.{ts,tsx,js,jsx}"
+        ]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/libs/dsb-client-gateway/ui/topics"],
+      "options": {
+        "jestConfig": "libs/dsb-client-gateway/ui/topics/jest.config.js",
+        "passWithNoTests": true
+      }
+    }
+  }
+}

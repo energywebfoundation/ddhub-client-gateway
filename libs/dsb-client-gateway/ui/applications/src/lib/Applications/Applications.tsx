@@ -1,13 +1,23 @@
-import { FC } from 'react';
-import { ApplicationsModalsProvider } from '../context';
-import { ApplicationsModalsCenter } from '../modals';
-import { Application } from '../Application';
+import { useApplications } from '@dsb-client-gateway/ui/api-hooks';
+import { GenericTable } from '@dsb-client-gateway/ui/core';
+import { APPLICATIONS_HEADERS } from '../models/applications-header';
+import { useRouter } from 'next/router';
+import { ApplicationDTO } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 
-export const Applications: FC = () => {
+export function Applications() {
+  const {applications} = useApplications();
+  const router = useRouter();
+
+  const handleRowClick = (data: ApplicationDTO) => {
+    router.push(data.namespace);
+  }
   return (
-    <ApplicationsModalsProvider>
-      <Application />
-      <ApplicationsModalsCenter />
-    </ApplicationsModalsProvider>
+    <div>
+      <GenericTable<ApplicationDTO>
+        headers={APPLICATIONS_HEADERS}
+        tableRows={applications}
+        onRowClick={handleRowClick}
+      />
+    </div>
   );
-};
+}
