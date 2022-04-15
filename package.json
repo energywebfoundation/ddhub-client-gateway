@@ -57,7 +57,7 @@
     "hdkey": "^2.0.1",
     "iam-client-lib": "^4.2.0",
     "lokijs": "^1.5.12",
-    "match-sorter": "^4.0.0",
+    "match-sorter": "^6.3.1",
     "moment": "^2.29.1",
     "nats.ws": "^1.7.2",
     "nedb": "^1.8.0",
