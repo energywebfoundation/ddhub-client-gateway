@@ -100,10 +100,10 @@ const dsbTheme: ThemeOptions = {
         }
       }
     },
-    MuiInputBase: {
+    MuiOutlinedInput: {
       styleOverrides: {
-        root: {
-          // width: '100%'
+        notchedOutline: {
+          borderColor: '#404656'
         }
       }
     },
