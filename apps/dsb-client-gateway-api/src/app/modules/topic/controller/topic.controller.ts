@@ -18,7 +18,7 @@ import {
   GetTopicsCountQueryDto,
   PaginatedResponse,
   TopicsCountResponse,
-  Topic,
+  GetTopicDto,
   UpdateTopicBodyDto,
   GetTopicsQueryDto,
   GetTopicsParamsDto,
@@ -28,6 +28,8 @@ import {
   UpdateTopicHistoryBodyDto,
   GetTopicsSearchQueryDto,
   PostTopicBodyDto,
+  PostTopicDto,
+  PaginatedSearchTopicResponse,
 } from '../dto';
 
 @Controller('topics')
@@ -56,7 +58,7 @@ export class TopicsController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Get Topics List with same Id and different versions',
-    type: () => PaginatedResponse,
+    type: () => PaginatedSearchTopicResponse,
   })
   @ApiResponse({
     status: HttpStatus.UNAUTHORIZED,
@@ -70,7 +72,7 @@ export class TopicsController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Get Topics History by Id and version',
-    type: () => PaginatedResponse,
+    type: () => PostTopicDto,
   })
   @ApiResponse({
     status: HttpStatus.UNAUTHORIZED,
@@ -101,7 +103,7 @@ export class TopicsController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Get Topics by Search',
-    type: () => PaginatedResponse,
+    type: () => PaginatedSearchTopicResponse,
   })
   public async getTopicsBySearch(
     @Query() { keyword, limit, page }: GetTopicsSearchQueryDto
@@ -113,7 +115,7 @@ export class TopicsController {
   @ApiResponse({
     status: HttpStatus.CREATED,
     description: 'Topic successfully created',
-    type: () => Topic,
+    type: () => PostTopicDto,
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
@@ -133,7 +135,7 @@ export class TopicsController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Topic updated successfully',
-    type: () => Topic,
+    type: () => PostTopicDto,
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
@@ -164,7 +166,7 @@ export class TopicsController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Topic updated successfully',
-    type: () => Topic,
+    type: () => PostTopicDto,
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,

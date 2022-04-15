@@ -25,6 +25,10 @@ export function makeServer({
       this.get('/identity', () => {
         return getIdentityControllerGetMock();
       });
+
+      this.post('/topics', (_schema, request) => {
+        return { topic: JSON.parse(request.requestBody) }
+      })
     },
   });
 }

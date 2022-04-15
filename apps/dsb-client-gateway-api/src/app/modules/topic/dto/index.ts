@@ -13,13 +13,13 @@ import {
 } from 'class-validator';
 import { IsVersion } from '../../utils/validator/decorators/IsVersion';
 import { IsValidTopicName } from '../../utils/validator/decorators/isValidTopicName';
-export class Topic {
+export class GetTopicDto {
   @IsString()
   @IsNotEmpty()
   @ApiProperty({
     description: 'id of the topic',
     type: String,
-    example: '622ac6325c890a2fd73cd081',
+    example: '62545547fe37f174d7715ff3',
   })
   id: string;
 
@@ -32,27 +32,9 @@ export class Topic {
   @ApiProperty({
     description: 'name of the topic',
     type: String,
-    example: 'topic16',
+    example: 'Topic_JSON_V12',
   })
   name: string;
-
-  @IsString()
-  @IsNotEmpty()
-  @ApiProperty({
-    description: 'owner of the topic',
-    type: String,
-    example: 'Vikas',
-  })
-  owner: string;
-
-  @IsString()
-  @IsNotEmpty()
-  @ApiProperty({
-    description: 'schema of the topic',
-    type: String,
-    example: JSON.stringify({ data: 'Vikas' }),
-  })
-  schema: string;
 
   @IsString()
   @IsNotEmpty()
@@ -71,6 +53,15 @@ export class Topic {
   })
   schemaType: SchemaType;
 
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({
+    description: 'owner of the topic',
+    type: String,
+    example: 'torta.apps.eggplant.vege.iam.ewc',
+  })
+  owner: string;
+
   @IsArray()
   @IsNotEmpty()
   @ArrayUnique()
@@ -80,15 +71,176 @@ export class Topic {
     example: `["aggregator"]`,
   })
   tags: string[];
+}
+
+export class PostTopicDto {
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({
+    description: 'id of the topic',
+    type: String,
+    example: '62545547fe37f174d7715ff3',
+  })
+  id: string;
+
+  @IsValidTopicName({
+    message:
+      'Malformed topic name. Name should contain only alphanumeric lowercase letters, use . as a separator. Max length 255',
+  })
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({
+    description: 'name of the topic',
+    type: String,
+    example: 'Topic_JSON_V12',
+  })
+  name: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @IsEnum(SchemaType)
+  @ApiProperty({
+    description: 'schema type of the topic',
+    type: String,
+    enum: [
+      SchemaType.JSD7,
+      SchemaType.XML,
+      SchemaType.XSD6,
+      SchemaType.CSV,
+      SchemaType.TSV,
+    ],
+    example: 'JSD7',
+  })
+  schemaType: SchemaType;
+
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({
+    description: 'schema of the topic',
+    type: String,
+    example: JSON.stringify({
+      type: 'object',
+      properties: {
+        data: {
+          type: 'number',
+        },
+      },
+    }),
+  })
+  schema: string;
 
   @IsString()
   @IsNotEmpty()
   @ApiProperty({
     description: 'version of the topic',
     type: String,
-    example: '2.0.0',
+    example: '1.0.9',
   })
   version: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({
+    description: 'owner of the topic',
+    type: String,
+    example: 'torta.apps.eggplant.vege.iam.ewc',
+  })
+  owner: string;
+
+  @IsArray()
+  @IsNotEmpty()
+  @ArrayUnique()
+  @ApiProperty({
+    description: 'tags of the topic',
+    type: [String],
+    example: `["aggregator"]`,
+  })
+  tags: string[];
+}
+
+export class GetTopicSearchDto {
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({
+    description: 'id of the topic',
+    type: String,
+    example: '62545547fe37f174d7715ff3',
+  })
+  id: string;
+
+  @IsValidTopicName({
+    message:
+      'Malformed topic name. Name should contain only alphanumeric lowercase letters, use . as a separator. Max length 255',
+  })
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({
+    description: 'name of the topic',
+    type: String,
+    example: 'Topic_JSON_V12',
+  })
+  name: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @IsEnum(SchemaType)
+  @ApiProperty({
+    description: 'schema type of the topic',
+    type: String,
+    enum: [
+      SchemaType.JSD7,
+      SchemaType.XML,
+      SchemaType.XSD6,
+      SchemaType.CSV,
+      SchemaType.TSV,
+    ],
+    example: 'JSD7',
+  })
+  schemaType: SchemaType;
+
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({
+    description: 'schema of the topic',
+    type: String,
+    example: JSON.stringify({
+      type: 'object',
+      properties: {
+        data: {
+          type: 'number',
+        },
+      },
+    }),
+  })
+  schema: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({
+    description: 'version of the topic',
+    type: String,
+    example: '1.0.9',
+  })
+  version: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({
+    description: 'owner of the topic',
+    type: String,
+    example: 'torta.apps.eggplant.vege.iam.ewc',
+  })
+  owner: string;
+
+  @IsArray()
+  @IsNotEmpty()
+  @ArrayUnique()
+  @ApiProperty({
+    description: 'tags of the topic',
+    type: [String],
+    example: `["aggregator"]`,
+  })
+  tags: string[];
 }
 
 export class UpdateTopicBodyDto {
@@ -140,12 +292,10 @@ export class GetMessagesQueryDto {
 
 export class GetTopicsCountQueryDto {
   @IsNotEmpty()
-  @IsArray()
-  @ArrayUnique()
   @ApiProperty({
     example: [
-      'ddhub.apps.energyweb.iam.ewc',
       'torta.apps.eggplant.vege.iam.ewc',
+      'mini.apps.sliced.carrot.vege.iam.ewc',
     ],
     type: [String],
   })
@@ -156,7 +306,7 @@ export class GetTopicsSearchQueryDto {
   @IsNotEmpty()
   @IsString()
   @ApiProperty({
-    example: 'keyword',
+    example: 'Topic_JSON_V12',
     type: String,
   })
   public keyword: string;
@@ -232,9 +382,9 @@ export class PaginatedResponse {
   @ApiProperty({
     description: 'total number of channels',
     type: Number,
-    example: 2,
+    example: 1,
   })
-  public count: number;
+  public total: number;
 
   @ApiProperty({
     description: 'limit of channels',
@@ -246,18 +396,51 @@ export class PaginatedResponse {
   @ApiProperty({
     description: 'page number out of total pages',
     type: Number,
-    example: 2,
+    example: 1,
   })
   @IsNumber()
   public page: number;
 
   @ApiProperty({
     description: 'Topics records',
-    type: () => [Topic],
+    type: () => [GetTopicDto],
   })
   @ArrayUnique()
   @IsArray()
-  public records: Topic[];
+  public records: GetTopicDto[];
+}
+
+export class PaginatedSearchTopicResponse {
+  @IsNumber()
+  @ApiProperty({
+    description: 'total number of channels',
+    type: Number,
+    example: 1,
+  })
+  public total: number;
+
+  @ApiProperty({
+    description: 'limit of channels',
+    type: Number,
+    example: 1,
+  })
+  @IsNumber()
+  public limit: number;
+  @ApiProperty({
+    description: 'page number out of total pages',
+    type: Number,
+    example: 1,
+  })
+  @IsNumber()
+  public page: number;
+
+  @ApiProperty({
+    description: 'Topics records',
+    type: () => [GetTopicSearchDto],
+  })
+  @ArrayUnique()
+  @IsArray()
+  public records: GetTopicSearchDto[];
 }
 
 export class TopicsCountResponse {
@@ -292,7 +475,7 @@ export class TopicsByIdAndVersionParamsDto {
   @ApiProperty({
     description: 'version of the topic',
     type: String,
-    example: '2.0.0',
+    example: '1.0.9',
   })
   public versionNumber: string;
 }
@@ -310,7 +493,7 @@ export class DeleteTopicsVersionParamsDto {
   @ApiProperty({
     description: 'version of the topic',
     type: String,
-    example: '2.0.0',
+    example: '1.0.9',
   })
   public version: string;
 }
@@ -328,7 +511,7 @@ export class DeleteTopic {
   @ApiProperty({
     description: 'returnCode from MB',
     type: String,
-    example: '400',
+    example: '200',
   })
   public returnCode: string;
 
@@ -351,7 +534,7 @@ export class PostTopicBodyDto {
   @ApiProperty({
     description: 'name of the topic',
     type: String,
-    example: 'topic16',
+    example: 'Topic_JSON_V12',
   })
   name: string;
 
@@ -393,7 +576,7 @@ export class PostTopicBodyDto {
   @ApiProperty({
     description: 'version of the topic',
     type: String,
-    example: '2.0.0',
+    example: '1.0.9',
   })
   version: string;
 
@@ -402,7 +585,7 @@ export class PostTopicBodyDto {
   @ApiProperty({
     description: 'owner of the topic',
     type: String,
-    example: 'Vikas',
+    example: 'torta.apps.eggplant.vege.iam.ewc',
   })
   owner: string;
 
