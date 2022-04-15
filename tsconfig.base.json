@@ -49,6 +49,9 @@
       "@dsb-client-gateway/ui/login": [
         "libs/dsb-client-gateway/ui/login/src/index.ts"
       ],
+      "@dsb-client-gateway/ui/applications": [
+        "libs/dsb-client-gateway/ui/applications/src/index.ts"
+      ],
       "@dsb-client-gateway/ui/utils": [
         "libs/dsb-client-gateway/ui/utils/src/index.ts"
       ]

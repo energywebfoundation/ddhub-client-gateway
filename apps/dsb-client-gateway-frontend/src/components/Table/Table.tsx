@@ -381,7 +381,7 @@ const useStyles = makeStyles()((theme) => ({
     table: {
         width: '100%',
         minWidth: 650,
-        background: theme.palette.primary.dark,
+        background: theme.palette.background.paper,
         'border-spacing': '0',
     },
 
