@@ -60,7 +60,7 @@ export function GenericTable<T>({headers, tableRows, onRowClick}: TableProps<T>)
                 <TableCell
                   key={column.accessor}>
                   {column.Header}
-                  <span>{column.isSorted ? (column.isSortedDesc ? ' 🔽' : ' 🔼') : ''}</span>
+                  <span>{column?.isSorted ? (column.isSortedDesc ? ' 🔽' : ' 🔼') : ''}</span>
                 </TableCell>
               ))}
             </TableRow>
@@ -72,7 +72,7 @@ export function GenericTable<T>({headers, tableRows, onRowClick}: TableProps<T>)
             ).map((row) => {
               prepareRow(row);
               return (
-                <TableRow key={row.namespace} {...row.getRowProps()} onClick={(event) => handleRowClick(event, row)}>
+                <TableRow key={row.namespace} {...row.getRowProps()} onClick={() => handleRowClick(row)}>
                   {row.cells.map((cell, key) => {
                     return (
                       <TableCell
