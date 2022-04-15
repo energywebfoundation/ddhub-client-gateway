@@ -20,9 +20,12 @@ import {
 } from '@dsb-client-gateway/ui/login';
 import { makeServer } from '../services/mock.service';
 
-const environment = process.env.NODE_ENV;
-
-makeServer({ environment, serverBaseUrl: process.env.NEXT_PUBLIC_SERVER_BASE_URL });
+if (
+  process.env.NODE_ENV !== 'production' &&
+  process.env.NEXT_PUBLIC_MOCK === 'true'
+) {
+  makeServer({ environment: process.env.NODE_ENV });
+}
 
 Axios.defaults.baseURL = process.env.NEXT_PUBLIC_SERVER_BASE_URL;
 
