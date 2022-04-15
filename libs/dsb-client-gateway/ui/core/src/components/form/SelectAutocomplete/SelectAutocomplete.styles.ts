@@ -31,7 +31,7 @@ export const useStyles = makeStyles()((theme) => ({
       },
     },
     '& .MuiAutocomplete-endAdornment .MuiSvgIcon-root': {
-      fill: alpha(theme.palette.grey[200], 0.5)
+      fill: alpha(theme.palette.grey[100], 0.5)
     }
   },
   placeholder: {

@@ -4,7 +4,8 @@ import { createTheme, ThemeOptions } from '@mui/material/styles';
 const dsbTheme: ThemeOptions = {
   palette: {
     primary: {
-      main: '#A466FF'
+      main: '#A466FF',
+      dark: '#7367F0'
     },
     secondary: {
       main: '#F6AFAF',
@@ -32,14 +33,15 @@ const dsbTheme: ThemeOptions = {
       secondary: '#FFFFFF'
     },
     grey: {
-      200: '#F2F2F3',
+      100: '#F2F2F3',
+      200: '#C6C9CE',
       300: '#B9B9C3',
       400: '#B2B6BD',
       500: '#848484'
     },
     background: {
       default: '#161D31',
-      paper: '#293145'
+      paper: '#293145' //#343E55
     }
   },
   typography: {

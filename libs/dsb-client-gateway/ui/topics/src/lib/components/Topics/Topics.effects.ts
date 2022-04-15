@@ -2,8 +2,11 @@ import {
   useTopicsModalsDispatch,
   TopicsModalsActionsEnum,
 } from '../../context';
+import { useTopics } from '@dsb-client-gateway/ui/api-hooks';
 
 export const useTopicsEffects = () => {
+  const { topics } = useTopics('edge.apps.aemo.iam.ewc');
+
   // TODO: remove mock
   const applicationMock = {
     appName: 'Application name 1',
@@ -13,16 +16,6 @@ export const useTopicsEffects = () => {
     namespace: 'edge.apps.aemo.iam.ewc',
     topicsCount: 4,
   };
-  const topicsMock = [
-    {
-      id: '1',
-      name: 'Topic',
-      owner: 'iam',
-      schema: 'schema',
-      schemaType: 'schema type',
-      version: '1.0.0',
-    },
-  ];
 
   const dispatch = useTopicsModalsDispatch();
 
@@ -40,6 +33,6 @@ export const useTopicsEffects = () => {
   return {
     openCreateTopic,
     application: applicationMock,
-    topics: topicsMock,
+    topics,
   };
 };

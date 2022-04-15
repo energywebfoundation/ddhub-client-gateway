@@ -13,9 +13,6 @@ body {
   font-family: 'Rajdhani', sans-serif;
   height: 100%;
 }
-[data-reactroot=""] {
-  height: 100%;
-}
 
 a {
   color: inherit;

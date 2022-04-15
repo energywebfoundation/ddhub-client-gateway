@@ -59,6 +59,7 @@ export const TablePaginationActions = (props: TablePaginationActionsProps) => {
           <KeyboardArrowLeft/>
         )}
       </IconButton>
+      {page}
       <IconButton
         onClick={handleNextButtonClick}
         disabled={page >= Math.ceil(count / rowsPerPage) - 1}

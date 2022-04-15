@@ -22,7 +22,7 @@ export function Search({filter, setFilter, debounceTime = 300}: SearchProps) {
   }
 
   return (
-    <div style={{display: 'flex', margin: '16px 0', alignItems: 'center'}}>
+    <div style={{display: 'inline-flex', margin: '16px 0', alignItems: 'center'}}>
       <label>Search</label>
       <TextField
         margin='dense'

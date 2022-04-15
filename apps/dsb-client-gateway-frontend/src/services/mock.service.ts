@@ -2,6 +2,7 @@ import { createServer } from 'miragejs';
 import {
   getApplicationsControllerGetApplicationsMock,
   getIdentityControllerGetMock,
+  getTopicsControllerGetTopicsMock
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 
 export function makeServer({ environment = 'development' }) {
@@ -19,6 +20,10 @@ export function makeServer({ environment = 'development' }) {
 
       this.get('/identity', () => {
         return getIdentityControllerGetMock();
+      });
+
+       this.get('/topics', () => {
+        return getTopicsControllerGetTopicsMock();
       });
 
       this.post('/topics', (_schema, request) => {
