@@ -7,17 +7,17 @@ import { useCreateTopic } from '@dsb-client-gateway/ui/api-hooks';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import {
-  useApplicationsModalsStore,
-  useApplicationsModalsDispatch,
-  ApplicationsModalsActionsEnum,
-} from '../../context';
+  useTopicsModalsStore,
+  useTopicsModalsDispatch,
+  TopicsModalsActionsEnum,
+} from '../../../context';
 
 export const useCreateTopicEffects = () => {
   const router = useRouter();
   const {
     createTopic: { open, hide, application },
-  } = useApplicationsModalsStore();
-  const dispatch = useApplicationsModalsDispatch();
+  } = useTopicsModalsStore();
+  const dispatch = useTopicsModalsDispatch();
 
   const initialValues = {
     name: '',
@@ -62,7 +62,7 @@ export const useCreateTopicEffects = () => {
 
   const closeModal = () => {
     dispatch({
-      type: ApplicationsModalsActionsEnum.SHOW_CREATE_TOPIC,
+      type: TopicsModalsActionsEnum.SHOW_CREATE_TOPIC,
       payload: {
         open: false,
         hide: false,
@@ -74,14 +74,14 @@ export const useCreateTopicEffects = () => {
 
   const hideModal = () => {
     dispatch({
-      type: ApplicationsModalsActionsEnum.HIDE_CREATE_TOPIC,
+      type: TopicsModalsActionsEnum.HIDE_CREATE_TOPIC,
       payload: true,
     });
   };
 
   const showModal = () => {
     dispatch({
-      type: ApplicationsModalsActionsEnum.HIDE_CREATE_TOPIC,
+      type: TopicsModalsActionsEnum.HIDE_CREATE_TOPIC,
       payload: false,
     });
   };
@@ -102,7 +102,7 @@ export const useCreateTopicEffects = () => {
   const openCancelModal = () => {
     hideModal();
     dispatch({
-      type: ApplicationsModalsActionsEnum.SHOW_CANCEL,
+      type: TopicsModalsActionsEnum.SHOW_CANCEL,
       payload: {
         open: true,
         onConfirm: closeModal,

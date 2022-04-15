@@ -1,18 +1,18 @@
 import {
-  useApplicationsModalsStore,
-  useApplicationsModalsDispatch,
-  ApplicationsModalsActionsEnum,
-} from '../../context';
+  useTopicsModalsStore,
+  useTopicsModalsDispatch,
+  TopicsModalsActionsEnum,
+} from '../../../context';
 
 export const useCancelEffects = () => {
   const {
     cancel: { open, onCancel, onConfirm },
-  } = useApplicationsModalsStore();
-  const dispatch = useApplicationsModalsDispatch();
+  } = useTopicsModalsStore();
+  const dispatch = useTopicsModalsDispatch();
 
   const closeModal = () => {
     dispatch({
-      type: ApplicationsModalsActionsEnum.SHOW_CANCEL,
+      type: TopicsModalsActionsEnum.SHOW_CANCEL,
       payload: {
         open: null,
         onConfirm: null,

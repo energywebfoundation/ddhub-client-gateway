@@ -1,12 +1,12 @@
-import { IApplicationsModalsStore, TApplicationsModalsAction } from './types';
+import { ITopicsModalsStore, TTopicsModalsAction } from './types';
 
-export enum ApplicationsModalsActionsEnum {
+export enum TopicsModalsActionsEnum {
   SHOW_CREATE_TOPIC = 'SHOW_CREATE_TOPIC',
   HIDE_CREATE_TOPIC = 'HIDE_CREATE_TOPIC',
   SHOW_CANCEL = 'SHOW_CANCEL',
 }
 
-export const applicationsModalsInitialState: IApplicationsModalsStore = {
+export const topicsModalsInitialState: ITopicsModalsStore = {
   createTopic: {
     open: false,
     hide: false,
@@ -19,19 +19,19 @@ export const applicationsModalsInitialState: IApplicationsModalsStore = {
   },
 };
 
-export const applicationsModalsReducer = (
-  state = applicationsModalsInitialState,
-  action: TApplicationsModalsAction
-): IApplicationsModalsStore => {
+export const topicsModalsReducer = (
+  state = topicsModalsInitialState,
+  action: TTopicsModalsAction
+): ITopicsModalsStore => {
   switch (action.type) {
-    case ApplicationsModalsActionsEnum.SHOW_CREATE_TOPIC:
+    case TopicsModalsActionsEnum.SHOW_CREATE_TOPIC:
       return { ...state, createTopic: action.payload };
-    case ApplicationsModalsActionsEnum.HIDE_CREATE_TOPIC:
+    case TopicsModalsActionsEnum.HIDE_CREATE_TOPIC:
       return {
         ...state,
         createTopic: { ...state.createTopic, hide: action.payload },
       };
-    case ApplicationsModalsActionsEnum.SHOW_CANCEL:
+    case TopicsModalsActionsEnum.SHOW_CANCEL:
       return { ...state, cancel: action.payload };
   }
 };
