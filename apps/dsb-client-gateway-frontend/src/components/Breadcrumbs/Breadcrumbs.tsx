@@ -10,8 +10,6 @@ export function Breadcrumbs() {
   const router = useRouter();
   const {classes} = useStyles();
 
-  console.log(router);
-
   const [main, text] = getBreadcrumbsFromPathname(router.pathname);
 
   const separator = text ? <NavigateNext fontSize="small"/> : '';

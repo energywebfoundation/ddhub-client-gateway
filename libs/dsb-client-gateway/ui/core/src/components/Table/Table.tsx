@@ -1,4 +1,3 @@
-import React from 'react';
 import 'regenerator-runtime/runtime';
 import {
   Paper,
@@ -12,47 +11,37 @@ import {
   TableRow,
   Box,
 } from '@mui/material';
+import { ColumnInstance } from 'react-table';
 import { Search } from './Search';
 import { TablePaginationActions } from './TablePaginationActions';
+import { TableComponentActions } from './TableComponentActions';
 import { EmptyRow } from './EmptyRow/EmptyRow';
 import { EmptyTable } from './EmptyTable/EmptyTable';
 import { useTableEffects } from './Table.effects';
 import { useStyles } from './Table.styles';
-import { TTable } from './Table.types';
+import { TableProps } from './Table.types';
 
-export const GenericTable: TTable = ({
+export function GenericTable<T>({
   headers,
   tableRows,
   onRowClick,
   children,
-}) => {
+  actions,
+}: TableProps<T>) {
   const { classes } = useStyles();
   const {
     getTableProps,
     prepareRow,
     rows,
-    gotoPage,
     setGlobalFilter,
     pageIndex,
     pageSize,
     globalFilter,
     totalLength,
     emptyRows,
-  } = useTableEffects({ headers, tableRows });
-
-  const handleChangePage = (
-    _event: React.MouseEvent<HTMLButtonElement> | null,
-    newPage: number
-  ) => {
-    gotoPage(newPage);
-  };
-
-  const handleRowClick = (selectedRow: any) => {
-    if (!onRowClick) {
-      return;
-    }
-    onRowClick(selectedRow);
-  };
+    handleChangePage,
+    handleRowClick,
+  } = useTableEffects({ headers, tableRows, onRowClick });
 
   return (
     <>
@@ -67,10 +56,6 @@ export const GenericTable: TTable = ({
               <TableRow>
                 {headers.map((column) => (
                   <TableCell
-                    style={{
-                      width: column.width ?? 'initial',
-                      color: column.hideHeader ? 'transparent' : 'inherit',
-                    }}
                     classes={{ head: classes.head }}
                     key={column.accessor}
                   >
@@ -84,6 +69,12 @@ export const GenericTable: TTable = ({
                     </span>
                   </TableCell>
                 ))}
+                {actions && (
+                  <TableCell
+                    classes={{ head: classes.head }}
+                    className={classes.action}
+                  />
+                )}
               </TableRow>
             </TableHead>
             <TableBody>
@@ -97,25 +88,26 @@ export const GenericTable: TTable = ({
                 prepareRow(row);
                 return (
                   <TableRow
-                    key={row.namespace}
                     {...row.getRowProps()}
                     onClick={() => handleRowClick(row)}
                   >
-                    {row.cells.map((cell, key) => {
-                      console.log(cell);
+                    {row.cells.map((cell) => {
+                      const column = cell.column as ColumnInstance & {
+                        color: string;
+                      };
                       return (
                         <TableCell
-                          key={key}
                           classes={{ body: classes.body }}
-                          style={{
-                            color: cell.column?.cellBodyColor || 'inherit',
-                          }}
+                          color={column.color}
                           {...cell.getCellProps()}
                         >
                           {cell.render('Cell')}
                         </TableCell>
                       );
                     })}
+                    {actions && (
+                      <TableComponentActions id={row.id} actions={actions} />
+                    )}
                   </TableRow>
                 );
               })}
@@ -148,4 +140,4 @@ export const GenericTable: TTable = ({
       </TableContainer>
     </>
   );
-};
+}

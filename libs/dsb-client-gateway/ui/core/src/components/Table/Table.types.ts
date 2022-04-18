@@ -1,4 +1,6 @@
-import { PropsWithChildren, ReactElement } from 'react';
+import { ReactElement } from 'react';
+import { Row } from 'react-table';
+import { TTableComponentAction } from '../Table/TableComponentActions';
 
 export interface TableHeader {
   accessor: string;
@@ -6,16 +8,12 @@ export interface TableHeader {
   filter?: string;
   isSorted?: boolean;
   isSortedDesc?: boolean;
-  width?: number;
-  hideHeader?: boolean;
 }
 
 export interface TableProps<T> {
   headers: TableHeader[];
   tableRows: T[];
-  onRowClick?: (data: T) => void;
+  onRowClick?: (data: Row<object>) => void;
+  actions?: TTableComponentAction[];
+  children?: ReactElement;
 }
-
-export type TTable = <T>(
-  props: PropsWithChildren<TableProps<T>>
-) => ReactElement;

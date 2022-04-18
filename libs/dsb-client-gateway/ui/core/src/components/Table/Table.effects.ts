@@ -7,11 +7,19 @@ import {
   usePagination,
   useSortBy,
   useTable,
+  Row
 } from 'react-table';
 import { TableProps } from './Table.types';
 
-export function useTableEffects<T>({ tableRows, headers }: TableProps<T>) {
-  const data = React.useMemo(() => tableRows, [tableRows]);
+export function useTableEffects<T>({
+  tableRows,
+  headers,
+  onRowClick,
+}: TableProps<T>) {
+  const data = React.useMemo(
+    () => tableRows,
+    [tableRows]
+  ) as unknown as readonly object[];
   const filterTypes = React.useMemo(
     () => ({
       fuzzyText: fuzzyTextFilterFn,
@@ -45,16 +53,31 @@ export function useTableEffects<T>({ tableRows, headers }: TableProps<T>) {
   const emptyRows: number =
     pageIndex > 0 ? Math.max(0, (1 + pageIndex) * pageSize - rows.length) : 0;
 
+  const handleChangePage = (
+    _event: React.MouseEvent<HTMLButtonElement> | null,
+    newPage: number
+  ) => {
+    gotoPage(newPage);
+  };
+
+  const handleRowClick = (selectedRow: Row<object>) => {
+    if (!onRowClick) {
+      return;
+    }
+    onRowClick(selectedRow);
+  };
+
   return {
     getTableProps,
     prepareRow,
     rows,
-    gotoPage,
     setGlobalFilter,
     pageIndex,
     pageSize,
     globalFilter,
     totalLength,
     emptyRows,
+    handleChangePage,
+    handleRowClick,
   };
 }

@@ -6,6 +6,9 @@ import React from 'react';
 
 const useStyles = makeStyles()(theme => ({
   root: {
+    '& svg': {
+      fill: theme.palette.grey[400]
+    },
     flexShrink: 0,
     marginLeft: theme.spacing(2.5),
   }
@@ -59,7 +62,6 @@ export const TablePaginationActions = (props: TablePaginationActionsProps) => {
           <KeyboardArrowLeft/>
         )}
       </IconButton>
-      {page}
       <IconButton
         onClick={handleNextButtonClick}
         disabled={page >= Math.ceil(count / rowsPerPage) - 1}

@@ -20,28 +20,10 @@ export const useStyles = makeStyles()((theme) => ({
     fontWeight: 400,
     textTransform: 'capitalize',
   },
-  connectionStatus: {
-    display: 'flex',
-    alignItems: 'center',
-    padding: '0 2rem',
-  },
   createTopicButtonWrapper: {
     display: 'flex',
     alignItems: 'flex-end',
     margin: '0 0 18px auto'
-  },
-  chip: {
-    background: alpha(theme.palette.primary.main, 0.12),
-    height: 20,
-    margin: 3
-  },
-  chipLabel: {
-    fontSize: 12,
-    lineHeight: '18px',
-    fontWeight: 400,
-    letterSpacing: '0.4px',
-    color: theme.palette.primary.main,
-    fontFamily: theme.typography.body2.fontFamily,
   },
   list: {
     borderRadius: 6,
@@ -65,7 +47,4 @@ export const useStyles = makeStyles()((theme) => ({
     background: theme.palette.background.paper,
     boxShadow: `0px 5px 25px ${alpha(theme.palette.common.black, 0.1)}`
   },
-  error: {
-    color: theme.palette.error.main
-  }
 }));
