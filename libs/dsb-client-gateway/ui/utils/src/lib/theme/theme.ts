@@ -41,7 +41,7 @@ const dsbTheme: ThemeOptions = {
     },
     background: {
       default: '#161D31',
-      paper: '#293145' //#343E55
+      paper: '#293145'
     }
   },
   typography: {
