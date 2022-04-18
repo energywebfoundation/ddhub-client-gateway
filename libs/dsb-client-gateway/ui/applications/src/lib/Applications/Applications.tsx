@@ -8,8 +8,8 @@ export function Applications() {
   const {applications} = useApplications();
   const router = useRouter();
 
-  const handleRowClick = (data: ApplicationDTO) => {
-    router.push(data.namespace);
+  const handleRowClick = (data) => {
+    router.push(data);
   }
   return (
     <div>
