@@ -43,6 +43,7 @@ import { isAxiosError } from '@nestjs/terminus/dist/utils';
 import { SecretsEngineService } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
 import { RoleStatus } from '@dsb-client-gateway/dsb-client-gateway/identity/models';
 import { OperationOptions } from 'retry';
+import { Span } from 'nestjs-otel';
 
 export interface RetryOptions {
   stopOnStatusCodes?: HttpStatus[];
@@ -100,6 +101,7 @@ export class DsbApiService implements OnApplicationBootstrap {
     return { data, headers };
   }
 
+  @Span('ddhub_mb_getDIDsFromRoles')
   public async getDIDsFromRoles(
     roles: string[],
     searchType: 'ANY',
@@ -130,6 +132,7 @@ export class DsbApiService implements OnApplicationBootstrap {
     return data.dids;
   }
 
+  @Span('ddhub_mb_getTopicVersions')
   public async getTopicVersions(
     topicId: string
   ): Promise<TopicVersionResponse> {
@@ -183,6 +186,7 @@ export class DsbApiService implements OnApplicationBootstrap {
     }
   }
 
+  @Span('ddhub_mb_downloadFile')
   public async uploadFile(
     file: Express.Multer.File,
     fqcns: string[],
@@ -237,6 +241,7 @@ export class DsbApiService implements OnApplicationBootstrap {
     }
   }
 
+  @Span('ddhub_mb_downloadFile')
   public async downloadFile(
     fileId: string
   ): Promise<{ data: string; headers: any }> {
@@ -269,6 +274,7 @@ export class DsbApiService implements OnApplicationBootstrap {
     }
   }
 
+  @Span('ddhub_mb_getTopicsByOwnerAndName')
   public async getTopicsByOwnerAndName(
     name: string,
     owner: string
@@ -303,6 +309,7 @@ export class DsbApiService implements OnApplicationBootstrap {
     }
   }
 
+  @Span('ddhub_mb_getApplicationsByOwnerAndRole')
   public async getApplicationsByOwnerAndRole(
     roleName: string
   ): Promise<ApplicationDTO[]> {
@@ -319,6 +326,7 @@ export class DsbApiService implements OnApplicationBootstrap {
     }
   }
 
+  @Span('ddhub_mb_getTopics')
   public async getTopics(
     limit: number,
     name: string,
@@ -354,6 +362,7 @@ export class DsbApiService implements OnApplicationBootstrap {
     }
   }
 
+  @Span('ddhub_mb_getTopicsCountByOwner')
   public async getTopicsCountByOwner(owners: string[]): Promise<Topic[]> {
     if (!owners || owners.length === 0) {
       return [];
@@ -386,6 +395,7 @@ export class DsbApiService implements OnApplicationBootstrap {
     }
   }
 
+  @Span('ddhub_mb_postTopics')
   public async postTopics(topicData: SendTopicBodyDTO): Promise<Topic> {
     try {
       const { data } = await this.request<null>(
@@ -409,6 +419,7 @@ export class DsbApiService implements OnApplicationBootstrap {
     }
   }
 
+  @Span('ddhub_mb_updateTopics')
   public async updateTopics(
     data: SendTopicBodyDTO,
     id: string
@@ -436,6 +447,7 @@ export class DsbApiService implements OnApplicationBootstrap {
     }
   }
 
+  @Span('ddhub_mb_deleteTopic')
   public async deleteTopic(id: string): Promise<TopicResultDTO> {
     try {
       this.logger.log('topic to be deleted', id);
@@ -460,6 +472,7 @@ export class DsbApiService implements OnApplicationBootstrap {
     }
   }
 
+  @Span('ddhub_mb_deleteTopicByVersion')
   public async deleteTopicByVersion(
     id: string,
     version: string
@@ -497,6 +510,7 @@ export class DsbApiService implements OnApplicationBootstrap {
     }
   }
 
+  @Span('ddhub_mb_messagesSearch')
   public async messagesSearch(
     topicId: string[],
     senderId: string[],
@@ -534,6 +548,7 @@ export class DsbApiService implements OnApplicationBootstrap {
     }
   }
 
+  @Span('ddhub_mb_getMessages')
   public async getMessages(
     fqcn: string,
     from?: string,
@@ -568,6 +583,7 @@ export class DsbApiService implements OnApplicationBootstrap {
     }
   }
 
+  @Span('ddhub_mb_sendMessage')
   public async sendMessage(
     fqcns: string[],
     payload: string,
@@ -609,6 +625,7 @@ export class DsbApiService implements OnApplicationBootstrap {
     }
   }
 
+  @Span('ddhub_mb_sendMessageInternal')
   public async sendMessageInternal(
     fqcn: string,
     clientGatewayMessageId: string,
@@ -651,6 +668,7 @@ export class DsbApiService implements OnApplicationBootstrap {
     }
   }
 
+  @Span('ddhub_mb_getSymmetricKeys')
   public async getSymmetricKeys(
     dto: { clientId: string; amount: number },
     overrideRetry?: OperationOptions
@@ -753,6 +771,7 @@ export class DsbApiService implements OnApplicationBootstrap {
     return data;
   }
 
+  @Span('ddhub_mb_login')
   public async login(): Promise<void> {
     const enrolment = this.enrolmentRepository.getEnrolment();
 
@@ -837,6 +856,7 @@ export class DsbApiService implements OnApplicationBootstrap {
     }
   }
 
+  @Span('ddhub_mb_initExtChannel')
   protected async initExtChannel(): Promise<void> {
     try {
       await this.request<null>(

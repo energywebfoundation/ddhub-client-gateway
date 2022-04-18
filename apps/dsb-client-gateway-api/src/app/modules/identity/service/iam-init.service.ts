@@ -3,6 +3,7 @@ import { IamService } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
 import { SecretsEngineService } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
 import { EnrolmentRepository } from '../../storage/repository/enrolment.repository';
 import { IdentityRepository } from '../../storage/repository/identity.repository';
+import { Span } from 'nestjs-otel';
 
 @Injectable()
 export class IamInitService implements OnModuleInit {
@@ -15,6 +16,7 @@ export class IamInitService implements OnModuleInit {
     protected readonly identityRepository: IdentityRepository
   ) {}
 
+  @Span('iam_initializer')
   public async onModuleInit(): Promise<void> {
     const privateKey = await this.secretsEngine.getPrivateKey();
 

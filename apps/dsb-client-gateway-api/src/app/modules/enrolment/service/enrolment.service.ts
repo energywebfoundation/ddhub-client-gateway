@@ -11,6 +11,7 @@ import {
 } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
 import { ConfigService } from '@nestjs/config';
 import { RoleListenerService } from './role-listener.service';
+import { Span } from 'nestjs-otel';
 
 @Injectable()
 export class EnrolmentService {
@@ -44,6 +45,7 @@ export class EnrolmentService {
     return currentEnrolment;
   }
 
+  @Span('enrolment_generateEnrolment')
   public async generateEnrolment(): Promise<Enrolment> {
     const existingClaimsWithStatus: Claim[] =
       await this.iamService.getClaimsWithStatus();

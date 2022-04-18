@@ -13,6 +13,7 @@ import { ChannelType } from '../channel.const';
 import { UpdateChannelDto } from '../dto/request/update-channel.dto';
 import { RefreshChannelCacheDataCommand } from '../command/refresh-channel-cache-data.command';
 import { ChannelAlreadyExistsException } from '../exceptions/channel-already-exists.exception';
+import { Span } from 'nestjs-otel';
 
 @Injectable()
 export class ChannelService {
@@ -24,10 +25,12 @@ export class ChannelService {
     protected readonly commandBus: CommandBus
   ) {}
 
+  @Span('channels_getChannels')
   public getChannels(): ChannelEntity[] {
     return this.channelRepository.getAll();
   }
 
+  @Span('channels_createChannel')
   public async createChannel(payload: CreateChannelDto): Promise<void> {
     this.logger.log(`Attempting to create channel ${payload.fqcn}`);
 
@@ -66,6 +69,7 @@ export class ChannelService {
     );
   }
 
+  @Span('channels_updateChannelTopic')
   public async updateChannelTopic(
     channelName: string,
     topicId: string,
@@ -81,6 +85,7 @@ export class ChannelService {
     await this.channelRepository.updateChannel(channel);
   }
 
+  @Span('channels_updateQualifiedDids')
   public async updateChannelQualifiedDids(
     channelName: string,
     dids: string[]
@@ -92,6 +97,7 @@ export class ChannelService {
     await this.channelRepository.updateChannel(channel);
   }
 
+  @Span('channels_getChannelQualifiedDids')
   public getChannelQualifiedDids(fqcn: string): ChannelQualifiedDids {
     const channel: ChannelEntity = this.getChannelOrThrow(fqcn);
 
@@ -130,6 +136,7 @@ export class ChannelService {
     await this.channelRepository.delete(channel.fqcn);
   }
 
+  @Span('channels_updateChannel')
   public async updateChannel(
     dto: UpdateChannelDto,
     fqcn: string
@@ -163,6 +170,7 @@ export class ChannelService {
     await this.commandBus.execute(new RefreshChannelCacheDataCommand(fqcn));
   }
 
+  @Span('channels_getTopicsWithIds')
   protected async getTopicsWithIds(
     topics: TopicDto[]
   ): Promise<ChannelTopic[]> {
@@ -194,6 +202,7 @@ export class ChannelService {
     return topicsToReturn;
   }
 
+  @Span('channels_getChannelsByType')
   public getChannelsByType(type?: ChannelType): ChannelEntity[] {
     return this.channelRepository.getChannelsByType(type);
   }

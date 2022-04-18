@@ -19,7 +19,7 @@ import { ChannelModule } from './modules/channel/channel.module';
 import { MessageModule } from './modules/message/message.module';
 import { ApplicationModule } from './modules/application/application.module';
 import { TopicModule } from './modules/topic/topic.module';
-import { OpenTelemetryModule } from 'nestjs-otel';
+import { DdhubClientGatewayTracingModule } from '@dsb-client-gateway/ddhub-client-gateway-tracing';
 
 @Module({})
 export class AppModule {
@@ -29,22 +29,7 @@ export class AppModule {
         isGlobal: true,
         validate: shouldValidate && configValidate,
       }),
-      OpenTelemetryModule.forRoot({
-        metrics: {
-          hostMetrics: true, // Includes Host Metrics
-          defaultMetrics: false, // Includes Default Metrics
-          apiMetrics: {
-            enable: true, // Includes api metrics
-            timeBuckets: [], // You can change the default time buckets
-            defaultAttributes: {
-              // You can set default labels for api metrics
-              custom: 'label',
-            },
-            ignoreRoutes: ['/favicon.ico'], // You can ignore specific routes (See https://docs.nestjs.com/middleware#excluding-routes for options)
-            ignoreUndefinedRoutes: false, //Records metrics for all URLs, even undefined ones
-          },
-        },
-      }),
+      DdhubClientGatewayTracingModule.forRoot(),
       MulterModule.register({
         dest: './files',
       }),

@@ -4,6 +4,7 @@ import {
   AbstractLokiRepository,
   LokiService,
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
+import { Span } from 'nestjs-otel';
 
 @Injectable()
 export class IdentityRepository extends AbstractLokiRepository {
@@ -37,6 +38,7 @@ export class IdentityRepository extends AbstractLokiRepository {
     );
   }
 
+  @Span('identity_write')
   public async writeIdentity(identity: Identity): Promise<void> {
     this.createCollectionIfNotExists(this.collection);
 

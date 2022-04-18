@@ -5,7 +5,7 @@ import { WsAdapter } from '@nestjs/platform-ws';
 import { AppModule } from './app/app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
-import otelSDK from './app/modules/utils/tracing';
+import { otelSDK } from '@dsb-client-gateway/ddhub-client-gateway-tracing';
 
 async function bootstrap() {
   await otelSDK.start();

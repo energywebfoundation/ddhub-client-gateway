@@ -158,12 +158,24 @@ export class EnvironmentVariables {
   @ValidateIf(EnvironmentVariables.isOTELEnabled)
   OPEN_TELEMETRY_EXPORTER = OpenTelemetryExporters.ZIPKIN;
 
+  @IsString()
+  @ValidateIf(EnvironmentVariables.isOTELEnabled)
+  OTEL_IGNORED_ROUTES = 'health,api/v2/health';
+
+  @IsString()
+  @ValidateIf(EnvironmentVariables.isOTELEnabled)
+  OTEL_TRACING_URL = 'http://localhost:4318/v1/traces';
+
+  @IsString()
+  @ValidateIf(EnvironmentVariables.isOTELEnabled)
+  OTEL_SERVICE_NAME = 'ddhub-client-gateway';
+
+  @IsString()
+  @ValidateIf(EnvironmentVariables.isOTELEnabled)
+  OTEL_ENVIRONMENT = 'local';
+
   static isOTELEnabled(values: EnvironmentVariables): boolean {
     return values.OPENTELEMETRY_ENABLED;
-  }
-
-  static isZipkinExporter(values: EnvironmentVariables): boolean {
-    return values.OPEN_TELEMETRY_EXPORTER === OpenTelemetryExporters.ZIPKIN;
   }
 
   static isVaultEnabled(values: EnvironmentVariables): boolean {

@@ -10,6 +10,7 @@ import {
   TopicVersion,
   TopicVersionResponse,
 } from '../../dsb-client/dsb-client.interface';
+import { Span } from 'nestjs-otel';
 
 @Injectable()
 export class ChannelDidCacheService {
@@ -23,6 +24,7 @@ export class ChannelDidCacheService {
     protected readonly topicRepository: TopicRepository
   ) {}
 
+  @Span('channel_refreshChannelCache')
   public async refreshChannelCache(fqcn: string): Promise<void> {
     if (!this.iamService.isInitialized()) {
       this.logger.warn('IAM connection is not initialized, skipping');

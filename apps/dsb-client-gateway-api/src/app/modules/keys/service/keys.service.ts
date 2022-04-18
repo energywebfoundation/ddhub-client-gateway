@@ -17,6 +17,7 @@ import {
 import { IdentityService } from '../../identity/service/identity.service';
 import { BalanceState } from '@dsb-client-gateway/dsb-client-gateway/identity/models';
 import { IamInitService } from '../../identity/service/iam-init.service';
+import { Span } from 'nestjs-otel';
 
 @Injectable()
 export class KeysService implements OnModuleInit {
@@ -35,10 +36,12 @@ export class KeysService implements OnModuleInit {
     protected readonly iamInitService: IamInitService
   ) {}
 
+  @Span('keys_storeKeysForMessage')
   public async storeKeysForMessage(): Promise<void> {
     await this.symmetricKeysCacheService.refreshSymmetricKeysCache();
   }
 
+  @Span('keys_getSymmetricKey')
   public async getSymmetricKey(
     senderDid: string,
     clientGatewayMessageId: string
@@ -61,6 +64,7 @@ export class KeysService implements OnModuleInit {
     return crypto.randomBytes(32).toString('hex');
   }
 
+  @Span('keys_encryptMessage')
   public encryptMessage(
     message: string | Buffer,
     computedSharedKey: string,
@@ -81,12 +85,14 @@ export class KeysService implements OnModuleInit {
     );
   }
 
+  @Span('keys_createSignature')
   public createSignature(encryptedData: string, privateKey: string): string {
     const signingKey = new SigningKey(privateKey);
 
     return joinSignature(signingKey.signDigest(id(encryptedData)));
   }
 
+  @Span('keys_verifySignature')
   public async verifySignature(
     senderDid: string,
     signature: string,
@@ -126,6 +132,7 @@ export class KeysService implements OnModuleInit {
     }
   }
 
+  @Span('keys_decryptMessage')
   public async decryptMessage(
     encryptedMessage: string,
     clientGatewayMessageId: string,
@@ -180,6 +187,7 @@ export class KeysService implements OnModuleInit {
     return decrypted;
   }
 
+  @Span('keys_encryptSymmetricKey')
   public async encryptSymmetricKey(
     symmetricKey: string,
     receiverDid: string
@@ -217,6 +225,7 @@ export class KeysService implements OnModuleInit {
     return encryptedData.toString('base64');
   }
 
+  @Span('keys_decryptSymetricKey')
   public decryptSymmetricKey(
     privateKey: string,
     encryptedSymmetricKey: any,
@@ -239,6 +248,7 @@ export class KeysService implements OnModuleInit {
       .toString();
   }
 
+  @Span('keys_generate')
   public async onModuleInit(): Promise<void> {
     this.logger.log('Starting keys onModuleInit');
 

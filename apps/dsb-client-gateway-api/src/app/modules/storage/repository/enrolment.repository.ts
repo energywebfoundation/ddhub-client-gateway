@@ -4,6 +4,7 @@ import {
   LokiService,
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
 import { Enrolment } from '@dsb-client-gateway/dsb-client-gateway/identity/models';
+import { Span } from 'nestjs-otel';
 
 @Injectable()
 export class EnrolmentRepository extends AbstractLokiRepository {
@@ -13,6 +14,7 @@ export class EnrolmentRepository extends AbstractLokiRepository {
     super('enrolment', lokiService);
   }
 
+  @Span('enrolment_write')
   public writeEnrolment(enrolment: Enrolment): void {
     this.createCollectionIfNotExists(this.collection);
 
