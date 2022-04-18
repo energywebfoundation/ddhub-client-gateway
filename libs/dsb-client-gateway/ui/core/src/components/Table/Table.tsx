@@ -85,6 +85,7 @@ export function GenericTable<T>({
                   )
                 : rows
               ).map((row) => {
+                const data = row.original as any;
                 prepareRow(row);
                 return (
                   <TableRow
@@ -106,7 +107,7 @@ export function GenericTable<T>({
                       );
                     })}
                     {actions && (
-                      <TableComponentActions id={row.id} actions={actions} />
+                      <TableComponentActions id={data?.id} actions={actions} />
                     )}
                   </TableRow>
                 );

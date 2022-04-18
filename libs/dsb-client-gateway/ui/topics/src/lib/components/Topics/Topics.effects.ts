@@ -4,10 +4,14 @@ import {
   TopicsModalsActionsEnum,
 } from '../../context';
 import { useTopics } from '@dsb-client-gateway/ui/api-hooks';
+import { TTableComponentAction } from '@dsb-client-gateway/ui/core';
+import { PostTopicDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
+import { useStyles } from './Topics.styles';
 
 export const useTopicsEffects = () => {
+  const { theme } = useStyles();
   const router = useRouter();
-  const { topics } = useTopics(router.query['namespace'] as string);
+  const { topics, topicsById } = useTopics(router.query['namespace'] as string);
 
   // TODO: remove mock
   const applicationMock = {
@@ -32,9 +36,39 @@ export const useTopicsEffects = () => {
     });
   };
 
+  const openUpdateTopic = (topic: PostTopicDto) => {
+    dispatch({
+      type: TopicsModalsActionsEnum.SHOW_UPDATE_TOPIC,
+      payload: {
+        open: true,
+        hide: false,
+        application: applicationMock,
+        topic,
+      },
+    });
+  };
+
+  const actions: TTableComponentAction[] = [
+    {
+      label: 'View details',
+    },
+    {
+      label: 'Update',
+      onClick: (id: string) => openUpdateTopic(topicsById[id] as PostTopicDto),
+    },
+    {
+      label: 'View version history',
+    },
+    {
+      label: 'Remove',
+      color: theme.palette.error.main,
+    },
+  ];
+
   return {
     openCreateTopic,
     application: applicationMock,
     topics,
+    actions,
   };
 };
