@@ -1,3 +1,4 @@
+import { useRouter } from 'next/router';
 import {
   useTopicsModalsDispatch,
   TopicsModalsActionsEnum,
@@ -5,7 +6,8 @@ import {
 import { useTopics } from '@dsb-client-gateway/ui/api-hooks';
 
 export const useTopicsEffects = () => {
-  const { topics } = useTopics('edge.apps.aemo.iam.ewc');
+  const router = useRouter();
+  const { topics } = useTopics(router.query['namespace'] as string);
 
   // TODO: remove mock
   const applicationMock = {

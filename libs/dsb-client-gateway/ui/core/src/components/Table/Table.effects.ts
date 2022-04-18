@@ -28,7 +28,7 @@ export function useTableEffects<T>({
     []
   );
   const columns = React.useMemo(() => headers, []);
-  const totalLength = data?.length || 0;
+  const totalLength = data.length;
 
   const {
     getTableProps,
