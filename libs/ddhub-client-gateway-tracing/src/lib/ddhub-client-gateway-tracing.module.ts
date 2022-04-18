@@ -16,7 +16,7 @@ export class DdhubClientGatewayTracingModule {
                 apiMetrics: {
                   enable: true,
                   ignoreRoutes: configService
-                    .get<string>('OTEL_IGNORED_ROUTES')
+                    .get<string>('OTEL_IGNORED_ROUTES', 'favicon.ico')
                     .split(','), // You can ignore specific routes (See https://docs.nestjs.com/middleware#excluding-routes for options)
                   ignoreUndefinedRoutes: false, //Records metrics for all URLs, even undefined ones
                 },

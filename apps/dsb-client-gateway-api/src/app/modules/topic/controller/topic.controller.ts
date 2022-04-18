@@ -18,12 +18,18 @@ import {
   GetTopicsCountQueryDto,
   PaginatedResponse,
   TopicsCountResponse,
-  Topic,
-  SendTopicBodyDto,
+  GetTopicDto,
+  UpdateTopicBodyDto,
   GetTopicsQueryDto,
   GetTopicsParamsDto,
   DeleteTopic,
   DeleteTopicsVersionParamsDto,
+  TopicsByIdAndVersionParamsDto,
+  UpdateTopicHistoryBodyDto,
+  GetTopicsSearchQueryDto,
+  PostTopicBodyDto,
+  PostTopicDto,
+  PaginatedSearchTopicResponse,
 } from '../dto';
 
 @Controller('topics')
@@ -48,6 +54,39 @@ export class TopicsController {
     return this.dsbClientService.getTopics(limit, name, owner, page, tags);
   }
 
+  @Get('/:id/versions')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Get Topics List with same Id and different versions',
+    type: () => PaginatedSearchTopicResponse,
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Unauthorized',
+  })
+  public async getTopicsHistoryById(@Param() { id }: GetTopicsParamsDto) {
+    return this.dsbClientService.getTopicHistoryById(id);
+  }
+
+  @Get('/:id/versions/:versionNumber')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Get Topics History by Id and version',
+    type: () => PostTopicDto,
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Unauthorized',
+  })
+  public async getTopicHistoryByIdAndVersion(
+    @Param() { id, versionNumber }: TopicsByIdAndVersionParamsDto
+  ) {
+    return this.dsbClientService.getTopicHistoryByIdAndVersion(
+      id,
+      versionNumber
+    );
+  }
+
   @Get('/count')
   @ApiResponse({
     status: HttpStatus.OK,
@@ -60,11 +99,23 @@ export class TopicsController {
     return this.dsbClientService.getTopicsCountByOwner(owner);
   }
 
+  @Get('/search')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Get Topics by Search',
+    type: () => PaginatedSearchTopicResponse,
+  })
+  public async getTopicsBySearch(
+    @Query() { keyword, limit, page }: GetTopicsSearchQueryDto
+  ) {
+    return this.dsbClientService.getTopicsBySearch(keyword, limit, page);
+  }
+
   @Post('')
   @ApiResponse({
     status: HttpStatus.CREATED,
     description: 'Topic successfully created',
-    type: () => Topic,
+    type: () => PostTopicDto,
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
@@ -76,15 +127,46 @@ export class TopicsController {
     description: 'Unauthorized',
   })
   @HttpCode(HttpStatus.CREATED)
-  public async postTopics(@Body() data: SendTopicBodyDto) {
+  public async postTopics(@Body() data: PostTopicBodyDto) {
     return this.dsbClientService.postTopics(data);
+  }
+
+  @Put('/:id/versions/:versionNumber')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Topic updated successfully',
+    type: () => PostTopicDto,
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description:
+      'Validation failed or some requirements were not fully satisfied',
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Unauthorized',
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Topic not found',
+  })
+  @HttpCode(HttpStatus.OK)
+  public async updateTopicsByIdAndVersion(
+    @Param() { id, versionNumber }: TopicsByIdAndVersionParamsDto,
+    @Body() data: UpdateTopicHistoryBodyDto
+  ) {
+    return this.dsbClientService.updateTopicByIdAndVersion(
+      data,
+      id,
+      versionNumber
+    );
   }
 
   @Put('/:id')
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Topic updated successfully',
-    type: () => Topic,
+    type: () => PostTopicDto,
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
@@ -102,9 +184,9 @@ export class TopicsController {
   @HttpCode(HttpStatus.OK)
   public async updateTopics(
     @Param() { id }: GetTopicsParamsDto,
-    @Body() data: SendTopicBodyDto
+    @Body() data: UpdateTopicBodyDto
   ) {
-    return this.dsbClientService.updateTopics(data, id);
+    return this.dsbClientService.updateTopic(data, id);
   }
 
   @Delete('/:id')
@@ -131,7 +213,7 @@ export class TopicsController {
     return this.dsbClientService.deleteTopic(id);
   }
 
-  @Delete('/:id/version/:version')
+  @Delete('/:id/versions/:version')
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Topic deleted successfully',

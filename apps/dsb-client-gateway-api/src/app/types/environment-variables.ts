@@ -152,7 +152,7 @@ export class EnvironmentVariables {
 
   @IsBoolean()
   @Transform(EnvironmentVariables.transformBoolean('OPENTELEMETRY_ENABLED'))
-  OPENTELEMETRY_ENABLED = true;
+  OPENTELEMETRY_ENABLED = false;
 
   @IsEnum(OpenTelemetryExporters)
   @ValidateIf(EnvironmentVariables.isOTELEnabled)

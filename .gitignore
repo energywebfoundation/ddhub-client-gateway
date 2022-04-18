@@ -45,4 +45,5 @@ logical
 file
 sys
 .env
+.env.local
 files

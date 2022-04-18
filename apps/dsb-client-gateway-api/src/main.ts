@@ -8,7 +8,9 @@ import { ConfigService } from '@nestjs/config';
 import { otelSDK } from '@dsb-client-gateway/ddhub-client-gateway-tracing';
 
 async function bootstrap() {
-  await otelSDK.start();
+  if (process.env.OPENTELEMETRY_ENABLED) {
+    await otelSDK.start();
+  }
 
   const app = await NestFactory.create(
     AppModule.register({ shouldValidate: true })

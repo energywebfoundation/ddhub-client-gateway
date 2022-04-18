@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import 'regenerator-runtime/runtime'
-import matchSorter from 'match-sorter'
+import { matchSorter } from 'match-sorter'
 import { MenuItem, Menu, IconButton } from '@mui/material'
 import { Pagination } from '@mui/material'
 import MoreVertIcon from '@mui/icons-material/MoreVert'
@@ -40,7 +40,7 @@ const options = [
 ]
 
 function fuzzyTextFilterFn(rows, id, filterValue) {
-    return matchSorter(rows, filterValue, { keys: [(row) => row.values[id]] })
+    return matchSorter(rows, filterValue, { keys: [(row: any) => row.values[id]] })
 }
 
 // Define a default UI for filtering
@@ -381,7 +381,7 @@ const useStyles = makeStyles()((theme) => ({
     table: {
         width: '100%',
         minWidth: 650,
-        background: theme.palette.primary.dark,
+        background: theme.palette.background.paper,
         'border-spacing': '0',
     },
 

@@ -4,8 +4,7 @@ import { createTheme, ThemeOptions } from '@mui/material/styles';
 const dsbTheme: ThemeOptions = {
   palette: {
     primary: {
-      main: '#A466FF',
-      dark: '#293145'
+      main: '#A466FF'
     },
     secondary: {
       main: '#F6AFAF',
@@ -31,6 +30,12 @@ const dsbTheme: ThemeOptions = {
     text: {
       primary: '#CED1D5',
       secondary: '#FFFFFF'
+    },
+    grey: {
+      200: '#F2F2F3',
+      300: '#B9B9C3',
+      400: '#B2B6BD',
+      500: '#848484'
     },
     background: {
       default: '#161D31',
@@ -95,10 +100,10 @@ const dsbTheme: ThemeOptions = {
         }
       }
     },
-    MuiInputBase: {
+    MuiOutlinedInput: {
       styleOverrides: {
-        root: {
-          width: '100%'
+        notchedOutline: {
+          borderColor: '#404656'
         }
       }
     },
@@ -106,6 +111,13 @@ const dsbTheme: ThemeOptions = {
       styleOverrides: {
         root: {
           width: '100%'
+        }
+      }
+    },
+    MuiTableCell: {
+      styleOverrides: {
+        root: {
+          borderBottomColor: '#384151'
         }
       }
     }

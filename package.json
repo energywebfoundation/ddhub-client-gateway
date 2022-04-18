@@ -4,6 +4,9 @@
   "license": "MIT",
   "scripts": {
     "start": "nx serve",
+    "start:ui": "wait-on tcp:3333 && nx serve",
+    "start:api": "nx serve dsb-client-gateway-api",
+    "start:dev": "concurrently \"npm run start:api\" \"npm run start:ui\"",
     "build": "npm run build:client && nx build",
     "build:client": "nx run dsb-client-gateway-api-client:build-all",
     "export": "npm run build:client && nx export dsb-client-gateway-frontend",
@@ -21,6 +24,7 @@
     "@ethersproject/providers": "^5.6.2",
     "@faker-js/faker": "^6.1.2",
     "@hookform/resolvers": "^2.8.8",
+    "@monaco-editor/react": "^4.4.2",
     "@mui/icons-material": "^5.5.1",
     "@mui/lab": "^5.0.0-alpha.74",
     "@mui/material": "^5.5.2",
@@ -63,9 +67,8 @@
     "hdkey": "^2.0.1",
     "iam-client-lib": "^4.2.0",
     "lokijs": "^1.5.12",
-    "match-sorter": "^4.0.0",
+    "match-sorter": "^6.3.1",
     "moment": "^2.29.1",
-    "msw": "^0.39.2",
     "nats.ws": "^1.7.2",
     "nedb": "^1.8.0",
     "nestjs-otel": "^3.0.4",
@@ -139,6 +142,8 @@
     "eslint-plugin-react-hooks": "4.3.0",
     "jest": "27.2.3",
     "json-to-pretty-yaml": "^1.2.2",
+    "miragejs": "^0.1.43",
+    "msw": "^0.39.2",
     "orval": "^6.7.0",
     "prettier": "^2.5.1",
     "react-test-renderer": "17.0.2",
@@ -147,6 +152,7 @@
     "ts-node": "^10.7.0",
     "tsconfig-paths": "^3.14.1",
     "typechain": "^8.0.0",
-    "typescript": "~4.5.2"
+    "typescript": "~4.5.2",
+    "wait-on": "^6.0.1"
   }
 }
