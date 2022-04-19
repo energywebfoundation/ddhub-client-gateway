@@ -3,6 +3,7 @@ export const routerConst = {
   Dashboard: '/dashboard',
   GatewaySettings: '/dashboard/gateway-settings',
   AppsAndTopics: '/applications',
+  Topics: '/applications/[namespace]',
   Channels: '/channels',
   IntegrationAPIs: '/integration',
   LargeDataMessagingFileUpload: '/large-file-upload',

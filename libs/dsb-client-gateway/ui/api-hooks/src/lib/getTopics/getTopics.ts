@@ -1,26 +1,24 @@
-import { useQueryClient } from 'react-query';
 import {
-  getTopicsControllerGetTopicsQueryKey,
-  TopicsControllerGetTopicsQueryResult,
-  useTopicsControllerGetTopics
+  GetTopicDto,
+  PaginatedResponse,
+  useTopicsControllerGetTopics,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 
-export const useCachedTopics = (owner: string) => {
-  const queryClient = useQueryClient();
-  const cachedTopics: TopicsControllerGetTopicsQueryResult[] | undefined =
-    queryClient.getQueryData(getTopicsControllerGetTopicsQueryKey());
+export const useTopics = (owner: string) => {
+  const { data, isLoading } = useTopicsControllerGetTopics(
+    { owner },
+    {
+      query: {
+        enabled: !!owner,
+      },
+    }
+  );
 
-  const { data, isLoading } = useTopicsControllerGetTopics(    {owner},
-  {
-    query: {
-      enabled: !cachedTopics,
-    },
-  });
-
-  const identity = data ?? [];
+  const paginated = data ?? ({} as PaginatedResponse);
+  const topics = paginated.records ?? ([] as GetTopicDto[]);
 
   return {
-    identity: cachedTopics ?? identity,
+    topics,
     isLoading,
   };
 };

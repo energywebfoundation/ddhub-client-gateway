@@ -1,5 +1,4 @@
 import Head from 'next/head';
-import { Container } from '@mui/material';
 import { TopicsContainer } from '@dsb-client-gateway/ui/topics';
 
 export default function Topics() {
@@ -13,9 +12,7 @@ export default function Topics() {
       </Head>
 
       <main>
-        <Container maxWidth="lg">
           <TopicsContainer />
-        </Container>
       </main>
     </div>
   );

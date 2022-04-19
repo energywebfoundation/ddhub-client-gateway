@@ -49,7 +49,7 @@ export const useStyles = makeStyles()((theme) => ({
   icon: {
     top: 9,
     right: 15,
-    stroke: alpha(theme.palette.grey[200], 0.5),
+    stroke: alpha(theme.palette.grey[100], 0.5),
     width: 20
   }
 }));
