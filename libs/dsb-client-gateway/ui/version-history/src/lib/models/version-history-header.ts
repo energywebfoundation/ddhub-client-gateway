@@ -18,5 +18,5 @@ export const VERSION_HISTORY_HEADERS = [
     Header: 'TAGS',
     accessor: 'tags',
     Cell: Tags,
-  }
+  },
 ];
