@@ -27,6 +27,7 @@ export function GenericTable<T>({
   onRowClick,
   children,
   actions,
+  showSearch = true
 }: TableProps<T>) {
   const { classes } = useStyles();
   const {
@@ -45,10 +46,10 @@ export function GenericTable<T>({
 
   return (
     <>
-      <Box display="flex">
+      {showSearch ? <Box display="flex">
         <Search filter={globalFilter} setFilter={setGlobalFilter} />
         {children}
-      </Box>
+      </Box> : ''}
       <TableContainer component={Paper}>
         {rows.length !== 0 ? (
           <Table sx={{ minWidth: 500 }} {...getTableProps()}>

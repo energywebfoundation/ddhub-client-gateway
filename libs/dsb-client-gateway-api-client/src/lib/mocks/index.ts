@@ -58,21 +58,21 @@ export const getTopicsControllerPostTopicsMock = () => ({
 
 export const getTopicsControllerGetTopicsHistoryByIdMock = () => {
   return {
-    count: 6,
-    limit: 6,
+    count: 1,
+    limit: 1,
     page: 1,
-    records: [...Array(6)].map(() => ({
+    records: [...Array(1)].map(() => ({
       id: faker.datatype.uuid(),
       name: faker.word.adverb(),
       owner: 'ddhub.apps.energyweb.iam.ewc',
-      schema: "{\"data\":\"test\"}",
+      schema: '{"data":"test"}',
       schemaType: faker.random.arrayElement(['JSD7', 'XML', 'XSD6', 'CSV', 'TSV']),
-      tags: [...Array(3)].map(() =>
+      tags: [...Array(1)].map(() =>
         faker.word.noun()
       ),
       version: '1.0.0',
     })),
-  }
-}
+  };
+};
 
 
