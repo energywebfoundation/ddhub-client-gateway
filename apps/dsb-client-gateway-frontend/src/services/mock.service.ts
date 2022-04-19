@@ -29,6 +29,10 @@ export function makeServer({ environment = 'development' }) {
       this.post('/topics', (_schema, request) => {
         return { topic: JSON.parse(request.requestBody) }
       })
+
+      this.put('/topics/:id', (_schema, request) => {
+        return { topic: JSON.parse(request.requestBody) }
+      })
     },
   });
 }

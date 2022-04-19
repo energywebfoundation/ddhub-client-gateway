@@ -3,7 +3,7 @@ import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 
 export const useEditorEffects = () => {
   const [isEditorReady, setIsEditorReady] = useState(false);
-  const [showPlaceholder, setShowPlaceholder] = useState(true);
+  const [placeholder, setPlaceholder] = useState(true);
 
   const monacoRef = useRef<monaco.editor.IStandaloneCodeEditor>();
 
@@ -12,9 +12,11 @@ export const useEditorEffects = () => {
   ) => {
     setIsEditorReady(true);
     monacoRef.current = editor;
+    monacoRef.current.getAction("editor.action.formatDocument").run();
+
     editor.onDidBlurEditorWidget(() => {
       if (!editor.getValue()) {
-        setShowPlaceholder(true);
+        setPlaceholder(true);
       }
     });
   };
@@ -22,7 +24,7 @@ export const useEditorEffects = () => {
   const handlePlaceholder = () => {
     if (!isEditorReady) return;
 
-    setShowPlaceholder(false);
+    setPlaceholder(false);
     monacoRef.current && monacoRef.current?.layout();
     monacoRef.current && monacoRef.current?.focus();
   };
@@ -50,7 +52,7 @@ export const useEditorEffects = () => {
   } as monaco.editor.IStandaloneEditorConstructionOptions;
 
   return {
-    showPlaceholder,
+    placeholder,
     isEditorReady,
     handleEditorDidMount,
     handlePlaceholder,

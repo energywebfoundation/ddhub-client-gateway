@@ -83,11 +83,13 @@ export const UpdateTopic: FC = () => {
                   field={fields.topicName}
                   register={register}
                   variant="outlined"
+                  disabled
                 />
                 <FormInput
                   field={fields.version}
                   register={register}
                   variant="outlined"
+                  disabled
                 />
               </Box>
               <Box mb={2.7}>
@@ -104,6 +106,7 @@ export const UpdateTopic: FC = () => {
                   register={register}
                   control={control}
                   variant="outlined"
+                  disabled
                 />
               </Box>
               <Box mb={2.7}>
@@ -112,6 +115,7 @@ export const UpdateTopic: FC = () => {
                   register={register}
                   control={control}
                   language={schemaTypeValue}
+                  showPlaceholder={false}
                 />
               </Box>
             </Grid>

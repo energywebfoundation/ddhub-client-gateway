@@ -22,6 +22,13 @@ export const useStyles = makeStyles()((theme) => ({
       color: theme.palette.common.white,
       minHeight: 22,
       fontFamily: theme.typography.body2.fontFamily,
+      '&:disabled': {
+        color: theme.palette.grey[500],
+        WebkitTextFillColor: theme.palette.grey[500],
+        '& + .MuiOutlinedInput-notchedOutline': {
+            border: `1px solid ${theme.palette.grey[500]}`
+        }
+      },
       '&::placeholder': {
         fontSize: 12,
         lineHeight: '24px',

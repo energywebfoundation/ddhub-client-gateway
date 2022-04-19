@@ -3,6 +3,11 @@ import { useForm, SubmitHandler, FieldValues } from 'react-hook-form';
 import { FormSelectOption } from '@dsb-client-gateway/ui/core';
 import { PostTopicDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { useUpdateTopics } from '@dsb-client-gateway/ui/api-hooks';
+import {
+  schemaTypeOptions,
+  schemaTypeOptionsByLabel,
+  schemaTypeOptionsByValue,
+} from '@dsb-client-gateway/ui/utils';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import {
@@ -11,28 +16,21 @@ import {
   TopicsModalsActionsEnum,
 } from '../../../context';
 
-const schemaTypeOptions: FormSelectOption[] = [
-  { value: 'json', label: 'JSD7' },
-  { value: 'xml', label: 'XML' },
-  { value: 'csv', label: 'CSV' },
-  { value: 'tsv', label: 'TSV' },
-];
-
-
 export const useUpdateTopicEffects = () => {
   const {
     updateTopic: { open, hide, application, topic },
   } = useTopicsModalsStore();
   const dispatch = useTopicsModalsDispatch();
-  const schemaType = schemaTypeOptions.find(option => option.label === topic?.schemaType)?.value
+  const schemaType = schemaTypeOptionsByLabel[topic?.schemaType]
+    ?.value as string;
 
   const initialValues = {
     name: topic?.name,
     owner: topic?.owner,
     schemaType: schemaType,
-    schema: '',
+    schema: topic?.schema,
     tags: topic?.tags,
-    version: '',
+    version: topic?.version,
   };
 
   const validationSchema = yup
@@ -49,7 +47,6 @@ export const useUpdateTopicEffects = () => {
     register,
     control,
     handleSubmit,
-    watch,
     formState: { isValid },
     reset,
   } = useForm<FieldValues>({
@@ -61,7 +58,7 @@ export const useUpdateTopicEffects = () => {
   useEffect(() => {
     reset({
       ...topic,
-      schemaType
+      schemaType,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [topic]);
@@ -69,16 +66,16 @@ export const useUpdateTopicEffects = () => {
   const { updateTopicHandler } = useUpdateTopics();
 
   const closeModal = () => {
+    reset();
     dispatch({
       type: TopicsModalsActionsEnum.SHOW_UPDATE_TOPIC,
       payload: {
         open: false,
         hide: false,
         application: null,
-        topic: null
+        topic: null,
       },
     });
-    reset();
   };
 
   const hideModal = () => {
@@ -100,9 +97,7 @@ export const useUpdateTopicEffects = () => {
     const fomattedValues = {
       ...values,
       id: topic.id,
-      schemaType: schemaTypeOptions.find(
-        (option) => option.value === values.schemaType
-      ).label,
+      schemaType: schemaTypeOptionsByValue[values.schemaType].label,
     };
     updateTopicHandler(fomattedValues as PostTopicDto, closeModal);
   };
@@ -172,7 +167,6 @@ export const useUpdateTopicEffects = () => {
     },
   };
 
-  const schemaTypeValue = watch('schemaType');
   const buttonDisabled = !isValid;
 
   return {
@@ -185,7 +179,7 @@ export const useUpdateTopicEffects = () => {
     control,
     onSubmit,
     buttonDisabled,
-    schemaTypeValue,
+    schemaTypeValue: schemaType,
     application,
   };
 };

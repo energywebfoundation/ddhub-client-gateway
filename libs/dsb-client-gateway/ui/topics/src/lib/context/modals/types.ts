@@ -1,4 +1,4 @@
-import { ApplicationDTO, GetTopicDto } from '@dsb-client-gateway/dsb-client-gateway-api-client'
+import { ApplicationDTO, PostTopicDto } from '@dsb-client-gateway/dsb-client-gateway-api-client'
 import { TopicsModalsActionsEnum } from './reducer';
 
 type TCreateTopic = {
@@ -10,7 +10,7 @@ type TCreateTopic = {
 type TUpdateTopic = {
   open: boolean;
   hide: boolean;
-  topic: GetTopicDto;
+  topic: PostTopicDto;
   application: ApplicationDTO;
 }
 
