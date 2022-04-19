@@ -9,5 +9,6 @@ export const routerConst = {
   LargeDataMessagingFileUpload: '/large-file-upload',
   LargeDataMessagingFileDownload: '/large-file-download',
   DataMessagingFileUpload: '/file-upload',
-  DataMessagingFileDownload: '/file-download'
+  DataMessagingFileDownload: '/file-download',
+  VersionHistory: '/applications/[namespace]/[topicId]/version-history'
 }
