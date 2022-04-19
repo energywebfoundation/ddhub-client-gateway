@@ -184,7 +184,11 @@ export class KeysService implements OnModuleInit {
     symmetricKey: string,
     receiverDid: string
   ): Promise<any | null> {
+    this.logger.log('fetching did', receiverDid);
+
     const did = await this.iamService.getDid(receiverDid);
+
+    this.logger.log('did fetched successfully', receiverDid);
 
     if (!did) {
       this.logger.error('IAM not initialized');

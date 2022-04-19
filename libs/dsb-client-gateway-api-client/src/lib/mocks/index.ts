@@ -28,19 +28,19 @@ export const getApplicationsControllerGetApplicationsMock = () =>
   }));
 
 export const getTopicsControllerGetTopicsMock = () => ({
-  count: faker.datatype.number(),
-  limit: faker.datatype.number(),
-  page: faker.datatype.number(),
-  records: [...Array(faker.datatype.number({ min: 1, max: 10 }))].map(() => ({
-    id: faker.random.word(),
-    name: faker.random.word(),
-    owner: faker.random.word(),
-    schema: faker.random.word(),
+  count: 6,
+  limit: 6,
+  page: 1,
+  records: [...Array(6)].map(() => ({
+    id: faker.unique,
+    name: faker.word.adverb,
+    owner: 'ddhub.apps.energyweb.iam.ewc',
+    schema: "{\"data\":\"test\"}",
     schemaType: faker.helpers.randomize(['JSD7', 'XML', 'XSD6', 'CSV', 'TSV']),
-    tags: [...Array(faker.datatype.number({ min: 1, max: 10 }))].map(() =>
-      faker.random.word()
+    tags: [...Array(3)].map(() =>
+      faker.word.noun
     ),
-    version: faker.random.word(),
+    version: '1.0.0',
   })),
 });
 

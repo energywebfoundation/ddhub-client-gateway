@@ -29,6 +29,7 @@ export type GenericFormField = {
   autocomplete?: boolean;
   multiple?: boolean;
   maxValues?: number;
+  tags?: boolean;
   startAdornment?: ReactNode;
   endAdornment?: {
     element: ReactNode;
