@@ -1,46 +1,46 @@
 import { useEffect } from 'react';
-import { useForm, SubmitHandler, FieldValues } from 'react-hook-form';
 import { useQueryClient } from 'react-query';
-import { useRouter } from 'next/router';
+import { useForm, SubmitHandler, FieldValues } from 'react-hook-form';
+import { useCustomAlert } from '@dsb-client-gateway/ui/core';
 import {
-  PostTopicBodyDto,
+  PostTopicDto,
   getTopicsControllerGetTopicsQueryKey,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
-import { useCreateTopic } from '@dsb-client-gateway/ui/api-hooks';
-import { useCustomAlert } from '@dsb-client-gateway/ui/core';
-import { Queries } from '@dsb-client-gateway/ui/utils';
+import { useUpdateTopics } from '@dsb-client-gateway/ui/api-hooks';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { validationSchema, fields } from '../../../models';
-import { schemaTypeOptionsByValue } from '../../../utils';
+import {
+  schemaTypeOptionsByLabel,
+  schemaTypeOptionsByValue,
+} from '../../../utils';
 import {
   useTopicsModalsStore,
   useTopicsModalsDispatch,
   TopicsModalsActionsEnum,
 } from '../../../context';
 
-export const useCreateTopicEffects = () => {
+export const useUpdateTopicEffects = () => {
   const queryClient = useQueryClient();
-  const router = useRouter();
   const {
-    createTopic: { open, hide, application },
+    updateTopic: { open, hide, application, topic },
   } = useTopicsModalsStore();
   const dispatch = useTopicsModalsDispatch();
-  const Swal = useCustomAlert();
+  const schemaType = schemaTypeOptionsByLabel[topic?.schemaType]
+    ?.value as string;
 
   const initialValues = {
-    name: '',
-    owner: '',
-    schemaType: '',
-    schema: '',
-    tags: [] as string[],
-    version: '',
+    name: topic?.name,
+    owner: topic?.owner,
+    schemaType: schemaType,
+    schema: topic?.schema,
+    tags: topic?.tags,
+    version: topic?.version,
   };
 
   const {
     register,
     control,
     handleSubmit,
-    watch,
     formState: { isValid },
     reset,
   } = useForm<FieldValues>({
@@ -51,87 +51,94 @@ export const useCreateTopicEffects = () => {
 
   useEffect(() => {
     reset({
-      owner: router.query[Queries.Namespace],
+      ...topic,
+      schemaType,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [router]);
+  }, [topic]);
 
-  const { createTopicHandler, isLoading: isCreatingTopic } = useCreateTopic();
+  const { updateTopicHandler, isLoading: isUpdatingTopics } = useUpdateTopics();
+  const Swal = useCustomAlert();
 
   const closeModal = () => {
+    reset();
     dispatch({
-      type: TopicsModalsActionsEnum.SHOW_CREATE_TOPIC,
+      type: TopicsModalsActionsEnum.SHOW_UPDATE_TOPIC,
       payload: {
         open: false,
         hide: false,
         application: null,
+        topic: null,
       },
     });
-    reset();
   };
 
   const hideModal = () => {
     dispatch({
-      type: TopicsModalsActionsEnum.HIDE_CREATE_TOPIC,
+      type: TopicsModalsActionsEnum.HIDE_UPDATE_TOPIC,
       payload: true,
     });
   };
 
   const showModal = () => {
     dispatch({
-      type: TopicsModalsActionsEnum.HIDE_CREATE_TOPIC,
+      type: TopicsModalsActionsEnum.HIDE_UPDATE_TOPIC,
       payload: false,
     });
   };
 
-  const onCreateTopic = () => {
+  const onUpdateTopics = () => {
     queryClient.invalidateQueries(getTopicsControllerGetTopicsQueryKey());
     closeModal();
     Swal.fire({
       title: 'Success',
-      text: 'You have successfully created the topic',
+      text: 'You have successfully updated the topic',
       type: 'success',
       confirmButtonText: 'Dismiss',
     });
   };
 
-  const onCreateTopicError = () => {
+  const onUpdateTopicsError = () => {
     Swal.fire({
       title: 'Error',
-      text: 'Error while creating topic',
+      text: 'Error while updating topic',
       type: 'error',
       confirmButtonText: 'Dismiss',
     });
   };
 
   const topicSubmitHandler: SubmitHandler<FieldValues> = (data) => {
-    const values = data as PostTopicBodyDto;
+    const values = data as PostTopicDto;
     const fomattedValues = {
       ...values,
+      id: topic.id,
       schemaType: schemaTypeOptionsByValue[values.schemaType].label,
     };
-    createTopicHandler(
-      fomattedValues as PostTopicBodyDto,
-      onCreateTopic,
-      onCreateTopicError
+    updateTopicHandler(
+      fomattedValues as PostTopicDto,
+      onUpdateTopics,
+      onUpdateTopicsError
     );
   };
 
   const onSubmit = handleSubmit(topicSubmitHandler);
 
-  const openCancelModal = () => {
+  const openCancelModal = async () => {
     hideModal();
-    dispatch({
-      type: TopicsModalsActionsEnum.SHOW_CANCEL,
-      payload: {
-        open: true,
-        onConfirm: closeModal,
-        onCancel: showModal,
-      },
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: 'you will close update topic form',
+      type: 'warning',
+      showCancelButton: true,
     });
+
+    if (result.isConfirmed) {
+      closeModal();
+    } else {
+      showModal();
+    }
   };
 
-  const schemaTypeValue = watch('schemaType');
   const buttonDisabled = !isValid;
 
   return {
@@ -144,8 +151,8 @@ export const useCreateTopicEffects = () => {
     control,
     onSubmit,
     buttonDisabled,
-    schemaTypeValue,
+    schemaTypeValue: schemaType,
     application,
-    isCreatingTopic,
+    isUpdatingTopics,
   };
 };

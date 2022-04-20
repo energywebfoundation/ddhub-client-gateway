@@ -1,12 +1,22 @@
-import { ApplicationDTO } from '@dsb-client-gateway/dsb-client-gateway-api-client'
+import { ApplicationDTO, PostTopicDto } from '@dsb-client-gateway/dsb-client-gateway-api-client'
 import { TopicsModalsActionsEnum } from './reducer';
 
+type TCreateTopic = {
+  open: boolean;
+  hide: boolean;
+  application: ApplicationDTO;
+};
+
+type TUpdateTopic = {
+  open: boolean;
+  hide: boolean;
+  topic: PostTopicDto;
+  application: ApplicationDTO;
+}
+
 export interface ITopicsModalsStore {
-  createTopic: {
-    open: boolean;
-    hide: boolean;
-    application: ApplicationDTO;
-  };
+  createTopic: TCreateTopic;
+  updateTopic: TUpdateTopic,
   cancel: {
     open: boolean;
     onConfirm: () => void;
@@ -16,15 +26,21 @@ export interface ITopicsModalsStore {
 
 interface IShowCreateTopicAction {
   type: TopicsModalsActionsEnum.SHOW_CREATE_TOPIC;
-  payload: {
-    open: boolean;
-    hide: boolean;
-    application: ApplicationDTO;
-  };
+  payload: TCreateTopic;
+}
+
+interface IShowUpdateTopicAction {
+  type: TopicsModalsActionsEnum.SHOW_UPDATE_TOPIC;
+  payload: TUpdateTopic;
 }
 
 interface IHideCreateTopicAction {
   type: TopicsModalsActionsEnum.HIDE_CREATE_TOPIC;
+  payload: boolean;
+}
+
+interface IHideUpdateTopicAction {
+  type: TopicsModalsActionsEnum.HIDE_UPDATE_TOPIC;
   payload: boolean;
 }
 
@@ -39,5 +55,7 @@ interface IShowCancelAction {
 
 export type TTopicsModalsAction =
   | IShowCreateTopicAction
+  | IShowUpdateTopicAction
   | IHideCreateTopicAction
+  | IHideUpdateTopicAction
   | IShowCancelAction

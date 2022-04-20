@@ -19,10 +19,10 @@ import {
   Editor,
 } from '@dsb-client-gateway/ui/core';
 import { ApplicationInfo } from '../../../components';
-import { useStyles } from './CreateTopic.styles';
-import { useCreateTopicEffects } from './CreateTopic.effects';
+import { useUpdateTopicEffects } from './UpdateTopic.effects';
+import { useStyles } from '../CreateTopic/CreateTopic.styles';
 
-export const CreateTopic: FC = () => {
+export const UpdateTopic: FC = () => {
   const { classes } = useStyles();
   const {
     open,
@@ -36,8 +36,8 @@ export const CreateTopic: FC = () => {
     buttonDisabled,
     schemaTypeValue,
     application,
-    isCreatingTopic,
-  } = useCreateTopicEffects();
+    isUpdatingTopics,
+  } = useUpdateTopicEffects();
 
   return (
     <Dialog
@@ -48,11 +48,11 @@ export const CreateTopic: FC = () => {
       classes={{ paper: classes.paper, container: classes.container }}
       style={{ visibility: hide ? 'hidden' : 'visible' }}
     >
-      <DialogTitle className={classes.title}>Create topic</DialogTitle>
+      <DialogTitle className={classes.title}>Update topic</DialogTitle>
       <form onSubmit={onSubmit}>
         <DialogContent sx={{ padding: 0 }}>
           <DialogContentText className={classes.subTitle}>
-            Provide topic data with this form
+            Update topic data
           </DialogContentText>
           <Grid container mt={4}>
             {application && (
@@ -66,11 +66,13 @@ export const CreateTopic: FC = () => {
                   field={fields.topicName}
                   register={register}
                   variant="outlined"
+                  disabled
                 />
                 <FormInput
                   field={fields.version}
                   register={register}
                   variant="outlined"
+                  disabled
                 />
               </Box>
               <Box mb={2.7}>
@@ -87,6 +89,7 @@ export const CreateTopic: FC = () => {
                   register={register}
                   control={control}
                   variant="outlined"
+                  disabled
                 />
               </Box>
               <Box mb={2.7}>
@@ -95,6 +98,7 @@ export const CreateTopic: FC = () => {
                   register={register}
                   control={control}
                   language={schemaTypeValue}
+                  showPlaceholder={false}
                 />
               </Box>
             </Grid>
@@ -116,11 +120,8 @@ export const CreateTopic: FC = () => {
             disabled={buttonDisabled}
             className={clsx(classes.button, classes.confirmButton)}
           >
-            {isCreatingTopic ? (
-              <CircularProgress
-                style={{ width: '17px', height: '17px' }}
-                className={classes.buttonProgress}
-              />
+            {isUpdatingTopics ? (
+              <CircularProgress style={{ width: '17px', height: '17px'}} className={classes.buttonProgress} />
             ) : (
               <Typography variant="body2" className={classes.submitButtonText}>
                 Save

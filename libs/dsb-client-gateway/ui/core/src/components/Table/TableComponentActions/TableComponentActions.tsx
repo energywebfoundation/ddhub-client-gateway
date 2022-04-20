@@ -6,7 +6,7 @@ import { useStyles } from './TableComponentActions.styles';
 
 export type TTableComponentAction = {
   label: string;
-  onClick: () => void;
+  onClick?: (id: string) => void;
   color?: string;
 };
 
@@ -16,6 +16,7 @@ interface TableComponentActionsProps {
 }
 
 export const TableComponentActions: FC<TableComponentActionsProps> = ({
+  id,
   actions,
 }) => {
   const { classes } = useStyles();
@@ -51,9 +52,15 @@ export const TableComponentActions: FC<TableComponentActionsProps> = ({
         {actions.map((action) => {
           return (
             <MenuItem
+              key={action.label}
               style={{ color: action.color ?? 'inherit' }}
               className={classes.menuItem}
-              onClick={action.onClick}
+              onClick={() => {
+                if (action.onClick) {
+                  handleClose();
+                  action.onClick(id);
+                }
+              }}
             >
               {action.label}
             </MenuItem>

@@ -14,6 +14,7 @@ export interface TableProps<T> {
   headers: TableHeader[];
   tableRows: T[];
   onRowClick?: (data: Row<object>) => void;
+  loading?: boolean;
   actions?: TTableComponentAction[];
   children?: ReactElement;
   showSearch?: boolean;
