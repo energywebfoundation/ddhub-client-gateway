@@ -74,7 +74,7 @@ export class MessageControlller {
   @HttpCode(HttpStatus.OK)
   public async downloadMessage(
     @Query() { fileId }: DownloadMessagesDto,
-    @Response({ passthrough: true }) res
+    @Response() res
   ): Promise<Readable> {
     const file: DownloadMessageResponse =
       await this.messageService.downloadMessages(fileId);
@@ -89,10 +89,11 @@ export class MessageControlller {
 
     try {
       const stream = Readable.from(file.data.toString());
-      res.end(file.data.toString());
+      res.write(file.data.toString());
       return stream.pipe(res);
     } catch (e) {
       console.error('error in catch directly', e);
+      throw new Error(e);
     }
   }
 
