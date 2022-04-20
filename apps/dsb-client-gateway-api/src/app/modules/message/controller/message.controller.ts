@@ -10,6 +10,7 @@ import {
   Query,
   Get,
   Response,
+  Logger,
 } from '@nestjs/common';
 import { ApiConsumes, ApiResponse, ApiTags } from '@nestjs/swagger';
 import {
@@ -24,13 +25,13 @@ import { SendMessagelResponseDto } from '../dto/response/send-message.dto';
 import { GetMessagesResponseDto } from '../dto/response/get-message-response.dto';
 import { DownloadMessageResponse } from '../entity/message.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
-import * as fs from 'fs';
 import { Readable } from 'stream';
 
 @Controller('messages')
 @UseGuards(DigestGuard)
 @ApiTags('Messaging')
 export class MessageControlller {
+  private readonly logger = new Logger();
   constructor(protected readonly messageService: MessageService) {}
 
   @Get('/')
@@ -92,7 +93,7 @@ export class MessageControlller {
       res.write(file.data.toString());
       return stream.pipe(res);
     } catch (e) {
-      console.error('error in catch directly', e);
+      this.logger.error('error in file download', e);
       throw new Error(e);
     }
   }
