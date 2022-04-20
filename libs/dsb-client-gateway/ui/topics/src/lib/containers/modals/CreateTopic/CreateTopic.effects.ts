@@ -8,6 +8,7 @@ import {
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { useCreateTopic } from '@dsb-client-gateway/ui/api-hooks';
 import { useCustomAlert } from '@dsb-client-gateway/ui/core';
+import { Queries } from '@dsb-client-gateway/ui/utils';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { validationSchema, fields } from '../../../models';
 import { schemaTypeOptionsByValue } from '../../../utils';
@@ -50,7 +51,7 @@ export const useCreateTopicEffects = () => {
 
   useEffect(() => {
     reset({
-      owner: router.query['namespace'],
+      owner: router.query[Queries.Namespace],
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router]);

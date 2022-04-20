@@ -5,13 +5,14 @@ import {
 } from '../../context';
 import { useTopics } from '@dsb-client-gateway/ui/api-hooks';
 import { TTableComponentAction } from '@dsb-client-gateway/ui/core';
+import { Queries } from '@dsb-client-gateway/ui/utils';
 import { PostTopicDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { useStyles } from './Topics.styles';
 
 export const useTopicsEffects = () => {
   const { theme } = useStyles();
   const router = useRouter();
-  const { topics, topicsById, isLoading: topicsLoading } = useTopics(router.query['namespace'] as string);
+  const { topics, topicsById, isLoading: topicsLoading } = useTopics(router.query[Queries.Namespace] as string);
 
   // TODO: remove mock
   const applicationMock = {
