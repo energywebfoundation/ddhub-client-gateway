@@ -1,3 +1,4 @@
+import { keyBy } from 'lodash';
 import {
   GetTopicDto,
   PaginatedResponse,
@@ -16,9 +17,11 @@ export const useTopics = (owner: string) => {
 
   const paginated = data ?? ({} as PaginatedResponse);
   const topics = paginated.records ?? ([] as GetTopicDto[]);
+  const topicsById = keyBy(topics, 'id');
 
   return {
     topics,
-    isLoading,
+    topicsById,
+    isLoading
   };
 };

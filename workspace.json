@@ -18,7 +18,6 @@
     "dsb-client-gateway-ui-login": "libs/dsb-client-gateway/ui/login",
     "dsb-client-gateway-ui-topics": "libs/dsb-client-gateway/ui/topics",
     "dsb-client-gateway-ui-utils": "libs/dsb-client-gateway/ui/utils",
-    "dsb-client-gateway-ui-version-history": "libs/dsb-client-gateway/ui/version-history",
     "ui-core": "libs/dsb-client-gateway/ui/core"
   }
 }

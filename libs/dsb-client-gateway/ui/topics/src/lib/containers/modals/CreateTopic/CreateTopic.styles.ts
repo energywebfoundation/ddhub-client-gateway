@@ -1,5 +1,5 @@
 import { makeStyles } from 'tss-react/mui';
-import { alpha } from '@mui/material/styles';
+import { alpha, darken } from '@mui/material/styles';
 
 export const useStyles = makeStyles()((theme) => ({
   root: {
@@ -46,6 +46,16 @@ export const useStyles = makeStyles()((theme) => ({
   cancelButton: {
    border: `1px solid ${alpha(theme.palette.secondary.main, 0.5)}`,
    marginRight: 7
+  },
+  confirmButton: {
+    width: 75,
+    border: `1px solid ${theme.palette.primary.main}`,
+    '&:hover': {
+      backgroundColor: darken(theme.palette.primary.main, 0.2),
+    }
+  },
+  buttonProgress: {
+    color: theme.palette.common.white,
   },
   cancelButtonText: {
     fontSize: 14,

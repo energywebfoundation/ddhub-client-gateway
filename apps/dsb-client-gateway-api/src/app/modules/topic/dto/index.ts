@@ -56,6 +56,15 @@ export class GetTopicDto {
   @IsString()
   @IsNotEmpty()
   @ApiProperty({
+    description: 'version of the topic',
+    type: String,
+    example: '1.0.9',
+  })
+  version: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({
     description: 'owner of the topic',
     type: String,
     example: 'torta.apps.eggplant.vege.iam.ewc',

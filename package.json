@@ -80,6 +80,7 @@
     "swagger-ui-express": "^4.3.0",
     "swagger-ui-react": "^4.6.1",
     "sweetalert2": "^11.4.6",
+    "sweetalert2-react-content": "^4.2.0",
     "tslib": "^2.0.0",
     "tss-react": "3.6.0",
     "uuid": "^8.3.2",
