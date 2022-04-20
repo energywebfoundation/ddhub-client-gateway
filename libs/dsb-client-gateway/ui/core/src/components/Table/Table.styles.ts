@@ -2,6 +2,11 @@ import { makeStyles } from 'tss-react/mui';
 import { lighten } from '@mui/material/styles';
 
 export const useStyles = makeStyles()((theme) => ({
+  root: {
+    '& .MuiTableCell-root': {
+      padding: '5px 16px'
+    }
+  },
   head: {
     background: lighten(theme.palette.background.paper, 0.07),
     fontSize: 12,
@@ -10,6 +15,7 @@ export const useStyles = makeStyles()((theme) => ({
     letterSpacing: '0.08em',
     color: theme.palette.grey[200],
     fontFamily: theme.typography.body2.fontFamily,
+    height: 40
   },
   body: {
     fontSize: 14,
