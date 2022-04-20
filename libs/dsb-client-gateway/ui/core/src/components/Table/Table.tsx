@@ -29,6 +29,7 @@ export function GenericTable<T>({
   children,
   actions,
   loading,
+  showSearch = true
 }: TableProps<T>) {
   const { classes } = useStyles();
   const {
@@ -47,10 +48,10 @@ export function GenericTable<T>({
 
   return (
     <>
-      <Box display="flex">
+      {showSearch ? <Box display="flex">
         <Search filter={globalFilter} setFilter={setGlobalFilter} />
         {children}
-      </Box>
+      </Box> : ''}
       <TableContainer component={Paper}>
         {loading ? (
           <TableRowsLoadingComponent pageSize={pageSize} />
