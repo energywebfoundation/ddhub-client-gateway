@@ -6,7 +6,11 @@ import {
 export const useUpdateTopics = () => {
   const { mutate, isLoading } = useTopicsControllerUpdateTopics();
 
-  const updateTopicHandler = (topic: PostTopicDto, callback: () => void) => {
+  const updateTopicHandler = (
+    topic: PostTopicDto,
+    onSuccess: () => void,
+    onError: () => void
+  ) => {
     const { id, ...rest } = topic;
     mutate(
       {
@@ -14,7 +18,8 @@ export const useUpdateTopics = () => {
         data: rest,
       },
       {
-        onSuccess: callback,
+        onSuccess,
+        onError,
       }
     );
   };

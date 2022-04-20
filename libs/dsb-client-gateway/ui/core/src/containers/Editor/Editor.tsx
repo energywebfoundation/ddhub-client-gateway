@@ -28,7 +28,7 @@ export const Editor: FC<EditorProps> = memo(
       handleEditorDidMount,
       placeholder,
       options,
-    } = useEditorEffects();
+    } = useEditorEffects(showPlaceholder);
 
     const { name } = register(field.name);
 

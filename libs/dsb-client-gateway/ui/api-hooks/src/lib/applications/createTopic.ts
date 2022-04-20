@@ -1,41 +1,29 @@
-import Swal from 'sweetalert2';
 import {
   PostTopicBodyDto,
   useTopicsControllerPostTopics,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 
 export const useCreateTopic = () => {
-  const { mutate } = useTopicsControllerPostTopics({
-    mutation: {
-      onError: () => {
-        Swal.fire('Error', 'Error while creating topic', 'error');
-      },
-    },
-  });
+  const { mutate, isLoading } = useTopicsControllerPostTopics();
 
   const createTopicHandler = (
     values: PostTopicBodyDto,
-    callback: () => void
+    onSuccess: () => void,
+    onError: () => void
   ) => {
     mutate(
       {
         data: values,
       },
       {
-        onSuccess: () => {
-          Swal.fire({
-            title: 'Success',
-            icon: 'success',
-            text: 'You have successfully created the topic',
-            confirmButtonText: 'Dismiss',
-          });
-          callback();
-        },
+        onSuccess,
+        onError,
       }
     );
   };
 
   return {
     createTopicHandler,
+    isLoading,
   };
 };

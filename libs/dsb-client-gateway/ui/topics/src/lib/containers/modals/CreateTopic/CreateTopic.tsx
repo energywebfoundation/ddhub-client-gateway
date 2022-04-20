@@ -1,6 +1,7 @@
 import { FC } from 'react';
 import clsx from 'clsx';
 import {
+  CircularProgress,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -35,6 +36,7 @@ export const CreateTopic: FC = () => {
     buttonDisabled,
     schemaTypeValue,
     application,
+    isCreatingTopic,
   } = useCreateTopicEffects();
 
   return (
@@ -112,11 +114,18 @@ export const CreateTopic: FC = () => {
             type="submit"
             variant="contained"
             disabled={buttonDisabled}
-            className={classes.button}
+            className={clsx(classes.button, classes.confirmButton)}
           >
-            <Typography variant="body2" className={classes.submitButtonText}>
-              Save
-            </Typography>
+            {isCreatingTopic ? (
+              <CircularProgress
+                style={{ width: '17px', height: '17px' }}
+                className={classes.buttonProgress}
+              />
+            ) : (
+              <Typography variant="body2" className={classes.submitButtonText}>
+                Save
+              </Typography>
+            )}
           </Button>
           <Box className={classes.closeButtonWrapper}>
             <CloseButton onClose={closeModal} />

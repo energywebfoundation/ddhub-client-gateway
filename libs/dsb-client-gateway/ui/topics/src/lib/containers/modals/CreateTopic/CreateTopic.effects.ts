@@ -1,8 +1,13 @@
 import { useEffect } from 'react';
 import { useForm, SubmitHandler, FieldValues } from 'react-hook-form';
+import { useQueryClient } from 'react-query';
 import { useRouter } from 'next/router';
-import { PostTopicBodyDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
+import {
+  PostTopicBodyDto,
+  getTopicsControllerGetTopicsQueryKey,
+} from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { useCreateTopic } from '@dsb-client-gateway/ui/api-hooks';
+import { useCustomAlert } from '@dsb-client-gateway/ui/core';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { validationSchema, fields } from '../../../models';
 import { schemaTypeOptionsByValue } from '../../../utils';
@@ -13,11 +18,13 @@ import {
 } from '../../../context';
 
 export const useCreateTopicEffects = () => {
+  const queryClient = useQueryClient();
   const router = useRouter();
   const {
     createTopic: { open, hide, application },
   } = useTopicsModalsStore();
   const dispatch = useTopicsModalsDispatch();
+  const Swal = useCustomAlert();
 
   const initialValues = {
     name: '',
@@ -48,7 +55,7 @@ export const useCreateTopicEffects = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router]);
 
-  const { createTopicHandler } = useCreateTopic();
+  const { createTopicHandler, isLoading: isCreatingTopic } = useCreateTopic();
 
   const closeModal = () => {
     dispatch({
@@ -76,13 +83,37 @@ export const useCreateTopicEffects = () => {
     });
   };
 
+  const onCreateTopic = () => {
+    queryClient.invalidateQueries(getTopicsControllerGetTopicsQueryKey());
+    closeModal();
+    Swal.fire({
+      title: 'Success',
+      text: 'You have successfully created the topic',
+      type: 'success',
+      confirmButtonText: 'Dismiss',
+    });
+  };
+
+  const onCreateTopicError = () => {
+    Swal.fire({
+      title: 'Error',
+      text: 'Error while creating topic',
+      type: 'error',
+      confirmButtonText: 'Dismiss',
+    });
+  };
+
   const topicSubmitHandler: SubmitHandler<FieldValues> = (data) => {
     const values = data as PostTopicBodyDto;
     const fomattedValues = {
       ...values,
       schemaType: schemaTypeOptionsByValue[values.schemaType].label,
     };
-    createTopicHandler(fomattedValues as PostTopicBodyDto, closeModal);
+    createTopicHandler(
+      fomattedValues as PostTopicBodyDto,
+      onCreateTopic,
+      onCreateTopicError
+    );
   };
 
   const onSubmit = handleSubmit(topicSubmitHandler);
@@ -114,5 +145,6 @@ export const useCreateTopicEffects = () => {
     buttonDisabled,
     schemaTypeValue,
     application,
+    isCreatingTopic,
   };
 };

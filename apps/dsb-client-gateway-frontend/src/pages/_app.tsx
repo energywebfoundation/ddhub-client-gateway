@@ -38,7 +38,7 @@ export interface MyAppProps extends AppProps {
 }
 
 function InitializeAccountStatus(props) {
-  useCheckAccountOnInitEffects();
+  // useCheckAccountOnInitEffects();
   return <>{props.children}</>;
 }
 
