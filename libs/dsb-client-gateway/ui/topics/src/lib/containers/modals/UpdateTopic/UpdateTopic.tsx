@@ -19,7 +19,7 @@ import {
   Editor,
 } from '@dsb-client-gateway/ui/core';
 import { useUpdateTopicEffects } from './UpdateTopic.effects';
-import { useStyles } from './UpdateTopic.styles';
+import { useStyles } from '../CreateTopic/CreateTopic.styles';
 
 export const UpdateTopic: FC = () => {
   const { classes } = useStyles();
