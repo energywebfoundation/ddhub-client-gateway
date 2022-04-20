@@ -7,7 +7,6 @@ import {
   usePagination,
   useSortBy,
   useTable,
-  Row
 } from 'react-table';
 import { TableProps } from './Table.types';
 
@@ -60,7 +59,7 @@ export function useTableEffects<T>({
     gotoPage(newPage);
   };
 
-  const handleRowClick = (selectedRow: Row<object>) => {
+  const handleRowClick = (selectedRow: T) => {
     if (!onRowClick) {
       return;
     }

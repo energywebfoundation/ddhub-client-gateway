@@ -6,7 +6,8 @@ import {
 import { useTopics } from '@dsb-client-gateway/ui/api-hooks';
 import { TTableComponentAction } from '@dsb-client-gateway/ui/core';
 import { Queries } from '@dsb-client-gateway/ui/utils';
-import { PostTopicDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
+import { PostTopicDto, GetTopicDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
+import { routerConst } from '@dsb-client-gateway/ui/utils';
 import { useStyles } from './Topics.styles';
 
 export const useTopicsEffects = () => {
@@ -66,11 +67,19 @@ export const useTopicsEffects = () => {
     },
   ];
 
+  const handleRowClick = (data: GetTopicDto) => {
+    router.push({
+      pathname: routerConst.VersionHistory,
+      query: { namespace: data.owner, topicId: data.id },
+    });
+  };
+
   return {
     openCreateTopic,
     application: applicationMock,
     topics,
     actions,
-    topicsLoading
+    topicsLoading,
+    handleRowClick
   };
 };

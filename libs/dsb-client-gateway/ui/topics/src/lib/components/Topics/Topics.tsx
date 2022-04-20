@@ -8,11 +8,8 @@ import { useStyles } from './Topics.styles';
 
 export const Topics: FC = () => {
   const { classes } = useStyles();
-  const { openCreateTopic, topics, actions, topicsLoading } = useTopicsEffects();
-
-  const handleRowClick = (data: any) => {
-    console.log(data);
-  };
+  const { openCreateTopic, topics, actions, topicsLoading, handleRowClick } =
+    useTopicsEffects();
 
   return (
     <section className={classes.table}>

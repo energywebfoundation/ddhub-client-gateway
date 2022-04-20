@@ -13,7 +13,7 @@ export interface TableHeader {
 export interface TableProps<T> {
   headers: TableHeader[];
   tableRows: T[];
-  onRowClick?: (data: Row<object>) => void;
+  onRowClick?: (data: T) => void;
   loading?: boolean;
   actions?: TTableComponentAction[];
   children?: ReactElement;
