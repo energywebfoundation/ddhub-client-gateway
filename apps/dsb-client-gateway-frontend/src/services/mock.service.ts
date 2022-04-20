@@ -1,7 +1,8 @@
 import { createServer } from 'miragejs';
 import {
   getApplicationsControllerGetApplicationsMock,
-  getIdentityControllerGetMock,
+  getIdentityControllerGetMock, getTopicsControllerGetTopicsHistoryByIdMock,
+  getTopicsControllerGetTopicsMock
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 
 export function makeServer({ environment = 'development' }) {
@@ -21,8 +22,16 @@ export function makeServer({ environment = 'development' }) {
         return getIdentityControllerGetMock();
       });
 
+       this.get('/topics', () => {
+        return getTopicsControllerGetTopicsMock();
+      });
+
       this.post('/topics', (_schema, request) => {
         return { topic: JSON.parse(request.requestBody) }
+      });
+
+      this.get('/topics/:id/versions', () => {
+        return getTopicsControllerGetTopicsHistoryByIdMock();
       })
     },
   });

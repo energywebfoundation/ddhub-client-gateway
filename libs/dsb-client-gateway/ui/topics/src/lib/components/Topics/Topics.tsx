@@ -1,20 +1,27 @@
 import { FC } from 'react';
 import { Typography, Button } from '@mui/material';
-import { TopicsList } from '../TopicsList';
+import { GetTopicDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
+import { GenericTable } from '@dsb-client-gateway/ui/core';
+import { TOPICS_HEADERS } from '../../models/topics-header';
 import { useTopicsEffects } from './Topics.effects';
 import { useStyles } from './Topics.styles';
 
 export const Topics: FC = () => {
   const { classes } = useStyles();
-  const { openCreateTopic, application, topics } = useTopicsEffects();
+  const { openCreateTopic, topics } = useTopicsEffects();
+
+  const handleRowClick = (data: any) => {
+    console.log(data);
+  };
 
   return (
     <section className={classes.table}>
-      {topics ? (
-        <TopicsList applicationName={application.appName} topics={topics} />
-      ) : null}
-      <div className={classes.createTopicButtonWrapper}>
-        <section className={classes.searchText}>
+      <GenericTable<GetTopicDto>
+        headers={TOPICS_HEADERS}
+        tableRows={topics}
+        onRowClick={handleRowClick}
+      >
+        <div className={classes.createTopicButtonWrapper}>
           <Button
             className={classes.createTopicButton}
             variant="contained"
@@ -28,8 +35,8 @@ export const Topics: FC = () => {
               Create
             </Typography>
           </Button>
-        </section>
-      </div>
+        </div>
+      </GenericTable>
     </section>
   );
 };
