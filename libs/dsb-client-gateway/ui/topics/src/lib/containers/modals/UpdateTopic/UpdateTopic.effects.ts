@@ -1,12 +1,14 @@
 import { useEffect } from 'react';
+import { useQueryClient } from 'react-query';
 import { useForm, SubmitHandler, FieldValues } from 'react-hook-form';
 import { FormSelectOption } from '@dsb-client-gateway/ui/core';
-import { PostTopicDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
+import { PostTopicDto, getTopicsControllerGetTopicsQueryKey } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { useUpdateTopics } from '@dsb-client-gateway/ui/api-hooks';
 import {
   schemaTypeOptions,
   schemaTypeOptionsByLabel,
   schemaTypeOptionsByValue,
+  useCustomAlert,
 } from '@dsb-client-gateway/ui/utils';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
@@ -17,6 +19,7 @@ import {
 } from '../../../context';
 
 export const useUpdateTopicEffects = () => {
+  const queryClient = useQueryClient();
   const {
     updateTopic: { open, hide, application, topic },
   } = useTopicsModalsStore();
@@ -63,7 +66,8 @@ export const useUpdateTopicEffects = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [topic]);
 
-  const { updateTopicHandler } = useUpdateTopics();
+  const { updateTopicHandler, isLoading: isUpdatingTopics } = useUpdateTopics();
+  const Swal = useCustomAlert();
 
   const closeModal = () => {
     reset();
@@ -80,17 +84,28 @@ export const useUpdateTopicEffects = () => {
 
   const hideModal = () => {
     dispatch({
-      type: TopicsModalsActionsEnum.HIDE_CREATE_TOPIC,
+      type: TopicsModalsActionsEnum.HIDE_UPDATE_TOPIC,
       payload: true,
     });
   };
 
   const showModal = () => {
     dispatch({
-      type: TopicsModalsActionsEnum.HIDE_CREATE_TOPIC,
+      type: TopicsModalsActionsEnum.HIDE_UPDATE_TOPIC,
       payload: false,
     });
   };
+
+  const onUpdateTopics = () => {
+    queryClient.invalidateQueries(getTopicsControllerGetTopicsQueryKey());
+    closeModal();
+    Swal.fire({
+      title: 'Success',
+      text: 'You have successfully updated the topic',
+      type: 'success',
+      confirmButtonText: 'Dismiss'
+    });
+  }
 
   const topicSubmitHandler: SubmitHandler<FieldValues> = (data) => {
     const values = data as PostTopicDto;
@@ -99,21 +114,25 @@ export const useUpdateTopicEffects = () => {
       id: topic.id,
       schemaType: schemaTypeOptionsByValue[values.schemaType].label,
     };
-    updateTopicHandler(fomattedValues as PostTopicDto, closeModal);
+    updateTopicHandler(fomattedValues as PostTopicDto, onUpdateTopics);
   };
 
   const onSubmit = handleSubmit(topicSubmitHandler);
 
-  const openCancelModal = () => {
+  const openCancelModal = async () => {
     hideModal();
-    dispatch({
-      type: TopicsModalsActionsEnum.SHOW_CANCEL,
-      payload: {
-        open: true,
-        onConfirm: closeModal,
-        onCancel: showModal,
-      },
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: 'you will close update topic form',
+      type: 'warning',
+      showCancelButton: true,
     });
+
+    if (result.isConfirmed) {
+      closeModal();
+    } else {
+      showModal();
+    }
   };
 
   const fields = {
@@ -181,5 +200,6 @@ export const useUpdateTopicEffects = () => {
     buttonDisabled,
     schemaTypeValue: schemaType,
     application,
+    isUpdatingTopics
   };
 };

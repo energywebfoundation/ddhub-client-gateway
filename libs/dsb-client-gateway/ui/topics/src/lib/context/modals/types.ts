@@ -39,6 +39,11 @@ interface IHideCreateTopicAction {
   payload: boolean;
 }
 
+interface IHideUpdateTopicAction {
+  type: TopicsModalsActionsEnum.HIDE_UPDATE_TOPIC;
+  payload: boolean;
+}
+
 interface IShowCancelAction {
   type: TopicsModalsActionsEnum.SHOW_CANCEL;
   payload: {
@@ -52,4 +57,5 @@ export type TTopicsModalsAction =
   | IShowCreateTopicAction
   | IShowUpdateTopicAction
   | IHideCreateTopicAction
+  | IHideUpdateTopicAction
   | IShowCancelAction

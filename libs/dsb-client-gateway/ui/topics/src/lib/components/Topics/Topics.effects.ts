@@ -11,7 +11,7 @@ import { useStyles } from './Topics.styles';
 export const useTopicsEffects = () => {
   const { theme } = useStyles();
   const router = useRouter();
-  const { topics, topicsById } = useTopics(router.query['namespace'] as string);
+  const { topics, topicsById, isLoading: topicsLoading } = useTopics(router.query['namespace'] as string);
 
   // TODO: remove mock
   const applicationMock = {
@@ -70,5 +70,6 @@ export const useTopicsEffects = () => {
     application: applicationMock,
     topics,
     actions,
+    topicsLoading
   };
 };

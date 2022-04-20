@@ -3,6 +3,7 @@ import { ITopicsModalsStore, TTopicsModalsAction } from './types';
 export enum TopicsModalsActionsEnum {
   SHOW_CREATE_TOPIC = 'SHOW_CREATE_TOPIC',
   SHOW_UPDATE_TOPIC = 'SHOW_UPDATE_TOPIC',
+  HIDE_UPDATE_TOPIC = 'HIDE_UPDATE_TOPIC',
   HIDE_CREATE_TOPIC = 'HIDE_CREATE_TOPIC',
   SHOW_CANCEL = 'SHOW_CANCEL',
 }
@@ -39,6 +40,11 @@ export const topicsModalsReducer = (
       return {
         ...state,
         createTopic: { ...state.createTopic, hide: action.payload },
+      };
+    case TopicsModalsActionsEnum.HIDE_UPDATE_TOPIC:
+      return {
+        ...state,
+        updateTopic: { ...state.updateTopic, hide: action.payload },
       };
     case TopicsModalsActionsEnum.SHOW_CANCEL:
       return { ...state, cancel: action.payload };

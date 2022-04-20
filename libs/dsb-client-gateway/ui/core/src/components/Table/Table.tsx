@@ -15,6 +15,7 @@ import { ColumnInstance } from 'react-table';
 import { Search } from './Search';
 import { TablePaginationActions } from './TablePaginationActions';
 import { TableComponentActions } from './TableComponentActions';
+import { TableRowsLoadingComponent } from './TableRowsLoadingComponent';
 import { EmptyRow } from './EmptyRow/EmptyRow';
 import { EmptyTable } from './EmptyTable/EmptyTable';
 import { useTableEffects } from './Table.effects';
@@ -27,6 +28,7 @@ export function GenericTable<T>({
   onRowClick,
   children,
   actions,
+  loading,
 }: TableProps<T>) {
   const { classes } = useStyles();
   const {
@@ -50,8 +52,14 @@ export function GenericTable<T>({
         {children}
       </Box>
       <TableContainer component={Paper}>
-        {rows.length !== 0 ? (
-          <Table sx={{ minWidth: 500 }} {...getTableProps()}>
+        {loading ? (
+          <TableRowsLoadingComponent pageSize={pageSize} />
+        ) : rows.length !== 0 ? (
+          <Table
+            className={classes.root}
+            sx={{ minWidth: 500 }}
+            {...getTableProps()}
+          >
             <TableHead>
               <TableRow>
                 {headers.map((column) => (

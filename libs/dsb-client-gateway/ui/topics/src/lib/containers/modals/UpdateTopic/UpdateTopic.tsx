@@ -1,6 +1,7 @@
 import { FC } from 'react';
 import clsx from 'clsx';
 import {
+  CircularProgress,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -34,6 +35,7 @@ export const UpdateTopic: FC = () => {
     buttonDisabled,
     schemaTypeValue,
     application,
+    isUpdatingTopics,
   } = useUpdateTopicEffects();
 
   return (
@@ -49,7 +51,7 @@ export const UpdateTopic: FC = () => {
       <form onSubmit={onSubmit}>
         <DialogContent sx={{ padding: 0 }}>
           <DialogContentText className={classes.subTitle}>
-          Update  topic data
+            Update topic data
           </DialogContentText>
           <Grid container mt={4}>
             {application && (
@@ -135,11 +137,15 @@ export const UpdateTopic: FC = () => {
             type="submit"
             variant="contained"
             disabled={buttonDisabled}
-            className={classes.button}
+            className={clsx(classes.button, classes.confirmButton)}
           >
-            <Typography variant="body2" className={classes.submitButtonText}>
-              Save
-            </Typography>
+            {isUpdatingTopics ? (
+              <CircularProgress style={{ width: '17px', height: '17px'}} className={classes.buttonProgress} />
+            ) : (
+              <Typography variant="body2" className={classes.submitButtonText}>
+                Save
+              </Typography>
+            )}
           </Button>
           <Box className={classes.closeButtonWrapper}>
             <CloseButton onClose={closeModal} />
