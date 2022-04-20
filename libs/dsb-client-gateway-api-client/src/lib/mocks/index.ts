@@ -55,3 +55,24 @@ export const getTopicsControllerPostTopicsMock = () => ({
   ),
   version: faker.random.word(),
 });
+
+export const getTopicsControllerGetTopicsHistoryByIdMock = () => {
+  return {
+    count: 1,
+    limit: 1,
+    page: 1,
+    records: [...Array(1)].map(() => ({
+      id: faker.datatype.uuid(),
+      name: faker.word.adverb(),
+      owner: 'ddhub.apps.energyweb.iam.ewc',
+      schema: '{"data":"test"}',
+      schemaType: faker.random.arrayElement(['JSD7', 'XML', 'XSD6', 'CSV', 'TSV']),
+      tags: [...Array(1)].map(() =>
+        faker.word.noun()
+      ),
+      version: '1.0.0',
+    })),
+  };
+};
+
+
