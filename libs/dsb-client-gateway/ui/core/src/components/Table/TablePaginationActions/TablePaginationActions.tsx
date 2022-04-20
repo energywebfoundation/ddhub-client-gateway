@@ -6,6 +6,9 @@ import React from 'react';
 
 const useStyles = makeStyles()(theme => ({
   root: {
+    '& svg': {
+      fill: theme.palette.grey[400]
+    },
     flexShrink: 0,
     marginLeft: theme.spacing(2.5),
   }
