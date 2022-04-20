@@ -1,24 +1,23 @@
-import { FC } from 'react';
 import { MoreVertical } from 'react-feather';
 import { Menu, MenuItem, IconButton, TableCell } from '@mui/material';
 import { useTableComponentActionsEffects } from './TableComponentActions.effects';
 import { useStyles } from './TableComponentActions.styles';
 
-export type TTableComponentAction = {
+export type TTableComponentAction<T = Record<string, unknown>> = {
   label: string;
-  onClick?: (id: string) => void;
+  onClick?: (id: T) => void;
   color?: string;
 };
 
-interface TableComponentActionsProps {
-  id: string;
-  actions: TTableComponentAction[];
+interface TableComponentActionsProps<T> {
+  data: T;
+  actions: TTableComponentAction<T>[];
 }
 
-export const TableComponentActions: FC<TableComponentActionsProps> = ({
-  id,
+export function TableComponentActions<T>({
+  data,
   actions,
-}) => {
+}: TableComponentActionsProps<T>) {
   const { classes } = useStyles();
   const { menuOpen, handleMenuOpen, handleClose, anchorRef } =
     useTableComponentActionsEffects();
@@ -58,7 +57,7 @@ export const TableComponentActions: FC<TableComponentActionsProps> = ({
               onClick={() => {
                 if (action.onClick) {
                   handleClose();
-                  action.onClick(id);
+                  action.onClick(data);
                 }
               }}
             >

@@ -1,4 +1,4 @@
-import { VersionHistoryContainer } from '@dsb-client-gateway/ui/version-history';
+import { VersionHistoryContainer } from '@dsb-client-gateway/ui/topics';
 
 export default function VersionHistory() {
   return <VersionHistoryContainer />;

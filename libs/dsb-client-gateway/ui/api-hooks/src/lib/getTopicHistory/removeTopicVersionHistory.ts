@@ -6,9 +6,10 @@ export const useRemoveTopicVersionHistory = () => {
   const removeTopicVersionHistoryHandler = (
     id: string,
     versionNumber: string,
-    callback?: () => void
+    onSuccess?: () => void,
+    onError?: (error: any) => void
   ) => {
-    mutate({ id, version: versionNumber }, { onSuccess: callback });
+    mutate({ id, version: versionNumber }, { onSuccess: onSuccess, onError: onError});
   };
 
   return { removeTopicVersionHistoryHandler, isLoading };
