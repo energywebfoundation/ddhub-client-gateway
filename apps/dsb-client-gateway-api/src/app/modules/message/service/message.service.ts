@@ -33,8 +33,6 @@ import { ChannelType } from '../../../modules/channel/channel.const';
 import { KeysService } from '../../keys/service/keys.service';
 // import { secretsEngineService } from 'libs/dsb-client-gateway-secrets-engine/src/lib/service/vault.service';
 import { v4 as uuidv4 } from 'uuid';
-import * as fs from 'fs';
-import { join } from 'path';
 import { CommandBus } from '@nestjs/cqrs';
 import { EncryptedMessageType } from '../../message/message.const';
 import { SecretsEngineService } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
@@ -470,25 +468,9 @@ export class MessageService {
           'Decryted Message cannot be parsed to JSON object.'
         );
       }
-
-      // const dir = __dirname + this.configService.get('FILES_DIRECTORY');
-
-      // this.logger.debug(`Making directory files if doesn't exist`);
-      // if (!fs.existsSync(dir)) {
-      //   fs.mkdirSync(dir);
-      // }
-
-      // this.logger.debug(
-      //   `Writing decrypted data to the file for file id:${fileId}`
-      // );
-
-      // await fs.writeFileSync(dir + fileName, Buffer.from(decrypted.data));
     }
 
     return {
-      filePath: join(
-        __dirname + this.configService.get('FILES_DIRECTORY') + fileName
-      ),
       fileName: fileName,
       sender: fileResponse.headers.ownerdid,
       signature: fileResponse.headers.signature,

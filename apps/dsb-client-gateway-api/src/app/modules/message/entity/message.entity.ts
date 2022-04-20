@@ -45,7 +45,6 @@ export interface SymmetricKeyEntity {
 }
 
 export interface DownloadMessageResponse {
-  filePath: string;
   fileName: string;
   sender: string;
   signature: string;
