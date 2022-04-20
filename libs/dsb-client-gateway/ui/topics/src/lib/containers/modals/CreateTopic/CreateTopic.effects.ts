@@ -1,11 +1,11 @@
 import { useEffect } from 'react';
 import { useForm, SubmitHandler, FieldValues } from 'react-hook-form';
 import { useRouter } from 'next/router';
-import { FormSelectOption } from '@dsb-client-gateway/ui/core';
 import { PostTopicBodyDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { useCreateTopic } from '@dsb-client-gateway/ui/api-hooks';
 import { yupResolver } from '@hookform/resolvers/yup';
-import * as yup from 'yup';
+import { validationSchema, fields } from '../../../models';
+import { schemaTypeOptionsByValue } from '../../../utils';
 import {
   useTopicsModalsStore,
   useTopicsModalsDispatch,
@@ -27,16 +27,6 @@ export const useCreateTopicEffects = () => {
     tags: [] as string[],
     version: '',
   };
-
-  const validationSchema = yup
-    .object({
-      name: yup.string().required(),
-      schema: yup.string().required(),
-      schemaType: yup.string().required(),
-      tags: yup.array().min(1).required(),
-      version: yup.string().required(),
-    })
-    .required();
 
   const {
     register,
@@ -90,9 +80,7 @@ export const useCreateTopicEffects = () => {
     const values = data as PostTopicBodyDto;
     const fomattedValues = {
       ...values,
-      schemaType: schemaTypeOptions.find(
-        (option) => option.value === values.schemaType
-      ).label,
+      schemaType: schemaTypeOptionsByValue[values.schemaType].label,
     };
     createTopicHandler(fomattedValues as PostTopicBodyDto, closeModal);
   };
@@ -109,64 +97,6 @@ export const useCreateTopicEffects = () => {
         onCancel: showModal,
       },
     });
-  };
-
-  const schemaTypeOptions: FormSelectOption[] = [
-    { value: 'json', label: 'JSD7' },
-    { value: 'xml', label: 'XML' },
-    { value: 'csv', label: 'CSV' },
-    { value: 'tsv', label: 'TSV' },
-  ];
-
-  const fields = {
-    topicName: {
-      name: 'name',
-      label: 'Topic name',
-      formInputsWrapperProps: {
-        width: 254,
-        marginRight: '15px',
-      },
-      inputProps: {
-        placeholder: 'Topic name',
-      },
-    },
-    version: {
-      name: 'version',
-      label: 'Version',
-      formInputsWrapperProps: {
-        width: 145,
-      },
-      inputProps: {
-        placeholder: 'Version',
-      },
-    },
-    tags: {
-      name: 'tags',
-      label: 'Tags',
-      options: [] as FormSelectOption[],
-      autocomplete: true,
-      maxValues: 20,
-      multiple: true,
-      tags: true,
-      inputProps: {
-        placeholder: 'Tags',
-      },
-    },
-    schemaType: {
-      name: 'schemaType',
-      label: 'Schema type',
-      options: schemaTypeOptions,
-      inputProps: {
-        placeholder: 'Schema type',
-      },
-    },
-    schema: {
-      name: 'schema',
-      label: 'Schema',
-      inputProps: {
-        placeholder: 'Schema',
-      },
-    },
   };
 
   const schemaTypeValue = watch('schemaType');

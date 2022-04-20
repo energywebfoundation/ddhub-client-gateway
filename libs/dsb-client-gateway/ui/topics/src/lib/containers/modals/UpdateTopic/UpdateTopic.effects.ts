@@ -1,17 +1,18 @@
 import { useEffect } from 'react';
 import { useQueryClient } from 'react-query';
 import { useForm, SubmitHandler, FieldValues } from 'react-hook-form';
-import { FormSelectOption } from '@dsb-client-gateway/ui/core';
-import { PostTopicDto, getTopicsControllerGetTopicsQueryKey } from '@dsb-client-gateway/dsb-client-gateway-api-client';
-import { useUpdateTopics } from '@dsb-client-gateway/ui/api-hooks';
+import { useCustomAlert } from '@dsb-client-gateway/ui/core';
 import {
-  schemaTypeOptions,
+  PostTopicDto,
+  getTopicsControllerGetTopicsQueryKey,
+} from '@dsb-client-gateway/dsb-client-gateway-api-client';
+import { useUpdateTopics } from '@dsb-client-gateway/ui/api-hooks';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { validationSchema, fields } from '../../../models';
+import {
   schemaTypeOptionsByLabel,
   schemaTypeOptionsByValue,
-  useCustomAlert,
-} from '@dsb-client-gateway/ui/utils';
-import { yupResolver } from '@hookform/resolvers/yup';
-import * as yup from 'yup';
+} from '../../../utils';
 import {
   useTopicsModalsStore,
   useTopicsModalsDispatch,
@@ -35,16 +36,6 @@ export const useUpdateTopicEffects = () => {
     tags: topic?.tags,
     version: topic?.version,
   };
-
-  const validationSchema = yup
-    .object({
-      name: yup.string().required(),
-      schema: yup.string().required(),
-      schemaType: yup.string().required(),
-      tags: yup.array().min(1).required(),
-      version: yup.string().required(),
-    })
-    .required();
 
   const {
     register,
@@ -103,9 +94,9 @@ export const useUpdateTopicEffects = () => {
       title: 'Success',
       text: 'You have successfully updated the topic',
       type: 'success',
-      confirmButtonText: 'Dismiss'
+      confirmButtonText: 'Dismiss',
     });
-  }
+  };
 
   const topicSubmitHandler: SubmitHandler<FieldValues> = (data) => {
     const values = data as PostTopicDto;
@@ -135,57 +126,6 @@ export const useUpdateTopicEffects = () => {
     }
   };
 
-  const fields = {
-    topicName: {
-      name: 'name',
-      label: 'Topic name',
-      formInputsWrapperProps: {
-        width: 254,
-        marginRight: '15px',
-      },
-      inputProps: {
-        placeholder: 'Topic name',
-      },
-    },
-    version: {
-      name: 'version',
-      label: 'Version',
-      formInputsWrapperProps: {
-        width: 145,
-      },
-      inputProps: {
-        placeholder: 'Version',
-      },
-    },
-    tags: {
-      name: 'tags',
-      label: 'Tags',
-      options: [] as FormSelectOption[],
-      autocomplete: true,
-      maxValues: 20,
-      multiple: true,
-      tags: true,
-      inputProps: {
-        placeholder: 'Tags',
-      },
-    },
-    schemaType: {
-      name: 'schemaType',
-      label: 'Schema type',
-      options: schemaTypeOptions,
-      inputProps: {
-        placeholder: 'Schema type',
-      },
-    },
-    schema: {
-      name: 'schema',
-      label: 'Schema',
-      inputProps: {
-        placeholder: 'Schema',
-      },
-    },
-  };
-
   const buttonDisabled = !isValid;
 
   return {
@@ -200,6 +140,6 @@ export const useUpdateTopicEffects = () => {
     buttonDisabled,
     schemaTypeValue: schemaType,
     application,
-    isUpdatingTopics
+    isUpdatingTopics,
   };
 };

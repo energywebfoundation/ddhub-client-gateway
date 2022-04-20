@@ -1,4 +1,4 @@
-import { Swal, SwalProps } from '@dsb-client-gateway/ui/core';
+import { Swal, SwalProps } from './Swal';
 
 export const useCustomAlert = () => {
   const CustomSwal = Swal();
