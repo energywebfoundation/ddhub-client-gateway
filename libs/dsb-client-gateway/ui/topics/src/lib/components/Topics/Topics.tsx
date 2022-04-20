@@ -8,7 +8,7 @@ import { useStyles } from './Topics.styles';
 
 export const Topics: FC = () => {
   const { classes } = useStyles();
-  const { openCreateTopic, topics } = useTopicsEffects();
+  const { openCreateTopic, topics, actions, topicsLoading } = useTopicsEffects();
 
   const handleRowClick = (data: any) => {
     console.log(data);
@@ -19,7 +19,9 @@ export const Topics: FC = () => {
       <GenericTable<GetTopicDto>
         headers={TOPICS_HEADERS}
         tableRows={topics}
+        actions={actions}
         onRowClick={handleRowClick}
+        loading={topicsLoading}
       >
         <div className={classes.createTopicButtonWrapper}>
           <Button

@@ -4,7 +4,7 @@ module.exports = {
           target: './schema.yaml'
       },
       output: {
-          mode: 'single',
+          mode: 'tags',
           client: 'react-query',
           target: './src/lib/client',
           override: {

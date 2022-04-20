@@ -1,6 +1,7 @@
 import { FC } from 'react';
 import clsx from 'clsx';
 import {
+  CircularProgress,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -17,6 +18,7 @@ import {
   FormSelect,
   Editor,
 } from '@dsb-client-gateway/ui/core';
+import { ApplicationInfo } from '../../../components';
 import { useStyles } from './CreateTopic.styles';
 import { useCreateTopicEffects } from './CreateTopic.effects';
 
@@ -34,6 +36,7 @@ export const CreateTopic: FC = () => {
     buttonDisabled,
     schemaTypeValue,
     application,
+    isCreatingTopic,
   } = useCreateTopicEffects();
 
   return (
@@ -54,27 +57,7 @@ export const CreateTopic: FC = () => {
           <Grid container mt={4}>
             {application && (
               <Grid item xs={4}>
-                <img
-                  className={classes.appImage}
-                  src={application.logoUrl}
-                  alt="app icon"
-                />
-                <Box mt={2.5}>
-                  <Typography variant="body2" className={classes.label}>
-                    Application name
-                  </Typography>
-                  <Typography variant="body2" className={classes.value}>
-                    {application.appName}
-                  </Typography>
-                </Box>
-                <Box mt={2.5}>
-                  <Typography variant="body2" className={classes.label}>
-                    Namespace
-                  </Typography>
-                  <Typography variant="body2" className={classes.value}>
-                    {application.namespace}
-                  </Typography>
-                </Box>
+                <ApplicationInfo application={application} />
               </Grid>
             )}
             <Grid item xs={8} pl={5} mt={1.7}>
@@ -131,11 +114,18 @@ export const CreateTopic: FC = () => {
             type="submit"
             variant="contained"
             disabled={buttonDisabled}
-            className={classes.button}
+            className={clsx(classes.button, classes.confirmButton)}
           >
-            <Typography variant="body2" className={classes.submitButtonText}>
-              Save
-            </Typography>
+            {isCreatingTopic ? (
+              <CircularProgress
+                style={{ width: '17px', height: '17px' }}
+                className={classes.buttonProgress}
+              />
+            ) : (
+              <Typography variant="body2" className={classes.submitButtonText}>
+                Save
+              </Typography>
+            )}
           </Button>
           <Box className={classes.closeButtonWrapper}>
             <CloseButton onClose={closeModal} />
