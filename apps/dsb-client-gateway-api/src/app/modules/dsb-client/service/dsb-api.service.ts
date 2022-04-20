@@ -23,11 +23,13 @@ import {
   SendInternalMessageResponse,
   SendMessageData,
   SendMessageResponse,
-  SendTopicBodyDTO,
+  UpdateTopicBodyDTO,
   Topic,
   TopicDataResponse,
   TopicResultDTO,
+  TopicVersion,
   TopicVersionResponse,
+  UpdateTopicHistoryDTO,
 } from '../dsb-client.interface';
 
 import promiseRetry from 'promise-retry';
@@ -41,6 +43,7 @@ import { AxiosResponse } from '@nestjs/terminus/dist/health-indicator/http/axios
 import { isAxiosError } from '@nestjs/terminus/dist/utils';
 import { SecretsEngineService } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
 import { RoleStatus } from '@dsb-client-gateway/dsb-client-gateway/identity/models';
+import { OperationOptions } from 'retry';
 
 export interface RetryOptions {
   stopOnStatusCodes?: HttpStatus[];
@@ -80,42 +83,50 @@ export class DsbApiService implements OnApplicationBootstrap {
 
   protected async request<T>(
     requestFn: Observable<AxiosResponse<T>>,
-    retryOptions: RetryOptions = {}
-  ): Promise<T> {
-    const { data } = await promiseRetry<AxiosResponse<T>>(async (retry) => {
-      return lastValueFrom(requestFn).catch((err) =>
-        this.handleRequestWithRetry(err, retry, retryOptions)
-      );
-    }, this.retryConfigService.config);
+    retryOptions: RetryOptions = {},
+    overrideRetryConfig?: OperationOptions
+  ): Promise<{ data: T; headers: any }> {
+    const { data, headers } = await promiseRetry<AxiosResponse<T>>(
+      async (retry) => {
+        return lastValueFrom(requestFn).catch((err) =>
+          this.handleRequestWithRetry(err, retry, retryOptions)
+        );
+      },
+      {
+        ...this.retryConfigService,
+        ...overrideRetryConfig,
+      }
+    );
 
-    return data;
+    return { data, headers };
   }
 
   public async getDIDsFromRoles(
     roles: string[],
-    searchType: 'ANY'
+    searchType: 'ANY',
+    overrideRetry?: OperationOptions
   ): Promise<string[]> {
     if (roles.length === 0) {
       return [];
     }
 
-    const { data } = await promiseRetry(async (retry, attempt) => {
-      return lastValueFrom(
-        this.httpService.get(this.baseUrl + '/roles/list', {
-          params: {
-            roles,
-            searchType,
-          },
-          paramsSerializer: (params) => {
-            return qs.stringify(params, { arrayFormat: 'repeat' });
-          },
-          httpsAgent: this.getTLS(),
-          headers: {
-            Authorization: `Bearer ${this.didAuthService.getToken()}`,
-          },
-        })
-      ).catch((err) => this.handleRequestWithRetry(err, retry));
-    });
+    const { data } = await this.request<{ dids: string[] }>(
+      this.httpService.get(this.baseUrl + '/roles/list', {
+        params: {
+          roles,
+          searchType,
+        },
+        paramsSerializer: (params) => {
+          return qs.stringify(params, { arrayFormat: 'repeat' });
+        },
+        httpsAgent: this.getTLS(),
+        headers: {
+          Authorization: `Bearer ${this.didAuthService.getToken()}`,
+        },
+      }),
+      {},
+      overrideRetry
+    );
 
     return data.dids;
   }
@@ -123,25 +134,33 @@ export class DsbApiService implements OnApplicationBootstrap {
   public async getTopicVersions(
     topicId: string
   ): Promise<TopicVersionResponse> {
-    const { data } = await promiseRetry(async (retry, attempt) => {
-      return lastValueFrom(
+    try {
+      const result = await this.request<null>(
         this.httpService.get(this.baseUrl + `/topics/${topicId}/version`, {
           httpsAgent: this.getTLS(),
           headers: {
             Authorization: `Bearer ${this.didAuthService.getToken()}`,
           },
-        })
-      ).catch((err) => this.handleRequestWithRetry(err, retry));
-    });
-    return data;
+        }),
+        {
+          stopOnResponseCodes: ['10'],
+        }
+      );
+
+      this.logger.log('get Topic Versions successful');
+      return result.data;
+    } catch (e) {
+      this.logger.error('get Topic Versions failed', e);
+      throw new Error(e);
+    }
   }
 
   public async checkIfDIDHasRoles(
     did: string,
     roles: string[]
   ): Promise<boolean> {
-    const { data } = await promiseRetry(async (retry, attempt) => {
-      return lastValueFrom(
+    try {
+      const result = await this.request<null>(
         this.httpService.get(this.baseUrl + '/roles/check', {
           params: {
             did,
@@ -151,11 +170,18 @@ export class DsbApiService implements OnApplicationBootstrap {
           headers: {
             Authorization: `Bearer ${this.didAuthService.getToken()}`,
           },
-        })
-      ).catch((err) => this.handleRequestWithRetry(err, retry));
-    });
+        }),
+        {
+          stopOnResponseCodes: ['10'],
+        }
+      );
 
-    return data;
+      this.logger.log('check If DID Has Roles  successful');
+      return result.data;
+    } catch (e) {
+      this.logger.error('check If DID Has Roles  failed', e);
+      throw new Error(e);
+    }
   }
 
   public async uploadFile(
@@ -179,54 +205,77 @@ export class DsbApiService implements OnApplicationBootstrap {
       formData.append('topicId', topicId);
       formData.append('topicVersion', topicVersion);
       formData.append('clientGatewayMessageId', clientGatewayMessageId);
-      formData.append('transactionId', transactionId);
 
-      const { data } = await promiseRetry(async (retry, attempt) => {
-        return lastValueFrom(
-          this.httpService.post(this.baseUrl + '/messages/upload', formData, {
-            maxContentLength: Infinity,
-            maxBodyLength: Infinity,
-            httpsAgent: this.getTLS(),
-            headers: {
-              Authorization: `Bearer ${this.didAuthService.getToken()}`,
-              ...formData.getHeaders(),
-            },
-          })
-        ).catch((err) => {
-          return this.handleRequestWithRetry(err, retry);
-        });
-      });
-      this.logger.log('File Uploaded Successfully');
-      return data;
+      if (transactionId) {
+        formData.append('transactionId', transactionId);
+      }
+
+      const result = await this.request<null>(
+        this.httpService.post(this.baseUrl + '/messages/upload', formData, {
+          maxContentLength: Infinity,
+          maxBodyLength: Infinity,
+          httpsAgent: this.getTLS(),
+          headers: {
+            Authorization: `Bearer ${this.didAuthService.getToken()}`,
+            ...formData.getHeaders(),
+          },
+        }),
+        {
+          stopOnResponseCodes: ['10'],
+        }
+      );
+
+      this.logger.log(
+        `upload file with file name: ${file.originalname} successful`
+      );
+      return result.data;
     } catch (e) {
-      this.logger.error(e);
+      this.logger.error(
+        `upload file with file name: ${file.originalname} failed`,
+        e
+      );
+      throw new Error(e);
     }
   }
 
-  public async downloadFile(fileId: string): Promise<any> {
-    const response = await promiseRetry(async (retry, attempt) => {
-      return lastValueFrom(
+  public async downloadFile(
+    fileId: string
+  ): Promise<{ data: string; headers: any }> {
+    try {
+      const result = await this.request<null>(
         this.httpService.get(this.baseUrl + '/messages/download', {
           params: {
             fileId,
           },
           httpsAgent: this.getTLS(),
           headers: {
-            Authorization: `Bearer ${this.didAuthService.getToken()}`,
+            ...this.getAuthHeader(),
           },
-        })
-      ).catch((err) => this.handleRequestWithRetry(err, retry));
-    });
+        }),
+        {
+          stopOnResponseCodes: ['10'],
+        }
+      );
 
-    return response;
+      this.logger.log(
+        `download file with fileId: ${fileId} successful from MB`
+      );
+      return result;
+    } catch (e) {
+      this.logger.error(
+        `download file with fileId: ${fileId} failed from MB`,
+        e
+      );
+      throw new Error(e);
+    }
   }
 
   public async getTopicsByOwnerAndName(
     name: string,
     owner: string
   ): Promise<TopicDataResponse> {
-    const { data } = await promiseRetry(async (retry, attempt) => {
-      return lastValueFrom(
+    try {
+      const { data } = await this.request<TopicDataResponse>(
         this.httpService.get(this.baseUrl + '/topics', {
           params: {
             owner,
@@ -236,11 +285,23 @@ export class DsbApiService implements OnApplicationBootstrap {
           headers: {
             Authorization: `Bearer ${this.didAuthService.getToken()}`,
           },
-        })
-      ).catch((err) => this.handleRequestWithRetry(err, retry));
-    });
+        }),
+        {
+          stopOnResponseCodes: ['10'],
+        }
+      );
 
-    return data;
+      this.logger.log(
+        `get topics with owner: ${owner} and name: ${name} successful`
+      );
+      return data;
+    } catch (e) {
+      this.logger.error(
+        `get topics with owner: ${owner} and name: ${name} failed`,
+        e
+      );
+      throw new Error(e);
+    }
   }
 
   public async getApplicationsByOwnerAndRole(
@@ -248,34 +309,50 @@ export class DsbApiService implements OnApplicationBootstrap {
   ): Promise<ApplicationDTO[]> {
     this.logger.debug('start: dsb API service getApplicationsByOwnerAndRole ');
     try {
-      const enrolment = this.enrolmentRepository.getEnrolment();
-      const ownerDID = enrolment.did;
+      const ownerDID = this.iamService.getDIDAddress();
       this.logger.debug('sucessfully fetched owner did');
       return this.iamService.getApplicationsByOwnerAndRole(roleName, ownerDID);
     } catch (e) {
       this.logger.error('error while getting applications', e);
-      return e;
+      throw e;
     } finally {
       this.logger.debug('end: dsb API service getApplicationsByOwnerAndRole');
     }
   }
 
-  public async getTopics(owner: string): Promise<TopicDataResponse> {
-    const { data } = await promiseRetry(async (retry, attempt) => {
-      return lastValueFrom(
+  public async getTopics(
+    limit: number,
+    name: string,
+    owner: string,
+    page: number,
+    tags: string[]
+  ): Promise<TopicDataResponse> {
+    try {
+      const { data } = await this.request<TopicDataResponse>(
         this.httpService.get(this.baseUrl + '/topics', {
           params: {
-            owner: owner,
+            limit,
+            name,
+            owner,
+            page,
+            tags,
           },
           httpsAgent: this.getTLS(),
           headers: {
-            Authorization: `Bearer ${this.didAuthService.getToken()}`,
+            ...this.getAuthHeader(),
           },
-        })
-      ).catch((err) => this.handleRequestWithRetry(err, retry));
-    });
+        }),
+        {
+          stopOnResponseCodes: ['10'],
+        }
+      );
 
-    return data;
+      this.logger.log(`get topics with owner:${owner} successful`);
+      return data;
+    } catch (e) {
+      this.logger.error(`get topics with owner:${owner} failed`, e);
+      throw new Error(e);
+    }
   }
 
   public async getTopicsCountByOwner(owners: string[]): Promise<Topic[]> {
@@ -283,8 +360,8 @@ export class DsbApiService implements OnApplicationBootstrap {
       return [];
     }
 
-    const { data } = await promiseRetry(async (retry, attempt) => {
-      return lastValueFrom(
+    try {
+      const result = await this.request<Topic[]>(
         this.httpService.get(this.baseUrl + '/topics/count', {
           params: {
             owner: owners,
@@ -296,40 +373,257 @@ export class DsbApiService implements OnApplicationBootstrap {
           headers: {
             Authorization: `Bearer ${this.didAuthService.getToken()}`,
           },
-        })
-      ).catch((err) => this.handleRequestWithRetry(err, retry));
-    });
+        }),
+        {
+          stopOnResponseCodes: ['10'],
+        }
+      );
 
-    return data;
+      this.logger.log(`get topics count with owners: ${owners} successful`);
+      return result.data;
+    } catch (e) {
+      this.logger.error(`get topics count with owners: ${owners} failed`, e);
+      throw new Error(e);
+    }
   }
 
-  public async postTopics(data: SendTopicBodyDTO): Promise<Topic> {
-    const result = await promiseRetry(async (retry, attempt) => {
-      return lastValueFrom(
-        this.httpService.post(this.baseUrl + '/topics', data, {
+  public async getTopicsBySearch(
+    keyword: string,
+    limit?: number,
+    page?: number
+  ): Promise<Topic[]> {
+    if (!keyword) {
+      this.logger.debug(`no keyword given so returning empty array`);
+      return [];
+    }
+
+    try {
+      const result = await this.request<null>(
+        this.httpService.get(this.baseUrl + '/topics/search', {
+          params: {
+            keyword,
+            limit,
+            page,
+          },
           httpsAgent: this.getTLS(),
           headers: {
             Authorization: `Bearer ${this.didAuthService.getToken()}`,
           },
-        })
-      ).catch((err) => this.handleRequestWithRetry(err, retry));
-    });
+        }),
+        {
+          stopOnResponseCodes: ['10'],
+        }
+      );
 
-    return result.data;
+      this.logger.log(`get topics search with keyword: ${keyword} successful`);
+      return result.data;
+    } catch (e) {
+      this.logger.error(`get topics search with keyword: ${keyword} failed`, e);
+      throw new Error(e);
+    }
   }
 
-  public async updateTopics(data: SendTopicBodyDTO): Promise<TopicResultDTO> {
-    const result = await promiseRetry(async (retry, attempt) => {
-      return lastValueFrom(
-        this.httpService.put(this.baseUrl + '/topics', data, {
+  public async getTopicHistoryById(id: string): Promise<TopicDataResponse> {
+    try {
+      const { data } = await this.request<TopicDataResponse>(
+        this.httpService.get(`${this.baseUrl}/topics/${id}/versions`, {
           httpsAgent: this.getTLS(),
           headers: {
-            Authorization: `Bearer ${this.didAuthService.getToken()}`,
+            ...this.getAuthHeader(),
           },
-        })
-      ).catch((err) => this.handleRequestWithRetry(err, retry));
-    });
-    return result.data;
+        }),
+        {
+          stopOnResponseCodes: ['10'],
+        }
+      );
+
+      this.logger.log(`get topics history with id:${id} successful`);
+      return data;
+    } catch (e) {
+      this.logger.error(`get topics history with id:${id} failed`, e);
+      throw new Error(e);
+    }
+  }
+
+  public async getTopicHistoryByIdAndVersion(
+    id: string,
+    version: string
+  ): Promise<TopicDataResponse> {
+    try {
+      const { data } = await this.request<TopicDataResponse>(
+        this.httpService.get(
+          `${this.baseUrl}/topics/${id}/versions/${version}`,
+          {
+            httpsAgent: this.getTLS(),
+            headers: {
+              ...this.getAuthHeader(),
+            },
+          }
+        ),
+        {
+          stopOnResponseCodes: ['10'],
+        }
+      );
+
+      this.logger.log(
+        `get topics history with id:${id} and version: ${version} successful`
+      );
+      return data;
+    } catch (e) {
+      this.logger.error(
+        `get topics history with id:${id} and version: ${version} failed`,
+        e
+      );
+      throw new Error(e);
+    }
+  }
+
+  public async postTopics(topicData: UpdateTopicBodyDTO): Promise<Topic> {
+    try {
+      const { data } = await this.request<null>(
+        this.httpService.post(this.baseUrl + '/topics', topicData, {
+          httpsAgent: this.getTLS(),
+          headers: {
+            ...this.getAuthHeader(),
+          },
+        }),
+        {
+          stopOnResponseCodes: ['10'],
+        }
+      );
+
+      this.logger.log('post topics successful', data);
+
+      return data;
+    } catch (e) {
+      this.logger.error('post topics failed', e);
+      throw new Error(e);
+    }
+  }
+
+  public async updateTopic(
+    data: UpdateTopicBodyDTO,
+    id: string
+  ): Promise<TopicResultDTO> {
+    try {
+      this.logger.log('topic to be updated', data);
+      const result = await this.request<TopicResultDTO>(
+        this.httpService.put(`${this.baseUrl}/topics/${id}`, data, {
+          httpsAgent: this.getTLS(),
+          headers: {
+            ...this.getAuthHeader(),
+          },
+        }),
+        {
+          stopOnResponseCodes: ['10'],
+        }
+      );
+
+      this.logger.log(`update topics successful with id: ${id}`);
+
+      return result.data;
+    } catch (e) {
+      this.logger.error(`update topics failed with id: ${id}`, e);
+      throw new Error(e);
+    }
+  }
+
+  public async updateTopicByIdAndVersion(
+    topicData: UpdateTopicHistoryDTO,
+    id: string,
+    versionNumber: string
+  ): Promise<TopicResultDTO> {
+    try {
+      this.logger.log('topic data to be updated', topicData);
+      const result = await this.request<TopicResultDTO>(
+        this.httpService.put(
+          `${this.baseUrl}/topics/${id}/versions/${versionNumber}`,
+          topicData,
+          {
+            httpsAgent: this.getTLS(),
+            headers: {
+              ...this.getAuthHeader(),
+            },
+          }
+        ),
+        {
+          stopOnResponseCodes: ['10'],
+        }
+      );
+
+      this.logger.log(
+        `update topics successful with id: ${id} and versionNumber:${versionNumber}`
+      );
+
+      return result.data;
+    } catch (e) {
+      this.logger.error(
+        `update topics failed with id: ${id} and versionNumber:${versionNumber}`,
+        e
+      );
+      throw new Error(e);
+    }
+  }
+
+  public async deleteTopic(id: string): Promise<TopicResultDTO> {
+    try {
+      this.logger.log('topic to be deleted', id);
+      const result = await this.request<TopicResultDTO>(
+        this.httpService.delete(`${this.baseUrl}/topics/${id}`, {
+          httpsAgent: this.getTLS(),
+          headers: {
+            ...this.getAuthHeader(),
+          },
+        }),
+        {
+          stopOnResponseCodes: ['10'],
+        }
+      );
+
+      this.logger.log(`delete topic successful with id:${id}`);
+
+      return result.data;
+    } catch (e) {
+      this.logger.error(`delete topic failed with id:${id}`, e);
+      throw new Error(e);
+    }
+  }
+
+  public async deleteTopicByVersion(
+    id: string,
+    version: string
+  ): Promise<TopicResultDTO> {
+    try {
+      this.logger.log(
+        `topic to be deleted with version: ${version} and id:${id}`
+      );
+      const { data } = await this.request<TopicResultDTO>(
+        this.httpService.delete(
+          `${this.baseUrl}/topics/${id}/versions/${version}`,
+          {
+            httpsAgent: this.getTLS(),
+            headers: {
+              ...this.getAuthHeader(),
+            },
+          }
+        ),
+        {
+          stopOnResponseCodes: ['10'],
+        }
+      );
+
+      this.logger.log(
+        `delete topic successful with version: ${version} and id:${id}`
+      );
+
+      return data;
+    } catch (e) {
+      this.logger.error(
+        `delete topic with id ${id} and version ${version} failed`,
+        e
+      );
+      throw new Error(e);
+    }
   }
 
   public async messagesSearch(
@@ -346,17 +640,27 @@ export class DsbApiService implements OnApplicationBootstrap {
       from,
       senderId,
     };
-    const { data } = await promiseRetry(async (retry, attempt) => {
-      return lastValueFrom(
+
+    try {
+      const result = await this.request<SearchMessageResponseDto[]>(
         this.httpService.post(this.baseUrl + '/messages/search', requestBody, {
           httpsAgent: this.getTLS(),
           headers: {
-            Authorization: `Bearer ${this.didAuthService.getToken()}`,
+            ...this.getAuthHeader(),
           },
-        })
-      ).catch((err) => this.handleRequestWithRetry(err, retry));
-    });
-    return data;
+        }),
+        {
+          stopOnResponseCodes: ['10'],
+        }
+      );
+
+      this.logger.log('messages search successful', result);
+
+      return result.data;
+    } catch (e) {
+      this.logger.error('messages search failed', e);
+      throw new Error(e);
+    }
   }
 
   public async getMessages(
@@ -366,28 +670,30 @@ export class DsbApiService implements OnApplicationBootstrap {
     amount?: number
   ): Promise<Message[]> {
     try {
-      const { data } = await promiseRetry(async (retry, attempt) => {
-        return lastValueFrom(
-          this.httpService.get(this.baseUrl + '/messages', {
-            httpsAgent: this.getTLS(),
-            params: {
-              fqcn,
-              from,
-              clientId,
-              amount,
-            },
-            headers: {
-              Authorization: `Bearer ${this.didAuthService.getToken()}`,
-            },
-          })
-        ).catch((err) => this.handleRequestWithRetry(err, retry));
-      });
+      const result = await this.request<null>(
+        this.httpService.get(this.baseUrl + '/messages', {
+          httpsAgent: this.getTLS(),
+          params: {
+            fqcn,
+            from,
+            clientId,
+            amount,
+          },
+          headers: {
+            ...this.getAuthHeader(),
+          },
+        }),
+        {
+          stopOnResponseCodes: ['10'],
+        }
+      );
 
-      return data;
+      this.logger.log(`get messages successful for fqcn: ${fqcn}`);
+
+      return result.data;
     } catch (e) {
-      this.logger.error(e);
-
-      return [];
+      this.logger.error(`get messages failed for fqcn: ${fqcn}`, e);
+      throw new Error(e);
     }
   }
 
@@ -410,19 +716,26 @@ export class DsbApiService implements OnApplicationBootstrap {
       clientGatewayMessageId,
     };
 
-    const { data } = await promiseRetry(async (retry, attempt) => {
-      return lastValueFrom(
+    try {
+      const result = await this.request<null>(
         this.httpService.post(this.baseUrl + '/messages', messageData, {
           httpsAgent: this.getTLS(),
           headers: {
-            Authorization: `Bearer ${this.didAuthService.getToken()}`,
+            ...this.getAuthHeader(),
           },
-        })
-      ).catch((err) => this.handleRequestWithRetry(err, retry));
-    });
-    this.logger.log('Message Sent Successfully!', data.clientGatewayMessageId);
+        }),
+        {
+          stopOnResponseCodes: ['10'],
+        }
+      );
 
-    return data;
+      this.logger.log('send message successful', result);
+
+      return result.data;
+    } catch (e) {
+      this.logger.error('send message failed', e);
+      throw new Error(e);
+    }
   }
 
   public async sendMessageInternal(
@@ -436,39 +749,62 @@ export class DsbApiService implements OnApplicationBootstrap {
       payload: payload,
     };
 
-    const { data } = await promiseRetry(async (retry, attempt) => {
-      console.log(this.baseUrl + '/messages/internal');
-
-      return lastValueFrom(
+    try {
+      const result = await this.request<null>(
         this.httpService.post(
           this.baseUrl + '/messages/internal',
           requestData,
           {
             httpsAgent: this.getTLS(),
             headers: {
-              Authorization: `Bearer ${this.didAuthService.getToken()}`,
+              ...this.getAuthHeader(),
             },
           }
-        )
-      ).catch((err) => this.handleRequestWithRetry(err, retry));
-    });
+        ),
+        {
+          stopOnResponseCodes: ['10'],
+        }
+      );
 
-    return data;
+      this.logger.log(
+        `send message internal successful with clientGatewayMessageId: ${clientGatewayMessageId}`
+      );
+
+      return result.data;
+    } catch (e) {
+      this.logger.error(
+        `send message internal failed with clientGatewayMessageId: ${clientGatewayMessageId}`,
+        e
+      );
+      throw new Error(e);
+    }
   }
 
-  public async getSymmetricKeys(dto): Promise<GetInternalMessageResponse[]> {
-    const { data } = await promiseRetry(async (retry, attempt) => {
-      return lastValueFrom(
+  public async getSymmetricKeys(
+    dto: { clientId: string; amount: number },
+    overrideRetry?: OperationOptions
+  ): Promise<GetInternalMessageResponse[]> {
+    try {
+      const { data } = await this.request<null>(
         this.httpService.post(this.baseUrl + '/messages/internal/search', dto, {
           httpsAgent: this.getTLS(),
           headers: {
-            Authorization: `Bearer ${this.didAuthService.getToken()}`,
+            ...this.getAuthHeader(),
           },
-        })
-      ).catch((err) => this.handleRequestWithRetry(err, retry));
-    });
+        }),
+        {
+          stopOnResponseCodes: ['10'],
+        },
+        overrideRetry
+      );
 
-    return data;
+      this.logger.log(`get symmetric keys successful with dto: ${dto}`);
+
+      return data;
+    } catch (e) {
+      this.logger.error(`get symmetric keys failed with dto: ${dto}`, e);
+      throw new Error(e);
+    }
   }
 
   protected async handleRequestWithRetry(
@@ -673,5 +1009,28 @@ export class DsbApiService implements OnApplicationBootstrap {
     this.tls.destroy();
 
     this.tls = null;
+  }
+
+  async getTopicById(topicId: string): Promise<TopicVersion | null> {
+    try {
+      const { data } = await this.request<TopicVersion | null>(
+        this.httpService.get(this.baseUrl + '/topics/' + topicId + '/version', {
+          httpsAgent: this.getTLS(),
+          headers: {
+            ...this.getAuthHeader(),
+          },
+        }),
+        {
+          stopOnResponseCodes: ['10'],
+        }
+      );
+      this.logger.error(`Get topic with topicId: ${topicId} successful`);
+
+      return data;
+    } catch (e) {
+      this.logger.error(`Get topic with topicId: ${topicId} failed`, e);
+
+      throw new Error(e);
+    }
   }
 }

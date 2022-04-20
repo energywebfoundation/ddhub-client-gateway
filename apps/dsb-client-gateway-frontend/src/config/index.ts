@@ -1,10 +1,4 @@
-import { loadEnvConfig } from '@next/env'
 import path from 'path'
-
-// manually load config because we have a custom server
-console.log(process.cwd(), process.env.NODE_ENV);
-
-loadEnvConfig(process.cwd(), process.env.NODE_ENV !== 'production')
 
 const defaults = {
   port: '3000',

@@ -4,8 +4,12 @@ import { ChannelService } from './channel.service';
 import { DsbApiService } from '../../dsb-client/service/dsb-api.service';
 import { IdentityService } from '../../identity/service/identity.service';
 import { ChannelEntity } from '../entity/channel.entity';
-import { TopicVersionResponse } from '../../dsb-client/dsb-client.interface';
 import { TopicRepository } from '../repository/topic.repository';
+import {
+  Topic,
+  TopicVersion,
+  TopicVersionResponse,
+} from '../../dsb-client/dsb-client.interface';
 
 @Injectable()
 export class ChannelDidCacheService {
@@ -39,41 +43,79 @@ export class ChannelDidCacheService {
 
     const rolesForDIDs: string[] = await this.dsbApiService.getDIDsFromRoles(
       internalChannel.conditions.roles,
-      'ANY'
+      'ANY',
+      {
+        retries: 1,
+      }
     );
 
-    if (!rolesForDIDs.length) {
-      this.logger.warn(
-        `There is no single DID for listed roles`,
-        internalChannel.conditions.roles
+    this.logger.log(`Updating DIDs for ${internalChannel.fqcn}`);
+
+    const uniqueDids: string[] = [
+      ...new Set([...rolesForDIDs, ...internalChannel.conditions.dids]),
+    ];
+
+    await this.channelService.updateChannelQualifiedDids(
+      internalChannel.fqcn,
+      uniqueDids
+    );
+
+    for (const { topicId, topicName, owner } of internalChannel.conditions
+      .topics) {
+      const topicInformation = await this.dsbApiService.getTopicsByOwnerAndName(
+        topicName,
+        owner
       );
-    } else {
-      this.logger.log(`Updating DIDs for ${internalChannel.fqcn}`);
 
-      await this.channelService.updateChannelQualifiedDids(
-        internalChannel.fqcn,
-        rolesForDIDs
-      );
-    }
-
-    for (const { topicId } of internalChannel.conditions.topics) {
-      const topicVersions: TopicVersionResponse =
-        await this.dsbApiService.getTopicVersions(topicId);
-
-      if (topicVersions.records.length === 0) {
+      if (topicInformation.records.length === 0) {
         this.logger.warn(`Topic with id ${topicId} does not have any versions`);
 
         continue;
       }
 
+      const topic: Topic = topicInformation.records[0];
+
+      const topicVersion: TopicVersion | null =
+        await this.dsbApiService.getTopicById(topic.id);
+
+      if (!topicVersion) {
+        this.logger.error(
+          `Topic version is missing for topic with id ${topicId}`
+        );
+      }
+
+      const topicVersions: TopicVersionResponse =
+        await this.dsbApiService.getTopicVersions(topic.id);
+
+      this.logger.log(`Found ${topicVersions.records.length} topic versions`);
+
       await this.channelService.updateChannelTopic(
-        internalChannel.fqcn,
-        topicId,
-        topicVersions.records
+        fqcn,
+        topic.id,
+        topicVersions.records.map((topicVersion) => ({
+          id: topic.id,
+          owner: topic.owner,
+          name: topic.name,
+          schemaType: topic.schemaType,
+          version: topicVersion.version,
+          schema: topicVersion.schema,
+        }))
       );
 
-      for (const topicVersion of topicVersions.records) {
-        await this.topicRepository.createOrUpdateTopic(topicVersion, topicId);
+      this.logger.log('Found topic', topic);
+
+      for (const { schema, version } of topicVersions.records) {
+        await this.topicRepository.createOrUpdateTopic(
+          {
+            id: topic.id,
+            schema,
+            version,
+            owner: topic.owner,
+            name: topic.name,
+            schemaType: topic.schemaType,
+          },
+          topic.id
+        );
       }
     }
   }

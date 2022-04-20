@@ -9,12 +9,13 @@ import { SymmetricKeysRepository } from '../message/repository/symmetric-keys.re
 import { SymmetricKeysCacheService } from '../message/service/symmetric-keys-cache.service';
 import { DsbClientModule } from '../dsb-client/dsb-client.module';
 import { RefreshKeysHandler } from './service/refresh-keys.handler';
-
+import { StorageModule } from '../storage/storage.module';
 @Module({
   imports: [
     DsbClientGatewayStorageModule,
     SecretsEngineModule,
     IdentityModule,
+    StorageModule,
     forwardRef(() => DsbClientModule),
   ],
   providers: [

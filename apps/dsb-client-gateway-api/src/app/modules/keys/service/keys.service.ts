@@ -92,6 +92,7 @@ export class KeysService implements OnModuleInit {
     signature: string,
     encryptedData: string
   ): Promise<boolean> {
+    this.logger.log('fetching did', senderDid);
     const did = await this.iamService.getDid(senderDid);
 
     if (!did) {
@@ -100,6 +101,7 @@ export class KeysService implements OnModuleInit {
       return false;
     }
 
+    this.logger.log('did fechted successully', senderDid);
     const key = did.publicKey.find(({ id }) => {
       return id === `${senderDid}#${DIDPublicKeyTags.DSB_SIGNATURE_KEY}`;
     });
@@ -182,7 +184,11 @@ export class KeysService implements OnModuleInit {
     symmetricKey: string,
     receiverDid: string
   ): Promise<any | null> {
+    this.logger.log('fetching did', receiverDid);
+
     const did = await this.iamService.getDid(receiverDid);
+
+    this.logger.log('did fetched successfully', receiverDid);
 
     if (!did) {
       this.logger.error('IAM not initialized');

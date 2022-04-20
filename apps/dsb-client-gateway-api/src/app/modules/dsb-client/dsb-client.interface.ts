@@ -10,16 +10,20 @@ export interface PaginatedData<T> {
   records: T[];
 }
 
-export type TopicDataResponse = PaginatedData<TopicData>;
+export type TopicDataResponse = PaginatedData<Topic>;
 
-export interface TopicVersion {
+export interface Topic {
+  id: string;
   name: string;
   owner: string;
-  schema: object;
-  schemaType: string;
+  schemaType: string; // @TODO make this ENUM
   tags: string[];
+}
+
+export interface TopicVersion {
+  id: string;
+  schema: object;
   version: string;
-  topicId: string;
 }
 
 export type TopicVersionResponse = PaginatedData<TopicVersion>;
@@ -42,7 +46,7 @@ export interface ApplicationHeader {
   Cell?: any;
 }
 
-export type TopicResultDTO = {
+export interface TopicResultDTO {
   id: string;
   name: string;
   schemaType: string;
@@ -50,24 +54,23 @@ export type TopicResultDTO = {
   version: string;
   owner: string;
   tags: string[];
-};
+}
 
-export type GetTopicsOptions = {
+export interface GetTopicsOptions {
   limit?: number;
   name: string;
   owner: string;
   page?: number;
   tags?: string[];
-};
+}
 
-export type SendTopicBodyDTO = {
-  name: string;
-  schemaType: string;
-  schema: string;
-  version: string;
-  owner: string;
+export interface UpdateTopicBodyDTO {
   tags: string[];
-};
+}
+
+export interface UpdateTopicHistoryDTO {
+  schema: string;
+}
 
 export class ChannelDTO {
   fqcn: string;

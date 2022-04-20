@@ -22,11 +22,12 @@ import { TopicOwnerTopicNameRequiredException } from '../exceptions/topic-owner-
 import { MessageDecryptionFailedException } from '../exceptions/message-decryption-failed.exception';
 import { FileSizeException } from '../exceptions/file-size.exception';
 import { FIleTypeNotSupportedException } from '../exceptions/file-type-not-supported.exception';
+import { NoPrivateKeyException } from '../../storage/exceptions/no-private-key.exception';
 import {
-  SendMessageResponse,
-  SearchMessageResponseDto,
-  GetMessageResponse,
   DownloadMessageResponse,
+  GetMessageResponse,
+  SearchMessageResponseDto,
+  SendMessageResponse,
 } from '../message.interface';
 import { ChannelType } from '../../../modules/channel/channel.const';
 import { KeysService } from '../../keys/service/keys.service';
@@ -37,6 +38,8 @@ import { join } from 'path';
 import { CommandBus } from '@nestjs/cqrs';
 import { EncryptedMessageType } from '../../message/message.const';
 import { SecretsEngineService } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
+import { TopicEntity } from '../../channel/channel.interface';
+import { ChannelEntity } from '../../channel/entity/channel.entity';
 
 export enum EventEmitMode {
   SINGLE = 'SINGLE',
@@ -96,12 +99,17 @@ export class MessageService {
       dto.topicVersion
     );
 
-    if (!topic) {
+    if (
+      !topic ||
+      !topic.id ||
+      !topic.schema ||
+      !topic.schemaType ||
+      !topic.version
+    ) {
       throw new TopicNotFoundException('NOT Found');
     }
 
     const qualifiedDids = channel.conditions.qualifiedDids;
-
     if (qualifiedDids.length === 0) {
       throw new RecipientsNotFoundException();
     }
@@ -117,11 +125,11 @@ export class MessageService {
     const clientGatewayMessageId: string = uuidv4();
 
     this.logger.log('Generating Random Key');
-    const randomKey: string = await this.keyService.generateRandomKey();
+    const randomKey: string = this.keyService.generateRandomKey();
 
     this.logger.log('Encrypting Payload');
 
-    const encryptedMessage = await this.keyService.encryptMessage(
+    const encryptedMessage = this.keyService.encryptMessage(
       dto.payload,
       randomKey,
       EncryptedMessageType['UTF-8']
@@ -130,9 +138,13 @@ export class MessageService {
     this.logger.log('fetching private key');
     const privateKey = await this.secretsEngineService.getPrivateKey();
 
+    if (!privateKey) {
+      throw new NoPrivateKeyException();
+    }
+
     this.logger.log('Generating Signature');
 
-    const signature = await this.keyService.createSignature(
+    const signature = this.keyService.createSignature(
       encryptedMessage,
       '0x' + privateKey
     );
@@ -161,10 +173,11 @@ export class MessageService {
 
     this.logger.log('Sending Message');
 
+    this.logger.debug('topic from cache', topic);
     return this.dsbApiService.sendMessage(
       qualifiedDids,
       encryptedMessage,
-      topic.topicId,
+      topic.id,
       topic.version,
       signature,
       clientGatewayMessageId,
@@ -195,7 +208,16 @@ export class MessageService {
       topicIds = channel.conditions.topics.map((topic) => topic.topicId);
     } else {
       const topic = await this.topicService.getTopic(topicName, topicOwner);
-      topicIds.push(topic.topicId);
+
+      if (!topic) {
+        this.logger.error(
+          `Couldn't find topic - topicName: ${topicName}, owner: ${topicOwner}`
+        );
+
+        return [];
+      }
+
+      topicIds.push(topic.id);
     }
 
     // call message search
@@ -292,18 +314,27 @@ export class MessageService {
     }
 
     //Check if internal channel exists
-    const channel = await this.channelService.getChannelOrThrow(dto.fqcn);
+    const channel: ChannelEntity = await this.channelService.getChannelOrThrow(
+      dto.fqcn
+    );
 
     //System gets topic details from cache
-    const topic = await this.topicService.getTopic(
+    const topic: TopicEntity | null = await this.topicService.getTopic(
       dto.topicName,
       dto.topicOwner,
       dto.topicVersion
     );
 
     //Check if topic exists
-    if (!topic) {
-      throw new TopicNotFoundException('TOPIC NOT FOUND');
+
+    if (
+      !topic ||
+      !topic.id ||
+      !topic.schema ||
+      !topic.schemaType ||
+      !topic.version
+    ) {
+      throw new TopicNotFoundException('NOT Found');
     }
 
     //System gets internal channel details
@@ -322,20 +353,24 @@ export class MessageService {
     const clientGatewayMessageId: string = uuidv4();
 
     this.logger.log('Generating Random Key');
-    const randomKey: string = await this.keyService.generateRandomKey();
+    const randomKey: string = this.keyService.generateRandomKey();
 
     this.logger.log('Encrypting Payload');
-    const encryptedMessage = await this.keyService.encryptMessage(
+    const encryptedMessage = this.keyService.encryptMessage(
       JSON.stringify(file.buffer),
       randomKey,
-      'utf-8'
+      EncryptedMessageType['UTF-8']
     );
 
     this.logger.log('fetching private key');
     const privateKey = await this.secretsEngineService.getPrivateKey();
 
+    if (!privateKey) {
+      throw new NoPrivateKeyException();
+    }
+
     this.logger.log('Generating Signature');
-    const signature = await this.keyService.createSignature(
+    const signature = this.keyService.createSignature(
       encryptedMessage,
       '0x' + privateKey
     );
@@ -346,11 +381,17 @@ export class MessageService {
 
     await Promise.allSettled(
       qualifiedDids.map(async (recipientDid: string) => {
+        this.logger.debug(
+          `generating encrypted symmetric key for recipientId: ${recipientDid} `
+        );
         const decryptionCiphertext = await this.keyService.encryptSymmetricKey(
           randomKey,
           recipientDid
         );
 
+        this.logger.debug(
+          `sending encrypted symmetric key for recipientId: ${recipientDid} `
+        );
         await this.dsbApiService.sendMessageInternal(
           recipientDid,
           clientGatewayMessageId,
@@ -363,7 +404,7 @@ export class MessageService {
     return this.dsbApiService.uploadFile(
       file,
       qualifiedDids,
-      topic.topicId,
+      topic.id,
       topic.version,
       signature,
       encryptedMessage,
@@ -377,11 +418,10 @@ export class MessageService {
   ): Promise<DownloadMessageResponse> {
     //Calling download file API of message broker
     const fileResponse = await this.dsbApiService.downloadFile(fileId);
+
     //getting file name from headers
     let fileName = fileResponse.headers['content-disposition'].split('=')[1];
 
-    console.log('fileName', fileName);
-    console.log(typeof fileName);
     fileName = fileName.replace(/"/g, '');
 
     //Verifying signature
@@ -399,7 +439,6 @@ export class MessageService {
       );
     } else {
       let decryptedMessage: string;
-      let decryptionSucesssfull: boolean;
       let decrypted: any;
 
       try {
@@ -414,7 +453,7 @@ export class MessageService {
 
         this.logger.debug(`Completed decryption for file id:${fileId}`);
       } catch (e) {
-        decryptionSucesssfull = false;
+        this.logger.debug(`Decryption failed for file id:${fileId}`);
         throw new MessageDecryptionFailedException(JSON.stringify(e));
       }
 
@@ -426,23 +465,29 @@ export class MessageService {
         // Parsing Decrypted data
         decrypted = JSON.parse(decryptedMessage);
       } catch (e) {
+        this.logger.debug(`Parsing failed for file id:${fileId}`);
         throw new MessageDecryptionFailedException(
           'Decryted Message cannot be parsed to JSON object.'
         );
       }
 
-      const dir = __dirname + '/../../../files/';
+      const dir = __dirname + this.configService.get('FILES_DIRECTORY');
 
+      this.logger.debug(`Making directory files if doesn't exist`);
       if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir);
       }
 
-      // writing the data to a file
+      this.logger.debug(
+        `Writing decrypted data to the file for file id:${fileId}`
+      );
       await fs.writeFileSync(dir + fileName, Buffer.from(decrypted.data));
     }
 
     return {
-      filePath: join(__dirname + '/../../../files/' + fileName),
+      filePath: join(
+        __dirname + this.configService.get('FILES_DIRECTORY') + fileName
+      ),
       fileName: fileName,
       sender: fileResponse.headers.ownerdid,
       signature: fileResponse.headers.signature,

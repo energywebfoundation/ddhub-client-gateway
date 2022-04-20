@@ -17,7 +17,7 @@ import { IdentityResponseDto } from './dto/identity-response.dto';
 
 @Controller('identity')
 @UseGuards(DigestGuard)
-@ApiTags('configuration', 'identity')
+@ApiTags('Identity')
 export class IdentityController {
   constructor(protected readonly identityService: IdentityService) {}
 

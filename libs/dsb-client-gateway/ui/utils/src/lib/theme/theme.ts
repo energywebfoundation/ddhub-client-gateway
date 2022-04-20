@@ -5,7 +5,7 @@ const dsbTheme: ThemeOptions = {
   palette: {
     primary: {
       main: '#A466FF',
-      dark: '#293145'
+      dark: '#7367F0'
     },
     secondary: {
       main: '#F6AFAF',
@@ -32,16 +32,60 @@ const dsbTheme: ThemeOptions = {
       primary: '#CED1D5',
       secondary: '#FFFFFF'
     },
+    grey: {
+      100: '#F2F2F3',
+      200: '#C6C9CE',
+      300: '#B9B9C3',
+      400: '#B2B6BD',
+      500: '#848484'
+    },
     background: {
       default: '#161D31',
       paper: '#293145'
     }
   },
   typography: {
-    fontFamily: 'Rajdhani'
+    fontFamily: 'Rajdhani',
+    body1: {
+      fontFamily: 'Bw Gradual',
+    },
+    body2: {
+      fontFamily: 'Sequel Sans',
+      letterSpacing: '0.4px'
+    }
   },
   components: {
     // Name of the component
+    MuiCssBaseline: {
+      styleOverrides: `
+        @font-face {
+          font-family: 'Sequel Sans';
+          font-style: normal;
+          src: url('/fonts/Sequel-Sans.ttf') format('truetype');
+        }
+        @font-face {
+          font-family: 'Bw Gradual';
+          font-style: normal;
+          font-display: swap;
+          font-weight: 400;
+          src: url('/fonts/BwGradual-Regular.woff2') format('woff2');
+        }
+        @font-face {
+          font-family: 'Bw Gradual';
+          font-style: normal;
+          font-display: swap;
+          font-weight: 500;
+          src: url('/fonts/BwGradual-Medium.woff2') format('woff2');
+        }
+        @font-face {
+          font-family: 'Bw Gradual';
+          font-style: normal;
+          font-display: swap;
+          font-weight: bold;
+          src: url('/fonts/BwGradual-Bold.woff2') format('woff2');
+        }
+      `,
+    },
     MuiDrawer: {
       styleOverrides: {
         // Name of the slot
@@ -58,10 +102,10 @@ const dsbTheme: ThemeOptions = {
         }
       }
     },
-    MuiInputBase: {
+    MuiOutlinedInput: {
       styleOverrides: {
-        root: {
-          width: '100%'
+        notchedOutline: {
+          borderColor: '#404656'
         }
       }
     },
@@ -69,6 +113,13 @@ const dsbTheme: ThemeOptions = {
       styleOverrides: {
         root: {
           width: '100%'
+        }
+      }
+    },
+    MuiTableCell: {
+      styleOverrides: {
+        root: {
+          borderBottomColor: '#384151'
         }
       }
     }

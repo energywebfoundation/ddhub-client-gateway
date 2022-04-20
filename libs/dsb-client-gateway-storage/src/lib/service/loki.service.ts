@@ -12,8 +12,11 @@ export class LokiService implements OnModuleInit, OnApplicationShutdown {
   constructor() {
     this.client = new loki('data.db', {
       autoload: true,
+      persistenceMethod: 'fs',
       autosave: true,
+      autosaveInterval: 1,
       serializationMethod: 'pretty',
+      throttledSaves: true,
     });
   }
 

@@ -30,8 +30,8 @@ import { UpdateChannelDto } from '../dto/request/update-channel.dto';
 import { CommandBus } from '@nestjs/cqrs';
 import { RefreshAllChannelsCacheDataCommand } from '../command/refresh-all-channels-cache-data.command';
 
-@Controller('channel')
-@ApiTags('internal-channels')
+@Controller('channels')
+@ApiTags('Channels')
 @UseInterceptors(LokiMetadataStripInterceptor)
 export class ChannelController {
   constructor(
