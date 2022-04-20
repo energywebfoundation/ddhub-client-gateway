@@ -94,7 +94,7 @@ export class MessageControlller {
       return stream.pipe(res);
     } catch (e) {
       this.logger.error('error in file download', e);
-      throw new Error(e);
+      throw e;
     }
   }
 

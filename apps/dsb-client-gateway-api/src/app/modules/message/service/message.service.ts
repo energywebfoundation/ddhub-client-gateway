@@ -416,15 +416,16 @@ export class MessageService {
   ): Promise<DownloadMessageResponse> {
     //Calling download file API of message broker
     const fileResponse = await this.dsbApiService.downloadFile(fileId);
-    let decrypted: any;
+    let decrypted: { data: string };
 
     //getting file name from headers
-    let fileName = fileResponse.headers['content-disposition'].split('=')[1];
+    let fileName: string =
+      fileResponse.headers['content-disposition'].split('=')[1];
 
     fileName = fileName.replace(/"/g, '');
 
     //Verifying signature
-    const isSignatureValid = await this.keyService.verifySignature(
+    const isSignatureValid: boolean = await this.keyService.verifySignature(
       fileResponse.headers.ownerdid,
       fileResponse.headers.signature,
       fileResponse.data
