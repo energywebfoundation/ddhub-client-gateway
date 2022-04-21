@@ -20,7 +20,7 @@ export const getIdentityControllerGetMock = () => ({
 export const getApplicationsControllerGetApplicationsMock = () => [
   {
     appName: faker.word.noun(),
-    logoUrl: '',
+    logoUrl: faker.image.abstract(),
     websiteUrl: faker.random.word(),
     description: faker.random.word(),
     namespace: 'ddhub.apps.energyweb.iam.ewc',
