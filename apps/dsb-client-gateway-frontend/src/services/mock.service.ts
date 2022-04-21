@@ -39,6 +39,10 @@ export function makeServer({ environment = 'development' }) {
         return { topic: JSON.parse(request.requestBody) };
       });
 
+      this.delete('/topics/:id', () => {
+        return {}
+      })
+
       this.delete('topics/:id/versions/:version', () => {
         return {}
       })
