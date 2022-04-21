@@ -32,14 +32,6 @@ export const getApplicationsControllerGetApplicationsMock = () =>
       logoUrl: faker.image.abstract(),
       websiteUrl: faker.random.word(),
       description: faker.random.word(),
-      namespace: 'edge.apps.aemo.iam.ewc',
-      topicsCount: faker.datatype.number({ min: 1, max: 10 }),
-    },
-    {
-      appName: faker.word.noun(),
-      logoUrl: faker.image.abstract(),
-      websiteUrl: faker.random.word(),
-      description: faker.random.word(),
       namespace: 'torta.apps.eggplant.vege.iam.ewc',
       topicsCount: faker.datatype.number({ min: 1, max: 10 }),
     }
@@ -55,7 +47,6 @@ export const getTopicsControllerGetTopicsMock = () => ({
     owner: faker.random.arrayElement([
       'ddhub.apps.energyweb.iam.ewc',
       'torta.apps.eggplant.vege.iam.ewc',
-      'edge.apps.aemo.iam.ewc',
     ]),
     schema: '{"data":"test"}',
     schemaType: faker.random.arrayElement(['JSD7', 'XML', 'CSV', 'TSV']),
@@ -69,7 +60,7 @@ export const getTopicsControllerPostTopicsMock = () => ({
   name: faker.random.word(),
   owner: faker.random.word(),
   schema: faker.random.word(),
-  schemaType: faker.helpers.randomize(['JSD7', 'XML', 'XSD6', 'CSV', 'TSV']),
+  schemaType: faker.helpers.randomize(['JSD7', 'XML', 'CSV', 'TSV']),
   tags: [...Array(faker.datatype.number({ min: 1, max: 10 }))].map(() =>
     faker.random.word()
   ),
@@ -89,7 +80,6 @@ export const getTopicsControllerGetTopicsHistoryByIdMock = () => {
       schemaType: faker.random.arrayElement([
         'JSD7',
         'XML',
-        'XSD6',
         'CSV',
         'TSV',
       ]),
