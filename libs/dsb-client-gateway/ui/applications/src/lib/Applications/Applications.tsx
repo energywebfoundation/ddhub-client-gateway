@@ -6,7 +6,7 @@ import { ApplicationDTO } from '@dsb-client-gateway/dsb-client-gateway-api-clien
 import { routerConst } from '@dsb-client-gateway/ui/utils';
 
 export function Applications() {
-  const { applications, isLoading } = useApplications();
+  const { applications, applicationsFetched } = useApplications();
   const router = useRouter();
 
   const handleRowClick = (data: ApplicationDTO) => {
@@ -15,13 +15,13 @@ export function Applications() {
     );
   };
   return (
-    <div>
+    <section style={{ marginTop: 16 }}>
       <GenericTable<ApplicationDTO>
         headers={APPLICATIONS_HEADERS}
         tableRows={applications}
         onRowClick={handleRowClick}
-        loading={isLoading}
+        loading={!applicationsFetched}
       />
-    </div>
+    </section>
   );
 }

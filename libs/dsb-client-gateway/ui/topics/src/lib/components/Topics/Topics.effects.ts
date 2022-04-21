@@ -13,7 +13,7 @@ import { useStyles } from './Topics.styles';
 export const useTopicsEffects = () => {
   const { theme } = useStyles();
   const router = useRouter();
-  const { topics, topicsById, isLoading: topicsLoading } = useTopics(router.query[Queries.Namespace] as string);
+  const { topics, topicsById, topicsFetched } = useTopics(router.query[Queries.Namespace] as string);
 
   // TODO: remove mock
   const applicationMock = {
@@ -79,7 +79,7 @@ export const useTopicsEffects = () => {
     application: applicationMock,
     topics,
     actions,
-    topicsLoading,
+    topicsFetched,
     handleRowClick
   };
 };

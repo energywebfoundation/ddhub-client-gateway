@@ -4,7 +4,7 @@ import { lighten } from '@mui/material/styles';
 export const useStyles = makeStyles()((theme) => ({
   root: {
     '& .MuiTableCell-root': {
-      padding: '5px 16px'
+      padding: '5px 12px'
     }
   },
   head: {

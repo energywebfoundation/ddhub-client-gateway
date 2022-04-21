@@ -8,7 +8,7 @@ import { useStyles } from './Topics.styles';
 
 export const Topics: FC = () => {
   const { classes } = useStyles();
-  const { openCreateTopic, topics, actions, topicsLoading, handleRowClick } =
+  const { openCreateTopic, topics, actions, topicsFetched, handleRowClick } =
     useTopicsEffects();
 
   return (
@@ -18,7 +18,7 @@ export const Topics: FC = () => {
         tableRows={topics}
         actions={actions}
         onRowClick={handleRowClick}
-        loading={topicsLoading}
+        loading={!topicsFetched}
       >
         <div className={classes.createTopicButtonWrapper}>
           <Button
