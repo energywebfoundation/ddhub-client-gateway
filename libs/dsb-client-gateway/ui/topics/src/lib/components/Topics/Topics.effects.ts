@@ -13,7 +13,7 @@ import { useStyles } from './Topics.styles';
 export const useTopicsEffects = () => {
   const { theme } = useStyles();
   const router = useRouter();
-  const { topics, topicsById, topicsFetched } = useTopics(router.query[Queries.Namespace] as string);
+  const { topics, topicsFetched } = useTopics(router.query[Queries.Namespace] as string);
   const { applicationsByNamespace } = useCachedApplications();
 
   const application = applicationsByNamespace[router.query[Queries.Namespace] as string];
@@ -43,13 +43,13 @@ export const useTopicsEffects = () => {
     });
   };
 
-  const actions: TTableComponentAction[] = [
+  const actions: TTableComponentAction<PostTopicDto>[] = [
     {
       label: 'View details',
     },
     {
       label: 'Update',
-      onClick: (id: string) => openUpdateTopic(topicsById[id] as PostTopicDto),
+      onClick: (topic: PostTopicDto) => openUpdateTopic(topic),
     },
     {
       label: 'View version history',

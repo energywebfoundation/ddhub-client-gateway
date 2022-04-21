@@ -6,7 +6,17 @@ export const useCustomAlert = () => {
     return await CustomSwal(props).fire();
   };
 
+  const error = async (props: Partial<SwalProps>) => {
+    return await CustomSwal({
+      title: 'Error',
+      type: 'error',
+      confirmButtonText: 'Dismiss',
+      ...props,
+    }).fire();
+  };
+
   return {
     fire,
+    error
   };
 };

@@ -119,7 +119,7 @@ export function GenericTable<T>({
                       );
                     })}
                     {actions && (
-                      <TableComponentActions id={data?.id} actions={actions} />
+                      <TableComponentActions<T> data={data} actions={actions} />
                     )}
                   </TableRow>
                 );
