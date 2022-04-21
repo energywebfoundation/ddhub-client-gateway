@@ -1,10 +1,5 @@
 import { memo, FC } from 'react';
-import {
-  InputAdornment,
-  TextField,
-  Box,
-  InputLabel
-} from '@mui/material';
+import { InputAdornment, TextField, Box, InputLabel } from '@mui/material';
 import { FormInputProps } from './FormInput.types';
 import { useStyles } from './FormInput.styles';
 
@@ -22,9 +17,9 @@ export const FormInput: FC<FormInputProps> = memo(
 
     return (
       <Box {...field.formInputsWrapperProps} flexShrink={0}>
-        <InputLabel className={classes.label}>
-          {field.label ?? ''}
-        </InputLabel>
+        {field.label && (
+          <InputLabel className={classes.label}>{field.label}</InputLabel>
+        )}
         <TextField
           fullWidth
           key={name}
@@ -41,7 +36,7 @@ export const FormInput: FC<FormInputProps> = memo(
             ...field.inputProps,
           }}
           classes={{
-            root: classes.root
+            root: classes.root,
           }}
           InputProps={{
             startAdornment: field.startAdornment && (

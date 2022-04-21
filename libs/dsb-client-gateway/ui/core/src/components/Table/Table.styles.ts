@@ -4,7 +4,7 @@ import { lighten } from '@mui/material/styles';
 export const useStyles = makeStyles()((theme) => ({
   root: {
     '& .MuiTableCell-root': {
-      padding: '5px 16px'
+      padding: '5px 12px'
     }
   },
   head: {
@@ -24,6 +24,7 @@ export const useStyles = makeStyles()((theme) => ({
     padding: '14px 16px',
     color: theme.palette.grey[200],
     fontFamily: theme.typography.body2.fontFamily,
+    height: 50
   },
   spacer: {
     flex: 0,
@@ -35,4 +36,7 @@ export const useStyles = makeStyles()((theme) => ({
     width: 30,
     color: 'transparent',
   },
+  toolbar: {
+    paddingLeft: 0
+  }
 }));

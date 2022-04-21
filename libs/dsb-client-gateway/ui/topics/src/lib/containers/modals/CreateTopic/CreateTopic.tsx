@@ -55,11 +55,9 @@ export const CreateTopic: FC = () => {
             Provide topic data with this form
           </DialogContentText>
           <Grid container mt={4}>
-            {application && (
-              <Grid item xs={4}>
-                <ApplicationInfo application={application} />
-              </Grid>
-            )}
+            <Grid item xs={4}>
+              {application && <ApplicationInfo application={application} />}
+            </Grid>
             <Grid item xs={8} pl={5} mt={1.7}>
               <Box display="flex" mb={2.7}>
                 <FormInput

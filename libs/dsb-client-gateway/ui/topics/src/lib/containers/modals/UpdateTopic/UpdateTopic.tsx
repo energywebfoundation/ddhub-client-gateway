@@ -55,11 +55,9 @@ export const UpdateTopic: FC = () => {
             Update topic data
           </DialogContentText>
           <Grid container mt={4}>
-            {application && (
-              <Grid item xs={4}>
-                <ApplicationInfo application={application} />
-              </Grid>
-            )}
+            <Grid item xs={4}>
+              {application && <ApplicationInfo application={application} />}
+            </Grid>
             <Grid item xs={8} pl={5} mt={1.7}>
               <Box display="flex" mb={2.7}>
                 <FormInput
@@ -121,7 +119,10 @@ export const UpdateTopic: FC = () => {
             className={clsx(classes.button, classes.confirmButton)}
           >
             {isUpdatingTopics ? (
-              <CircularProgress style={{ width: '17px', height: '17px'}} className={classes.buttonProgress} />
+              <CircularProgress
+                style={{ width: '17px', height: '17px' }}
+                className={classes.buttonProgress}
+              />
             ) : (
               <Typography variant="body2" className={classes.submitButtonText}>
                 Save

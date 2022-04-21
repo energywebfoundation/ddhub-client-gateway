@@ -6,19 +6,23 @@ import { ApplicationDTO } from '@dsb-client-gateway/dsb-client-gateway-api-clien
 import { routerConst } from '@dsb-client-gateway/ui/utils';
 
 export function Applications() {
-  const {applications} = useApplications();
+  const { applications, applicationsFetched } = useApplications();
   const router = useRouter();
 
-  const handleRowClick = (data) => {
-    router.push(routerConst.Topics.replace('[namespace]', data.original.namespace));
-  }
+  const handleRowClick = (data: ApplicationDTO) => {
+    router.push(
+      routerConst.Topics.replace('[namespace]', data.namespace)
+    );
+  };
   return (
-    <div>
+    <section style={{ marginTop: 16 }}>
       <GenericTable<ApplicationDTO>
         headers={APPLICATIONS_HEADERS}
         tableRows={applications}
         onRowClick={handleRowClick}
+        loading={!applicationsFetched}
+        showFooter={false}
       />
-    </div>
+    </section>
   );
 }
