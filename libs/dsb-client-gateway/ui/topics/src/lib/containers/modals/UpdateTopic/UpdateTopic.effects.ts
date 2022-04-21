@@ -6,9 +6,12 @@ import {
   PostTopicDto,
   getTopicsControllerGetTopicsQueryKey,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
-import { useUpdateTopics } from '@dsb-client-gateway/ui/api-hooks';
+import {
+  useUpdateTopics,
+  useTopicVersion,
+} from '@dsb-client-gateway/ui/api-hooks';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { validationSchema, fields } from '../../../models';
+import { fields, validationSchema } from '../../../models';
 import {
   schemaTypeOptionsByLabel,
   schemaTypeOptionsByValue,
@@ -25,16 +28,24 @@ export const useUpdateTopicEffects = () => {
     updateTopic: { open, hide, application, topic },
   } = useTopicsModalsStore();
   const dispatch = useTopicsModalsDispatch();
-  const schemaType = schemaTypeOptionsByLabel[topic?.schemaType]
+
+  const {
+    topic: topicWithSchema,
+    isLoading,
+    isSuccess,
+    remove,
+  } = useTopicVersion(topic?.id, topic?.version);
+
+  const schemaType = schemaTypeOptionsByLabel[topicWithSchema?.schemaType]
     ?.value as string;
 
   const initialValues = {
-    name: topic?.name,
-    owner: topic?.owner,
-    schemaType: schemaType,
-    schema: topic?.schema,
-    tags: topic?.tags,
-    version: topic?.version,
+    name: '',
+    owner: '',
+    schemaType: '',
+    schema: '',
+    tags: [] as string[],
+    version: '',
   };
 
   const {
@@ -43,6 +54,9 @@ export const useUpdateTopicEffects = () => {
     handleSubmit,
     formState: { isValid },
     reset,
+    setValue,
+    clearErrors,
+    trigger,
   } = useForm<FieldValues>({
     defaultValues: initialValues,
     resolver: yupResolver(validationSchema),
@@ -50,18 +64,33 @@ export const useUpdateTopicEffects = () => {
   });
 
   useEffect(() => {
-    reset({
-      ...topic,
-      schemaType,
+    if (!isSuccess) return;
+    Object.entries(topicWithSchema).forEach(([name, value]) => {
+      if (name === 'schemaType') {
+        setValue(name, schemaType);
+      } else {
+        setValue(name, value);
+      }
     });
+    trigger();
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [topic]);
+  }, [isSuccess, JSON.stringify(topicWithSchema)]);
 
   const { updateTopicHandler, isLoading: isUpdatingTopics } = useUpdateTopics();
   const Swal = useCustomAlert();
 
   const closeModal = () => {
-    reset();
+    reset({
+      name: '',
+      owner: '',
+      schema: '',
+      schemaType: '',
+      tags: [],
+      version: '',
+    });
+    clearErrors();
+    remove();
     dispatch({
       type: TopicsModalsActionsEnum.SHOW_UPDATE_TOPIC,
       payload: {
@@ -154,5 +183,6 @@ export const useUpdateTopicEffects = () => {
     schemaTypeValue: schemaType,
     application,
     isUpdatingTopics,
+    isLoading,
   };
 };
