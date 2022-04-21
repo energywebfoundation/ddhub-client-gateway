@@ -3,7 +3,7 @@ import {
   useTopicsModalsDispatch,
   TopicsModalsActionsEnum,
 } from '../../context';
-import { useTopics } from '@dsb-client-gateway/ui/api-hooks';
+import { useTopics, useCachedApplications } from '@dsb-client-gateway/ui/api-hooks';
 import { TTableComponentAction } from '@dsb-client-gateway/ui/core';
 import { Queries } from '@dsb-client-gateway/ui/utils';
 import { PostTopicDto, GetTopicDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
@@ -14,16 +14,9 @@ export const useTopicsEffects = () => {
   const { theme } = useStyles();
   const router = useRouter();
   const { topics, topicsById, topicsFetched } = useTopics(router.query[Queries.Namespace] as string);
+  const { applicationsByNamespace } = useCachedApplications();
 
-  // TODO: remove mock
-  const applicationMock = {
-    appName: 'Application name 1',
-    logoUrl: '/appIcon.svg',
-    websiteUrl: 'url of the website',
-    description: 'description',
-    namespace: 'edge.apps.aemo.iam.ewc',
-    topicsCount: 4,
-  };
+  const application = applicationsByNamespace[router.query[Queries.Namespace] as string];
 
   const dispatch = useTopicsModalsDispatch();
 
@@ -33,7 +26,7 @@ export const useTopicsEffects = () => {
       payload: {
         open: true,
         hide: false,
-        application: applicationMock,
+        application: application,
       },
     });
   };
@@ -44,7 +37,7 @@ export const useTopicsEffects = () => {
       payload: {
         open: true,
         hide: false,
-        application: applicationMock,
+        application: application,
         topic,
       },
     });
@@ -76,7 +69,7 @@ export const useTopicsEffects = () => {
 
   return {
     openCreateTopic,
-    application: applicationMock,
+    application,
     topics,
     actions,
     topicsFetched,

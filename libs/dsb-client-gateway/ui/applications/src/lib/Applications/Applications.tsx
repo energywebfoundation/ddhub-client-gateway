@@ -21,6 +21,7 @@ export function Applications() {
         tableRows={applications}
         onRowClick={handleRowClick}
         loading={!applicationsFetched}
+        showFooter={false}
       />
     </section>
   );

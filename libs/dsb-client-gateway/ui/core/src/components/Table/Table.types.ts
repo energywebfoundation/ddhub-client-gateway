@@ -19,4 +19,5 @@ export interface TableProps<T> {
   actions?: TTableComponentAction[];
   children?: ReactElement;
   showSearch?: boolean;
+  showFooter?: boolean;
 }

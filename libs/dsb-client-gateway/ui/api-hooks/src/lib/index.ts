@@ -1,4 +1,3 @@
 export * from './identity';
 export * from './topics';
-export * from './applications'
-export * from './getTopicHistory';
+export * from './applications';

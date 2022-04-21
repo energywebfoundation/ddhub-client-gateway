@@ -29,7 +29,8 @@ export function GenericTable<T>({
   children,
   actions,
   loading,
-  showSearch = true
+  showSearch = true,
+  showFooter = true
 }: TableProps<T>) {
   const { classes } = useStyles();
   const {
@@ -126,7 +127,7 @@ export function GenericTable<T>({
 
               {emptyRows > 0 && <EmptyRow rowsToFill={emptyRows} />}
             </TableBody>
-            <TableFooter>
+            {showFooter && <TableFooter>
               <TableRow>
                 <TablePagination
                   rowsPerPageOptions={[]}
@@ -145,7 +146,7 @@ export function GenericTable<T>({
                   }}
                 />
               </TableRow>
-            </TableFooter>
+            </TableFooter>}
           </Table>
         ) : (
           <EmptyTable />

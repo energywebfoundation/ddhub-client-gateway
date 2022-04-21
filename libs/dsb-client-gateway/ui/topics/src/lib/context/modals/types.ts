@@ -1,4 +1,7 @@
-import { ApplicationDTO, PostTopicDto } from '@dsb-client-gateway/dsb-client-gateway-api-client'
+import {
+  ApplicationDTO,
+  PostTopicDto,
+} from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { TopicsModalsActionsEnum } from './reducer';
 
 type TCreateTopic = {
@@ -12,16 +15,11 @@ type TUpdateTopic = {
   hide: boolean;
   topic: PostTopicDto;
   application: ApplicationDTO;
-}
+};
 
 export interface ITopicsModalsStore {
   createTopic: TCreateTopic;
-  updateTopic: TUpdateTopic,
-  cancel: {
-    open: boolean;
-    onConfirm: () => void;
-    onCancel: () => void;
-  }
+  updateTopic: TUpdateTopic;
 }
 
 interface IShowCreateTopicAction {
@@ -44,18 +42,8 @@ interface IHideUpdateTopicAction {
   payload: boolean;
 }
 
-interface IShowCancelAction {
-  type: TopicsModalsActionsEnum.SHOW_CANCEL;
-  payload: {
-    open: boolean;
-    onConfirm: () => void;
-    onCancel: () => void;
-  }
-}
-
 export type TTopicsModalsAction =
   | IShowCreateTopicAction
   | IShowUpdateTopicAction
   | IHideCreateTopicAction
-  | IHideUpdateTopicAction
-  | IShowCancelAction
+  | IHideUpdateTopicAction;
