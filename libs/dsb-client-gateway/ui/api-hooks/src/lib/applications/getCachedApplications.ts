@@ -5,11 +5,13 @@ import {
   getApplicationsControllerGetApplicationsQueryKey,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 
-export const useCachedApplications = () => {
+export const useCachedApplications = (roleName = 'topiccreator') => {
   const queryClient = useQueryClient();
   const cachedApplications: ApplicationDTO[] | undefined =
     queryClient.getQueryData(
-      getApplicationsControllerGetApplicationsQueryKey()
+      getApplicationsControllerGetApplicationsQueryKey({
+        roleName,
+      })
     );
 
   const applicationsByNamespace = keyBy(cachedApplications, 'namespace');
