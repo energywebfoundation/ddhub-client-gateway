@@ -1,10 +1,10 @@
-import { GetTopicSearchDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { useTopicVersion } from '@dsb-client-gateway/ui/api-hooks';
 import {
   useTopicsModalsStore,
   useTopicsModalsDispatch,
   TopicsModalsActionsEnum,
 } from '../../../context';
+import { downloadJson, fields } from './ViewTopicDetails.utils';
 
 export const useViewTopicDetailsEffects = () => {
   const {
@@ -28,7 +28,8 @@ export const useViewTopicDetailsEffects = () => {
     });
   };
 
-  const openUpdateTopic = (topic: GetTopicSearchDto) => {
+  const openUpdateTopic = () => {
+    closeModal();
     dispatch({
       type: TopicsModalsActionsEnum.SHOW_UPDATE_TOPIC,
       payload: {
@@ -40,10 +41,21 @@ export const useViewTopicDetailsEffects = () => {
     });
   };
 
+  const exportSchema = () => {
+    downloadJson(
+      topicWithSchema.schema,
+      `Schema_${topicWithSchema.name}_${topicWithSchema.version}.json`
+    );
+  };
+
   return {
     open,
     closeModal,
     isLoading,
-    application
+    application,
+    openUpdateTopic,
+    topic: topicWithSchema,
+    exportSchema,
+    fields
   };
 };

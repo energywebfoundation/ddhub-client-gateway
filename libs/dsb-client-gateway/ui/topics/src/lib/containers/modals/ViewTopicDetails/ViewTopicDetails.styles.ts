@@ -1,5 +1,5 @@
 import { makeStyles } from 'tss-react/mui';
-import { lighten } from '@mui/material/styles';
+import { alpha, lighten } from '@mui/material/styles';
 
 export const useStyles = makeStyles()((theme) => ({
   root: {
@@ -9,7 +9,7 @@ export const useStyles = makeStyles()((theme) => ({
   },
   paper: {
     maxWidth: 514,
-    minHeight: 637,
+    minHeight: 620,
     padding: '37px 50px 52px 50px',
     borderRadius: 0
   },
@@ -71,6 +71,51 @@ export const useStyles = makeStyles()((theme) => ({
     position: 'absolute'
   },
   details: {
-    marginTop: 36
+    marginTop: 36,
+    position: 'relative'
+  },
+  icon: {
+    stroke: theme.palette.primary.main,
+    width: 18,
+    height: 18
+  },
+  editIconButton: {
+    position: 'absolute',
+    top: -10,
+    right: 0
+  },
+  downloadIconButton: {
+    position: 'absolute',
+    top: -10,
+    right: 30
+  },
+  detailsInfo: {
+    marginTop: 15,
+  },
+  detailsInfoLabel: {
+    fontSize: 12,
+    lineHeight: '21px',
+    fontWeight: 400,
+    color: theme.palette.grey[300],
+    marginRight: 20
+  },
+  detailsInfoValue: {
+    fontSize: 14,
+    lineHeight: '21px',
+    fontWeight: 400,
+    color: theme.palette.common.white,
+  },
+  tag: {
+    fontSize: 12,
+    lineHeight: '18px',
+    fontWeight: 400,
+    color: theme.palette.primary.main,
+    padding: '1px 9px',
+    margin: '2px 3px',
+    borderRadius: 4,
+    background: alpha(theme.palette.primary.main, 0.12),
+  },
+  schemaWrapper: {
+    pointerEvents: 'none'
   }
 }));

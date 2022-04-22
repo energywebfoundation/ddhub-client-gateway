@@ -89,7 +89,7 @@ export const useTopicsEffects = () => {
     },
   ];
 
-  const handleRowClick = (topic: GetTopicDto) => {};
+  const handleRowClick = (topic: GetTopicDto) => openTopicDetails(topic);
 
   return {
     openCreateTopic,
