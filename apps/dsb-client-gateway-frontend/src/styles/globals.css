@@ -28,6 +28,7 @@ a {
 }
 #nprogress .bar {
   background: #a567ff !important;
+  z-index: 2000;
 }
 
 #nprogress .peg {

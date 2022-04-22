@@ -9,7 +9,7 @@ import {
   useRemoveTopic,
 } from '@dsb-client-gateway/ui/api-hooks';
 import { TTableComponentAction } from '@dsb-client-gateway/ui/core';
-import { GetTopicSearchDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
+import { GetTopicDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { routerConst, Queries } from '@dsb-client-gateway/ui/utils';
 import { useStyles } from './Topics.styles';
 
@@ -28,6 +28,17 @@ export const useTopicsEffects = () => {
 
   const dispatch = useTopicsModalsDispatch();
 
+  const openTopicDetails = (topic: GetTopicDto) => {
+    dispatch({
+      type: TopicsModalsActionsEnum.SHOW_TOPIC_DETAILS,
+      payload: {
+        open: true,
+        application: application,
+        topic,
+      },
+    });
+  };
+
   const openCreateTopic = () => {
     dispatch({
       type: TopicsModalsActionsEnum.SHOW_CREATE_TOPIC,
@@ -39,7 +50,7 @@ export const useTopicsEffects = () => {
     });
   };
 
-  const openUpdateTopic = (topic: GetTopicSearchDto) => {
+  const openUpdateTopic = (topic: GetTopicDto) => {
     dispatch({
       type: TopicsModalsActionsEnum.SHOW_UPDATE_TOPIC,
       payload: {
@@ -51,35 +62,34 @@ export const useTopicsEffects = () => {
     });
   };
 
-  const navigateToVersionHistory = (data: GetTopicSearchDto) => {
+  const navigateToVersionHistory = (data: GetTopicDto) => {
     router.push({
       pathname: routerConst.VersionHistory,
       query: { namespace: data.owner, topicId: data.id },
     });
   }
 
-  const actions: TTableComponentAction<GetTopicSearchDto>[] = [
+  const actions: TTableComponentAction<GetTopicDto>[] = [
     {
       label: 'View details',
+      onClick: (topic: GetTopicDto) => openTopicDetails(topic)
     },
     {
       label: 'Update',
-      onClick: (topic: GetTopicSearchDto) => openUpdateTopic(topic),
+      onClick: (topic: GetTopicDto) => openUpdateTopic(topic),
     },
     {
       label: 'View version history',
-      onClick: (topic: GetTopicSearchDto) => navigateToVersionHistory(topic)
+      onClick: (topic: GetTopicDto) => navigateToVersionHistory(topic)
     },
     {
       label: 'Remove',
       color: theme.palette.error.main,
-      onClick: async (topic: GetTopicSearchDto) => removeTopicHandler(topic.id),
+      onClick: async (topic: GetTopicDto) => removeTopicHandler(topic.id),
     },
   ];
 
-  const handleRowClick = (topic: GetTopicSearchDto) => {
-    navigateToVersionHistory(topic);
-  };
+  const handleRowClick = (topic: GetTopicDto) => openTopicDetails(topic);
 
   return {
     openCreateTopic,

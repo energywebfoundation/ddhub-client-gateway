@@ -3,7 +3,8 @@ import { makeStyles } from 'tss-react/mui';
 export const useStyles = makeStyles()((theme) => ({
   appImage: {
     width: 49,
-    height: 49
+    height: 49,
+    objectFit: 'cover'
   },
   label: {
     fontSize: 12,

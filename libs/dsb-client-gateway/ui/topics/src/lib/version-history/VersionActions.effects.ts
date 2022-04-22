@@ -3,9 +3,13 @@ import {
   useCustomAlert,
 } from '@dsb-client-gateway/ui/core';
 import { Queries, routerConst, theme } from '@dsb-client-gateway/ui/utils';
-import { useRemoveTopicVersionHistory } from '@dsb-client-gateway/ui/api-hooks';
+import { useRemoveTopicVersionHistory, useCachedApplications } from '@dsb-client-gateway/ui/api-hooks';
 import { useRouter } from 'next/router';
-import { GetTopicSearchDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
+import { GetTopicDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
+import {
+  useTopicsModalsDispatch,
+  TopicsModalsActionsEnum,
+} from '../context';
 
 export const useVersionActionsEffects = (
   namespace: string,
@@ -13,8 +17,21 @@ export const useVersionActionsEffects = (
 ) => {
   const router = useRouter();
   const Swal = useCustomAlert();
+  const dispatch = useTopicsModalsDispatch();
+  const { applicationsByNamespace } = useCachedApplications();
 
   const { removeTopicVersionHistoryHandler } = useRemoveTopicVersionHistory();
+
+  const openTopicDetails = (topic: GetTopicDto) => {
+    dispatch({
+      type: TopicsModalsActionsEnum.SHOW_TOPIC_DETAILS,
+      payload: {
+        open: true,
+        application: applicationsByNamespace[namespace],
+        topic,
+      },
+    });
+  };
 
   const removeTopicVersionSuccess = async () => {
     const buttonClick = await Swal.success({
@@ -27,19 +44,19 @@ export const useVersionActionsEffects = (
     }
   };
 
-  const actions: TTableComponentAction<GetTopicSearchDto>[] = [
+  const actions: TTableComponentAction<GetTopicDto>[] = [
     {
       label: 'View details',
-      onClick: () => {},
+      onClick: (topic: GetTopicDto) => openTopicDetails(topic),
     },
     {
       label: 'Update',
-      onClick: (topicVersion: GetTopicSearchDto) => {},
+      onClick: (topicVersion: GetTopicDto) => {},
     },
     {
       label: 'Remove',
       color: theme.palette.error.main,
-      onClick: async (topic: GetTopicSearchDto) => {
+      onClick: async (topic: GetTopicDto) => {
         const { isDismissed } = await Swal.warning({
           text: 'you will delete or remove the topic',
         });
