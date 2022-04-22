@@ -34,7 +34,6 @@ export const CreateTopic: FC = () => {
     control,
     onSubmit,
     buttonDisabled,
-    schemaTypeValue,
     application,
     isCreatingTopic,
   } = useCreateTopicEffects();
@@ -92,7 +91,6 @@ export const CreateTopic: FC = () => {
                   field={fields.schema}
                   register={register}
                   control={control}
-                  language={schemaTypeValue}
                 />
               </Box>
             </Grid>
