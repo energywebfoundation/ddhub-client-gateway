@@ -9,8 +9,8 @@ import {
   UploadedFile,
   Query,
   Get,
-  StreamableFile,
   Response,
+  Logger,
 } from '@nestjs/common';
 import { ApiConsumes, ApiResponse, ApiTags } from '@nestjs/swagger';
 import {
@@ -25,12 +25,13 @@ import { SendMessagelResponseDto } from '../dto/response/send-message.dto';
 import { GetMessagesResponseDto } from '../dto/response/get-message-response.dto';
 import { DownloadMessageResponse } from '../entity/message.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
-import * as fs from 'fs';
+import { Readable } from 'stream';
 
 @Controller('messages')
 @UseGuards(DigestGuard)
 @ApiTags('Messaging')
 export class MessageControlller {
+  private readonly logger = new Logger();
   constructor(protected readonly messageService: MessageService) {}
 
   @Get('/')
@@ -74,8 +75,8 @@ export class MessageControlller {
   @HttpCode(HttpStatus.OK)
   public async downloadMessage(
     @Query() { fileId }: DownloadMessagesDto,
-    @Response({ passthrough: true }) res
-  ): Promise<StreamableFile> {
+    @Response() res
+  ): Promise<Readable> {
     const file: DownloadMessageResponse =
       await this.messageService.downloadMessages(fileId);
 
@@ -88,15 +89,12 @@ export class MessageControlller {
     });
 
     try {
-      const readStream = fs.createReadStream(file.filePath);
-      readStream.on('data', (chunk) => console.log(chunk));
-      readStream.on('end', () => console.log('done'));
-      readStream.on('error', (err) => {
-        console.error('error in readtream', err);
-      });
-      return new StreamableFile(readStream);
+      const stream = Readable.from(file.data.toString());
+      res.write(file.data.toString());
+      return stream.pipe(res);
     } catch (e) {
-      console.error('error in catch directly', e);
+      this.logger.error('error in file download', e);
+      throw e;
     }
   }
 
