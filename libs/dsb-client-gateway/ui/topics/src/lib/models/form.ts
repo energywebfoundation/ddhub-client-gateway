@@ -1,10 +1,10 @@
 import { FormSelectOption } from '@dsb-client-gateway/ui/core';
 
 export const schemaTypeOptions: FormSelectOption[] = [
-  { value: 'json', label: 'JSD7' },
-  { value: 'xml', label: 'XML' },
-  { value: 'csv', label: 'CSV' },
-  { value: 'tsv', label: 'TSV' },
+  { value: 'JSD7', label: 'JSD7' },
+  { value: 'XML', label: 'XML' },
+  { value: 'CSV', label: 'CSV' },
+  { value: 'TSV', label: 'TSV' },
 ];
 
 export const fields = {
@@ -51,9 +51,9 @@ export const fields = {
   },
   schema: {
     name: 'schema',
-    label: 'Schema',
+    label: 'Schema Definition',
     inputProps: {
-      placeholder: 'Schema',
+      placeholder: 'Schema Definition',
     },
   },
 };

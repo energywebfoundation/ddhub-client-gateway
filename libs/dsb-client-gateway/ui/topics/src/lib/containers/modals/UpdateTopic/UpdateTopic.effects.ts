@@ -13,10 +13,6 @@ import {
 import { yupResolver } from '@hookform/resolvers/yup';
 import { fields, validationSchema } from '../../../models';
 import {
-  schemaTypeOptionsByLabel,
-  schemaTypeOptionsByValue,
-} from '../../../utils';
-import {
   useTopicsModalsStore,
   useTopicsModalsDispatch,
   TopicsModalsActionsEnum,
@@ -35,9 +31,6 @@ export const useUpdateTopicEffects = () => {
     isSuccess,
     remove,
   } = useTopicVersion(topic?.id, topic?.version);
-
-  const schemaType = schemaTypeOptionsByLabel[topicWithSchema?.schemaType]
-    ?.value as string;
 
   const initialValues = {
     name: '',
@@ -66,11 +59,7 @@ export const useUpdateTopicEffects = () => {
   useEffect(() => {
     if (!isSuccess) return;
     Object.entries(topicWithSchema).forEach(([name, value]) => {
-      if (name === 'schemaType') {
-        setValue(name, schemaType);
-      } else {
-        setValue(name, value);
-      }
+      setValue(name, value);
     });
     trigger();
 
@@ -140,8 +129,7 @@ export const useUpdateTopicEffects = () => {
     const values = data as PostTopicDto;
     const fomattedValues = {
       ...values,
-      id: topic.id,
-      schemaType: schemaTypeOptionsByValue[values.schemaType].label,
+      id: topic.id
     };
     updateTopicHandler(
       fomattedValues as PostTopicDto,
@@ -180,7 +168,6 @@ export const useUpdateTopicEffects = () => {
     control,
     onSubmit,
     buttonDisabled,
-    schemaTypeValue: schemaType,
     application,
     isUpdatingTopics,
     isLoading,
