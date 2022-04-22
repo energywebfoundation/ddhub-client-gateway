@@ -51,6 +51,13 @@ export const useTopicsEffects = () => {
     });
   };
 
+  const navigateToVersionHistory = (data: GetTopicSearchDto) => {
+    router.push({
+      pathname: routerConst.VersionHistory,
+      query: { namespace: data.owner, topicId: data.id },
+    });
+  }
+
   const actions: TTableComponentAction<GetTopicSearchDto>[] = [
     {
       label: 'View details',
@@ -61,6 +68,7 @@ export const useTopicsEffects = () => {
     },
     {
       label: 'View version history',
+      onClick: (topic: GetTopicSearchDto) => navigateToVersionHistory(topic)
     },
     {
       label: 'Remove',
@@ -69,11 +77,8 @@ export const useTopicsEffects = () => {
     },
   ];
 
-  const handleRowClick = (data: GetTopicSearchDto) => {
-    router.push({
-      pathname: routerConst.VersionHistory,
-      query: { namespace: data.owner, topicId: data.id },
-    });
+  const handleRowClick = (topic: GetTopicSearchDto) => {
+    navigateToVersionHistory(topic);
   };
 
   return {
