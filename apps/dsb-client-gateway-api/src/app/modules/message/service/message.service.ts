@@ -417,9 +417,6 @@ export class MessageService {
   ): Promise<DownloadMessageResponse> {
     //Calling download file API of message broker
     const fileResponse = await this.dsbApiService.downloadFile(fileId);
-
-    // console.log('fileResponse', fileResponse);
-
     let decrypted: { data: string };
 
     const regExpFilename = /filename="(?<filename>.*)"/;
