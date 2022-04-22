@@ -119,16 +119,20 @@ export const useCreateTopicEffects = () => {
 
   const onSubmit = handleSubmit(topicSubmitHandler);
 
-  const openCancelModal = () => {
+  const openCancelModal = async () => {
     hideModal();
-    dispatch({
-      type: TopicsModalsActionsEnum.SHOW_CANCEL,
-      payload: {
-        open: true,
-        onConfirm: closeModal,
-        onCancel: showModal,
-      },
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: 'you will close create topic form',
+      type: 'warning',
+      showCancelButton: true,
     });
+
+    if (result.isConfirmed) {
+      closeModal();
+    } else {
+      showModal();
+    }
   };
 
   const schemaTypeValue = watch('schemaType');

@@ -37,7 +37,8 @@ const dsbTheme: ThemeOptions = {
       200: '#C6C9CE',
       300: '#B9B9C3',
       400: '#B2B6BD',
-      500: '#848484'
+      500: '#848484',
+      600: '#6E6B7B'
     },
     background: {
       default: '#161D31',

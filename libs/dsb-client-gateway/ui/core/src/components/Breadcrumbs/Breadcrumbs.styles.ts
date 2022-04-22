@@ -6,9 +6,6 @@ export const useStyles = makeStyles()((theme) => ({
     alignItems: 'center',
     fontStyle: 'Medium',
     fontSize: '24px',
-    '& *': {
-      color: theme.palette.text.secondary
-    },
     marginBottom: '1rem'
   },
   pageTitle: {
@@ -17,5 +14,11 @@ export const useStyles = makeStyles()((theme) => ({
   },
   breadCrumbs: {
     marginLeft: '1rem',
+  },
+  lastElement: {
+    color: theme.palette.text.secondary
+  },
+  defaultElement: {
+    color: theme.palette.primary.main
   }
 }));

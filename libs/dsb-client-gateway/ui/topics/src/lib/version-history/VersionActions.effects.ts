@@ -17,11 +17,8 @@ export const useVersionActionsEffects = (
   const { removeTopicVersionHistoryHandler } = useRemoveTopicVersionHistory();
 
   const removeTopicVersionSuccess = async () => {
-    const buttonClick = await Swal.fire({
-      title: 'Success',
-      text: 'You have successfully removed version',
-      type: 'success',
-      confirmButtonText: 'Dismiss',
+    const buttonClick = await Swal.success({
+      text: 'You have successfully deleted the topic',
     });
     if (buttonClick) {
       await router.push(
@@ -42,7 +39,13 @@ export const useVersionActionsEffects = (
     {
       label: 'Remove',
       color: theme.palette.error.main,
-      onClick: (topic: GetTopicSearchDto) => {
+      onClick: async (topic: GetTopicSearchDto) => {
+        const { isDismissed } = await Swal.warning({
+          text: 'you will delete or remove the topic',
+        });
+        if (isDismissed) {
+          return;
+        }
         removeTopicVersionHistoryHandler(
           topicId,
           topic.version,
