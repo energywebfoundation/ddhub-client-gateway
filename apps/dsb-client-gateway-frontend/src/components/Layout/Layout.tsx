@@ -1,7 +1,7 @@
 import Sidebar from '../Sidebar/Sidebar';
 import { useStyles } from './Layout.styles';
 import Header from '../Header/Header';
-import Breadcrumbs from '../Breadcrumbs/Breadcrumbs';
+import { Breadcrumbs } from '@dsb-client-gateway/ui/core';
 
 export interface LayoutProps {
   children: React.ReactNode;

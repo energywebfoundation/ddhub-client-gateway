@@ -1,2 +1,2 @@
 export * from './getApplications';
-export * from './createTopic';
+export * from './getCachedApplications';

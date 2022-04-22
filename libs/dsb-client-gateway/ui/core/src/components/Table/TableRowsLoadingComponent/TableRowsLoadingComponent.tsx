@@ -10,13 +10,15 @@ export const TableRowsLoadingComponent: FC<{ pageSize: number }> = ({
   return (
     <>
       <Box className={classes.progress}></Box>
-      {range(pageSize).map((value) => (
-        <Box key={value.toString()}>
-          <Box m={'10px'}>
-            <Skeleton className={classes.skeleton} />
+      <Box p={'5px 0'}>
+        {range(pageSize).map((value) => (
+          <Box key={value.toString()}>
+            <Box m={'5px 10px'}>
+              <Skeleton className={classes.skeleton} />
+            </Box>
           </Box>
-        </Box>
-      ))}
+        ))}
+      </Box>
     </>
   );
 };

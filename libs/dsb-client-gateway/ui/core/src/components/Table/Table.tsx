@@ -29,7 +29,8 @@ export function GenericTable<T>({
   children,
   actions,
   loading,
-  showSearch = true
+  showSearch = true,
+  showFooter = true
 }: TableProps<T>) {
   const { classes } = useStyles();
   const {
@@ -65,6 +66,7 @@ export function GenericTable<T>({
               <TableRow>
                 {headers.map((column) => (
                   <TableCell
+                    style={{ width: column.width ?? 'initial' }}
                     classes={{ head: classes.head }}
                     key={column.accessor}
                   >
@@ -99,7 +101,7 @@ export function GenericTable<T>({
                 return (
                   <TableRow
                     {...row.getRowProps()}
-                    onClick={() => handleRowClick(row)}
+                    onClick={() => handleRowClick(data)}
                   >
                     {row.cells.map((cell) => {
                       const column = cell.column as ColumnInstance & {
@@ -107,6 +109,7 @@ export function GenericTable<T>({
                       };
                       return (
                         <TableCell
+                          style={{ cursor: onRowClick ? 'pointer' : 'default'}}
                           classes={{ body: classes.body }}
                           color={column.color}
                           {...cell.getCellProps()}
@@ -124,7 +127,7 @@ export function GenericTable<T>({
 
               {emptyRows > 0 && <EmptyRow rowsToFill={emptyRows} />}
             </TableBody>
-            <TableFooter>
+            {showFooter && <TableFooter>
               <TableRow>
                 <TablePagination
                   rowsPerPageOptions={[]}
@@ -139,10 +142,11 @@ export function GenericTable<T>({
                   classes={{
                     spacer: classes.spacer,
                     displayedRows: classes.displayedRows,
+                    toolbar: classes.toolbar
                   }}
                 />
               </TableRow>
-            </TableFooter>
+            </TableFooter>}
           </Table>
         ) : (
           <EmptyTable />

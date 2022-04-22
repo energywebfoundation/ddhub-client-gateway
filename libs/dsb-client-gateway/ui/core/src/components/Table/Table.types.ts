@@ -1,21 +1,23 @@
 import { ReactElement } from 'react';
-import { Row } from 'react-table';
+import { TableCellProps } from '@mui/material';
 import { TTableComponentAction } from '../Table/TableComponentActions';
 
 export interface TableHeader {
   accessor: string;
-  Header: string;
+  Header?: string;
   filter?: string;
   isSorted?: boolean;
   isSortedDesc?: boolean;
+  width?: TableCellProps['width'];
 }
 
 export interface TableProps<T> {
   headers: TableHeader[];
   tableRows: T[];
-  onRowClick?: (data: Row<object>) => void;
+  onRowClick?: (data: T) => void;
   loading?: boolean;
   actions?: TTableComponentAction<T>[];
   children?: ReactElement;
   showSearch?: boolean;
+  showFooter?: boolean;
 }

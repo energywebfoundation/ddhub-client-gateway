@@ -14,7 +14,6 @@ export class LokiService implements OnModuleInit, OnApplicationShutdown {
       autoload: true,
       persistenceMethod: 'fs',
       autosave: true,
-      autosaveInterval: 1,
       serializationMethod: 'pretty',
       throttledSaves: true,
     });

@@ -5,7 +5,6 @@ export enum TopicsModalsActionsEnum {
   SHOW_UPDATE_TOPIC = 'SHOW_UPDATE_TOPIC',
   HIDE_UPDATE_TOPIC = 'HIDE_UPDATE_TOPIC',
   HIDE_CREATE_TOPIC = 'HIDE_CREATE_TOPIC',
-  SHOW_CANCEL = 'SHOW_CANCEL',
 }
 
 export const topicsModalsInitialState: ITopicsModalsStore = {
@@ -19,11 +18,6 @@ export const topicsModalsInitialState: ITopicsModalsStore = {
     hide: false,
     topic: null,
     application: null,
-  },
-  cancel: {
-    open: false,
-    onConfirm: null,
-    onCancel: null,
   },
 };
 
@@ -46,7 +40,5 @@ export const topicsModalsReducer = (
         ...state,
         updateTopic: { ...state.updateTopic, hide: action.payload },
       };
-    case TopicsModalsActionsEnum.SHOW_CANCEL:
-      return { ...state, cancel: action.payload };
   }
 };
