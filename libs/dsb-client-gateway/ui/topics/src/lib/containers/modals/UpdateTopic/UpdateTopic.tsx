@@ -34,7 +34,6 @@ export const UpdateTopic: FC = () => {
     control,
     onSubmit,
     buttonDisabled,
-    schemaTypeValue,
     application,
     isUpdatingTopics,
     isLoading,
@@ -103,7 +102,6 @@ export const UpdateTopic: FC = () => {
                       field={fields.schema}
                       register={register}
                       control={control}
-                      language={schemaTypeValue}
                       showPlaceholder={false}
                     />
                   </Box>

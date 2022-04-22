@@ -11,7 +11,6 @@ import { useCustomAlert } from '@dsb-client-gateway/ui/core';
 import { Queries } from '@dsb-client-gateway/ui/utils';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { validationSchema, fields } from '../../../models';
-import { schemaTypeOptionsByValue } from '../../../utils';
 import {
   useTopicsModalsStore,
   useTopicsModalsDispatch,
@@ -40,7 +39,6 @@ export const useCreateTopicEffects = () => {
     register,
     control,
     handleSubmit,
-    watch,
     formState: { isValid },
     reset,
   } = useForm<FieldValues>({
@@ -106,12 +104,8 @@ export const useCreateTopicEffects = () => {
 
   const topicSubmitHandler: SubmitHandler<FieldValues> = (data) => {
     const values = data as PostTopicBodyDto;
-    const fomattedValues = {
-      ...values,
-      schemaType: schemaTypeOptionsByValue[values.schemaType].label,
-    };
     createTopicHandler(
-      fomattedValues as PostTopicBodyDto,
+      values,
       onCreateTopic,
       onCreateTopicError
     );
@@ -135,7 +129,6 @@ export const useCreateTopicEffects = () => {
     }
   };
 
-  const schemaTypeValue = watch('schemaType');
   const buttonDisabled = !isValid;
 
   return {
@@ -148,7 +141,6 @@ export const useCreateTopicEffects = () => {
     control,
     onSubmit,
     buttonDisabled,
-    schemaTypeValue,
     application,
     isCreatingTopic,
   };

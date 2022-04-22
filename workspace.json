@@ -15,6 +15,7 @@
     "dsb-client-gateway-storage": "libs/dsb-client-gateway-storage",
     "dsb-client-gateway-ui-api-hooks": "libs/dsb-client-gateway/ui/api-hooks",
     "dsb-client-gateway-ui-applications": "libs/dsb-client-gateway/ui/applications",
+    "dsb-client-gateway-ui-channels": "libs/dsb-client-gateway/ui/channels",
     "dsb-client-gateway-ui-login": "libs/dsb-client-gateway/ui/login",
     "dsb-client-gateway-ui-topics": "libs/dsb-client-gateway/ui/topics",
     "dsb-client-gateway-ui-utils": "libs/dsb-client-gateway/ui/utils",

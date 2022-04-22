@@ -136,7 +136,7 @@ export class DsbApiService implements OnApplicationBootstrap {
   ): Promise<TopicVersionResponse> {
     try {
       const result = await this.request<null>(
-        this.httpService.get(this.baseUrl + `/topics/${topicId}/version`, {
+        this.httpService.get(this.baseUrl + `/topics/${topicId}/versions`, {
           httpsAgent: this.getTLS(),
           headers: {
             Authorization: `Bearer ${this.didAuthService.getToken()}`,
@@ -1014,12 +1014,15 @@ export class DsbApiService implements OnApplicationBootstrap {
   async getTopicById(topicId: string): Promise<TopicVersion | null> {
     try {
       const { data } = await this.request<TopicVersion | null>(
-        this.httpService.get(this.baseUrl + '/topics/' + topicId + '/version', {
-          httpsAgent: this.getTLS(),
-          headers: {
-            ...this.getAuthHeader(),
-          },
-        }),
+        this.httpService.get(
+          this.baseUrl + '/topics/' + topicId + '/versions',
+          {
+            httpsAgent: this.getTLS(),
+            headers: {
+              ...this.getAuthHeader(),
+            },
+          }
+        ),
         {
           stopOnResponseCodes: ['10'],
         }
