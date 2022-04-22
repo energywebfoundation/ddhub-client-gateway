@@ -1,6 +1,6 @@
 import {
   ApplicationDTO,
-  PostTopicDto,
+  GetTopicDto,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { TopicsModalsActionsEnum } from './reducer';
 
@@ -13,13 +13,20 @@ type TCreateTopic = {
 type TUpdateTopic = {
   open: boolean;
   hide: boolean;
-  topic: PostTopicDto;
+  topic: GetTopicDto;
+  application: ApplicationDTO;
+};
+
+type TTopicDetails = {
+  open: boolean;
+  topic: GetTopicDto;
   application: ApplicationDTO;
 };
 
 export interface ITopicsModalsStore {
   createTopic: TCreateTopic;
   updateTopic: TUpdateTopic;
+  topicDetails: TTopicDetails;
 }
 
 interface IShowCreateTopicAction {
@@ -30,6 +37,11 @@ interface IShowCreateTopicAction {
 interface IShowUpdateTopicAction {
   type: TopicsModalsActionsEnum.SHOW_UPDATE_TOPIC;
   payload: TUpdateTopic;
+}
+
+interface IShowTopicDetailsAction {
+  type: TopicsModalsActionsEnum.SHOW_TOPIC_DETAILS;
+  payload: TTopicDetails;
 }
 
 interface IHideCreateTopicAction {
@@ -46,4 +58,5 @@ export type TTopicsModalsAction =
   | IShowCreateTopicAction
   | IShowUpdateTopicAction
   | IHideCreateTopicAction
-  | IHideUpdateTopicAction;
+  | IHideUpdateTopicAction
+  | IShowTopicDetailsAction;

@@ -19,16 +19,16 @@ export const getIdentityControllerGetMock = () => ({
 
 export const getApplicationsControllerGetApplicationsMock = () => [
   {
-    appName: faker.word.noun(),
-    logoUrl: faker.image.abstract(),
+    appName: 'Decentralised Data Hub',
+    logoUrl: '/appIcon.svg',
     websiteUrl: faker.random.word(),
     description: faker.random.word(),
     namespace: 'ddhub.apps.energyweb.iam.ewc',
     topicsCount: faker.datatype.number({ min: 1, max: 10 }),
   },
   {
-    appName: faker.word.noun(),
-    logoUrl: faker.image.abstract(),
+    appName: 'Torta',
+    logoUrl: '/appIcon.svg',
     websiteUrl: faker.random.word(),
     description: faker.random.word(),
     namespace: 'torta.apps.eggplant.vege.iam.ewc',
