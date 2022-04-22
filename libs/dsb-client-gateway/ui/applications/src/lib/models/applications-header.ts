@@ -1,9 +1,9 @@
-import { AppImage } from '@dsb-client-gateway/ui/core';
+import { AppImageWithWrapper } from '@dsb-client-gateway/ui/core';
 
 export const APPLICATIONS_HEADERS = [
   {
     accessor: 'logoUrl',
-    Cell: AppImage,
+    Cell: AppImageWithWrapper,
     width: '50px'
   },
   {
