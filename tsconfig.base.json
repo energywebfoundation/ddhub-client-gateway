@@ -40,8 +40,8 @@
       "@dsb-client-gateway/dsb-client-gateway/identity/models": [
         "libs/dsb-client-gateway/identity/models/src/index.ts"
       ],
-      "@dsb-client-gateway/ui/topics": [
-        "libs/dsb-client-gateway/ui/topics/src/index.ts"
+      "@dsb-client-gateway/ui/channels": [
+        "libs/dsb-client-gateway/ui/channels/src/index.ts"
       ],
       "@dsb-client-gateway/ui/api-hooks": [
         "libs/dsb-client-gateway/ui/api-hooks/src/index.ts"
@@ -54,6 +54,9 @@
       ],
       "@dsb-client-gateway/ui/login": [
         "libs/dsb-client-gateway/ui/login/src/index.ts"
+      ],
+      "@dsb-client-gateway/ui/topics": [
+        "libs/dsb-client-gateway/ui/topics/src/index.ts"
       ],
       "@dsb-client-gateway/ui/utils": [
         "libs/dsb-client-gateway/ui/utils/src/index.ts"

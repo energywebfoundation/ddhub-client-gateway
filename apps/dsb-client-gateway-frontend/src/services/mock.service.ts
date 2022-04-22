@@ -5,6 +5,7 @@ import {
   getTopicsControllerGetTopicsHistoryByIdMock,
   getTopicsControllerGetTopicsMock,
   getTopicsControllerGetTopicHistoryByIdAndVersionMock,
+  getChannelControllerGetByTypeMock,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 
 export function makeServer({ environment = 'development' }) {
@@ -26,6 +27,10 @@ export function makeServer({ environment = 'development' }) {
 
       this.get('/topics', () => {
         return getTopicsControllerGetTopicsMock();
+      });
+
+      this.get('/channels', () => {
+        return getChannelControllerGetByTypeMock();
       });
 
       this.post('/topics', (_schema, request) => {
