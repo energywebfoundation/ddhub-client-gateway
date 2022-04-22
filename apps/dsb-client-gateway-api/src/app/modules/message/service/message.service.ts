@@ -38,6 +38,7 @@ import { EncryptedMessageType } from '../../message/message.const';
 import { SecretsEngineService } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
 import { TopicEntity } from '../../channel/channel.interface';
 import { ChannelEntity } from '../../channel/entity/channel.entity';
+import { FileNotFoundException } from '../exceptions/file-not-found.exception';
 
 export enum EventEmitMode {
   SINGLE = 'SINGLE',
@@ -416,11 +417,21 @@ export class MessageService {
   ): Promise<DownloadMessageResponse> {
     //Calling download file API of message broker
     const fileResponse = await this.dsbApiService.downloadFile(fileId);
+
+    // console.log('fileResponse', fileResponse);
+
     let decrypted: { data: string };
 
-    //getting file name from headers
-    let fileName: string =
-      fileResponse.headers['content-disposition'].split('=')[1];
+    const regExpFilename = /filename="(?<filename>.*)"/;
+
+    //validating file name
+    let fileName: string | null =
+      regExpFilename.exec(fileResponse.headers['content-disposition'])?.groups
+        ?.filename ?? null;
+
+    if (!fileName) {
+      throw new FileNotFoundException('');
+    }
 
     fileName = fileName.replace(/"/g, '');
 
