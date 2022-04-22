@@ -1,11 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { ChannelRepository } from '../repository/channel.repository';
-import { ChannelEntity, ChannelTopic } from '../entity/channel.entity';
+import { ChannelTopic } from '../entity/channel.entity';
 import { CreateChannelDto, TopicDto } from '../dto/request/create-channel.dto';
 import { DsbApiService } from '../../dsb-client/service/dsb-api.service';
 import { Topic } from '../../dsb-client/dsb-client.interface';
 import { ChannelNotFoundException } from '../exceptions/channel-not-found.exception';
-import moment from 'moment';
 import { ChannelUpdateRestrictedFieldsException } from '../exceptions/channel-update-restricted-fields.exception';
 import { CommandBus } from '@nestjs/cqrs';
 import { ChannelQualifiedDids, TopicEntity } from '../channel.interface';
@@ -14,27 +12,31 @@ import { UpdateChannelDto } from '../dto/request/update-channel.dto';
 import { RefreshChannelCacheDataCommand } from '../command/refresh-channel-cache-data.command';
 import { ChannelAlreadyExistsException } from '../exceptions/channel-already-exists.exception';
 import { Span } from 'nestjs-otel';
+import {
+  ChannelEntity,
+  ChannelWrapperRepository,
+} from '@dsb-client-gateway/dsb-client-gateway-storage';
 
 @Injectable()
 export class ChannelService {
   protected readonly logger = new Logger(ChannelService.name);
 
   constructor(
-    protected readonly channelRepository: ChannelRepository,
+    protected readonly wrapperRepository: ChannelWrapperRepository,
     protected readonly dsbApiService: DsbApiService,
     protected readonly commandBus: CommandBus
   ) {}
 
   @Span('channels_getChannels')
-  public getChannels(): ChannelEntity[] {
-    return this.channelRepository.getAll();
+  public async getChannels(): Promise<ChannelEntity[]> {
+    return this.wrapperRepository.channelRepository.getAll();
   }
 
   @Span('channels_createChannel')
   public async createChannel(payload: CreateChannelDto): Promise<void> {
     this.logger.log(`Attempting to create channel ${payload.fqcn}`);
 
-    const channel = this.getChannel(payload.fqcn);
+    const channel: ChannelEntity = await this.getChannel(payload.fqcn);
 
     if (channel) {
       throw new ChannelAlreadyExistsException();
@@ -46,9 +48,7 @@ export class ChannelService {
       payload.conditions.topics
     );
 
-    const creationDate: string = moment().toISOString();
-
-    await this.channelRepository.createChannel({
+    await this.wrapperRepository.channelRepository.save({
       fqcn: payload.fqcn,
       type: payload.type,
       conditions: {
@@ -58,8 +58,6 @@ export class ChannelService {
         qualifiedDids: [],
         topicsVersions: {},
       },
-      createdAt: creationDate,
-      updatedAt: creationDate,
     });
 
     this.logger.log(`Channel with name ${payload.fqcn} created`);
@@ -71,35 +69,37 @@ export class ChannelService {
 
   @Span('channels_updateChannelTopic')
   public async updateChannelTopic(
-    channelName: string,
+    fqcn: string,
     topicId: string,
     topicVersions: TopicEntity[]
   ): Promise<void> {
-    const channel: ChannelEntity = this.getChannel(channelName);
+    const channel: ChannelEntity = await this.getChannel(fqcn);
 
     channel.conditions.topicsVersions = {
       ...channel.conditions.topicsVersions,
       [topicId]: topicVersions,
     };
 
-    await this.channelRepository.updateChannel(channel);
+    await this.wrapperRepository.channelRepository.update(fqcn, channel);
   }
 
   @Span('channels_updateQualifiedDids')
   public async updateChannelQualifiedDids(
-    channelName: string,
+    fqcn: string,
     dids: string[]
   ): Promise<void> {
-    const channel: ChannelEntity = this.getChannel(channelName);
+    const channel: ChannelEntity = await this.getChannel(fqcn);
 
     channel.conditions.qualifiedDids = dids;
 
-    await this.channelRepository.updateChannel(channel);
+    await this.wrapperRepository.channelRepository.update(fqcn, channel);
   }
 
   @Span('channels_getChannelQualifiedDids')
-  public getChannelQualifiedDids(fqcn: string): ChannelQualifiedDids {
-    const channel: ChannelEntity = this.getChannelOrThrow(fqcn);
+  public async getChannelQualifiedDids(
+    fqcn: string
+  ): Promise<ChannelQualifiedDids> {
+    const channel: ChannelEntity = await this.getChannelOrThrow(fqcn);
 
     const uniqueDids: string[] = [
       ...new Set([
@@ -111,12 +111,17 @@ export class ChannelService {
     return {
       qualifiedDids: uniqueDids,
       fqcn: channel.fqcn,
-      updatedAt: channel.updatedAt,
+      updatedAt: channel.updatedDate.toISOString(),
     };
   }
 
-  public getChannelOrThrow(name: string): ChannelEntity {
-    const channel: ChannelEntity | null = this.getChannel(name);
+  public async getChannelOrThrow(fqcn: string): Promise<ChannelEntity> {
+    const channel: ChannelEntity =
+      await this.wrapperRepository.channelRepository.findOne({
+        where: {
+          fqcn,
+        },
+      });
 
     if (!channel) {
       throw new ChannelNotFoundException();
@@ -125,15 +130,20 @@ export class ChannelService {
     return channel;
   }
 
-  public getChannel(name: string): ChannelEntity | null {
-    return this.channelRepository.getChannel(name);
+  public async getChannel(fqcn: string): Promise<ChannelEntity | null> {
+    return this.wrapperRepository.channelRepository.findOne({
+      where: {
+        fqcn,
+      },
+    });
   }
 
-  public async deleteChannelOrThrow(channelName: string): Promise<void> {
-    const channel = this.getChannelOrThrow(channelName);
+  public async deleteChannelOrThrow(fqcn: string): Promise<void> {
+    const channel = await this.getChannelOrThrow(fqcn);
 
-    await this.channelRepository.delete(channel.fqcn);
-    await this.channelRepository.delete(channel.fqcn);
+    await this.wrapperRepository.channelRepository.delete({
+      fqcn: channel.fqcn,
+    });
   }
 
   @Span('channels_updateChannel')
@@ -141,7 +151,7 @@ export class ChannelService {
     dto: UpdateChannelDto,
     fqcn: string
   ): Promise<void> {
-    const channel: ChannelEntity = this.getChannelOrThrow(fqcn);
+    const channel: ChannelEntity = await this.getChannelOrThrow(fqcn);
 
     const hasChangedRestrictedFields: boolean =
       channel.type !== dto.type || channel.fqcn !== fqcn;
@@ -154,8 +164,6 @@ export class ChannelService {
       dto.conditions.topics
     );
 
-    const updateDate: string = moment().toISOString();
-
     channel.conditions = {
       ...channel.conditions,
       dids: dto.conditions.dids,
@@ -163,9 +171,12 @@ export class ChannelService {
       topics: topicsWithIds,
     };
 
-    channel.updatedAt = updateDate;
-
-    await this.channelRepository.updateChannel(channel);
+    await this.wrapperRepository.channelRepository.update(
+      {
+        fqcn: channel.fqcn,
+      },
+      channel
+    );
 
     await this.commandBus.execute(new RefreshChannelCacheDataCommand(fqcn));
   }
@@ -177,10 +188,13 @@ export class ChannelService {
     const topicsToReturn: ChannelTopic[] = [];
 
     for (const { topicName, owner } of topics) {
-      const receivedTopics = await this.dsbApiService.getTopicsByOwnerAndName(
-        topicName,
-        owner
-      );
+      const receivedTopics = await this.dsbApiService
+        .getTopicsByOwnerAndName(topicName, owner)
+        .catch(() => {
+          return {
+            records: [],
+          };
+        });
 
       if (receivedTopics.records.length !== 1) {
         this.logger.warn(
@@ -203,7 +217,7 @@ export class ChannelService {
   }
 
   @Span('channels_getChannelsByType')
-  public getChannelsByType(type?: ChannelType): ChannelEntity[] {
-    return this.channelRepository.getChannelsByType(type);
+  public async getChannelsByType(type?: ChannelType): Promise<ChannelEntity[]> {
+    return this.wrapperRepository.channelRepository.getChannelsByType(type);
   }
 }

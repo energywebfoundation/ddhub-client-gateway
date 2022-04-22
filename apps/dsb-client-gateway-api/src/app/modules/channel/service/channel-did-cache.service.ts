@@ -3,14 +3,17 @@ import { IamService } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
 import { ChannelService } from './channel.service';
 import { DsbApiService } from '../../dsb-client/service/dsb-api.service';
 import { IdentityService } from '../../identity/service/identity.service';
-import { ChannelEntity } from '../entity/channel.entity';
-import { TopicRepository } from '../repository/topic.repository';
 import {
   Topic,
   TopicVersion,
   TopicVersionResponse,
 } from '../../dsb-client/dsb-client.interface';
 import { Span } from 'nestjs-otel';
+import {
+  ChannelEntity,
+  TopicEntity,
+} from '@dsb-client-gateway/dsb-client-gateway-storage';
+import { TopicService } from './topic.service';
 
 @Injectable()
 export class ChannelDidCacheService {
@@ -21,7 +24,7 @@ export class ChannelDidCacheService {
     protected readonly channelService: ChannelService,
     protected readonly dsbApiService: DsbApiService,
     protected readonly identityService: IdentityService,
-    protected readonly topicRepository: TopicRepository
+    protected readonly topicService: TopicService
   ) {}
 
   @Span('channel_refreshChannelCache')
@@ -41,7 +44,7 @@ export class ChannelDidCacheService {
     }
 
     const internalChannel: ChannelEntity =
-      this.channelService.getChannelOrThrow(fqcn);
+      await this.channelService.getChannelOrThrow(fqcn);
 
     const rolesForDIDs: string[] = await this.dsbApiService.getDIDsFromRoles(
       internalChannel.conditions.roles,
@@ -86,8 +89,20 @@ export class ChannelDidCacheService {
         );
       }
 
-      const topicVersions: TopicVersionResponse =
-        await this.dsbApiService.getTopicVersions(topic.id);
+      const topicVersions: TopicVersionResponse = await this.dsbApiService
+        .getTopicVersions(topic.id)
+        .catch((e) => ({
+          records: [],
+          count: 0,
+          page: 0,
+          limit: 0,
+        }));
+
+      if (topicVersions.records.length === 0) {
+        this.logger.warn(`Topic with id ${topic.id} has no versions`);
+
+        return;
+      }
 
       this.logger.log(`Found ${topicVersions.records.length} topic versions`);
 
@@ -107,17 +122,19 @@ export class ChannelDidCacheService {
       this.logger.log('Found topic', topic);
 
       for (const { schema, version } of topicVersions.records) {
-        await this.topicRepository.createOrUpdateTopic(
-          {
-            id: topic.id,
-            schema,
-            version,
-            owner: topic.owner,
-            name: topic.name,
-            schemaType: topic.schemaType,
-          },
-          topic.id
-        );
+        const s = schema as object;
+
+        const topicEntity: TopicEntity = {
+          id: topic.id,
+          schema: s,
+          version,
+          owner: topic.owner,
+          name: topic.name,
+          schemaType: topic.schemaType,
+          tags: ['xd'],
+        };
+
+        await this.topicService.createOrUpdateTopic(topicEntity);
       }
     }
   }

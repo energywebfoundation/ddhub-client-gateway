@@ -6,9 +6,15 @@ import { StorageModule } from '../storage/storage.module';
 import { IdentityModule } from '../identity/identity.module';
 import { ClaimListenerService } from './service/claim-listener.service';
 import { RoleListenerService } from './service/role-listener.service';
+import { EnrolmentRepositoryModule } from '@dsb-client-gateway/dsb-client-gateway-storage';
 
 @Module({
-  imports: [UtilsModule, StorageModule, forwardRef(() => IdentityModule)],
+  imports: [
+    UtilsModule,
+    StorageModule,
+    forwardRef(() => IdentityModule),
+    EnrolmentRepositoryModule,
+  ],
   providers: [EnrolmentService, ClaimListenerService, RoleListenerService],
   controllers: [EnrolmentController],
   exports: [EnrolmentService],

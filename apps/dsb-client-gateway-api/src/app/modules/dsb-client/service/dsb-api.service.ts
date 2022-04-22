@@ -8,7 +8,6 @@ import { ConfigService } from '@nestjs/config';
 import { HttpService } from '@nestjs/axios';
 import { Agent } from 'https';
 import { TlsAgentService } from './tls-agent.service';
-import { EthersService } from '../../utils/service/ethers.service';
 import {
   ApplicationDTO,
   IamService,
@@ -23,18 +22,17 @@ import {
   SendInternalMessageResponse,
   SendMessageData,
   SendMessageResponse,
-  UpdateTopicBodyDTO,
   Topic,
   TopicDataResponse,
   TopicResultDTO,
   TopicVersion,
   TopicVersionResponse,
+  UpdateTopicBodyDTO,
   UpdateTopicHistoryDTO,
 } from '../dsb-client.interface';
 
 import promiseRetry from 'promise-retry';
 import FormData from 'form-data';
-import { EnrolmentRepository } from '../../storage/repository/enrolment.repository';
 import { DidAuthService } from '../module/did-auth/service/did-auth.service';
 import * as qs from 'qs';
 import 'multer';
@@ -45,6 +43,8 @@ import { SecretsEngineService } from '@dsb-client-gateway/dsb-client-gateway-sec
 import { RoleStatus } from '@dsb-client-gateway/dsb-client-gateway/identity/models';
 import { OperationOptions } from 'retry';
 import { Span } from 'nestjs-otel';
+import { EnrolmentService } from '../../enrolment/service/enrolment.service';
+import { UnableToLoginException } from '../exceptions/unable-to-login.exception';
 
 export interface RetryOptions {
   stopOnStatusCodes?: HttpStatus[];
@@ -69,8 +69,7 @@ export class DsbApiService implements OnApplicationBootstrap {
     protected readonly configService: ConfigService,
     protected readonly httpService: HttpService,
     protected readonly tlsAgentService: TlsAgentService,
-    protected readonly ethersService: EthersService,
-    protected readonly enrolmentRepository: EnrolmentRepository,
+    protected readonly enrolmentService: EnrolmentService,
     protected readonly iamService: IamService,
     protected readonly secretsEngineService: SecretsEngineService,
     protected readonly didAuthService: DidAuthService,
@@ -139,7 +138,7 @@ export class DsbApiService implements OnApplicationBootstrap {
   ): Promise<TopicVersionResponse> {
     try {
       const result = await this.request<null>(
-        this.httpService.get(this.baseUrl + `/topics/${topicId}/version`, {
+        this.httpService.get(this.baseUrl + `/topics/${topicId}/versions`, {
           httpsAgent: this.getTLS(),
           headers: {
             Authorization: `Bearer ${this.didAuthService.getToken()}`,
@@ -905,23 +904,23 @@ export class DsbApiService implements OnApplicationBootstrap {
 
   @Span('ddhub_mb_login')
   public async login(): Promise<void> {
-    const enrolment = this.enrolmentRepository.getEnrolment();
+    const enrolment = await this.enrolmentService.get();
 
     if (!enrolment) {
       this.logger.warn('Stopping login, enrolment is not enabled');
 
-      return;
+      throw new UnableToLoginException();
     }
 
     const hasRequiredRoles =
       enrolment.roles.filter(
-        (role) => role.required === true && role.status !== RoleStatus.SYNCED
+        (role) => role.required === true && role.status === RoleStatus.SYNCED
       ).length > 0;
 
-    if (hasRequiredRoles) {
+    if (!hasRequiredRoles) {
       this.logger.warn('Stopping login, roles are missing');
 
-      return;
+      throw new UnableToLoginException();
     }
 
     this.logger.log('Attempting to login to DID Auth Server');
@@ -1037,12 +1036,15 @@ export class DsbApiService implements OnApplicationBootstrap {
   async getTopicById(topicId: string): Promise<TopicVersion | null> {
     try {
       const { data } = await this.request<TopicVersion | null>(
-        this.httpService.get(this.baseUrl + '/topics/' + topicId + '/version', {
-          httpsAgent: this.getTLS(),
-          headers: {
-            ...this.getAuthHeader(),
-          },
-        }),
+        this.httpService.get(
+          this.baseUrl + '/topics/' + topicId + '/versions',
+          {
+            httpsAgent: this.getTLS(),
+            headers: {
+              ...this.getAuthHeader(),
+            },
+          }
+        ),
         {
           stopOnResponseCodes: ['10'],
         }
@@ -1053,7 +1055,7 @@ export class DsbApiService implements OnApplicationBootstrap {
     } catch (e) {
       this.logger.error(`Get topic with topicId: ${topicId} failed`, e);
 
-      throw new Error(e);
+      return null;
     }
   }
 }

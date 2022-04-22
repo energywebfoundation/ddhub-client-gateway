@@ -1,3 +1,10 @@
+import { EntityName, Utils } from '@mikro-orm/core';
+
 export * from './service';
 export * from './dsb-client-gateway-storage.module';
 export * from './repository';
+export * from './entity';
+export * from './module';
+
+export const getRepositoryToken = <T>(entity: EntityName<T>) =>
+  `${Utils.className(entity)}Repository`;

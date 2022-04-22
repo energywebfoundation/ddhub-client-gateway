@@ -3,8 +3,6 @@ import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { IamService } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
 import { SecretsEngineService } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
 import { DIDPublicKeyTags } from '../keys.const';
-import { KeysRepository } from '../repository/keys.repository';
-import { SymmetricKeysRepository } from '../../message/repository/symmetric-keys.repository';
 import { SymmetricKeysCacheService } from '../../message/service/symmetric-keys-cache.service';
 import { KeysEntity } from '../keys.interface';
 import { EthersService } from '../../utils/service/ethers.service';
@@ -18,6 +16,10 @@ import { IdentityService } from '../../identity/service/identity.service';
 import { BalanceState } from '@dsb-client-gateway/dsb-client-gateway/identity/models';
 import { IamInitService } from '../../identity/service/iam-init.service';
 import { Span } from 'nestjs-otel';
+import {
+  SymmetricKeysEntity,
+  SymmetricKeysRepositoryWrapper,
+} from '@dsb-client-gateway/dsb-client-gateway-storage';
 
 @Injectable()
 export class KeysService implements OnModuleInit {
@@ -28,10 +30,9 @@ export class KeysService implements OnModuleInit {
   constructor(
     protected readonly secretsEngineService: SecretsEngineService,
     protected readonly iamService: IamService,
-    protected readonly keysRepository: KeysRepository,
     protected readonly ethersService: EthersService,
     protected readonly identityService: IdentityService,
-    protected readonly symmetricKeysRepository: SymmetricKeysRepository,
+    protected readonly wrapper: SymmetricKeysRepositoryWrapper,
     protected readonly symmetricKeysCacheService: SymmetricKeysCacheService,
     protected readonly iamInitService: IamInitService
   ) {}
@@ -46,16 +47,25 @@ export class KeysService implements OnModuleInit {
     senderDid: string,
     clientGatewayMessageId: string
   ): Promise<KeysEntity> {
-    const symmetricKey = this.symmetricKeysRepository.getSymmetricKey(
-      clientGatewayMessageId,
-      senderDid
-    );
+    const symmetricKey: SymmetricKeysEntity | null =
+      await this.wrapper.symmetricKeysRepository.findOne({
+        where: {
+          clientGatewayMessageId,
+          senderDid,
+        },
+      });
+
     if (!symmetricKey) {
+      this.logger.warn('No symmetric keys found attempting to fetch latest');
+
       await this.storeKeysForMessage();
-      return this.symmetricKeysRepository.getSymmetricKey(
-        clientGatewayMessageId,
-        senderDid
-      );
+
+      return this.wrapper.symmetricKeysRepository.findOne({
+        where: {
+          clientGatewayMessageId,
+          senderDid,
+        },
+      });
     }
     return symmetricKey;
   }

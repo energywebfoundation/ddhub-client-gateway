@@ -5,11 +5,8 @@ import {
   IamService,
 } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
 import { NoPrivateKeyException } from '../../storage/exceptions/no-private-key.exception';
-import { EnrolmentRepository } from '../../storage/repository/enrolment.repository';
-import { IdentityRepository } from '../../storage/repository/identity.repository';
 import { EnrolmentService } from '../../enrolment/service/enrolment.service';
 import {
-  BalanceState,
   Enrolment,
   Identity,
   IdentityWithEnrolment,
@@ -18,6 +15,11 @@ import { SecretsEngineService } from '@dsb-client-gateway/dsb-client-gateway-sec
 import { CommandBus } from '@nestjs/cqrs';
 import { RefreshKeysCommand } from '../../keys/command/refresh-keys.command';
 import { Span } from 'nestjs-otel';
+import {
+  BalanceState,
+  IdentityEntity,
+  IdentityRepositoryWrapper,
+} from '@dsb-client-gateway/dsb-client-gateway-storage';
 
 @Injectable()
 export class IdentityService {
@@ -25,8 +27,7 @@ export class IdentityService {
 
   constructor(
     protected readonly ethersService: EthersService,
-    protected readonly enrolmentRepository: EnrolmentRepository,
-    protected readonly identityRepository: IdentityRepository,
+    protected readonly wrapper: IdentityRepositoryWrapper,
     protected readonly secretsEngineService: SecretsEngineService,
     protected readonly iamService: IamService,
     protected readonly enrolmentService: EnrolmentService,
@@ -59,7 +60,9 @@ export class IdentityService {
   }
 
   @Span('getIdentity')
-  public async getIdentity(forceRefresh = false): Promise<Identity | null> {
+  public async getIdentity(
+    forceRefresh = false
+  ): Promise<IdentityEntity | null> {
     if (forceRefresh) {
       const rootKey: string | null =
         await this.secretsEngineService.getPrivateKey();
@@ -70,7 +73,9 @@ export class IdentityService {
 
       const wallet = this.ethersService.getWalletFromPrivateKey(rootKey);
 
-      const balanceState = await this.ethersService.getBalance(wallet.address);
+      const balanceState: BalanceState = await this.ethersService.getBalance(
+        wallet.address
+      );
 
       return {
         publicKey: wallet.publicKey,
@@ -79,7 +84,7 @@ export class IdentityService {
       };
     }
 
-    const identity = this.identityRepository.getIdentity();
+    const identity = await this.wrapper.identityRepository.findOne();
 
     if (!identity) {
       return this.getIdentity(true);
@@ -100,7 +105,7 @@ export class IdentityService {
 
     this.logger.log(`Balance state: ${balanceState}`);
 
-    const publicIdentity: Identity = {
+    const publicIdentity: IdentityEntity = {
       publicKey: wallet.publicKey,
       balance: balanceState,
       address: wallet.address,
@@ -109,7 +114,7 @@ export class IdentityService {
     this.logger.log(`Obtained identity`);
     this.logger.log(publicIdentity);
 
-    await this.identityRepository.writeIdentity(publicIdentity);
+    await this.wrapper.identityRepository.createOne(publicIdentity);
 
     await this.secretsEngineService.setPrivateKey(privateKey);
 

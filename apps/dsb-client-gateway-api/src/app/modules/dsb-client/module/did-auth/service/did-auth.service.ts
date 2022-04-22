@@ -28,6 +28,8 @@ export class DidAuthService {
       .login(proof)
       .catch(async (e) => {
         if (this.refreshToken) {
+          this.logger.log('Attempting to refresh token');
+
           const refreshTokenData: DidAuthResponse | null =
             await this.didAuthApiService.refreshToken(this.refreshToken);
 
@@ -41,6 +43,11 @@ export class DidAuthService {
           this.refreshToken = refreshTokenData.refresh_token;
           this.accessToken = refreshTokenData.access_token;
         }
+
+        this.refreshToken = null;
+        this.accessToken = null;
+
+        throw e;
       });
 
     if (!response) {
