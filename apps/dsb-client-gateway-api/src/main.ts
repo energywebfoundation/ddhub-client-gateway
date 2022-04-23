@@ -25,8 +25,8 @@ async function bootstrap() {
   const configService = app.get<ConfigService>(ConfigService);
 
   const config = new DocumentBuilder()
-    .setTitle('DSB Client Gateway')
-    .setDescription('DSB Client Gateway')
+    .setTitle('DDHub Client Gateway')
+    .setDescription('DDHub Client Gateway')
     .setVersion('2.0')
     .setExternalDoc('Postman Collection', '/docs-json')
     .build();
@@ -54,8 +54,8 @@ export const createDocument = async () => {
   app.setGlobalPrefix('api/v2');
 
   const config = new DocumentBuilder()
-    .setTitle('DSB Client Gateway')
-    .setDescription('DSB Client Gateway')
+    .setTitle('DDHub Client Gateway')
+    .setDescription('DDHub Client Gateway')
     .setVersion('2.0')
     .setExternalDoc('Postman Collection', '/docs-json')
     .build();
