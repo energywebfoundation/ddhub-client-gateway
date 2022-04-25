@@ -152,7 +152,7 @@ export class EnvironmentVariables {
 
   @IsBoolean()
   @Transform(EnvironmentVariables.transformBoolean('OPENTELEMETRY_ENABLED'))
-  OPENTELEMETRY_ENABLED = true;
+  OPENTELEMETRY_ENABLED = false;
 
   @IsEnum(OpenTelemetryExporters)
   @ValidateIf(EnvironmentVariables.isOTELEnabled)
@@ -173,6 +173,9 @@ export class EnvironmentVariables {
   @IsString()
   @ValidateIf(EnvironmentVariables.isOTELEnabled)
   OTEL_ENVIRONMENT = 'local';
+
+  @IsString()
+  DB_NAME = 'local.db';
 
   static isOTELEnabled(values: EnvironmentVariables): boolean {
     return values.OPENTELEMETRY_ENABLED;

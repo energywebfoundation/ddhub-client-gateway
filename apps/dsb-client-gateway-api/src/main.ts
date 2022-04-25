@@ -1,3 +1,4 @@
+import * as dotenv from 'dotenv';
 import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { WsAdapter } from '@nestjs/platform-ws';
@@ -6,6 +7,8 @@ import { AppModule } from './app/app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 import { otelSDK } from '@dsb-client-gateway/ddhub-client-gateway-tracing';
+
+dotenv.config();
 
 async function bootstrap() {
   if (process.env.OPENTELEMETRY_ENABLED) {
@@ -46,21 +49,5 @@ async function bootstrap() {
     `🚀 Application is running on: http://localhost:${port}/${globalPrefix}`
   );
 }
-
-export const createDocument = async () => {
-  const app = await NestFactory.create(
-    AppModule.register({ shouldValidate: false })
-  );
-  app.setGlobalPrefix('api/v2');
-
-  const config = new DocumentBuilder()
-    .setTitle('DSB Client Gateway')
-    .setDescription('DSB Client Gateway')
-    .setVersion('2.0')
-    .setExternalDoc('Postman Collection', '/docs-json')
-    .build();
-
-  return SwaggerModule.createDocument(app, config);
-};
 
 bootstrap();

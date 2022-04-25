@@ -9,20 +9,26 @@ import {
   SymmetricKeysEntity,
   TopicEntity,
 } from './module';
+import { ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: 'better-sqlite3',
-      database: './test1.db',
-      synchronize: true,
-      entities: [
-        ChannelEntity,
-        IdentityEntity,
-        EnrolmentEntity,
-        TopicEntity,
-        SymmetricKeysEntity,
-      ],
+    TypeOrmModule.forRootAsync({
+      useFactory: async (configService: ConfigService) => {
+        return {
+          type: 'better-sqlite3',
+          database: configService.get<string>('DB_NAME', 'local.db'),
+          synchronize: true,
+          entities: [
+            ChannelEntity,
+            IdentityEntity,
+            EnrolmentEntity,
+            TopicEntity,
+            SymmetricKeysEntity,
+          ],
+        };
+      },
+      inject: [ConfigService],
     }),
   ],
   controllers: [],

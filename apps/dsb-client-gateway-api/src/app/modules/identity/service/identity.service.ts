@@ -34,6 +34,10 @@ export class IdentityService {
     protected readonly commandBus: CommandBus
   ) {}
 
+  public async removeIdentity(): Promise<void> {
+    await this.wrapper.identityRepository.clear();
+  }
+
   public async getClaims(): Promise<Claims> {
     return {
       did: this.iamService.getDIDAddress(),

@@ -818,11 +818,11 @@ export class DsbApiService implements OnApplicationBootstrap {
         overrideRetry
       );
 
-      this.logger.log(`get symmetric keys successful with dto: ${dto}`);
+      this.logger.log(`get symmetric keys successful with dto:`, dto);
 
       return data;
     } catch (e) {
-      this.logger.error(`get symmetric keys failed with dto: ${dto}`, e);
+      this.logger.error(`get symmetric keys failed with dto:`, dto, e);
       throw new Error(e);
     }
   }

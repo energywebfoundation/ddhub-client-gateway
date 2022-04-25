@@ -122,11 +122,11 @@ export class ChannelDidCacheService {
       this.logger.log('Found topic', topic);
 
       for (const { schema, version } of topicVersions.records) {
-        const s = schema as object;
+        const typedSchema = schema as object;
 
         const topicEntity: TopicEntity = {
           id: topic.id,
-          schema: s,
+          schema: typedSchema,
           version,
           owner: topic.owner,
           name: topic.name,

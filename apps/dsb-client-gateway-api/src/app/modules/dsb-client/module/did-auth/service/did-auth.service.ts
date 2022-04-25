@@ -42,6 +42,8 @@ export class DidAuthService {
 
           this.refreshToken = refreshTokenData.refresh_token;
           this.accessToken = refreshTokenData.access_token;
+
+          return;
         }
 
         this.refreshToken = null;

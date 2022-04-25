@@ -322,8 +322,6 @@ export class KeysService implements OnModuleInit {
 
     if (existingRSAKey && existingKeyInDid) {
       this.logger.log('RSA key already generated');
-
-      return;
     }
 
     const { publicKey, privateKey } = this.deriveRSAKey(rootKey);

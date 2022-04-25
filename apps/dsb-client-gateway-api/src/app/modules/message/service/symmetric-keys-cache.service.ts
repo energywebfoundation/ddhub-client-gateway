@@ -59,7 +59,7 @@ export class SymmetricKeysCacheService {
           }
         );
 
-      this.logger.log('symmetric keys', symmetricKeys);
+      this.logger.log('symmetric keys', JSON.stringify(symmetricKeys));
 
       if (symmetricKeys.length === 0) {
         this.logger.log('No symmetric keys fetched from MB, job not running');

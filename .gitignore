@@ -50,3 +50,4 @@ files
 *.db-shm
 *.db-wal
 
+local.db
