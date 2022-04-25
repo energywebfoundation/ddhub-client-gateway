@@ -11,5 +11,5 @@ export const CHANNELS_HEADERS = [
   {
     Header: 'RESTRICTIONS',
     accessor: 'restrictions',
-  }
+  },
 ];

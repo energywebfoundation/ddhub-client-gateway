@@ -2,7 +2,6 @@ import { FC } from 'react';
 import clsx from 'clsx';
 import {
   CircularProgress,
-  Dialog,
   DialogTitle,
   DialogContent,
   DialogContentText,
@@ -17,7 +16,8 @@ import {
   FormInput,
   FormSelect,
   Editor,
-} from '@dsb-client-gateway/ui/core';
+  Dialog, DialogSubTitle
+} from "@dsb-client-gateway/ui/core";
 import { ApplicationInfo } from '../../../components';
 import { useStyles } from './CreateTopic.styles';
 import { useCreateTopicEffects } from './CreateTopic.effects';
@@ -26,7 +26,6 @@ export const CreateTopic: FC = () => {
   const { classes } = useStyles();
   const {
     open,
-    hide,
     closeModal,
     openCancelModal,
     fields,
@@ -42,17 +41,13 @@ export const CreateTopic: FC = () => {
     <Dialog
       open={open}
       onClose={closeModal}
-      fullWidth
-      className={classes.root}
-      classes={{ paper: classes.paper, container: classes.container }}
-      style={{ visibility: hide ? 'hidden' : 'visible' }}
     >
-      <DialogTitle className={classes.title}>Create topic</DialogTitle>
+      <DialogTitle>Create topic</DialogTitle>
       <form onSubmit={onSubmit}>
         <DialogContent sx={{ padding: 0 }}>
-          <DialogContentText className={classes.subTitle}>
+          <DialogSubTitle>
             Provide topic data with this form
-          </DialogContentText>
+          </DialogSubTitle>
           <Grid container mt={4}>
             <Grid item xs={4}>
               {application && <ApplicationInfo application={application} />}

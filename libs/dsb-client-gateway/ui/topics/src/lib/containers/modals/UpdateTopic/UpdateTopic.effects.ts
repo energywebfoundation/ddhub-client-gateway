@@ -31,7 +31,7 @@ const initialValues = {
 export const useUpdateTopicEffects = () => {
   const queryClient = useQueryClient();
   const {
-    updateTopic: { open, hide, application, topic, canUpdateSchema },
+    updateTopic: { open, application, topic, canUpdateSchema },
   } = useTopicsModalsStore();
   const dispatch = useTopicsModalsDispatch();
 
@@ -81,7 +81,6 @@ export const useUpdateTopicEffects = () => {
       type: TopicsModalsActionsEnum.SHOW_UPDATE_TOPIC,
       payload: {
         open: false,
-        hide: false,
         canUpdateSchema: false,
         application: null,
         topic: null,
@@ -165,7 +164,6 @@ export const useUpdateTopicEffects = () => {
 
   return {
     open,
-    hide,
     closeModal,
     openCancelModal,
     fields,

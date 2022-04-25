@@ -7,7 +7,7 @@ interface TagsProps {
 
 export const Tags = ({ value }: TagsProps) => {
   const { classes } = useStyles();
-  return value.map((tag: string) => (
+  return <>{value.map((tag: string) => (
     <Chip
       key={tag}
       color="primary"
@@ -17,5 +17,5 @@ export const Tags = ({ value }: TagsProps) => {
         label: classes.chipLabel,
       }}
     />
-  ));
+  ))}</>;
 };

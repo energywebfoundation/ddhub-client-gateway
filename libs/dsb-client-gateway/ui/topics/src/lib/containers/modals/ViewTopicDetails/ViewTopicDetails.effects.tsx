@@ -36,7 +36,6 @@ export const useViewTopicDetailsEffects = () => {
       type: TopicsModalsActionsEnum.SHOW_UPDATE_TOPIC,
       payload: {
         open: true,
-        hide: false,
         canUpdateSchema: true,
         application,
         topic,
