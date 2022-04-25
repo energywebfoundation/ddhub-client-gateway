@@ -1,11 +1,16 @@
 import { useEffect } from 'react';
 import { useForm, SubmitHandler, FieldValues } from 'react-hook-form';
+import { useQueryClient } from 'react-query';
 import { useRouter } from 'next/router';
-import { FormSelectOption } from '@dsb-client-gateway/ui/core';
-import { PostTopicBodyDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
+import {
+  PostTopicBodyDto,
+  getTopicsControllerGetTopicsQueryKey,
+} from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { useCreateTopic } from '@dsb-client-gateway/ui/api-hooks';
+import { useCustomAlert } from '@dsb-client-gateway/ui/core';
+import { Queries } from '@dsb-client-gateway/ui/utils';
 import { yupResolver } from '@hookform/resolvers/yup';
-import * as yup from 'yup';
+import { validationSchema, fields } from '../../../models';
 import {
   useTopicsModalsStore,
   useTopicsModalsDispatch,
@@ -13,11 +18,13 @@ import {
 } from '../../../context';
 
 export const useCreateTopicEffects = () => {
+  const queryClient = useQueryClient();
   const router = useRouter();
   const {
     createTopic: { open, hide, application },
   } = useTopicsModalsStore();
   const dispatch = useTopicsModalsDispatch();
+  const Swal = useCustomAlert();
 
   const initialValues = {
     name: '',
@@ -28,21 +35,10 @@ export const useCreateTopicEffects = () => {
     version: '',
   };
 
-  const validationSchema = yup
-    .object({
-      name: yup.string().required(),
-      schema: yup.string().required(),
-      schemaType: yup.string().required(),
-      tags: yup.array().min(1).required(),
-      version: yup.string().required(),
-    })
-    .required();
-
   const {
     register,
     control,
     handleSubmit,
-    watch,
     formState: { isValid },
     reset,
   } = useForm<FieldValues>({
@@ -53,12 +49,12 @@ export const useCreateTopicEffects = () => {
 
   useEffect(() => {
     reset({
-      owner: router.query['namespace'],
+      owner: router.query[Queries.Namespace],
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router]);
 
-  const { createTopicHandler } = useCreateTopic();
+  const { createTopicHandler, isLoading: isCreatingTopic } = useCreateTopic();
 
   const closeModal = () => {
     dispatch({
@@ -86,90 +82,53 @@ export const useCreateTopicEffects = () => {
     });
   };
 
+  const onCreateTopic = () => {
+    queryClient.invalidateQueries(getTopicsControllerGetTopicsQueryKey());
+    closeModal();
+    Swal.fire({
+      title: 'Success',
+      text: 'You have successfully created the topic',
+      type: 'success',
+      confirmButtonText: 'Dismiss',
+    });
+  };
+
+  const onCreateTopicError = () => {
+    Swal.fire({
+      title: 'Error',
+      text: 'Error while creating topic',
+      type: 'error',
+      confirmButtonText: 'Dismiss',
+    });
+  };
+
   const topicSubmitHandler: SubmitHandler<FieldValues> = (data) => {
     const values = data as PostTopicBodyDto;
-    const fomattedValues = {
-      ...values,
-      schemaType: schemaTypeOptions.find(
-        (option) => option.value === values.schemaType
-      ).label,
-    };
-    createTopicHandler(fomattedValues as PostTopicBodyDto, closeModal);
+    createTopicHandler(
+      values,
+      onCreateTopic,
+      onCreateTopicError
+    );
   };
 
   const onSubmit = handleSubmit(topicSubmitHandler);
 
-  const openCancelModal = () => {
+  const openCancelModal = async () => {
     hideModal();
-    dispatch({
-      type: TopicsModalsActionsEnum.SHOW_CANCEL,
-      payload: {
-        open: true,
-        onConfirm: closeModal,
-        onCancel: showModal,
-      },
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: 'you will close create topic form',
+      type: 'warning',
+      showCancelButton: true,
     });
+
+    if (result.isConfirmed) {
+      closeModal();
+    } else {
+      showModal();
+    }
   };
 
-  const schemaTypeOptions: FormSelectOption[] = [
-    { value: 'json', label: 'JSD7' },
-    { value: 'xml', label: 'XML' },
-    { value: 'csv', label: 'CSV' },
-    { value: 'tsv', label: 'TSV' },
-  ];
-
-  const fields = {
-    topicName: {
-      name: 'name',
-      label: 'Topic name',
-      formInputsWrapperProps: {
-        width: 254,
-        marginRight: '15px',
-      },
-      inputProps: {
-        placeholder: 'Topic name',
-      },
-    },
-    version: {
-      name: 'version',
-      label: 'Version',
-      formInputsWrapperProps: {
-        width: 145,
-      },
-      inputProps: {
-        placeholder: 'Version',
-      },
-    },
-    tags: {
-      name: 'tags',
-      label: 'Tags',
-      options: [] as FormSelectOption[],
-      autocomplete: true,
-      maxValues: 20,
-      multiple: true,
-      tags: true,
-      inputProps: {
-        placeholder: 'Tags',
-      },
-    },
-    schemaType: {
-      name: 'schemaType',
-      label: 'Schema type',
-      options: schemaTypeOptions,
-      inputProps: {
-        placeholder: 'Schema type',
-      },
-    },
-    schema: {
-      name: 'schema',
-      label: 'Schema',
-      inputProps: {
-        placeholder: 'Schema',
-      },
-    },
-  };
-
-  const schemaTypeValue = watch('schemaType');
   const buttonDisabled = !isValid;
 
   return {
@@ -182,7 +141,7 @@ export const useCreateTopicEffects = () => {
     control,
     onSubmit,
     buttonDisabled,
-    schemaTypeValue,
     application,
+    isCreatingTopic,
   };
 };

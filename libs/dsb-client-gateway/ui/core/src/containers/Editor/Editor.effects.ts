@@ -1,9 +1,9 @@
 import { useState, useRef } from 'react';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 
-export const useEditorEffects = () => {
+export const useEditorEffects = (showPlaceholder: boolean) => {
   const [isEditorReady, setIsEditorReady] = useState(false);
-  const [showPlaceholder, setShowPlaceholder] = useState(true);
+  const [placeholder, setPlaceholder] = useState(true);
 
   const monacoRef = useRef<monaco.editor.IStandaloneCodeEditor>();
 
@@ -12,17 +12,21 @@ export const useEditorEffects = () => {
   ) => {
     setIsEditorReady(true);
     monacoRef.current = editor;
+    monacoRef.current.getAction("editor.action.formatDocument").run();
+
+    if (!showPlaceholder) return;
+
     editor.onDidBlurEditorWidget(() => {
       if (!editor.getValue()) {
-        setShowPlaceholder(true);
+        setPlaceholder(true);
       }
     });
   };
 
   const handlePlaceholder = () => {
-    if (!isEditorReady) return;
+    if (!isEditorReady || !showPlaceholder) return;
 
-    setShowPlaceholder(false);
+    setPlaceholder(false);
     monacoRef.current && monacoRef.current?.layout();
     monacoRef.current && monacoRef.current?.focus();
   };
@@ -50,7 +54,7 @@ export const useEditorEffects = () => {
   } as monaco.editor.IStandaloneEditorConstructionOptions;
 
   return {
-    showPlaceholder,
+    placeholder,
     isEditorReady,
     handleEditorDidMount,
     handlePlaceholder,

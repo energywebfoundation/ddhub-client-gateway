@@ -11,14 +11,14 @@ import { CssBaseline } from '@mui/material';
 import createCache from '@emotion/cache';
 import { Layout } from '../components/Layout';
 import { queryClientOptions } from '../utils';
-import '../styles/globals.css';
-import 'nprogress/nprogress.css';
 import {
   useCheckAccountOnInitEffects,
   UserDataContext,
   useUserData,
 } from '@dsb-client-gateway/ui/login';
 import { makeServer } from '../services/mock.service';
+import 'nprogress/nprogress.css';
+import '../styles/globals.css';
 
 if (
   process.env.NODE_ENV !== 'production' &&
@@ -57,9 +57,18 @@ function MyApp(props: MyAppProps) {
 
   useEffect(() => {
     NProgress.configure({ showSpinner: false });
-    Router.events.on('routeChangeStart', () => NProgress.start());
-    Router.events.on('routeChangeComplete', () => NProgress.done());
-    Router.events.on('routeChangeError', () => NProgress.done());
+    const handleRouteStart = () => NProgress.start();
+    const handleRouteDone = () => NProgress.done();
+
+    Router.events.on('routeChangeStart', handleRouteStart);
+    Router.events.on('routeChangeComplete', handleRouteDone);
+    Router.events.on('routeChangeError', handleRouteDone);
+
+    return () => {
+      Router.events.off('routeChangeStart', handleRouteStart);
+      Router.events.off('routeChangeComplete', handleRouteDone);
+      Router.events.off('routeChangeError', handleRouteDone);
+    };
   }, []);
 
   return (

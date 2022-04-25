@@ -1,2 +1,2 @@
 export * from './Topics';
-export * from './TopicsList';
+export * from './ApplicationInfo';

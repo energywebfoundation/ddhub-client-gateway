@@ -1,4 +1,3 @@
-import React from 'react';
 import 'regenerator-runtime/runtime';
 import {
   Paper,
@@ -10,102 +9,149 @@ import {
   TableHead,
   TablePagination,
   TableRow,
+  Box,
 } from '@mui/material';
+import { ColumnInstance } from 'react-table';
 import { Search } from './Search';
 import { TablePaginationActions } from './TablePaginationActions';
+import { TableComponentActions } from './TableComponentActions';
+import { TableRowsLoadingComponent } from './TableRowsLoadingComponent';
 import { EmptyRow } from './EmptyRow/EmptyRow';
-import { useTableEffects } from './Table.effects';
-import { TableProps } from './Table.types';
 import { EmptyTable } from './EmptyTable/EmptyTable';
+import { useTableEffects } from './Table.effects';
+import { useStyles } from './Table.styles';
+import { TableProps } from './Table.types';
 
-export function GenericTable<T>({headers, tableRows, onRowClick}: TableProps<T>) {
+export function GenericTable<T>({
+  headers,
+  tableRows,
+  onRowClick,
+  children,
+  actions,
+  loading,
+  showSearch = true,
+  showFooter = true
+}: TableProps<T>) {
+  const { classes } = useStyles();
   const {
     getTableProps,
     prepareRow,
     rows,
-    gotoPage,
-    setPageSize,
     setGlobalFilter,
-    pageIndex, pageSize, globalFilter,
+    pageIndex,
+    pageSize,
+    globalFilter,
     totalLength,
-    emptyRows
-  } = useTableEffects({headers, tableRows});
-
-  const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
-    gotoPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    setPageSize(parseInt(event.target.value, 10));
-  };
-
-  const handleRowClick = (selectedRow: T) => {
-    if (!onRowClick) {
-      return;
-    }
-    onRowClick(selectedRow);
-  };
+    emptyRows,
+    handleChangePage,
+    handleRowClick,
+  } = useTableEffects({ headers, tableRows, onRowClick });
 
   return (
     <>
-      <Search
-        filter={globalFilter}
-        setFilter={setGlobalFilter}
-      />
+      {showSearch ? <Box display="flex">
+        <Search filter={globalFilter} setFilter={setGlobalFilter} />
+        {children}
+      </Box> : ''}
       <TableContainer component={Paper}>
-        {rows.length !== 0 ? <Table sx={{minWidth: 500}} {...getTableProps()}>
-          <TableHead>
-            <TableRow>
-              {headers.map((column) => (
-                <TableCell
-                  key={column.accessor}>
-                  {column.Header}
-                  <span>{column?.isSorted ? (column.isSortedDesc ? ' 🔽' : ' 🔼') : ''}</span>
-                </TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {(pageSize > 0
-                ? rows.slice(pageIndex * pageSize, pageIndex * pageSize + pageSize)
+        {loading ? (
+          <TableRowsLoadingComponent pageSize={pageSize} />
+        ) : rows.length !== 0 ? (
+          <Table
+            className={classes.root}
+            sx={{ minWidth: 500 }}
+            {...getTableProps()}
+          >
+            <TableHead>
+              <TableRow>
+                {headers.map((column) => (
+                  <TableCell
+                    style={{ width: column.width ?? 'initial' }}
+                    classes={{ head: classes.head }}
+                    key={column.accessor}
+                  >
+                    {column.Header}
+                    <span>
+                      {column?.isSorted
+                        ? column.isSortedDesc
+                          ? ' 🔽'
+                          : ' 🔼'
+                        : ''}
+                    </span>
+                  </TableCell>
+                ))}
+                {actions && (
+                  <TableCell
+                    classes={{ head: classes.head }}
+                    className={classes.action}
+                  />
+                )}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {(pageSize > 0
+                ? rows.slice(
+                    pageIndex * pageSize,
+                    pageIndex * pageSize + pageSize
+                  )
                 : rows
-            ).map((row) => {
-              prepareRow(row);
-              return (
-                <TableRow key={row.namespace} {...row.getRowProps()} onClick={() => handleRowClick(row)}>
-                  {row.cells.map((cell, key) => {
-                    return (
-                      <TableCell
-                        key={key}
-                        {...cell.getCellProps()}
-                      >
-                        {cell.render('Cell')}
-                      </TableCell>
-                    );
-                  })}
-                </TableRow>
-              );
-            })}
+              ).map((row) => {
+                const data = row.original as any;
+                prepareRow(row);
+                return (
+                  <TableRow
+                    {...row.getRowProps()}
+                    onClick={() => handleRowClick(data)}
+                  >
+                    {row.cells.map((cell) => {
+                      const column = cell.column as ColumnInstance & {
+                        color: string;
+                      };
+                      return (
+                        <TableCell
+                          style={{ cursor: onRowClick ? 'pointer' : 'default'}}
+                          classes={{ body: classes.body }}
+                          color={column.color}
+                          {...cell.getCellProps()}
+                        >
+                          {cell.render('Cell')}
+                        </TableCell>
+                      );
+                    })}
+                    {actions && (
+                      <TableComponentActions<T> data={data} actions={actions} />
+                    )}
+                  </TableRow>
+                );
+              })}
 
-            {emptyRows > 0 && (<EmptyRow rowsToFill={emptyRows}/>)}
-          </TableBody>
-          <TableFooter>
-            <TableRow>
-              <TablePagination
-                rowsPerPageOptions={[3, 10, 25, 100]}
-                count={totalLength}
-                rowsPerPage={pageSize}
-                page={pageIndex}
-                onPageChange={handleChangePage}
-                onRowsPerPageChange={handleChangeRowsPerPage}
-                ActionsComponent={TablePaginationActions}
-              />
-            </TableRow>
-          </TableFooter>
-        </Table> : <EmptyTable />}
-
+              {emptyRows > 0 && <EmptyRow rowsToFill={emptyRows} />}
+            </TableBody>
+            {showFooter && <TableFooter>
+              <TableRow>
+                <TablePagination
+                  rowsPerPageOptions={[]}
+                  labelDisplayedRows={({ from, to, count }) =>
+                    `Showing ${from} to ${to} of ${count} entries`
+                  }
+                  count={totalLength}
+                  rowsPerPage={pageSize}
+                  page={pageIndex}
+                  onPageChange={handleChangePage}
+                  ActionsComponent={TablePaginationActions}
+                  classes={{
+                    spacer: classes.spacer,
+                    displayedRows: classes.displayedRows,
+                    toolbar: classes.toolbar
+                  }}
+                />
+              </TableRow>
+            </TableFooter>}
+          </Table>
+        ) : (
+          <EmptyTable />
+        )}
       </TableContainer>
     </>
   );
 }
-

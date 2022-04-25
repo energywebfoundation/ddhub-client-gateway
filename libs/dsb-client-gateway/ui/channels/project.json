@@ -1,0 +1,25 @@
+{
+  "root": "libs/dsb-client-gateway/ui/channels",
+  "sourceRoot": "libs/dsb-client-gateway/ui/channels/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": [
+          "libs/dsb-client-gateway/ui/channels/**/*.{ts,tsx,js,jsx}"
+        ]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/libs/dsb-client-gateway/ui/channels"],
+      "options": {
+        "jestConfig": "libs/dsb-client-gateway/ui/channels/jest.config.js",
+        "passWithNoTests": true
+      }
+    }
+  }
+}

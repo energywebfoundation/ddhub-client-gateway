@@ -13,9 +13,6 @@ body {
   font-family: 'Rajdhani', sans-serif;
   height: 100%;
 }
-[data-reactroot=""] {
-  height: 100%;
-}
 
 a {
   color: inherit;
@@ -25,12 +22,21 @@ a {
 * {
   box-sizing: border-box;
 }
+
+#__next {
+  height: 100%;
+}
 #nprogress .bar {
   background: #a567ff !important;
+  z-index: 2000;
 }
 
 #nprogress .peg {
   box-shadow: 0 0 10px #a567ff, 0 0 5px #a567ff;
+}
+
+[color="primary"] {
+  color: var(--primary-color) !important;
 }
 
 /* Dialog, swal */

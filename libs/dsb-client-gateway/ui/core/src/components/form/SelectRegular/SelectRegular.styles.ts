@@ -14,6 +14,9 @@ export const useStyles = makeStyles()((theme) => ({
     },
     '& .MuiSelect-select': {
       padding: '8px 10px 8px 15px',
+      '&.Mui-disabled': {
+        WebkitTextFillColor: theme.palette.grey[500],
+      }
     },
     '& .MuiOutlinedInput-notchedOutline': {
       border: `1px solid ${theme.palette.grey[500]}`,
@@ -49,7 +52,10 @@ export const useStyles = makeStyles()((theme) => ({
   icon: {
     top: 9,
     right: 15,
-    stroke: alpha(theme.palette.grey[200], 0.5),
-    width: 20
+    stroke: alpha(theme.palette.grey[100], 0.5),
+    width: 20,
+    '&.Mui-disabled': {
+      stroke: theme.palette.grey[500],
+    }
   }
 }));

@@ -73,9 +73,9 @@ export interface GetMessageResponse {
 }
 
 export interface DownloadMessageResponse {
-  filePath: string;
   fileName: string;
   sender: string;
   signature: string;
   clientGatewayMessageId: string;
+  data: Buffer;
 }

@@ -1,12 +1,14 @@
 import { FC } from 'react';
 import { CreateTopic } from './CreateTopic';
-import { Cancel } from './Cancel';
+import { UpdateTopic } from './UpdateTopic';
+import { ViewTopicDetails  } from './ViewTopicDetails';
 
 export const TopicsModalsCenter: FC = () => {
   return (
     <>
       <CreateTopic />
-      <Cancel />
+      <UpdateTopic />
+      <ViewTopicDetails />
     </>
   );
 };
