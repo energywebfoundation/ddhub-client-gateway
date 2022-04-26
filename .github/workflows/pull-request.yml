@@ -49,8 +49,6 @@ jobs:
         run: npm install
       - name: Build
         run: nx build dsb-client-gateway-api
-      - name: Run spec tests
-        run: nx run dsb-client-gateway-api:test
   build-fe:
     name: Build Frontend
     runs-on: ubuntu-latest

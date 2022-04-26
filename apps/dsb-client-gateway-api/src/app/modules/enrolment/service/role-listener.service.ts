@@ -11,6 +11,7 @@ import { ClaimListenerService } from './claim-listener.service';
 import { IamService } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
 import { NoPrivateKeyException } from '../../storage/exceptions/no-private-key.exception';
 import { NotEnoughBalanceException } from '../../identity/exceptions/not-enough-balance.exception';
+import { Span } from 'nestjs-otel';
 
 @Injectable()
 export class RoleListenerService {
@@ -25,6 +26,7 @@ export class RoleListenerService {
     protected readonly iamService: IamService
   ) {}
 
+  @Span('roleListener_requestClaimsForRequiredRoles')
   public async requestClaimsForRequiredRoles(): Promise<void> {
     const generatedEnrolment: Enrolment =
       await this.enrolmentService.generateEnrolment();

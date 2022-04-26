@@ -9,6 +9,7 @@ import { KeysModule } from '../keys/keys.module';
 import { DidAuthModule } from './module/did-auth/did-auth.module';
 import { CqrsModule } from '@nestjs/cqrs';
 import { SecretsEngineModule } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
+import { EnrolmentModule } from '../enrolment/enrolment.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { SecretsEngineModule } from '@dsb-client-gateway/dsb-client-gateway-secr
     UtilsModule,
     SecretsEngineModule,
     KeysModule,
+    EnrolmentModule,
     DidAuthModule,
   ],
   providers: [DsbApiService, TlsAgentService],

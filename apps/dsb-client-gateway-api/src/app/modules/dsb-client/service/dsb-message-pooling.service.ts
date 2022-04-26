@@ -6,7 +6,8 @@ import { Enrolment } from '@dsb-client-gateway/dsb-client-gateway/identity/model
 import { ConfigService } from '@nestjs/config';
 import { WebSocketImplementation } from '../../message/message.const';
 import { MessageService } from '../../message/service/message.service';
-import { EnrolmentRepository } from '../../storage/repository/enrolment.repository';
+import { EnrolmentService } from '../../enrolment/service/enrolment.service';
+import { EnrolmentEntity } from '@dsb-client-gateway/dsb-client-gateway-storage';
 
 enum SCHEDULER_HANDLERS {
   MESSAGES = 'messages',
@@ -18,7 +19,7 @@ export class DsbMessagePoolingService implements OnModuleInit {
 
   constructor(
     protected readonly dsbApiService: DsbApiService,
-    protected readonly enrolmentRepository: EnrolmentRepository,
+    protected readonly enrolmentService: EnrolmentService,
     protected readonly configService: ConfigService,
     protected readonly schedulerRegistry: SchedulerRegistry,
     protected readonly messageService: MessageService
@@ -55,8 +56,8 @@ export class DsbMessagePoolingService implements OnModuleInit {
     try {
       this.schedulerRegistry.deleteTimeout(SCHEDULER_HANDLERS.MESSAGES);
 
-      const enrolment: Enrolment | null =
-        this.enrolmentRepository.getEnrolment();
+      const enrolment: EnrolmentEntity | null =
+        await this.enrolmentService.get();
 
       const isEnrolmentValid: boolean = this.validateEnrolment(enrolment);
 

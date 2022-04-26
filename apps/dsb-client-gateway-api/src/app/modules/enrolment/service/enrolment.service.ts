@@ -1,16 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import {
-  Enrolment,
   Role,
   RoleStatus,
 } from '@dsb-client-gateway/dsb-client-gateway/identity/models';
-import { EnrolmentRepository } from '../../storage/repository/enrolment.repository';
 import {
   Claim,
   IamService,
 } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
 import { ConfigService } from '@nestjs/config';
 import { RoleListenerService } from './role-listener.service';
+import { Span } from 'nestjs-otel';
+import {
+  EnrolmentEntity,
+  EnrolmentWrapperRepository,
+} from '@dsb-client-gateway/dsb-client-gateway-storage';
 
 @Injectable()
 export class EnrolmentService {
@@ -18,25 +21,25 @@ export class EnrolmentService {
     protected readonly iamService: IamService,
     protected readonly configService: ConfigService,
     protected readonly roleListenerService: RoleListenerService,
-    protected readonly enrolmentRepository: EnrolmentRepository
+    protected readonly wrapper: EnrolmentWrapperRepository
   ) {}
 
-  public deleteEnrolment(): void {
-    this.enrolmentRepository.removeEnrolment();
+  public async deleteEnrolment(): Promise<void> {
+    await this.wrapper.enrolmentRepository.clear();
   }
 
   public async startListening(): Promise<void> {
     await this.roleListenerService.startListening();
   }
 
-  public async get(): Promise<Enrolment> {
-    const currentEnrolment: Enrolment | null =
-      this.enrolmentRepository.getEnrolment();
+  public async get(): Promise<EnrolmentEntity> {
+    const currentEnrolment: EnrolmentEntity | null =
+      await this.wrapper.enrolmentRepository.findOne();
 
     if (!currentEnrolment) {
-      const createdEnrolment: Enrolment = await this.generateEnrolment();
+      const createdEnrolment: EnrolmentEntity = await this.generateEnrolment();
 
-      await this.enrolmentRepository.writeEnrolment(createdEnrolment);
+      await this.wrapper.enrolmentRepository.insert(createdEnrolment);
 
       return createdEnrolment;
     }
@@ -44,7 +47,8 @@ export class EnrolmentService {
     return currentEnrolment;
   }
 
-  public async generateEnrolment(): Promise<Enrolment> {
+  @Span('enrolment_generateEnrolment')
+  public async generateEnrolment(): Promise<EnrolmentEntity> {
     const existingClaimsWithStatus: Claim[] =
       await this.iamService.getClaimsWithStatus();
     const requiredRoles: string[] = this.getRequiredRoles();
@@ -71,12 +75,12 @@ export class EnrolmentService {
       }
     });
 
-    const enrolment: Enrolment = {
+    const enrolment: EnrolmentEntity = {
       did: this.iamService.getDIDAddress(),
       roles: claimsToRoles,
     };
 
-    await this.enrolmentRepository.writeEnrolment(enrolment);
+    await this.wrapper.enrolmentRepository.createOne(enrolment);
 
     return enrolment;
   }

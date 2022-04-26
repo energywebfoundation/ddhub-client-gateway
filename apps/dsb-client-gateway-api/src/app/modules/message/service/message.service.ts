@@ -8,11 +8,8 @@ import {
   uploadMessageBodyDto,
 } from '../dto/request/send-message.dto';
 import { GetMessagesDto } from '../dto/request/get-messages.dto';
-import { SymmetricKeysRepository } from '../repository/symmetric-keys.repository';
-import { SymmetricKeysCacheService } from './symmetric-keys-cache.service';
 import { ChannelService } from '../../channel/service/channel.service';
 import { TopicService } from '../../channel/service/topic.service';
-import { IdentityService } from '../../identity/service/identity.service';
 import { IsSchemaValid } from '../../utils/validator/decorators/IsSchemaValid';
 import { TopicNotFoundException } from '../exceptions/topic-not-found.exception';
 import { ChannelTypeNotPubException } from '../exceptions/channel-type-not-pub.exception';
@@ -31,13 +28,13 @@ import {
 } from '../message.interface';
 import { ChannelType } from '../../../modules/channel/channel.const';
 import { KeysService } from '../../keys/service/keys.service';
-// import { secretsEngineService } from 'libs/dsb-client-gateway-secrets-engine/src/lib/service/vault.service';
 import { v4 as uuidv4 } from 'uuid';
-import { CommandBus } from '@nestjs/cqrs';
 import { EncryptedMessageType } from '../../message/message.const';
 import { SecretsEngineService } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
-import { TopicEntity } from '../../channel/channel.interface';
-import { ChannelEntity } from '../../channel/entity/channel.entity';
+import {
+  ChannelEntity,
+  TopicEntity,
+} from '@dsb-client-gateway/dsb-client-gateway-storage';
 import { FileNotFoundException } from '../exceptions/file-not-found.exception';
 
 export enum EventEmitMode {
@@ -56,11 +53,7 @@ export class MessageService {
     protected readonly dsbApiService: DsbApiService,
     protected readonly channelService: ChannelService,
     protected readonly topicService: TopicService,
-    protected readonly identityService: IdentityService,
-    protected readonly keyService: KeysService,
-    protected readonly internalMessageRepository: SymmetricKeysRepository,
-    protected readonly commandBus: CommandBus,
-    protected readonly symmetricKeysCacheService: SymmetricKeysCacheService
+    protected readonly keyService: KeysService
   ) {}
 
   public async sendMessagesToSubscribers(

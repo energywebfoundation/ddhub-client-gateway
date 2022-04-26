@@ -9,9 +9,11 @@ import {
   setChainConfig,
   SignerService,
 } from 'iam-client-lib';
+import { Span } from 'nestjs-otel';
 
 @Injectable()
 export class IamFactoryService {
+  @Span('iam_initialize')
   public async initialize(
     privateKey: string,
     configService: ConfigService

@@ -2,20 +2,21 @@ import { Injectable, Logger } from '@nestjs/common';
 import { IamService } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
 import { DsbApiService } from '../../dsb-client/service/dsb-api.service';
 import { SymmetricKeyEntity } from '../entity/message.entity';
-import { SymmetricKeysRepository } from '../repository/symmetric-keys.repository';
 import { ConfigService } from '@nestjs/config';
 import { IdentityService } from '../../identity/service/identity.service';
-import { EnrolmentRepository } from '../../storage/repository/enrolment.repository';
+import { SymmetricKeysRepositoryWrapper } from '@dsb-client-gateway/dsb-client-gateway-storage';
+import { EnrolmentService } from '../../enrolment/service/enrolment.service';
+
 @Injectable()
 export class SymmetricKeysCacheService {
   private readonly logger = new Logger(SymmetricKeysCacheService.name);
 
   constructor(
-    protected readonly enrolmentRepository: EnrolmentRepository,
+    protected readonly enrolmentService: EnrolmentService,
     protected readonly iamService: IamService,
     protected readonly identityService: IdentityService,
     protected readonly dsbApiService: DsbApiService,
-    protected readonly symmetricKeysRepository: SymmetricKeysRepository,
+    protected readonly wrapper: SymmetricKeysRepositoryWrapper,
     protected readonly configService: ConfigService
   ) {}
 
@@ -39,7 +40,7 @@ export class SymmetricKeysCacheService {
         return;
       }
 
-      const enrolment = this.enrolmentRepository.getEnrolment();
+      const enrolment = await this.enrolmentService.get();
 
       if (!enrolment) {
         this.logger.warn('enrolment is not enabled, skipping cron');
@@ -58,7 +59,7 @@ export class SymmetricKeysCacheService {
           }
         );
 
-      this.logger.log('symmetric keys', symmetricKeys);
+      this.logger.log('symmetric keys', JSON.stringify(symmetricKeys));
 
       if (symmetricKeys.length === 0) {
         this.logger.log('No symmetric keys fetched from MB, job not running');
@@ -66,8 +67,12 @@ export class SymmetricKeysCacheService {
       }
 
       for (const symmetricKey of symmetricKeys) {
-        await this.symmetricKeysRepository
-          .createOrUpdateSymmetricKey(symmetricKey)
+        await this.wrapper.symmetricKeysRepository
+          .save({
+            clientGatewayMessageId: symmetricKey.clientGatewayMessageId,
+            senderDid: symmetricKey.senderDid,
+            payload: symmetricKey.payload,
+          })
           .catch((e) => {
             this.logger.error('Failed when saving symmetric key', e);
           });

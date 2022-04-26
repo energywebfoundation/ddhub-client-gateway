@@ -1,18 +1,39 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { TopicRepository } from '../repository/topic.repository';
-import { TopicEntity } from '../channel.interface';
+import {
+  TopicEntity,
+  TopicRepositoryWrapper,
+} from '@dsb-client-gateway/dsb-client-gateway-storage';
 
 @Injectable()
 export class TopicService {
   protected readonly logger = new Logger(TopicService.name);
 
-  constructor(protected readonly topicRepository: TopicRepository) {}
+  constructor(protected readonly wrapper: TopicRepositoryWrapper) {}
 
-  public getTopic(
+  public async createOrUpdateTopic(topicEntity: TopicEntity): Promise<void> {
+    await this.wrapper.topicRepository.save(topicEntity);
+  }
+
+  public async getTopic(
     name: string,
     owner: string,
     version?: string
-  ): TopicEntity | null {
-    return this.topicRepository.getTopic(name, owner, version);
+  ): Promise<TopicEntity | null> {
+    if (!version) {
+      return this.wrapper.topicRepository.findOne({
+        where: {
+          name,
+          owner,
+        },
+      });
+    }
+
+    return this.wrapper.topicRepository.findOne({
+      where: {
+        name,
+        owner,
+        version,
+      },
+    });
   }
 }
