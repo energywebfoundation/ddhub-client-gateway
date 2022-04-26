@@ -1,4 +1,5 @@
-import { CardContent, Paper, Typography } from '@mui/material';
+import { CardContent, Paper, Typography, Box } from '@mui/material';
+import { CopyToClipboard } from '@dsb-client-gateway/ui/core';
 import { useStyles } from './TopicInfo.styles';
 
 export interface TopicInfoProps {
@@ -10,20 +11,23 @@ export function TopicInfo({ applicationNamespace, topicId }: TopicInfoProps) {
   const { classes } = useStyles();
   return (
     <Paper className={classes.root}>
-      <CardContent>
+      <CardContent className={classes.card}>
         <div className={classes.row}>
           <Typography className={classes.title} variant="h4">
             Application namespace
           </Typography>
-          <Typography className={classes.subTitle}>
-            {applicationNamespace}
-          </Typography>
+          <Box display="flex" alignItems="center">
+            <Typography className={classes.subTitle} noWrap>
+              {applicationNamespace}
+            </Typography>
+            <CopyToClipboard text={applicationNamespace} />
+          </Box>
         </div>
-        <div className={classes.row}>
+        <div>
           <Typography className={classes.title} variant="h4">
-            Topic Id
+            Topic ID
           </Typography>
-          <Typography className={classes.subTitle} variant="body1">
+          <Typography className={classes.subTitle} variant="body2">
             {topicId}
           </Typography>
         </div>
