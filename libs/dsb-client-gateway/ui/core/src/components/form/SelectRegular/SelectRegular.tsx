@@ -1,7 +1,15 @@
 import React, { FC } from 'react';
-import { MenuItem, TextField } from '@mui/material';
+import {
+  MenuItem,
+  TextField,
+  Box,
+  InputLabel,
+  Typography,
+} from '@mui/material';
 import { UseFormRegister, FieldValues } from 'react-hook-form';
 import { GenericFormField } from '../../../containers/GenericForm';
+import { ChevronDown } from 'react-feather';
+import { useStyles } from './SelectRegular.styles';
 
 export interface SelectRegularProps {
   field: GenericFormField;
@@ -21,34 +29,63 @@ export const SelectRegular: FC<SelectRegularProps> = ({
   errorText = '',
   variant = 'standard',
   value = '',
-  disabled = false
+  disabled = false,
 }) => {
+  const { classes } = useStyles();
   const options = field.options || [];
+
   return (
+    <Box {...field.formInputsWrapperProps} flexShrink={0}>
+      <InputLabel className={classes.label}>{field.label ?? ''}</InputLabel>
       <TextField
         select
         fullWidth
         name={`${field.name}`}
-        label={field.label}
         error={errorExists}
         helperText={errorText}
         margin="normal"
         variant={variant}
         value={value}
-        defaultValue={value}
         onChange={onChange}
         disabled={disabled}
         required={field.required}
         inputProps={{
           ...field.inputProps,
         }}
+        classes={{
+          root: classes.root,
+        }}
+        SelectProps={{
+          renderValue: (value) => {
+            const label = options.find(
+              (option) => option.value === value
+            )?.label;
+            return value ? (
+              label
+            ) : (
+              <Typography className={classes.placeholder}>
+                {field.inputProps?.placeholder}
+              </Typography>
+            );
+          },
+          displayEmpty: true,
+          IconComponent: ChevronDown,
+          classes: {
+            icon: classes.icon,
+          },
+        }}
         {...field.textFieldProps}
       >
         {options.map((option) => (
-          <MenuItem key={option.label} value={option.value}>
+          <MenuItem
+            key={option.label}
+            value={option.value}
+            className={classes.menuItem}
+          >
             {option.label}
           </MenuItem>
         ))}
       </TextField>
+    </Box>
   );
 };

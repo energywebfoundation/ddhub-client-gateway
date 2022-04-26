@@ -13,9 +13,6 @@ body {
   font-family: 'Rajdhani', sans-serif;
   height: 100%;
 }
-[data-reactroot=""] {
-  height: 100%;
-}
 
 a {
   color: inherit;
@@ -25,12 +22,21 @@ a {
 * {
   box-sizing: border-box;
 }
+
+#__next {
+  height: 100%;
+}
 #nprogress .bar {
   background: #a567ff !important;
+  z-index: 2000;
 }
 
 #nprogress .peg {
   box-shadow: 0 0 10px #a567ff, 0 0 5px #a567ff;
+}
+
+[color="primary"] {
+  color: var(--primary-color) !important;
 }
 
 /* Dialog, swal */
@@ -39,10 +45,27 @@ a {
   background: var(--background-color) !important;
 }
 
-.swal2-title {
+.swal2-container.swal2-center {
+  z-index: 2000;
+}
+
+#swal2-title {
   font-size: 21px;
   font-weight: 400;
   color: var(--text-color) !important;
+  font-family: Bw Gradual, sans-serif;
+  font-style: normal;
+  line-height: 25px;
+}
+
+#swal2-html-container {
+  font-family: Sequel Sans, sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 21px;
+  color: #939393;
+  margin-top: 7px;
 }
 
 .swal2-text {
@@ -64,6 +87,13 @@ a {
   outline: none !important;
   border-radius: 5px;
   padding: 10px 24px;
+  font-family: Sequel Sans, sans-serif;
+  font-style: normal;
+  font-weight: 405;
+  font-size: 14px;
+  line-height: 17px;
+  text-align: center;
+  letter-spacing: 0.4px;
 }
 
 .swal2-confirm:active {
@@ -71,8 +101,7 @@ a {
 }
 
 .swal2-confirm:not([disabled]):hover {
-  background-color: var(--primary-light-color) !important;
-  box-shadow: 0px 4px 14px rgba(115, 103, 240, 0.38);
+  background-color: #8351cc !important;
 }
 
 body.swal2-height-auto.swal2-height-auto {
@@ -92,4 +121,24 @@ body.swal2-height-auto.swal2-height-auto {
 
 .swal2-styled.swal2-cancel:focus {
   box-shadow: none !important;
+}
+
+.monaco-scrollable-element>.invisible.vertical {
+  width: 5px !important;
+}
+
+.monaco-scrollable-element > .scrollbar.vertical > .slider {
+  width: 5px !important;
+  left: initial !important;
+  right: 0;
+}
+
+.monaco-scrollable-element > .scrollbar.horizontal > .slider {
+  height: 5px !important;
+  top: initial !important;
+  bottom: 0;
+}
+
+.decorationsOverviewRuler {
+  width: 5px !important;
 }

@@ -45,3 +45,9 @@ logical
 file
 sys
 .env
+.env.local
+files
+*.db-shm
+*.db-wal
+
+local.db

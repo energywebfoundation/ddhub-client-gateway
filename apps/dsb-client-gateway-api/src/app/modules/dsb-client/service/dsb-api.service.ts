@@ -8,7 +8,6 @@ import { ConfigService } from '@nestjs/config';
 import { HttpService } from '@nestjs/axios';
 import { Agent } from 'https';
 import { TlsAgentService } from './tls-agent.service';
-import { EthersService } from '../../utils/service/ethers.service';
 import {
   ApplicationDTO,
   IamService,
@@ -23,17 +22,17 @@ import {
   SendInternalMessageResponse,
   SendMessageData,
   SendMessageResponse,
-  SendTopicBodyDTO,
   Topic,
   TopicDataResponse,
   TopicResultDTO,
   TopicVersion,
   TopicVersionResponse,
+  UpdateTopicBodyDTO,
+  UpdateTopicHistoryDTO,
 } from '../dsb-client.interface';
 
 import promiseRetry from 'promise-retry';
 import FormData from 'form-data';
-import { EnrolmentRepository } from '../../storage/repository/enrolment.repository';
 import { DidAuthService } from '../module/did-auth/service/did-auth.service';
 import * as qs from 'qs';
 import 'multer';
@@ -43,6 +42,9 @@ import { isAxiosError } from '@nestjs/terminus/dist/utils';
 import { SecretsEngineService } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
 import { RoleStatus } from '@dsb-client-gateway/dsb-client-gateway/identity/models';
 import { OperationOptions } from 'retry';
+import { Span } from 'nestjs-otel';
+import { EnrolmentService } from '../../enrolment/service/enrolment.service';
+import { UnableToLoginException } from '../exceptions/unable-to-login.exception';
 
 export interface RetryOptions {
   stopOnStatusCodes?: HttpStatus[];
@@ -67,8 +69,7 @@ export class DsbApiService implements OnApplicationBootstrap {
     protected readonly configService: ConfigService,
     protected readonly httpService: HttpService,
     protected readonly tlsAgentService: TlsAgentService,
-    protected readonly ethersService: EthersService,
-    protected readonly enrolmentRepository: EnrolmentRepository,
+    protected readonly enrolmentService: EnrolmentService,
     protected readonly iamService: IamService,
     protected readonly secretsEngineService: SecretsEngineService,
     protected readonly didAuthService: DidAuthService,
@@ -100,6 +101,7 @@ export class DsbApiService implements OnApplicationBootstrap {
     return { data, headers };
   }
 
+  @Span('ddhub_mb_getDIDsFromRoles')
   public async getDIDsFromRoles(
     roles: string[],
     searchType: 'ANY',
@@ -130,12 +132,13 @@ export class DsbApiService implements OnApplicationBootstrap {
     return data.dids;
   }
 
+  @Span('ddhub_mb_getTopicVersions')
   public async getTopicVersions(
     topicId: string
   ): Promise<TopicVersionResponse> {
     try {
       const result = await this.request<null>(
-        this.httpService.get(this.baseUrl + `/topics/${topicId}/version`, {
+        this.httpService.get(this.baseUrl + `/topics/${topicId}/versions`, {
           httpsAgent: this.getTLS(),
           headers: {
             Authorization: `Bearer ${this.didAuthService.getToken()}`,
@@ -183,6 +186,7 @@ export class DsbApiService implements OnApplicationBootstrap {
     }
   }
 
+  @Span('ddhub_mb_downloadFile')
   public async uploadFile(
     file: Express.Multer.File,
     fqcns: string[],
@@ -204,7 +208,10 @@ export class DsbApiService implements OnApplicationBootstrap {
       formData.append('topicId', topicId);
       formData.append('topicVersion', topicVersion);
       formData.append('clientGatewayMessageId', clientGatewayMessageId);
-      formData.append('transactionId', transactionId);
+
+      if (transactionId) {
+        formData.append('transactionId', transactionId);
+      }
 
       const result = await this.request<null>(
         this.httpService.post(this.baseUrl + '/messages/upload', formData, {
@@ -221,14 +228,20 @@ export class DsbApiService implements OnApplicationBootstrap {
         }
       );
 
-      this.logger.log('Upload File successful');
+      this.logger.log(
+        `upload file with file name: ${file.originalname} successful`
+      );
       return result.data;
     } catch (e) {
-      this.logger.error('Upload File failed', e);
+      this.logger.error(
+        `upload file with file name: ${file.originalname} failed`,
+        e
+      );
       throw new Error(e);
     }
   }
 
+  @Span('ddhub_mb_downloadFile')
   public async downloadFile(
     fileId: string
   ): Promise<{ data: string; headers: any }> {
@@ -248,20 +261,26 @@ export class DsbApiService implements OnApplicationBootstrap {
         }
       );
 
-      this.logger.log('Download File successful from MB');
+      this.logger.log(
+        `download file with fileId: ${fileId} successful from MB`
+      );
       return result;
     } catch (e) {
-      this.logger.error('Download File failed from MB', e);
+      this.logger.error(
+        `download file with fileId: ${fileId} failed from MB`,
+        e
+      );
       throw new Error(e);
     }
   }
 
+  @Span('ddhub_mb_getTopicsByOwnerAndName')
   public async getTopicsByOwnerAndName(
     name: string,
     owner: string
   ): Promise<TopicDataResponse> {
     try {
-      const result = await this.request<null>(
+      const { data } = await this.request<TopicDataResponse>(
         this.httpService.get(this.baseUrl + '/topics', {
           params: {
             owner,
@@ -277,14 +296,20 @@ export class DsbApiService implements OnApplicationBootstrap {
         }
       );
 
-      this.logger.log('Download File successful');
-      return result.data;
+      this.logger.log(
+        `get topics with owner: ${owner} and name: ${name} successful`
+      );
+      return data;
     } catch (e) {
-      this.logger.error('Download File failed', e);
+      this.logger.error(
+        `get topics with owner: ${owner} and name: ${name} failed`,
+        e
+      );
       throw new Error(e);
     }
   }
 
+  @Span('ddhub_mb_getApplicationsByOwnerAndRole')
   public async getApplicationsByOwnerAndRole(
     roleName: string
   ): Promise<ApplicationDTO[]> {
@@ -301,12 +326,23 @@ export class DsbApiService implements OnApplicationBootstrap {
     }
   }
 
-  public async getTopics(owner: string): Promise<TopicDataResponse> {
+  @Span('ddhub_mb_getTopics')
+  public async getTopics(
+    limit: number,
+    name: string,
+    owner: string,
+    page: number,
+    tags: string[]
+  ): Promise<TopicDataResponse> {
     try {
-      const result = await this.request<null>(
+      const { data } = await this.request<TopicDataResponse>(
         this.httpService.get(this.baseUrl + '/topics', {
           params: {
-            owner: owner,
+            limit,
+            name,
+            owner,
+            page,
+            tags,
           },
           httpsAgent: this.getTLS(),
           headers: {
@@ -318,21 +354,22 @@ export class DsbApiService implements OnApplicationBootstrap {
         }
       );
 
-      this.logger.log('Post Topics successful');
-      return result.data;
+      this.logger.log(`get topics with owner:${owner} successful`);
+      return data;
     } catch (e) {
-      this.logger.error('Post Topics failed', e);
+      this.logger.error(`get topics with owner:${owner} failed`, e);
       throw new Error(e);
     }
   }
 
+  @Span('ddhub_mb_getTopicsCountByOwner')
   public async getTopicsCountByOwner(owners: string[]): Promise<Topic[]> {
     if (!owners || owners.length === 0) {
       return [];
     }
 
     try {
-      const result = await this.request<null>(
+      const result = await this.request<Topic[]>(
         this.httpService.get(this.baseUrl + '/topics/count', {
           params: {
             owner: owners,
@@ -350,18 +387,56 @@ export class DsbApiService implements OnApplicationBootstrap {
         }
       );
 
-      this.logger.log('Get topics count by owner successful.');
+      this.logger.log(`get topics count with owners: ${owners} successful`);
       return result.data;
     } catch (e) {
-      this.logger.error('Get topics count by owner successful.', e);
+      this.logger.error(`get topics count with owners: ${owners} failed`, e);
       throw new Error(e);
     }
   }
 
-  public async postTopics(data: SendTopicBodyDTO): Promise<Topic> {
+  @Span('ddhub_mb_getTopicsBySearch')
+  public async getTopicsBySearch(
+    keyword: string,
+    limit?: number,
+    page?: number
+  ): Promise<Topic[]> {
+    if (!keyword) {
+      this.logger.debug(`no keyword given so returning empty array`);
+      return [];
+    }
+
     try {
       const result = await this.request<null>(
-        this.httpService.post(this.baseUrl + '/topics', data, {
+        this.httpService.get(this.baseUrl + '/topics/search', {
+          params: {
+            keyword,
+            limit,
+            page,
+          },
+          httpsAgent: this.getTLS(),
+          headers: {
+            Authorization: `Bearer ${this.didAuthService.getToken()}`,
+          },
+        }),
+        {
+          stopOnResponseCodes: ['10'],
+        }
+      );
+
+      this.logger.log(`get topics search with keyword: ${keyword} successful`);
+      return result.data;
+    } catch (e) {
+      this.logger.error(`get topics search with keyword: ${keyword} failed`, e);
+      throw new Error(e);
+    }
+  }
+
+  @Span('ddhub_mb_getTopicHistoryById')
+  public async getTopicHistoryById(id: string): Promise<TopicDataResponse> {
+    try {
+      const { data } = await this.request<TopicDataResponse>(
+        this.httpService.get(`${this.baseUrl}/topics/${id}/versions`, {
           httpsAgent: this.getTLS(),
           headers: {
             ...this.getAuthHeader(),
@@ -372,19 +447,52 @@ export class DsbApiService implements OnApplicationBootstrap {
         }
       );
 
-      this.logger.log('Post Topics successful');
-      console.log('result', result);
-      return result.data;
+      this.logger.log(`get topics history with id:${id} successful`);
+      return data;
     } catch (e) {
-      this.logger.error('Post Topics failed', e);
+      this.logger.error(`get topics history with id:${id} failed`, e);
       throw new Error(e);
     }
   }
 
-  public async updateTopics(data: SendTopicBodyDTO): Promise<TopicResultDTO> {
+  @Span('ddhub_mb_getTopicHistoryByIdAndVersion')
+  public async getTopicHistoryByIdAndVersion(
+    id: string,
+    version: string
+  ): Promise<TopicDataResponse> {
     try {
-      const result = await this.request<null>(
-        this.httpService.put(this.baseUrl + '/topics', data, {
+      const { data } = await this.request<TopicDataResponse>(
+        this.httpService.get(
+          `${this.baseUrl}/topics/${id}/versions/${version}`,
+          {
+            httpsAgent: this.getTLS(),
+            headers: {
+              ...this.getAuthHeader(),
+            },
+          }
+        ),
+        {
+          stopOnResponseCodes: ['10'],
+        }
+      );
+
+      this.logger.log(
+        `get topics history with id:${id} and version: ${version} successful`
+      );
+      return data;
+    } catch (e) {
+      this.logger.error(
+        `get topics history with id:${id} and version: ${version} failed`,
+        e
+      );
+      throw new Error(e);
+    }
+  }
+
+  public async postTopics(topicData: UpdateTopicBodyDTO): Promise<Topic> {
+    try {
+      const { data } = await this.request<null>(
+        this.httpService.post(this.baseUrl + '/topics', topicData, {
           httpsAgent: this.getTLS(),
           headers: {
             ...this.getAuthHeader(),
@@ -395,15 +503,145 @@ export class DsbApiService implements OnApplicationBootstrap {
         }
       );
 
-      this.logger.log('Update Topics successful');
+      this.logger.log('post topics successful', data);
 
-      return result.data;
+      return data;
     } catch (e) {
-      this.logger.error('Update Topics failed', e);
+      this.logger.error('post topics failed', e);
       throw new Error(e);
     }
   }
 
+  @Span('ddhub_mb_updateTopics')
+  public async updateTopic(
+    data: UpdateTopicBodyDTO,
+    id: string
+  ): Promise<TopicResultDTO> {
+    try {
+      this.logger.log('topic to be updated', data);
+      const result = await this.request<TopicResultDTO>(
+        this.httpService.put(`${this.baseUrl}/topics/${id}`, data, {
+          httpsAgent: this.getTLS(),
+          headers: {
+            ...this.getAuthHeader(),
+          },
+        }),
+        {
+          stopOnResponseCodes: ['10'],
+        }
+      );
+
+      this.logger.log(`update topics successful with id: ${id}`);
+
+      return result.data;
+    } catch (e) {
+      this.logger.error(`update topics failed with id: ${id}`, e);
+      throw new Error(e);
+    }
+  }
+
+  @Span('ddhub_mb_updateTopicByIdAndVersion')
+  public async updateTopicByIdAndVersion(
+    topicData: UpdateTopicHistoryDTO,
+    id: string,
+    versionNumber: string
+  ): Promise<TopicResultDTO> {
+    try {
+      this.logger.log('topic data to be updated', topicData);
+      const result = await this.request<TopicResultDTO>(
+        this.httpService.put(
+          `${this.baseUrl}/topics/${id}/versions/${versionNumber}`,
+          topicData,
+          {
+            httpsAgent: this.getTLS(),
+            headers: {
+              ...this.getAuthHeader(),
+            },
+          }
+        ),
+        {
+          stopOnResponseCodes: ['10'],
+        }
+      );
+
+      this.logger.log(
+        `update topics successful with id: ${id} and versionNumber:${versionNumber}`
+      );
+
+      return result.data;
+    } catch (e) {
+      this.logger.error(
+        `update topics failed with id: ${id} and versionNumber:${versionNumber}`,
+        e
+      );
+      throw new Error(e);
+    }
+  }
+
+  @Span('ddhub_mb_deleteTopic')
+  public async deleteTopic(id: string): Promise<TopicResultDTO> {
+    try {
+      this.logger.log('topic to be deleted', id);
+      const result = await this.request<TopicResultDTO>(
+        this.httpService.delete(`${this.baseUrl}/topics/${id}`, {
+          httpsAgent: this.getTLS(),
+          headers: {
+            ...this.getAuthHeader(),
+          },
+        }),
+        {
+          stopOnResponseCodes: ['10'],
+        }
+      );
+
+      this.logger.log(`delete topic successful with id:${id}`);
+
+      return result.data;
+    } catch (e) {
+      this.logger.error(`delete topic failed with id:${id}`, e);
+      throw new Error(e);
+    }
+  }
+
+  @Span('ddhub_mb_deleteTopicByVersion')
+  public async deleteTopicByVersion(
+    id: string,
+    version: string
+  ): Promise<TopicResultDTO> {
+    try {
+      this.logger.log(
+        `topic to be deleted with version: ${version} and id:${id}`
+      );
+      const { data } = await this.request<TopicResultDTO>(
+        this.httpService.delete(
+          `${this.baseUrl}/topics/${id}/versions/${version}`,
+          {
+            httpsAgent: this.getTLS(),
+            headers: {
+              ...this.getAuthHeader(),
+            },
+          }
+        ),
+        {
+          stopOnResponseCodes: ['10'],
+        }
+      );
+
+      this.logger.log(
+        `delete topic successful with version: ${version} and id:${id}`
+      );
+
+      return data;
+    } catch (e) {
+      this.logger.error(
+        `delete topic with id ${id} and version ${version} failed`,
+        e
+      );
+      throw new Error(e);
+    }
+  }
+
+  @Span('ddhub_mb_messagesSearch')
   public async messagesSearch(
     topicId: string[],
     senderId: string[],
@@ -420,7 +658,7 @@ export class DsbApiService implements OnApplicationBootstrap {
     };
 
     try {
-      const result = await this.request<null>(
+      const result = await this.request<SearchMessageResponseDto[]>(
         this.httpService.post(this.baseUrl + '/messages/search', requestBody, {
           httpsAgent: this.getTLS(),
           headers: {
@@ -432,15 +670,16 @@ export class DsbApiService implements OnApplicationBootstrap {
         }
       );
 
-      this.logger.log('Messages Search successful', result);
+      this.logger.log('messages search successful', result);
 
       return result.data;
     } catch (e) {
-      this.logger.error('Messages Search failed', e);
+      this.logger.error('messages search failed', e);
       throw new Error(e);
     }
   }
 
+  @Span('ddhub_mb_getMessages')
   public async getMessages(
     fqcn: string,
     from?: string,
@@ -466,15 +705,16 @@ export class DsbApiService implements OnApplicationBootstrap {
         }
       );
 
-      this.logger.log('Get Messages successful');
+      this.logger.log(`get messages successful for fqcn: ${fqcn}`);
 
       return result.data;
     } catch (e) {
-      this.logger.error('Get Messages failed', e);
+      this.logger.error(`get messages failed for fqcn: ${fqcn}`, e);
       throw new Error(e);
     }
   }
 
+  @Span('ddhub_mb_sendMessage')
   public async sendMessage(
     fqcns: string[],
     payload: string,
@@ -507,15 +747,16 @@ export class DsbApiService implements OnApplicationBootstrap {
         }
       );
 
-      this.logger.log('Send Message successful', result);
+      this.logger.log('send message successful', result);
 
       return result.data;
     } catch (e) {
-      this.logger.error('Send Message failed', e);
+      this.logger.error('send message failed', e);
       throw new Error(e);
     }
   }
 
+  @Span('ddhub_mb_sendMessageInternal')
   public async sendMessageInternal(
     fqcn: string,
     clientGatewayMessageId: string,
@@ -544,21 +785,27 @@ export class DsbApiService implements OnApplicationBootstrap {
         }
       );
 
-      this.logger.log('Send Message internal successful');
+      this.logger.log(
+        `send message internal successful with clientGatewayMessageId: ${clientGatewayMessageId}`
+      );
 
       return result.data;
     } catch (e) {
-      this.logger.error('Send Message internal failed', e);
+      this.logger.error(
+        `send message internal failed with clientGatewayMessageId: ${clientGatewayMessageId}`,
+        e
+      );
       throw new Error(e);
     }
   }
 
+  @Span('ddhub_mb_getSymmetricKeys')
   public async getSymmetricKeys(
-    dto,
+    dto: { clientId: string; amount: number },
     overrideRetry?: OperationOptions
   ): Promise<GetInternalMessageResponse[]> {
     try {
-      const result = await this.request<null>(
+      const { data } = await this.request<null>(
         this.httpService.post(this.baseUrl + '/messages/internal/search', dto, {
           httpsAgent: this.getTLS(),
           headers: {
@@ -571,9 +818,11 @@ export class DsbApiService implements OnApplicationBootstrap {
         overrideRetry
       );
 
-      return result.data;
+      this.logger.log(`get symmetric keys successful with dto:`, dto);
+
+      return data;
     } catch (e) {
-      this.logger.error('Get symmetric keys failed', e);
+      this.logger.error(`get symmetric keys failed with dto:`, dto, e);
       throw new Error(e);
     }
   }
@@ -653,24 +902,25 @@ export class DsbApiService implements OnApplicationBootstrap {
     return data;
   }
 
+  @Span('ddhub_mb_login')
   public async login(): Promise<void> {
-    const enrolment = this.enrolmentRepository.getEnrolment();
+    const enrolment = await this.enrolmentService.get();
 
     if (!enrolment) {
       this.logger.warn('Stopping login, enrolment is not enabled');
 
-      return;
+      throw new UnableToLoginException();
     }
 
     const hasRequiredRoles =
       enrolment.roles.filter(
-        (role) => role.required === true && role.status !== RoleStatus.SYNCED
+        (role) => role.required === true && role.status === RoleStatus.SYNCED
       ).length > 0;
 
-    if (hasRequiredRoles) {
+    if (!hasRequiredRoles) {
       this.logger.warn('Stopping login, roles are missing');
 
-      return;
+      throw new UnableToLoginException();
     }
 
     this.logger.log('Attempting to login to DID Auth Server');
@@ -737,6 +987,7 @@ export class DsbApiService implements OnApplicationBootstrap {
     }
   }
 
+  @Span('ddhub_mb_initExtChannel')
   protected async initExtChannel(): Promise<void> {
     try {
       await this.request<null>(
@@ -784,21 +1035,25 @@ export class DsbApiService implements OnApplicationBootstrap {
 
   async getTopicById(topicId: string): Promise<TopicVersion | null> {
     try {
-      const result = await this.request<any>(
-        this.httpService.get(this.baseUrl + '/topics/' + topicId + '/version', {
-          httpsAgent: this.getTLS(),
-          headers: {
-            ...this.getAuthHeader(),
-          },
-        }),
+      const { data } = await this.request<TopicVersion | null>(
+        this.httpService.get(
+          this.baseUrl + '/topics/' + topicId + '/versions',
+          {
+            httpsAgent: this.getTLS(),
+            headers: {
+              ...this.getAuthHeader(),
+            },
+          }
+        ),
         {
           stopOnResponseCodes: ['10'],
         }
       );
+      this.logger.error(`Get topic with topicId: ${topicId} successful`);
 
-      return result.data;
+      return data;
     } catch (e) {
-      this.logger.error(`Get topic with id ${topicId} failed`, e);
+      this.logger.error(`Get topic with topicId: ${topicId} failed`, e);
 
       return null;
     }

@@ -1,25 +1,20 @@
-import { useState } from 'react';
-import { makeStyles } from 'tss-react/mui';
-import { Container } from '@mui/material';
-import { ApplicationContainer } from '../../components/Applications/ApplicationsContainer';
-import { IAppDefinition } from '@energyweb/iam-contracts';
+import Head from 'next/head';
+import { Applications } from '@dsb-client-gateway/ui/applications';
 
 export default function ListApplications() {
-  const {classes} = useStyles();
-  const [applications, setApplications] = useState<IAppDefinition[]>([]);
   return (
-    <div>
-      <Container maxWidth="lg">
-        <section className={classes.table}>
-          {applications ? <ApplicationContainer applications={applications}/> : null}
-        </section>
-      </Container>
-    </div>
+    <>
+      <Head>
+        <title>EW-DSB Client Gateway - Applications</title>
+        <meta
+          name="description"
+          content="EW-DSB Client Gateway - Applications"
+        />
+      </Head>
+
+      <main>
+        <Applications />
+      </main>
+    </>
   );
 }
-const useStyles = makeStyles()((theme) => ({
-  table: {
-    marginTop: '1rem',
-  }
-}));
-

@@ -119,7 +119,7 @@ export const ProxyCertificate = ({
 const useStyles = makeStyles()((theme) => ({
   credentials: {
     borderRadius: '6px',
-    background: theme.palette.primary.dark,
+    background: theme.palette.background.paper,
     padding: '2rem',
     minHeight: '550px',
     display: 'flex',

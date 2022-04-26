@@ -64,7 +64,7 @@ export const Download = ({ channels, onDownload }: DownloadProps,) => {
 const useStyles = makeStyles()((theme) => ({
   download: {
     borderRadius: '6px',
-    background: theme.palette.primary.dark,
+    background: theme.palette.background.paper,
     padding: theme.spacing(6),
     margin: theme.spacing(3, 1)
   },
