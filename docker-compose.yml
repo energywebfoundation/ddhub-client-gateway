@@ -15,4 +15,31 @@ services:
       - IPC_LOCK
     container_name: vault_dev
     entrypoint: "vault server -dev"
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    ports:
+      - "16686:16686"
+      - "14250"
+  #Zipkin
+  zipkin:
+    image: openzipkin/zipkin
+    container_name: zipkin
+    ports:
+      - 9411:9411
 
+  otel-collector:
+    image: otel/opentelemetry-collector:0.48.0
+    command: ["--config=/etc/otel-collector-config.yaml"]
+    volumes:
+      - ./otel-local-config.yaml:/etc/otel-collector-config.yaml
+    ports:
+      - "1888:1888"   # pprof extension
+      - "13133:13133" # health_check extension
+      - "9411"   # Zipkin receiver
+      - "55679:55679" # zpages extension
+      - "55681:55681"
+      - "4318:4318"
+      - "4317:4317"
+    depends_on:
+      - jaeger
+      - zipkin

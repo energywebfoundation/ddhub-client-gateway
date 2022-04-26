@@ -19,6 +19,7 @@ import { ChannelModule } from './modules/channel/channel.module';
 import { MessageModule } from './modules/message/message.module';
 import { ApplicationModule } from './modules/application/application.module';
 import { TopicModule } from './modules/topic/topic.module';
+import { DdhubClientGatewayTracingModule } from '@dsb-client-gateway/ddhub-client-gateway-tracing';
 
 @Module({})
 export class AppModule {
@@ -28,6 +29,7 @@ export class AppModule {
         isGlobal: true,
         validate: shouldValidate && configValidate,
       }),
+      DdhubClientGatewayTracingModule.forRoot(),
       MulterModule.register({
         dest: './files',
       }),
