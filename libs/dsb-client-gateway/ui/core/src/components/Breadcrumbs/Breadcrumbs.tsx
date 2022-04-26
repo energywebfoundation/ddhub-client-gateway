@@ -24,7 +24,7 @@ export function Breadcrumbs() {
         <Link href={routerConst.Dashboard}>
           <Home color={theme.palette.primary.main} size={15} />
         </Link>
-        <></>
+        <div></div>
       </MuiBreadcrumbs>
       <MuiBreadcrumbs separator={separator} aria-label="breadcrumb">
         {list?.map((item, index, list) => (
