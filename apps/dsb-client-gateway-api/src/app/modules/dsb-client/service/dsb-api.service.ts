@@ -8,7 +8,6 @@ import { ConfigService } from '@nestjs/config';
 import { HttpService } from '@nestjs/axios';
 import { Agent } from 'https';
 import { TlsAgentService } from './tls-agent.service';
-import { EthersService } from '../../utils/service/ethers.service';
 import {
   ApplicationDTO,
   IamService,
@@ -23,18 +22,17 @@ import {
   SendInternalMessageResponse,
   SendMessageData,
   SendMessageResponse,
-  UpdateTopicBodyDTO,
   Topic,
   TopicDataResponse,
   TopicResultDTO,
   TopicVersion,
   TopicVersionResponse,
+  UpdateTopicBodyDTO,
   UpdateTopicHistoryDTO,
 } from '../dsb-client.interface';
 
 import promiseRetry from 'promise-retry';
 import FormData from 'form-data';
-import { EnrolmentRepository } from '../../storage/repository/enrolment.repository';
 import { DidAuthService } from '../module/did-auth/service/did-auth.service';
 import * as qs from 'qs';
 import 'multer';
@@ -44,6 +42,9 @@ import { isAxiosError } from '@nestjs/terminus/dist/utils';
 import { SecretsEngineService } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
 import { RoleStatus } from '@dsb-client-gateway/dsb-client-gateway/identity/models';
 import { OperationOptions } from 'retry';
+import { Span } from 'nestjs-otel';
+import { EnrolmentService } from '../../enrolment/service/enrolment.service';
+import { UnableToLoginException } from '../exceptions/unable-to-login.exception';
 
 export interface RetryOptions {
   stopOnStatusCodes?: HttpStatus[];
@@ -68,8 +69,7 @@ export class DsbApiService implements OnApplicationBootstrap {
     protected readonly configService: ConfigService,
     protected readonly httpService: HttpService,
     protected readonly tlsAgentService: TlsAgentService,
-    protected readonly ethersService: EthersService,
-    protected readonly enrolmentRepository: EnrolmentRepository,
+    protected readonly enrolmentService: EnrolmentService,
     protected readonly iamService: IamService,
     protected readonly secretsEngineService: SecretsEngineService,
     protected readonly didAuthService: DidAuthService,
@@ -101,6 +101,7 @@ export class DsbApiService implements OnApplicationBootstrap {
     return { data, headers };
   }
 
+  @Span('ddhub_mb_getDIDsFromRoles')
   public async getDIDsFromRoles(
     roles: string[],
     searchType: 'ANY',
@@ -131,6 +132,7 @@ export class DsbApiService implements OnApplicationBootstrap {
     return data.dids;
   }
 
+  @Span('ddhub_mb_getTopicVersions')
   public async getTopicVersions(
     topicId: string
   ): Promise<TopicVersionResponse> {
@@ -184,6 +186,7 @@ export class DsbApiService implements OnApplicationBootstrap {
     }
   }
 
+  @Span('ddhub_mb_downloadFile')
   public async uploadFile(
     file: Express.Multer.File,
     fqcns: string[],
@@ -238,6 +241,7 @@ export class DsbApiService implements OnApplicationBootstrap {
     }
   }
 
+  @Span('ddhub_mb_downloadFile')
   public async downloadFile(
     fileId: string
   ): Promise<{ data: string; headers: any }> {
@@ -270,6 +274,7 @@ export class DsbApiService implements OnApplicationBootstrap {
     }
   }
 
+  @Span('ddhub_mb_getTopicsByOwnerAndName')
   public async getTopicsByOwnerAndName(
     name: string,
     owner: string
@@ -304,6 +309,7 @@ export class DsbApiService implements OnApplicationBootstrap {
     }
   }
 
+  @Span('ddhub_mb_getApplicationsByOwnerAndRole')
   public async getApplicationsByOwnerAndRole(
     roleName: string
   ): Promise<ApplicationDTO[]> {
@@ -320,6 +326,7 @@ export class DsbApiService implements OnApplicationBootstrap {
     }
   }
 
+  @Span('ddhub_mb_getTopics')
   public async getTopics(
     limit: number,
     name: string,
@@ -355,6 +362,7 @@ export class DsbApiService implements OnApplicationBootstrap {
     }
   }
 
+  @Span('ddhub_mb_getTopicsCountByOwner')
   public async getTopicsCountByOwner(owners: string[]): Promise<Topic[]> {
     if (!owners || owners.length === 0) {
       return [];
@@ -387,6 +395,7 @@ export class DsbApiService implements OnApplicationBootstrap {
     }
   }
 
+  @Span('ddhub_mb_getTopicsBySearch')
   public async getTopicsBySearch(
     keyword: string,
     limit?: number,
@@ -423,6 +432,7 @@ export class DsbApiService implements OnApplicationBootstrap {
     }
   }
 
+  @Span('ddhub_mb_getTopicHistoryById')
   public async getTopicHistoryById(id: string): Promise<TopicDataResponse> {
     try {
       const { data } = await this.request<TopicDataResponse>(
@@ -445,6 +455,7 @@ export class DsbApiService implements OnApplicationBootstrap {
     }
   }
 
+  @Span('ddhub_mb_getTopicHistoryByIdAndVersion')
   public async getTopicHistoryByIdAndVersion(
     id: string,
     version: string
@@ -501,6 +512,7 @@ export class DsbApiService implements OnApplicationBootstrap {
     }
   }
 
+  @Span('ddhub_mb_updateTopics')
   public async updateTopic(
     data: UpdateTopicBodyDTO,
     id: string
@@ -528,6 +540,7 @@ export class DsbApiService implements OnApplicationBootstrap {
     }
   }
 
+  @Span('ddhub_mb_updateTopicByIdAndVersion')
   public async updateTopicByIdAndVersion(
     topicData: UpdateTopicHistoryDTO,
     id: string,
@@ -565,6 +578,7 @@ export class DsbApiService implements OnApplicationBootstrap {
     }
   }
 
+  @Span('ddhub_mb_deleteTopic')
   public async deleteTopic(id: string): Promise<TopicResultDTO> {
     try {
       this.logger.log('topic to be deleted', id);
@@ -589,6 +603,7 @@ export class DsbApiService implements OnApplicationBootstrap {
     }
   }
 
+  @Span('ddhub_mb_deleteTopicByVersion')
   public async deleteTopicByVersion(
     id: string,
     version: string
@@ -626,6 +641,7 @@ export class DsbApiService implements OnApplicationBootstrap {
     }
   }
 
+  @Span('ddhub_mb_messagesSearch')
   public async messagesSearch(
     topicId: string[],
     senderId: string[],
@@ -663,6 +679,7 @@ export class DsbApiService implements OnApplicationBootstrap {
     }
   }
 
+  @Span('ddhub_mb_getMessages')
   public async getMessages(
     fqcn: string,
     from?: string,
@@ -697,6 +714,7 @@ export class DsbApiService implements OnApplicationBootstrap {
     }
   }
 
+  @Span('ddhub_mb_sendMessage')
   public async sendMessage(
     fqcns: string[],
     payload: string,
@@ -738,6 +756,7 @@ export class DsbApiService implements OnApplicationBootstrap {
     }
   }
 
+  @Span('ddhub_mb_sendMessageInternal')
   public async sendMessageInternal(
     fqcn: string,
     clientGatewayMessageId: string,
@@ -780,6 +799,7 @@ export class DsbApiService implements OnApplicationBootstrap {
     }
   }
 
+  @Span('ddhub_mb_getSymmetricKeys')
   public async getSymmetricKeys(
     dto: { clientId: string; amount: number },
     overrideRetry?: OperationOptions
@@ -798,11 +818,11 @@ export class DsbApiService implements OnApplicationBootstrap {
         overrideRetry
       );
 
-      this.logger.log(`get symmetric keys successful with dto: ${dto}`);
+      this.logger.log(`get symmetric keys successful with dto:`, dto);
 
       return data;
     } catch (e) {
-      this.logger.error(`get symmetric keys failed with dto: ${dto}`, e);
+      this.logger.error(`get symmetric keys failed with dto:`, dto, e);
       throw new Error(e);
     }
   }
@@ -882,24 +902,25 @@ export class DsbApiService implements OnApplicationBootstrap {
     return data;
   }
 
+  @Span('ddhub_mb_login')
   public async login(): Promise<void> {
-    const enrolment = this.enrolmentRepository.getEnrolment();
+    const enrolment = await this.enrolmentService.get();
 
     if (!enrolment) {
       this.logger.warn('Stopping login, enrolment is not enabled');
 
-      return;
+      throw new UnableToLoginException();
     }
 
     const hasRequiredRoles =
       enrolment.roles.filter(
-        (role) => role.required === true && role.status !== RoleStatus.SYNCED
+        (role) => role.required === true && role.status === RoleStatus.SYNCED
       ).length > 0;
 
-    if (hasRequiredRoles) {
+    if (!hasRequiredRoles) {
       this.logger.warn('Stopping login, roles are missing');
 
-      return;
+      throw new UnableToLoginException();
     }
 
     this.logger.log('Attempting to login to DID Auth Server');
@@ -966,6 +987,7 @@ export class DsbApiService implements OnApplicationBootstrap {
     }
   }
 
+  @Span('ddhub_mb_initExtChannel')
   protected async initExtChannel(): Promise<void> {
     try {
       await this.request<null>(
@@ -1033,7 +1055,7 @@ export class DsbApiService implements OnApplicationBootstrap {
     } catch (e) {
       this.logger.error(`Get topic with topicId: ${topicId} failed`, e);
 
-      throw new Error(e);
+      return null;
     }
   }
 }

@@ -1,5 +1,6 @@
 import { ChannelType } from '../channel.const';
 import { TopicVersion } from '../../dsb-client/dsb-client.interface';
+import { IsEnum, IsString } from 'class-validator';
 
 export class ChannelTopic {
   topicName: string;
@@ -16,7 +17,10 @@ export class ChannelConditions {
 }
 
 export class ChannelEntity {
+  @IsString()
   fqcn: string;
+
+  @IsEnum(ChannelType)
   type: ChannelType;
   conditions: ChannelConditions;
   createdAt: string;

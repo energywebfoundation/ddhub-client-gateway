@@ -7,6 +7,7 @@ import { EnrolmentModule } from '../enrolment/enrolment.module';
 import { SecretsEngineModule } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
 import { IamInitService } from './service/iam-init.service';
 import { CqrsModule } from '@nestjs/cqrs';
+import { IdentityRepositoryModule } from '@dsb-client-gateway/dsb-client-gateway-storage';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { CqrsModule } from '@nestjs/cqrs';
     SecretsEngineModule,
     EnrolmentModule,
     CqrsModule,
+    IdentityRepositoryModule,
   ],
   providers: [IdentityService, IamInitService],
   controllers: [IdentityController],

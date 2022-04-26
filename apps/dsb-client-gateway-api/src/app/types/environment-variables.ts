@@ -18,6 +18,10 @@ export enum NODE_ENV {
   Test = 'test',
 }
 
+export enum OpenTelemetryExporters {
+  ZIPKIN = 'ZIPKIN',
+}
+
 export class EnvironmentVariables {
   @IsString()
   @IsEnum(NODE_ENV)
@@ -145,6 +149,37 @@ export class EnvironmentVariables {
 
   @IsString()
   REFRESH_SYMMETRIC_KEY_CRON_TIME = '*/2 * * * * *';
+
+  @IsBoolean()
+  @Transform(EnvironmentVariables.transformBoolean('OPENTELEMETRY_ENABLED'))
+  OPENTELEMETRY_ENABLED = false;
+
+  @IsEnum(OpenTelemetryExporters)
+  @ValidateIf(EnvironmentVariables.isOTELEnabled)
+  OPEN_TELEMETRY_EXPORTER = OpenTelemetryExporters.ZIPKIN;
+
+  @IsString()
+  @ValidateIf(EnvironmentVariables.isOTELEnabled)
+  OTEL_IGNORED_ROUTES = 'health,api/v2/health';
+
+  @IsString()
+  @ValidateIf(EnvironmentVariables.isOTELEnabled)
+  OTEL_TRACING_URL = 'http://localhost:4318/v1/traces';
+
+  @IsString()
+  @ValidateIf(EnvironmentVariables.isOTELEnabled)
+  OTEL_SERVICE_NAME = 'ddhub-client-gateway';
+
+  @IsString()
+  @ValidateIf(EnvironmentVariables.isOTELEnabled)
+  OTEL_ENVIRONMENT = 'local';
+
+  @IsString()
+  DB_NAME = 'local.db';
+
+  static isOTELEnabled(values: EnvironmentVariables): boolean {
+    return values.OPENTELEMETRY_ENABLED;
+  }
 
   static isVaultEnabled(values: EnvironmentVariables): boolean {
     return values.SECRETS_ENGINE === SecretsEngine.VAULT;
