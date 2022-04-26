@@ -1,6 +1,4 @@
 import { Module } from '@nestjs/common';
-import { LokiService } from './service';
-import { DidRepository } from './repository/did.repository';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import {
   ChannelEntity,
@@ -32,7 +30,7 @@ import { ConfigService } from '@nestjs/config';
     }),
   ],
   controllers: [],
-  providers: [LokiService, DidRepository],
-  exports: [LokiService, DidRepository],
+  providers: [],
+  exports: [],
 })
 export class DsbClientGatewayStorageModule {}

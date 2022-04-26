@@ -7,7 +7,6 @@ import { IdentityModule } from '../identity/identity.module';
 import { ChannelDidCacheService } from './service/channel-did-cache.service';
 import { RefreshAllChannelsCacheDataHandler } from './handlers/refresh-all-channels-cache-data.handler';
 import { RefreshTopicsCacheCronService } from './service/refresh-topics-cache-cron.service';
-import { TopicRepository } from './repository/topic.repository';
 import { TopicService } from './service/topic.service';
 import { RefreshChannelCacheDataHandler } from './handlers/refresh-channel-cache-data.handler';
 import {
@@ -32,7 +31,6 @@ import {
     RefreshAllChannelsCacheDataHandler,
     RefreshTopicsCacheCronService,
     RefreshChannelCacheDataHandler,
-    TopicRepository,
     TopicService,
   ],
   controllers: [ChannelController],
