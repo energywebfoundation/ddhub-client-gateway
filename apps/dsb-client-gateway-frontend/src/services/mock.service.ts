@@ -53,6 +53,10 @@ export function makeServer({ environment = 'development' }) {
         return getTopicsControllerGetTopicHistoryByIdAndVersionMock();
       });
 
+      this.put('topics/:id/versions/:version', (_schema, request) => {
+        return { topic: JSON.parse(request.requestBody) };
+      });
+
       this.delete('topics/:id/versions/:version', () => {
         return {};
       });

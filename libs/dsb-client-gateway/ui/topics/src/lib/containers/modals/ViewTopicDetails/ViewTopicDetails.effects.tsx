@@ -24,6 +24,7 @@ export const useViewTopicDetailsEffects = () => {
         open: false,
         topic: null,
         application: null,
+        canUpdateSchema: false,
       },
     });
   };
@@ -35,6 +36,7 @@ export const useViewTopicDetailsEffects = () => {
       payload: {
         open: true,
         hide: false,
+        canUpdateSchema: true,
         application,
         topic,
       },
