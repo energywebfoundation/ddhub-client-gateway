@@ -11,7 +11,7 @@ import {
   IsNumber,
   IsEnum,
 } from 'class-validator';
-import { IsVersion } from '../../utils/validator/decorators/IsVersion';
+import { IsValidApplicationNameSpace } from '../../utils/validator/decorators/IsValidApplicationNameSpace';
 import { IsValidTopicName } from '../../utils/validator/decorators/isValidTopicName';
 export class GetTopicDto {
   @IsString()
@@ -62,6 +62,9 @@ export class GetTopicDto {
   })
   version: string;
 
+  @IsValidApplicationNameSpace({
+    message: 'Malformed owner name. Please enter correct owner name',
+  })
   @IsString()
   @IsNotEmpty()
   @ApiProperty({
@@ -149,6 +152,9 @@ export class PostTopicDto {
 
   @IsString()
   @IsNotEmpty()
+  @IsValidApplicationNameSpace({
+    message: 'Malformed owner name. Please enter correct owner name',
+  })
   @ApiProperty({
     description: 'owner of the topic',
     type: String,
@@ -359,6 +365,9 @@ export class GetTopicsQueryDto {
   })
   public name: string;
 
+  @IsValidApplicationNameSpace({
+    message: 'Malformed owner name. Please enter correct owner name',
+  })
   @IsNotEmpty()
   @IsString()
   @ApiProperty({
@@ -599,7 +608,6 @@ export class PostTopicBodyDto {
   owner: string;
 
   @IsArray()
-  @IsNotEmpty()
   @ArrayUnique()
   @ApiProperty({
     description: 'tags of the topic',
