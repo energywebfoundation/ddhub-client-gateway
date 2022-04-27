@@ -2,6 +2,10 @@
   "name": "dsb-client-gateway",
   "version": "0.0.0",
   "license": "MIT",
+  "engines": {
+    "node": ">=16 <=18",
+    "npm": ">=8.5.0"
+  },
   "scripts": {
     "start": "nx serve",
     "start:ui": "wait-on tcp:3333 && nx serve",
