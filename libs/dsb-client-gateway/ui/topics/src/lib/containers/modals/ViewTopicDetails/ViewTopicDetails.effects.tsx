@@ -1,10 +1,11 @@
 import { useTopicVersion } from '@dsb-client-gateway/ui/api-hooks';
+import { downloadJson } from '@dsb-client-gateway/ui/utils';
 import {
   useTopicsModalsStore,
   useTopicsModalsDispatch,
   TopicsModalsActionsEnum,
 } from '../../../context';
-import { downloadJson, fields } from './ViewTopicDetails.utils';
+import { fields } from './ViewTopicDetails.utils';
 
 export const useViewTopicDetailsEffects = () => {
   const {
