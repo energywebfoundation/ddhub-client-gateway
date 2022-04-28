@@ -5,37 +5,42 @@ import { useCustomAlert } from '@dsb-client-gateway/ui/core';
 import {
   PostTopicDto,
   getTopicsControllerGetTopicsQueryKey,
+  getTopicsControllerGetTopicsHistoryByIdQueryKey,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
-import { useUpdateTopics } from '@dsb-client-gateway/ui/api-hooks';
-import { yupResolver } from '@hookform/resolvers/yup';
-import { validationSchema, fields } from '../../../models';
 import {
-  schemaTypeOptionsByLabel,
-  schemaTypeOptionsByValue,
-} from '../../../utils';
+  useUpdateTopics,
+  useTopicVersion,
+} from '@dsb-client-gateway/ui/api-hooks';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { fields, validationSchema } from '../../../models';
 import {
   useTopicsModalsStore,
   useTopicsModalsDispatch,
   TopicsModalsActionsEnum,
 } from '../../../context';
 
+const initialValues = {
+  name: '',
+  owner: '',
+  schemaType: '',
+  schema: '',
+  tags: [] as string[],
+  version: '',
+};
+
 export const useUpdateTopicEffects = () => {
   const queryClient = useQueryClient();
   const {
-    updateTopic: { open, hide, application, topic },
+    updateTopic: { open, hide, application, topic, canUpdateSchema },
   } = useTopicsModalsStore();
   const dispatch = useTopicsModalsDispatch();
-  const schemaType = schemaTypeOptionsByLabel[topic?.schemaType]
-    ?.value as string;
 
-  const initialValues = {
-    name: topic?.name,
-    owner: topic?.owner,
-    schemaType: schemaType,
-    schema: topic?.schema,
-    tags: topic?.tags,
-    version: topic?.version,
-  };
+  const {
+    topic: topicWithSchema,
+    remove: removeTopicCache,
+    isSuccess: topicLoaded,
+    isLoading,
+  } = useTopicVersion(topic?.id, topic?.version);
 
   const {
     register,
@@ -43,6 +48,10 @@ export const useUpdateTopicEffects = () => {
     handleSubmit,
     formState: { isValid },
     reset,
+    setValue,
+    getValues,
+    clearErrors,
+    trigger,
   } = useForm<FieldValues>({
     defaultValues: initialValues,
     resolver: yupResolver(validationSchema),
@@ -50,23 +59,30 @@ export const useUpdateTopicEffects = () => {
   });
 
   useEffect(() => {
-    reset({
-      ...topic,
-      schemaType,
+    if (!topicLoaded) return;
+    Object.entries(topicWithSchema).forEach(([name, value]) => {
+      setValue(name, value);
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [topic]);
+    trigger();
 
-  const { updateTopicHandler, isLoading: isUpdatingTopics } = useUpdateTopics();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [topicLoaded, JSON.stringify(topicWithSchema)]);
+
+  const { updateTopicHandler, isLoading: isUpdatingTopics } =
+    useUpdateTopics(canUpdateSchema);
   const Swal = useCustomAlert();
 
   const closeModal = () => {
-    reset();
+    reset(initialValues);
+    clearErrors();
+    removeTopicCache();
+
     dispatch({
       type: TopicsModalsActionsEnum.SHOW_UPDATE_TOPIC,
       payload: {
         open: false,
         hide: false,
+        canUpdateSchema: false,
         application: null,
         topic: null,
       },
@@ -88,7 +104,14 @@ export const useUpdateTopicEffects = () => {
   };
 
   const onUpdateTopics = () => {
-    queryClient.invalidateQueries(getTopicsControllerGetTopicsQueryKey());
+    if (canUpdateSchema) {
+      queryClient.invalidateQueries(
+        getTopicsControllerGetTopicsHistoryByIdQueryKey(topic.id)
+      );
+    } else {
+      queryClient.invalidateQueries(getTopicsControllerGetTopicsQueryKey());
+    }
+
     closeModal();
     Swal.fire({
       title: 'Success',
@@ -112,7 +135,6 @@ export const useUpdateTopicEffects = () => {
     const fomattedValues = {
       ...values,
       id: topic.id,
-      schemaType: schemaTypeOptionsByValue[values.schemaType].label,
     };
     updateTopicHandler(
       fomattedValues as PostTopicDto,
@@ -151,8 +173,10 @@ export const useUpdateTopicEffects = () => {
     control,
     onSubmit,
     buttonDisabled,
-    schemaTypeValue: schemaType,
     application,
     isUpdatingTopics,
+    isLoading,
+    canUpdateSchema,
+    getValues,
   };
 };

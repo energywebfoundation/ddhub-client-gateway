@@ -5,11 +5,8 @@ import {
   IamService,
 } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
 import { NoPrivateKeyException } from '../../storage/exceptions/no-private-key.exception';
-import { EnrolmentRepository } from '../../storage/repository/enrolment.repository';
-import { IdentityRepository } from '../../storage/repository/identity.repository';
 import { EnrolmentService } from '../../enrolment/service/enrolment.service';
 import {
-  BalanceState,
   Enrolment,
   Identity,
   IdentityWithEnrolment,
@@ -17,6 +14,13 @@ import {
 import { SecretsEngineService } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
 import { CommandBus } from '@nestjs/cqrs';
 import { RefreshKeysCommand } from '../../keys/command/refresh-keys.command';
+import { Span } from 'nestjs-otel';
+import {
+  BalanceState,
+  IdentityEntity,
+  IdentityRepositoryWrapper,
+} from '@dsb-client-gateway/dsb-client-gateway-storage';
+import { LoginCommand } from '../../dsb-client/module/did-auth/command/login.command';
 
 @Injectable()
 export class IdentityService {
@@ -24,13 +28,16 @@ export class IdentityService {
 
   constructor(
     protected readonly ethersService: EthersService,
-    protected readonly enrolmentRepository: EnrolmentRepository,
-    protected readonly identityRepository: IdentityRepository,
+    protected readonly wrapper: IdentityRepositoryWrapper,
     protected readonly secretsEngineService: SecretsEngineService,
     protected readonly iamService: IamService,
     protected readonly enrolmentService: EnrolmentService,
     protected readonly commandBus: CommandBus
   ) {}
+
+  public async removeIdentity(): Promise<void> {
+    await this.wrapper.identityRepository.clear();
+  }
 
   public async getClaims(): Promise<Claims> {
     return {
@@ -57,7 +64,10 @@ export class IdentityService {
     return !!identity;
   }
 
-  public async getIdentity(forceRefresh = false): Promise<Identity | null> {
+  @Span('getIdentity')
+  public async getIdentity(
+    forceRefresh = false
+  ): Promise<IdentityEntity | null> {
     if (forceRefresh) {
       const rootKey: string | null =
         await this.secretsEngineService.getPrivateKey();
@@ -68,7 +78,9 @@ export class IdentityService {
 
       const wallet = this.ethersService.getWalletFromPrivateKey(rootKey);
 
-      const balanceState = await this.ethersService.getBalance(wallet.address);
+      const balanceState: BalanceState = await this.ethersService.getBalance(
+        wallet.address
+      );
 
       return {
         publicKey: wallet.publicKey,
@@ -77,7 +89,7 @@ export class IdentityService {
       };
     }
 
-    const identity = this.identityRepository.getIdentity();
+    const identity = await this.wrapper.identityRepository.findOne();
 
     if (!identity) {
       return this.getIdentity(true);
@@ -86,21 +98,7 @@ export class IdentityService {
     return identity;
   }
 
-  public async getIdentityOrThrow(): Promise<Identity> {
-    const identity: Identity | null = this.identityRepository.getIdentity();
-
-    if (!identity) {
-      throw new NoPrivateKeyException();
-    }
-
-    const balanceState = await this.ethersService.getBalance(identity.address);
-
-    return {
-      ...identity,
-      balance: balanceState,
-    };
-  }
-
+  @Span('createIdentity')
   public async createIdentity(privateKey?: string): Promise<void> {
     privateKey = privateKey || this.ethersService.createPrivateKey();
 
@@ -112,7 +110,7 @@ export class IdentityService {
 
     this.logger.log(`Balance state: ${balanceState}`);
 
-    const publicIdentity: Identity = {
+    const publicIdentity: IdentityEntity = {
       publicKey: wallet.publicKey,
       balance: balanceState,
       address: wallet.address,
@@ -121,7 +119,7 @@ export class IdentityService {
     this.logger.log(`Obtained identity`);
     this.logger.log(publicIdentity);
 
-    await this.identityRepository.writeIdentity(publicIdentity);
+    await this.wrapper.identityRepository.createOne(publicIdentity);
 
     await this.secretsEngineService.setPrivateKey(privateKey);
 
@@ -137,22 +135,8 @@ export class IdentityService {
     }
 
     await this.commandBus.execute(new RefreshKeysCommand());
-  }
-
-  /**
-   *
-   * @param payload message paylaod stringified
-   * @returns signature (string of concatenated r+s+v)
-   */
-  public async signPayload(payload: string): Promise<string> {
-    this.logger.debug('signing payload');
-    this.logger.debug('fetching private key');
-    const privateKey = await this.secretsEngineService.getPrivateKey();
-    if (!privateKey) {
-      throw new NoPrivateKeyException();
-    }
-
-    const signer = this.ethersService.getWalletFromPrivateKey(privateKey);
-    return signer.signMessage(payload);
+    await this.commandBus.execute(
+      new LoginCommand(privateKey, this.iamService.getDIDAddress())
+    );
   }
 }

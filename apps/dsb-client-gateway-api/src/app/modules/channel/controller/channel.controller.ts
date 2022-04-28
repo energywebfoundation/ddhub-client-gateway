@@ -25,10 +25,10 @@ import {
   GetChannelResponseDto,
 } from '../dto/response/get-channel.dto';
 import { LokiMetadataStripInterceptor } from '../../utils/interceptors/loki-metadata-strip.interceptor';
-import { ChannelEntity } from '../entity/channel.entity';
 import { UpdateChannelDto } from '../dto/request/update-channel.dto';
 import { CommandBus } from '@nestjs/cqrs';
 import { RefreshAllChannelsCacheDataCommand } from '../command/refresh-all-channels-cache-data.command';
+import { ChannelEntity } from '@dsb-client-gateway/dsb-client-gateway-storage';
 
 @Controller('channels')
 @ApiTags('Channels')

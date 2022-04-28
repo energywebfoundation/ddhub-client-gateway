@@ -6,7 +6,7 @@ import {
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 
 export const useTopics = (owner: string) => {
-  const { data, isLoading } = useTopicsControllerGetTopics(
+  const { data, isLoading, isSuccess, isError } = useTopicsControllerGetTopics(
     { owner },
     {
       query: {
@@ -18,10 +18,12 @@ export const useTopics = (owner: string) => {
   const paginated = data ?? ({} as PaginatedResponse);
   const topics = paginated.records ?? ([] as GetTopicDto[]);
   const topicsById = keyBy(topics, 'id');
+  const topicsFetched = isSuccess && data !== undefined && !isError;
 
   return {
     topics,
     topicsById,
-    isLoading
+    isLoading,
+    topicsFetched
   };
 };

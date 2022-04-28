@@ -6,6 +6,7 @@ import {
 } from '../secrets-engine.interface';
 import { ConfigService } from '@nestjs/config';
 import nv from 'node-vault';
+import { Span } from 'nestjs-otel';
 
 enum PATHS {
   IDENTITY_PRIVATE_KEY = 'dsb/identity/privateKey',
@@ -24,6 +25,7 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
     super();
   }
 
+  @Span('vault_onModuleInit')
   public async onModuleInit(): Promise<void> {
     const vaultEndpoint: string = this.configService.get('VAULT_ENDPOINT');
 
@@ -94,6 +96,7 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
       });
   }
 
+  @Span('vault_setRSAKey')
   public async setRSAPrivateKey(privateKey: string): Promise<void> {
     this.logger.log('Attempting to write private RSA key');
 
@@ -102,6 +105,7 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
     this.logger.log('Writing private RSA key');
   }
 
+  @Span('vault_getRSAPrivateKey')
   public async getRSAPrivateKey(): Promise<string | null> {
     this.logger.log('Retrieving private RSA key');
 
@@ -131,6 +135,7 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
     this.logger.log('Writing certificate');
   }
 
+  @Span('vault_setPrivateKey')
   public async setPrivateKey(key: string): Promise<void> {
     this.logger.log('Attempting to write private key');
 
@@ -139,6 +144,7 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
     this.logger.log('Writing private key');
   }
 
+  @Span('vault_setEncryptionKeys')
   public async setEncryptionKeys(keys: EncryptionKeys): Promise<void> {
     await this.client.write(PATHS.KEYS, keys);
 

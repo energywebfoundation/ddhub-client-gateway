@@ -21,7 +21,7 @@ export const Swal = () => {
   const icons: Record<SweetAlertIcon, ReactElement> = {
     warning: <AlertCircle style={{ stroke: theme.palette.error.main }} />,
     success: <Check className={classes.successIcon} />,
-    error: <XCircle />,
+    error: <XCircle style={{ stroke: theme.palette.error.main }} />,
     question: <HelpCircle />,
     info: <Info />,
   };

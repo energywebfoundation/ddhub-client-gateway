@@ -12,7 +12,6 @@ import { useEditorEffects } from './Editor.effects';
 import { useStyles } from './Editor.styles';
 
 interface EditorProps {
-  language: string;
   field: GenericFormField;
   register: UseFormRegister<FieldValues>;
   control: Control<FieldValues>;
@@ -20,7 +19,7 @@ interface EditorProps {
 }
 
 export const Editor: FC<EditorProps> = memo(
-  ({ language, field, register, control, showPlaceholder = true }) => {
+  ({ field, register, control, showPlaceholder = true }) => {
     const { classes } = useStyles();
     const {
       isEditorReady,
@@ -56,7 +55,7 @@ export const Editor: FC<EditorProps> = memo(
                 <MonacoEditor
                   height="calc(100% - 19px)"
                   theme="vs-dark"
-                  language={language}
+                  language="json"
                   options={options}
                   onChange={(value: string | undefined) => {
                     onChange(value);

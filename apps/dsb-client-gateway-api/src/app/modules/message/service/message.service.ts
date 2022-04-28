@@ -8,11 +8,8 @@ import {
   uploadMessageBodyDto,
 } from '../dto/request/send-message.dto';
 import { GetMessagesDto } from '../dto/request/get-messages.dto';
-import { SymmetricKeysRepository } from '../repository/symmetric-keys.repository';
-import { SymmetricKeysCacheService } from './symmetric-keys-cache.service';
 import { ChannelService } from '../../channel/service/channel.service';
 import { TopicService } from '../../channel/service/topic.service';
-import { IdentityService } from '../../identity/service/identity.service';
 import { IsSchemaValid } from '../../utils/validator/decorators/IsSchemaValid';
 import { TopicNotFoundException } from '../exceptions/topic-not-found.exception';
 import { ChannelTypeNotPubException } from '../exceptions/channel-type-not-pub.exception';
@@ -31,15 +28,14 @@ import {
 } from '../message.interface';
 import { ChannelType } from '../../../modules/channel/channel.const';
 import { KeysService } from '../../keys/service/keys.service';
-// import { secretsEngineService } from 'libs/dsb-client-gateway-secrets-engine/src/lib/service/vault.service';
 import { v4 as uuidv4 } from 'uuid';
-import * as fs from 'fs';
-import { join } from 'path';
-import { CommandBus } from '@nestjs/cqrs';
 import { EncryptedMessageType } from '../../message/message.const';
 import { SecretsEngineService } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
-import { TopicEntity } from '../../channel/channel.interface';
-import { ChannelEntity } from '../../channel/entity/channel.entity';
+import {
+  ChannelEntity,
+  TopicEntity,
+} from '@dsb-client-gateway/dsb-client-gateway-storage';
+import { FileNotFoundException } from '../exceptions/file-not-found.exception';
 
 export enum EventEmitMode {
   SINGLE = 'SINGLE',
@@ -57,11 +53,7 @@ export class MessageService {
     protected readonly dsbApiService: DsbApiService,
     protected readonly channelService: ChannelService,
     protected readonly topicService: TopicService,
-    protected readonly identityService: IdentityService,
-    protected readonly keyService: KeysService,
-    protected readonly internalMessageRepository: SymmetricKeysRepository,
-    protected readonly commandBus: CommandBus,
-    protected readonly symmetricKeysCacheService: SymmetricKeysCacheService
+    protected readonly keyService: KeysService
   ) {}
 
   public async sendMessagesToSubscribers(
@@ -418,14 +410,23 @@ export class MessageService {
   ): Promise<DownloadMessageResponse> {
     //Calling download file API of message broker
     const fileResponse = await this.dsbApiService.downloadFile(fileId);
+    let decrypted: { data: string };
 
-    //getting file name from headers
-    let fileName = fileResponse.headers['content-disposition'].split('=')[1];
+    const regExpFilename = /filename="(?<filename>.*)"/;
+
+    //validating file name
+    let fileName: string | null =
+      regExpFilename.exec(fileResponse.headers['content-disposition'])?.groups
+        ?.filename ?? null;
+
+    if (!fileName) {
+      throw new FileNotFoundException('');
+    }
 
     fileName = fileName.replace(/"/g, '');
 
     //Verifying signature
-    const isSignatureValid = await this.keyService.verifySignature(
+    const isSignatureValid: boolean = await this.keyService.verifySignature(
       fileResponse.headers.ownerdid,
       fileResponse.headers.signature,
       fileResponse.data
@@ -439,7 +440,6 @@ export class MessageService {
       );
     } else {
       let decryptedMessage: string;
-      let decrypted: any;
 
       try {
         // Decrypting File Content
@@ -470,28 +470,14 @@ export class MessageService {
           'Decryted Message cannot be parsed to JSON object.'
         );
       }
-
-      const dir = __dirname + this.configService.get('FILES_DIRECTORY');
-
-      this.logger.debug(`Making directory files if doesn't exist`);
-      if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir);
-      }
-
-      this.logger.debug(
-        `Writing decrypted data to the file for file id:${fileId}`
-      );
-      await fs.writeFileSync(dir + fileName, Buffer.from(decrypted.data));
     }
 
     return {
-      filePath: join(
-        __dirname + this.configService.get('FILES_DIRECTORY') + fileName
-      ),
       fileName: fileName,
       sender: fileResponse.headers.ownerdid,
       signature: fileResponse.headers.signature,
       clientGatewayMessageId: fileResponse.headers.clientgatewaymessageid,
+      data: Buffer.from(decrypted.data),
     };
   }
 }

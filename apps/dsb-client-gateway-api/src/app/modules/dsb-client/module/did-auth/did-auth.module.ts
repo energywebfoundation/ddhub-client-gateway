@@ -3,6 +3,8 @@ import { HttpModule } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { DidAuthService } from './service/did-auth.service';
 import { DidAuthApiService } from './service/did-auth-api.service';
+import { LoginHandler } from './service/login.handler';
+import { SecretsEngineModule } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
 
 @Module({
   imports: [
@@ -17,8 +19,9 @@ import { DidAuthApiService } from './service/did-auth-api.service';
       },
       inject: [ConfigService],
     }),
+    SecretsEngineModule,
   ],
-  providers: [DidAuthService, DidAuthApiService],
+  providers: [DidAuthService, DidAuthApiService, LoginHandler],
   exports: [DidAuthService],
 })
 export class DidAuthModule {}

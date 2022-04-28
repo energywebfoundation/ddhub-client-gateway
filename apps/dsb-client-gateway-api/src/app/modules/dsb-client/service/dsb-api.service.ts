@@ -8,7 +8,6 @@ import { ConfigService } from '@nestjs/config';
 import { HttpService } from '@nestjs/axios';
 import { Agent } from 'https';
 import { TlsAgentService } from './tls-agent.service';
-import { EthersService } from '../../utils/service/ethers.service';
 import {
   ApplicationDTO,
   IamService,
@@ -23,18 +22,17 @@ import {
   SendInternalMessageResponse,
   SendMessageData,
   SendMessageResponse,
-  UpdateTopicBodyDTO,
   Topic,
   TopicDataResponse,
   TopicResultDTO,
   TopicVersion,
   TopicVersionResponse,
+  UpdateTopicBodyDTO,
   UpdateTopicHistoryDTO,
 } from '../dsb-client.interface';
 
 import promiseRetry from 'promise-retry';
 import FormData from 'form-data';
-import { EnrolmentRepository } from '../../storage/repository/enrolment.repository';
 import { DidAuthService } from '../module/did-auth/service/did-auth.service';
 import * as qs from 'qs';
 import 'multer';
@@ -44,6 +42,9 @@ import { isAxiosError } from '@nestjs/terminus/dist/utils';
 import { SecretsEngineService } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
 import { RoleStatus } from '@dsb-client-gateway/dsb-client-gateway/identity/models';
 import { OperationOptions } from 'retry';
+import { Span } from 'nestjs-otel';
+import { EnrolmentService } from '../../enrolment/service/enrolment.service';
+import { UnableToLoginException } from '../exceptions/unable-to-login.exception';
 
 export interface RetryOptions {
   stopOnStatusCodes?: HttpStatus[];
@@ -68,8 +69,7 @@ export class DsbApiService implements OnApplicationBootstrap {
     protected readonly configService: ConfigService,
     protected readonly httpService: HttpService,
     protected readonly tlsAgentService: TlsAgentService,
-    protected readonly ethersService: EthersService,
-    protected readonly enrolmentRepository: EnrolmentRepository,
+    protected readonly enrolmentService: EnrolmentService,
     protected readonly iamService: IamService,
     protected readonly secretsEngineService: SecretsEngineService,
     protected readonly didAuthService: DidAuthService,
@@ -82,13 +82,13 @@ export class DsbApiService implements OnApplicationBootstrap {
   }
 
   protected async request<T>(
-    requestFn: Observable<AxiosResponse<T>>,
+    requestFn: () => Observable<AxiosResponse<T>>,
     retryOptions: RetryOptions = {},
     overrideRetryConfig?: OperationOptions
   ): Promise<{ data: T; headers: any }> {
     const { data, headers } = await promiseRetry<AxiosResponse<T>>(
       async (retry) => {
-        return lastValueFrom(requestFn).catch((err) =>
+        return lastValueFrom(requestFn()).catch((err) =>
           this.handleRequestWithRetry(err, retry, retryOptions)
         );
       },
@@ -101,6 +101,7 @@ export class DsbApiService implements OnApplicationBootstrap {
     return { data, headers };
   }
 
+  @Span('ddhub_mb_getDIDsFromRoles')
   public async getDIDsFromRoles(
     roles: string[],
     searchType: 'ANY',
@@ -111,19 +112,20 @@ export class DsbApiService implements OnApplicationBootstrap {
     }
 
     const { data } = await this.request<{ dids: string[] }>(
-      this.httpService.get(this.baseUrl + '/roles/list', {
-        params: {
-          roles,
-          searchType,
-        },
-        paramsSerializer: (params) => {
-          return qs.stringify(params, { arrayFormat: 'repeat' });
-        },
-        httpsAgent: this.getTLS(),
-        headers: {
-          Authorization: `Bearer ${this.didAuthService.getToken()}`,
-        },
-      }),
+      () =>
+        this.httpService.get(this.baseUrl + '/roles/list', {
+          params: {
+            roles,
+            searchType,
+          },
+          paramsSerializer: (params) => {
+            return qs.stringify(params, { arrayFormat: 'repeat' });
+          },
+          httpsAgent: this.getTLS(),
+          headers: {
+            Authorization: `Bearer ${this.didAuthService.getToken()}`,
+          },
+        }),
       {},
       overrideRetry
     );
@@ -131,17 +133,19 @@ export class DsbApiService implements OnApplicationBootstrap {
     return data.dids;
   }
 
+  @Span('ddhub_mb_getTopicVersions')
   public async getTopicVersions(
     topicId: string
   ): Promise<TopicVersionResponse> {
     try {
       const result = await this.request<null>(
-        this.httpService.get(this.baseUrl + `/topics/${topicId}/version`, {
-          httpsAgent: this.getTLS(),
-          headers: {
-            Authorization: `Bearer ${this.didAuthService.getToken()}`,
-          },
-        }),
+        () =>
+          this.httpService.get(this.baseUrl + `/topics/${topicId}/versions`, {
+            httpsAgent: this.getTLS(),
+            headers: {
+              Authorization: `Bearer ${this.didAuthService.getToken()}`,
+            },
+          }),
         {
           stopOnResponseCodes: ['10'],
         }
@@ -161,16 +165,17 @@ export class DsbApiService implements OnApplicationBootstrap {
   ): Promise<boolean> {
     try {
       const result = await this.request<null>(
-        this.httpService.get(this.baseUrl + '/roles/check', {
-          params: {
-            did,
-            roles,
-          },
-          httpsAgent: this.getTLS(),
-          headers: {
-            Authorization: `Bearer ${this.didAuthService.getToken()}`,
-          },
-        }),
+        () =>
+          this.httpService.get(this.baseUrl + '/roles/check', {
+            params: {
+              did,
+              roles,
+            },
+            httpsAgent: this.getTLS(),
+            headers: {
+              Authorization: `Bearer ${this.didAuthService.getToken()}`,
+            },
+          }),
         {
           stopOnResponseCodes: ['10'],
         }
@@ -184,6 +189,7 @@ export class DsbApiService implements OnApplicationBootstrap {
     }
   }
 
+  @Span('ddhub_mb_downloadFile')
   public async uploadFile(
     file: Express.Multer.File,
     fqcns: string[],
@@ -211,15 +217,16 @@ export class DsbApiService implements OnApplicationBootstrap {
       }
 
       const result = await this.request<null>(
-        this.httpService.post(this.baseUrl + '/messages/upload', formData, {
-          maxContentLength: Infinity,
-          maxBodyLength: Infinity,
-          httpsAgent: this.getTLS(),
-          headers: {
-            Authorization: `Bearer ${this.didAuthService.getToken()}`,
-            ...formData.getHeaders(),
-          },
-        }),
+        () =>
+          this.httpService.post(this.baseUrl + '/messages/upload', formData, {
+            maxContentLength: Infinity,
+            maxBodyLength: Infinity,
+            httpsAgent: this.getTLS(),
+            headers: {
+              Authorization: `Bearer ${this.didAuthService.getToken()}`,
+              ...formData.getHeaders(),
+            },
+          }),
         {
           stopOnResponseCodes: ['10'],
         }
@@ -238,20 +245,22 @@ export class DsbApiService implements OnApplicationBootstrap {
     }
   }
 
+  @Span('ddhub_mb_downloadFile')
   public async downloadFile(
     fileId: string
   ): Promise<{ data: string; headers: any }> {
     try {
       const result = await this.request<null>(
-        this.httpService.get(this.baseUrl + '/messages/download', {
-          params: {
-            fileId,
-          },
-          httpsAgent: this.getTLS(),
-          headers: {
-            ...this.getAuthHeader(),
-          },
-        }),
+        () =>
+          this.httpService.get(this.baseUrl + '/messages/download', {
+            params: {
+              fileId,
+            },
+            httpsAgent: this.getTLS(),
+            headers: {
+              ...this.getAuthHeader(),
+            },
+          }),
         {
           stopOnResponseCodes: ['10'],
         }
@@ -270,22 +279,24 @@ export class DsbApiService implements OnApplicationBootstrap {
     }
   }
 
+  @Span('ddhub_mb_getTopicsByOwnerAndName')
   public async getTopicsByOwnerAndName(
     name: string,
     owner: string
   ): Promise<TopicDataResponse> {
     try {
       const { data } = await this.request<TopicDataResponse>(
-        this.httpService.get(this.baseUrl + '/topics', {
-          params: {
-            owner,
-            name,
-          },
-          httpsAgent: this.getTLS(),
-          headers: {
-            Authorization: `Bearer ${this.didAuthService.getToken()}`,
-          },
-        }),
+        () =>
+          this.httpService.get(this.baseUrl + '/topics', {
+            params: {
+              owner,
+              name,
+            },
+            httpsAgent: this.getTLS(),
+            headers: {
+              Authorization: `Bearer ${this.didAuthService.getToken()}`,
+            },
+          }),
         {
           stopOnResponseCodes: ['10'],
         }
@@ -304,6 +315,7 @@ export class DsbApiService implements OnApplicationBootstrap {
     }
   }
 
+  @Span('ddhub_mb_getApplicationsByOwnerAndRole')
   public async getApplicationsByOwnerAndRole(
     roleName: string
   ): Promise<ApplicationDTO[]> {
@@ -320,6 +332,7 @@ export class DsbApiService implements OnApplicationBootstrap {
     }
   }
 
+  @Span('ddhub_mb_getTopics')
   public async getTopics(
     limit: number,
     name: string,
@@ -329,19 +342,20 @@ export class DsbApiService implements OnApplicationBootstrap {
   ): Promise<TopicDataResponse> {
     try {
       const { data } = await this.request<TopicDataResponse>(
-        this.httpService.get(this.baseUrl + '/topics', {
-          params: {
-            limit,
-            name,
-            owner,
-            page,
-            tags,
-          },
-          httpsAgent: this.getTLS(),
-          headers: {
-            ...this.getAuthHeader(),
-          },
-        }),
+        () =>
+          this.httpService.get(this.baseUrl + '/topics', {
+            params: {
+              limit,
+              name,
+              owner,
+              page,
+              tags,
+            },
+            httpsAgent: this.getTLS(),
+            headers: {
+              ...this.getAuthHeader(),
+            },
+          }),
         {
           stopOnResponseCodes: ['10'],
         }
@@ -355,6 +369,7 @@ export class DsbApiService implements OnApplicationBootstrap {
     }
   }
 
+  @Span('ddhub_mb_getTopicsCountByOwner')
   public async getTopicsCountByOwner(owners: string[]): Promise<Topic[]> {
     if (!owners || owners.length === 0) {
       return [];
@@ -362,18 +377,19 @@ export class DsbApiService implements OnApplicationBootstrap {
 
     try {
       const result = await this.request<Topic[]>(
-        this.httpService.get(this.baseUrl + '/topics/count', {
-          params: {
-            owner: owners,
-          },
-          paramsSerializer: function (params) {
-            return qs.stringify(params, { arrayFormat: 'repeat' });
-          },
-          httpsAgent: this.getTLS(),
-          headers: {
-            Authorization: `Bearer ${this.didAuthService.getToken()}`,
-          },
-        }),
+        () =>
+          this.httpService.get(this.baseUrl + '/topics/count', {
+            params: {
+              owner: owners,
+            },
+            paramsSerializer: function (params) {
+              return qs.stringify(params, { arrayFormat: 'repeat' });
+            },
+            httpsAgent: this.getTLS(),
+            headers: {
+              Authorization: `Bearer ${this.didAuthService.getToken()}`,
+            },
+          }),
         {
           stopOnResponseCodes: ['10'],
         }
@@ -387,6 +403,7 @@ export class DsbApiService implements OnApplicationBootstrap {
     }
   }
 
+  @Span('ddhub_mb_getTopicsBySearch')
   public async getTopicsBySearch(
     keyword: string,
     limit?: number,
@@ -399,17 +416,18 @@ export class DsbApiService implements OnApplicationBootstrap {
 
     try {
       const result = await this.request<null>(
-        this.httpService.get(this.baseUrl + '/topics/search', {
-          params: {
-            keyword,
-            limit,
-            page,
-          },
-          httpsAgent: this.getTLS(),
-          headers: {
-            Authorization: `Bearer ${this.didAuthService.getToken()}`,
-          },
-        }),
+        () =>
+          this.httpService.get(this.baseUrl + '/topics/search', {
+            params: {
+              keyword,
+              limit,
+              page,
+            },
+            httpsAgent: this.getTLS(),
+            headers: {
+              Authorization: `Bearer ${this.didAuthService.getToken()}`,
+            },
+          }),
         {
           stopOnResponseCodes: ['10'],
         }
@@ -423,15 +441,17 @@ export class DsbApiService implements OnApplicationBootstrap {
     }
   }
 
+  @Span('ddhub_mb_getTopicHistoryById')
   public async getTopicHistoryById(id: string): Promise<TopicDataResponse> {
     try {
       const { data } = await this.request<TopicDataResponse>(
-        this.httpService.get(`${this.baseUrl}/topics/${id}/versions`, {
-          httpsAgent: this.getTLS(),
-          headers: {
-            ...this.getAuthHeader(),
-          },
-        }),
+        () =>
+          this.httpService.get(`${this.baseUrl}/topics/${id}/versions`, {
+            httpsAgent: this.getTLS(),
+            headers: {
+              ...this.getAuthHeader(),
+            },
+          }),
         {
           stopOnResponseCodes: ['10'],
         }
@@ -445,21 +465,23 @@ export class DsbApiService implements OnApplicationBootstrap {
     }
   }
 
+  @Span('ddhub_mb_getTopicHistoryByIdAndVersion')
   public async getTopicHistoryByIdAndVersion(
     id: string,
     version: string
   ): Promise<TopicDataResponse> {
     try {
       const { data } = await this.request<TopicDataResponse>(
-        this.httpService.get(
-          `${this.baseUrl}/topics/${id}/versions/${version}`,
-          {
-            httpsAgent: this.getTLS(),
-            headers: {
-              ...this.getAuthHeader(),
-            },
-          }
-        ),
+        () =>
+          this.httpService.get(
+            `${this.baseUrl}/topics/${id}/versions/${version}`,
+            {
+              httpsAgent: this.getTLS(),
+              headers: {
+                ...this.getAuthHeader(),
+              },
+            }
+          ),
         {
           stopOnResponseCodes: ['10'],
         }
@@ -481,12 +503,13 @@ export class DsbApiService implements OnApplicationBootstrap {
   public async postTopics(topicData: UpdateTopicBodyDTO): Promise<Topic> {
     try {
       const { data } = await this.request<null>(
-        this.httpService.post(this.baseUrl + '/topics', topicData, {
-          httpsAgent: this.getTLS(),
-          headers: {
-            ...this.getAuthHeader(),
-          },
-        }),
+        () =>
+          this.httpService.post(this.baseUrl + '/topics', topicData, {
+            httpsAgent: this.getTLS(),
+            headers: {
+              ...this.getAuthHeader(),
+            },
+          }),
         {
           stopOnResponseCodes: ['10'],
         }
@@ -501,6 +524,7 @@ export class DsbApiService implements OnApplicationBootstrap {
     }
   }
 
+  @Span('ddhub_mb_updateTopics')
   public async updateTopic(
     data: UpdateTopicBodyDTO,
     id: string
@@ -508,12 +532,13 @@ export class DsbApiService implements OnApplicationBootstrap {
     try {
       this.logger.log('topic to be updated', data);
       const result = await this.request<TopicResultDTO>(
-        this.httpService.put(`${this.baseUrl}/topics/${id}`, data, {
-          httpsAgent: this.getTLS(),
-          headers: {
-            ...this.getAuthHeader(),
-          },
-        }),
+        () =>
+          this.httpService.put(`${this.baseUrl}/topics/${id}`, data, {
+            httpsAgent: this.getTLS(),
+            headers: {
+              ...this.getAuthHeader(),
+            },
+          }),
         {
           stopOnResponseCodes: ['10'],
         }
@@ -528,6 +553,7 @@ export class DsbApiService implements OnApplicationBootstrap {
     }
   }
 
+  @Span('ddhub_mb_updateTopicByIdAndVersion')
   public async updateTopicByIdAndVersion(
     topicData: UpdateTopicHistoryDTO,
     id: string,
@@ -536,16 +562,17 @@ export class DsbApiService implements OnApplicationBootstrap {
     try {
       this.logger.log('topic data to be updated', topicData);
       const result = await this.request<TopicResultDTO>(
-        this.httpService.put(
-          `${this.baseUrl}/topics/${id}/versions/${versionNumber}`,
-          topicData,
-          {
-            httpsAgent: this.getTLS(),
-            headers: {
-              ...this.getAuthHeader(),
-            },
-          }
-        ),
+        () =>
+          this.httpService.put(
+            `${this.baseUrl}/topics/${id}/versions/${versionNumber}`,
+            topicData,
+            {
+              httpsAgent: this.getTLS(),
+              headers: {
+                ...this.getAuthHeader(),
+              },
+            }
+          ),
         {
           stopOnResponseCodes: ['10'],
         }
@@ -565,16 +592,18 @@ export class DsbApiService implements OnApplicationBootstrap {
     }
   }
 
+  @Span('ddhub_mb_deleteTopic')
   public async deleteTopic(id: string): Promise<TopicResultDTO> {
     try {
       this.logger.log('topic to be deleted', id);
       const result = await this.request<TopicResultDTO>(
-        this.httpService.delete(`${this.baseUrl}/topics/${id}`, {
-          httpsAgent: this.getTLS(),
-          headers: {
-            ...this.getAuthHeader(),
-          },
-        }),
+        () =>
+          this.httpService.delete(`${this.baseUrl}/topics/${id}`, {
+            httpsAgent: this.getTLS(),
+            headers: {
+              ...this.getAuthHeader(),
+            },
+          }),
         {
           stopOnResponseCodes: ['10'],
         }
@@ -589,6 +618,7 @@ export class DsbApiService implements OnApplicationBootstrap {
     }
   }
 
+  @Span('ddhub_mb_deleteTopicByVersion')
   public async deleteTopicByVersion(
     id: string,
     version: string
@@ -598,15 +628,16 @@ export class DsbApiService implements OnApplicationBootstrap {
         `topic to be deleted with version: ${version} and id:${id}`
       );
       const { data } = await this.request<TopicResultDTO>(
-        this.httpService.delete(
-          `${this.baseUrl}/topics/${id}/versions/${version}`,
-          {
-            httpsAgent: this.getTLS(),
-            headers: {
-              ...this.getAuthHeader(),
-            },
-          }
-        ),
+        () =>
+          this.httpService.delete(
+            `${this.baseUrl}/topics/${id}/versions/${version}`,
+            {
+              httpsAgent: this.getTLS(),
+              headers: {
+                ...this.getAuthHeader(),
+              },
+            }
+          ),
         {
           stopOnResponseCodes: ['10'],
         }
@@ -626,6 +657,7 @@ export class DsbApiService implements OnApplicationBootstrap {
     }
   }
 
+  @Span('ddhub_mb_messagesSearch')
   public async messagesSearch(
     topicId: string[],
     senderId: string[],
@@ -643,12 +675,17 @@ export class DsbApiService implements OnApplicationBootstrap {
 
     try {
       const result = await this.request<SearchMessageResponseDto[]>(
-        this.httpService.post(this.baseUrl + '/messages/search', requestBody, {
-          httpsAgent: this.getTLS(),
-          headers: {
-            ...this.getAuthHeader(),
-          },
-        }),
+        () =>
+          this.httpService.post(
+            this.baseUrl + '/messages/search',
+            requestBody,
+            {
+              httpsAgent: this.getTLS(),
+              headers: {
+                ...this.getAuthHeader(),
+              },
+            }
+          ),
         {
           stopOnResponseCodes: ['10'],
         }
@@ -663,6 +700,7 @@ export class DsbApiService implements OnApplicationBootstrap {
     }
   }
 
+  @Span('ddhub_mb_getMessages')
   public async getMessages(
     fqcn: string,
     from?: string,
@@ -671,18 +709,19 @@ export class DsbApiService implements OnApplicationBootstrap {
   ): Promise<Message[]> {
     try {
       const result = await this.request<null>(
-        this.httpService.get(this.baseUrl + '/messages', {
-          httpsAgent: this.getTLS(),
-          params: {
-            fqcn,
-            from,
-            clientId,
-            amount,
-          },
-          headers: {
-            ...this.getAuthHeader(),
-          },
-        }),
+        () =>
+          this.httpService.get(this.baseUrl + '/messages', {
+            httpsAgent: this.getTLS(),
+            params: {
+              fqcn,
+              from,
+              clientId,
+              amount,
+            },
+            headers: {
+              ...this.getAuthHeader(),
+            },
+          }),
         {
           stopOnResponseCodes: ['10'],
         }
@@ -697,6 +736,7 @@ export class DsbApiService implements OnApplicationBootstrap {
     }
   }
 
+  @Span('ddhub_mb_sendMessage')
   public async sendMessage(
     fqcns: string[],
     payload: string,
@@ -718,12 +758,13 @@ export class DsbApiService implements OnApplicationBootstrap {
 
     try {
       const result = await this.request<null>(
-        this.httpService.post(this.baseUrl + '/messages', messageData, {
-          httpsAgent: this.getTLS(),
-          headers: {
-            ...this.getAuthHeader(),
-          },
-        }),
+        () =>
+          this.httpService.post(this.baseUrl + '/messages', messageData, {
+            httpsAgent: this.getTLS(),
+            headers: {
+              ...this.getAuthHeader(),
+            },
+          }),
         {
           stopOnResponseCodes: ['10'],
         }
@@ -738,6 +779,7 @@ export class DsbApiService implements OnApplicationBootstrap {
     }
   }
 
+  @Span('ddhub_mb_sendMessageInternal')
   public async sendMessageInternal(
     fqcn: string,
     clientGatewayMessageId: string,
@@ -751,16 +793,17 @@ export class DsbApiService implements OnApplicationBootstrap {
 
     try {
       const result = await this.request<null>(
-        this.httpService.post(
-          this.baseUrl + '/messages/internal',
-          requestData,
-          {
-            httpsAgent: this.getTLS(),
-            headers: {
-              ...this.getAuthHeader(),
-            },
-          }
-        ),
+        () =>
+          this.httpService.post(
+            this.baseUrl + '/messages/internal',
+            requestData,
+            {
+              httpsAgent: this.getTLS(),
+              headers: {
+                ...this.getAuthHeader(),
+              },
+            }
+          ),
         {
           stopOnResponseCodes: ['10'],
         }
@@ -780,29 +823,35 @@ export class DsbApiService implements OnApplicationBootstrap {
     }
   }
 
+  @Span('ddhub_mb_getSymmetricKeys')
   public async getSymmetricKeys(
     dto: { clientId: string; amount: number },
     overrideRetry?: OperationOptions
   ): Promise<GetInternalMessageResponse[]> {
     try {
       const { data } = await this.request<null>(
-        this.httpService.post(this.baseUrl + '/messages/internal/search', dto, {
-          httpsAgent: this.getTLS(),
-          headers: {
-            ...this.getAuthHeader(),
-          },
-        }),
+        () =>
+          this.httpService.post(
+            this.baseUrl + '/messages/internal/search',
+            dto,
+            {
+              httpsAgent: this.getTLS(),
+              headers: {
+                ...this.getAuthHeader(),
+              },
+            }
+          ),
         {
           stopOnResponseCodes: ['10'],
         },
         overrideRetry
       );
 
-      this.logger.log(`get symmetric keys successful with dto: ${dto}`);
+      this.logger.log(`get symmetric keys successful with dto:`, dto);
 
       return data;
     } catch (e) {
-      this.logger.error(`get symmetric keys failed with dto: ${dto}`, e);
+      this.logger.error(`get symmetric keys failed with dto:`, dto, e);
       throw new Error(e);
     }
   }
@@ -858,10 +907,9 @@ export class DsbApiService implements OnApplicationBootstrap {
 
       await this.login();
 
-      return retry(e);
+      return retry();
     }
 
-    // return retry(e);
     throw e;
   }
 
@@ -882,24 +930,25 @@ export class DsbApiService implements OnApplicationBootstrap {
     return data;
   }
 
+  @Span('ddhub_mb_login')
   public async login(): Promise<void> {
-    const enrolment = this.enrolmentRepository.getEnrolment();
+    const enrolment = await this.enrolmentService.get();
 
     if (!enrolment) {
       this.logger.warn('Stopping login, enrolment is not enabled');
 
-      return;
+      throw new UnableToLoginException();
     }
 
     const hasRequiredRoles =
       enrolment.roles.filter(
-        (role) => role.required === true && role.status !== RoleStatus.SYNCED
+        (role) => role.required === true && role.status === RoleStatus.SYNCED
       ).length > 0;
 
-    if (hasRequiredRoles) {
+    if (!hasRequiredRoles) {
       this.logger.warn('Stopping login, roles are missing');
 
-      return;
+      throw new UnableToLoginException();
     }
 
     this.logger.log('Attempting to login to DID Auth Server');
@@ -966,20 +1015,22 @@ export class DsbApiService implements OnApplicationBootstrap {
     }
   }
 
+  @Span('ddhub_mb_initExtChannel')
   protected async initExtChannel(): Promise<void> {
     try {
       await this.request<null>(
-        this.httpService.post(
-          this.baseUrl + '/channel/initExtChannel',
-          {
-            httpsAgent: this.getTLS(),
-          },
-          {
-            headers: {
-              ...this.getAuthHeader(),
+        () =>
+          this.httpService.post(
+            this.baseUrl + '/channel/initExtChannel',
+            {
+              httpsAgent: this.getTLS(),
             },
-          }
-        ),
+            {
+              headers: {
+                ...this.getAuthHeader(),
+              },
+            }
+          ),
         {
           stopOnResponseCodes: ['10'],
         }
@@ -1014,12 +1065,16 @@ export class DsbApiService implements OnApplicationBootstrap {
   async getTopicById(topicId: string): Promise<TopicVersion | null> {
     try {
       const { data } = await this.request<TopicVersion | null>(
-        this.httpService.get(this.baseUrl + '/topics/' + topicId + '/version', {
-          httpsAgent: this.getTLS(),
-          headers: {
-            ...this.getAuthHeader(),
-          },
-        }),
+        () =>
+          this.httpService.get(
+            this.baseUrl + '/topics/' + topicId + '/versions',
+            {
+              httpsAgent: this.getTLS(),
+              headers: {
+                ...this.getAuthHeader(),
+              },
+            }
+          ),
         {
           stopOnResponseCodes: ['10'],
         }
@@ -1030,7 +1085,7 @@ export class DsbApiService implements OnApplicationBootstrap {
     } catch (e) {
       this.logger.error(`Get topic with topicId: ${topicId} failed`, e);
 
-      throw new Error(e);
+      return null;
     }
   }
 }

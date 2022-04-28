@@ -11,7 +11,6 @@ import { useCustomAlert } from '@dsb-client-gateway/ui/core';
 import { Queries } from '@dsb-client-gateway/ui/utils';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { validationSchema, fields } from '../../../models';
-import { schemaTypeOptionsByValue } from '../../../utils';
 import {
   useTopicsModalsStore,
   useTopicsModalsDispatch,
@@ -40,7 +39,6 @@ export const useCreateTopicEffects = () => {
     register,
     control,
     handleSubmit,
-    watch,
     formState: { isValid },
     reset,
   } = useForm<FieldValues>({
@@ -106,12 +104,8 @@ export const useCreateTopicEffects = () => {
 
   const topicSubmitHandler: SubmitHandler<FieldValues> = (data) => {
     const values = data as PostTopicBodyDto;
-    const fomattedValues = {
-      ...values,
-      schemaType: schemaTypeOptionsByValue[values.schemaType].label,
-    };
     createTopicHandler(
-      fomattedValues as PostTopicBodyDto,
+      values,
       onCreateTopic,
       onCreateTopicError
     );
@@ -119,19 +113,22 @@ export const useCreateTopicEffects = () => {
 
   const onSubmit = handleSubmit(topicSubmitHandler);
 
-  const openCancelModal = () => {
+  const openCancelModal = async () => {
     hideModal();
-    dispatch({
-      type: TopicsModalsActionsEnum.SHOW_CANCEL,
-      payload: {
-        open: true,
-        onConfirm: closeModal,
-        onCancel: showModal,
-      },
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: 'you will close create topic form',
+      type: 'warning',
+      showCancelButton: true,
     });
+
+    if (result.isConfirmed) {
+      closeModal();
+    } else {
+      showModal();
+    }
   };
 
-  const schemaTypeValue = watch('schemaType');
   const buttonDisabled = !isValid;
 
   return {
@@ -144,7 +141,6 @@ export const useCreateTopicEffects = () => {
     control,
     onSubmit,
     buttonDisabled,
-    schemaTypeValue,
     application,
     isCreatingTopic,
   };

@@ -90,5 +90,15 @@ export const useStyles = makeStyles()((theme) => ({
     lineHeight: '14px',
     fontWeight: 400,
     color: theme.palette.grey[400],
+  },
+  progress: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    left: 0,
+    top: 0,
+    bottom: 0,
+    width: '100%',
+    position: 'absolute'
   }
 }));

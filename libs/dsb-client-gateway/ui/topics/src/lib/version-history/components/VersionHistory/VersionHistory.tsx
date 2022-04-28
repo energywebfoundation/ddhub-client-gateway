@@ -6,7 +6,7 @@ import { VERSION_HISTORY_HEADERS } from '../../models/version-history-header';
 import { TopicInfo } from '../TopicInfo/TopicInfo';
 
 export function VersionHistory() {
-  const { applicationNamespace, topicHistory, topicId, actions } =
+  const { applicationNamespace, topicHistory, topicId, actions, topicHistoryLoaded } =
     useVersionHistoryEffects();
 
   return (
@@ -21,6 +21,7 @@ export function VersionHistory() {
             tableRows={topicHistory}
             showSearch={false}
             actions={actions}
+            loading={!topicHistoryLoaded}
           />
         </div>
       </Stack>

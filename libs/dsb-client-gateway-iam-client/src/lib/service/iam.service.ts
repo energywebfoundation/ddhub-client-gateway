@@ -15,6 +15,7 @@ import { Encoding } from '@ew-did-registry/did-resolver-interface';
 import { KeyType } from '@ew-did-registry/keys';
 import { ApplicationDTO, Claim } from '../iam.interface';
 import { RoleStatus } from '@dsb-client-gateway/dsb-client-gateway/identity/models';
+import { Span } from 'nestjs-otel';
 
 @Injectable()
 export class IamService {
@@ -31,6 +32,7 @@ export class IamService {
     protected readonly configService: ConfigService
   ) {}
 
+  @Span('iam_getClaimsWithStatus')
   public async getClaimsWithStatus(): Promise<Claim[]> {
     const claims: DIDClaim[] = await this.getClaims();
     const synchronizedToDIDClaims = await this.getUserClaimsFromDID();
@@ -68,14 +70,17 @@ export class IamService {
     return this.didRegistry;
   }
 
+  @Span('iam_getClaims')
   public async getClaims(): Promise<DIDClaim[]> {
     return this.cacheClient.getClaimsBySubject(this.getDIDAddress());
   }
 
+  @Span('iam_getUserClaimsFromDID')
   public async getUserClaimsFromDID() {
     return this.claimsService.getUserClaims();
   }
 
+  @Span('iam_setVerificationMethod')
   public async setVerificationMethod(
     publicKey: string,
     tag = 'dsb'
@@ -100,6 +105,7 @@ export class IamService {
     return this.cacheClient.getDIDsForRole(roleName);
   }
 
+  @Span('iam_setup')
   public async setup(privateKey: string) {
     this.logger.log('Initializing IAM connection');
 
@@ -118,10 +124,12 @@ export class IamService {
     return this.initialized;
   }
 
+  @Span('iam_getClaimById')
   public getClaimById(id: string): Promise<DIDClaim> {
     return this.claimsService.getClaimById(id);
   }
 
+  @Span('iam_getApplicationsByOwnerAndRole')
   public async getApplicationsByOwnerAndRole(
     roleName: string,
     ownerDid: string
@@ -189,12 +197,14 @@ export class IamService {
     })) as Promise<{ [key: string]: Claim }>;
   }
 
+  @Span('iam_publishPublicClaim')
   public async publishPublicClaim(token: string): Promise<void> {
     await this.claimsService.publishPublicClaim({
       claim: { token },
     });
   }
 
+  @Span('iam_requestClaim')
   public async requestClaim(claim: string): Promise<void> {
     const claimObject = {
       claim: {
@@ -213,6 +223,7 @@ export class IamService {
     await this.claimsService.createClaimRequest(claimObject);
   }
 
+  @Span('iam_getDid')
   public getDid(did?: string, includeClaims = false) {
     return this.didRegistry.getDidDocument({
       did,
