@@ -5,12 +5,12 @@ import {
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 
 export const useApplications = (role = 'topiccreator') => {
-  const { data, isLoading, isSuccess } =
+  const { data, isLoading, isSuccess, isError } =
     useApplicationsControllerGetApplications({
       roleName: role,
     });
   const applications = data ?? ([] as ApplicationDTO[]);
-  const applicationsFetched = isSuccess && data !== undefined;
+  const applicationsFetched = isSuccess && data !== undefined && !isError;
   const applicationsByNamespace = keyBy(applications, 'namespace');
 
   return {

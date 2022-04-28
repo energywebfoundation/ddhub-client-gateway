@@ -114,8 +114,5 @@ export const useStyles = makeStyles()((theme) => ({
     margin: '2px 3px',
     borderRadius: 4,
     background: alpha(theme.palette.primary.main, 0.12),
-  },
-  schemaWrapper: {
-    pointerEvents: 'none'
   }
 }));
