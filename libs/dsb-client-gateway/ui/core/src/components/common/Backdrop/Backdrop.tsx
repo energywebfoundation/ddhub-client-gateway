@@ -8,10 +8,14 @@ import {
 import { useStyles } from './Backdrop.styles';
 import { alpha } from '@mui/material/styles';
 
-export const Backdrop: FC = () => {
+interface BackdropProps {
+  open: boolean;
+}
+
+export const Backdrop: FC<BackdropProps> = ({ open }) => {
   const { classes, theme } = useStyles();
   return (
-    <MaterialBackdrop open={true} className={classes.root}>
+    <MaterialBackdrop open={open} className={classes.root}>
       <Box className={classes.wrapper}>
         <svg style={{ position: 'absolute' }}>
           <defs>
