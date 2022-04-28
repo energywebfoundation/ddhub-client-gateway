@@ -1,6 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { EthersService } from '../../../../utils/service/ethers.service';
-import { DidAuthResponse } from '../did-auth.interface';
 import { DidAuthApiService } from './did-auth-api.service';
 
 @Injectable()
@@ -24,33 +23,7 @@ export class DidAuthService {
 
     const proof = await this.ethersService.createProof(privateKey, did);
 
-    const response = await this.didAuthApiService
-      .login(proof)
-      .catch(async (e) => {
-        if (this.refreshToken) {
-          this.logger.log('Attempting to refresh token');
-
-          const refreshTokenData: DidAuthResponse | null =
-            await this.didAuthApiService.refreshToken(this.refreshToken);
-
-          if (!refreshTokenData) {
-            this.refreshToken = null;
-            this.accessToken = null;
-
-            throw e;
-          }
-
-          this.refreshToken = refreshTokenData.refresh_token;
-          this.accessToken = refreshTokenData.access_token;
-
-          return;
-        }
-
-        this.refreshToken = null;
-        this.accessToken = null;
-
-        throw e;
-      });
+    const response = await this.didAuthApiService.login(proof);
 
     if (!response) {
       throw new Error();

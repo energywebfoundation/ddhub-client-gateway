@@ -82,13 +82,13 @@ export class DsbApiService implements OnApplicationBootstrap {
   }
 
   protected async request<T>(
-    requestFn: Observable<AxiosResponse<T>>,
+    requestFn: () => Observable<AxiosResponse<T>>,
     retryOptions: RetryOptions = {},
     overrideRetryConfig?: OperationOptions
   ): Promise<{ data: T; headers: any }> {
     const { data, headers } = await promiseRetry<AxiosResponse<T>>(
       async (retry) => {
-        return lastValueFrom(requestFn).catch((err) =>
+        return lastValueFrom(requestFn()).catch((err) =>
           this.handleRequestWithRetry(err, retry, retryOptions)
         );
       },
@@ -112,19 +112,20 @@ export class DsbApiService implements OnApplicationBootstrap {
     }
 
     const { data } = await this.request<{ dids: string[] }>(
-      this.httpService.get(this.baseUrl + '/roles/list', {
-        params: {
-          roles,
-          searchType,
-        },
-        paramsSerializer: (params) => {
-          return qs.stringify(params, { arrayFormat: 'repeat' });
-        },
-        httpsAgent: this.getTLS(),
-        headers: {
-          Authorization: `Bearer ${this.didAuthService.getToken()}`,
-        },
-      }),
+      () =>
+        this.httpService.get(this.baseUrl + '/roles/list', {
+          params: {
+            roles,
+            searchType,
+          },
+          paramsSerializer: (params) => {
+            return qs.stringify(params, { arrayFormat: 'repeat' });
+          },
+          httpsAgent: this.getTLS(),
+          headers: {
+            Authorization: `Bearer ${this.didAuthService.getToken()}`,
+          },
+        }),
       {},
       overrideRetry
     );
@@ -138,12 +139,13 @@ export class DsbApiService implements OnApplicationBootstrap {
   ): Promise<TopicVersionResponse> {
     try {
       const result = await this.request<null>(
-        this.httpService.get(this.baseUrl + `/topics/${topicId}/versions`, {
-          httpsAgent: this.getTLS(),
-          headers: {
-            Authorization: `Bearer ${this.didAuthService.getToken()}`,
-          },
-        }),
+        () =>
+          this.httpService.get(this.baseUrl + `/topics/${topicId}/versions`, {
+            httpsAgent: this.getTLS(),
+            headers: {
+              Authorization: `Bearer ${this.didAuthService.getToken()}`,
+            },
+          }),
         {
           stopOnResponseCodes: ['10'],
         }
@@ -163,16 +165,17 @@ export class DsbApiService implements OnApplicationBootstrap {
   ): Promise<boolean> {
     try {
       const result = await this.request<null>(
-        this.httpService.get(this.baseUrl + '/roles/check', {
-          params: {
-            did,
-            roles,
-          },
-          httpsAgent: this.getTLS(),
-          headers: {
-            Authorization: `Bearer ${this.didAuthService.getToken()}`,
-          },
-        }),
+        () =>
+          this.httpService.get(this.baseUrl + '/roles/check', {
+            params: {
+              did,
+              roles,
+            },
+            httpsAgent: this.getTLS(),
+            headers: {
+              Authorization: `Bearer ${this.didAuthService.getToken()}`,
+            },
+          }),
         {
           stopOnResponseCodes: ['10'],
         }
@@ -214,15 +217,16 @@ export class DsbApiService implements OnApplicationBootstrap {
       }
 
       const result = await this.request<null>(
-        this.httpService.post(this.baseUrl + '/messages/upload', formData, {
-          maxContentLength: Infinity,
-          maxBodyLength: Infinity,
-          httpsAgent: this.getTLS(),
-          headers: {
-            Authorization: `Bearer ${this.didAuthService.getToken()}`,
-            ...formData.getHeaders(),
-          },
-        }),
+        () =>
+          this.httpService.post(this.baseUrl + '/messages/upload', formData, {
+            maxContentLength: Infinity,
+            maxBodyLength: Infinity,
+            httpsAgent: this.getTLS(),
+            headers: {
+              Authorization: `Bearer ${this.didAuthService.getToken()}`,
+              ...formData.getHeaders(),
+            },
+          }),
         {
           stopOnResponseCodes: ['10'],
         }
@@ -247,15 +251,16 @@ export class DsbApiService implements OnApplicationBootstrap {
   ): Promise<{ data: string; headers: any }> {
     try {
       const result = await this.request<null>(
-        this.httpService.get(this.baseUrl + '/messages/download', {
-          params: {
-            fileId,
-          },
-          httpsAgent: this.getTLS(),
-          headers: {
-            ...this.getAuthHeader(),
-          },
-        }),
+        () =>
+          this.httpService.get(this.baseUrl + '/messages/download', {
+            params: {
+              fileId,
+            },
+            httpsAgent: this.getTLS(),
+            headers: {
+              ...this.getAuthHeader(),
+            },
+          }),
         {
           stopOnResponseCodes: ['10'],
         }
@@ -281,16 +286,17 @@ export class DsbApiService implements OnApplicationBootstrap {
   ): Promise<TopicDataResponse> {
     try {
       const { data } = await this.request<TopicDataResponse>(
-        this.httpService.get(this.baseUrl + '/topics', {
-          params: {
-            owner,
-            name,
-          },
-          httpsAgent: this.getTLS(),
-          headers: {
-            Authorization: `Bearer ${this.didAuthService.getToken()}`,
-          },
-        }),
+        () =>
+          this.httpService.get(this.baseUrl + '/topics', {
+            params: {
+              owner,
+              name,
+            },
+            httpsAgent: this.getTLS(),
+            headers: {
+              Authorization: `Bearer ${this.didAuthService.getToken()}`,
+            },
+          }),
         {
           stopOnResponseCodes: ['10'],
         }
@@ -336,19 +342,20 @@ export class DsbApiService implements OnApplicationBootstrap {
   ): Promise<TopicDataResponse> {
     try {
       const { data } = await this.request<TopicDataResponse>(
-        this.httpService.get(this.baseUrl + '/topics', {
-          params: {
-            limit,
-            name,
-            owner,
-            page,
-            tags,
-          },
-          httpsAgent: this.getTLS(),
-          headers: {
-            ...this.getAuthHeader(),
-          },
-        }),
+        () =>
+          this.httpService.get(this.baseUrl + '/topics', {
+            params: {
+              limit,
+              name,
+              owner,
+              page,
+              tags,
+            },
+            httpsAgent: this.getTLS(),
+            headers: {
+              ...this.getAuthHeader(),
+            },
+          }),
         {
           stopOnResponseCodes: ['10'],
         }
@@ -370,18 +377,19 @@ export class DsbApiService implements OnApplicationBootstrap {
 
     try {
       const result = await this.request<Topic[]>(
-        this.httpService.get(this.baseUrl + '/topics/count', {
-          params: {
-            owner: owners,
-          },
-          paramsSerializer: function (params) {
-            return qs.stringify(params, { arrayFormat: 'repeat' });
-          },
-          httpsAgent: this.getTLS(),
-          headers: {
-            Authorization: `Bearer ${this.didAuthService.getToken()}`,
-          },
-        }),
+        () =>
+          this.httpService.get(this.baseUrl + '/topics/count', {
+            params: {
+              owner: owners,
+            },
+            paramsSerializer: function (params) {
+              return qs.stringify(params, { arrayFormat: 'repeat' });
+            },
+            httpsAgent: this.getTLS(),
+            headers: {
+              Authorization: `Bearer ${this.didAuthService.getToken()}`,
+            },
+          }),
         {
           stopOnResponseCodes: ['10'],
         }
@@ -408,17 +416,18 @@ export class DsbApiService implements OnApplicationBootstrap {
 
     try {
       const result = await this.request<null>(
-        this.httpService.get(this.baseUrl + '/topics/search', {
-          params: {
-            keyword,
-            limit,
-            page,
-          },
-          httpsAgent: this.getTLS(),
-          headers: {
-            Authorization: `Bearer ${this.didAuthService.getToken()}`,
-          },
-        }),
+        () =>
+          this.httpService.get(this.baseUrl + '/topics/search', {
+            params: {
+              keyword,
+              limit,
+              page,
+            },
+            httpsAgent: this.getTLS(),
+            headers: {
+              Authorization: `Bearer ${this.didAuthService.getToken()}`,
+            },
+          }),
         {
           stopOnResponseCodes: ['10'],
         }
@@ -436,12 +445,13 @@ export class DsbApiService implements OnApplicationBootstrap {
   public async getTopicHistoryById(id: string): Promise<TopicDataResponse> {
     try {
       const { data } = await this.request<TopicDataResponse>(
-        this.httpService.get(`${this.baseUrl}/topics/${id}/versions`, {
-          httpsAgent: this.getTLS(),
-          headers: {
-            ...this.getAuthHeader(),
-          },
-        }),
+        () =>
+          this.httpService.get(`${this.baseUrl}/topics/${id}/versions`, {
+            httpsAgent: this.getTLS(),
+            headers: {
+              ...this.getAuthHeader(),
+            },
+          }),
         {
           stopOnResponseCodes: ['10'],
         }
@@ -462,15 +472,16 @@ export class DsbApiService implements OnApplicationBootstrap {
   ): Promise<TopicDataResponse> {
     try {
       const { data } = await this.request<TopicDataResponse>(
-        this.httpService.get(
-          `${this.baseUrl}/topics/${id}/versions/${version}`,
-          {
-            httpsAgent: this.getTLS(),
-            headers: {
-              ...this.getAuthHeader(),
-            },
-          }
-        ),
+        () =>
+          this.httpService.get(
+            `${this.baseUrl}/topics/${id}/versions/${version}`,
+            {
+              httpsAgent: this.getTLS(),
+              headers: {
+                ...this.getAuthHeader(),
+              },
+            }
+          ),
         {
           stopOnResponseCodes: ['10'],
         }
@@ -492,12 +503,13 @@ export class DsbApiService implements OnApplicationBootstrap {
   public async postTopics(topicData: UpdateTopicBodyDTO): Promise<Topic> {
     try {
       const { data } = await this.request<null>(
-        this.httpService.post(this.baseUrl + '/topics', topicData, {
-          httpsAgent: this.getTLS(),
-          headers: {
-            ...this.getAuthHeader(),
-          },
-        }),
+        () =>
+          this.httpService.post(this.baseUrl + '/topics', topicData, {
+            httpsAgent: this.getTLS(),
+            headers: {
+              ...this.getAuthHeader(),
+            },
+          }),
         {
           stopOnResponseCodes: ['10'],
         }
@@ -520,12 +532,13 @@ export class DsbApiService implements OnApplicationBootstrap {
     try {
       this.logger.log('topic to be updated', data);
       const result = await this.request<TopicResultDTO>(
-        this.httpService.put(`${this.baseUrl}/topics/${id}`, data, {
-          httpsAgent: this.getTLS(),
-          headers: {
-            ...this.getAuthHeader(),
-          },
-        }),
+        () =>
+          this.httpService.put(`${this.baseUrl}/topics/${id}`, data, {
+            httpsAgent: this.getTLS(),
+            headers: {
+              ...this.getAuthHeader(),
+            },
+          }),
         {
           stopOnResponseCodes: ['10'],
         }
@@ -549,16 +562,17 @@ export class DsbApiService implements OnApplicationBootstrap {
     try {
       this.logger.log('topic data to be updated', topicData);
       const result = await this.request<TopicResultDTO>(
-        this.httpService.put(
-          `${this.baseUrl}/topics/${id}/versions/${versionNumber}`,
-          topicData,
-          {
-            httpsAgent: this.getTLS(),
-            headers: {
-              ...this.getAuthHeader(),
-            },
-          }
-        ),
+        () =>
+          this.httpService.put(
+            `${this.baseUrl}/topics/${id}/versions/${versionNumber}`,
+            topicData,
+            {
+              httpsAgent: this.getTLS(),
+              headers: {
+                ...this.getAuthHeader(),
+              },
+            }
+          ),
         {
           stopOnResponseCodes: ['10'],
         }
@@ -583,12 +597,13 @@ export class DsbApiService implements OnApplicationBootstrap {
     try {
       this.logger.log('topic to be deleted', id);
       const result = await this.request<TopicResultDTO>(
-        this.httpService.delete(`${this.baseUrl}/topics/${id}`, {
-          httpsAgent: this.getTLS(),
-          headers: {
-            ...this.getAuthHeader(),
-          },
-        }),
+        () =>
+          this.httpService.delete(`${this.baseUrl}/topics/${id}`, {
+            httpsAgent: this.getTLS(),
+            headers: {
+              ...this.getAuthHeader(),
+            },
+          }),
         {
           stopOnResponseCodes: ['10'],
         }
@@ -613,15 +628,16 @@ export class DsbApiService implements OnApplicationBootstrap {
         `topic to be deleted with version: ${version} and id:${id}`
       );
       const { data } = await this.request<TopicResultDTO>(
-        this.httpService.delete(
-          `${this.baseUrl}/topics/${id}/versions/${version}`,
-          {
-            httpsAgent: this.getTLS(),
-            headers: {
-              ...this.getAuthHeader(),
-            },
-          }
-        ),
+        () =>
+          this.httpService.delete(
+            `${this.baseUrl}/topics/${id}/versions/${version}`,
+            {
+              httpsAgent: this.getTLS(),
+              headers: {
+                ...this.getAuthHeader(),
+              },
+            }
+          ),
         {
           stopOnResponseCodes: ['10'],
         }
@@ -659,12 +675,17 @@ export class DsbApiService implements OnApplicationBootstrap {
 
     try {
       const result = await this.request<SearchMessageResponseDto[]>(
-        this.httpService.post(this.baseUrl + '/messages/search', requestBody, {
-          httpsAgent: this.getTLS(),
-          headers: {
-            ...this.getAuthHeader(),
-          },
-        }),
+        () =>
+          this.httpService.post(
+            this.baseUrl + '/messages/search',
+            requestBody,
+            {
+              httpsAgent: this.getTLS(),
+              headers: {
+                ...this.getAuthHeader(),
+              },
+            }
+          ),
         {
           stopOnResponseCodes: ['10'],
         }
@@ -688,18 +709,19 @@ export class DsbApiService implements OnApplicationBootstrap {
   ): Promise<Message[]> {
     try {
       const result = await this.request<null>(
-        this.httpService.get(this.baseUrl + '/messages', {
-          httpsAgent: this.getTLS(),
-          params: {
-            fqcn,
-            from,
-            clientId,
-            amount,
-          },
-          headers: {
-            ...this.getAuthHeader(),
-          },
-        }),
+        () =>
+          this.httpService.get(this.baseUrl + '/messages', {
+            httpsAgent: this.getTLS(),
+            params: {
+              fqcn,
+              from,
+              clientId,
+              amount,
+            },
+            headers: {
+              ...this.getAuthHeader(),
+            },
+          }),
         {
           stopOnResponseCodes: ['10'],
         }
@@ -736,12 +758,13 @@ export class DsbApiService implements OnApplicationBootstrap {
 
     try {
       const result = await this.request<null>(
-        this.httpService.post(this.baseUrl + '/messages', messageData, {
-          httpsAgent: this.getTLS(),
-          headers: {
-            ...this.getAuthHeader(),
-          },
-        }),
+        () =>
+          this.httpService.post(this.baseUrl + '/messages', messageData, {
+            httpsAgent: this.getTLS(),
+            headers: {
+              ...this.getAuthHeader(),
+            },
+          }),
         {
           stopOnResponseCodes: ['10'],
         }
@@ -770,16 +793,17 @@ export class DsbApiService implements OnApplicationBootstrap {
 
     try {
       const result = await this.request<null>(
-        this.httpService.post(
-          this.baseUrl + '/messages/internal',
-          requestData,
-          {
-            httpsAgent: this.getTLS(),
-            headers: {
-              ...this.getAuthHeader(),
-            },
-          }
-        ),
+        () =>
+          this.httpService.post(
+            this.baseUrl + '/messages/internal',
+            requestData,
+            {
+              httpsAgent: this.getTLS(),
+              headers: {
+                ...this.getAuthHeader(),
+              },
+            }
+          ),
         {
           stopOnResponseCodes: ['10'],
         }
@@ -806,12 +830,17 @@ export class DsbApiService implements OnApplicationBootstrap {
   ): Promise<GetInternalMessageResponse[]> {
     try {
       const { data } = await this.request<null>(
-        this.httpService.post(this.baseUrl + '/messages/internal/search', dto, {
-          httpsAgent: this.getTLS(),
-          headers: {
-            ...this.getAuthHeader(),
-          },
-        }),
+        () =>
+          this.httpService.post(
+            this.baseUrl + '/messages/internal/search',
+            dto,
+            {
+              httpsAgent: this.getTLS(),
+              headers: {
+                ...this.getAuthHeader(),
+              },
+            }
+          ),
         {
           stopOnResponseCodes: ['10'],
         },
@@ -878,10 +907,9 @@ export class DsbApiService implements OnApplicationBootstrap {
 
       await this.login();
 
-      return retry(e);
+      return retry();
     }
 
-    // return retry(e);
     throw e;
   }
 
@@ -991,17 +1019,18 @@ export class DsbApiService implements OnApplicationBootstrap {
   protected async initExtChannel(): Promise<void> {
     try {
       await this.request<null>(
-        this.httpService.post(
-          this.baseUrl + '/channel/initExtChannel',
-          {
-            httpsAgent: this.getTLS(),
-          },
-          {
-            headers: {
-              ...this.getAuthHeader(),
+        () =>
+          this.httpService.post(
+            this.baseUrl + '/channel/initExtChannel',
+            {
+              httpsAgent: this.getTLS(),
             },
-          }
-        ),
+            {
+              headers: {
+                ...this.getAuthHeader(),
+              },
+            }
+          ),
         {
           stopOnResponseCodes: ['10'],
         }
@@ -1036,15 +1065,16 @@ export class DsbApiService implements OnApplicationBootstrap {
   async getTopicById(topicId: string): Promise<TopicVersion | null> {
     try {
       const { data } = await this.request<TopicVersion | null>(
-        this.httpService.get(
-          this.baseUrl + '/topics/' + topicId + '/versions',
-          {
-            httpsAgent: this.getTLS(),
-            headers: {
-              ...this.getAuthHeader(),
-            },
-          }
-        ),
+        () =>
+          this.httpService.get(
+            this.baseUrl + '/topics/' + topicId + '/versions',
+            {
+              httpsAgent: this.getTLS(),
+              headers: {
+                ...this.getAuthHeader(),
+              },
+            }
+          ),
         {
           stopOnResponseCodes: ['10'],
         }
