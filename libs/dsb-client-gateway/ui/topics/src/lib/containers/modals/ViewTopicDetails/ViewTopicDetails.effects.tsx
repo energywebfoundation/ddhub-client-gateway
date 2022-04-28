@@ -1,10 +1,11 @@
 import { useTopicVersion } from '@dsb-client-gateway/ui/api-hooks';
+import { downloadJson } from '@dsb-client-gateway/ui/utils';
 import {
   useTopicsModalsStore,
   useTopicsModalsDispatch,
   TopicsModalsActionsEnum,
 } from '../../../context';
-import { downloadJson, fields } from './ViewTopicDetails.utils';
+import { fields } from './ViewTopicDetails.utils';
 
 export const useViewTopicDetailsEffects = () => {
   const {
@@ -24,6 +25,7 @@ export const useViewTopicDetailsEffects = () => {
         open: false,
         topic: null,
         application: null,
+        canUpdateSchema: false,
       },
     });
   };
@@ -35,6 +37,7 @@ export const useViewTopicDetailsEffects = () => {
       payload: {
         open: true,
         hide: false,
+        canUpdateSchema: true,
         application,
         topic,
       },

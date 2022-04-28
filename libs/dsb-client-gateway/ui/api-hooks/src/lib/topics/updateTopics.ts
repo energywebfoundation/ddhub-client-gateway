@@ -1,21 +1,29 @@
 import {
   PostTopicDto,
+  UpdateTopicBodyDto,
+  UpdateTopicHistoryBodyDto,
   useTopicsControllerUpdateTopics,
+  useTopicsControllerUpdateTopicsByIdAndVersion,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 
-export const useUpdateTopics = () => {
-  const { mutate, isLoading } = useTopicsControllerUpdateTopics();
+export const useUpdateTopics = (canUpdateSchema: boolean) => {
+  const { mutate: mutateTopic, isLoading: topicMutationLoading } =
+    useTopicsControllerUpdateTopics();
+  const {
+    mutate: mutateTopicByVersion,
+    isLoading: topicVersionByMutationLoading,
+  } = useTopicsControllerUpdateTopicsByIdAndVersion();
 
-  const updateTopicHandler = (
+  const updateTopic = (
     topic: PostTopicDto,
     onSuccess: () => void,
     onError: () => void
   ) => {
-    const { id, ...rest } = topic;
-    mutate(
+    const { id, tags } = topic;
+    mutateTopic(
       {
-        id: topic.id,
-        data: rest,
+        id,
+        data: { tags } as UpdateTopicBodyDto,
       },
       {
         onSuccess,
@@ -23,6 +31,30 @@ export const useUpdateTopics = () => {
       }
     );
   };
+
+  const updateTopicByVersion = (
+    topic: PostTopicDto,
+    onSuccess: () => void,
+    onError: () => void
+  ) => {
+    const { id, version, schema } = topic;
+    mutateTopicByVersion(
+      {
+        id,
+        versionNumber: version,
+        data: { schema } as UpdateTopicHistoryBodyDto,
+      },
+      {
+        onSuccess,
+        onError,
+      }
+    );
+  };
+
+  const updateTopicHandler = canUpdateSchema
+    ? updateTopicByVersion
+    : updateTopic;
+  const isLoading = topicMutationLoading || topicVersionByMutationLoading;
 
   return {
     updateTopicHandler,

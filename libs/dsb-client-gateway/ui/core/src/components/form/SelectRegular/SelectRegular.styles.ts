@@ -11,6 +11,9 @@ export const useStyles = makeStyles()((theme) => ({
       fontSize: 12,
       lineHeight: '24px',
       fontWeight: 400,
+      '&.Mui-disabled .MuiOutlinedInput-notchedOutline': {
+        border: `1px solid ${theme.palette.grey[500]}`,
+      }
     },
     '& .MuiSelect-select': {
       padding: '8px 10px 8px 15px',

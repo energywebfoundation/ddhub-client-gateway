@@ -11,7 +11,10 @@ export const useStyles = makeStyles()((theme) => ({
       fontSize: 12,
       lineHeight: '24px',
       fontWeight: 400,
-      padding: '4px 0 4px 12px'
+      padding: '4px 0 4px 12px',
+      '&.Mui-disabled .MuiOutlinedInput-notchedOutline': {
+        border: `1px solid ${theme.palette.grey[500]}`,
+      }
     },
     '& .MuiOutlinedInput-notchedOutline': {
       border: `1px solid ${theme.palette.grey[500]}`,
@@ -22,6 +25,9 @@ export const useStyles = makeStyles()((theme) => ({
       minHeight: 22,
       fontFamily: theme.typography.body2.fontFamily,
       marginLeft: 3,
+      '&.Mui-disabled': {
+        WebkitTextFillColor: theme.palette.grey[500],
+      },
       '&::placeholder': {
         fontSize: 12,
         lineHeight: '24px',

@@ -17,6 +17,7 @@ import {
   FormInput,
   FormSelect,
   Editor,
+  EditorView,
 } from '@dsb-client-gateway/ui/core';
 import { ApplicationInfo } from '../../../components';
 import { useUpdateTopicEffects } from './UpdateTopic.effects';
@@ -37,6 +38,8 @@ export const UpdateTopic: FC = () => {
     application,
     isUpdatingTopics,
     isLoading,
+    canUpdateSchema,
+    getValues,
   } = useUpdateTopicEffects();
 
   return (
@@ -47,7 +50,6 @@ export const UpdateTopic: FC = () => {
       className={classes.root}
       classes={{ paper: classes.paper, container: classes.container }}
       style={{ visibility: hide ? 'hidden' : 'visible' }}
-
     >
       {isLoading ? (
         <Box className={classes.progress}>
@@ -77,7 +79,7 @@ export const UpdateTopic: FC = () => {
                       field={fields.version}
                       register={register}
                       variant="outlined"
-                      disabled
+                      disabled={!canUpdateSchema}
                     />
                   </Box>
                   <Box mb={2.7}>
@@ -86,6 +88,7 @@ export const UpdateTopic: FC = () => {
                       register={register}
                       control={control}
                       variant="outlined"
+                      disabled={canUpdateSchema}
                     />
                   </Box>
                   <Box mb={2.7}>
@@ -98,12 +101,16 @@ export const UpdateTopic: FC = () => {
                     />
                   </Box>
                   <Box mb={2.7}>
-                    <Editor
-                      field={fields.schema}
-                      register={register}
-                      control={control}
-                      showPlaceholder={false}
-                    />
+                    {canUpdateSchema ? (
+                      <Editor
+                        field={fields.schema}
+                        register={register}
+                        control={control}
+                        showPlaceholder={false}
+                      />
+                    ) : (
+                      <EditorView value={getValues(fields.schema.name)} />
+                    )}
                   </Box>
                 </Grid>
               </Grid>
