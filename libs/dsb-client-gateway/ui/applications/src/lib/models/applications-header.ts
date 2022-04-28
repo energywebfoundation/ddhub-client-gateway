@@ -1,10 +1,11 @@
-import { AppImageWithWrapper, AppNamespace } from '@dsb-client-gateway/ui/core';
+import { AppImageWithWrapper } from '@dsb-client-gateway/ui/core';
+import { AppNamespace } from '../AppNamespace';
 
 export const APPLICATIONS_HEADERS = [
   {
     accessor: 'logoUrl',
     Cell: AppImageWithWrapper,
-    width: '50px'
+    width: '50px',
   },
   {
     Header: 'APPLICATION NAME',
@@ -15,7 +16,7 @@ export const APPLICATIONS_HEADERS = [
     Header: 'APPLICATION NAMESPACE',
     accessor: 'namespace',
     filter: 'fuzzyText',
-    Cell: AppNamespace
+    Cell: AppNamespace,
   },
   {
     Header: 'NO. OF TOPICS',
