@@ -10,7 +10,7 @@ COPY . .
 
 ENV NODE_ENV=$NODE_ENV
 
-RUN npm install --quiet --no-progress -g nx && \
+RUN npm install --quiet --no-progress -g nx npm@8.5.0 && \
     npm ci --quiet --no-progress
 
 CMD ["nx", "serve", "dsb-client-gateway-frontend"]
