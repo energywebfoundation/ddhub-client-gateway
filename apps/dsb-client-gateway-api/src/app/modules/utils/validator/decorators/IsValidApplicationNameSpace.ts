@@ -20,9 +20,7 @@ export function IsValidApplicationNameSpace(
           const applicationNameSpacePattern: string = configService.get(
             'APPLICATION_NAMESPACE_REGULAR_EXPRESSION'
           );
-          if (value.includes('"')) {
-            return false;
-          } else if (typeof value === 'string' && value.length > 0) {
+          if (typeof value === 'string' && value.length > 0) {
             return !!value.match(new RegExp(applicationNameSpacePattern));
           }
           return false;
