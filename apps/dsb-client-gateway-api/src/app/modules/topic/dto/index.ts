@@ -14,6 +14,7 @@ import {
 import { IsValidApplicationNameSpace } from '../../utils/validator/decorators/IsValidApplicationNameSpace';
 import { IsValidTopicName } from '../../utils/validator/decorators/isValidTopicName';
 import { ConfigService } from '@nestjs/config';
+import { IsValidVersion } from '../../utils/validator/decorators/isValidVersion';
 export class GetTopicDto {
   constructor(protected readonly configService: ConfigService) {}
 
@@ -592,6 +593,9 @@ export class PostTopicBodyDto {
   })
   schema: string;
 
+  @IsValidVersion({
+    message: 'Malformed version.',
+  })
   @IsString()
   @IsNotEmpty()
   @ApiProperty({
