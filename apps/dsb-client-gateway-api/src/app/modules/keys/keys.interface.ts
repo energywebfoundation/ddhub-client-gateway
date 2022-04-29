@@ -3,3 +3,9 @@ export interface KeysEntity {
   payload: string;
   senderDid: string;
 }
+
+export interface DidKeys {
+  did: string;
+  publicRSAKey: string;
+  publicSignatureKey: string;
+}

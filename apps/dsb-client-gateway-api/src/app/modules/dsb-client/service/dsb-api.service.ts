@@ -93,7 +93,7 @@ export class DsbApiService implements OnApplicationBootstrap {
         );
       },
       {
-        ...this.retryConfigService,
+        ...this.retryConfigService.config,
         ...overrideRetryConfig,
       }
     );

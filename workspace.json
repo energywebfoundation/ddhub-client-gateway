@@ -2,6 +2,7 @@
   "version": 2,
   "projects": {
     "ddhub-client-gateway-tracing": "libs/ddhub-client-gateway-tracing",
+    "ddhub-client-gateway-utils": "libs/ddhub-client-gateway-utils",
     "dsb-client-gateway-api": "apps/dsb-client-gateway-api",
     "dsb-client-gateway-api-client": "libs/dsb-client-gateway-api-client",
     "dsb-client-gateway-api-e2e": "apps/dsb-client-gateway-api-e2e",
