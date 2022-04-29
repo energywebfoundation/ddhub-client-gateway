@@ -35,7 +35,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-node@v2-beta
         with:
-          node-version: '16.10.0'
+          node-version: '16.14.2'
       - name: Setup app dependencies
         uses: actions/setup-node@v1
         with:
@@ -52,10 +52,10 @@ jobs:
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
             ${{ runner.os }}-
-      - name: Install NX
-        run: npm install -g nx
+      - name: Install NX, NPM
+        run: npm install -g nx npm@8.5.0
       - name: Install dependencies
-        run: npm install
+        run: npm ci
       - name: Build
         run: nx build dsb-client-gateway-api
 
@@ -100,7 +100,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-node@v2-beta
         with:
-          node-version: '16.10.0'
+          node-version: '16.14.2'
       - name: Setup app dependencies
         uses: actions/setup-node@v1
         with:
@@ -117,10 +117,10 @@ jobs:
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
             ${{ runner.os }}-
-      - name: Install NX
-        run: npm install -g nx
+      - name: Install NX, NPM
+        run: npm install -g nx npm@8.5.0
       - name: Install dependencies
-        run: npm install
+        run: npm ci
       - name: Build
         run: npm run export
 

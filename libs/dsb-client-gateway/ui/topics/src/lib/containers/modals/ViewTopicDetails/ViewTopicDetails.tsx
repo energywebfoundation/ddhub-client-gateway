@@ -74,7 +74,7 @@ export const ViewTopicDetails: FC = () => {
                 {fields.map((field) => (
                   <TopicDetail key={field.value} topic={topic} field={field} />
                 ))}
-                <Box className={classes.schemaWrapper}>
+                <Box>
                   <Typography
                     style={{ marginBottom: 7 }}
                     className={classes.detailsInfoLabel}

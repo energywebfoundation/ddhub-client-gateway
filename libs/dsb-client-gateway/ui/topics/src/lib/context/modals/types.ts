@@ -15,6 +15,7 @@ type TUpdateTopic = {
   hide: boolean;
   topic: GetTopicDto;
   application: ApplicationDTO;
+  canUpdateSchema?: boolean;
 };
 
 type TTopicDetails = {

@@ -5,6 +5,7 @@ import { useCustomAlert } from '@dsb-client-gateway/ui/core';
 import {
   PostTopicDto,
   getTopicsControllerGetTopicsQueryKey,
+  getTopicsControllerGetTopicsHistoryByIdQueryKey,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import {
   useUpdateTopics,
@@ -18,28 +19,28 @@ import {
   TopicsModalsActionsEnum,
 } from '../../../context';
 
+const initialValues = {
+  name: '',
+  owner: '',
+  schemaType: '',
+  schema: '',
+  tags: [] as string[],
+  version: '',
+};
+
 export const useUpdateTopicEffects = () => {
   const queryClient = useQueryClient();
   const {
-    updateTopic: { open, hide, application, topic },
+    updateTopic: { open, hide, application, topic, canUpdateSchema },
   } = useTopicsModalsStore();
   const dispatch = useTopicsModalsDispatch();
 
   const {
     topic: topicWithSchema,
+    remove: removeTopicCache,
+    isSuccess: topicLoaded,
     isLoading,
-    isSuccess,
-    remove,
   } = useTopicVersion(topic?.id, topic?.version);
-
-  const initialValues = {
-    name: '',
-    owner: '',
-    schemaType: '',
-    schema: '',
-    tags: [] as string[],
-    version: '',
-  };
 
   const {
     register,
@@ -48,6 +49,7 @@ export const useUpdateTopicEffects = () => {
     formState: { isValid },
     reset,
     setValue,
+    getValues,
     clearErrors,
     trigger,
   } = useForm<FieldValues>({
@@ -57,34 +59,30 @@ export const useUpdateTopicEffects = () => {
   });
 
   useEffect(() => {
-    if (!isSuccess) return;
+    if (!topicLoaded) return;
     Object.entries(topicWithSchema).forEach(([name, value]) => {
       setValue(name, value);
     });
     trigger();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSuccess, JSON.stringify(topicWithSchema)]);
+  }, [topicLoaded, JSON.stringify(topicWithSchema)]);
 
-  const { updateTopicHandler, isLoading: isUpdatingTopics } = useUpdateTopics();
+  const { updateTopicHandler, isLoading: isUpdatingTopics } =
+    useUpdateTopics(canUpdateSchema);
   const Swal = useCustomAlert();
 
   const closeModal = () => {
-    reset({
-      name: '',
-      owner: '',
-      schema: '',
-      schemaType: '',
-      tags: [],
-      version: '',
-    });
+    reset(initialValues);
     clearErrors();
-    remove();
+    removeTopicCache();
+
     dispatch({
       type: TopicsModalsActionsEnum.SHOW_UPDATE_TOPIC,
       payload: {
         open: false,
         hide: false,
+        canUpdateSchema: false,
         application: null,
         topic: null,
       },
@@ -106,7 +104,14 @@ export const useUpdateTopicEffects = () => {
   };
 
   const onUpdateTopics = () => {
-    queryClient.invalidateQueries(getTopicsControllerGetTopicsQueryKey());
+    if (canUpdateSchema) {
+      queryClient.invalidateQueries(
+        getTopicsControllerGetTopicsHistoryByIdQueryKey(topic.id)
+      );
+    } else {
+      queryClient.invalidateQueries(getTopicsControllerGetTopicsQueryKey());
+    }
+
     closeModal();
     Swal.fire({
       title: 'Success',
@@ -129,7 +134,7 @@ export const useUpdateTopicEffects = () => {
     const values = data as PostTopicDto;
     const fomattedValues = {
       ...values,
-      id: topic.id
+      id: topic.id,
     };
     updateTopicHandler(
       fomattedValues as PostTopicDto,
@@ -171,5 +176,7 @@ export const useUpdateTopicEffects = () => {
     application,
     isUpdatingTopics,
     isLoading,
+    canUpdateSchema,
+    getValues,
   };
 };

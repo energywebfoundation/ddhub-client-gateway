@@ -22,6 +22,20 @@ export const useVersionActionsEffects = (
 
   const { removeTopicVersionHistoryHandler } = useRemoveTopicVersionHistory();
 
+  const openUpdateTopic = (topic: GetTopicDto) => {
+    dispatch({
+      type: TopicsModalsActionsEnum.SHOW_UPDATE_TOPIC,
+      payload: {
+        open: true,
+        hide: false,
+        canUpdateSchema: true,
+        application: applicationsByNamespace[namespace],
+        topic,
+      },
+    });
+  };
+
+
   const openTopicDetails = (topic: GetTopicDto) => {
     dispatch({
       type: TopicsModalsActionsEnum.SHOW_TOPIC_DETAILS,
@@ -51,7 +65,7 @@ export const useVersionActionsEffects = (
     },
     {
       label: 'Update',
-      onClick: (topicVersion: GetTopicDto) => {},
+      onClick: (topic: GetTopicDto) => openUpdateTopic(topic),
     },
     {
       label: 'Remove',

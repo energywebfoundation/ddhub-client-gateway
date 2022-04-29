@@ -16,9 +16,10 @@ export const topicsModalsInitialState: ITopicsModalsStore = {
   },
   updateTopic: {
     open: false,
-    hide: false,
     topic: null,
     application: null,
+    hide: false,
+    canUpdateSchema: false,
   },
   topicDetails: {
     open: false,
