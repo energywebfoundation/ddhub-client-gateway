@@ -9,8 +9,7 @@ export function IsValidApplicationNameSpace(
   configService: ConfigService,
   validationOptions?: ValidationOptions
 ) {
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  return function (object: Object, propertyName: string) {
+  return function (object: unknown, propertyName: string) {
     registerDecorator({
       name: 'isApplicationNameSpace',
       target: object.constructor,
