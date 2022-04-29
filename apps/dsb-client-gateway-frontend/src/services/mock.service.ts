@@ -6,6 +6,7 @@ import {
   getTopicsControllerGetTopicsMock,
   getTopicsControllerGetTopicHistoryByIdAndVersionMock,
   getChannelControllerGetByTypeMock,
+  getChannelControllerGetMock,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 
 export function makeServer({ environment = 'development' }) {
@@ -31,6 +32,10 @@ export function makeServer({ environment = 'development' }) {
 
       this.get('/channels', () => {
         return getChannelControllerGetByTypeMock();
+      });
+
+      this.get('/channels/:fqcn', () => {
+        return getChannelControllerGetMock();
       });
 
       this.post('/topics', (_schema, request) => {

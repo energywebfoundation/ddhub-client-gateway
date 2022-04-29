@@ -1,5 +1,5 @@
 import { ReactElement } from 'react';
-import { TableCellProps } from '@mui/material';
+import { TableCellProps, TableContainerProps } from '@mui/material';
 import { TTableComponentAction } from '../Table/TableComponentActions';
 
 export interface TableHeader {
@@ -20,4 +20,6 @@ export interface TableProps<T> {
   children?: ReactElement;
   showSearch?: boolean;
   showFooter?: boolean;
+  containerProps?: TableContainerProps;
+  loadingRows?: number;
 }
