@@ -176,7 +176,7 @@ export class EnvironmentVariables {
   OTEL_ENVIRONMENT = 'local';
 
   @IsString()
-  EWT_ROOT_NAMESPACE_VALIDATION_REGULAR_EXPRESSION = '\\w.apps.*\\w.iam.ewc';
+  APPLICATION_NAMESPACE_REGULAR_EXPRESSION = '\\w.apps.*\\w.iam.ewc';
 
   @IsString()
   DB_NAME = 'local.db';

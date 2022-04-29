@@ -18,14 +18,13 @@ export function IsValidApplicationNameSpace(
       options: validationOptions,
       validator: {
         validate(value: string, args: ValidationArguments) {
-          const regularExpression: string = configService.get(
-            'EWT_ROOT_NAMESPACE_VALIDATION_REGULAR_EXPRESSION'
+          const applicationNameSpacePattern: string = configService.get(
+            'APPLICATION_NAMESPACE_REGULAR_EXPRESSION'
           );
-
           if (value.includes('"')) {
             return false;
           } else if (typeof value === 'string' && value.length > 0) {
-            return !!value.match(new RegExp(regularExpression));
+            return !!value.match(new RegExp(applicationNameSpacePattern));
           }
           return false;
         },
