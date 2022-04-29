@@ -5,32 +5,33 @@ const dsbTheme: ThemeOptions = {
   palette: {
     primary: {
       main: '#A466FF',
-      dark: '#7367F0'
+      dark: '#7367F0',
     },
     secondary: {
       main: '#F6AFAF',
       light: '#FFC9CA',
-      dark: '#EC9A9A'
+      dark: '#EC9A9A',
     },
     error: {
-      main: '#FD1803'
+      main: '#FD1803',
     },
     warning: {
-      main: '#FF5A00'
+      main: '#FF5A00',
     },
     success: {
-      main: '#2EB67D'
+      main: '#2EB67D',
     },
     info: {
-      main: '#0B80DF'
+      main: '#0B80DF',
+      dark: '#1c2338',
     },
     action: {
       hover: '#CC98FF',
-      selected: '#A466FF'
+      selected: '#A466FF',
     },
     text: {
       primary: '#CED1D5',
-      secondary: '#FFFFFF'
+      secondary: '#FFFFFF',
     },
     grey: {
       100: '#F2F2F3',
@@ -38,12 +39,12 @@ const dsbTheme: ThemeOptions = {
       300: '#B9B9C3',
       400: '#B2B6BD',
       500: '#848484',
-      600: '#6E6B7B'
+      600: '#6E6B7B',
     },
     background: {
       default: '#161D31',
-      paper: '#293145'
-    }
+      paper: '#293145',
+    },
   },
   typography: {
     fontFamily: 'Rajdhani',
@@ -52,8 +53,8 @@ const dsbTheme: ThemeOptions = {
     },
     body2: {
       fontFamily: 'Sequel Sans',
-      letterSpacing: '0.4px'
-    }
+      letterSpacing: '0.4px',
+    },
   },
   components: {
     // Name of the component
@@ -99,32 +100,32 @@ const dsbTheme: ThemeOptions = {
     MuiCard: {
       styleOverrides: {
         root: {
-          height: '100%'
-        }
-      }
+          height: '100%',
+        },
+      },
     },
     MuiOutlinedInput: {
       styleOverrides: {
         notchedOutline: {
-          borderColor: '#404656'
-        }
-      }
+          borderColor: '#404656',
+        },
+      },
     },
     MuiTextField: {
       styleOverrides: {
         root: {
-          width: '100%'
-        }
-      }
+          width: '100%',
+        },
+      },
     },
     MuiTableCell: {
       styleOverrides: {
         root: {
-          borderBottomColor: '#384151'
-        }
-      }
-    }
+          borderBottomColor: '#384151',
+        },
+      },
+    },
   },
-}
+};
 
 export const theme = createTheme(dsbTheme);
