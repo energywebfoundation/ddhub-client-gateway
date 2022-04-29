@@ -13,7 +13,10 @@ import {
 } from 'class-validator';
 import { IsValidApplicationNameSpace } from '../../utils/validator/decorators/IsValidApplicationNameSpace';
 import { IsValidTopicName } from '../../utils/validator/decorators/isValidTopicName';
+import { ConfigService } from '@nestjs/config';
 export class GetTopicDto {
+  constructor(protected readonly configService: ConfigService) {}
+
   @IsString()
   @IsNotEmpty()
   @ApiProperty({
@@ -62,7 +65,7 @@ export class GetTopicDto {
   })
   version: string;
 
-  @IsValidApplicationNameSpace({
+  @IsValidApplicationNameSpace(new ConfigService(), {
     message: 'Malformed owner name. Please enter correct owner name',
   })
   @IsString()
@@ -152,7 +155,7 @@ export class PostTopicDto {
 
   @IsString()
   @IsNotEmpty()
-  @IsValidApplicationNameSpace({
+  @IsValidApplicationNameSpace(new ConfigService(), {
     message: 'Malformed owner name. Please enter correct owner name',
   })
   @ApiProperty({
@@ -365,7 +368,7 @@ export class GetTopicsQueryDto {
   })
   public name: string;
 
-  @IsValidApplicationNameSpace({
+  @IsValidApplicationNameSpace(new ConfigService(), {
     message: 'Malformed owner name. Please enter correct owner name',
   })
   @IsNotEmpty()
