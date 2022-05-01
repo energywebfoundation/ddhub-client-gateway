@@ -66,7 +66,7 @@ ddhub-client-gateway-ui:
           backend:
             serviceName: ddhub-client-gateway-api
             servicePort: 80
-        - path: /*
+        - path: /
           pathType: Prefix
           backend:
             serviceName: "ddhub-client-gateway-dev"
