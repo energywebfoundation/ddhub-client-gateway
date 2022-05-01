@@ -56,16 +56,6 @@ ddhub-client-gateway-ui:
     hosts:
       - host: ddhub-gateway-dev.energyweb.org
         paths:
-        - path: /docs
-          pathType: Prefix
-          backend:
-            serviceName: ddhub-client-gateway-api-dev
-            servicePort: 80
-        - path: /api
-          pathType: Prefix
-          backend:
-            serviceName: ddhub-client-gateway-api-dev
-            servicePort: 80
         - path: /
           pathType: Prefix
           backend:
