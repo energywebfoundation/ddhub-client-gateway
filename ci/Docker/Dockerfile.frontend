@@ -1,16 +1,5 @@
-ARG IMAGE=node:16.10
-ARG NODE_ENV=production
+ARG IMAGE=nginx:alpine
 
-FROM $IMAGE as build
-ENV CYPRESS_INSTALL_BINARY=0
+FROM $IMAGE
 
-WORKDIR /usr/usr/app
-
-COPY . .
-
-ENV NODE_ENV=$NODE_ENV
-
-RUN npm install --quiet --no-progress -g nx npm@8.5.0 && \
-    npm ci --quiet --no-progress
-
-CMD ["nx", "serve", "dsb-client-gateway-frontend"]
+COPY dist/apps/dsb-client-gateway-frontend/exported /usr/share/nginx/html

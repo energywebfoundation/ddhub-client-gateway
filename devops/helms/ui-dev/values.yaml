@@ -17,7 +17,7 @@ ddhub-client-gateway-ui:
     repository: aemocontainerregistry.azurecr.io/ddhub-client-gateway-frontend
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
-    tag: b3fb7a7b-8735-4858-8143-64935e9dce2f
+    tag: canary
 
   imagePullSecrets: []
   nameOverride: "ddhub-client-gateway-dev"
