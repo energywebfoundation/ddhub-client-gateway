@@ -41,6 +41,25 @@ export class AllExceptionsFilter implements ExceptionFilter {
       httpAdapter.reply(ctx.getResponse(), responseBody, httpStatus);
 
       return;
+    } else if (exception.response) {
+      const httpStatus =
+        exception instanceof HttpException
+          ? exception.getStatus()
+          : HttpStatus.INTERNAL_SERVER_ERROR;
+
+      const responseBody = {
+        err: {
+          reason: exception.response.message,
+          statusCode: httpStatus,
+          code: exception.code,
+        },
+        statusCode: httpStatus,
+        timestamp: new Date().toISOString(),
+      };
+
+      httpAdapter.reply(ctx.getResponse(), responseBody, httpStatus);
+
+      return;
     }
 
     const httpStatus =

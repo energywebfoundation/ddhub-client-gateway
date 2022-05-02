@@ -376,6 +376,7 @@ export class GetTopicsQueryDto {
   @IsString()
   @ApiProperty({
     example: 'ddhub.apps.energyweb.iam.ewc',
+    required: true,
     type: String,
   })
   public owner: string;
