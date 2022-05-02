@@ -7,6 +7,8 @@ import {
 } from '@nestjs/common';
 import { HttpAdapterHost } from '@nestjs/core';
 
+import { DsbMessageBrokerErrors } from '@dsb-client-gateway/dsb-client-gateway-errors';
+
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
   constructor(private readonly httpAdapterHost: HttpAdapterHost) {}
@@ -16,17 +18,20 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
     const ctx = host.switchToHttp();
 
-    if (exception.response) {
+    if (exception.response && exception.response.data) {
       const httpStatus =
         exception instanceof HttpException
           ? exception.getStatus()
           : HttpStatus.INTERNAL_SERVER_ERROR;
-
       const responseBody = {
         err: {
-          reason: exception.response.message,
+          reason: exception.response.data.returnMessage
+            ? exception.response.data.returnMessage
+            : 'something went wrong',
           statusCode: httpStatus,
-          code: exception.code,
+          code: exception.response.data.returnCode
+            ? DsbMessageBrokerErrors[exception.response.data.returnCode]
+            : '',
           additionalDetails: exception.additionalDetails,
         },
         statusCode: httpStatus,
