@@ -25,19 +25,19 @@ ddhub-client-gateway-api:
       # -- Defines how many events should be pushed per second, regardless of mode chosen (see above).
       events_max_per_second: 2
       # -- The URL of the DSB Message Broker you want to connect to. Trailing / allowed.
-      dsb_base_url: http://ddhub-messagebroker.ddhub-dev.svc
+      dsb_base_url: http://ddhub-messagebroker-demo.ddhub-demo.svc
       # -- Sets the chain ID of the blockchain network. Options: 73799 (Volta), 246 (EWC)
       chain_id: 73799
       # -- Sets the blockchain RPC node to connect to retreive state from and submit transactions to. Should match the network given in CHAIN_ID.
       rpc_url: https://volta-rpc.energyweb.org/
       # -- Sets the Energy Web IAM cache server URL, used to cache identities (as it can be expensive to rely only on querying smart contract data).
-      cache_server_url: https://identitycache-dev.energyweb.org/v1
+      cache_server_url: https://identitycache-staging.energyweb.org/v1
       # -- Sets the Energy Web IAM events server URL, used to receive notification of approved DSB role claims.
-      event_server_url: https://identityevents-dev.energyweb.org
+      event_server_url: https://identityevents-staging.energyweb.org
       # -- Sets the Energy Web IAM application namespace. DSB related roles, such as user and messagebroker should fall under this namespace.
       parent_namespace: ddhub.apps.energyweb.iam.ewc
       secret_engine: vault
-      vault_endpoint: http://vault.ddhub-dev.svc:8200
+      vault_endpoint: http://demo-vault.ddhub-demo.svc:8200
       # -- Enable basic auth. (Once enabled, associated secret is required, eg: "ddhub-client-gateway-api-secret")
       basic_auth_enabled: true
       node_env: test
@@ -49,8 +49,8 @@ ddhub-client-gateway-api:
     tag: canary
 
   imagePullSecrets: []
-  nameOverride: "ddhub-client-gateway-api-dev"
-  fullnameOverride: "ddhub-client-gateway-api-dev"
+  nameOverride: "ddhub-client-gateway-api-demo"
+  fullnameOverride: "ddhub-client-gateway-api-demo"
 
   serviceAccount:
     # Specifies whether a service account should be created
@@ -83,22 +83,22 @@ ddhub-client-gateway-api:
     annotations: {kubernetes.io/ingress.class: nginx, ngress.kubernetes.io/rewrite-targe: $1}
       # kubernetes.io/tls-acme: "true"
     hosts:
-      - host: ddhub-gateway-dev.energyweb.org
+      - host: ddhub-gateway-demo.energyweb.org
         paths:
         - path: /docs
           pathType: Prefix
           backend:
-            serviceName: ddhub-client-gateway-api-dev
+            serviceName: ddhub-client-gateway-api-demo
             servicePort: 80
         - path: /api
           pathType: Prefix
           backend:
-            serviceName: ddhub-client-gateway-api-dev
+            serviceName: ddhub-client-gateway-api-demo
             servicePort: 80
     tls:
       - secretName: dsb-tls-secret
         hosts:
-          - ddhub-gateway-dev.energyweb.org
+          - ddhub-gateway-demo.energyweb.org
 
   resources: {}
     # We usually recommend not to specify default resources and to leave this as a conscious
