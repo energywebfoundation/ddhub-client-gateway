@@ -20,6 +20,8 @@ ddhub-client-gateway-api:
       annotations: {kubernetes.io/ingress.class: nginx, ngress.kubernetes.io/rewrite-targe: $1}
         # kubernetes.io/tls-acme: "true"
       hosts:
+        - host: ddhub-gateway-demo.energyweb.org
+          paths:
           - path: /
             pathType: Prefix
             backend:
