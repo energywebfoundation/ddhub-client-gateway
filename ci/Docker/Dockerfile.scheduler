@@ -1,0 +1,18 @@
+ARG IMAGE=node:16.10-alpine
+ARG NODE_ENV=production
+
+FROM $IMAGE
+
+ENV NODE_ENV=$NODE_ENV
+
+RUN apk add --no-cache python3 py3-pip make g++
+
+COPY --chown=node:node dist/apps/dsb-client-gateway-scheduler/* /usr/app/
+COPY --chown=node:node package-lock.json /usr/app/
+
+WORKDIR /usr/app
+RUN npm ci --production
+
+USER node
+
+CMD ["node", "main.js"]

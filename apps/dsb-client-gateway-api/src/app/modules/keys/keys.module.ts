@@ -4,6 +4,7 @@ import { SecretsEngineModule } from '@dsb-client-gateway/dsb-client-gateway-secr
 import { KeysController } from './keys.controller';
 import { IdentityModule } from '../identity/identity.module';
 import {
+  DidRepositoryModule,
   DsbClientGatewayStorageModule,
   SymmetricKeysRepositoryModule,
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
@@ -21,6 +22,7 @@ import { EnrolmentModule } from '../enrolment/enrolment.module';
     IdentityModule,
     EnrolmentModule,
     StorageModule,
+    DidRepositoryModule,
     forwardRef(() => DsbClientModule),
   ],
   providers: [KeysService, SymmetricKeysCacheService, RefreshKeysHandler],

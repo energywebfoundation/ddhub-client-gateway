@@ -11,11 +11,13 @@ import {
 import { IAppDefinition } from '@energyweb/iam-contracts';
 import { IamFactoryService } from './iam-factory.service';
 import { ConfigService } from '@nestjs/config';
-import { Encoding } from '@ew-did-registry/did-resolver-interface';
-import { KeyType } from '@ew-did-registry/keys';
 import { ApplicationDTO, Claim } from '../iam.interface';
 import { RoleStatus } from '@dsb-client-gateway/dsb-client-gateway/identity/models';
 import { Span } from 'nestjs-otel';
+import promiseRetry from 'promise-retry';
+import { Encoding } from '@ew-did-registry/did-resolver-interface';
+import { KeyType } from '@ew-did-registry/keys';
+import { RetryConfigService } from '@dsb-client-gateway/ddhub-client-gateway-utils';
 
 @Injectable()
 export class IamService {
@@ -29,7 +31,8 @@ export class IamService {
 
   constructor(
     protected readonly iamFactoryService: IamFactoryService,
-    protected readonly configService: ConfigService
+    protected readonly configService: ConfigService,
+    protected readonly retryConfigService: RetryConfigService
   ) {}
 
   @Span('iam_getClaimsWithStatus')
@@ -85,20 +88,40 @@ export class IamService {
     publicKey: string,
     tag = 'dsb'
   ): Promise<void> {
-    await this.didRegistry.updateDocument({
-      did: this.getDIDAddress(),
-      didAttribute: DIDAttribute.PublicKey,
-      data: {
-        type: DIDAttribute.PublicKey,
-        encoding: Encoding.HEX,
-        algo: KeyType.RSA,
-        value: {
-          type: KeyType.RSA,
-          tag,
-          publicKey,
-        },
+    await promiseRetry(
+      async (retryFn, attempt) => {
+        this.logger.log(
+          `attempting to update ${tag} in DID document of ${this.getDIDAddress()}, attempt number ${attempt}`
+        );
+
+        await this.didRegistry
+          .updateDocument({
+            did: this.getDIDAddress(),
+            didAttribute: DIDAttribute.PublicKey,
+            data: {
+              type: DIDAttribute.PublicKey,
+              encoding: Encoding.HEX,
+              algo: KeyType.RSA,
+              value: {
+                type: KeyType.RSA,
+                tag,
+                publicKey,
+              },
+            },
+          })
+          .catch((e) => {
+            this.logger.error(
+              `failed during updating verification method ${this.getDIDAddress()}`,
+              e
+            );
+
+            return retryFn(e);
+          });
       },
-    });
+      {
+        ...this.retryConfigService.config,
+      }
+    );
   }
 
   public async getEnrolledDids(roleName: string): Promise<string[]> {

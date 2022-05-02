@@ -4,9 +4,8 @@ import {
   ValidationOptions,
 } from 'class-validator';
 
-export function IsVersion(validationOptions?: ValidationOptions) {
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  return function (object: Object, propertyName: string) {
+export function IsValidVersion(validationOptions?: ValidationOptions) {
+  return function (object: unknown, propertyName: string) {
     registerDecorator({
       name: 'isVersion',
       target: object.constructor,

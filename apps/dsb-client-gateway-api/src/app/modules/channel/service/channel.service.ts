@@ -16,6 +16,7 @@ import {
   ChannelEntity,
   ChannelWrapperRepository,
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
+import { TopicNotFoundException } from '../exceptions/topic-not-found.exception';
 
 @Injectable()
 export class ChannelService {
@@ -47,6 +48,10 @@ export class ChannelService {
     const topicsWithIds: ChannelTopic[] = await this.getTopicsWithIds(
       payload.conditions.topics
     );
+
+    if (payload.conditions.topics.length && !topicsWithIds.length) {
+      throw new TopicNotFoundException();
+    }
 
     await this.wrapperRepository.channelRepository.save({
       fqcn: payload.fqcn,

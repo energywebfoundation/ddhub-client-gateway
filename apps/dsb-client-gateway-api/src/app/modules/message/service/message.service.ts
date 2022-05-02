@@ -165,7 +165,6 @@ export class MessageService {
 
     this.logger.log('Sending Message');
 
-    this.logger.debug('topic from cache', topic);
     return this.dsbApiService.sendMessage(
       qualifiedDids,
       encryptedMessage,
