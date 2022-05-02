@@ -22,6 +22,8 @@ import {
   SymmetricKeysEntity,
   SymmetricKeysRepositoryWrapper,
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
+import { ConfigService } from '@nestjs/config';
+import moment from 'moment';
 
 @Injectable()
 export class KeysService implements OnModuleInit {
@@ -37,7 +39,8 @@ export class KeysService implements OnModuleInit {
     protected readonly wrapper: SymmetricKeysRepositoryWrapper,
     protected readonly symmetricKeysCacheService: SymmetricKeysCacheService,
     protected readonly iamInitService: IamInitService,
-    protected readonly didWrapper: DidWrapperRepository
+    protected readonly didWrapper: DidWrapperRepository,
+    protected readonly configService: ConfigService
   ) {}
 
   @Span('keys_storeKeysForMessage')
@@ -345,7 +348,19 @@ export class KeysService implements OnModuleInit {
       });
 
     if (cacheDid) {
-      return cacheDid;
+      const didTtl: number = this.configService.get<number>('DID_TTL');
+
+      if (
+        moment(cacheDid.updatedDate).add(didTtl, 'seconds').isSameOrBefore()
+      ) {
+        this.logger.log(`${cacheDid.did} expired, requesting new one`);
+
+        await this.didWrapper.didRepository.remove(cacheDid);
+      } else {
+        this.logger.debug(`${cacheDid.did} retrieving DID from cache`);
+
+        return cacheDid;
+      }
     }
 
     const didDocument = await this.iamService.getDid(did);
