@@ -11,6 +11,7 @@ import { WebSocketImplementation } from '../modules/message/message.const';
 import { EventEmitMode } from '../modules/message/service/message.service';
 import { Transform } from 'class-transformer';
 import { SecretsEngine } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
+import { isRegExp } from 'util/types';
 
 export enum NODE_ENV {
   Production = 'production',
@@ -173,6 +174,9 @@ export class EnvironmentVariables {
   @IsString()
   @ValidateIf(EnvironmentVariables.isOTELEnabled)
   OTEL_ENVIRONMENT = 'local';
+
+  @IsString()
+  APPLICATION_NAMESPACE_REGULAR_EXPRESSION = '\\w.apps.*\\w.iam.ewc';
 
   @IsString()
   DB_NAME = 'local.db';

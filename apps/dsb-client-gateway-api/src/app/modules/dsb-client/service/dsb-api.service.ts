@@ -336,10 +336,13 @@ export class DsbApiService implements OnApplicationBootstrap {
   public async getTopics(
     limit: number,
     name: string,
-    owner: string,
+    applicationNameSpace: string,
     page: number,
     tags: string[]
   ): Promise<TopicDataResponse> {
+    //replacing double quotes in order to pass correct input to MB
+    const owner = applicationNameSpace.replace(/"/g, '');
+
     try {
       const { data } = await this.request<TopicDataResponse>(
         () =>
