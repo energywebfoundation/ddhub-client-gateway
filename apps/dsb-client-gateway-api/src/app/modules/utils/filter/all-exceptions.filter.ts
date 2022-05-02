@@ -18,16 +18,20 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
     const ctx = host.switchToHttp();
 
-    if (exception.response) {
+    if (exception.response && exception.response.data) {
       const httpStatus =
         exception instanceof HttpException
           ? exception.getStatus()
           : HttpStatus.INTERNAL_SERVER_ERROR;
       const responseBody = {
         err: {
-          reason: exception.response.data.returnMessage,
+          reason: exception.response.data.returnMessage
+            ? exception.response.data.returnMessage
+            : 'something went wrong',
           statusCode: httpStatus,
-          code: DsbMessageBrokerErrors[exception.response.data.returnCode],
+          code: exception.response.data.returnCode
+            ? DsbMessageBrokerErrors[exception.response.data.returnCode]
+            : '',
           additionalDetails: exception.additionalDetails,
         },
         statusCode: httpStatus,
