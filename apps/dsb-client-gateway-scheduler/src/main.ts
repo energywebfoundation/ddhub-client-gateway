@@ -6,15 +6,19 @@
 import { NestFactory } from '@nestjs/core';
 import { Logger } from '@nestjs/common';
 import { AppModule } from './app/app.module';
+import { otelSDK } from '@dsb-client-gateway/ddhub-client-gateway-tracing';
+import * as dotenv from 'dotenv';
+
+dotenv.config();
 
 async function bootstrap() {
-  const app = await NestFactory.createApplicationContext(AppModule);
+  if (process.env.OPENTELEMETRY_ENABLED) {
+    await otelSDK.start();
+  }
+
+  await NestFactory.createApplicationContext(AppModule);
 
   Logger.log('Application starting');
-
-  await app.close();
-
-  Logger.log('Application closing');
 }
 
 bootstrap();

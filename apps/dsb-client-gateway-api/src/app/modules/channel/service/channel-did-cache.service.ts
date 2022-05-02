@@ -57,7 +57,7 @@ export class ChannelDidCacheService {
     this.logger.log(`Updating DIDs for ${internalChannel.fqcn}`);
 
     const uniqueDids: string[] = [
-      ...new Set([...rolesForDIDs, ...internalChannel.conditions.dids]),
+      ...new Set([...rolesForDIDs, ...(internalChannel.conditions.dids ?? [])]),
     ];
 
     await this.channelService.updateChannelQualifiedDids(

@@ -93,7 +93,7 @@ export class DsbApiService implements OnApplicationBootstrap {
         );
       },
       {
-        ...this.retryConfigService,
+        ...this.retryConfigService.config,
         ...overrideRetryConfig,
       }
     );
@@ -103,11 +103,11 @@ export class DsbApiService implements OnApplicationBootstrap {
 
   @Span('ddhub_mb_getDIDsFromRoles')
   public async getDIDsFromRoles(
-    roles: string[],
+    roles: string[] | undefined,
     searchType: 'ANY',
     overrideRetry?: OperationOptions
   ): Promise<string[]> {
-    if (roles.length === 0) {
+    if (!roles || roles.length === 0) {
       return [];
     }
 

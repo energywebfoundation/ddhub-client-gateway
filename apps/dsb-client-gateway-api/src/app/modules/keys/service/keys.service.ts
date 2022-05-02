@@ -17,9 +17,13 @@ import { BalanceState } from '@dsb-client-gateway/dsb-client-gateway/identity/mo
 import { IamInitService } from '../../identity/service/iam-init.service';
 import { Span } from 'nestjs-otel';
 import {
+  DidEntity,
+  DidWrapperRepository,
   SymmetricKeysEntity,
   SymmetricKeysRepositoryWrapper,
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
+import { ConfigService } from '@nestjs/config';
+import moment from 'moment';
 
 @Injectable()
 export class KeysService implements OnModuleInit {
@@ -34,7 +38,9 @@ export class KeysService implements OnModuleInit {
     protected readonly identityService: IdentityService,
     protected readonly wrapper: SymmetricKeysRepositoryWrapper,
     protected readonly symmetricKeysCacheService: SymmetricKeysCacheService,
-    protected readonly iamInitService: IamInitService
+    protected readonly iamInitService: IamInitService,
+    protected readonly didWrapper: DidWrapperRepository,
+    protected readonly configService: ConfigService
   ) {}
 
   @Span('keys_storeKeysForMessage')
@@ -108,21 +114,9 @@ export class KeysService implements OnModuleInit {
     signature: string,
     encryptedData: string
   ): Promise<boolean> {
-    this.logger.log('fetching did', senderDid);
-    const did = await this.iamService.getDid(senderDid);
+    const did = await this.getDid(senderDid);
 
     if (!did) {
-      this.logger.error(`${senderDid} is invalid DID`);
-
-      return false;
-    }
-
-    this.logger.log('did fechted successully', senderDid);
-    const key = did.publicKey.find(({ id }) => {
-      return id === `${senderDid}#${DIDPublicKeyTags.DSB_SIGNATURE_KEY}`;
-    });
-
-    if (!key) {
       this.logger.error(
         `Sender does not have public key configured on path ${senderDid}#${DIDPublicKeyTags.DSB_SIGNATURE_KEY}`
       );
@@ -132,7 +126,8 @@ export class KeysService implements OnModuleInit {
 
     try {
       const recoveredPublicKey = recoverPublicKey(id(encryptedData), signature);
-      return recoveredPublicKey === key.publicKeyHex;
+
+      return recoveredPublicKey === did.publicSignatureKey;
     } catch (e) {
       this.logger.error(
         `error ocurred while recoverPublicKey in verify signature`,
@@ -202,11 +197,7 @@ export class KeysService implements OnModuleInit {
     symmetricKey: string,
     receiverDid: string
   ): Promise<any | null> {
-    this.logger.log('fetching did', receiverDid);
-
-    const did = await this.iamService.getDid(receiverDid);
-
-    this.logger.log('did fetched successfully', receiverDid);
+    const did: DidEntity | null = await this.getDid(receiverDid);
 
     if (!did) {
       this.logger.error('IAM not initialized');
@@ -214,23 +205,9 @@ export class KeysService implements OnModuleInit {
       return;
     }
 
-    const key = did.publicKey.find(({ id }) => {
-      return (
-        id === `${receiverDid}#${DIDPublicKeyTags.DSB_SYMMETRIC_ENCRYPTION}`
-      );
-    });
-
-    if (!key) {
-      this.logger.error(
-        `Receiver ${receiverDid} has no public key with ${receiverDid}#${DIDPublicKeyTags.DSB_SYMMETRIC_ENCRYPTION}`
-      );
-
-      return;
-    }
-
     const encryptedData = crypto.publicEncrypt(
       {
-        key: key.publicKeyHex,
+        key: did.publicRSAKey,
         padding: this.rsaPadding,
       },
       Buffer.from(symmetricKey)
@@ -360,5 +337,64 @@ export class KeysService implements OnModuleInit {
     });
 
     return { publicKey, privateKey };
+  }
+
+  protected async getDid(did: string): Promise<DidEntity | null> {
+    const cacheDid: DidEntity | null =
+      await this.didWrapper.didRepository.findOne({
+        where: {
+          did,
+        },
+      });
+
+    if (cacheDid) {
+      const didTtl: number = this.configService.get<number>('DID_TTL');
+
+      if (
+        moment(cacheDid.updatedDate).add(didTtl, 'seconds').isSameOrBefore()
+      ) {
+        this.logger.log(`${cacheDid.did} expired, requesting new one`);
+
+        await this.didWrapper.didRepository.remove(cacheDid);
+      } else {
+        this.logger.debug(`${cacheDid.did} retrieving DID from cache`);
+
+        return cacheDid;
+      }
+    }
+
+    const didDocument = await this.iamService.getDid(did);
+
+    if (!didDocument) {
+      this.logger.warn(`${did} does not exists`);
+
+      return null;
+    }
+
+    const rsaKey = didDocument.publicKey.find(({ id }) => {
+      return id === `${did}#${DIDPublicKeyTags.DSB_SYMMETRIC_ENCRYPTION}`;
+    });
+
+    const signatureKey = didDocument.publicKey.find(({ id }) => {
+      return id === `${did}#${DIDPublicKeyTags.DSB_SIGNATURE_KEY}`;
+    });
+
+    if (!rsaKey || !signatureKey) {
+      this.logger.error(`${did} does not have rsaKey or signatureKey`);
+
+      return null;
+    }
+
+    const didEntity: DidEntity = new DidEntity();
+
+    didEntity.did = did;
+    didEntity.publicSignatureKey = signatureKey.publicKeyHex;
+    didEntity.publicRSAKey = rsaKey.publicKeyHex;
+
+    this.logger.log(`Saving didEntity to cache ${did}`);
+
+    await this.didWrapper.didRepository.save(didEntity);
+
+    return didEntity;
   }
 }

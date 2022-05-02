@@ -1,6 +1,6 @@
 import { plainToClass } from 'class-transformer';
-import { EnvironmentVariables } from '../../../../dsb-client-gateway-api/src/app/types/environment-variables';
 import { validateSync } from 'class-validator';
+import { EnvironmentVariables } from '../types/environment-variables';
 
 // @TODO - Copied from dsb-client-gateway-api, move it to some shared library
 export function configValidate(config: Record<string, unknown>) {
