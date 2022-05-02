@@ -21,12 +21,11 @@ export class AllExceptionsFilter implements ExceptionFilter {
         exception instanceof HttpException
           ? exception.getStatus()
           : HttpStatus.INTERNAL_SERVER_ERROR;
-
       const responseBody = {
         err: {
-          reason: exception.response.message,
+          reason: exception.response.data.returnMessage,
           statusCode: httpStatus,
-          code: exception.code,
+          code: exception.response.data.returnCode,
           additionalDetails: exception.additionalDetails,
         },
         statusCode: httpStatus,
