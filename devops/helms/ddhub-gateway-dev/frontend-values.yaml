@@ -12,22 +12,22 @@ ddhub-client-gateway-api:
       # Overrides the image tag whose default is the chart appVersion.
       tag: canary
 
-    nameOverride: "ddhub-client-gateway-ui-demo"
-    fullnameOverride: "ddhub-client-gateway-ui-demo"
+    nameOverride: "ddhub-client-gateway-ui-dev"
+    fullnameOverride: "ddhub-client-gateway-ui-dev"
 
     ingress:
       enabled: true
       annotations: {kubernetes.io/ingress.class: nginx, ngress.kubernetes.io/rewrite-targe: $1}
         # kubernetes.io/tls-acme: "true"
       hosts:
-        - host: ddhub-gateway-demo.energyweb.org
+        - host: ddhub-gateway-dev.energyweb.org
           paths:
           - path: /
             pathType: Prefix
             backend:
-              serviceName: ddhub-client-gateway-ui-demo
+              serviceName: ddhub-client-gateway-ui-dev
               servicePort: 80
       tls:
         - secretName: dsb-tls-secret
           hosts:
-            - ddhub-gateway-demo.energyweb.org
+            - ddhub-gateway-dev.energyweb.org
