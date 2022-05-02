@@ -16,6 +16,21 @@ export class ChannelRepository extends Repository<ChannelEntity> {
     return this.find();
   }
 
+  public async getAllQualifiedDids(): Promise<string[]> {
+    const channelConditions: Pick<ChannelEntity, 'conditions'>[] =
+      await this.find({
+        select: ['conditions'],
+      });
+
+    const dids: string[] = channelConditions.reduce((acc, currentValue) => {
+      currentValue.conditions.qualifiedDids.forEach((did) => acc.push(did));
+
+      return acc;
+    }, []);
+
+    return [...new Set(dids)];
+  }
+
   public async drop(fqcn: string): Promise<void> {
     await this.delete({
       fqcn,

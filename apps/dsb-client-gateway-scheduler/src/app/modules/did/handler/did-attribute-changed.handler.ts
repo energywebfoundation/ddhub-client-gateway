@@ -2,7 +2,10 @@ import { DidAttributeChangedCommand } from '@dsb-client-gateway/dsb-client-gatew
 import { IamService } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
 import { Logger } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { DidWrapperRepository } from '@dsb-client-gateway/dsb-client-gateway-storage';
+import {
+  ChannelWrapperRepository,
+  DidWrapperRepository,
+} from '@dsb-client-gateway/dsb-client-gateway-storage';
 import { Span } from 'nestjs-otel';
 
 @CommandHandler(DidAttributeChangedCommand)
@@ -13,11 +16,21 @@ export class DidAttributeChangedHandler
 
   constructor(
     protected readonly wrapper: DidWrapperRepository,
+    protected readonly channelWrapper: ChannelWrapperRepository,
     protected readonly iamService: IamService
   ) {}
 
   @Span('didListener_attributeChanged')
   public async execute({ did }: DidAttributeChangedCommand): Promise<void> {
+    const channelsDids: string[] =
+      await this.channelWrapper.channelRepository.getAllQualifiedDids();
+
+    if (!channelsDids.includes(did)) {
+      this.logger.debug(`${did} is not known for app, not saving it`);
+
+      return;
+    }
+
     const didDocument = await this.iamService.getDid(did);
 
     const rsaPublicKey = didDocument.publicKey.find(
