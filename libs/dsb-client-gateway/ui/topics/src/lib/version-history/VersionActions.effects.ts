@@ -27,7 +27,6 @@ export const useVersionActionsEffects = (
       type: TopicsModalsActionsEnum.SHOW_UPDATE_TOPIC,
       payload: {
         open: true,
-        hide: false,
         canUpdateSchema: true,
         application: applicationsByNamespace[namespace],
         topic,

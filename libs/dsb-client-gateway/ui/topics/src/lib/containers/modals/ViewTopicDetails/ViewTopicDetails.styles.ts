@@ -2,20 +2,6 @@ import { makeStyles } from 'tss-react/mui';
 import { alpha, lighten } from '@mui/material/styles';
 
 export const useStyles = makeStyles()((theme) => ({
-  root: {
-    '& .MuiBackdrop-root': {
-      transition: 'none !important'
-    }
-  },
-  paper: {
-    maxWidth: 514,
-    minHeight: 620,
-    padding: '37px 50px 52px 50px',
-    borderRadius: 0
-  },
-  container: {
-    transition: 'none !important'
-  },
   appWrapper: {
     display: 'flex',
     justifyContent: 'center',

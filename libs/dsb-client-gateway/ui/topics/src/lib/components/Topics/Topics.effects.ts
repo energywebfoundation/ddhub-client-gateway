@@ -44,7 +44,6 @@ export const useTopicsEffects = () => {
       type: TopicsModalsActionsEnum.SHOW_CREATE_TOPIC,
       payload: {
         open: true,
-        hide: false,
         application: application,
       },
     });
@@ -55,7 +54,6 @@ export const useTopicsEffects = () => {
       type: TopicsModalsActionsEnum.SHOW_UPDATE_TOPIC,
       payload: {
         open: true,
-        hide: false,
         application: application,
         topic,
       },
