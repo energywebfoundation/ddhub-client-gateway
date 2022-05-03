@@ -40,12 +40,12 @@ export const topicsModalsReducer = (
     case TopicsModalsActionsEnum.HIDE_CREATE_TOPIC:
       return {
         ...state,
-        createTopic: { ...state.createTopic },
+        createTopic: { ...state.createTopic, open: !action.payload },
       };
     case TopicsModalsActionsEnum.HIDE_UPDATE_TOPIC:
       return {
         ...state,
-        updateTopic: { ...state.updateTopic },
+        updateTopic: { ...state.updateTopic, open: !action.payload },
       };
   }
 };

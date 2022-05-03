@@ -1,4 +1,4 @@
-import { ModalActionsEnum, useModalDispatch, useModalStore } from '../../../../context';
+import { ModalActionsEnum, useModalDispatch, useModalStore } from '../../../context';
 
 export const useDetailsEffects = () => {
   const {
@@ -16,9 +16,12 @@ export const useDetailsEffects = () => {
     });
   }
 
+  const openUpdateChannel = () => {};
+
   return {
     open,
     data,
-    closeModal
+    closeModal,
+    openUpdateChannel
   }
 }

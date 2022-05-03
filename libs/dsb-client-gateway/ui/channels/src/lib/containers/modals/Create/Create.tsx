@@ -47,7 +47,7 @@ export const Create = () => {
   };
 
   return (
-    <Dialog open={open} onClose={closeModal}>
+    <Dialog open={open} onClose={closeModal} paperClassName={classes.paper}>
       <DialogTitle>Create Channel</DialogTitle>
       <DialogSubTitle>{subTitle}</DialogSubTitle>
       <Grid container spacing={2} className={classes.content}>

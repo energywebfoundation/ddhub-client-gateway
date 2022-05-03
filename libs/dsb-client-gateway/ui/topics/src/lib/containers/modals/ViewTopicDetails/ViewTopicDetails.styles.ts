@@ -2,6 +2,12 @@ import { makeStyles } from 'tss-react/mui';
 import { alpha, lighten } from '@mui/material/styles';
 
 export const useStyles = makeStyles()((theme) => ({
+  paper: {
+    maxWidth: 514,
+    minHeight: 620,
+    padding: '37px 50px 52px 50px',
+    borderRadius: 0
+  },
   appWrapper: {
     display: 'flex',
     justifyContent: 'center',
