@@ -11,14 +11,12 @@ export enum TopicsModalsActionsEnum {
 export const topicsModalsInitialState: ITopicsModalsStore = {
   createTopic: {
     open: false,
-    hide: false,
     application: null,
   },
   updateTopic: {
     open: false,
     topic: null,
     application: null,
-    hide: false,
     canUpdateSchema: false,
   },
   topicDetails: {
@@ -42,12 +40,12 @@ export const topicsModalsReducer = (
     case TopicsModalsActionsEnum.HIDE_CREATE_TOPIC:
       return {
         ...state,
-        createTopic: { ...state.createTopic, hide: action.payload },
+        createTopic: { ...state.createTopic },
       };
     case TopicsModalsActionsEnum.HIDE_UPDATE_TOPIC:
       return {
         ...state,
-        updateTopic: { ...state.updateTopic, hide: action.payload },
+        updateTopic: { ...state.updateTopic },
       };
   }
 };
