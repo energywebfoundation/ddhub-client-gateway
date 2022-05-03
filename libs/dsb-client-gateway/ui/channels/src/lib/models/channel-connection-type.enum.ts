@@ -1,4 +1,4 @@
-export enum ChannelType {
+export enum ChannelConnectionType {
   pub = 'Publish',
   sub = 'Subscribe',
   download = 'Download',

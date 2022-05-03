@@ -2,7 +2,7 @@ import { FieldValues, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { ConnectionType } from './models/connection-type.enum';
-import { ChannelType } from './models/channel-type.enum';
+import { ChannelType } from '../../../../models/channel-type.enum';
 
 const validationSchema = yup
   .object({
