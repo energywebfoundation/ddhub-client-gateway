@@ -1,2 +1,1 @@
-export * from './lib/ChannelsContainer';
-export * from './lib/Channel';
+export * from './lib/containers';

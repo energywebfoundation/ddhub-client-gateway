@@ -1,36 +1,36 @@
-import { useRouter } from 'next/router';
 import { useChannels } from '@dsb-client-gateway/ui/api-hooks';
 import { TTableComponentAction } from '@dsb-client-gateway/ui/core';
-import { theme, routerConst } from '@dsb-client-gateway/ui/utils';
+import { theme } from '@dsb-client-gateway/ui/utils';
 import { GetChannelResponseDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { ModalActionsEnum, useModalDispatch } from '../../context';
 
 export const useChannelListEffects = () => {
-  const router = useRouter();
-  const {channels, isLoading, channelsLoaded} = useChannels();
+  const { channels, isLoading, channelsLoaded } = useChannels();
   const dispatch = useModalDispatch();
 
   const onCreateHandler = () => {
-      dispatch({
-        type: ModalActionsEnum.SHOW_CREATE,
-        payload: {
-          open: true,
-        },
-      });
-  }
+    dispatch({
+      type: ModalActionsEnum.SHOW_CREATE,
+      payload: {
+        open: true,
+      },
+    });
+  };
 
-  const navigateToChannelDetails = (data: GetChannelResponseDto) => {
-    router.push({
-      pathname: routerConst.Channel,
-      query: { fqcn: data.fqcn },
+  const openChannelDetails = (data: GetChannelResponseDto) => {
+    dispatch({
+      type: ModalActionsEnum.SHOW_DETAILS,
+      payload: {
+        open: true,
+        data,
+      },
     });
   };
 
   const actions: TTableComponentAction<GetChannelResponseDto>[] = [
     {
       label: 'View details',
-      onClick: (channel: GetChannelResponseDto) =>
-        navigateToChannelDetails(channel),
+      onClick: (channel: GetChannelResponseDto) => openChannelDetails(channel),
     },
     {
       label: 'Update',
@@ -43,5 +43,5 @@ export const useChannelListEffects = () => {
     },
   ];
 
-  return {channels, isLoading, onCreateHandler, actions, channelsLoaded};
-}
+  return { channels, isLoading, onCreateHandler, actions, channelsLoaded };
+};
