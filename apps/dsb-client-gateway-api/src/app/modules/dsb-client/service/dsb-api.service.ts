@@ -342,6 +342,7 @@ export class DsbApiService implements OnApplicationBootstrap {
   ): Promise<TopicDataResponse> {
     //replacing double quotes in order to pass correct input to MB
     const owner = applicationNameSpace.replace(/"/g, '');
+    const topicName = name ? name.replace(/"/g, '') : '';
 
     try {
       const { data } = await this.request<TopicDataResponse>(
@@ -349,7 +350,7 @@ export class DsbApiService implements OnApplicationBootstrap {
           this.httpService.get(this.baseUrl + '/topics', {
             params: {
               limit,
-              name,
+              topicName,
               owner,
               page,
               tags,
