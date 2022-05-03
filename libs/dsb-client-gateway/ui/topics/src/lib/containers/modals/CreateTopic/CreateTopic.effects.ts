@@ -21,7 +21,7 @@ export const useCreateTopicEffects = () => {
   const queryClient = useQueryClient();
   const router = useRouter();
   const {
-    createTopic: { open, hide, application },
+    createTopic: { open, application },
   } = useTopicsModalsStore();
   const dispatch = useTopicsModalsDispatch();
   const Swal = useCustomAlert();
@@ -61,7 +61,6 @@ export const useCreateTopicEffects = () => {
       type: TopicsModalsActionsEnum.SHOW_CREATE_TOPIC,
       payload: {
         open: false,
-        hide: false,
         application: null,
       },
     });
@@ -133,7 +132,6 @@ export const useCreateTopicEffects = () => {
 
   return {
     open,
-    hide,
     closeModal,
     openCancelModal,
     fields,

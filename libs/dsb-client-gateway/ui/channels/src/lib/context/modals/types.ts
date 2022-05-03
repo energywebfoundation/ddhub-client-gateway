@@ -1,5 +1,4 @@
 import {
-  CreateChannelDto,
   GetChannelResponseDto,
   UpdateChannelDto,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';

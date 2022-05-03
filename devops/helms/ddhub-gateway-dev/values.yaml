@@ -49,8 +49,8 @@ ddhub-client-gateway-api:
     tag: canary
 
   imagePullSecrets: []
-  nameOverride: "ddhub-client-gateway-api-dev"
-  fullnameOverride: "ddhub-client-gateway-api-dev"
+  nameOverride: "ddhub-gateway-api-dev"
+  fullnameOverride: "ddhub-gateway-api-dev"
 
   serviceAccount:
     # Specifies whether a service account should be created
@@ -80,20 +80,25 @@ ddhub-client-gateway-api:
 
   ingress:
     enabled: true
-    annotations: {kubernetes.io/ingress.class: azure/application-gateway, appgw.ingress.kubernetes.io/ssl-redirect: "true"}
+    annotations: {kubernetes.io/ingress.class: nginx, ngress.kubernetes.io/rewrite-targe: $1}
       # kubernetes.io/tls-acme: "true"
     hosts:
-      - host: ddhub-gateway-api-dev.energyweb.org
+      - host: ddhub-gateway-dev.energyweb.org
         paths:
-        - path: /*
+        - path: /docs
           pathType: Prefix
           backend:
-            serviceName: ddhub-client-gateway-api
+            serviceName: ddhub-gateway-api-dev
+            servicePort: 80
+        - path: /api
+          pathType: Prefix
+          backend:
+            serviceName: ddhub-gateway-api-dev
             servicePort: 80
     tls:
       - secretName: dsb-tls-secret
         hosts:
-          - ddhub-gateway-api-dev.energyweb.org
+          - ddhub-gateway-dev.energyweb.org
 
   resources: {}
     # We usually recommend not to specify default resources and to leave this as a conscious

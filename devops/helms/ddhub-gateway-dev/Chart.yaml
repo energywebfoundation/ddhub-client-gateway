@@ -1,5 +1,5 @@
 apiVersion: v2
-name: ddhub-client-gateway-api-dev
+name: ddhub-client-gateway-dev
 description: A Helm chart for Kubernetes
 
 # A chart can be either an 'application' or a 'library' chart.
@@ -24,5 +24,5 @@ appVersion: "1.0"
 
 dependencies:
   - name: ddhub-client-gateway-api
-    version: 0.0.3
+    version: 0.1.0
     repository: https://aemocontainerregistry.azurecr.io/helm/v1/repo

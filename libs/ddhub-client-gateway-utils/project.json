@@ -1,0 +1,22 @@
+{
+  "root": "libs/ddhub-client-gateway-utils",
+  "sourceRoot": "libs/ddhub-client-gateway-utils/src",
+  "targets": {
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/ddhub-client-gateway-utils/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/libs/ddhub-client-gateway-utils"],
+      "options": {
+        "jestConfig": "libs/ddhub-client-gateway-utils/jest.config.js",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": []
+}

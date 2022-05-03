@@ -3,14 +3,10 @@ import { modalInitialState, modalsReducer } from './reducer';
 import { IModalStore, TModalAction } from './types';
 
 const ModalStore = createContext<IModalStore>(null);
-const ModalDispatch =
-  createContext<React.Dispatch<TModalAction>>(null);
+const ModalDispatch = createContext<React.Dispatch<TModalAction>>(null);
 
 export const ModalProvider: React.FC = ({ children }) => {
-  const [state, dispatch] = useReducer(
-    modalsReducer,
-    modalInitialState
-  );
+  const [state, dispatch] = useReducer(modalsReducer, modalInitialState);
 
   return (
     <ModalStore.Provider value={state}>

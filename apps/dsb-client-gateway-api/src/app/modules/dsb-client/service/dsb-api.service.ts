@@ -93,7 +93,7 @@ export class DsbApiService implements OnApplicationBootstrap {
         );
       },
       {
-        ...this.retryConfigService,
+        ...this.retryConfigService.config,
         ...overrideRetryConfig,
       }
     );
@@ -103,11 +103,11 @@ export class DsbApiService implements OnApplicationBootstrap {
 
   @Span('ddhub_mb_getDIDsFromRoles')
   public async getDIDsFromRoles(
-    roles: string[],
+    roles: string[] | undefined,
     searchType: 'ANY',
     overrideRetry?: OperationOptions
   ): Promise<string[]> {
-    if (roles.length === 0) {
+    if (!roles || roles.length === 0) {
       return [];
     }
 
@@ -155,7 +155,7 @@ export class DsbApiService implements OnApplicationBootstrap {
       return result.data;
     } catch (e) {
       this.logger.error('get Topic Versions failed', e);
-      throw new Error(e);
+      throw e;
     }
   }
 
@@ -185,7 +185,7 @@ export class DsbApiService implements OnApplicationBootstrap {
       return result.data;
     } catch (e) {
       this.logger.error('check If DID Has Roles  failed', e);
-      throw new Error(e);
+      throw e;
     }
   }
 
@@ -241,7 +241,7 @@ export class DsbApiService implements OnApplicationBootstrap {
         `upload file with file name: ${file.originalname} failed`,
         e
       );
-      throw new Error(e);
+      throw e;
     }
   }
 
@@ -275,7 +275,7 @@ export class DsbApiService implements OnApplicationBootstrap {
         `download file with fileId: ${fileId} failed from MB`,
         e
       );
-      throw new Error(e);
+      throw e;
     }
   }
 
@@ -311,7 +311,7 @@ export class DsbApiService implements OnApplicationBootstrap {
         `get topics with owner: ${owner} and name: ${name} failed`,
         e
       );
-      throw new Error(e);
+      throw e;
     }
   }
 
@@ -336,10 +336,13 @@ export class DsbApiService implements OnApplicationBootstrap {
   public async getTopics(
     limit: number,
     name: string,
-    owner: string,
+    applicationNameSpace: string,
     page: number,
     tags: string[]
   ): Promise<TopicDataResponse> {
+    //replacing double quotes in order to pass correct input to MB
+    const owner = applicationNameSpace.replace(/"/g, '');
+
     try {
       const { data } = await this.request<TopicDataResponse>(
         () =>
@@ -365,7 +368,7 @@ export class DsbApiService implements OnApplicationBootstrap {
       return data;
     } catch (e) {
       this.logger.error(`get topics with owner:${owner} failed`, e);
-      throw new Error(e);
+      throw e;
     }
   }
 
@@ -399,7 +402,7 @@ export class DsbApiService implements OnApplicationBootstrap {
       return result.data;
     } catch (e) {
       this.logger.error(`get topics count with owners: ${owners} failed`, e);
-      throw new Error(e);
+      throw e;
     }
   }
 
@@ -437,7 +440,7 @@ export class DsbApiService implements OnApplicationBootstrap {
       return result.data;
     } catch (e) {
       this.logger.error(`get topics search with keyword: ${keyword} failed`, e);
-      throw new Error(e);
+      throw e;
     }
   }
 
@@ -461,7 +464,7 @@ export class DsbApiService implements OnApplicationBootstrap {
       return data;
     } catch (e) {
       this.logger.error(`get topics history with id:${id} failed`, e);
-      throw new Error(e);
+      throw e;
     }
   }
 
@@ -496,7 +499,7 @@ export class DsbApiService implements OnApplicationBootstrap {
         `get topics history with id:${id} and version: ${version} failed`,
         e
       );
-      throw new Error(e);
+      throw e;
     }
   }
 
@@ -520,7 +523,7 @@ export class DsbApiService implements OnApplicationBootstrap {
       return data;
     } catch (e) {
       this.logger.error('post topics failed', e);
-      throw new Error(e);
+      throw e;
     }
   }
 
@@ -549,7 +552,7 @@ export class DsbApiService implements OnApplicationBootstrap {
       return result.data;
     } catch (e) {
       this.logger.error(`update topics failed with id: ${id}`, e);
-      throw new Error(e);
+      throw e;
     }
   }
 
@@ -588,7 +591,7 @@ export class DsbApiService implements OnApplicationBootstrap {
         `update topics failed with id: ${id} and versionNumber:${versionNumber}`,
         e
       );
-      throw new Error(e);
+      throw e;
     }
   }
 
@@ -614,7 +617,7 @@ export class DsbApiService implements OnApplicationBootstrap {
       return result.data;
     } catch (e) {
       this.logger.error(`delete topic failed with id:${id}`, e);
-      throw new Error(e);
+      throw e;
     }
   }
 
@@ -653,7 +656,7 @@ export class DsbApiService implements OnApplicationBootstrap {
         `delete topic with id ${id} and version ${version} failed`,
         e
       );
-      throw new Error(e);
+      throw e;
     }
   }
 
@@ -696,7 +699,7 @@ export class DsbApiService implements OnApplicationBootstrap {
       return result.data;
     } catch (e) {
       this.logger.error('messages search failed', e);
-      throw new Error(e);
+      throw e;
     }
   }
 
@@ -732,7 +735,7 @@ export class DsbApiService implements OnApplicationBootstrap {
       return result.data;
     } catch (e) {
       this.logger.error(`get messages failed for fqcn: ${fqcn}`, e);
-      throw new Error(e);
+      throw e;
     }
   }
 
@@ -775,7 +778,7 @@ export class DsbApiService implements OnApplicationBootstrap {
       return result.data;
     } catch (e) {
       this.logger.error('send message failed', e);
-      throw new Error(e);
+      throw e;
     }
   }
 
@@ -819,7 +822,7 @@ export class DsbApiService implements OnApplicationBootstrap {
         `send message internal failed with clientGatewayMessageId: ${clientGatewayMessageId}`,
         e
       );
-      throw new Error(e);
+      throw e;
     }
   }
 
@@ -852,7 +855,7 @@ export class DsbApiService implements OnApplicationBootstrap {
       return data;
     } catch (e) {
       this.logger.error(`get symmetric keys failed with dto:`, dto, e);
-      throw new Error(e);
+      throw e;
     }
   }
 

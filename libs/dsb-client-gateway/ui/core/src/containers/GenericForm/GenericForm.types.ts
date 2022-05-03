@@ -25,6 +25,7 @@ export type GenericFormField = {
   placeholder?: string;
   required?: boolean;
   select?: boolean;
+  radio?: boolean;
   options?: FormSelectOption[];
   autocomplete?: boolean;
   multiple?: boolean;

@@ -6,13 +6,11 @@ import { TopicsModalsActionsEnum } from './reducer';
 
 type TCreateTopic = {
   open: boolean;
-  hide: boolean;
   application: ApplicationDTO;
 };
 
 type TUpdateTopic = {
   open: boolean;
-  hide: boolean;
   topic: GetTopicDto;
   application: ApplicationDTO;
   canUpdateSchema?: boolean;

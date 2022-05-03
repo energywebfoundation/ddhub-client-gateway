@@ -65,6 +65,10 @@ export function makeServer({ environment = 'development' }) {
       this.delete('topics/:id/versions/:version', () => {
         return {};
       });
+
+      this.post('channel', (_schema, request) => {
+        return { channel: JSON.parse(request.requestBody) };
+      });
     },
   });
 }

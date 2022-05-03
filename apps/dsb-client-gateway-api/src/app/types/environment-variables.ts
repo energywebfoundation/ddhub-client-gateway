@@ -69,6 +69,10 @@ export class EnvironmentVariables {
   @ValidateIf(EnvironmentVariables.isWebsocketEnabled)
   EVENTS_EMIT_MODE = EventEmitMode.BULK;
 
+  @IsPositive()
+  @Transform(EnvironmentVariables.transformNumber('DID_TTL'))
+  DID_TTL = 60; // seconds
+
   @IsString()
   @ValidateIf(EnvironmentVariables.isClientWebSocketEnabled)
   WEBSOCKET_URL: string;
@@ -173,6 +177,9 @@ export class EnvironmentVariables {
   @IsString()
   @ValidateIf(EnvironmentVariables.isOTELEnabled)
   OTEL_ENVIRONMENT = 'local';
+
+  @IsString()
+  APPLICATION_NAMESPACE_REGULAR_EXPRESSION = '\\w.apps.*\\w.iam.ewc';
 
   @IsString()
   DB_NAME = 'local.db';

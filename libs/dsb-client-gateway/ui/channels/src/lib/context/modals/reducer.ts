@@ -18,7 +18,7 @@ export const modalInitialState: IModalStore = {
   },
   details: {
     open: false,
-    data: undefined
+    data: undefined,
   },
 };
 

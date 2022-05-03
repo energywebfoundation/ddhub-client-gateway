@@ -1,23 +1,23 @@
 import { FC } from 'react';
 import clsx from 'clsx';
 import {
-  CircularProgress,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  DialogActions,
-  Button,
-  Typography,
-  Grid,
   Box,
+  Button,
+  CircularProgress,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Grid,
+  Typography,
 } from '@mui/material';
 import {
   CloseButton,
-  FormInput,
-  FormSelect,
+  Dialog,
+  DialogSubTitle,
   Editor,
   EditorView,
+  FormInput,
+  FormSelect,
 } from '@dsb-client-gateway/ui/core';
 import { ApplicationInfo } from '../../../components';
 import { useUpdateTopicEffects } from './UpdateTopic.effects';
@@ -27,7 +27,6 @@ export const UpdateTopic: FC = () => {
   const { classes } = useStyles();
   const {
     open,
-    hide,
     closeModal,
     openCancelModal,
     fields,
@@ -43,26 +42,17 @@ export const UpdateTopic: FC = () => {
   } = useUpdateTopicEffects();
 
   return (
-    <Dialog
-      open={open}
-      onClose={closeModal}
-      fullWidth
-      className={classes.root}
-      classes={{ paper: classes.paper, container: classes.container }}
-      style={{ visibility: hide ? 'hidden' : 'visible' }}
-    >
+    <Dialog open={open} onClose={closeModal}>
       {isLoading ? (
         <Box className={classes.progress}>
           <CircularProgress />
         </Box>
       ) : (
         <>
-          <DialogTitle className={classes.title}>Update topic</DialogTitle>
+          <DialogTitle>Update topic</DialogTitle>
           <form onSubmit={onSubmit}>
             <DialogContent sx={{ padding: 0 }}>
-              <DialogContentText className={classes.subTitle}>
-                Update topic data
-              </DialogContentText>
+              <DialogSubTitle>Update topic data</DialogSubTitle>
               <Grid container mt={4}>
                 <Grid item xs={4}>
                   {application && <ApplicationInfo application={application} />}

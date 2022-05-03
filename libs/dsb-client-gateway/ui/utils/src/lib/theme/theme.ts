@@ -88,6 +88,20 @@ const dsbTheme: ThemeOptions = {
         }
       `,
     },
+    MuiDialogTitle: {
+      styleOverrides: {
+        root: {
+          fontSize: 23,
+          lineHeight: '34px',
+          fontWeight: 400,
+          fontFamily: 'Bw Gradual',
+          color: '#ffffff',
+          padding: 0,
+          marginBottom: 8,
+          textAlign: 'center'
+        }
+      }
+    },
     MuiDrawer: {
       styleOverrides: {
         // Name of the slot
@@ -125,6 +139,13 @@ const dsbTheme: ThemeOptions = {
         },
       },
     },
+    MuiDivider: {
+      styleOverrides: {
+        root: {
+          borderColor: '#343D4D'
+        }
+      }
+    }
   },
 };
 
