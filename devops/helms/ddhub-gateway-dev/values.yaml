@@ -49,8 +49,8 @@ ddhub-client-gateway-api:
     tag: canary
 
   imagePullSecrets: []
-  nameOverride: "ddhub-client-gateway-api-dev"
-  fullnameOverride: "ddhub-client-gateway-api-dev"
+  nameOverride: "ddhub-gateway-api-dev"
+  fullnameOverride: "ddhub-gateway-api-dev"
 
   serviceAccount:
     # Specifies whether a service account should be created
@@ -88,12 +88,12 @@ ddhub-client-gateway-api:
         - path: /docs
           pathType: Prefix
           backend:
-            serviceName: ddhub-client-gateway-api-dev
+            serviceName: ddhub-gateway-api-dev
             servicePort: 80
         - path: /api
           pathType: Prefix
           backend:
-            serviceName: ddhub-client-gateway-api-dev
+            serviceName: ddhub-gateway-api-dev
             servicePort: 80
     tls:
       - secretName: dsb-tls-secret
