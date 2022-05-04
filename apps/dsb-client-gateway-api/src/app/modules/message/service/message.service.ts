@@ -83,10 +83,25 @@ export class MessageService {
     });
   }
 
-  public async sendMessage(dto: SendMessageDto): Promise<SendMessageResponse> {
-    const channel = await this.channelService.getChannelOrThrow(dto.fqcn);
+  private checkTopicForChannel(
+    channel: ChannelEntity,
+    topic: TopicEntity
+  ): boolean {
+    const topicFound = channel.conditions.topics.find(
+      (topicOfChannel) => topicOfChannel.topicId === topic.id
+    );
+    if (!topicFound) {
+      return false;
+    }
+    return true;
+  }
 
-    const topic = await this.topicService.getTopic(
+  public async sendMessage(dto: SendMessageDto): Promise<SendMessageResponse> {
+    const channel: ChannelEntity = await this.channelService.getChannelOrThrow(
+      dto.fqcn
+    );
+
+    const topic: TopicEntity = await this.topicService.getTopic(
       dto.topicName,
       dto.topicOwner,
       dto.topicVersion
@@ -102,12 +117,15 @@ export class MessageService {
       throw new TopicNotFoundException('NOT Found');
     }
 
-    const topicFound = channel.conditions.topics.find(
-      (topicOfChannel) => topicOfChannel.topicId === topic.id
+    const isTopicRelatedToChannel: boolean = this.checkTopicForChannel(
+      channel,
+      topic
     );
 
-    if (!topicFound) {
-      throw new TopicNotRelatedToChannelException('');
+    if (!isTopicRelatedToChannel) {
+      throw new TopicNotRelatedToChannelException(
+        `topic with ${topic.name} not related to channel with name ${dto.fqcn}`
+      );
     }
 
     const qualifiedDids = channel.conditions.qualifiedDids;

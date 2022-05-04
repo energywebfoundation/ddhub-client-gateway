@@ -3,6 +3,7 @@ const ajv = new Ajv({ multipleOfPrecision: 1 });
 import { SchemaNotValidException } from '../../../message/exceptions/schema-not-valid.exception';
 import { SchemaType } from '../../../message/message.const';
 import addFormats from 'ajv-formats';
+import { MalformedJSONException } from '../../../message/exceptions/malformed-json.exception';
 
 export function IsSchemaValid(
   schemaType: string,
@@ -51,9 +52,7 @@ function validateJSONSchema(schema: object, payload: string) {
   try {
     jsonPayload = JSON.parse(payload);
   } catch (e) {
-    throw new SchemaNotValidException(
-      'Payload cannot be parsed to JSON object'
-    );
+    throw new MalformedJSONException('Payload cannot be parsed to JSON object');
   }
 
   try {
