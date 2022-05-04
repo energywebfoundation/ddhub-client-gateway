@@ -59,7 +59,6 @@ function validateJSONSchema(schema: object, payload: string) {
   try {
     validate = ajv.compile(schema);
   } catch (e) {
-    console.log(e);
     throw new SchemaNotValidException(e.message);
   }
   const valid: boolean = validate(jsonPayload);
