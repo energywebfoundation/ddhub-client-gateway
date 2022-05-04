@@ -3,7 +3,7 @@ import { Home, ChevronRight } from 'react-feather';
 import Link from 'next/link';
 import clsx from 'clsx';
 import { routerConst, theme } from '@dsb-client-gateway/ui/utils';
-import { AppImage } from '@dsb-client-gateway/ui/core';
+import { Image } from '@dsb-client-gateway/ui/core';
 import { useBreadcrumbsEffects } from './Breadcrumbs.effects';
 import { useStyles } from './Breadcrumbs.styles';
 
@@ -20,11 +20,11 @@ export function Breadcrumbs() {
 
   return (
     <section className={classes.root}>
-      {item.imageUrl && (
-        <AppImage src={item.imageUrl} className={classes.image} />
+      {item?.imageUrl && (
+        <Image src={item.imageUrl} className={classes.image} />
       )}
       <Typography variant="h5" className={classes.pageTitle}>
-        {item.title}
+        {item?.title}
       </Typography>
       <Box className={classes.line}></Box>
       <MuiBreadcrumbs
