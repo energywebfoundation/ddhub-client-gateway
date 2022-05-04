@@ -86,8 +86,6 @@ export class MessageService {
   public async sendMessage(dto: SendMessageDto): Promise<SendMessageResponse> {
     const channel = await this.channelService.getChannelOrThrow(dto.fqcn);
 
-    console.log('channel', JSON.stringify(channel, null, 2));
-
     const topic = await this.topicService.getTopic(
       dto.topicName,
       dto.topicOwner,
