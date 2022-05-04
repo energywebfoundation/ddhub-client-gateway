@@ -2,7 +2,7 @@ name: Build and publish images
 
 on:
   push:
-    branches: [ ddhub-dev ]
+    branches: [ ddhub-dev, demo-instance-CD ]
 env:
   SECRETS_ENGINE: vault
 
@@ -84,11 +84,18 @@ jobs:
           command: login ${{ secrets.ARGOCD_DEV_URL }}
           options: --insecure --password ${{ secrets.ARGOCD_DEV_PASS }} --username ${{ secrets.ARGOCD_DEV_USERNAME }}
 
-      - name: ArgoCD overwrite image tag
+      - name: ArgoCD overwrite DEV image tag
         uses: clowdhaus/argo-cd-action/@main
         id: argocd_image_tag_overwrite
         with:
           command: app set ddhub-gateway-dev
+          options: -p ddhub-client-gateway-api.image.tag=${{needs.unique_id.outputs.unique_id}}
+
+      - name: ArgoCD overwrite DEMO image tag
+        uses: clowdhaus/argo-cd-action/@main
+        id: argocd_image_tag_overwrite
+        with:
+          command: app set ddhub-gateway-demo
           options: -p ddhub-client-gateway-api.image.tag=${{needs.unique_id.outputs.unique_id}}
   build-fe:
     name: Build Frontend
@@ -149,9 +156,16 @@ jobs:
           command: login ${{ secrets.ARGOCD_DEV_URL }}
           options: --insecure --password ${{ secrets.ARGOCD_DEV_PASS }} --username ${{ secrets.ARGOCD_DEV_USERNAME }}
 
-      - name: ArgoCD overwrite image tag
+      - name: ArgoCD overwrite DEV image tag
         uses: clowdhaus/argo-cd-action/@main
         id: argocd_image_tag_overwrite
         with:
           command: app set ddhub-gateway-dev
+          options: -p ddhub-client-gateway-api.ddhub-client-gateway-ui.image.tag=${{needs.unique_id.outputs.unique_id}}
+
+      - name: ArgoCD overwrite DEMO image tag
+        uses: clowdhaus/argo-cd-action/@main
+        id: argocd_image_tag_overwrite
+        with:
+          command: app set ddhub-gateway-demo
           options: -p ddhub-client-gateway-api.ddhub-client-gateway-ui.image.tag=${{needs.unique_id.outputs.unique_id}}
