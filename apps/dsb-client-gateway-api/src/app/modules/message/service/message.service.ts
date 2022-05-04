@@ -113,12 +113,12 @@ export class MessageService {
       throw new TopicNotFoundException('NOT Found');
     }
 
-    const isTopicRelatedToChannel: boolean = this.checkTopicForChannel(
+    const isTopicNotRelatedToChannel: boolean = this.checkTopicForChannel(
       channel,
       topic
     );
 
-    if (!isTopicRelatedToChannel) {
+    if (isTopicNotRelatedToChannel) {
       throw new TopicNotRelatedToChannelException(
         `topic with ${topic.name} and owner ${topic.owner} not related to channel with name ${dto.fqcn}`
       );
