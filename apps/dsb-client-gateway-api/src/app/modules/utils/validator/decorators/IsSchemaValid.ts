@@ -30,34 +30,6 @@ addFormats(ajv, {
   ],
   keywords: true,
 });
-
-addFormats(ajv, {
-  mode: 'fast',
-  formats: [
-    'date',
-    'time',
-    'date-time',
-    'duration',
-    'uri',
-    'uri-reference',
-    'uri-template',
-    'email',
-    'hostname',
-    'ipv4',
-    'ipv6',
-    'uuid',
-    'json-pointer',
-    'byte',
-    'int32',
-    'int64',
-    'float',
-    'double',
-    'password',
-    'binary',
-  ],
-  keywords: true,
-});
-
 export function IsSchemaValid(
   schemaType: string,
   schema: object,
