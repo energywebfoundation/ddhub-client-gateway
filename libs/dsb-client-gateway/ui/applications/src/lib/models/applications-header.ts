@@ -5,7 +5,7 @@ export const APPLICATIONS_HEADERS = [
   {
     accessor: 'logoUrl',
     Cell: AppImageWithWrapper,
-    width: '50px',
+    style: { width: '50px' }
   },
   {
     Header: 'APPLICATION NAME',

@@ -31,7 +31,7 @@ export const Details: FC = () => {
         {channel && (
           <>
             <Box className={classes.channelWrapper}>
-              <ChannelImage type={channel.type} />
+              <ChannelImage type={channel.type} wrapperProps={{ width: '62px', height: '52px' }} />
               <Typography className={classes.type}>
                 {getChannelType(channel.type)}
               </Typography>

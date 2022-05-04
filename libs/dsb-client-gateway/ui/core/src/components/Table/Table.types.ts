@@ -8,7 +8,7 @@ export interface TableHeader {
   filter?: string;
   isSorted?: boolean;
   isSortedDesc?: boolean;
-  width?: TableCellProps['width'];
+  style?: TableCellProps['style'];
 }
 
 export interface TableProps<T> {

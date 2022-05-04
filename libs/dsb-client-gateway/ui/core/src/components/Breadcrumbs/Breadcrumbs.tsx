@@ -1,21 +1,32 @@
-import { Breadcrumbs as MuiBreadcrumbs, Typography } from '@mui/material';
-import { Home } from 'react-feather';
-import { useStyles } from './Breadcrumbs.styles';
+import { Breadcrumbs as MuiBreadcrumbs, Typography, Box } from '@mui/material';
+import { Home, ChevronRight } from 'react-feather';
 import Link from 'next/link';
+import clsx from 'clsx';
 import { routerConst, theme } from '@dsb-client-gateway/ui/utils';
+import { AppImage } from '@dsb-client-gateway/ui/core';
 import { useBreadcrumbsEffects } from './Breadcrumbs.effects';
-import { NavigateNext } from '@mui/icons-material';
+import { useStyles } from './Breadcrumbs.styles';
 
 export function Breadcrumbs() {
-  const [title, ...list] = useBreadcrumbsEffects();
   const { classes } = useStyles();
-  const separator = list.length > 0 ? <NavigateNext fontSize="small" /> : '';
+  const [item, ...list] = useBreadcrumbsEffects();
+
+  const separator =
+    list.length > 0 ? (
+      <ChevronRight color={theme.palette.grey[600]} size={14} />
+    ) : (
+      ''
+    );
+
   return (
     <section className={classes.root}>
+      {item.imageUrl && (
+        <AppImage src={item.imageUrl} className={classes.image} />
+      )}
       <Typography variant="h5" className={classes.pageTitle}>
-        {title}
+        {item.title}
       </Typography>
-      <Typography variant="h5">|</Typography>
+      <Box className={classes.line}></Box>
       <MuiBreadcrumbs
         separator={separator}
         aria-label="breadcrumb"
@@ -29,15 +40,13 @@ export function Breadcrumbs() {
       <MuiBreadcrumbs separator={separator} aria-label="breadcrumb">
         {list?.map((item, index, list) => (
           <Typography
-            key={item}
+            key={item.title}
             variant="subtitle2"
-            className={
-              index === list.length - 1
-                ? classes.lastElement
-                : classes.defaultElement
-            }
+            className={clsx(classes.element, {
+              [classes.lastElement]: index === list.length - 1,
+            })}
           >
-            {item}
+            {item.title}
           </Typography>
         ))}
       </MuiBreadcrumbs>

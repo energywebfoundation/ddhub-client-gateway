@@ -41,7 +41,7 @@ export const useStyles = makeStyles()((theme) => ({
   },
   wrapper: {
     display: 'inline-flex',
-    margin: '16px 0',
+    margin: '0 0 16px',
     alignItems: 'center',
   },
   label: {
