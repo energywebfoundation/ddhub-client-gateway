@@ -4,9 +4,10 @@ import { useTableComponentActionsEffects } from './TableComponentActions.effects
 import { useStyles } from './TableComponentActions.styles';
 
 export type TTableComponentAction<T = Record<string, unknown>> = {
-  label: string;
-  onClick?: (id: T) => void;
+  onClick: (id: T) => void;
+  label?: string;
   color?: string;
+  icon?: React.ReactElement;
 };
 
 interface TableComponentActionsProps<T> {
@@ -21,51 +22,68 @@ export function TableComponentActions<T>({
   const { classes } = useStyles();
   const { menuOpen, handleMenuOpen, handleClose, anchorRef } =
     useTableComponentActionsEffects();
+  const singleActionWithIcon =
+    actions.every((action) => action.icon) && actions.length === 1;
 
   return (
     <TableCell>
-      <IconButton onClick={handleMenuOpen} ref={anchorRef}>
-        <MoreVertical className={classes.icon} />
-      </IconButton>
-      <Menu
-        keepMounted
-        anchorEl={anchorRef.current}
-        open={menuOpen}
-        onClose={handleClose}
-        onClick={(event: React.MouseEvent<HTMLElement>) =>
-          event.stopPropagation()
-        }
-        classes={{
-          paper: classes.paper,
-          list: classes.list,
-        }}
-        anchorOrigin={{
-          vertical: 'top',
-          horizontal: 'right',
-        }}
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'right',
-        }}
-      >
-        {actions.map((action) => {
+      {singleActionWithIcon ? (
+        actions.map((action) => {
+          const handleAction = () => {
+            handleClose();
+            action.onClick(data);
+          };
           return (
-            <MenuItem
-              key={action.label}
-              style={{ color: action.color ?? 'inherit' }}
-              className={classes.menuItem}
-              onClick={() => {
-                if (action.onClick) {
-                  handleClose();
-                  action.onClick(data);
-                }
-              }}
-            >
-              {action.label}
-            </MenuItem>
+            <IconButton disableRipple onClick={handleAction}>
+              {action.icon}
+            </IconButton>
           );
-        })}
-      </Menu>
+        })
+      ) : (
+        <>
+          <IconButton onClick={handleMenuOpen} ref={anchorRef}>
+            <MoreVertical className={classes.icon} />
+          </IconButton>
+          <Menu
+            keepMounted
+            anchorEl={anchorRef.current}
+            open={menuOpen}
+            onClose={handleClose}
+            onClick={(event: React.MouseEvent<HTMLElement>) =>
+              event.stopPropagation()
+            }
+            classes={{
+              paper: classes.paper,
+              list: classes.list,
+            }}
+            anchorOrigin={{
+              vertical: 'top',
+              horizontal: 'right',
+            }}
+            transformOrigin={{
+              vertical: 'top',
+              horizontal: 'right',
+            }}
+          >
+            {actions.map((action) => {
+              const handleAction = () => {
+                handleClose();
+                action.onClick(data);
+              };
+              return (
+                <MenuItem
+                  key={action.label}
+                  style={{ color: action.color ?? 'inherit' }}
+                  className={classes.menuItem}
+                  onClick={handleAction}
+                >
+                  {action.label}
+                </MenuItem>
+              );
+            })}
+          </Menu>
+        </>
+      )}
     </TableCell>
   );
-};
+}

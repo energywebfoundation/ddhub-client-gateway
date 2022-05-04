@@ -29,8 +29,10 @@ export function GenericTable<T>({
   children,
   actions,
   loading,
+  containerProps,
+  loadingRows,
   showSearch = true,
-  showFooter = true
+  showFooter = true,
 }: TableProps<T>) {
   const { classes } = useStyles();
   const {
@@ -49,13 +51,17 @@ export function GenericTable<T>({
 
   return (
     <>
-      {showSearch ? <Box display="flex">
-        <Search filter={globalFilter} setFilter={setGlobalFilter} />
-        {children}
-      </Box> : ''}
-      <TableContainer component={Paper}>
+      {showSearch ? (
+        <Box display="flex">
+          <Search filter={globalFilter} setFilter={setGlobalFilter} />
+          {children}
+        </Box>
+      ) : (
+        ''
+      )}
+      <TableContainer component={Paper} {...containerProps}>
         {loading ? (
-          <TableRowsLoadingComponent pageSize={pageSize} />
+          <TableRowsLoadingComponent pageSize={loadingRows ?? pageSize} />
         ) : rows.length !== 0 ? (
           <Table
             className={classes.root}
@@ -109,7 +115,7 @@ export function GenericTable<T>({
                       };
                       return (
                         <TableCell
-                          style={{ cursor: onRowClick ? 'pointer' : 'default'}}
+                          style={{ cursor: onRowClick ? 'pointer' : 'default' }}
                           classes={{ body: classes.body }}
                           color={column.color}
                           {...cell.getCellProps()}
@@ -127,26 +133,28 @@ export function GenericTable<T>({
 
               {emptyRows > 0 && <EmptyRow rowsToFill={emptyRows} />}
             </TableBody>
-            {showFooter && <TableFooter>
-              <TableRow>
-                <TablePagination
-                  rowsPerPageOptions={[]}
-                  labelDisplayedRows={({ from, to, count }) =>
-                    `Showing ${from} to ${to} of ${count} entries`
-                  }
-                  count={totalLength}
-                  rowsPerPage={pageSize}
-                  page={pageIndex}
-                  onPageChange={handleChangePage}
-                  ActionsComponent={TablePaginationActions}
-                  classes={{
-                    spacer: classes.spacer,
-                    displayedRows: classes.displayedRows,
-                    toolbar: classes.toolbar
-                  }}
-                />
-              </TableRow>
-            </TableFooter>}
+            {showFooter && (
+              <TableFooter>
+                <TableRow>
+                  <TablePagination
+                    rowsPerPageOptions={[]}
+                    labelDisplayedRows={({ from, to, count }) =>
+                      `Showing ${from} to ${to} of ${count} entries`
+                    }
+                    count={totalLength}
+                    rowsPerPage={pageSize}
+                    page={pageIndex}
+                    onPageChange={handleChangePage}
+                    ActionsComponent={TablePaginationActions}
+                    classes={{
+                      spacer: classes.spacer,
+                      displayedRows: classes.displayedRows,
+                      toolbar: classes.toolbar,
+                    }}
+                  />
+                </TableRow>
+              </TableFooter>
+            )}
           </Table>
         ) : (
           <EmptyTable />

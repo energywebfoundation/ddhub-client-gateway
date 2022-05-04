@@ -29,6 +29,7 @@ export const ViewTopicDetails: FC = () => {
     <Dialog
       open={open}
       onClose={closeModal}
+      paperClassName={classes.paper}
     >
       {isLoading ? (
         <Box className={classes.progress}>

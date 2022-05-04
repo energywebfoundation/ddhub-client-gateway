@@ -14,7 +14,7 @@ import {
 import { useCreateChannel } from '@dsb-client-gateway/ui/api-hooks';
 import { Topic } from './Topics/Topics.effects';
 import { ICreateChannel } from '../models/create-channel.interface';
-import { ChannelType } from './Details/models/channel-type.enum';
+import { ChannelType } from '../../../models/channel-type.enum';
 import { ConnectionType } from './Details/models/connection-type.enum';
 
 export const useCreateChannelEffects = () => {

@@ -12,7 +12,7 @@ export const useTableComponentActionsEffects = () => {
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     event.stopPropagation();
     setMenuOpen(true);
-  }
+  };
 
   return {
     menuOpen,
