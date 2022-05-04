@@ -63,6 +63,7 @@
     "@opentelemetry/tracing": "^0.24.0",
     "@sentry/nextjs": "^6.17.9",
     "ajv": "^8.11.0",
+    "ajv-formats": "^2.1.1",
     "babel-plugin-styled-components": "^2.0.2",
     "better-sqlite3": "^7.5.1",
     "bip39": "^3.0.4",
