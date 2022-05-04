@@ -87,13 +87,9 @@ export class MessageService {
     channel: ChannelEntity,
     topic: TopicEntity
   ): boolean {
-    const topicFound = channel.conditions.topics.find(
+    return !channel.conditions.topics.find(
       (topicOfChannel) => topicOfChannel.topicId === topic.id
     );
-    if (!topicFound) {
-      return false;
-    }
-    return true;
   }
 
   public async sendMessage(dto: SendMessageDto): Promise<SendMessageResponse> {
@@ -124,7 +120,7 @@ export class MessageService {
 
     if (!isTopicRelatedToChannel) {
       throw new TopicNotRelatedToChannelException(
-        `topic with ${topic.name} not related to channel with name ${dto.fqcn}`
+        `topic with ${topic.name} and owner ${topic.owner} not related to channel with name ${dto.fqcn}`
       );
     }
 
