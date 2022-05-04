@@ -19,25 +19,27 @@ export function IsSchemaValid(
 
 function validateJSONSchema(schema: object, payload: string) {
   let validate: any;
-  let valid: boolean;
+  let jsonPayload: object;
+  try {
+    jsonPayload = JSON.parse(payload);
+  } catch (e) {
+    throw new SchemaNotValidException(
+      'Payload cannot be parsed to JSON object.'
+    );
+  }
 
   try {
-    const jsonPayload = JSON.parse(payload);
     validate = ajv.compile(schema);
-    valid = validate(jsonPayload);
   } catch (e) {
-    valid = false;
+    throw new SchemaNotValidException(e.message);
   }
+  const valid: boolean = validate(jsonPayload);
 
   if (valid) {
     return true;
   } else if (validate) {
     throw new SchemaNotValidException(
       JSON.stringify(ajv.errorsText(validate.errors))
-    );
-  } else {
-    throw new SchemaNotValidException(
-      'Payload cannot be parsed to JSON object.'
     );
   }
 }

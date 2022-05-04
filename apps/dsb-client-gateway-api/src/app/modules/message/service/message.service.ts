@@ -36,6 +36,7 @@ import {
   TopicEntity,
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
 import { FileNotFoundException } from '../exceptions/file-not-found.exception';
+import { TopicNotRelatedToChannelException } from '../exceptions/topic-not-related-to-channel.exception';
 
 export enum EventEmitMode {
   SINGLE = 'SINGLE',
@@ -85,6 +86,8 @@ export class MessageService {
   public async sendMessage(dto: SendMessageDto): Promise<SendMessageResponse> {
     const channel = await this.channelService.getChannelOrThrow(dto.fqcn);
 
+    console.log('channel', JSON.stringify(channel, null, 2));
+
     const topic = await this.topicService.getTopic(
       dto.topicName,
       dto.topicOwner,
@@ -99,6 +102,14 @@ export class MessageService {
       !topic.version
     ) {
       throw new TopicNotFoundException('NOT Found');
+    }
+
+    const topicFound = channel.conditions.topics.find(
+      (topicOfChannel) => topicOfChannel.topicId === topic.id
+    );
+
+    if (!topicFound) {
+      throw new TopicNotRelatedToChannelException('');
     }
 
     const qualifiedDids = channel.conditions.qualifiedDids;
