@@ -92,25 +92,36 @@ export const getTopicsControllerGetTopicHistoryByIdAndVersionMock = () => ({
   version: '1.0.0',
 });
 
-export const getChannelControllerGetByTypeMock = () => ([
-    {
-      "fqcn": "channel.name",
-      "type": "sub",
-      "conditions": {
-        "dids": [
-          "did:ethr:volta:0x09Df5d33f1242E1b8aA5E0E0F6BfA687E6846993"
-        ],
-        "roles": [
-          "marketoperator.roles"
-        ],
-        "topics": [
-          {
-            "topicName": "operatorEnvelope",
-            "owner": "aemo.edge",
-            "topicId": "622fed6e4258501225095045"
-          }
-        ]
-      }
-    }
-  ]
-);
+export const getChannelControllerGetByTypeMock = () => [
+  {
+    fqcn: 'channel.name',
+    type: 'sub',
+    conditions: {
+      dids: ['did:ethr:volta:0x09Df5d33f1242E1b8aA5E0E0F6BfA687E6846993'],
+      roles: ['marketoperator.roles'],
+      topics: [
+        {
+          topicName: 'operatorEnvelope',
+          owner: 'aemo.edge',
+          topicId: '622fed6e4258501225095045',
+        },
+      ],
+    },
+  },
+];
+
+export const getChannelControllerGetMock = () => ({
+  fqcn: 'channel.name',
+  type: 'sub',
+  conditions: {
+    dids: ['did:ethr:volta:0x09Df5d33f1242E1b8aA5E0E0F6BfA687E6846993'],
+    roles: ['marketoperator.roles'],
+    topics: [
+      {
+        topicName: 'operatorEnvelope',
+        owner: 'aemo.edge',
+        topicId: '622fed6e4258501225095045',
+      },
+    ],
+  },
+});

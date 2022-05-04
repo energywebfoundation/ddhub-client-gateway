@@ -1,5 +1,5 @@
 import { useStyles } from './Header.styles';
-import { didFormatMinifier } from '../../utils/did-format-minifier';
+import { didFormatMinifier } from '@dsb-client-gateway/ui/utils';
 import { useHeaderEffects } from './Header.effects';
 
 export function Header() {

@@ -2,14 +2,13 @@ import { FC } from 'react';
 import { Edit, Download } from 'react-feather';
 import {
   CircularProgress,
-  Dialog,
   DialogContent,
   DialogActions,
   Typography,
   Box,
   IconButton,
 } from '@mui/material';
-import { CloseButton, AppImage, EditorView } from '@dsb-client-gateway/ui/core';
+import { CloseButton, AppImage, EditorView, Dialog } from '@dsb-client-gateway/ui/core';
 import { TopicDetail } from './TopicDetail';
 import { useViewTopicDetailsEffects } from './ViewTopicDetails.effects';
 import { useStyles } from './ViewTopicDetails.styles';
@@ -30,9 +29,7 @@ export const ViewTopicDetails: FC = () => {
     <Dialog
       open={open}
       onClose={closeModal}
-      fullWidth
-      className={classes.root}
-      classes={{ paper: classes.paper, container: classes.container }}
+      paperClassName={classes.paper}
     >
       {isLoading ? (
         <Box className={classes.progress}>
