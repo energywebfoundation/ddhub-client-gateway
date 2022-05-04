@@ -1,42 +1,41 @@
 import Ajv from 'ajv';
-const ajv = new Ajv({ multipleOfPrecision: 1 });
+const ajv = new Ajv({ allErrors: true, multipleOfPrecision: 1 });
 import { SchemaNotValidException } from '../../../message/exceptions/schema-not-valid.exception';
 import { SchemaType } from '../../../message/message.const';
 import addFormats from 'ajv-formats';
 import { MalformedJSONException } from '../../../message/exceptions/malformed-json.exception';
+addFormats(ajv, {
+  mode: 'fast',
+  formats: [
+    'date',
+    'time',
+    'date-time',
+    'duration',
+    'uri',
+    'uri-reference',
+    'uri-template',
+    'email',
+    'hostname',
+    'ipv4',
+    'ipv6',
+    'uuid',
+    'json-pointer',
+    'byte',
+    'int32',
+    'int64',
+    'float',
+    'double',
+    'password',
+    'binary',
+  ],
+  keywords: true,
+});
 
 export function IsSchemaValid(
   schemaType: string,
   schema: object,
   payload: string
 ) {
-  addFormats(ajv, {
-    mode: 'fast',
-    formats: [
-      'date',
-      'time',
-      'date-time',
-      'duration',
-      'uri',
-      'uri-reference',
-      'uri-template',
-      'email',
-      'hostname',
-      'ipv4',
-      'ipv6',
-      'uuid',
-      'json-pointer',
-      'byte',
-      'int32',
-      'int64',
-      'float',
-      'double',
-      'password',
-      'binary',
-    ],
-    keywords: true,
-  });
-
   let isValid = true;
   switch (schemaType) {
     case SchemaType.JSD7:
