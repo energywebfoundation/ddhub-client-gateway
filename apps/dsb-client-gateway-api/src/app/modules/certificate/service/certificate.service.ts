@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { SecretsEngineService } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
+import 'multer';
 
 @Injectable()
 export class CertificateService {

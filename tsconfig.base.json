@@ -14,8 +14,15 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
+    "types": ["Multer"],
     "esModuleInterop": true,
     "paths": {
+      "@dsb-client-gateway/ddhub-client-gateway-did-auth": [
+        "libs/ddhub-client-gateway-did-auth/src/index.ts"
+      ],
+      "@dsb-client-gateway/ddhub-client-gateway-message-broker": [
+        "libs/ddhub-client-gateway-message-broker/src/index.ts"
+      ],
       "@dsb-client-gateway/ddhub-client-gateway-tracing": [
         "libs/ddhub-client-gateway-tracing/src/index.ts"
       ],
