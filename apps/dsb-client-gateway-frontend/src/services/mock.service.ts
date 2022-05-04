@@ -38,6 +38,10 @@ export function makeServer({ environment = 'development' }) {
         return getChannelControllerGetMock();
       });
 
+      this.delete('/channels/:fqcn', () => {
+        return {};
+      });
+
       this.post('/topics', (_schema, request) => {
         return { topic: JSON.parse(request.requestBody) };
       });
