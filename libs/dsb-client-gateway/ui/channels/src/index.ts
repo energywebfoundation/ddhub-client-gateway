@@ -1,1 +1,1 @@
-export * from './lib/ChannelsContainer';
+export * from './lib/containers';

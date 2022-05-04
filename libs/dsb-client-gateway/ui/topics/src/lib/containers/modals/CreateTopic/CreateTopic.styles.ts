@@ -2,38 +2,6 @@ import { makeStyles } from 'tss-react/mui';
 import { alpha, darken } from '@mui/material/styles';
 
 export const useStyles = makeStyles()((theme) => ({
-  root: {
-    '& .MuiBackdrop-root': {
-      transition: 'none !important'
-    }
-  },
-  paper: {
-    maxWidth: 756,
-    minHeight: 633,
-    padding: '37px 43px 32px 32px',
-    borderRadius: 6
-  },
-  container: {
-    transition: 'none !important'
-  },
-  title: {
-    fontSize: 23,
-    lineHeight: '34px',
-    fontWeight: 400,
-    fontFamily: theme.typography.body1.fontFamily,
-    color: theme.palette.common.white,
-    padding: 0,
-    marginBottom: 8,
-    textAlign: 'center'
-  },
-  subTitle: {
-    fontSize: 14,
-    lineHeight: '21px',
-    fontWeight: 400,
-    textAlign: 'center',
-    color: theme.palette.grey[400],
-    fontFamily: theme.typography.body2.fontFamily,
-  },
   closeButtonWrapper: {
     position: 'absolute',
     top: 17,

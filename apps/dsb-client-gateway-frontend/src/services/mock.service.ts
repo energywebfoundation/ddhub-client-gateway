@@ -6,6 +6,7 @@ import {
   getTopicsControllerGetTopicsMock,
   getTopicsControllerGetTopicHistoryByIdAndVersionMock,
   getChannelControllerGetByTypeMock,
+  getChannelControllerGetMock,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 
 export function makeServer({ environment = 'development' }) {
@@ -31,6 +32,14 @@ export function makeServer({ environment = 'development' }) {
 
       this.get('/channels', () => {
         return getChannelControllerGetByTypeMock();
+      });
+
+      this.get('/channels/:fqcn', () => {
+        return getChannelControllerGetMock();
+      });
+
+      this.delete('/channels/:fqcn', () => {
+        return {};
       });
 
       this.post('/topics', (_schema, request) => {
@@ -59,6 +68,10 @@ export function makeServer({ environment = 'development' }) {
 
       this.delete('topics/:id/versions/:version', () => {
         return {};
+      });
+
+      this.post('channel', (_schema, request) => {
+        return { channel: JSON.parse(request.requestBody) };
       });
     },
   });
