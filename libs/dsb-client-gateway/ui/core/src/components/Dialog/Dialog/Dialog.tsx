@@ -5,9 +5,10 @@ export interface DialogProps {
   children: React.ReactNode;
   onClose: () => void;
   open: boolean;
+  paperClassName?: string;
 }
 
-export const Dialog = ({ children, onClose, open }: DialogProps) => {
+export const Dialog = ({ children, onClose, open, paperClassName }: DialogProps) => {
   const { classes } = useStyles();
   return (
     <MuiDialog
@@ -15,7 +16,7 @@ export const Dialog = ({ children, onClose, open }: DialogProps) => {
       onClose={onClose}
       fullWidth
       className={classes.root}
-      classes={{ paper: classes.paper, container: classes.container }}
+      classes={{ paper: paperClassName ?? classes.paper, container: classes.container }}
       style={{ visibility: !open ? 'hidden' : 'visible' }}
     >
       {children}

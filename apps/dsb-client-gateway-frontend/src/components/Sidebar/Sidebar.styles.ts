@@ -1,77 +1,43 @@
 import { makeStyles } from 'tss-react/mui';
-import {alpha} from '@mui/material/styles';
+import { alpha } from '@mui/material/styles';
 
 const drawerWidth = 264;
 
-export const useStyles = makeStyles()(theme => ({
+export const useStyles = makeStyles()((theme) => ({
   root: {
-    display: "flex"
+    display: 'flex',
   },
   drawer: {
-    [theme.breakpoints.up("md")]: {
+    [theme.breakpoints.up('md')]: {
       width: drawerWidth,
-      flexShrink: 0
-    }
+      flexShrink: 0,
+    },
   },
   appBar: {
     zIndex: theme.zIndex.drawer + 1,
     backgroundColor: 'unset',
     boxShadow: 'unset',
-    padding: '5px 0'
+    padding: '5px 0',
   },
   menuButton: {
     marginRight: theme.spacing(2),
-    [theme.breakpoints.up("md")]: {
-      display: "none"
-    }
+    [theme.breakpoints.up('md')]: {
+      display: 'none',
+    },
   },
   drawerPaper: {
     width: drawerWidth,
-    padding: "15px"
+    padding: '15px',
   },
   content: {
     flexGrow: 1,
-    padding: theme.spacing(3)
+    padding: theme.spacing(3),
   },
   closeMenuButton: {
-    marginRight: "auto",
-    marginLeft: 0
+    marginRight: 'auto',
+    marginLeft: 0,
   },
-  navLink: {
-    fontSize: '1.04rem',
-    height: '42px',
-    '&:hover': {
-      background: 'none',
-      transform: 'translateX(5px)'
-    }
+  toolbar: {
+    paddingLeft: 22,
   },
-  active: {
-    color: theme.palette.text.secondary,
-    background: theme.palette.primary.main,
-    borderRadius: '4px',
-    '&:hover': {
-      background: theme.palette.primary.main,
-      transform: 'none'
-    }
-  },
-  icon: {
-    marginRight: "15px"
-  },
-  ListItemText: {
-    lineHeight: '1.25'
-  },
-  logo: {
-    height: '38px'
-  },
-  dividerColor: {
-    backgroundColor: alpha(theme.palette.text.secondary, 0.2),
-    margin: "15px 0px"
-  },
-  menuTitle: {
-    marginLeft: "20px",
-    marginBottom: "10px",
-    fontSize: "14px",
-    color: theme.palette.primary.main
-  }
-
 }));

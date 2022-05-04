@@ -8,26 +8,27 @@ export const useStyles = makeStyles()((theme) => ({
     justifyContent: 'flex-end',
     padding: '12px',
     borderRadius: '6px',
-    marginBottom: '12px'
+    marginBottom: '12px',
+    minHeight: 72,
   },
   content: {
     flexGrow: 1,
     justifyContent: 'center',
     display: 'flex',
     flexDirection: 'column',
-    alignItems: 'flex-end'
+    alignItems: 'flex-end',
   },
   did: {
-    fontSize: '14px'
+    fontSize: '14px',
   },
   client: {
-    fontSize: '12px'
+    fontSize: '12px',
   },
   avatar: {
     width: '40px',
     height: '40px',
     borderRadius: '50%',
     background: theme.palette.primary.main,
-    marginLeft: '8px'
-  }
+    marginLeft: '8px',
+  },
 }));
