@@ -1,5 +1,4 @@
 import { makeStyles } from 'tss-react/mui';
-import { alpha } from '@mui/material/styles';
 
 const drawerWidth = 264;
 

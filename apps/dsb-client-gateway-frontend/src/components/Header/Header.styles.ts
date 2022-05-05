@@ -1,4 +1,5 @@
 import { makeStyles } from 'tss-react/mui';
+import { lighten } from '@mui/material/styles';
 
 export const useStyles = makeStyles()((theme) => ({
   root: {
@@ -6,10 +7,10 @@ export const useStyles = makeStyles()((theme) => ({
     backgroundColor: theme.palette.background.paper,
     color: theme.palette.text.primary,
     justifyContent: 'flex-end',
-    padding: '12px',
+    padding: '11px 21px 12px',
     borderRadius: '6px',
-    marginBottom: '12px',
-    minHeight: 72,
+    marginBottom: '24px',
+    minHeight: 62,
   },
   content: {
     flexGrow: 1,
@@ -20,15 +21,29 @@ export const useStyles = makeStyles()((theme) => ({
   },
   did: {
     fontSize: '14px',
+    lineHeight: '21px',
+    fontWeight: 400,
+    color: theme.palette.text.primary,
   },
   client: {
     fontSize: '12px',
+    lineHeight: '18px',
+    fontWeight: 400,
+    color: theme.palette.grey[300],
   },
   avatar: {
-    width: '40px',
-    height: '40px',
+    width: '39px',
+    height: '39px',
     borderRadius: '50%',
-    background: theme.palette.primary.main,
-    marginLeft: '8px',
+    background: lighten(theme.palette.primary.main, 0.4),
+    marginLeft: '13px',
+    position: 'relative',
+  },
+  status: {
+    width: 11,
+    height: 11,
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
   },
 }));
