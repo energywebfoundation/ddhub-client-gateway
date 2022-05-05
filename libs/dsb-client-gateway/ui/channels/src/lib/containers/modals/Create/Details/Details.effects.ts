@@ -15,7 +15,7 @@ const fields = {
     name: 'fqcn',
     label: 'Internal channel namespace',
     formInputsWrapperProps: {
-      marginRight: '15px',
+      margin: '23px 15px 0 0',
     },
     inputProps: {
       placeholder: 'name.role.application',
@@ -23,6 +23,9 @@ const fields = {
   },
   channelType: {
     name: 'channelType',
+    formInputsWrapperProps: {
+      marginBottom: '20px',
+    },
     options: [
       { label: 'Messaging', value: ChannelType.Messaging },
       { label: 'File Transfer', value: ChannelType.FileTransfer },
