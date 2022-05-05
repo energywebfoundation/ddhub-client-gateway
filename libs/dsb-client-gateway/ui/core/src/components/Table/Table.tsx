@@ -72,7 +72,7 @@ export function GenericTable<T>({
               <TableRow>
                 {headers.map((column) => (
                   <TableCell
-                    style={{ width: column.width ?? 'initial' }}
+                    style={{ ...column.style }}
                     classes={{ head: classes.head }}
                     key={column.accessor}
                   >

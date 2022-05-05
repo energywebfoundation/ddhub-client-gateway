@@ -28,7 +28,7 @@ export const mapUrlToBreadcrumbs = new Map<string, Breadcrumb[]>()
     { type: BreadcrumbsType.App, title: '' },
     { title: 'Apps and Topics' },
     { title: 'Topics' },
-    { title: 'Version History'}
+    { title: 'Version history'}
   ])
   .set(routerConst.Channels, [{ title: 'Channels' }, { title: 'Channels' }])
   .set(routerConst.IntegrationAPIs, [
