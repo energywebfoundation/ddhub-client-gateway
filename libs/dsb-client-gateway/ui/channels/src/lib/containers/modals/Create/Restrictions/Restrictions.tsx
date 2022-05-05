@@ -1,5 +1,5 @@
+import { KeyboardEvent } from 'react';
 import {
-  Button,
   Grid,
   InputAdornment,
   InputLabel,
@@ -13,8 +13,8 @@ import { RestrictionBox } from './RestrictionBox/RestrictionBox';
 import { Autocomplete } from '@mui/lab';
 import { Plus } from 'react-feather';
 import { theme } from '@dsb-client-gateway/ui/utils';
+import { SubmitButton } from '../SubmitButton';
 import { RestrictionType } from './models/restriction-type.enum';
-import { KeyboardEvent } from 'react';
 
 export interface RestrictionsProps {
   nextClick: (value: { dids: string[]; roles: string[] }) => void;
@@ -126,13 +126,11 @@ export const Restrictions = ({ nextClick }: RestrictionsProps) => {
         />
       </Grid>
       <Grid item alignSelf="flex-end">
-        <Button
-          type="submit"
-          variant="contained"
+        <SubmitButton
           onClick={() => nextClick({ dids, roles })}
         >
           Next
-        </Button>
+        </SubmitButton>
       </Grid>
     </Grid>
   );

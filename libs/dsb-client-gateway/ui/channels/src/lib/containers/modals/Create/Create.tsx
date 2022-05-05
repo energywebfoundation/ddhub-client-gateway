@@ -1,5 +1,9 @@
-import { Dialog, DialogSubTitle } from '@dsb-client-gateway/ui/core';
-import { DialogTitle, Grid } from '@mui/material';
+import {
+  Dialog,
+  DialogSubTitle,
+  CloseButton,
+} from '@dsb-client-gateway/ui/core';
+import { DialogTitle, Grid, DialogActions, Box } from '@mui/material';
 import { Details } from './Details/Details';
 import { Restrictions } from './Restrictions/Restrictions';
 import { Topics } from './Topics/Topics';
@@ -58,6 +62,9 @@ export const Create = () => {
           {formPart(activeStep)}
         </Grid>
       </Grid>
+      <Box className={classes.closeButtonWrapper}>
+        <CloseButton onClose={closeModal} />
+      </Box>
     </Dialog>
   );
 };

@@ -1,6 +1,6 @@
-import { Button, Grid } from '@mui/material';
-import { ChevronRight } from 'react-feather';
+import { Grid } from '@mui/material';
 import { FormInput, FormRadio } from '@dsb-client-gateway/ui/core';
+import { SubmitButton } from '../SubmitButton';
 import { useDetailsEffects } from './Details.effects';
 import { useStyles } from './Details.styles';
 
@@ -9,7 +9,7 @@ export interface DetailsProps {
 }
 
 export const Details = ({ nextClick }: DetailsProps) => {
-  const { classes, theme } = useStyles();
+  const { classes } = useStyles();
   const { register, fields, handleSubmit, isValid, control } =
     useDetailsEffects();
 
@@ -40,19 +40,9 @@ export const Details = ({ nextClick }: DetailsProps) => {
           />
         </Grid>
         <Grid item alignSelf="flex-end">
-          <Button
-            type="submit"
-            variant="contained"
-            disabled={!isValid}
-            onClick={handleSubmit(nextClick)}
-            className={classes.button}
-            classes={{ endIcon: classes.buttonIcon }}
-            endIcon={
-              <ChevronRight size={14} color={theme.palette.common.white} />
-            }
-          >
+          <SubmitButton disabled={!isValid} onClick={handleSubmit(nextClick)}>
             Next
-          </Button>
+          </SubmitButton>
         </Grid>
       </Grid>
     </form>

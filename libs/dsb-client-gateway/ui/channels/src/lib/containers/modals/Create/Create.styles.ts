@@ -18,5 +18,10 @@ export const useStyles = makeStyles()((theme) => ({
     fontWeight: 500,
     fontFamily: theme.typography.body1.fontFamily,
     color: theme.palette.common.white
-  }
+  },
+  closeButtonWrapper: {
+    position: 'absolute',
+    top: 17,
+    right: 18
+  },
 }));

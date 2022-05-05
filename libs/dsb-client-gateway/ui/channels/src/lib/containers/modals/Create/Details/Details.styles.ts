@@ -10,17 +10,7 @@ export const useStyles = makeStyles()({
     display: 'flex',
     flexDirection: 'column',
     '&.MuiGrid-item': {
-      paddingTop: 8
-    }
+      paddingTop: 11,
+    },
   },
-  button: {
-    height: 37,
-    minWidth: 95,
-    textTransform: 'capitalize',
-    padding: '11px 22px',
-    justifyContent: 'flex-start'
-  },
-  buttonIcon: {
-    marginLeft: 12
-  }
 });
