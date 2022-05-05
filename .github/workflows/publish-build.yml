@@ -2,7 +2,7 @@ name: Build and publish images
 
 on:
   push:
-    branches: [ ddhub-dev, demo-instance-CD ]
+    branches: [ ddhub-dev ]
 env:
   SECRETS_ENGINE: vault
 
