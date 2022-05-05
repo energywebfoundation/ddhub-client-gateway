@@ -1,11 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { IamService } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
-import { DsbApiService } from '../../dsb-client/service/dsb-api.service';
 import { SymmetricKeyEntity } from '../entity/message.entity';
 import { ConfigService } from '@nestjs/config';
 import { IdentityService } from '../../identity/service/identity.service';
 import { SymmetricKeysRepositoryWrapper } from '@dsb-client-gateway/dsb-client-gateway-storage';
 import { EnrolmentService } from '../../enrolment/service/enrolment.service';
+import { DdhubMessagesService } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
 
 @Injectable()
 export class SymmetricKeysCacheService {
@@ -15,9 +15,9 @@ export class SymmetricKeysCacheService {
     protected readonly enrolmentService: EnrolmentService,
     protected readonly iamService: IamService,
     protected readonly identityService: IdentityService,
-    protected readonly dsbApiService: DsbApiService,
     protected readonly wrapper: SymmetricKeysRepositoryWrapper,
-    protected readonly configService: ConfigService
+    protected readonly configService: ConfigService,
+    protected readonly ddhubMessagingService: DdhubMessagesService
   ) {}
 
   public async refreshSymmetricKeysCache(): Promise<void> {
@@ -49,7 +49,7 @@ export class SymmetricKeysCacheService {
       }
 
       const symmetricKeys: SymmetricKeyEntity[] =
-        await this.dsbApiService.getSymmetricKeys(
+        await this.ddhubMessagingService.getSymmetricKeys(
           {
             clientId: this.configService.get('SYMMETRIC_KEY_CLIENT_ID'),
             amount: this.configService.get('AMOUNT_OF_SYMMETRIC_KEYS_FETCHED'),

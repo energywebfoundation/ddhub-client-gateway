@@ -1,18 +1,27 @@
-import { ApplicationDTO } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
+import {
+  ApplicationDTO,
+  IamService,
+} from '@dsb-client-gateway/dsb-client-gateway-iam-client';
 import { Injectable, Logger } from '@nestjs/common';
-import { DsbApiService } from '../../dsb-client/service/dsb-api.service';
+import { DdhubTopicsService } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
 
 @Injectable()
 export class TopicService {
   private readonly logger = new Logger(TopicService.name);
-  constructor(protected readonly dsbClientService: DsbApiService) {}
+  constructor(
+    protected readonly iamService: IamService,
+    protected readonly ddhubTopicService: DdhubTopicsService
+  ) {}
 
   public async getApplications(roleName) {
     this.logger.debug('start: Topic Service getApplications ');
 
     let finalApllicationsResult: Array<ApplicationDTO> = [];
     const applications: Array<ApplicationDTO> =
-      await this.dsbClientService.getApplicationsByOwnerAndRole(roleName);
+      await this.iamService.getApplicationsByOwnerAndRole(
+        roleName,
+        this.iamService.getDIDAddress()
+      );
 
     this.logger.debug('applications fetched successfully.', applications);
 
@@ -22,7 +31,7 @@ export class TopicService {
       );
 
       this.logger.debug('fetching topic count for applications.');
-      const topicsCount = await this.dsbClientService.getTopicsCountByOwner(
+      const topicsCount = await this.ddhubTopicService.getTopicsCountByOwner(
         nameSpaces
       );
 

@@ -1,12 +1,18 @@
 import { Injectable } from '@nestjs/common';
-import { Agent } from 'https';
 import { SecretsEngineService } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
+import { Agent } from 'https';
 
 @Injectable()
 export class TlsAgentService {
+  private agent: Agent | undefined;
+
   constructor(protected readonly secretsEngineService: SecretsEngineService) {}
 
-  public async create(): Promise<Agent | undefined> {
+  public get(): Agent | undefined {
+    return this.agent;
+  }
+
+  public async create(): Promise<void> {
     const certificateDetails =
       await this.secretsEngineService.getCertificateDetails();
 
@@ -14,7 +20,7 @@ export class TlsAgentService {
       return undefined;
     }
 
-    return new Agent({
+    this.agent = new Agent({
       cert: certificateDetails.certificate,
       key: certificateDetails.privateKey,
       ca: certificateDetails.caCertificate,

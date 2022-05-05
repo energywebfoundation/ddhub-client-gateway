@@ -1,19 +1,20 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { IamService } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
 import { ChannelService } from './channel.service';
-import { DsbApiService } from '../../dsb-client/service/dsb-api.service';
 import { IdentityService } from '../../identity/service/identity.service';
-import {
-  Topic,
-  TopicVersion,
-  TopicVersionResponse,
-} from '../../dsb-client/dsb-client.interface';
 import { Span } from 'nestjs-otel';
 import {
   ChannelEntity,
   TopicEntity,
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
 import { TopicService } from './topic.service';
+import {
+  DdhubDidService,
+  DdhubTopicsService,
+  Topic,
+  TopicVersion,
+  TopicVersionResponse,
+} from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
 
 @Injectable()
 export class ChannelDidCacheService {
@@ -22,9 +23,10 @@ export class ChannelDidCacheService {
   constructor(
     protected readonly iamService: IamService,
     protected readonly channelService: ChannelService,
-    protected readonly dsbApiService: DsbApiService,
     protected readonly identityService: IdentityService,
-    protected readonly topicService: TopicService
+    protected readonly topicService: TopicService,
+    protected readonly ddhubTopicService: DdhubTopicsService,
+    protected readonly ddhubDidService: DdhubDidService
   ) {}
 
   @Span('channel_refreshChannelCache')
@@ -46,7 +48,7 @@ export class ChannelDidCacheService {
     const internalChannel: ChannelEntity =
       await this.channelService.getChannelOrThrow(fqcn);
 
-    const rolesForDIDs: string[] = await this.dsbApiService.getDIDsFromRoles(
+    const rolesForDIDs: string[] = await this.ddhubDidService.getDIDsFromRoles(
       internalChannel.conditions.roles,
       'ANY',
       {
@@ -67,10 +69,8 @@ export class ChannelDidCacheService {
 
     for (const { topicId, topicName, owner } of internalChannel.conditions
       .topics) {
-      const topicInformation = await this.dsbApiService.getTopicsByOwnerAndName(
-        topicName,
-        owner
-      );
+      const topicInformation =
+        await this.ddhubTopicService.getTopicsByOwnerAndName(topicName, owner);
 
       if (topicInformation.records.length === 0) {
         this.logger.warn(`Topic with id ${topicId} does not have any versions`);
@@ -81,7 +81,7 @@ export class ChannelDidCacheService {
       const topic: Topic = topicInformation.records[0];
 
       const topicVersion: TopicVersion | null =
-        await this.dsbApiService.getTopicById(topic.id);
+        await this.ddhubTopicService.getTopicById(topic.id);
 
       if (!topicVersion) {
         this.logger.error(
@@ -89,7 +89,7 @@ export class ChannelDidCacheService {
         );
       }
 
-      const topicVersions: TopicVersionResponse = await this.dsbApiService
+      const topicVersions: TopicVersionResponse = await this.ddhubTopicService
         .getTopicVersions(topic.id)
         .catch((e) => ({
           records: [],

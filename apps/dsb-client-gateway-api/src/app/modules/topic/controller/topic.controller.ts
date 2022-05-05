@@ -1,42 +1,41 @@
 import {
-  Controller,
-  Get,
-  UseGuards,
   Body,
-  Post,
-  Query,
+  Controller,
+  Delete,
+  Get,
   HttpCode,
   HttpStatus,
-  Put,
   Param,
-  Delete,
+  Post,
+  Put,
+  Query,
+  UseGuards,
 } from '@nestjs/common';
-import { DsbApiService } from '../../dsb-client/service/dsb-api.service';
 import { DigestGuard } from '../../utils/guards/digest.guard';
-import { ApiTags, ApiResponse } from '@nestjs/swagger';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import {
-  GetTopicsCountQueryDto,
-  PaginatedResponse,
-  TopicsCountResponse,
-  GetTopicDto,
-  UpdateTopicBodyDto,
-  GetTopicsQueryDto,
-  GetTopicsParamsDto,
   DeleteTopic,
   DeleteTopicsVersionParamsDto,
-  TopicsByIdAndVersionParamsDto,
-  UpdateTopicHistoryBodyDto,
+  GetTopicsCountQueryDto,
+  GetTopicsParamsDto,
+  GetTopicsQueryDto,
   GetTopicsSearchQueryDto,
+  PaginatedResponse,
+  PaginatedSearchTopicResponse,
   PostTopicBodyDto,
   PostTopicDto,
-  PaginatedSearchTopicResponse,
+  TopicsByIdAndVersionParamsDto,
+  TopicsCountResponse,
+  UpdateTopicBodyDto,
+  UpdateTopicHistoryBodyDto,
 } from '../dto';
+import { DdhubTopicsService } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
 
 @Controller('topics')
 @UseGuards(DigestGuard)
 @ApiTags('Topics')
 export class TopicsController {
-  constructor(protected readonly dsbClientService: DsbApiService) {}
+  constructor(protected readonly ddhubTopicsService: DdhubTopicsService) {}
 
   @Get('')
   @ApiResponse({
@@ -51,7 +50,7 @@ export class TopicsController {
   public async getTopics(
     @Query() { limit, name, owner, page, tags }: GetTopicsQueryDto
   ) {
-    return this.dsbClientService.getTopics(limit, name, owner, page, tags);
+    return this.ddhubTopicsService.getTopics(limit, name, owner, page, tags);
   }
 
   @Get('/:id/versions')
@@ -65,7 +64,7 @@ export class TopicsController {
     description: 'Unauthorized',
   })
   public async getTopicsHistoryById(@Param() { id }: GetTopicsParamsDto) {
-    return this.dsbClientService.getTopicHistoryById(id);
+    return this.ddhubTopicsService.getTopicHistoryById(id);
   }
 
   @Get('/:id/versions/:versionNumber')
@@ -81,7 +80,7 @@ export class TopicsController {
   public async getTopicHistoryByIdAndVersion(
     @Param() { id, versionNumber }: TopicsByIdAndVersionParamsDto
   ) {
-    return this.dsbClientService.getTopicHistoryByIdAndVersion(
+    return this.ddhubTopicsService.getTopicHistoryByIdAndVersion(
       id,
       versionNumber
     );
@@ -96,7 +95,7 @@ export class TopicsController {
   public async getTopicsCountByOwner(
     @Query() { owner }: GetTopicsCountQueryDto
   ) {
-    return this.dsbClientService.getTopicsCountByOwner(owner);
+    return this.ddhubTopicsService.getTopicsCountByOwner(owner);
   }
 
   @Get('/search')
@@ -108,7 +107,7 @@ export class TopicsController {
   public async getTopicsBySearch(
     @Query() { keyword, limit, page }: GetTopicsSearchQueryDto
   ) {
-    return this.dsbClientService.getTopicsBySearch(keyword, limit, page);
+    return this.ddhubTopicsService.getTopicsBySearch(keyword, limit, page);
   }
 
   @Post('')
@@ -128,7 +127,7 @@ export class TopicsController {
   })
   @HttpCode(HttpStatus.CREATED)
   public async postTopics(@Body() data: PostTopicBodyDto) {
-    return this.dsbClientService.postTopics(data);
+    return this.ddhubTopicsService.postTopics(data);
   }
 
   @Put('/:id/versions/:versionNumber')
@@ -155,7 +154,7 @@ export class TopicsController {
     @Param() { id, versionNumber }: TopicsByIdAndVersionParamsDto,
     @Body() data: UpdateTopicHistoryBodyDto
   ) {
-    return this.dsbClientService.updateTopicByIdAndVersion(
+    return this.ddhubTopicsService.updateTopicByIdAndVersion(
       data,
       id,
       versionNumber
@@ -186,7 +185,7 @@ export class TopicsController {
     @Param() { id }: GetTopicsParamsDto,
     @Body() data: UpdateTopicBodyDto
   ) {
-    return this.dsbClientService.updateTopic(data, id);
+    return this.ddhubTopicsService.updateTopic(data, id);
   }
 
   @Delete('/:id')
@@ -210,7 +209,7 @@ export class TopicsController {
   })
   @HttpCode(HttpStatus.OK)
   public async deleteTopics(@Param() { id }: GetTopicsParamsDto) {
-    return this.dsbClientService.deleteTopic(id);
+    return this.ddhubTopicsService.deleteTopic(id);
   }
 
   @Delete('/:id/versions/:version')
@@ -236,6 +235,6 @@ export class TopicsController {
   public async deleteTopicsByVersion(
     @Param() { id, version }: DeleteTopicsVersionParamsDto
   ) {
-    return this.dsbClientService.deleteTopicByVersion(id, version);
+    return this.ddhubTopicsService.deleteTopicByVersion(id, version);
   }
 }
