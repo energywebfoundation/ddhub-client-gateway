@@ -42,6 +42,8 @@ export const useRestrictionsEffects = () => {
     }
   };
 
+  const restrictionsCount = dids.length + roles.length;
+
   return {
     type,
     dids,
@@ -53,6 +55,7 @@ export const useRestrictionsEffects = () => {
     removeRole,
     removeDID,
     addRestriction,
+    restrictionsCount,
     restrictionTypeChangeHandler,
     rolesInputChangeHandler,
     didInputChangeHandler,

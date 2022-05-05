@@ -1,4 +1,4 @@
-import { Box, Typography } from '@mui/material';
+import { Box, BoxProps, Typography } from '@mui/material';
 import { useStyles } from './RestrictionBox.styles';
 import { RestrictionList } from '../RestrictionList/RestrictionList';
 import { RestrictionType } from "../models/restriction-type.enum";
@@ -9,6 +9,7 @@ export interface RestrictionBoxProps {
   remove?: (value: string) => void;
   canRemove?: boolean;
   canCopy?: boolean;
+  wrapperProps?: BoxProps;
 }
 
 export const RestrictionBox = ({
@@ -17,11 +18,12 @@ export const RestrictionBox = ({
   remove,
   canRemove = true,
   canCopy = false,
+  wrapperProps
 }: RestrictionBoxProps) => {
   const { classes } = useStyles();
   return (
-    <Box component="div" className={classes.root}>
-      <Typography>{type}</Typography>
+    <Box component="div" className={classes.root} {...wrapperProps}>
+      <Typography className={classes.label}>{type}</Typography>
       <RestrictionList
         list={list}
         remove={remove}

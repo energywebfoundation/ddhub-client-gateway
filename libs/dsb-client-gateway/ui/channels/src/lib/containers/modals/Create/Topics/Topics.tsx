@@ -1,14 +1,22 @@
-import { Button, Grid, TextField, Typography } from '@mui/material';
-import { Topic, useTopicsEffects } from './Topics.effects';
-import { Autocomplete } from '@mui/lab';
+import {
+  Button,
+  Grid,
+  TextField,
+  Typography,
+  Autocomplete,
+} from '@mui/material';
+import { ChevronDown } from 'react-feather';
 import { SelectedTopicList } from './SelectedTopicList/SelectedTopicList';
 import { TopicItem } from './TopicItem/TopicItem';
+import { Topic, useTopicsEffects } from './Topics.effects';
+import { useStyles } from './Topics.styles';
 
 export interface TopicsProps {
   nextClick: (topics: Topic[]) => void;
 }
 
 export const Topics = ({ nextClick }: TopicsProps) => {
+  const { classes } = useStyles();
   const {
     applicationList,
     isLoadingApplications,
@@ -31,21 +39,37 @@ export const Topics = ({ nextClick }: TopicsProps) => {
       <Grid item>
         <Autocomplete
           disablePortal
+          popupIcon={<ChevronDown size={20} />}
+          classes={{
+            popupIndicator: classes.popupIcon,
+            clearIndicator: classes.clearIndicator,
+            option: classes.menuItem,
+          }}
           loading={isLoadingApplications}
           options={applicationList}
           inputValue={selectedApplication}
-          onInputChange={(event, newInputValue) => {
+          onInputChange={(_event, newInputValue) => {
             setSelectedApplication(newInputValue);
           }}
           renderInput={(params) => (
-            <TextField {...params} label="Select Application" />
+            <TextField
+              {...params}
+              placeholder="Select Application"
+              classes={{ root: classes.autocomplete }}
+            />
           )}
           sx={{ marginBottom: '10px' }}
         />
         {topics.length > 0 && (
           <Autocomplete
             options={topics}
-            placeholder="Add topic"
+            popupIcon={<ChevronDown size={20} />}
+            classes={{
+              popupIndicator: classes.popupIcon,
+              clearIndicator: classes.clearIndicator,
+              option: classes.menuItem,
+              listbox: classes.listBox,
+            }}
             renderOption={(props, option) => (
               <TopicItem
                 key={option.topicName}
@@ -59,7 +83,12 @@ export const Topics = ({ nextClick }: TopicsProps) => {
               }
             }}
             renderInput={(params) => (
-              <TextField {...params} label="Add topic" value="" />
+              <TextField
+                {...params}
+                placeholder="Add topic"
+                value=""
+                classes={{ root: classes.autocomplete }}
+              />
             )}
             sx={{ marginBottom: '10px' }}
           />

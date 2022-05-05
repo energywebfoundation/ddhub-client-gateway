@@ -54,11 +54,11 @@ export const Create = () => {
     <Dialog open={open} onClose={closeModal} paperClassName={classes.paper}>
       <DialogTitle className={classes.title}>Create Channel</DialogTitle>
       <DialogSubTitle>{subTitle}</DialogSubTitle>
-      <Grid container spacing={2} className={classes.content}>
-        <Grid item xs={5}>
+      <Grid container className={classes.content}>
+        <Grid item pt={2}>
           <Steps activeStep={activeStep} />
         </Grid>
-        <Grid item xs={7}>
+        <Grid item pt={2} ml={'auto'} sx={{ minWidth: '416px' }}>
           {formPart(activeStep)}
         </Grid>
       </Grid>

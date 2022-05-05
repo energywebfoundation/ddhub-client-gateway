@@ -7,14 +7,17 @@ import {
   Select,
   SelectChangeEvent,
   TextField,
+  Autocomplete,
+  IconButton,
+  Typography,
+  Box,
 } from '@mui/material';
 import { useRestrictionsEffects } from './Restrictions.effects';
 import { RestrictionBox } from './RestrictionBox/RestrictionBox';
-import { Autocomplete } from '@mui/lab';
-import { Plus } from 'react-feather';
-import { theme } from '@dsb-client-gateway/ui/utils';
+import { Plus, ChevronDown } from 'react-feather';
 import { SubmitButton } from '../SubmitButton';
 import { RestrictionType } from './models/restriction-type.enum';
+import { useStyles } from './Restrictions.styles';
 
 export interface RestrictionsProps {
   nextClick: (value: { dids: string[]; roles: string[] }) => void;
@@ -26,7 +29,6 @@ export const Restrictions = ({ nextClick }: RestrictionsProps) => {
     dids,
     roles,
     didInput,
-    roleInput,
     possibleRoles,
     isDIDValid,
     removeRole,
@@ -35,18 +37,37 @@ export const Restrictions = ({ nextClick }: RestrictionsProps) => {
     restrictionTypeChangeHandler,
     rolesInputChangeHandler,
     didInputChangeHandler,
+    restrictionsCount,
   } = useRestrictionsEffects();
+  const { classes, theme } = useStyles();
 
   const selectRoleRestriction = type === RestrictionType.Role && (
     <Autocomplete
       disablePortal
       options={possibleRoles}
-      inputValue={roleInput}
-      onInputChange={(_event, newInputValue) => {
-        rolesInputChangeHandler(newInputValue);
+      popupIcon={
+        <IconButton className={classes.plusButton}>
+          <Plus
+            color={theme.palette.common.white}
+            size={15}
+          />
+        </IconButton>
+      }
+      classes={{
+        popupIndicator: classes.popupIcon,
+        clearIndicator: classes.clearIndicator,
+        option: classes.menuItem,
+      }}
+      onChange={(_event, newInputValue) => {
+        addRestriction(newInputValue);
       }}
       renderInput={(params) => (
-        <TextField {...params} label="Search for roles..." />
+        <TextField
+          {...params}
+          placeholder="Search for roles..."
+          classes={{ root: classes.autocomplete }}
+          onChange={(event: any) => rolesInputChangeHandler(event.target.value)}
+        />
       )}
     />
   );
@@ -56,6 +77,7 @@ export const Restrictions = ({ nextClick }: RestrictionsProps) => {
       fullWidth
       variant={'outlined'}
       value={didInput}
+      classes={{ root: classes.textField }}
       onChange={(event) => {
         didInputChangeHandler(event.target.value);
       }}
@@ -63,10 +85,13 @@ export const Restrictions = ({ nextClick }: RestrictionsProps) => {
         endAdornment: (
           <InputAdornment
             position="start"
-            onClick={() => addRestriction(didInput)}
+            onClick={() => didInput && addRestriction(didInput)}
             sx={{ cursor: 'pointer' }}
           >
-            <Plus color={theme.palette.common.white} />
+            <Plus
+              color={theme.palette.common.white}
+              size={15}
+            />
           </InputAdornment>
         ),
       }}
@@ -74,7 +99,7 @@ export const Restrictions = ({ nextClick }: RestrictionsProps) => {
       helperText={!isDIDValid ? 'DID format is invalid' : ''}
       onKeyPress={(event: KeyboardEvent<HTMLInputElement>) => {
         if (event.key === 'Enter') {
-          addRestriction(didInput);
+          didInput && addRestriction(didInput);
         }
       }}
     />
@@ -84,51 +109,75 @@ export const Restrictions = ({ nextClick }: RestrictionsProps) => {
     <Grid
       container
       direction="column"
-      spacing={2}
       justifyContent="space-between"
       className={'no-wrap'}
       sx={{ height: '100%', flexWrap: 'nowrap' }}
     >
       <Grid item>
         <Grid container spacing={2}>
-          <Grid item sx={{marginBottom: isDIDValid ? '0px' : '22px'}}>
-            <InputLabel id="restriction-type">Restrictions</InputLabel>
+          <Grid item sx={{ marginBottom: '22px' }}>
+            <InputLabel id="restriction-type" className={classes.label}>
+              Restrictions
+            </InputLabel>
             <Select
               labelId="restriction-type"
               value={type}
+              IconComponent={ChevronDown}
+              classes={{
+                icon: classes.icon,
+              }}
+              className={classes.select}
               onChange={(d: SelectChangeEvent<RestrictionType>) => {
                 restrictionTypeChangeHandler(d.target.value as RestrictionType);
               }}
               sx={{ width: '100px' }}
             >
-              <MenuItem value={RestrictionType.DID}>
+              <MenuItem
+                value={RestrictionType.DID}
+                className={classes.menuItem}
+              >
                 {RestrictionType.DID}
               </MenuItem>
-              <MenuItem value={RestrictionType.Role}>
+              <MenuItem
+                value={RestrictionType.Role}
+                className={classes.menuItem}
+              >
                 {RestrictionType.Role}
               </MenuItem>
             </Select>
           </Grid>
-          <Grid item alignSelf="flex-end" flexGrow="1">
+          <Grid
+            item
+            alignSelf="flex-end"
+            flexGrow="1"
+            sx={{ marginBottom: '22px' }}
+          >
             {selectRoleRestriction}
             {setDIDRestriction}
           </Grid>
         </Grid>
-        <RestrictionBox
-          type={RestrictionType.DID}
-          list={dids}
-          remove={removeDID}
-        />
-        <RestrictionBox
-          type={RestrictionType.Role}
-          list={roles}
-          remove={removeRole}
-        />
+        <Box>
+          <Typography className={classes.label}>
+            {restrictionsCount} Restrictions
+          </Typography>
+        </Box>
+        <Box display="flex">
+          <RestrictionBox
+            type={RestrictionType.DID}
+            list={dids}
+            remove={removeDID}
+            wrapperProps={{ mr: 0.75 }}
+          />
+          <RestrictionBox
+            type={RestrictionType.Role}
+            list={roles}
+            remove={removeRole}
+            wrapperProps={{ ml: 0.75 }}
+          />
+        </Box>
       </Grid>
       <Grid item alignSelf="flex-end">
-        <SubmitButton
-          onClick={() => nextClick({ dids, roles })}
-        >
+        <SubmitButton onClick={() => nextClick({ dids, roles })}>
           Next
         </SubmitButton>
       </Grid>

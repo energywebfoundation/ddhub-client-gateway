@@ -1,6 +1,6 @@
 import { useStyles } from './RestrictionList.styles';
-import { Close } from '@mui/icons-material';
-import { Grid } from '@mui/material';
+import { X as Close } from 'react-feather';
+import { Grid, Typography, IconButton } from '@mui/material';
 import { CopyToClipboard } from '@dsb-client-gateway/ui/core';
 
 export interface RestrictionListProps {
@@ -20,11 +20,19 @@ export const RestrictionList = ({
   return (
     <div className={classes.root}>
       {list.map((el) => (
-        <Grid container justifyContent="space-between" key={el}>
-          <Grid item>{el}</Grid>
+        <Grid
+          container
+          justifyContent="space-between"
+          key={el}
+          className={classes.container}
+        >
+          <Grid item>
+            <Typography noWrap variant="body2" className={classes.itemText}>
+              {el}
+            </Typography>
+          </Grid>
           {canRemove && (
-            <Grid
-              item
+            <IconButton
               onClick={() => {
                 if (remove) {
                   remove(el);
@@ -32,8 +40,8 @@ export const RestrictionList = ({
               }}
               className={classes.close}
             >
-              <Close />
-            </Grid>
+              <Close size={18} />
+            </IconButton>
           )}
           {canCopy && <CopyToClipboard text={el} />}
         </Grid>
