@@ -1,17 +1,17 @@
 import { Box } from '@mui/material';
-import { Image } from 'react-feather';
-import { useStyles } from './AppImage.styles';
+import { Image as ImageIcon } from 'react-feather';
+import { useStyles } from './Image.styles';
 
-interface AppImageProps {
+interface ImageProps {
   src: string;
   className?: string;
 }
 
-interface AppImageWithWrapperProps {
+interface ImageWithWrapperProps {
   value: string;
 }
 
-export const AppImage = ({ src, className }: AppImageProps) => {
+export const Image = ({ src, className }: ImageProps) => {
   const { classes, theme } = useStyles();
   return src ? (
     <img
@@ -21,20 +21,20 @@ export const AppImage = ({ src, className }: AppImageProps) => {
       alt="app icon"
     />
   ) : (
-    <Image
+    <ImageIcon
       style={{ stroke: theme.palette.grey[400] }}
       className={className ?? classes.image}
     />
   );
 };
 
-export const AppImageWithWrapper = ({
+export const ImageWithWrapper = ({
   value: logoUrl,
-}: AppImageWithWrapperProps) => {
+}: ImageWithWrapperProps) => {
   const { classes } = useStyles();
   return (
     <Box className={classes.wrapper}>
-      <AppImage src={logoUrl} />
+      <Image src={logoUrl} />
     </Box>
   );
 };

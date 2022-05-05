@@ -8,7 +8,7 @@ import {
   Box,
   IconButton,
 } from '@mui/material';
-import { CloseButton, AppImage, EditorView, Dialog } from '@dsb-client-gateway/ui/core';
+import { CloseButton, Image, EditorView, Dialog } from '@dsb-client-gateway/ui/core';
 import { TopicDetail } from './TopicDetail';
 import { useViewTopicDetailsEffects } from './ViewTopicDetails.effects';
 import { useStyles } from './ViewTopicDetails.styles';
@@ -40,7 +40,7 @@ export const ViewTopicDetails: FC = () => {
           <DialogContent sx={{ padding: 0 }}>
             {application && (
               <Box className={classes.appWrapper}>
-                <AppImage
+                <Image
                   src={application.logoUrl}
                   className={classes.appImage}
                 />
