@@ -5,7 +5,6 @@ import { EnrolmentModule } from './modules/enrolment/enrolment.module';
 import { IamModule } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
 import { CertificateModule } from './modules/certificate/certificate.module';
 import { MulterModule } from '@nestjs/platform-express';
-import { DsbClientModule } from './modules/dsb-client/dsb-client.module';
 import { KeysModule } from './modules/keys/keys.module';
 import { SecretsEngineModule } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
 import { APP_FILTER, APP_PIPE } from '@nestjs/core';
@@ -38,7 +37,6 @@ export class AppModule {
       IdentityModule,
       EnrolmentModule,
       CertificateModule,
-      DsbClientModule,
       TerminusModule,
       ScheduleModule.forRoot(),
       UtilsModule,

@@ -1,10 +1,14 @@
 import { Module } from '@nestjs/common';
 import { TopicsController } from './controller/topic.controller';
-import { DsbClientModule } from '../dsb-client/dsb-client.module';
 import { DsbClientGatewayStorageModule } from '@dsb-client-gateway/dsb-client-gateway-storage';
+import { DdhubClientGatewayMessageBrokerModule } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
+import { EnrolmentModule } from '../enrolment/enrolment.module';
 
 @Module({
-  imports: [DsbClientModule, DsbClientGatewayStorageModule],
+  imports: [
+    DsbClientGatewayStorageModule,
+    DdhubClientGatewayMessageBrokerModule.forRootAsync([EnrolmentModule]),
+  ],
   controllers: [TopicsController],
 })
 export class TopicModule {}

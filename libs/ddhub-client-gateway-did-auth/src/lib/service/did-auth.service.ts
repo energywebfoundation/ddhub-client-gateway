@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { EthersService } from '../../../../utils/service/ethers.service';
 import { DidAuthApiService } from './did-auth-api.service';
+import { EthersService } from '../../../../../apps/dsb-client-gateway-api/src/app/modules/utils/service/ethers.service';
 
 @Injectable()
 export class DidAuthService {

@@ -1,5 +1,4 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { Message } from '../../dsb-client/dsb-client.interface';
 import { ConfigService } from '@nestjs/config';
 import { WebSocketImplementation } from '../message.const';
 import {
@@ -125,6 +124,4 @@ export class WsClientService implements OnModuleInit {
     const maxRetries = reconnectMaxRetries ?? 10;
     return this.retryCount < maxRetries;
   }
-
-  public async sendMessage(messages: Message[]): Promise<void> {}
 }
