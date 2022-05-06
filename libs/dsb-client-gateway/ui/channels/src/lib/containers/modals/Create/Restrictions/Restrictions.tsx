@@ -6,11 +6,11 @@ import {
   MenuItem,
   Select,
   SelectChangeEvent,
-  TextField,
   Typography,
   IconButton,
   Box,
 } from '@mui/material';
+import { TextField } from '@dsb-client-gateway/ui/core';
 import { Plus, ChevronDown } from 'react-feather';
 import { ICreateChannel } from '../../models/create-channel.interface';
 import { RestrictionBox } from './RestrictionBox/RestrictionBox';
@@ -53,7 +53,6 @@ export const Restrictions = ({
       fullWidth
       variant={'outlined'}
       value={roleInput}
-      classes={{ root: classes.textField }}
       onChange={(event) => {
         rolesInputChangeHandler(event.target.value);
       }}
@@ -85,7 +84,6 @@ export const Restrictions = ({
       fullWidth
       variant={'outlined'}
       value={didInput}
-      classes={{ root: classes.textField }}
       onChange={(event) => {
         didInputChangeHandler(event.target.value);
       }}

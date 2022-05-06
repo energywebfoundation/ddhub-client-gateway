@@ -11,6 +11,16 @@ export const useStyles = makeStyles()((theme) => ({
       fontSize: 12,
       lineHeight: '24px',
       fontWeight: 400,
+      paddingRight: 4
+    },
+    '& .MuiFormHelperText-root': {
+       position: 'absolute',
+       bottom: -22,
+       fontSize: 12,
+       lineHeight: '17px',
+       fontWeight: 400,
+       fontFamily: theme.typography.body2.fontFamily,
+       letterSpacing: '0.4px',
     },
     '& .MuiOutlinedInput-notchedOutline': {
       border: `1px solid ${theme.palette.grey[500]}`,

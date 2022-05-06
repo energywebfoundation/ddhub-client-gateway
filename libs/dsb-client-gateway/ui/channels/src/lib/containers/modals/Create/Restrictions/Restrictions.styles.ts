@@ -28,52 +28,6 @@ export const useStyles = makeStyles()((theme) => ({
       fontFamily: theme.typography.body2.fontFamily
     },
   },
-  textField: {
-    margin: 0,
-    background: alpha(theme.palette.background.default, 0.45),
-    borderRadius: 5,
-    '& .MuiInputBase-root': {
-      fontFamily: theme.typography.body2.fontFamily,
-      fontSize: 12,
-      lineHeight: '24px',
-      fontWeight: 400,
-      paddingRight: 4
-    },
-    '& .MuiFormHelperText-root': {
-       position: 'absolute',
-       bottom: -22,
-       fontSize: 12,
-       lineHeight: '17px',
-       fontWeight: 400,
-       fontFamily: theme.typography.body2.fontFamily,
-       letterSpacing: '0.4px',
-    },
-    '& .MuiOutlinedInput-notchedOutline': {
-      border: `1px solid ${theme.palette.grey[500]}`,
-      borderRadius: 5,
-    },
-    '& input': {
-      padding: '8px 10px 8px 15px',
-      fontSize: 12,
-      color: theme.palette.common.white,
-      minHeight: 22,
-      fontFamily: theme.typography.body2.fontFamily,
-      '&:disabled': {
-        color: theme.palette.grey[500],
-        WebkitTextFillColor: theme.palette.grey[500],
-        '& + .MuiOutlinedInput-notchedOutline': {
-          border: `1px solid ${theme.palette.grey[500]}`,
-        },
-      },
-      '&::placeholder': {
-        fontSize: 12,
-        lineHeight: '24px',
-        fontWeight: 400,
-        color: theme.palette.grey[300],
-        opacity: 1,
-      },
-    },
-  },
   menuItem: {
     fontSize: 14,
     lineHeight: '21px',
