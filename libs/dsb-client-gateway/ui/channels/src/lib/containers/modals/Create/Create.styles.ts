@@ -24,4 +24,9 @@ export const useStyles = makeStyles()((theme) => ({
     top: 17,
     right: 18
   },
+  formWrapper: {
+    minWidth: '416px',
+    marginLeft: 'auto',
+    paddingTop: 16
+  }
 }));

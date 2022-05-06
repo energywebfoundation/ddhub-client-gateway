@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import { Grid, Typography, IconButton } from '@mui/material';
 import { useStyles } from './SelectedTopic.styles';
 import { X as Close } from 'react-feather';
@@ -21,7 +22,10 @@ export const SelectedTopic = ({
   return (
     <Grid container justifyContent="space-between" alignItems="center">
       <Grid item>
-        <Typography variant="body2" className={classes.name}>
+        <Typography
+          variant="body2"
+          className={clsx(classes.name, { [classes.nameSecondary]: canCopy })}
+        >
           {topic?.name}
         </Typography>
         <Grid container>

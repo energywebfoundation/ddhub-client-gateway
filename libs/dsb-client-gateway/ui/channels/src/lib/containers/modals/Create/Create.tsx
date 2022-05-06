@@ -3,7 +3,7 @@ import {
   DialogSubTitle,
   CloseButton,
 } from '@dsb-client-gateway/ui/core';
-import { DialogTitle, Grid, DialogActions, Box } from '@mui/material';
+import { DialogTitle, Grid, Box } from '@mui/material';
 import { Details } from './Details/Details';
 import { Restrictions } from './Restrictions/Restrictions';
 import { Topics } from './Topics/Topics';
@@ -22,6 +22,8 @@ export const Create = () => {
     channelSubmitHandler,
     setRestrictions,
     channelValues,
+    goBack,
+    isCreating,
   } = useCreateChannelEffects();
   const { classes } = useStyles();
 
@@ -33,16 +35,30 @@ export const Create = () => {
   const formPart = (id: number) => {
     switch (id) {
       case 0:
-        return <Details nextClick={setDetails} />;
+        return <Details nextClick={setDetails} channelValues={channelValues} />;
       case 1:
-        return <Restrictions nextClick={setRestrictions} />;
+        return (
+          <Restrictions
+            nextClick={setRestrictions}
+            channelValues={channelValues}
+            goBack={goBack}
+          />
+        );
       case 2:
-        return <Topics nextClick={setTopics} />;
+        return (
+          <Topics
+            nextClick={setTopics}
+            goBack={goBack}
+            channelValues={channelValues}
+          />
+        );
       case 3:
         return (
           <Summary
             channelValues={channelValues}
             nextClick={channelSubmitHandler}
+            isCreating={isCreating}
+            goBack={goBack}
           />
         );
       default:
@@ -58,7 +74,7 @@ export const Create = () => {
         <Grid item pt={2}>
           <Steps activeStep={activeStep} />
         </Grid>
-        <Grid item pt={2} ml={'auto'} sx={{ minWidth: '416px' }}>
+        <Grid item className={classes.formWrapper}>
           {formPart(activeStep)}
         </Grid>
       </Grid>

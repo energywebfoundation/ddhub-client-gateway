@@ -2,26 +2,28 @@ import { Grid, Typography } from '@mui/material';
 import { SelectedTopicList } from './SelectedTopicList/SelectedTopicList';
 import { Autocomplete } from '@dsb-client-gateway/ui/core';
 import { TopicItem } from './TopicItem/TopicItem';
-import { SubmitButton } from '../SubmitButton';
+import { ActionButtons } from '../ActionButtons';
+import { ICreateChannel } from '../../models/create-channel.interface';
 import { Topic, useTopicsEffects } from './Topics.effects';
 import { useStyles } from './Topics.styles';
 
 export interface TopicsProps {
+  channelValues: ICreateChannel;
   nextClick: (topics: Topic[]) => void;
+  goBack: () => void;
 }
 
-export const Topics = ({ nextClick }: TopicsProps) => {
+export const Topics = ({ nextClick, goBack, channelValues }: TopicsProps) => {
   const { classes } = useStyles();
   const {
     applicationList,
     isLoadingApplications,
-    selectedApplication,
     setSelectedApplication,
     topics,
     addSelectedTopic,
     selectedTopics,
     removeSelectedTopic,
-  } = useTopicsEffects();
+  } = useTopicsEffects(channelValues);
 
   return (
     <Grid
@@ -34,9 +36,8 @@ export const Topics = ({ nextClick }: TopicsProps) => {
         <Autocomplete
           loading={isLoadingApplications}
           options={applicationList}
-          inputValue={selectedApplication}
-          onInputChange={(_event, newInputValue) => {
-            setSelectedApplication(newInputValue);
+          onChange={(_event, newInputValue) => {
+            setSelectedApplication(newInputValue.value);
           }}
           placeholder="Select Application"
           label="Select Application"
@@ -71,10 +72,11 @@ export const Topics = ({ nextClick }: TopicsProps) => {
           remove={removeSelectedTopic}
         />
       </Grid>
-      <Grid item alignSelf="flex-end">
-        <SubmitButton onClick={() => nextClick(selectedTopics)}>
-          Next
-        </SubmitButton>
+      <Grid item alignSelf="flex-end" width="100%">
+        <ActionButtons
+          goBack={goBack}
+          nextClick={() => nextClick(selectedTopics)}
+        />
       </Grid>
     </Grid>
   );

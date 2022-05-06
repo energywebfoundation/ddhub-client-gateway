@@ -8,6 +8,10 @@ export const useStyles = makeStyles()((theme) => ({
     fontWeight: 400,
     fontFamily: theme.typography.body2.fontFamily,
   },
+  nameSecondary: {
+    color: theme.palette.common.white,
+    lineHeight: '21px',
+  },
   owner: {
     color: theme.palette.grey[300],
     fontSize: 14,

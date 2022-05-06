@@ -1,30 +1,23 @@
 import { useApplications, useTopics } from '@dsb-client-gateway/ui/api-hooks';
 import { useState } from 'react';
+import { differenceBy } from 'lodash';
 import { GetTopicDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
+import { ICreateChannel } from '../../models/create-channel.interface';
 
 export interface Topic extends Partial<GetTopicDto> {
   owner: string;
   topicName: string;
 }
 
-export const useTopicsEffects = () => {
+export const useTopicsEffects = (channelValues: ICreateChannel) => {
   const [selectedApplication, setSelectedApplication] = useState('');
-  const [selectedTopics, setSelectedTopics] = useState<Topic[]>([]);
-  const { applications, isLoading: isLoadingApplications } = useApplications();
+  const [selectedTopics, setSelectedTopics] = useState<Topic[]>(
+    channelValues.conditions.topics
+  );
+  const { applications, isLoading: isLoadingApplications } =
+    useApplications('user');
 
   const { topics } = useTopics(selectedApplication);
-
-  const isNotEqual = (topic1: Topic, topic2: Topic) => {
-    return (
-      topic1.topicName !== topic2.topicName && topic1.owner !== topic2.owner
-    );
-  };
-
-  const isEqual = (topic1: Topic, topic2: Topic) => {
-    return (
-      topic1.topicName === topic2.topicName && topic1.owner === topic2.owner
-    );
-  };
 
   const addSelectedTopic = (selectedTopic: Topic) => {
     const exist =
@@ -43,18 +36,18 @@ export const useTopicsEffects = () => {
   };
 
   const removeSelectedTopic = (data: Topic) => {
-    setSelectedTopics(selectedTopics.filter((topic) => !isEqual(topic, data)));
+    setSelectedTopics(selectedTopics.filter((topic) => topic.id !== data.id));
   };
 
-  const availableTopics: Topic[] = topics
-    .map((topic: GetTopicDto) => ({
-      label: topic.name,
-      topicName: topic.name,
-      ...topic,
-    }))
-    .filter((topic) =>
-      selectedTopics.every((selected) => isNotEqual(topic, selected))
-    );
+  const availableTopics: Topic[] = differenceBy(
+    topics,
+    selectedTopics,
+    'id'
+  ).map((topic: GetTopicDto) => ({
+    label: topic.name,
+    topicName: topic.name,
+    ...topic,
+  }));
 
   return {
     applicationList: applications.map((application) => ({

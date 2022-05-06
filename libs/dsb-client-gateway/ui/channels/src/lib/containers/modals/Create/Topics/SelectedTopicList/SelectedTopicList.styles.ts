@@ -4,7 +4,7 @@ export const useStyles = makeStyles()((theme) => ({
   root: {
     maxHeight: 92,
     overflow: 'auto',
-    marginRight: -2,
+    margin: '0 -2px 30px 0',
     paddingRight: 2,
     '&::-webkit-scrollbar': {
       width: 2,

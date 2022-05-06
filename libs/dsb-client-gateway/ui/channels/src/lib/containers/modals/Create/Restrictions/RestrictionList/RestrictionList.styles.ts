@@ -23,7 +23,7 @@ export const useStyles = makeStyles()((theme) => ({
       backgroundColor: theme.palette.primary.main,
       borderRadius: 3,
     },
-    '& .MuiGrid-root:nth-child(even)': {
+    '& .MuiGrid-root:nth-of-type(even)': {
       background: lighten('#21273B', 0.1)
     }
   },

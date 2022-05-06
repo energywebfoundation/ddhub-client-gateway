@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { RestrictionType } from './models/restriction-type.enum';
+import { ICreateChannel } from '../../models/create-channel.interface';
 import { useDIDRestrictionEffects } from './effects/didRestriction.effects';
 import { useRolesRestrictionEffects } from './effects/roleRestriction.effects';
 
-export const useRestrictionsEffects = () => {
+export const useRestrictionsEffects = (channelValues: ICreateChannel) => {
+  const restrictions = channelValues?.conditions;
   const {
     clearDIDInput,
     didInput,
@@ -12,16 +14,16 @@ export const useRestrictionsEffects = () => {
     removeDID,
     didInputChangeHandler,
     isValid: isDIDValid
-  } = useDIDRestrictionEffects();
+  } = useDIDRestrictionEffects(restrictions.dids);
   const {
     roles,
     roleInput,
-    possibleRoles,
     clearRolesInput,
     removeRole,
     addRole,
     rolesInputChangeHandler,
-  } = useRolesRestrictionEffects();
+    isValid: isRoleValid
+  } = useRolesRestrictionEffects(restrictions.roles);
   const [type, setType] = useState<RestrictionType>(RestrictionType.DID);
 
   const clear = () => {
@@ -50,8 +52,8 @@ export const useRestrictionsEffects = () => {
     roles,
     didInput,
     roleInput,
-    possibleRoles,
     isDIDValid,
+    isRoleValid,
     removeRole,
     removeDID,
     addRestriction,

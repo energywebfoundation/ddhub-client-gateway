@@ -8,28 +8,36 @@ import {
   SelectChangeEvent,
   TextField,
   Typography,
+  IconButton,
   Box,
 } from '@mui/material';
 import { Plus, ChevronDown } from 'react-feather';
+import { ICreateChannel } from '../../models/create-channel.interface';
 import { RestrictionBox } from './RestrictionBox/RestrictionBox';
-import { SubmitButton } from '../SubmitButton';
-import { Autocomplete } from '@dsb-client-gateway/ui/core';
 import { RestrictionType } from './models/restriction-type.enum';
+import { ActionButtons } from '../ActionButtons';
 import { useRestrictionsEffects } from './Restrictions.effects';
 import { useStyles } from './Restrictions.styles';
 
 export interface RestrictionsProps {
+  channelValues: ICreateChannel;
   nextClick: (value: { dids: string[]; roles: string[] }) => void;
+  goBack: () => void;
 }
 
-export const Restrictions = ({ nextClick }: RestrictionsProps) => {
+export const Restrictions = ({
+  nextClick,
+  goBack,
+  channelValues,
+}: RestrictionsProps) => {
   const {
     type,
     dids,
     roles,
     didInput,
-    possibleRoles,
+    roleInput,
     isDIDValid,
+    isRoleValid,
     removeRole,
     removeDID,
     addRestriction,
@@ -37,17 +45,38 @@ export const Restrictions = ({ nextClick }: RestrictionsProps) => {
     rolesInputChangeHandler,
     didInputChangeHandler,
     restrictionsCount,
-  } = useRestrictionsEffects();
+  } = useRestrictionsEffects(channelValues);
   const { classes, theme } = useStyles();
 
   const selectRoleRestriction = type === RestrictionType.Role && (
-    <Autocomplete
-      options={possibleRoles}
-      onChange={(_event, newInputValue) => {
-        addRestriction(newInputValue);
+    <TextField
+      fullWidth
+      variant={'outlined'}
+      value={roleInput}
+      classes={{ root: classes.textField }}
+      onChange={(event) => {
+        rolesInputChangeHandler(event.target.value);
       }}
-      placeholder="Search for roles..."
-      onTextChange={(event: any) => rolesInputChangeHandler(event.target.value)}
+      InputProps={{
+        endAdornment: (
+          <InputAdornment position="start">
+            <IconButton
+              sx={{ padding: 0 }}
+              disabled={!roleInput || !isRoleValid}
+              onClick={() => addRestriction(roleInput)}
+            >
+              <Plus color={theme.palette.common.white} size={15} />
+            </IconButton>
+          </InputAdornment>
+        ),
+      }}
+      error={!isRoleValid}
+      helperText={!isRoleValid ? 'Role format is invalid' : ''}
+      onKeyPress={(event: KeyboardEvent<HTMLInputElement>) => {
+        if (event.key === 'Enter') {
+          roleInput && isRoleValid && addRestriction(roleInput);
+        }
+      }}
     />
   );
 
@@ -62,12 +91,14 @@ export const Restrictions = ({ nextClick }: RestrictionsProps) => {
       }}
       InputProps={{
         endAdornment: (
-          <InputAdornment
-            position="start"
-            onClick={() => didInput && addRestriction(didInput)}
-            sx={{ cursor: 'pointer' }}
-          >
-            <Plus color={theme.palette.common.white} size={15} />
+          <InputAdornment position="start">
+            <IconButton
+              sx={{ padding: 0 }}
+              disabled={!didInput || !isDIDValid}
+              onClick={() => addRestriction(didInput)}
+            >
+              <Plus color={theme.palette.common.white} size={15} />
+            </IconButton>
           </InputAdornment>
         ),
       }}
@@ -75,7 +106,7 @@ export const Restrictions = ({ nextClick }: RestrictionsProps) => {
       helperText={!isDIDValid ? 'DID format is invalid' : ''}
       onKeyPress={(event: KeyboardEvent<HTMLInputElement>) => {
         if (event.key === 'Enter') {
-          didInput && addRestriction(didInput);
+          didInput && isDIDValid && addRestriction(didInput);
         }
       }}
     />
@@ -152,10 +183,11 @@ export const Restrictions = ({ nextClick }: RestrictionsProps) => {
           />
         </Box>
       </Grid>
-      <Grid item alignSelf="flex-end">
-        <SubmitButton onClick={() => nextClick({ dids, roles })}>
-          Next
-        </SubmitButton>
+      <Grid item alignSelf="flex-end" width="100%">
+        <ActionButtons
+          goBack={goBack}
+          nextClick={() => nextClick({ dids, roles })}
+        />
       </Grid>
     </Grid>
   );
