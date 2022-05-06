@@ -1,13 +1,8 @@
-import {
-  Button,
-  Grid,
-  TextField,
-  Typography,
-  Autocomplete,
-} from '@mui/material';
-import { ChevronDown } from 'react-feather';
+import { Grid, Typography } from '@mui/material';
 import { SelectedTopicList } from './SelectedTopicList/SelectedTopicList';
+import { Autocomplete } from '@dsb-client-gateway/ui/core';
 import { TopicItem } from './TopicItem/TopicItem';
+import { SubmitButton } from '../SubmitButton';
 import { Topic, useTopicsEffects } from './Topics.effects';
 import { useStyles } from './Topics.styles';
 
@@ -32,44 +27,24 @@ export const Topics = ({ nextClick }: TopicsProps) => {
     <Grid
       container
       direction="column"
-      spacing={2}
       justifyContent="space-between"
       sx={{ height: '100%', flexWrap: 'nowrap' }}
     >
       <Grid item>
         <Autocomplete
-          disablePortal
-          popupIcon={<ChevronDown size={20} />}
-          classes={{
-            popupIndicator: classes.popupIcon,
-            clearIndicator: classes.clearIndicator,
-            option: classes.menuItem,
-          }}
           loading={isLoadingApplications}
           options={applicationList}
           inputValue={selectedApplication}
           onInputChange={(_event, newInputValue) => {
             setSelectedApplication(newInputValue);
           }}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              placeholder="Select Application"
-              classes={{ root: classes.autocomplete }}
-            />
-          )}
-          sx={{ marginBottom: '10px' }}
+          placeholder="Select Application"
+          label="Select Application"
+          wrapperProps={{ mb: 1.2 }}
         />
         {topics.length > 0 && (
           <Autocomplete
             options={topics}
-            popupIcon={<ChevronDown size={20} />}
-            classes={{
-              popupIndicator: classes.popupIcon,
-              clearIndicator: classes.clearIndicator,
-              option: classes.menuItem,
-              listbox: classes.listBox,
-            }}
             renderOption={(props, option) => (
               <TopicItem
                 key={option.topicName}
@@ -82,32 +57,24 @@ export const Topics = ({ nextClick }: TopicsProps) => {
                 addSelectedTopic(newValue);
               }
             }}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                placeholder="Add topic"
-                value=""
-                classes={{ root: classes.autocomplete }}
-              />
-            )}
-            sx={{ marginBottom: '10px' }}
+            placeholder="Add topic"
+            label="Add topic"
+            wrapperProps={{ mb: 1.2 }}
           />
         )}
 
-        <Typography>{selectedTopics.length} Topics</Typography>
+        <Typography className={classes.label}>
+          {selectedTopics.length} Topics
+        </Typography>
         <SelectedTopicList
           topics={selectedTopics}
           remove={removeSelectedTopic}
         />
       </Grid>
       <Grid item alignSelf="flex-end">
-        <Button
-          type="submit"
-          variant="contained"
-          onClick={() => nextClick(selectedTopics)}
-        >
+        <SubmitButton onClick={() => nextClick(selectedTopics)}>
           Next
-        </Button>
+        </SubmitButton>
       </Grid>
     </Grid>
   );

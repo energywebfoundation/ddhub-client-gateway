@@ -7,16 +7,15 @@ import {
   Select,
   SelectChangeEvent,
   TextField,
-  Autocomplete,
-  IconButton,
   Typography,
   Box,
 } from '@mui/material';
-import { useRestrictionsEffects } from './Restrictions.effects';
-import { RestrictionBox } from './RestrictionBox/RestrictionBox';
 import { Plus, ChevronDown } from 'react-feather';
+import { RestrictionBox } from './RestrictionBox/RestrictionBox';
 import { SubmitButton } from '../SubmitButton';
+import { Autocomplete } from '@dsb-client-gateway/ui/core';
 import { RestrictionType } from './models/restriction-type.enum';
+import { useRestrictionsEffects } from './Restrictions.effects';
 import { useStyles } from './Restrictions.styles';
 
 export interface RestrictionsProps {
@@ -43,32 +42,12 @@ export const Restrictions = ({ nextClick }: RestrictionsProps) => {
 
   const selectRoleRestriction = type === RestrictionType.Role && (
     <Autocomplete
-      disablePortal
       options={possibleRoles}
-      popupIcon={
-        <IconButton className={classes.plusButton}>
-          <Plus
-            color={theme.palette.common.white}
-            size={15}
-          />
-        </IconButton>
-      }
-      classes={{
-        popupIndicator: classes.popupIcon,
-        clearIndicator: classes.clearIndicator,
-        option: classes.menuItem,
-      }}
       onChange={(_event, newInputValue) => {
         addRestriction(newInputValue);
       }}
-      renderInput={(params) => (
-        <TextField
-          {...params}
-          placeholder="Search for roles..."
-          classes={{ root: classes.autocomplete }}
-          onChange={(event: any) => rolesInputChangeHandler(event.target.value)}
-        />
-      )}
+      placeholder="Search for roles..."
+      onTextChange={(event: any) => rolesInputChangeHandler(event.target.value)}
     />
   );
 
@@ -88,10 +67,7 @@ export const Restrictions = ({ nextClick }: RestrictionsProps) => {
             onClick={() => didInput && addRestriction(didInput)}
             sx={{ cursor: 'pointer' }}
           >
-            <Plus
-              color={theme.palette.common.white}
-              size={15}
-            />
+            <Plus color={theme.palette.common.white} size={15} />
           </InputAdornment>
         ),
       }}

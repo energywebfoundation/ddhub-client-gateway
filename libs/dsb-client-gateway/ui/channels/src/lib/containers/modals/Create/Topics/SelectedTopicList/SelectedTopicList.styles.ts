@@ -1,9 +1,22 @@
 import { makeStyles } from 'tss-react/mui';
 
-export const useStyles = makeStyles()(() => ({
+export const useStyles = makeStyles()((theme) => ({
   root: {
-    maxHeight: '150px',
+    maxHeight: 92,
     overflow: 'auto',
-    paddingRight: '15px',
+    marginRight: -2,
+    paddingRight: 2,
+    '&::-webkit-scrollbar': {
+      width: 2,
+    },
+    '&::-webkit-scrollbar-track': {
+      backgroundColor: theme.palette.background.paper,
+      boxSizing: 'border-box',
+      borderRadius: 3,
+    },
+    '&::-webkit-scrollbar-thumb': {
+      backgroundColor: theme.palette.primary.main,
+      borderRadius: 3,
+    },
   },
 }));

@@ -28,52 +28,6 @@ export const useStyles = makeStyles()((theme) => ({
       fontFamily: theme.typography.body2.fontFamily
     },
   },
-  autocomplete: {
-    margin: 0,
-    background: alpha(theme.palette.background.default, 0.45),
-    borderRadius: 5,
-    '& .MuiInputBase-root': {
-      fontFamily: theme.typography.body2.fontFamily,
-      fontSize: 12,
-      lineHeight: '24px',
-      fontWeight: 400,
-      padding: '4px 0 4px 12px',
-      '&.Mui-disabled .MuiOutlinedInput-notchedOutline': {
-        border: `1px solid ${theme.palette.grey[500]}`,
-      }
-    },
-    '& .MuiOutlinedInput-notchedOutline': {
-      border: `1px solid ${theme.palette.grey[500]}`,
-      borderRadius: 5
-    },
-    '& .MuiOutlinedInput-input': {
-      padding: '6px 10px 6px 15px',
-      fontSize: 12,
-      lineHeight: '24px',
-      fontWeight: 400,
-      letterSpacing: '0.4px',
-      fontFamily: theme.typography.body2.fontFamily,
-      '&::placeholder': {
-        fontSize: 12,
-        lineHeight: '24px',
-        fontWeight: 400,
-        color: theme.palette.common.white,
-        opacity: 1
-      },
-    },
-    '& .MuiInputBase-input.MuiAutocomplete-input': {
-      padding: '4px 10px 4px 0',
-      minHeight: 22,
-      fontFamily: theme.typography.body2.fontFamily,
-      marginLeft: 3,
-      '&.Mui-disabled': {
-        WebkitTextFillColor: theme.palette.grey[500],
-      }
-    },
-    '& .MuiAutocomplete-endAdornment .MuiSvgIcon-root': {
-      fill: alpha(theme.palette.grey[100], 0.5)
-    }
-  },
   textField: {
     margin: 0,
     background: alpha(theme.palette.background.default, 0.45),
@@ -122,20 +76,6 @@ export const useStyles = makeStyles()((theme) => ({
     minHeight: 22,
     fontFamily: theme.typography.body2.fontFamily,
     padding: '8px 16px'
-  },
-  clearIndicator: {
-    position: 'absolute',
-    top: 0,
-    right: 25,
-  },
-  popupIcon: {
-    position: 'absolute',
-    top: 2,
-    right: 4,
-    transform: 'none',
-    '& svg': {
-      stroke: theme.palette.common.white
-    }
   },
   icon: {
     top: 8,
