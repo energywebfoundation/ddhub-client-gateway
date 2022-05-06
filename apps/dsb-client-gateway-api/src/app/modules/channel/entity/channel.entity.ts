@@ -1,6 +1,6 @@
 import { ChannelType } from '../channel.const';
-import { TopicVersion } from '../../dsb-client/dsb-client.interface';
 import { IsEnum, IsString } from 'class-validator';
+import { TopicVersion } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
 
 export class ChannelTopic {
   topicName: string;

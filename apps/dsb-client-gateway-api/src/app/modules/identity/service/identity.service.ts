@@ -20,7 +20,7 @@ import {
   IdentityEntity,
   IdentityRepositoryWrapper,
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
-import { LoginCommand } from '../../dsb-client/module/did-auth/command/login.command';
+import { LoginCommand } from '@dsb-client-gateway/ddhub-client-gateway-did-auth';
 
 @Injectable()
 export class IdentityService {

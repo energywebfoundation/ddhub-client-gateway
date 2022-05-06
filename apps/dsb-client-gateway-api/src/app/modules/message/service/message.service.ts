@@ -1,8 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { EventsGateway } from '../gateway/events.gateway';
 import { ConfigService } from '@nestjs/config';
-import { Message } from '../../dsb-client/dsb-client.interface';
-import { DsbApiService } from '../../dsb-client/service/dsb-api.service';
 import {
   SendMessageDto,
   uploadMessageBodyDto,
@@ -36,6 +34,11 @@ import {
   TopicEntity,
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
 import { FileNotFoundException } from '../exceptions/file-not-found.exception';
+import {
+  DdhubFilesService,
+  DdhubMessagesService,
+  Message,
+} from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
 import { TopicNotRelatedToChannelException } from '../exceptions/topic-not-related-to-channel.exception';
 
 export enum EventEmitMode {
@@ -51,10 +54,11 @@ export class MessageService {
     protected readonly secretsEngineService: SecretsEngineService,
     protected readonly gateway: EventsGateway,
     protected readonly configService: ConfigService,
-    protected readonly dsbApiService: DsbApiService,
     protected readonly channelService: ChannelService,
     protected readonly topicService: TopicService,
-    protected readonly keyService: KeysService
+    protected readonly keyService: KeysService,
+    protected readonly ddhubMessageService: DdhubMessagesService,
+    protected readonly ddhubFilesService: DdhubFilesService
   ) {}
 
   public async sendMessagesToSubscribers(
@@ -172,7 +176,7 @@ export class MessageService {
           randomKey,
           recipientDid
         );
-        await this.dsbApiService.sendMessageInternal(
+        await this.ddhubMessageService.sendMessageInternal(
           recipientDid,
           clientGatewayMessageId,
           encryptedSymmetricKey
@@ -188,7 +192,7 @@ export class MessageService {
 
     this.logger.log('Sending Message');
 
-    return this.dsbApiService.sendMessage(
+    return this.ddhubMessageService.sendMessage(
       qualifiedDids,
       encryptedMessage,
       topic.id,
@@ -236,7 +240,7 @@ export class MessageService {
 
     // call message search
     const messages: Array<SearchMessageResponseDto> =
-      await this.dsbApiService.messagesSearch(
+      await this.ddhubMessageService.messagesSearch(
         topicIds,
         channel.conditions.qualifiedDids,
         clientId,
@@ -406,7 +410,7 @@ export class MessageService {
         this.logger.debug(
           `sending encrypted symmetric key for recipientId: ${recipientDid} `
         );
-        await this.dsbApiService.sendMessageInternal(
+        await this.ddhubMessageService.sendMessageInternal(
           recipientDid,
           clientGatewayMessageId,
           decryptionCiphertext
@@ -415,7 +419,7 @@ export class MessageService {
     );
 
     //uploading file
-    return this.dsbApiService.uploadFile(
+    return this.ddhubFilesService.uploadFile(
       file,
       qualifiedDids,
       topic.id,
@@ -431,7 +435,7 @@ export class MessageService {
     fileId: string
   ): Promise<DownloadMessageResponse> {
     //Calling download file API of message broker
-    const fileResponse = await this.dsbApiService.downloadFile(fileId);
+    const fileResponse = await this.ddhubFilesService.downloadFile(fileId);
     let decrypted: { data: string };
 
     const regExpFilename = /filename="(?<filename>.*)"/;

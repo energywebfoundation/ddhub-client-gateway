@@ -1,4 +1,4 @@
-import { forwardRef, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { KeysService } from './service/keys.service';
 import { SecretsEngineModule } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
 import { KeysController } from './keys.controller';
@@ -9,10 +9,10 @@ import {
   SymmetricKeysRepositoryModule,
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
 import { SymmetricKeysCacheService } from '../message/service/symmetric-keys-cache.service';
-import { DsbClientModule } from '../dsb-client/dsb-client.module';
 import { RefreshKeysHandler } from './service/refresh-keys.handler';
 import { StorageModule } from '../storage/storage.module';
 import { EnrolmentModule } from '../enrolment/enrolment.module';
+import { DdhubClientGatewayMessageBrokerModule } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
 
 @Module({
   imports: [
@@ -23,10 +23,10 @@ import { EnrolmentModule } from '../enrolment/enrolment.module';
     EnrolmentModule,
     StorageModule,
     DidRepositoryModule,
-    forwardRef(() => DsbClientModule),
+    DdhubClientGatewayMessageBrokerModule.forRootAsync([EnrolmentModule]),
   ],
   providers: [KeysService, SymmetricKeysCacheService, RefreshKeysHandler],
   controllers: [KeysController],
-  exports: [KeysService],
+  exports: [KeysService, SymmetricKeysCacheService],
 })
 export class KeysModule {}
