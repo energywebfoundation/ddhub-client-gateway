@@ -6,8 +6,6 @@ export function ChannelList() {
   const { channels, onCreateHandler, actions, channelsLoaded } =
     useChannelListEffects();
 
-    console.log(channels)
-
   return (
       <div>
         <GenericTable

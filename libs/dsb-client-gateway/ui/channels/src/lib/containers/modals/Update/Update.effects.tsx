@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQueryClient } from 'react-query';
 import {
   UpdateChannelDto,
@@ -11,9 +11,12 @@ import {
   useModalDispatch,
   useModalStore,
 } from '../../../context';
+import { TActionButtonsProps } from '../Create/ActionButtons/ActionButtons';
 import { useUpdateChannel } from '@dsb-client-gateway/ui/api-hooks';
 import { ChannelTopic } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { Topic } from '../Create/Topics/Topics.effects';
+
+type TGetActionButtonsProps = TActionButtonsProps['nextClickButtonProps'];
 
 const initialState = {
   type: '' as UpdateChannelDtoType,
@@ -33,15 +36,21 @@ export const useUpdateChannelEffects = () => {
   const Swal = useCustomAlert();
   const [activeStep, setActiveStep] = useState(0);
 
-  const initialUpdateState = {
-    type: UpdateChannelDtoType.sub,
-    conditions: channel.conditions
-  };
-
   const { updateChannelHandler, isLoading: isUpdating } = useUpdateChannel();
 
   const [channelValues, setChannelValues] =
-    useState<UpdateChannelDto>(initialUpdateState);
+    useState<UpdateChannelDto>(initialState);
+
+    useEffect(() => {
+     if (open) {
+      setChannelValues({
+        type: UpdateChannelDtoType.sub,
+        conditions: channel.conditions
+      })
+     } else {
+      resetToInitialState();
+     }
+    }, [open])
 
   const resetToInitialState = () => {
     setChannelValues(initialState);
@@ -67,7 +76,6 @@ export const useUpdateChannelEffects = () => {
         data: undefined
       },
     });
-    resetToInitialState();
   };
 
   const hideModal = () => {
@@ -75,7 +83,6 @@ export const useUpdateChannelEffects = () => {
       type: ModalActionsEnum.HIDE_UPDATE,
       payload: true,
     });
-    resetToInitialState();
   };
 
   const showModal = () => {
@@ -124,19 +131,28 @@ export const useUpdateChannelEffects = () => {
     }
   };
 
-  const goBack = () => {
-    setActiveStep(activeStep - 1);
-  };
+  const getActionButtonsProps = ({
+    onClick,
+    loading = false,
+  }: TGetActionButtonsProps): TActionButtonsProps => ({
+    nextClickButtonProps: {
+      onClick,
+      text: 'Save',
+      loading
+    },
+    onCancel: openCancelModal
+  });
 
   return {
     open,
+    channel,
     closeModal,
     openCancelModal,
     activeStep,
     setRestrictions,
     channelValues,
-    goBack,
     channelUpdateHandler,
-    isUpdating
+    isUpdating,
+    getActionButtonsProps
   };
 };

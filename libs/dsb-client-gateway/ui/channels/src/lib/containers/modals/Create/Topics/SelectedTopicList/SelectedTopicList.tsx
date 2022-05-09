@@ -21,7 +21,7 @@ export const SelectedTopicList = ({
     <Box className={classes.root}>
       {topics.map((topic) => (
         <SelectedTopic
-          key={topic.name}
+          key={topic.topicName}
           topic={topic}
           canRemove={canRemove}
           canCopy={canCopy}

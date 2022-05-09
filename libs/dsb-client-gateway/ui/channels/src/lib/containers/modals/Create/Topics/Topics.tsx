@@ -3,16 +3,19 @@ import { SelectedTopicList } from './SelectedTopicList/SelectedTopicList';
 import { Autocomplete } from '@dsb-client-gateway/ui/core';
 import { TopicItem } from './TopicItem/TopicItem';
 import { ActionButtons } from '../ActionButtons';
+import { TActionButtonsProps } from '../ActionButtons/ActionButtons';
 import { Topic, useTopicsEffects } from './Topics.effects';
 import { useStyles } from './Topics.styles';
 
 export interface TopicsProps {
   topics: Topic[];
-  nextClick: (topics: Topic[]) => void;
-  goBack: () => void;
+  actionButtonsProps: TActionButtonsProps;
 }
 
-export const Topics = ({ nextClick, goBack, topics: topicsState }: TopicsProps) => {
+export const Topics = ({
+  topics: topicsState,
+  actionButtonsProps,
+}: TopicsProps) => {
   const { classes } = useStyles();
   const {
     applicationList,
@@ -73,8 +76,12 @@ export const Topics = ({ nextClick, goBack, topics: topicsState }: TopicsProps) 
       </Grid>
       <Grid item alignSelf="flex-end" width="100%">
         <ActionButtons
-          goBack={goBack}
-          nextClick={() => nextClick(selectedTopics)}
+          {...actionButtonsProps}
+          nextClickButtonProps={{
+            ...actionButtonsProps.nextClickButtonProps,
+            onClick: () =>
+              actionButtonsProps.nextClickButtonProps.onClick(selectedTopics),
+          }}
         />
       </Grid>
     </Grid>

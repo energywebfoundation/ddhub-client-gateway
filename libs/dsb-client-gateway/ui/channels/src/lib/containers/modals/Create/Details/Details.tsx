@@ -42,7 +42,13 @@ export const Details = ({ nextClick, channelValues }: DetailsProps) => {
           />
         </Grid>
         <Grid item alignSelf="flex-end">
-          <ActionButton disabled={!isValid} onClick={handleSubmit(nextClick)} />
+          <ActionButton
+            disabled={!isValid}
+            showArrowIcon
+            onClick={handleSubmit(nextClick)}
+          >
+            Next
+          </ActionButton>
         </Grid>
       </Grid>
     </form>

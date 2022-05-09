@@ -16,21 +16,18 @@ import { ChannelConditionsDto } from '@dsb-client-gateway/dsb-client-gateway-api
 import { RestrictionBox } from './RestrictionBox/RestrictionBox';
 import { RestrictionType } from './models/restriction-type.enum';
 import { ActionButtons } from '../ActionButtons';
+import { TActionButtonsProps } from '../ActionButtons/ActionButtons';
 import { useRestrictionsEffects } from './Restrictions.effects';
 import { useStyles } from './Restrictions.styles';
 
 export interface RestrictionsProps {
   restrictions: ChannelConditionsDto;
-  nextClick: (value: { dids: string[]; roles: string[] }) => void;
-  submitButtonText?: string;
-  goBack?: () => void;
+  actionButtonsProps: TActionButtonsProps;
 }
 
 export const Restrictions = ({
-  nextClick,
-  goBack,
+  actionButtonsProps,
   restrictions,
-  submitButtonText
 }: RestrictionsProps) => {
   const {
     type,
@@ -185,9 +182,15 @@ export const Restrictions = ({
       </Grid>
       <Grid item alignSelf="flex-end" width="100%">
         <ActionButtons
-          goBack={goBack}
-          nextClick={() => nextClick({ dids, roles })}
-          submitButtonText={submitButtonText}
+          {...actionButtonsProps}
+          nextClickButtonProps={{
+            ...actionButtonsProps.nextClickButtonProps,
+            onClick: () =>
+              actionButtonsProps.nextClickButtonProps.onClick({
+                dids,
+                roles,
+              }),
+          }}
         />
       </Grid>
     </Grid>

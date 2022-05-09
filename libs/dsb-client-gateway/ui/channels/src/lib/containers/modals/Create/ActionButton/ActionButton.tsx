@@ -1,4 +1,5 @@
 import { FC } from 'react';
+import clsx from 'clsx';
 import {
   Box,
   Button,
@@ -9,21 +10,27 @@ import {
 import { ChevronRight } from 'react-feather';
 import { useStyles } from './ActionButton.styles';
 
-export const ActionButton: FC<ButtonProps & { loading?: boolean }> = (props) => {
+export type TActionButton = {
+  onClick: (data?: any) => void,
+  text?: string;
+  showArrowIcon?: boolean;
+  loading?: boolean;
+}
+
+export const ActionButton: FC<ButtonProps & TActionButton> = (props) => {
   const { classes, theme } = useStyles();
-  const loading = props.loading ?? false;
-  const isSubmitButton = props.type === 'submit';
+  const { loading = false} = props;
 
   return (
     <Button
       type="submit"
       variant="contained"
-      className={classes.button}
+      className={clsx(classes.button, {[classes.center]: !props.showArrowIcon })}
       classes={{ endIcon: classes.buttonIcon }}
       endIcon={
-        isSubmitButton ? null : (
+        props.showArrowIcon ? (
           <ChevronRight size={14} color={theme.palette.common.white} />
-        )
+        ) : null
       }
       {...props}
     >

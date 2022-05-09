@@ -20,6 +20,9 @@ export const useStyles = makeStyles()((theme) => ({
       },
     },
   },
+  center: {
+    justifyContent: 'center',
+  },
   buttonText: {
     fontSize: 14,
     lineHeight: '17px',

@@ -23,8 +23,8 @@ export const Create = () => {
     channelSubmitHandler,
     setRestrictions,
     channelValues,
-    goBack,
     isCreating,
+    getActionButtonsProps,
   } = useCreateChannelEffects();
   const { classes } = useStyles();
 
@@ -40,26 +40,34 @@ export const Create = () => {
       case 1:
         return (
           <Restrictions
-            nextClick={setRestrictions}
-            channelValues={channelValues}
-            goBack={goBack}
+            actionButtonsProps={getActionButtonsProps({
+              canGoBack: true,
+              onClick: setRestrictions,
+            })}
+            restrictions={channelValues.conditions}
           />
         );
       case 2:
         return (
           <Topics
-            nextClick={setTopics}
-            goBack={goBack}
-            channelValues={channelValues}
+            actionButtonsProps={getActionButtonsProps({
+              canGoBack: true,
+              onClick: setTopics,
+            })}
+            topics={channelValues.conditions?.topics || []}
           />
         );
       case 3:
         return (
           <Summary
             channelValues={channelValues}
-            nextClick={channelSubmitHandler}
-            isCreating={isCreating}
-            goBack={goBack}
+            actionButtonsProps={getActionButtonsProps({
+              canGoBack: true,
+              onClick: channelSubmitHandler,
+              loading: isCreating,
+              showArrowIcon: false,
+              text: 'Submit'
+            })}
           />
         );
       default:
