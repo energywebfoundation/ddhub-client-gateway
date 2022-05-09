@@ -1,6 +1,8 @@
 {
   "version": 2,
   "projects": {
+    "ddhub-client-gateway-did-auth": "libs/ddhub-client-gateway-did-auth",
+    "ddhub-client-gateway-message-broker": "libs/ddhub-client-gateway-message-broker",
     "ddhub-client-gateway-tracing": "libs/ddhub-client-gateway-tracing",
     "ddhub-client-gateway-utils": "libs/ddhub-client-gateway-utils",
     "dsb-client-gateway-api": "apps/dsb-client-gateway-api",

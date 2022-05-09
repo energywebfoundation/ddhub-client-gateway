@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ChannelController } from './controller/channel.controller';
 import { ChannelService } from './service/channel.service';
-import { DsbClientModule } from '../dsb-client/dsb-client.module';
 import { CqrsModule } from '@nestjs/cqrs';
 import { IdentityModule } from '../identity/identity.module';
 import { ChannelDidCacheService } from './service/channel-did-cache.service';
@@ -14,16 +13,17 @@ import {
   DsbClientGatewayStorageModule,
   TopicRepositoryModule,
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
+import { DdhubClientGatewayMessageBrokerModule } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
+import { EnrolmentModule } from '../enrolment/enrolment.module';
 
 @Module({
   imports: [
     CqrsModule,
-    DsbClientModule,
     DsbClientGatewayStorageModule,
-    DsbClientModule,
     IdentityModule,
     ChannelRepositoryModule,
     TopicRepositoryModule,
+    DdhubClientGatewayMessageBrokerModule.forRootAsync([EnrolmentModule]),
   ],
   providers: [
     ChannelService,

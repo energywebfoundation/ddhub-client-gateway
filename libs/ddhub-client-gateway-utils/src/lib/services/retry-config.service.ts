@@ -1,6 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { OperationOptions } from 'retry';
+
+export interface RetryOptions {
+  stopOnStatusCodes?: HttpStatus[];
+  stopOnResponseCodes?: string[];
+  retryWithAuth?: boolean;
+}
 
 @Injectable()
 export class RetryConfigService {
