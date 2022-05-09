@@ -2,13 +2,14 @@ import { useState } from 'react';
 
 const didRegex = new RegExp(/^did:[a-z0-9]+:([a-z0-9]+:)?(0x[0-9a-fA-F]{40})$/);
 
-export const useDIDRestrictionEffects = () => {
-  const [dids, setDids] = useState<string[]>([]);
+export const useDIDRestrictionEffects = (currentDids: string[]) => {
+  const [dids, setDids] = useState<string[]>(currentDids);
   const [didInput, setDIDInput] = useState<string>('');
   const [isValid, setIsValid] = useState<boolean>(true)
 
   const clearDIDInput = () => {
     setDIDInput('');
+    setIsValid(true);
   };
 
   const didInputChangeHandler = (value: string) => {
