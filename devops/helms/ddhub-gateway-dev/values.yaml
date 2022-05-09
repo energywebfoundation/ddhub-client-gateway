@@ -25,7 +25,7 @@ ddhub-client-gateway-api:
       # -- Defines how many events should be pushed per second, regardless of mode chosen (see above).
       events_max_per_second: 2
       # -- The URL of the DSB Message Broker you want to connect to. Trailing / allowed.
-      dsb_base_url: https://ddhub-dev.energyweb.org
+      dsb_base_url: http://ddhub-messagebroker-proxy-dev.ddhub-dev.svc
       # -- Sets the chain ID of the blockchain network. Options: 73799 (Volta), 246 (EWC)
       chain_id: 73799
       # -- Sets the blockchain RPC node to connect to retreive state from and submit transactions to. Should match the network given in CHAIN_ID.
@@ -37,10 +37,9 @@ ddhub-client-gateway-api:
       # -- Sets the Energy Web IAM application namespace. DSB related roles, such as user and messagebroker should fall under this namespace.
       parent_namespace: ddhub.apps.energyweb.iam.ewc
       secret_engine: vault
-      vault_endpoint: http://vault.ddhub-dev.svc:8200
-      # -- Enable basic auth. (Once enabled, associated secret is required, eg: "ddhub-client-gateway-api-secret")
-      basic_auth_enabled: true
+      secret_engine_endpoint: http://vault.ddhub-dev.svc:8200
       node_env: test
+      db_name: local.db
   image:
     # repository: 098061033856.dkr.ecr.us-east-1.amazonaws.com/ew-dos-dsb-ecr
     repository: aemocontainerregistry.azurecr.io/ddhub-client-gateway-backend
