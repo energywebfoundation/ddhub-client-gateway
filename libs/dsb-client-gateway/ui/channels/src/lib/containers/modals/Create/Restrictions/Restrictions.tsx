@@ -12,7 +12,7 @@ import {
 } from '@mui/material';
 import { TextField } from '@dsb-client-gateway/ui/core';
 import { Plus, ChevronDown } from 'react-feather';
-import { ICreateChannel } from '../../models/create-channel.interface';
+import { ChannelConditionsDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { RestrictionBox } from './RestrictionBox/RestrictionBox';
 import { RestrictionType } from './models/restriction-type.enum';
 import { ActionButtons } from '../ActionButtons';
@@ -20,15 +20,17 @@ import { useRestrictionsEffects } from './Restrictions.effects';
 import { useStyles } from './Restrictions.styles';
 
 export interface RestrictionsProps {
-  channelValues: ICreateChannel;
+  restrictions: ChannelConditionsDto;
   nextClick: (value: { dids: string[]; roles: string[] }) => void;
-  goBack: () => void;
+  submitButtonText?: string;
+  goBack?: () => void;
 }
 
 export const Restrictions = ({
   nextClick,
   goBack,
-  channelValues,
+  restrictions,
+  submitButtonText
 }: RestrictionsProps) => {
   const {
     type,
@@ -45,7 +47,7 @@ export const Restrictions = ({
     rolesInputChangeHandler,
     didInputChangeHandler,
     restrictionsCount,
-  } = useRestrictionsEffects(channelValues);
+  } = useRestrictionsEffects(restrictions);
   const { classes, theme } = useStyles();
 
   const selectRoleRestriction = type === RestrictionType.Role && (
@@ -185,6 +187,7 @@ export const Restrictions = ({
         <ActionButtons
           goBack={goBack}
           nextClick={() => nextClick({ dids, roles })}
+          submitButtonText={submitButtonText}
         />
       </Grid>
     </Grid>

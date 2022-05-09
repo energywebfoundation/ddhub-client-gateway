@@ -3,17 +3,16 @@ import { SelectedTopicList } from './SelectedTopicList/SelectedTopicList';
 import { Autocomplete } from '@dsb-client-gateway/ui/core';
 import { TopicItem } from './TopicItem/TopicItem';
 import { ActionButtons } from '../ActionButtons';
-import { ICreateChannel } from '../../models/create-channel.interface';
 import { Topic, useTopicsEffects } from './Topics.effects';
 import { useStyles } from './Topics.styles';
 
 export interface TopicsProps {
-  channelValues: ICreateChannel;
+  topics: Topic[];
   nextClick: (topics: Topic[]) => void;
   goBack: () => void;
 }
 
-export const Topics = ({ nextClick, goBack, channelValues }: TopicsProps) => {
+export const Topics = ({ nextClick, goBack, topics: topicsState }: TopicsProps) => {
   const { classes } = useStyles();
   const {
     applicationList,
@@ -23,7 +22,7 @@ export const Topics = ({ nextClick, goBack, channelValues }: TopicsProps) => {
     addSelectedTopic,
     selectedTopics,
     removeSelectedTopic,
-  } = useTopicsEffects(channelValues);
+  } = useTopicsEffects(topicsState);
 
   return (
     <Grid

@@ -8,6 +8,7 @@ import { Details } from './Details/Details';
 import { Restrictions } from './Restrictions/Restrictions';
 import { Topics } from './Topics/Topics';
 import { Summary } from './Summary/Summary';
+import { CREATION_STEPS } from './Steps/models/creationSteps';
 import { useCreateChannelEffects } from './Create.effects';
 import { Steps } from './Steps/Steps';
 import { useStyles } from './Create.styles';
@@ -72,7 +73,7 @@ export const Create = () => {
       <DialogSubTitle>{subTitle}</DialogSubTitle>
       <Grid container className={classes.content}>
         <Grid item pt={2}>
-          <Steps activeStep={activeStep} />
+          <Steps steps={CREATION_STEPS} activeStep={activeStep} />
         </Grid>
         <Grid item className={classes.formWrapper}>
           {formPart(activeStep)}

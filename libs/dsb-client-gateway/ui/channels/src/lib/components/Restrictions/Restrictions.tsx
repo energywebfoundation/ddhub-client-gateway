@@ -12,7 +12,7 @@ export const Restrictions: FC<RestrictionsProps> = ({ value, type }) => {
   return (
     <Box>
       <Typography variant="body2" className={classes.text}>
-        {value.length === 0 ? '--' : type}
+        {value?.length === 0 ? '--' : type}
       </Typography>
     </Box>
   );

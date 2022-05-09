@@ -16,7 +16,7 @@ export const ActionButton: FC<ButtonProps & { loading?: boolean }> = (props) => 
 
   return (
     <Button
-      type={props.type ?? 'button'}
+      type="submit"
       variant="contained"
       className={classes.button}
       classes={{ endIcon: classes.buttonIcon }}
@@ -36,7 +36,7 @@ export const ActionButton: FC<ButtonProps & { loading?: boolean }> = (props) => 
         </Box>
       ) : (
         <Typography className={classes.buttonText} variant="body2">
-          {isSubmitButton ? 'Submit' : 'Next'}
+          {props.children}
         </Typography>
       )}
     </Button>
