@@ -1,4 +1,7 @@
-import { useChannels, useRemoveChannel } from '@dsb-client-gateway/ui/api-hooks';
+import {
+  useChannels,
+  useRemoveChannel,
+} from '@dsb-client-gateway/ui/api-hooks';
 import { TTableComponentAction } from '@dsb-client-gateway/ui/core';
 import { theme } from '@dsb-client-gateway/ui/utils';
 import { GetChannelResponseDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
@@ -29,6 +32,16 @@ export const useChannelListEffects = () => {
     });
   };
 
+  const openChannelUpdate = (data: GetChannelResponseDto) => {
+    dispatch({
+      type: ModalActionsEnum.SHOW_UPDATE,
+      payload: {
+        open: true,
+        data,
+      },
+    });
+  };
+
   const actions: TTableComponentAction<GetChannelResponseDto>[] = [
     {
       label: 'View details',
@@ -36,12 +49,13 @@ export const useChannelListEffects = () => {
     },
     {
       label: 'Update',
-      onClick: () => {},
+      onClick: (channel: GetChannelResponseDto) => openChannelUpdate(channel),
     },
     {
       label: 'Remove',
       color: theme.palette.error.main,
-      onClick: (channel: GetChannelResponseDto) => removeChannelHandler(channel.fqcn),
+      onClick: (channel: GetChannelResponseDto) =>
+        removeChannelHandler(channel.fqcn),
     },
   ];
 

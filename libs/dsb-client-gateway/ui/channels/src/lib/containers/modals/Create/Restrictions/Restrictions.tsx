@@ -12,23 +12,22 @@ import {
 } from '@mui/material';
 import { TextField } from '@dsb-client-gateway/ui/core';
 import { Plus, ChevronDown } from 'react-feather';
-import { ICreateChannel } from '../../models/create-channel.interface';
+import { ChannelConditionsDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { RestrictionBox } from './RestrictionBox/RestrictionBox';
 import { RestrictionType } from './models/restriction-type.enum';
 import { ActionButtons } from '../ActionButtons';
+import { TActionButtonsProps } from '../ActionButtons/ActionButtons';
 import { useRestrictionsEffects } from './Restrictions.effects';
 import { useStyles } from './Restrictions.styles';
 
 export interface RestrictionsProps {
-  channelValues: ICreateChannel;
-  nextClick: (value: { dids: string[]; roles: string[] }) => void;
-  goBack: () => void;
+  restrictions: ChannelConditionsDto;
+  actionButtonsProps: TActionButtonsProps;
 }
 
 export const Restrictions = ({
-  nextClick,
-  goBack,
-  channelValues,
+  actionButtonsProps,
+  restrictions,
 }: RestrictionsProps) => {
   const {
     type,
@@ -45,7 +44,7 @@ export const Restrictions = ({
     rolesInputChangeHandler,
     didInputChangeHandler,
     restrictionsCount,
-  } = useRestrictionsEffects(channelValues);
+  } = useRestrictionsEffects(restrictions);
   const { classes, theme } = useStyles();
 
   const selectRoleRestriction = type === RestrictionType.Role && (
@@ -183,8 +182,15 @@ export const Restrictions = ({
       </Grid>
       <Grid item alignSelf="flex-end" width="100%">
         <ActionButtons
-          goBack={goBack}
-          nextClick={() => nextClick({ dids, roles })}
+          {...actionButtonsProps}
+          nextClickButtonProps={{
+            ...actionButtonsProps.nextClickButtonProps,
+            onClick: () =>
+              actionButtonsProps.nextClickButtonProps.onClick({
+                dids,
+                roles,
+              }),
+          }}
         />
       </Grid>
     </Grid>

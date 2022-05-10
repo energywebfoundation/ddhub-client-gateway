@@ -1,6 +1,5 @@
 import {
-  GetChannelResponseDto,
-  UpdateChannelDto,
+  GetChannelResponseDto
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { ModalActionsEnum } from './reducer';
 
@@ -10,7 +9,7 @@ type TCreate = {
 
 type TUpdate = {
   open: boolean;
-  data: UpdateChannelDto;
+  data: GetChannelResponseDto;
 };
 
 type TDetails = {

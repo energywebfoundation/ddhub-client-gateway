@@ -2,17 +2,16 @@ import { useApplications, useTopics } from '@dsb-client-gateway/ui/api-hooks';
 import { useState } from 'react';
 import { differenceBy } from 'lodash';
 import { GetTopicDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
-import { ICreateChannel } from '../../models/create-channel.interface';
 
 export interface Topic extends Partial<GetTopicDto> {
   owner: string;
   topicName: string;
 }
 
-export const useTopicsEffects = (channelValues: ICreateChannel) => {
+export const useTopicsEffects = (topicsState: Topic[]) => {
   const [selectedApplication, setSelectedApplication] = useState('');
   const [selectedTopics, setSelectedTopics] = useState<Topic[]>(
-    channelValues.conditions.topics
+    topicsState
   );
   const { applications, isLoading: isLoadingApplications } =
     useApplications('user');
