@@ -1,4 +1,8 @@
-import { ModalActionsEnum, useModalDispatch, useModalStore } from '../../../context';
+import {
+  ModalActionsEnum,
+  useModalDispatch,
+  useModalStore,
+} from '../../../context';
 
 export const useDetailsEffects = () => {
   const {
@@ -11,17 +15,26 @@ export const useDetailsEffects = () => {
       type: ModalActionsEnum.SHOW_DETAILS,
       payload: {
         open: false,
-        data: undefined
+        data: undefined,
       },
     });
-  }
+  };
 
-  const openUpdateChannel = () => {};
+  const openUpdateChannel = () => {
+    closeModal();
+    dispatch({
+      type: ModalActionsEnum.SHOW_UPDATE,
+      payload: {
+        open: true,
+        data,
+      },
+    });
+  };
 
   return {
     open,
     data,
     closeModal,
-    openUpdateChannel
-  }
-}
+    openUpdateChannel,
+  };
+};

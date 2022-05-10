@@ -44,7 +44,7 @@ export const useUpdateChannelEffects = () => {
     useEffect(() => {
      if (open) {
       setChannelValues({
-        type: UpdateChannelDtoType.sub,
+        type: channel.type,
         conditions: channel.conditions
       })
      } else {

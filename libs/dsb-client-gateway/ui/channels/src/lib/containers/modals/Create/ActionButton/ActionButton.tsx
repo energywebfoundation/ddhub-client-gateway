@@ -19,7 +19,7 @@ export type TActionButton = {
 
 export const ActionButton: FC<ButtonProps & TActionButton> = (props) => {
   const { classes, theme } = useStyles();
-  const { loading = false} = props;
+  const { loading = false, showArrowIcon, ...rest} = props;
 
   return (
     <Button
@@ -28,11 +28,11 @@ export const ActionButton: FC<ButtonProps & TActionButton> = (props) => {
       className={clsx(classes.button, {[classes.center]: !props.showArrowIcon })}
       classes={{ endIcon: classes.buttonIcon }}
       endIcon={
-        props.showArrowIcon ? (
+        showArrowIcon ? (
           <ChevronRight size={14} color={theme.palette.common.white} />
         ) : null
       }
-      {...props}
+      {...rest}
     >
       {loading ? (
         <Box width="100%" display="flex" alignItems="center" justifyContent="center">
