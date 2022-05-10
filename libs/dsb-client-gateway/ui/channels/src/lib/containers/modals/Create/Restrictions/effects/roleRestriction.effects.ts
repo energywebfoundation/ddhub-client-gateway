@@ -1,19 +1,21 @@
 import { useState } from 'react';
 
-export const useRolesRestrictionEffects = () => {
-  const [roles, setRoles] = useState<string[]>([]);
+// TODO: create regex
+const roleRegex = new RegExp(/^\w+/);
+
+export const useRolesRestrictionEffects = (currentRoles: string[]) => {
+  const [roles, setRoles] = useState<string[]>(currentRoles);
   const [roleInput, setRoleInput] = useState<string>('');
-  const [possibleRoles, setPossibleRoles] = useState<string[]>([]);
+  const [isValid, setIsValid] = useState<boolean>(true)
 
   const clearRolesInput = () => {
     setRoleInput('');
+    setIsValid(true);
   };
 
   const rolesInputChangeHandler = (value: string) => {
     setRoleInput(value);
-    // TODO: add searching for roles
-    // const {roles, isLoading: isLoadingRoles} =  useSearchForRoles(value);
-    setPossibleRoles([]);
+    setIsValid(roleRegex.test(value));
   };
 
   const addRole = (role: string) => {
@@ -31,11 +33,10 @@ export const useRolesRestrictionEffects = () => {
   return {
     roles,
     roleInput,
-    possibleRoles,
-    // isLoadingRoles,
     clearRolesInput,
     removeRole,
     addRole,
+    isValid,
     rolesInputChangeHandler,
   };
 };

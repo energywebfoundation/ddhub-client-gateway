@@ -11,10 +11,7 @@ export const useChannels = () => {
   const channelsLoaded = data !== undefined && isSuccess && !isError;
 
   return {
-    channels: channels.map((channel) => ({
-      ...channel,
-      restrictions: [...channel.conditions.roles].join(', '),
-    })),
+    channels,
     isLoading,
     channelsLoaded,
   };

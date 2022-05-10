@@ -1,53 +1,81 @@
+import { KeyboardEvent } from 'react';
 import {
-  Button,
   Grid,
   InputAdornment,
   InputLabel,
   MenuItem,
   Select,
   SelectChangeEvent,
-  TextField,
+  Typography,
+  IconButton,
+  Box,
 } from '@mui/material';
-import { useRestrictionsEffects } from './Restrictions.effects';
+import { TextField } from '@dsb-client-gateway/ui/core';
+import { Plus, ChevronDown } from 'react-feather';
+import { ICreateChannel } from '../../models/create-channel.interface';
 import { RestrictionBox } from './RestrictionBox/RestrictionBox';
-import { Autocomplete } from '@mui/lab';
-import { Plus } from 'react-feather';
-import { theme } from '@dsb-client-gateway/ui/utils';
 import { RestrictionType } from './models/restriction-type.enum';
-import { KeyboardEvent } from 'react';
+import { ActionButtons } from '../ActionButtons';
+import { useRestrictionsEffects } from './Restrictions.effects';
+import { useStyles } from './Restrictions.styles';
 
 export interface RestrictionsProps {
+  channelValues: ICreateChannel;
   nextClick: (value: { dids: string[]; roles: string[] }) => void;
+  goBack: () => void;
 }
 
-export const Restrictions = ({ nextClick }: RestrictionsProps) => {
+export const Restrictions = ({
+  nextClick,
+  goBack,
+  channelValues,
+}: RestrictionsProps) => {
   const {
     type,
     dids,
     roles,
     didInput,
     roleInput,
-    possibleRoles,
     isDIDValid,
+    isRoleValid,
     removeRole,
     removeDID,
     addRestriction,
     restrictionTypeChangeHandler,
     rolesInputChangeHandler,
     didInputChangeHandler,
-  } = useRestrictionsEffects();
+    restrictionsCount,
+  } = useRestrictionsEffects(channelValues);
+  const { classes, theme } = useStyles();
 
   const selectRoleRestriction = type === RestrictionType.Role && (
-    <Autocomplete
-      disablePortal
-      options={possibleRoles}
-      inputValue={roleInput}
-      onInputChange={(_event, newInputValue) => {
-        rolesInputChangeHandler(newInputValue);
+    <TextField
+      fullWidth
+      variant={'outlined'}
+      value={roleInput}
+      onChange={(event) => {
+        rolesInputChangeHandler(event.target.value);
       }}
-      renderInput={(params) => (
-        <TextField {...params} label="Search for roles..." />
-      )}
+      InputProps={{
+        endAdornment: (
+          <InputAdornment position="start">
+            <IconButton
+              sx={{ padding: 0 }}
+              disabled={!roleInput || !isRoleValid}
+              onClick={() => addRestriction(roleInput)}
+            >
+              <Plus color={theme.palette.common.white} size={15} />
+            </IconButton>
+          </InputAdornment>
+        ),
+      }}
+      error={!isRoleValid}
+      helperText={!isRoleValid ? 'Role format is invalid' : ''}
+      onKeyPress={(event: KeyboardEvent<HTMLInputElement>) => {
+        if (event.key === 'Enter') {
+          roleInput && isRoleValid && addRestriction(roleInput);
+        }
+      }}
     />
   );
 
@@ -61,12 +89,14 @@ export const Restrictions = ({ nextClick }: RestrictionsProps) => {
       }}
       InputProps={{
         endAdornment: (
-          <InputAdornment
-            position="start"
-            onClick={() => addRestriction(didInput)}
-            sx={{ cursor: 'pointer' }}
-          >
-            <Plus color={theme.palette.common.white} />
+          <InputAdornment position="start">
+            <IconButton
+              sx={{ padding: 0 }}
+              disabled={!didInput || !isDIDValid}
+              onClick={() => addRestriction(didInput)}
+            >
+              <Plus color={theme.palette.common.white} size={15} />
+            </IconButton>
           </InputAdornment>
         ),
       }}
@@ -74,7 +104,7 @@ export const Restrictions = ({ nextClick }: RestrictionsProps) => {
       helperText={!isDIDValid ? 'DID format is invalid' : ''}
       onKeyPress={(event: KeyboardEvent<HTMLInputElement>) => {
         if (event.key === 'Enter') {
-          addRestriction(didInput);
+          didInput && isDIDValid && addRestriction(didInput);
         }
       }}
     />
@@ -84,55 +114,78 @@ export const Restrictions = ({ nextClick }: RestrictionsProps) => {
     <Grid
       container
       direction="column"
-      spacing={2}
       justifyContent="space-between"
       className={'no-wrap'}
       sx={{ height: '100%', flexWrap: 'nowrap' }}
     >
       <Grid item>
         <Grid container spacing={2}>
-          <Grid item sx={{marginBottom: isDIDValid ? '0px' : '22px'}}>
-            <InputLabel id="restriction-type">Restrictions</InputLabel>
+          <Grid item sx={{ marginBottom: '22px' }}>
+            <InputLabel id="restriction-type" className={classes.label}>
+              Restrictions
+            </InputLabel>
             <Select
               labelId="restriction-type"
               value={type}
+              IconComponent={ChevronDown}
+              classes={{
+                icon: classes.icon,
+              }}
+              className={classes.select}
               onChange={(d: SelectChangeEvent<RestrictionType>) => {
                 restrictionTypeChangeHandler(d.target.value as RestrictionType);
               }}
               sx={{ width: '100px' }}
             >
-              <MenuItem value={RestrictionType.DID}>
+              <MenuItem
+                value={RestrictionType.DID}
+                className={classes.menuItem}
+              >
                 {RestrictionType.DID}
               </MenuItem>
-              <MenuItem value={RestrictionType.Role}>
+              <MenuItem
+                value={RestrictionType.Role}
+                className={classes.menuItem}
+              >
                 {RestrictionType.Role}
               </MenuItem>
             </Select>
           </Grid>
-          <Grid item alignSelf="flex-end" flexGrow="1">
+          <Grid
+            item
+            alignSelf="flex-end"
+            flexGrow="1"
+            sx={{ marginBottom: '22px' }}
+          >
             {selectRoleRestriction}
             {setDIDRestriction}
           </Grid>
         </Grid>
-        <RestrictionBox
-          type={RestrictionType.DID}
-          list={dids}
-          remove={removeDID}
-        />
-        <RestrictionBox
-          type={RestrictionType.Role}
-          list={roles}
-          remove={removeRole}
-        />
+        <Box>
+          <Typography className={classes.label}>
+            {restrictionsCount} Restrictions
+          </Typography>
+        </Box>
+        <Box display="flex">
+          <RestrictionBox
+            type={RestrictionType.DID}
+            list={dids}
+            remove={removeDID}
+            wrapperProps={{ mr: 0.75 }}
+          />
+          <RestrictionBox
+            type={RestrictionType.Role}
+            list={roles}
+            remove={removeRole}
+            wrapperProps={{ ml: 0.75 }}
+          />
+        </Box>
       </Grid>
-      <Grid item alignSelf="flex-end">
-        <Button
-          type="submit"
-          variant="contained"
-          onClick={() => nextClick({ dids, roles })}
-        >
-          Next
-        </Button>
+      <Grid item alignSelf="flex-end" width="100%">
+        <ActionButtons
+          goBack={goBack}
+          nextClick={() => nextClick({ dids, roles })}
+        />
       </Grid>
     </Grid>
   );

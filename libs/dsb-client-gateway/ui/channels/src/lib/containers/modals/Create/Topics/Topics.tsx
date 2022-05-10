@@ -1,51 +1,51 @@
-import { Button, Grid, TextField, Typography } from '@mui/material';
-import { Topic, useTopicsEffects } from './Topics.effects';
-import { Autocomplete } from '@mui/lab';
+import { Grid, Typography } from '@mui/material';
 import { SelectedTopicList } from './SelectedTopicList/SelectedTopicList';
+import { Autocomplete } from '@dsb-client-gateway/ui/core';
 import { TopicItem } from './TopicItem/TopicItem';
+import { ActionButtons } from '../ActionButtons';
+import { ICreateChannel } from '../../models/create-channel.interface';
+import { Topic, useTopicsEffects } from './Topics.effects';
+import { useStyles } from './Topics.styles';
 
 export interface TopicsProps {
+  channelValues: ICreateChannel;
   nextClick: (topics: Topic[]) => void;
+  goBack: () => void;
 }
 
-export const Topics = ({ nextClick }: TopicsProps) => {
+export const Topics = ({ nextClick, goBack, channelValues }: TopicsProps) => {
+  const { classes } = useStyles();
   const {
     applicationList,
     isLoadingApplications,
-    selectedApplication,
     setSelectedApplication,
     topics,
     addSelectedTopic,
     selectedTopics,
     removeSelectedTopic,
-  } = useTopicsEffects();
+  } = useTopicsEffects(channelValues);
 
   return (
     <Grid
       container
       direction="column"
-      spacing={2}
       justifyContent="space-between"
       sx={{ height: '100%', flexWrap: 'nowrap' }}
     >
       <Grid item>
         <Autocomplete
-          disablePortal
           loading={isLoadingApplications}
           options={applicationList}
-          inputValue={selectedApplication}
-          onInputChange={(event, newInputValue) => {
-            setSelectedApplication(newInputValue);
+          onChange={(_event, newInputValue) => {
+            setSelectedApplication(newInputValue.value);
           }}
-          renderInput={(params) => (
-            <TextField {...params} label="Select Application" />
-          )}
-          sx={{ marginBottom: '10px' }}
+          placeholder="Select Application"
+          label="Select Application"
+          wrapperProps={{ mb: 1.2 }}
         />
         {topics.length > 0 && (
           <Autocomplete
             options={topics}
-            placeholder="Add topic"
             renderOption={(props, option) => (
               <TopicItem
                 key={option.topicName}
@@ -58,27 +58,25 @@ export const Topics = ({ nextClick }: TopicsProps) => {
                 addSelectedTopic(newValue);
               }
             }}
-            renderInput={(params) => (
-              <TextField {...params} label="Add topic" value="" />
-            )}
-            sx={{ marginBottom: '10px' }}
+            placeholder="Add topic"
+            label="Add topic"
+            wrapperProps={{ mb: 1.2 }}
           />
         )}
 
-        <Typography>{selectedTopics.length} Topics</Typography>
+        <Typography className={classes.label}>
+          {selectedTopics.length} Topics
+        </Typography>
         <SelectedTopicList
           topics={selectedTopics}
           remove={removeSelectedTopic}
         />
       </Grid>
-      <Grid item alignSelf="flex-end">
-        <Button
-          type="submit"
-          variant="contained"
-          onClick={() => nextClick(selectedTopics)}
-        >
-          Next
-        </Button>
+      <Grid item alignSelf="flex-end" width="100%">
+        <ActionButtons
+          goBack={goBack}
+          nextClick={() => nextClick(selectedTopics)}
+        />
       </Grid>
     </Grid>
   );

@@ -1,4 +1,7 @@
-import { Control, UseFormRegister, FieldValues } from 'react-hook-form';
+import { Control, FieldValues } from 'react-hook-form';
+import {
+  FormControlLabelProps,
+} from '@mui/material';
 import { GenericFormField } from '../../../containers/GenericForm';
 
 export type FormRadioOption = {
@@ -10,5 +13,5 @@ export interface FormRadioProps {
   field: GenericFormField;
   control: Control<FieldValues>;
   disabled?: boolean;
-  register: UseFormRegister<FieldValues>;
+  formControlLabelProps?: Omit<FormControlLabelProps, 'control' | 'label'>;
 }

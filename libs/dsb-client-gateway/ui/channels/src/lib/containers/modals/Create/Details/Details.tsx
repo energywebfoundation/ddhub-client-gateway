@@ -1,35 +1,37 @@
-import { Button, Grid } from '@mui/material';
-import { useDetailsEffects } from './Details.effects';
+import { Grid } from '@mui/material';
 import { FormInput, FormRadio } from '@dsb-client-gateway/ui/core';
+import { ActionButton } from '../ActionButton';
+import { ICreateChannel } from '../../models/create-channel.interface';
+import { useDetailsEffects } from './Details.effects';
 import { useStyles } from './Details.styles';
 
 export interface DetailsProps {
   nextClick: (data) => void;
+  channelValues: ICreateChannel;
 }
 
-export const Details = ({ nextClick }: DetailsProps) => {
+export const Details = ({ nextClick, channelValues }: DetailsProps) => {
   const { classes } = useStyles();
   const { register, fields, handleSubmit, isValid, control } =
-    useDetailsEffects();
+    useDetailsEffects(channelValues);
 
   return (
     <form className={classes.form}>
-      <Grid
-        container
-        direction="column"
-        spacing={2}
-        justifyContent="space-between"
-      >
+      <Grid container direction="column" justifyContent="space-between">
         <Grid item className={classes.formContent}>
           <FormRadio
-            register={register}
             control={control}
             field={fields.channelType}
+            formControlLabelProps={{
+              style: { marginRight: 33 },
+            }}
           />
           <FormRadio
-            register={register}
             control={control}
             field={fields.connectionType}
+            formControlLabelProps={{
+              style: { marginRight: 36 },
+            }}
           />
 
           <FormInput
@@ -39,15 +41,8 @@ export const Details = ({ nextClick }: DetailsProps) => {
             variant="outlined"
           />
         </Grid>
-        <Grid item alignSelf="flex-end" className={classes.buttonContainer}>
-          <Button
-            type="submit"
-            variant="contained"
-            disabled={!isValid}
-            onClick={handleSubmit(nextClick)}
-          >
-            Next
-          </Button>
+        <Grid item alignSelf="flex-end">
+          <ActionButton disabled={!isValid} onClick={handleSubmit(nextClick)} />
         </Grid>
       </Grid>
     </form>

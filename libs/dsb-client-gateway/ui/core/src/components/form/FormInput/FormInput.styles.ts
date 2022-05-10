@@ -11,10 +11,20 @@ export const useStyles = makeStyles()((theme) => ({
       fontSize: 12,
       lineHeight: '24px',
       fontWeight: 400,
+      paddingRight: 4
+    },
+    '& .MuiFormHelperText-root': {
+       position: 'absolute',
+       bottom: -22,
+       fontSize: 12,
+       lineHeight: '17px',
+       fontWeight: 400,
+       fontFamily: theme.typography.body2.fontFamily,
+       letterSpacing: '0.4px',
     },
     '& .MuiOutlinedInput-notchedOutline': {
       border: `1px solid ${theme.palette.grey[500]}`,
-      borderRadius: 5
+      borderRadius: 5,
     },
     '& input': {
       padding: '8px 10px 8px 15px',
@@ -26,17 +36,17 @@ export const useStyles = makeStyles()((theme) => ({
         color: theme.palette.grey[500],
         WebkitTextFillColor: theme.palette.grey[500],
         '& + .MuiOutlinedInput-notchedOutline': {
-            border: `1px solid ${theme.palette.grey[500]}`
-        }
+          border: `1px solid ${theme.palette.grey[500]}`,
+        },
       },
       '&::placeholder': {
         fontSize: 12,
         lineHeight: '24px',
         fontWeight: 400,
         color: theme.palette.grey[300],
-        opacity: 1
+        opacity: 1,
       },
-    }
+    },
   },
   label: {
     fontSize: 12,
@@ -45,6 +55,24 @@ export const useStyles = makeStyles()((theme) => ({
     letterSpacing: '0.4px',
     color: theme.palette.common.white,
     fontFamily: theme.typography.body2.fontFamily,
-    marginBottom: 10
-  }
+    marginBottom: 10,
+  },
+  formControlLabel: {
+    fontSize: 14,
+    lineHeight: '21px',
+    fontWeight: 400,
+    fontFamily: theme.typography.body2.fontFamily,
+    color: theme.palette.grey[300],
+    letterSpacing: '0.4px',
+  },
+  labelRoot: {
+    '& .Mui-checked ~.MuiFormControlLabel-label': {
+      color: theme.palette.common.white,
+    },
+  },
+  circle: {
+    borderRadius: '50%',
+    fill: theme.palette.primary.main,
+    boxShadow: `0px 2px 4px ${alpha(theme.palette.primary.dark, 0.4)}`,
+  },
 }));

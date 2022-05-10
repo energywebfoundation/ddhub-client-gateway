@@ -12,10 +12,23 @@ import {
   useModalStore,
 } from '../../../context';
 import { useCreateChannel } from '@dsb-client-gateway/ui/api-hooks';
+import { ChannelTopic } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { Topic } from './Topics/Topics.effects';
 import { ICreateChannel } from '../models/create-channel.interface';
 import { ChannelType } from '../../../models/channel-type.enum';
 import { ConnectionType } from './Details/models/connection-type.enum';
+
+const initialState = {
+  fqcn: '',
+  type: CreateChannelDtoType.sub,
+  conditions: {
+    roles: [] as string[],
+    dids: [] as string[],
+    topics: [] as ChannelTopic[],
+  },
+  channelType: '',
+  connectionType: '',
+};
 
 export const useCreateChannelEffects = () => {
   const queryClient = useQueryClient();
@@ -25,18 +38,6 @@ export const useCreateChannelEffects = () => {
   const dispatch = useModalDispatch();
   const Swal = useCustomAlert();
   const [activeStep, setActiveStep] = useState(0);
-
-  const initialState = {
-    fqcn: 'asd',
-    type: CreateChannelDtoType.sub,
-    conditions: {
-      roles: ['role1', 'role2'],
-      dids: ['did:ethr:0xaaa', '0xA028720Bc0cc22d296DCD3a26E7E8AAe73c9B6F3'],
-      topics: [],
-    },
-    channelType: '',
-    connectionType: '',
-  };
 
   const [channelValues, setChannelValues] =
     useState<ICreateChannel>(initialState);
@@ -147,19 +148,24 @@ export const useCreateChannelEffects = () => {
 
   const onCreateError = () => {
     Swal.error({
-      text: 'Error while creating topic',
+      text: 'Error while creating channel',
     });
   };
 
   const channelSubmitHandler = () => {
-    const values = channelValues as CreateChannelDto;
-    createChannelHandler(values, onCreate, onCreateError);
+    const values = channelValues;
+    const channelCreateValues: CreateChannelDto = {
+      fqcn: values.fqcn,
+      type: values.type,
+      conditions: values.conditions,
+    };
+    createChannelHandler(channelCreateValues, onCreate, onCreateError);
   };
 
   const openCancelModal = async () => {
     hideModal();
     const result = await Swal.warning({
-      text: 'you will close create topic form',
+      text: 'you will close create channel form',
     });
 
     if (result.isConfirmed) {
@@ -167,6 +173,10 @@ export const useCreateChannelEffects = () => {
     } else {
       showModal();
     }
+  };
+
+  const goBack = () => {
+    setActiveStep(activeStep - 1);
   };
 
   return {
@@ -180,5 +190,6 @@ export const useCreateChannelEffects = () => {
     channelSubmitHandler,
     setRestrictions,
     channelValues,
+    goBack,
   };
 };
