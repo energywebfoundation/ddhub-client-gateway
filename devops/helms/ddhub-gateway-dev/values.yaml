@@ -127,7 +127,7 @@ ddhub-client-gateway-api:
   existingClaim:
     enabled: true
     claimName: azurefile-ddhub-gw-dev
-    mountPath: /mnt/claim
+    mountPath: /usr/app/data
 
   probes:
     liveness: true
