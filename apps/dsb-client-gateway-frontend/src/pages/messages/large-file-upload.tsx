@@ -1,3 +1,5 @@
+import { DataMessagingUpload } from '@dsb-client-gateway/ui/messaging';
+
 export default function LargeFileUpload() {
-  return <div>LargeFileUpload</div>;
+  return <DataMessagingUpload />;
 }
