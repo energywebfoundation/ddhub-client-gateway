@@ -1,0 +1,45 @@
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: azurefile-ddhub-gw-dev
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: azurefile-csi
+  csi:
+    driver: file.csi.azure.com
+    readOnly: false
+    volumeHandle: aemo-aks-dev#aemoblobstoragedev#ddhub-gw-dev  # make sure this volumeid is unique in the cluster
+    volumeAttributes:
+      resourceGroup: aemo-aks-dev  # optional, only set this when storage account is not in the same resource group as agent node
+      shareName: ddhub-gw-dev
+    nodeStageSecretRef:
+      name: aemo-dev-blob-access
+      namespace: aemo-demo
+  mountOptions:
+    - dir_mode=0777
+    - file_mode=0777
+    - uid=0
+    - gid=0
+    - mfsymlinks
+    - cache=strict
+    - nosharesock
+    - nobrl
+      
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: azurefile-ddhub-gw-dev
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: azurefile-csi
+  volumeName: azurefile-ddhub-gw-dev
+  resources:
+    requests:
+      storage: 1Gi
