@@ -1,11 +1,10 @@
 import { useState } from 'react';
+import { ChannelConditionsDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { RestrictionType } from './models/restriction-type.enum';
-import { ICreateChannel } from '../../models/create-channel.interface';
 import { useDIDRestrictionEffects } from './effects/didRestriction.effects';
 import { useRolesRestrictionEffects } from './effects/roleRestriction.effects';
 
-export const useRestrictionsEffects = (channelValues: ICreateChannel) => {
-  const restrictions = channelValues?.conditions;
+export const useRestrictionsEffects = (restrictions: ChannelConditionsDto) => {
   const {
     clearDIDInput,
     didInput,

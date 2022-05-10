@@ -6,21 +6,18 @@ import { SelectedTopicList } from '../Topics/SelectedTopicList/SelectedTopicList
 import { ICreateChannel } from '../../models/create-channel.interface';
 import { RestrictionType } from '../Restrictions/models/restriction-type.enum';
 import { ActionButtons } from '../ActionButtons';
+import { TActionButtonsProps } from '../ActionButtons/ActionButtons';
 import { useSummaryEffects } from './Summary.effects';
 import { useStyles } from './Summary.styles';
 
 export interface SummaryProps {
-  nextClick: () => void;
   channelValues: ICreateChannel;
-  goBack: () => void;
-  isCreating: boolean;
+  actionButtonsProps: TActionButtonsProps;
 }
 
 export const Summary = ({
-  nextClick,
   channelValues,
-  goBack,
-  isCreating,
+  actionButtonsProps
 }: SummaryProps) => {
   const { countRestrictions } = useSummaryEffects();
   const { classes } = useStyles();
@@ -86,11 +83,8 @@ export const Summary = ({
         />
       </Grid>
       <Grid item alignSelf="flex-end" width="100%">
-        <ActionButtons
-          goBack={goBack}
-          nextClick={nextClick}
-          type="submit"
-          loading={isCreating}
+      <ActionButtons
+          {...actionButtonsProps}
         />
       </Grid>
     </Grid>

@@ -26,7 +26,7 @@ export const SelectedTopic = ({
           variant="body2"
           className={clsx(classes.name, { [classes.nameSecondary]: canCopy })}
         >
-          {topic?.name}
+          {topic?.topicName}
         </Typography>
         <Grid container>
           <Grid item>
