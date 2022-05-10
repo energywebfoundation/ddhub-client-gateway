@@ -1,24 +1,29 @@
 import { FC } from 'react';
-import { Box, ButtonProps } from '@mui/material';
-import { ActionButton } from '../ActionButton';
+import { Box } from '@mui/material';
+import { ActionButton, TActionButton } from '../ActionButton';
 import { BackButton } from '../BackButton';
+import { CancelButton } from '../CancelButton';
 
-interface ActionButtonsProps extends ButtonProps {
-  nextClick: () => void;
-  goBack: () => void;
-  loading?: boolean;
+export type TActionButtonsProps = {
+  nextClickButtonProps: TActionButton;
+  goBack?: () => void;
+  onCancel?: () => void;
 }
 
-export const ActionButtons: FC<ActionButtonsProps> = ({
+export const ActionButtons: FC<TActionButtonsProps> = ({
   goBack,
-  nextClick,
-  type,
-  loading,
+  onCancel,
+  nextClickButtonProps,
 }) => {
+  const { text, ...nextButtonProps } = nextClickButtonProps;
+
   return (
     <Box display="flex" justifyContent="space-between" width="100%">
-      <BackButton onClick={goBack} />
-      <ActionButton onClick={nextClick} type={type} loading={loading} />
+      {goBack && <BackButton onClick={goBack} color="secondary" />}
+      {onCancel && <CancelButton onClick={onCancel} />}
+      <ActionButton {...nextButtonProps}>
+        {nextClickButtonProps.text}
+      </ActionButton>
     </Box>
   );
 };

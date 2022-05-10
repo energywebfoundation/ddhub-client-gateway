@@ -1,4 +1,5 @@
 import { FC } from 'react';
+import clsx from 'clsx';
 import {
   Box,
   Button,
@@ -9,23 +10,29 @@ import {
 import { ChevronRight } from 'react-feather';
 import { useStyles } from './ActionButton.styles';
 
-export const ActionButton: FC<ButtonProps & { loading?: boolean }> = (props) => {
+export type TActionButton = {
+  onClick: (data?: any) => void,
+  text?: string;
+  showArrowIcon?: boolean;
+  loading?: boolean;
+}
+
+export const ActionButton: FC<ButtonProps & TActionButton> = (props) => {
   const { classes, theme } = useStyles();
-  const loading = props.loading ?? false;
-  const isSubmitButton = props.type === 'submit';
+  const { loading = false, showArrowIcon, ...rest} = props;
 
   return (
     <Button
-      type={props.type ?? 'button'}
+      type="submit"
       variant="contained"
-      className={classes.button}
+      className={clsx(classes.button, {[classes.center]: !props.showArrowIcon })}
       classes={{ endIcon: classes.buttonIcon }}
       endIcon={
-        isSubmitButton ? null : (
+        showArrowIcon ? (
           <ChevronRight size={14} color={theme.palette.common.white} />
-        )
+        ) : null
       }
-      {...props}
+      {...rest}
     >
       {loading ? (
         <Box width="100%" display="flex" alignItems="center" justifyContent="center">
@@ -36,7 +43,7 @@ export const ActionButton: FC<ButtonProps & { loading?: boolean }> = (props) => 
         </Box>
       ) : (
         <Typography className={classes.buttonText} variant="body2">
-          {isSubmitButton ? 'Submit' : 'Next'}
+          {props.children}
         </Typography>
       )}
     </Button>

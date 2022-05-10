@@ -14,9 +14,14 @@ import {
 import { useCreateChannel } from '@dsb-client-gateway/ui/api-hooks';
 import { ChannelTopic } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { Topic } from './Topics/Topics.effects';
+import { TActionButtonsProps } from './ActionButtons/ActionButtons';
 import { ICreateChannel } from '../models/create-channel.interface';
 import { ChannelType } from '../../../models/channel-type.enum';
 import { ConnectionType } from './Details/models/connection-type.enum';
+
+type TGetActionButtonsProps = TActionButtonsProps['nextClickButtonProps'] & {
+  canGoBack: boolean;
+};
 
 const initialState = {
   fqcn: '',
@@ -179,6 +184,22 @@ export const useCreateChannelEffects = () => {
     setActiveStep(activeStep - 1);
   };
 
+  const getActionButtonsProps = ({
+    onClick,
+    text = 'Next',
+    showArrowIcon = true,
+    loading = false,
+    canGoBack = false,
+  }: TGetActionButtonsProps): TActionButtonsProps => ({
+    nextClickButtonProps: {
+      onClick,
+      text,
+      showArrowIcon,
+      loading
+    },
+    ...(canGoBack && { goBack }),
+  });
+
   return {
     open,
     closeModal,
@@ -190,6 +211,6 @@ export const useCreateChannelEffects = () => {
     channelSubmitHandler,
     setRestrictions,
     channelValues,
-    goBack,
+    getActionButtonsProps
   };
 };

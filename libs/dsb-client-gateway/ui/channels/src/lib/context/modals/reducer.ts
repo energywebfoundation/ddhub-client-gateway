@@ -41,7 +41,7 @@ export const modalsReducer = (
     case ModalActionsEnum.HIDE_UPDATE:
       return {
         ...state,
-        update: { ...state.update },
+        update: { ...state.update, open: !action.payload },
       };
   }
 };

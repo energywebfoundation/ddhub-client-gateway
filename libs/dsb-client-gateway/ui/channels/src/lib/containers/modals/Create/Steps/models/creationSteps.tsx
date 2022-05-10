@@ -1,10 +1,7 @@
 import { FileText, CreditCard, Check } from 'react-feather';
+import { TStep } from './types'
 
-export const CREATION_STEPS: {
-  title: string;
-  subtitle: string;
-  icon: React.ReactNode;
-}[] = [
+export const CREATION_STEPS: TStep[] = [
   { title: 'Details', subtitle: 'Type · namespace', icon: <FileText size={18} /> },
   {
     title: 'Restrictions',
