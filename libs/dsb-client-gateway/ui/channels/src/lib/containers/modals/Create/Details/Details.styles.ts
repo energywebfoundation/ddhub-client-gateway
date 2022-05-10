@@ -1,6 +1,6 @@
 import { makeStyles } from 'tss-react/mui';
 
-export const useStyles = makeStyles()(() => ({
+export const useStyles = makeStyles()({
   form: {
     display: 'flex',
     height: '100%',
@@ -9,9 +9,8 @@ export const useStyles = makeStyles()(() => ({
     justifyContent: 'space-evenly',
     display: 'flex',
     flexDirection: 'column',
-    flex: 1,
+    '&.MuiGrid-item': {
+      paddingTop: 11,
+    },
   },
-  buttonContainer: {
-    marginRight: '15px',
-  },
-}));
+});

@@ -1,6 +1,7 @@
-import { Grid, Typography } from '@mui/material';
+import clsx from 'clsx';
+import { Grid, Typography, IconButton } from '@mui/material';
 import { useStyles } from './SelectedTopic.styles';
-import { Close } from '@mui/icons-material';
+import { X as Close } from 'react-feather';
 import { Topic } from '../Topics.effects';
 import { CopyToClipboard } from '@dsb-client-gateway/ui/core';
 
@@ -17,12 +18,16 @@ export const SelectedTopic = ({
   canRemove,
   canCopy,
 }: SelectedTopicProps) => {
-  const { classes } = useStyles();
+  const { classes, theme } = useStyles();
   return (
-    <Grid container justifyContent="space-between">
+    <Grid container justifyContent="space-between" alignItems="center">
       <Grid item>
-        <Typography className={classes.name}>{topic?.name}</Typography>
-
+        <Typography
+          variant="body2"
+          className={clsx(classes.name, { [classes.nameSecondary]: canCopy })}
+        >
+          {topic?.name}
+        </Typography>
         <Grid container>
           <Grid item>
             <Typography variant="body2" className={classes.owner}>
@@ -37,8 +42,10 @@ export const SelectedTopic = ({
         </Grid>
       </Grid>
       {canRemove && (
-        <Grid item onClick={remove} className={classes.close}>
-          <Close />
+        <Grid item>
+          <IconButton onClick={remove} className={classes.close}>
+            <Close color={theme.palette.secondary.main} size={18} />
+          </IconButton>
         </Grid>
       )}
     </Grid>

@@ -1,70 +1,97 @@
-import { Button, Divider, Grid, Stack, Typography } from '@mui/material';
-import { useSummaryEffects } from './Summary.effects';
-import { RestrictionBox } from '../Restrictions/RestrictionBox/RestrictionBox';
-import { useStyles } from './Summary.styles';
+import { Divider, Grid, Stack, Typography, Box } from '@mui/material';
+import { CopyToClipboard } from '@dsb-client-gateway/ui/core';
+import { didFormatMinifier } from '@dsb-client-gateway/ui/utils';
+import { RestrictionsViewBox } from '../../../../components';
 import { SelectedTopicList } from '../Topics/SelectedTopicList/SelectedTopicList';
 import { ICreateChannel } from '../../models/create-channel.interface';
 import { RestrictionType } from '../Restrictions/models/restriction-type.enum';
+import { ActionButtons } from '../ActionButtons';
+import { useSummaryEffects } from './Summary.effects';
+import { useStyles } from './Summary.styles';
 
 export interface SummaryProps {
   nextClick: () => void;
   channelValues: ICreateChannel;
+  goBack: () => void;
+  isCreating: boolean;
 }
 
-export const Summary = ({ nextClick, channelValues }: SummaryProps) => {
+export const Summary = ({
+  nextClick,
+  channelValues,
+  goBack,
+  isCreating,
+}: SummaryProps) => {
   const { countRestrictions } = useSummaryEffects();
   const { classes } = useStyles();
   return (
     <Grid
       container
       direction="column"
-      spacing={2}
       justifyContent="space-between"
       className={'no-wrap'}
-      sx={{ height: '100%', flexWrap: 'nowrap' }}
+      sx={{ height: '100%', flexWrap: 'nowrap', marginTop: '-20px' }}
     >
       <Grid item>
-        <Typography variant={'h4'}>{channelValues.channelType}</Typography>
-        <Stack direction="row">
-          <Typography className={classes.detailsTitle}>Type: </Typography>
-          <Typography className={classes.description}>
+        <Typography variant={'h4'} className={classes.mainLabel}>
+          {channelValues.channelType}
+        </Typography>
+        <Stack direction="row" mt={2.8}>
+          <Typography className={classes.detailsTitle} variant="body2">
+            Type:{' '}
+          </Typography>
+          <Typography className={classes.description} variant="body2">
             {channelValues?.connectionType}
           </Typography>
         </Stack>
-        <Stack direction="row">
-          <Typography className={classes.detailsTitle}>Namespace:</Typography>
-          <Typography className={classes.description}>
-            {channelValues?.fqcn}
+        <Stack direction="row" mt={1}>
+          <Typography className={classes.detailsTitle} variant="body2">
+            Namespace:
           </Typography>
+          <Box display="flex">
+            <Typography className={classes.description} variant="body2">
+              {channelValues?.fqcn}
+            </Typography>
+            <CopyToClipboard
+              text={channelValues?.fqcn}
+              wrapperProps={{ marginLeft: '8px' }}
+            />
+          </Box>
         </Stack>
         <Divider className={classes.divider} />
-        <Typography variant={'body2'}>
+        <Typography variant={'body2'} className={classes.label}>
           {countRestrictions(channelValues?.conditions)} Restrictions
         </Typography>
-        <RestrictionBox
-          type={RestrictionType.DID}
-          list={channelValues.conditions.dids}
-          canRemove={false}
-          canCopy={true}
-        />
-        <RestrictionBox
-          type={RestrictionType.Role}
-          list={channelValues.conditions.roles}
-          canRemove={false}
-          canCopy={true}
-        />
+        <Box display="flex">
+          <RestrictionsViewBox
+            label={RestrictionType.DID}
+            list={channelValues.conditions.dids}
+            formatter={(value: string) => didFormatMinifier(value, 5, 3)}
+            wrapperProps={{ mr: 0.75 }}
+          />
+          <RestrictionsViewBox
+            label={RestrictionType.Role}
+            list={channelValues.conditions.roles}
+            wrapperProps={{ ml: 0.75 }}
+          />
+        </Box>
         <Divider className={classes.divider} />
-        <Typography variant={'body2'}>Topics</Typography>
+        <Typography variant={'body2'} className={classes.label}>
+          Topics
+        </Typography>
         <SelectedTopicList
           topics={channelValues.conditions.topics}
           canRemove={false}
           canCopy={true}
         />
       </Grid>
-      <Grid item alignSelf="flex-end">
-        <Button type="submit" variant="contained" onClick={nextClick}>
-          Next
-        </Button>
+      <Grid item alignSelf="flex-end" width="100%">
+        <ActionButtons
+          goBack={goBack}
+          nextClick={nextClick}
+          type="submit"
+          loading={isCreating}
+        />
       </Grid>
     </Grid>
   );
