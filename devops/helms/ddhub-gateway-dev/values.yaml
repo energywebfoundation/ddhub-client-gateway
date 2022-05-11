@@ -29,7 +29,7 @@ ddhub-client-gateway-api:
       # -- Sets the chain ID of the blockchain network. Options: 73799 (Volta), 246 (EWC)
       chain_id: 73799
       # -- Sets the blockchain RPC node to connect to retreive state from and submit transactions to. Should match the network given in CHAIN_ID.
-      rpc_url: https://volta-rpc.energyweb.org/
+      rpc_url: https://volta-rpc-vkn5r5zx4ke71f9hcu0c.energyweb.org/
       # -- Sets the Energy Web IAM cache server URL, used to cache identities (as it can be expensive to rely only on querying smart contract data).
       cache_server_url: https://identitycache-dev.energyweb.org/v1
       # -- Sets the Energy Web IAM events server URL, used to receive notification of approved DSB role claims.
@@ -39,7 +39,7 @@ ddhub-client-gateway-api:
       secret_engine: vault
       secret_engine_endpoint: http://vault.ddhub-dev.svc:8200
       node_env: test
-      db_name: local.db
+      db_name: ./data/local.db
   image:
     # repository: 098061033856.dkr.ecr.us-east-1.amazonaws.com/ew-dos-dsb-ecr
     repository: aemocontainerregistry.azurecr.io/ddhub-client-gateway-backend
@@ -124,17 +124,10 @@ ddhub-client-gateway-api:
 
   affinity: {}
 
-  pvc:
-    enabled: false
-    storageClassName: default
-    accessMode: ReadWriteOnce
-    capacity: 1Gi
-    mountPath: /mnt/azure
-
   existingClaim:
-    enabled: false
-    claimName: my-claim
-    mountPath: /mnt/claim
+    enabled: true
+    claimName: azurefile-ddhub-gw-dev
+    mountPath: /usr/app/data
 
   probes:
     liveness: true
