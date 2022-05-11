@@ -39,7 +39,7 @@ ddhub-client-gateway-api:
       secret_engine: vault
       secret_engine_endpoint: http://vault.ddhub-dev.svc:8200
       node_env: test
-      db_name: local.db
+      db_name: ./data/local.db
   image:
     # repository: 098061033856.dkr.ecr.us-east-1.amazonaws.com/ew-dos-dsb-ecr
     repository: aemocontainerregistry.azurecr.io/ddhub-client-gateway-backend
