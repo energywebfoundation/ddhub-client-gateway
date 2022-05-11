@@ -94,6 +94,11 @@ ddhub-client-gateway-api:
           backend:
             serviceName: ddhub-gateway-api-dev
             servicePort: 80
+        - path: /docs-json
+          pathType: Prefix
+          backend:
+            serviceName: ddhub-gateway-api-dev
+            servicePort: 80
     tls:
       - secretName: dsb-tls-secret
         hosts:
