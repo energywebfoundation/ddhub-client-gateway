@@ -36,4 +36,12 @@ export class TopicService {
       },
     });
   }
+
+  public async getTopicById(id: string): Promise<TopicEntity | null> {
+    return this.wrapper.topicRepository.findOne({
+      where: {
+        id,
+      },
+    });
+  }
 }
