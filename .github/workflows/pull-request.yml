@@ -4,6 +4,8 @@ on:
   pull_request:
     branches:
       - '*'
+    paths-ignore:
+      - 'devops/**'
 env:
   SECRETS_ENGINE: vault
 
