@@ -9,6 +9,17 @@ export const useSelectAutocompleteEffects = (
 ) => {
   const [textValue, setTextValue] = useState<string>('');
 
+  const add = (value: any) => {
+    const isDuplicate = currentValue?.indexOf(value) !== -1;
+
+    if (isDuplicate) {
+      setTextValue('');
+      return;
+    }
+    onChange([...currentValue, value] as FormSelectOption[]);
+    setTextValue('');
+  }
+
   const changeHandler = (
     _event: SyntheticEvent,
     value: (string | FormSelectOption)[]
@@ -25,16 +36,13 @@ export const useSelectAutocompleteEffects = (
 
   const onKeyDown = (event: any) => {
     if (event.key === 'Enter' && field.tags) {
-      const isDuplicate = currentValue?.indexOf(event.target.value) !== -1;
-
-      if (isDuplicate) {
-        setTextValue('');
-        return;
-      }
-      onChange([...currentValue, event.target.value] as FormSelectOption[]);
-      setTextValue('');
+      add(event.target.value)
     }
   };
+
+  const onBlur = (event: any) => {
+    add(event.target.value);
+  }
 
   const options = field.options || [];
 
@@ -44,5 +52,6 @@ export const useSelectAutocompleteEffects = (
     setTextValue,
     changeHandler,
     onKeyDown,
+    onBlur
   };
 };
