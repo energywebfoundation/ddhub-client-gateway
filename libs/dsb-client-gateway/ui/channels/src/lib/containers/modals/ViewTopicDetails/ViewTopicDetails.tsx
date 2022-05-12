@@ -1,7 +1,7 @@
 import { FC } from 'react';
 import { DialogContent, DialogActions, Box } from '@mui/material';
 import { CloseButton, Dialog } from '@dsb-client-gateway/ui/core';
-import { TopicDetails } from '../../../components';
+import { TopicDetails } from '@dsb-client-gateway/ui/topics';
 import { useViewTopicDetailsEffects } from './ViewTopicDetails.effects';
 import { useStyles } from './ViewTopicDetails.styles';
 

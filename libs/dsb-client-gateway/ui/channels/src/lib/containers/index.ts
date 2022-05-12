@@ -1,2 +1,2 @@
 export * from './ChannelsContainer/ChannelsContainer';
-export * from './TopicVersionHistory';
+export * from './TopicVersionHistoryContainer';

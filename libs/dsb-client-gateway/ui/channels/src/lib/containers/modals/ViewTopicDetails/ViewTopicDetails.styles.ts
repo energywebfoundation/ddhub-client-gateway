@@ -21,14 +21,9 @@ export const useStyles = makeStyles()((theme) => ({
     width: 18,
     height: 18,
   },
-  editIconButton: {
-    position: 'absolute',
-    top: -10,
-    right: 0,
-  },
   downloadIconButton: {
     position: 'absolute',
     top: -10,
-    right: 30,
+    right: 0,
   },
 }));

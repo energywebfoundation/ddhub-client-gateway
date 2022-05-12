@@ -1,7 +1,7 @@
 import { FC } from 'react';
 import { Typography, Box } from '@mui/material';
 import { PostTopicDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
-import { useStyles } from './ViewTopicDetails.styles';
+import { useStyles } from './TopicDetails.styles';
 
 interface TopicDetailProps {
   topic: PostTopicDto;
