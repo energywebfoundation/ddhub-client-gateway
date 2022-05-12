@@ -198,7 +198,7 @@ export class KeysService implements OnModuleInit {
     receiverDid: string
   ): Promise<any | null> {
 
-    this.logger.log(`get did for receiverDid:${receiverDid}`)
+    this.logger.log(`fetching did for receiverDid:${receiverDid}`)
 
     const did: DidEntity | null = await this.getDid(receiverDid);
 
