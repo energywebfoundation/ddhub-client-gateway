@@ -16,6 +16,7 @@ export const routerConst = {
   IntegrationAPIs: '/integration',
   LargeDataMessagingFileUpload: '/messages/large-file-upload',
   LargeDataMessagingFileDownload: '/messages/large-file-download',
+  LargeFileDownloadChannel: `/messages/large-file-download/[${Queries.FQCN}]`,
   DataMessagingFileUpload: '/messages/file-upload',
   DataMessagingFileDownload: '/messages/file-download',
   VersionHistory: `/applications/[${Queries.Namespace}]/[${Queries.TopicId}]/version-history`,
