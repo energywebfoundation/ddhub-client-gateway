@@ -1,18 +1,7 @@
 import Box from '@mui/material/Box';
-import {
-  Avatar,
-  Card,
-  CardContent,
-  CardHeader,
-  Stack,
-  Typography,
-} from '@mui/material';
-import { Mail } from 'react-feather';
+import { Avatar, Card, CardContent, CardHeader, Stack } from '@mui/material';
 import React from 'react';
 import { useStyles } from './ApiBox.styles';
-import { CreateButton } from '@dsb-client-gateway/ui/core';
-import { useRouter } from 'next/router';
-import Link from 'next/link';
 
 export interface ApiBoxProps {
   icon: React.ReactNode;
@@ -32,7 +21,7 @@ export const ApiBox = ({ icon, url, title, subtitle }: ApiBoxProps) => {
           subheader={subtitle}
         />
         <CardContent>
-          <Stack direction='row' justifyContent="flex-end">
+          <Stack direction="row" justifyContent="flex-end">
             <a href={url} target="_blank" className={classes.link}>
               Open
             </a>

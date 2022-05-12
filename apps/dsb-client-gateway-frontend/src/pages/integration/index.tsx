@@ -1,5 +1,5 @@
-import Head from "next/head";
-import { IntegrationContainer } from "@dsb-client-gateway/ui/integration";
+import Head from 'next/head';
+import { IntegrationContainer } from '@dsb-client-gateway/ui/integration';
 
 export default function Documentation() {
   return (
@@ -13,5 +13,5 @@ export default function Documentation() {
         <IntegrationContainer />
       </main>
     </div>
-  )
+  );
 }

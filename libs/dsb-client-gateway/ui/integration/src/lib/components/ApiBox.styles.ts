@@ -1,5 +1,5 @@
 import { makeStyles } from 'tss-react/mui';
-import { alpha } from "@mui/material/styles";
+import { alpha } from '@mui/material/styles';
 
 export const useStyles = makeStyles()((theme) => ({
   avatar: {
@@ -14,6 +14,6 @@ export const useStyles = makeStyles()((theme) => ({
   link: {
     backgroundColor: theme.palette.primary.main,
     padding: '10px 22px',
-    borderRadius: '5px'
-  }
+    borderRadius: '5px',
+  },
 }));

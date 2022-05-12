@@ -1,20 +1,11 @@
-import {
-  Avatar,
-  Card,
-  CardContent,
-  CardHeader,
-  Grid,
-  Typography,
-} from '@mui/material';
+import { Grid } from '@mui/material';
 import React from 'react';
-import Box from '@mui/material/Box';
-import { Mail } from 'react-feather';
 import { ApiBox } from '../components/ApiBox';
-import { WebSocketApi, RestApi } from '@dsb-client-gateway/ui/core';
-import { useIntegrationContainerEffects } from "./IntegrationContainer.effects";
+import { RestApi, WebSocketApi } from '@dsb-client-gateway/ui/core';
+import { useIntegrationContainerEffects } from './IntegrationContainer.effects';
 
 export const IntegrationContainer = () => {
-  const {websocketApiUrl, restApiUrl} = useIntegrationContainerEffects();
+  const { websocketApiUrl, restApiUrl } = useIntegrationContainerEffects();
   return (
     <Grid container spacing={2}>
       <Grid item xs={6}>
