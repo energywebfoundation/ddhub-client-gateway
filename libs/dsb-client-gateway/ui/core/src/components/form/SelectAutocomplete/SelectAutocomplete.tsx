@@ -28,7 +28,7 @@ export const SelectAutocomplete: FC<SelectAutocompleteProps> = ({
   className,
 }) => {
   const { classes } = useStyles();
-  const { options, textValue, setTextValue, changeHandler, onKeyDown } =
+  const { options, textValue, setTextValue, changeHandler, onKeyDown, onBlur } =
     useSelectAutocompleteEffects(onChange, field, value);
 
   return (
@@ -44,6 +44,7 @@ export const SelectAutocomplete: FC<SelectAutocompleteProps> = ({
         getOptionLabel={(option: FormSelectOption) => option.label}
         onChange={changeHandler}
         onKeyDown={onKeyDown}
+        onBlur={onBlur}
         getOptionDisabled={() => disabled}
         disabled={disabled}
         value={value !== undefined ? value : []}

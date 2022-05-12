@@ -197,7 +197,12 @@ export class KeysService implements OnModuleInit {
     symmetricKey: string,
     receiverDid: string
   ): Promise<any | null> {
+
+    this.logger.log(`fetching did for receiverDid:${receiverDid}`)
+
     const did: DidEntity | null = await this.getDid(receiverDid);
+
+    this.logger.log(`did fetched for receiverDid:${receiverDid}`)
 
     if (!did) {
       this.logger.error('IAM not initialized');
@@ -205,6 +210,7 @@ export class KeysService implements OnModuleInit {
       return;
     }
 
+    this.logger.debug(`encrypting receiverDid: ${receiverDid}`);
     const encryptedData = crypto.publicEncrypt(
       {
         key: did.publicRSAKey,
@@ -212,6 +218,8 @@ export class KeysService implements OnModuleInit {
       },
       Buffer.from(symmetricKey)
     );
+
+    this.logger.debug(`encryption completed for receiverDid: ${receiverDid}`);
 
     return encryptedData.toString('base64');
   }

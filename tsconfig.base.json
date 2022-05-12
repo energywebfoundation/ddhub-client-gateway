@@ -56,6 +56,9 @@
       "@dsb-client-gateway/ui/messaging": [
         "libs/dsb-client-gateway/ui/messaging/src/index.ts"
       ],
+      "@dsb-client-gateway/ui/integration": [
+        "libs/dsb-client-gateway/ui/integration/src/index.ts"
+      ],
       "@dsb-client-gateway/ui/api-hooks": [
         "libs/dsb-client-gateway/ui/api-hooks/src/index.ts"
       ],

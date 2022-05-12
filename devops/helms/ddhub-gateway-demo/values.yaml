@@ -41,6 +41,7 @@ ddhub-client-gateway-api:
       # -- Enable basic auth. (Once enabled, associated secret is required, eg: "ddhub-client-gateway-api-secret")
       basic_auth_enabled: true
       node_env: test
+      db_name: ./data/local.db
   image:
     # repository: 098061033856.dkr.ecr.us-east-1.amazonaws.com/ew-dos-dsb-ecr
     repository: aemocontainerregistry.azurecr.io/ddhub-client-gateway-backend
@@ -95,6 +96,11 @@ ddhub-client-gateway-api:
           backend:
             serviceName: ddhub-client-gateway-api-demo
             servicePort: 80
+        - path: /docs-json
+          pathType: Prefix
+          backend:
+            serviceName: ddhub-client-gateway-api-demo
+            servicePort: 80
     tls:
       - secretName: dsb-tls-secret
         hosts:
@@ -125,17 +131,10 @@ ddhub-client-gateway-api:
 
   affinity: {}
 
-  pvc:
-    enabled: false
-    storageClassName: default
-    accessMode: ReadWriteOnce
-    capacity: 1Gi
-    mountPath: /mnt/azure
-
   existingClaim:
-    enabled: false
-    claimName: my-claim
-    mountPath: /mnt/claim
+    enabled: true
+    claimName: azurefile-ddhub-gw-demo
+    mountPath: /usr/app/data
 
   probes:
     liveness: true
