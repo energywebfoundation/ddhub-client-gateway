@@ -3,7 +3,7 @@ import { Stack } from '@mui/material';
 import { GetTopicSearchDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { useTopicVersionHistoryEffects } from './TopicVersionHistory.effects';
 import { VERSION_HISTORY_HEADERS } from '../../models/version-history-header';
-import { TopicInfo } from '../../components';
+import { TopicInfo } from '@dsb-client-gateway/ui/topics';
 
 export function TopicVersionHistory() {
   const { applicationNamespace, topicHistory, topicId, loading } =
