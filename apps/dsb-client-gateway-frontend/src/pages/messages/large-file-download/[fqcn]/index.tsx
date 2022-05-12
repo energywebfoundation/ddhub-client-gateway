@@ -1,3 +1,5 @@
-export default function Channel() {
-  return <div>Channel view</div>
+import { Channel } from "@dsb-client-gateway/ui/channels";
+
+export default function Index() {
+  return <Channel />
 }
