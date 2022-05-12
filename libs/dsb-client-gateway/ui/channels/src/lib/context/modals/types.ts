@@ -1,4 +1,6 @@
 import {
+  GetTopicDto,
+  ApplicationDTO,
   GetChannelResponseDto
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { ModalActionsEnum } from './reducer';
@@ -17,10 +19,19 @@ type TDetails = {
   data: GetChannelResponseDto;
 };
 
+type TTopicDetails = {
+  open: boolean;
+  data: {
+    topic: GetTopicDto;
+    application: ApplicationDTO;
+  }
+};
+
 export interface IModalStore {
   create: TCreate;
   update: TUpdate;
   details: TDetails;
+  topicDetails: TTopicDetails;
 }
 
 interface IShowCreateAction {
@@ -38,6 +49,11 @@ interface IShowDetailsAction {
   payload: TDetails;
 }
 
+interface IShowTopicDetailsAction {
+  type: ModalActionsEnum.SHOW_TOPIC_DETAILS;
+  payload: TTopicDetails;
+}
+
 interface IHideCreateAction {
   type: ModalActionsEnum.HIDE_CREATE;
   payload: boolean;
@@ -53,4 +69,5 @@ export type TModalAction =
   | IShowUpdateAction
   | IHideCreateAction
   | IHideUpdateAction
-  | IShowDetailsAction;
+  | IShowDetailsAction
+  | IShowTopicDetailsAction;
