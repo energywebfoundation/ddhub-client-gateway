@@ -7,13 +7,14 @@ export const useStyles = makeStyles()((theme) => ({
     borderRadius: 5,
     marginBottom: 3,
     '&:hover': {
-      background: alpha(theme.palette.primary.main, 0.4),
+      backgroundColor: alpha(theme.palette.primary.main, 0.12),
+      color: theme.palette.primary.main
     },
     '&:hover .MuiTypography-root': {
-      color: theme.palette.common.white,
+      color: theme.palette.primary.main,
     },
     '&:hover svg': {
-      stroke: theme.palette.common.white,
+      stroke: theme.palette.primary.main,
     },
   },
   active: {
@@ -28,6 +29,12 @@ export const useStyles = makeStyles()((theme) => ({
     '&:hover': {
       background: theme.palette.primary.main,
       transform: 'none',
+      '& .MuiTypography-root': {
+        color: theme.palette.common.white,
+      },
+      '& svg': {
+        stroke: theme.palette.common.white,
+      }
     },
   },
   icon: {
