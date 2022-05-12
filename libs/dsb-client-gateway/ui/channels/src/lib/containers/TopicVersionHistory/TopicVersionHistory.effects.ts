@@ -6,6 +6,7 @@ export const useTopicVersionHistoryEffects = () => {
   const router = useRouter();
   const topicId = router.query[Queries.TopicId] as string;
   const applicationNamespace = router.query[Queries.Namespace] as string;
+  // TODO: add useApplication
   const { applicationsFetched } = useApplications('user');
   const { topicHistory, topicHistoryLoaded } = useTopicVersionHistory(topicId);
 
