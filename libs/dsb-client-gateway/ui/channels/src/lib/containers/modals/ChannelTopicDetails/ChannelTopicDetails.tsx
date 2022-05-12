@@ -1,22 +1,22 @@
 import { FC } from 'react';
-import { DialogContent, DialogActions, Box } from '@mui/material';
-import { CloseButton, Dialog } from '@dsb-client-gateway/ui/core';
+import { Dialog, CloseButton } from '@dsb-client-gateway/ui/core';
 import { TopicDetails } from '@dsb-client-gateway/ui/topics';
-import { useChannelTopicDetailsEffects } from './ChannelTopicDetails.effects';
+import { DialogContent, Box, DialogActions } from '@mui/material';
 import { useStyles } from './ChannelTopicDetails.styles';
+import { useChannelTopicDetailsEffects } from './ChannelTopicDetails.effects';
 
 export const ChannelTopicDetails: FC = () => {
   const { classes } = useStyles();
   const { open, closeModal, isLoading, fields, details, buttons } =
     useChannelTopicDetailsEffects();
   return (
-    <Dialog open={open} onClose={closeModal} paperClassName={classes.paper}>
+    <Dialog paperClassName={classes.paper} open={open} onClose={closeModal}>
       <DialogContent sx={{ padding: 0 }}>
         <TopicDetails
-          isLoading={isLoading}
           details={details}
-          fields={fields}
           buttons={buttons}
+          fields={fields}
+          isLoading={isLoading}
         />
       </DialogContent>
       <DialogActions className={classes.actions}>
