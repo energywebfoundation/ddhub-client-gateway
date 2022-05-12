@@ -7,16 +7,21 @@ import { useStyles } from './UploadForm.styles';
 const bytesToMegaBytes = (bytes: number) => (bytes / (1024 * 1024)).toFixed(2);
 
 export interface UploadFormProps {
+  acceptedFiles: File[];
   onFileChange: (acceptedFiles: File[]) => void;
   wrapperProps?: BoxProps;
 }
 
 export const UploadForm: FC<UploadFormProps> = ({
   onFileChange,
+  acceptedFiles,
   wrapperProps,
 }) => {
   const { classes } = useStyles();
-  const { open, files, fileTextValue } = useUploadFormEffects({ onFileChange });
+  const { open, files, fileTextValue } = useUploadFormEffects({
+    onFileChange,
+    acceptedFiles,
+  });
 
   return (
     <Box className={classes.wrapper} {...wrapperProps}>
@@ -35,7 +40,7 @@ export const UploadForm: FC<UploadFormProps> = ({
               mb={4.1}
               sx={{ minHeight: '44px' }}
             >
-              {files.map((file) => {
+              {files?.map((file) => {
                 return (
                   <Box key={file.name} display="flex" flexDirection="column">
                     <Typography variant="body1">File:</Typography>

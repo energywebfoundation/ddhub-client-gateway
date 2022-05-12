@@ -5,9 +5,16 @@ export const useStyles = makeStyles()((theme) => ({
   wrapper: {
     backgroundColor: theme.palette.background.paper,
     borderRadius: 6,
-    minHeight: 416,
+    minHeight: 401,
+    padding: '37px 23px 27px 25px',
+  },
+  channelWrapper: {
+    backgroundColor: theme.palette.background.paper,
+    borderRadius: 6,
+    minHeight: 133,
     marginTop: 36,
-    padding: '46px 21px 25px 25px',
+    padding: '46px 21px 28px 25px',
+    marginBottom: 20
   },
   field: {
     '& .MuiOutlinedInput-root input::placeholder': {

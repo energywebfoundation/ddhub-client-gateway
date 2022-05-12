@@ -3,6 +3,7 @@ import { keyBy } from 'lodash';
 import {
   useChannels,
   useUploadMessage,
+  useTopicVersionHistory,
 } from '@dsb-client-gateway/ui/api-hooks';
 
 type TOption = {
@@ -17,13 +18,23 @@ export const useDataMessagingUploadEffects = () => {
     channelsByName,
     isLoading: channelsLoading,
   } = useChannels();
+
   const [selectedChannel, setSelectedChannel] = useState<string>('');
   const [selectedTopic, setSelectedTopic] = useState<string>('');
   const [selectedFile, setSelectedFile] = useState<File>();
+  const [selectedTopicVersion, setSelectedTopicVersion] = useState<string>('');
+
+  const { topicHistory, isLoading: topicHistoryLoading } =
+    useTopicVersionHistory(selectedTopic);
 
   const channelOptions = channels.map((channel) => ({
     label: channel.fqcn,
     value: channel.fqcn,
+  }));
+
+  const topicHistoryOptions = topicHistory.map((topic) => ({
+    label: topic.version,
+    value: topic.version,
   }));
 
   const topics = channelsByName[selectedChannel]?.conditions?.topics ?? [];
@@ -35,8 +46,6 @@ export const useDataMessagingUploadEffects = () => {
       value: topic.topicId,
     })) || [];
 
-  const topicsFieldDisabled = topicsOptions.length === 0;
-
   const onFileChange = (acceptedFiles: File[]) => {
     setSelectedFile(acceptedFiles[0]);
   };
@@ -47,15 +56,35 @@ export const useDataMessagingUploadEffects = () => {
   ) => {
     if (newInputValue === null) {
       setSelectedTopic('');
+      setSelectedTopicVersion('');
+    } else {
+      setSelectedChannel(newInputValue?.value);
     }
-    setSelectedChannel(newInputValue?.value);
   };
 
   const onTopicChange = (
     _event: React.SyntheticEvent,
     newInputValue: TOption
   ) => {
-    setSelectedTopic(newInputValue?.value);
+    if (newInputValue === null) {
+      setSelectedTopicVersion('');
+    } else {
+      setSelectedTopic(newInputValue?.value);
+    }
+  };
+
+  const onTopicVersionChange = (
+    _event: React.SyntheticEvent,
+    newInputValue: TOption
+  ) => {
+    setSelectedTopicVersion(newInputValue?.value);
+  };
+
+  const onUpload = () => {
+    setSelectedTopic('');
+    setSelectedTopicVersion('');
+    setSelectedChannel('');
+    setSelectedFile(undefined);
   };
 
   const submitHandler = () => {
@@ -64,16 +93,19 @@ export const useDataMessagingUploadEffects = () => {
       fqcn: selectedChannel,
       topicName: topicsById[selectedTopic]?.topicName,
       topicOwner: topicsById[selectedTopic]?.owner,
-      // TODO: get topic version
-      topicVersion: '1.0.0',
-    });
+      topicVersion: selectedTopicVersion,
+    }, onUpload);
   };
 
+  const topicsFieldDisabled = topicsOptions.length === 0;
+  const topicVersionsFieldDisabled = topicHistoryOptions.length === 0;
   const buttonDisabled = !selectedChannel || !selectedTopic || !selectedFile;
 
   return {
     channelOptions,
+    topicHistoryOptions,
     channelsLoading,
+    topicHistoryLoading,
     onChannelChange,
     onTopicChange,
     topicsFieldDisabled,
@@ -85,5 +117,9 @@ export const useDataMessagingUploadEffects = () => {
     submitHandler,
     topicsById,
     buttonDisabled,
+    selectedTopicVersion,
+    onTopicVersionChange,
+    topicVersionsFieldDisabled,
+    selectedFile
   };
 };

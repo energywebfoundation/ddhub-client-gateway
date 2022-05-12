@@ -20,13 +20,19 @@ export const useUploadMessage = () => {
     });
   };
 
-  const uploadMessageHandler = (values: UploadMessageBodyDto) => {
+  const uploadMessageHandler = (
+    values: UploadMessageBodyDto,
+    onUpload: () => void
+  ) => {
     mutate(
       {
         data: values,
       },
       {
-        onSuccess: uploadMessageSuccess,
+        onSuccess: () => {
+          uploadMessageSuccess();
+          onUpload();
+        },
         onError: uploadMessageError,
       }
     );
