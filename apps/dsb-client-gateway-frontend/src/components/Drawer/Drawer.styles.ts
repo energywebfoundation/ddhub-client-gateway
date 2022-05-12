@@ -31,7 +31,20 @@ export const useStyles = makeStyles()((theme) => ({
     },
   },
   icon: {
-    marginRight: 20,
+    marginRight: 10,
+  },
+  subMenuIcon: {
+    margin: '0 14px 0 4px'
+  },
+  menuIcon: {
+    position: 'absolute',
+    right: 4,
+    transition: theme.transitions.create('transform', {
+      duration: theme.transitions.duration.short,
+    }),
+  },
+  menuIconActive: {
+    transform: 'rotate(90deg)'
   },
   listItemText: {
     fontSize: 15,
