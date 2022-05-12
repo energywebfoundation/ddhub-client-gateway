@@ -1,5 +1,6 @@
 export enum Queries {
   Namespace = 'namespace',
+  Owner = 'owner',
   TopicId = 'topicId',
   FQCN = 'fqcn',
 }
@@ -18,4 +19,5 @@ export const routerConst = {
   DataMessagingFileUpload: '/file-upload',
   DataMessagingFileDownload: '/file-download',
   VersionHistory: `/applications/[${Queries.Namespace}]/[${Queries.TopicId}]/version-history`,
+  ChannelTopicVersionHistory: `/channels/[${Queries.Owner}]/[${Queries.TopicId}]/version-history`,
 };

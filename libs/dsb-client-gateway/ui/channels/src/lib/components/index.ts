@@ -3,3 +3,4 @@ export * from './ChannelList';
 export * from './ChannelType';
 export * from './RestrictionsViewBox';
 export * from './Restrictions';
+export * from './TopicInfo';

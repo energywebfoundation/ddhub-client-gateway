@@ -2,6 +2,7 @@ import { FC } from 'react';
 import { Typography, Box } from '@mui/material';
 import { ChannelTopic } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { CopyToClipboard } from '@dsb-client-gateway/ui/core';
+import { useTopicsEffects } from './Topics.effects';
 import { useStyles } from './Topics.styles';
 
 interface TopicsProps {
@@ -10,6 +11,7 @@ interface TopicsProps {
 
 export const Topics: FC<TopicsProps> = ({ topics }) => {
   const { classes } = useStyles();
+  const { navigateToVersionHistory } = useTopicsEffects();
 
   return (
     <>
@@ -21,9 +23,8 @@ export const Topics: FC<TopicsProps> = ({ topics }) => {
           return (
             <Box
               key={topic.topicId}
-              display="flex"
-              flexDirection="column"
-              mb={0.4}
+              className={classes.topic}
+              onClick={() => navigateToVersionHistory(topic)}
             >
               <Typography className={classes.topicLabel} variant="body2">
                 {topic.topicName}
