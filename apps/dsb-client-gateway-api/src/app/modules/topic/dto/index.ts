@@ -311,6 +311,10 @@ export class GetMessagesQueryDto {
 
 export class GetTopicsCountQueryDto {
   @IsNotEmpty()
+  @IsValidApplicationNameSpace(new ConfigService(), {
+    message: 'Malformed owner name. Please enter correct owner name',
+    each: true,
+  })
   @ApiProperty({
     example: [
       'torta.apps.eggplant.vege.iam.ewc',
