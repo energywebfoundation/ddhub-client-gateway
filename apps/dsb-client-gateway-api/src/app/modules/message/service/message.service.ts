@@ -213,7 +213,9 @@ export class MessageService {
   }: GetMessagesDto): Promise<GetMessageResponse[]> {
     const getMessagesResponse: Array<GetMessageResponse> = [];
 
-    const channel = await this.channelService.getChannelOrThrow(fqcn);
+    const channel: ChannelEntity = await this.channelService.getChannelOrThrow(
+      fqcn
+    );
 
     // topic owner and topic name should be present
     if ((topicOwner && !topicName) || (!topicOwner && topicName)) {
@@ -225,7 +227,10 @@ export class MessageService {
     if (!topicName && !topicOwner) {
       topicIds = channel.conditions.topics.map((topic) => topic.topicId);
     } else {
-      const topic = await this.topicService.getTopic(topicName, topicOwner);
+      const topic: TopicEntity = await this.topicService.getTopic(
+        topicName,
+        topicOwner
+      );
 
       if (!topic) {
         this.logger.error(
@@ -256,10 +261,13 @@ export class MessageService {
     //validate signature and decrypt messages
     await Promise.allSettled(
       messages.map(async (message: SearchMessageResponseDto) => {
+        const topicFromCache: TopicEntity =
+          await this.topicService.getTopicById(message.topicId);
+
         const result: GetMessageResponse = {
           id: message.messageId,
-          topicName: topicName,
-          topicOwner: topicOwner,
+          topicName: topicFromCache.name,
+          topicOwner: topicFromCache.owner,
           topicVersion: message.topicVersion,
           payload: message.payload,
           signature: message.signature,
