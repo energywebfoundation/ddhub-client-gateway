@@ -1,15 +1,15 @@
 import { Download } from 'react-feather';
 import { useTopicVersion } from '@dsb-client-gateway/ui/api-hooks';
 import { downloadJson } from '@dsb-client-gateway/ui/utils';
-import { fields } from './ViewTopicDetails.utils';
+import { fields } from './ChannelTopicDetails.utils';
 import {
  useModalDispatch,
  useModalStore,
  ModalActionsEnum
 } from '../../../context';
-import { useStyles } from './ViewTopicDetails.styles';
+import { useStyles } from './ChannelTopicDetails.styles';
 
-export const useViewTopicDetailsEffects = () => {
+export const useChannelTopicDetailsEffects = () => {
   const { classes } = useStyles();
   const {
     topicDetails: { open, data },

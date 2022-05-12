@@ -2,7 +2,7 @@ import { FC } from 'react';
 import { Create } from '../Create/Create';
 import { Details } from '../Details';
 import { Update } from '../Update';
-import { ViewTopicDetails } from '../ViewTopicDetails/ViewTopicDetails';
+import { ChannelTopicDetails } from '../ChannelTopicDetails';
 
 export const ModalCenter: FC = () => {
   return (
@@ -10,7 +10,7 @@ export const ModalCenter: FC = () => {
       <Create />
       <Update />
       <Details />
-      <ViewTopicDetails />
+      <ChannelTopicDetails />
     </>
   );
 };

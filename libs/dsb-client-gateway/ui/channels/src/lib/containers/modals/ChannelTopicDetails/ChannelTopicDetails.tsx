@@ -2,13 +2,13 @@ import { FC } from 'react';
 import { DialogContent, DialogActions, Box } from '@mui/material';
 import { CloseButton, Dialog } from '@dsb-client-gateway/ui/core';
 import { TopicDetails } from '@dsb-client-gateway/ui/topics';
-import { useViewTopicDetailsEffects } from './ViewTopicDetails.effects';
-import { useStyles } from './ViewTopicDetails.styles';
+import { useChannelTopicDetailsEffects } from './ChannelTopicDetails.effects';
+import { useStyles } from './ChannelTopicDetails.styles';
 
-export const ViewTopicDetails: FC = () => {
+export const ChannelTopicDetails: FC = () => {
   const { classes } = useStyles();
   const { open, closeModal, isLoading, fields, details, buttons } =
-    useViewTopicDetailsEffects();
+    useChannelTopicDetailsEffects();
   return (
     <Dialog open={open} onClose={closeModal} paperClassName={classes.paper}>
       <DialogContent sx={{ padding: 0 }}>
