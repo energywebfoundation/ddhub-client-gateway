@@ -102,7 +102,7 @@ export const getChannelControllerGetByTypeMock = () => [
       topics: [
         {
           topicName: 'operatorEnvelope',
-          owner: 'aemo.edge',
+          owner: 'ddhub.apps.energyweb.iam.ewc',
           topicId: '622fed6e4258501225095045',
         },
       ],
@@ -119,7 +119,7 @@ export const getChannelControllerGetMock = () => ({
     topics: [
       {
         topicName: 'operatorEnvelope',
-        owner: 'aemo.edge',
+        owner: 'ddhub.apps.energyweb.iam.ewc',
         topicId: '622fed6e4258501225095045',
       },
     ],
