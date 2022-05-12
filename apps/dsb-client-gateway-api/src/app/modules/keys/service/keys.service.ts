@@ -205,6 +205,7 @@ export class KeysService implements OnModuleInit {
       return;
     }
 
+    this.logger.debug(`encrypting receiverDid: ${receiverDid}`);
     const encryptedData = crypto.publicEncrypt(
       {
         key: did.publicRSAKey,
@@ -212,6 +213,8 @@ export class KeysService implements OnModuleInit {
       },
       Buffer.from(symmetricKey)
     );
+
+    this.logger.debug(`encryption completed for receiverDid: ${receiverDid}`);
 
     return encryptedData.toString('base64');
   }
