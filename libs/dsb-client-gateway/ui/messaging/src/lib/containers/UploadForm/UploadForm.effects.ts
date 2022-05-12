@@ -1,8 +1,8 @@
 import { useDropzone, FileWithPath } from 'react-dropzone';
 import { UploadFormProps } from './UploadForm';
 
-export const useUploadFormEffects = ({ onFileChange }: UploadFormProps) => {
-  const { open, acceptedFiles } = useDropzone({
+export const useUploadFormEffects = ({ onFileChange, acceptedFiles }: UploadFormProps) => {
+  const { open } = useDropzone({
     onDrop: onFileChange,
     noClick: true,
     noKeyboard: true,
@@ -14,7 +14,7 @@ export const useUploadFormEffects = ({ onFileChange }: UploadFormProps) => {
     },
   });
 
-  const files = acceptedFiles.map((file: FileWithPath) => file);
+  const files = acceptedFiles?.map((file: FileWithPath) => file);
 
   const fileTextValue = files[0]?.path ?? '';
 

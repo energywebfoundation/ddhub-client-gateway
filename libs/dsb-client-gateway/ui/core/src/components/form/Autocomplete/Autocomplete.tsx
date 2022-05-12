@@ -20,7 +20,7 @@ interface AutocompleteProps {
   freeSolo?: boolean;
   className?: string;
   label?: string;
-  value?: string;
+  value?: string | undefined;
   inputValue?: string;
   popupIcon?: ReactNode;
   loading?: boolean;
@@ -52,6 +52,8 @@ export const Autocomplete: FC<AutocompleteProps> = ({
       {label && <InputLabel className={classes.label}>{label}</InputLabel>}
       <MuiAutocomplete
         disablePortal
+        filterSelectedOptions
+        disableClearable={!value}
         disabled={disabled}
         freeSolo={freeSolo}
         onChange={onChange}

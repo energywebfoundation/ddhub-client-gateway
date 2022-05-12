@@ -54,13 +54,15 @@ export const useStyles = makeStyles()((theme) => ({
     },
   },
   menuItem: {
-    fontSize: 14,
-    lineHeight: '21px',
-    fontWeight: 400,
-    color: theme.palette.text.primary,
-    minHeight: 22,
-    fontFamily: theme.typography.body2.fontFamily,
-    padding: '8px 16px',
+    '&.MuiAutocomplete-option': {
+      fontSize: 14,
+      lineHeight: '21px',
+      fontWeight: 400,
+      color: theme.palette.text.primary,
+      minHeight: 22,
+      fontFamily: theme.typography.body2.fontFamily,
+      padding: '10px 16px 9px',
+    }
   },
   clearIndicator: {
     position: 'absolute',
@@ -89,7 +91,8 @@ export const useStyles = makeStyles()((theme) => ({
     borderRadius: 6,
     '& .MuiAutocomplete-option': {
        '&:hover, &.Mui-focused': {
-         backgroundColor: alpha(theme.palette.primary.dark, 0.12)
+         backgroundColor: alpha(theme.palette.primary.main, 0.12),
+         color: theme.palette.primary.main
        }
     },
     '&::-webkit-scrollbar': {
