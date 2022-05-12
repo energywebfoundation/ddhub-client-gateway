@@ -197,7 +197,12 @@ export class KeysService implements OnModuleInit {
     symmetricKey: string,
     receiverDid: string
   ): Promise<any | null> {
+
+    this.logger.log(`get did for receiverDid:${receiverDid}`)
+
     const did: DidEntity | null = await this.getDid(receiverDid);
+
+    this.logger.log(`did fetched for receiverDid:${receiverDid}`)
 
     if (!did) {
       this.logger.error('IAM not initialized');
