@@ -73,8 +73,8 @@ export const useStyles = makeStyles()((theme) => ({
   },
   popupIcon: {
     position: 'absolute',
-    top: 10,
-    right: 10,
+    top: 2,
+    right: 2,
     transform: 'none',
     '& svg': {
       stroke: theme.palette.common.white,

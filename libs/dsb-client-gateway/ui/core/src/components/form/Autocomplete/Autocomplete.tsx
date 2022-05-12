@@ -6,7 +6,6 @@ import {
   TextField,
   InputLabel,
   Autocomplete as MuiAutocomplete,
-  CircularProgress,
 } from '@mui/material';
 import { useStyles } from './Autocomplete.styles';
 
@@ -62,7 +61,9 @@ export const Autocomplete: FC<AutocompleteProps> = ({
         inputValue={inputValue}
         loading={loading}
         renderOption={renderOption}
-        popupIcon={null}
+        popupIcon={
+          popupIcon ?? <ChevronDown className={classes.popupIcon} size={20} />
+        }
         className={className}
         classes={{
           popupIndicator: classes.popupIcon,
@@ -77,23 +78,6 @@ export const Autocomplete: FC<AutocompleteProps> = ({
             placeholder={placeholder}
             classes={{ root: classes.autocomplete }}
             onChange={onTextChange}
-            InputProps={{
-              ...params.InputProps,
-              endAdornment: loading ? (
-                <CircularProgress
-                  color="inherit"
-                  className={classes.progress}
-                  size={20}
-                />
-              ) : (
-                <>
-                  {popupIcon ?? (
-                    <ChevronDown className={classes.popupIcon} size={20} />
-                  )}
-                  {params.InputProps.endAdornment}
-                </>
-              ),
-            }}
           />
         )}
       />
