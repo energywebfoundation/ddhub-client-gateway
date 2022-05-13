@@ -1,13 +1,16 @@
 import LoadingInfo from '../LoadingInfo/LoadingInfo';
 import { useLoginStatusEffects } from './RequestingEnrolment/LoginStatus.effects';
 
-
 export function LoginStatus() {
-  const {isLoading, statusFactory} = useLoginStatusEffects();
+  const { isLoading, statusFactory } = useLoginStatusEffects();
 
   return (
     <>
-      {isLoading ? <LoadingInfo>Checking identity</LoadingInfo> : statusFactory()}
+      {isLoading ? (
+        <LoadingInfo>Checking identity</LoadingInfo>
+      ) : (
+        statusFactory()
+      )}
     </>
   );
 }

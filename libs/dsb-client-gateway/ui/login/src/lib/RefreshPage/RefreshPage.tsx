@@ -1,18 +1,18 @@
 /* eslint-disable-next-line */
 import { Button } from '@mui/material';
 
-
 export function RefreshPage() {
   const refreshPageHandler = () => {
     window.location.reload();
-  }
+  };
   return (
     <Button
-      variant='outlined'
+      variant="outlined"
       color="primary"
-      sx={{marginTop: '17px'}}
+      sx={{ marginTop: '17px' }}
       onClick={() => refreshPageHandler()}
-      fullWidth>
+      fullWidth
+    >
       Refresh
     </Button>
   );

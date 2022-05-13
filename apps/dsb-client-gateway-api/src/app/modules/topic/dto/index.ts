@@ -411,7 +411,7 @@ export class PaginatedResponse {
     type: Number,
     example: 1,
   })
-  public total: number;
+  public count: number;
 
   @ApiProperty({
     description: 'limit of channels',
@@ -444,7 +444,7 @@ export class PaginatedSearchTopicResponse {
     type: Number,
     example: 1,
   })
-  public total: number;
+  public count: number;
 
   @ApiProperty({
     description: 'limit of channels',

@@ -7,20 +7,27 @@ import {
 export enum AccountStatusEnum {
   InsufficientFund = 'Insufficient fund',
   NotSetPrivateKey = 'Not Set Private Key',
+  ErrorOccur = 'Error Occur',
 }
 
-export const checkAccountStatus = (res: IdentityWithEnrolment): AccountStatusEnum | RoleStatus => {
+export const checkAccountStatus = (
+  res: IdentityWithEnrolment
+): AccountStatusEnum | RoleStatus => {
   if (isBalanceToLow(res.balance)) {
     return AccountStatusEnum.InsufficientFund;
   }
 
-  const requiredRoles = res.enrolment.roles.filter(role => role.required).filter(role => role.status !== RoleStatus.REJECTED);
+  const requiredRoles = res.enrolment.roles
+    .filter((role) => role.required)
+    .filter((role) => role.status !== RoleStatus.REJECTED);
 
-  const areRequiredSynced = requiredRoles.every(role => role.status === RoleStatus.SYNCED);
+  const areRequiredSynced = requiredRoles.every(
+    (role) => role.status === RoleStatus.SYNCED
+  );
 
   const checkStatus = (status: RoleStatus) => {
-   return requiredRoles.some(role => role.status === status)
-  }
+    return requiredRoles.some((role) => role.status === status);
+  };
 
   if (areRequiredSynced) {
     return RoleStatus.SYNCED;
