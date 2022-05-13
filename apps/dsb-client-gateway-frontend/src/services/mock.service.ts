@@ -78,6 +78,10 @@ export function makeServer({ environment = 'development' }) {
         return { channel: JSON.parse(request.requestBody) };
       });
 
+      this.post('messages', () => {
+        return {};
+      });
+
       this.post('messages/upload', () => {
         return {};
       });
