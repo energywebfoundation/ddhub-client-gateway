@@ -1,6 +1,12 @@
-import { AccountStatusEnum, checkAccountStatus } from './check-account-status/check-account-status';
+import {
+  AccountStatusEnum,
+  checkAccountStatus,
+} from './check-account-status/check-account-status';
 import { getIdentityControllerGetQueryKey } from '@dsb-client-gateway/dsb-client-gateway-api-client';
-import { IdentityWithEnrolment, RoleStatus } from '@dsb-client-gateway/dsb-client-gateway/identity/models';
+import {
+  IdentityWithEnrolment,
+  RoleStatus,
+} from '@dsb-client-gateway/dsb-client-gateway/identity/models';
 import { routerConst } from '@dsb-client-gateway/ui/utils';
 import { useRouter } from 'next/router';
 import { useContext } from 'react';
@@ -9,7 +15,7 @@ import { useQueryClient } from 'react-query';
 
 export const useSetUserDataEffect = () => {
   const router = useRouter();
-  const {userData, setUserData} = useContext(UserDataContext);
+  const { userData, setUserData } = useContext(UserDataContext);
   const queryClient = useQueryClient();
 
   const setData = (res: IdentityWithEnrolment) => {
@@ -24,13 +30,14 @@ export const useSetUserDataEffect = () => {
     const accountStatus = checkAccountStatus(res);
 
     setUserData({
-      accountStatus
+      accountStatus,
+      isChecking: false,
     });
 
     queryClient.setQueryData(getIdentityControllerGetQueryKey(), res);
 
     redirect(accountStatus).catch(console.error);
-  }
+  };
 
-  return {setUserData: setData, userData};
-}
+  return { setUserData: setData, userData };
+};

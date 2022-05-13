@@ -18,7 +18,7 @@ export const useResetPrivateKeyEffects = () => {
       confirmButtonText: 'Confirm'
     }).then((result) => {
       if (result.isConfirmed) {
-        setUserData({...userData, accountStatus: AccountStatusEnum.NotSetPrivateKey});
+        setUserData({accountStatus: AccountStatusEnum.NotSetPrivateKey, isChecking: false});
       }
     })
   };
