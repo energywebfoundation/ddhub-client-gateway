@@ -39,5 +39,12 @@ export const useSetUserDataEffect = () => {
     redirect(accountStatus).catch(console.error);
   };
 
-  return { setUserData: setData, userData };
+  const setIsChecking = (value: boolean) => {
+    setUserData({
+      ...userData,
+      isChecking: value,
+    });
+  }
+
+  return { setUserData: setData, userData, setIsChecking };
 };

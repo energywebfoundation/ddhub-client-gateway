@@ -12,14 +12,15 @@ import { routerConst } from '@dsb-client-gateway/ui/utils';
 
 export const useCheckAccountOnInitEffects = () => {
   const queryClient = useQueryClient();
-  const {setUserData} = useSetUserDataEffect();
+  const {setUserData, setIsChecking} = useSetUserDataEffect();
   const router = useRouter();
   useEffect(() => {
+    setIsChecking(true);
     queryClient.fetchQuery(getIdentityControllerGetQueryKey(), identityControllerGet).then((res) => {
       setUserData(res as IdentityWithEnrolment);
     }).catch(error => {
       console.error(error);
       router.push(routerConst.InitialPage);
-    });
+    }).finally(() => setIsChecking(false));
   }, []);
 };

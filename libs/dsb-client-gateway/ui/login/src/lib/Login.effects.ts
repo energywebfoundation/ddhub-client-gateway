@@ -3,10 +3,11 @@ import { useIdentityControllerPost } from '@dsb-client-gateway/dsb-client-gatewa
 import { useSetUserDataEffect } from './set-user-data.effect';
 
 export const usePrivateKeyEffects = () => {
-  const {setUserData, userData} = useSetUserDataEffect();
+  const {setUserData, userData, setIsChecking} = useSetUserDataEffect();
 
   const {mutate, isLoading} = useIdentityControllerPost({
     mutation: {
+      onMutate: () => setIsChecking(true),
       onSuccess: (res) => setUserData(res as IdentityWithEnrolment)
     }
   });
