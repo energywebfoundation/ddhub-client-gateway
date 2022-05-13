@@ -5,7 +5,7 @@ import {
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { useEffect } from 'react';
 import { useQueryClient } from 'react-query';
-import { useSetUserDataEffect } from './set-user-data.effect';
+import { useSetUserDataEffect } from './SetUserData.effects';
 import { useRouter } from 'next/router';
 import { routerConst } from '@dsb-client-gateway/ui/utils';
 
