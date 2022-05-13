@@ -5,7 +5,7 @@ import { theme } from '@dsb-client-gateway/ui/utils';
 import { AccountStatusEnum } from '../check-account-status/check-account-status';
 
 export const useResetPrivateKeyEffects = () => {
-  const { userData, setUserData } = useContext(UserDataContext);
+  const { setUserData } = useContext(UserDataContext);
 
   const resetPrivateKeyHandler = () => {
     Swal.fire({
@@ -21,6 +21,7 @@ export const useResetPrivateKeyEffects = () => {
         setUserData({
           accountStatus: AccountStatusEnum.NotSetPrivateKey,
           isChecking: false,
+          errorMessage: ''
         });
       }
     });
