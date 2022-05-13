@@ -5,23 +5,27 @@ import { theme } from '@dsb-client-gateway/ui/utils';
 import { AccountStatusEnum } from '../check-account-status/check-account-status';
 
 export const useResetPrivateKeyEffects = () => {
-  const {userData, setUserData} = useContext(UserDataContext);
+  const { setUserData } = useContext(UserDataContext);
 
   const resetPrivateKeyHandler = () => {
-    Swal.fire( {
+    Swal.fire({
       icon: 'warning',
       iconColor: theme.palette.warning.main,
       title: 'Reset private key',
       text: 'Please confirm to reset private key',
       showCancelButton: true,
       showConfirmButton: true,
-      confirmButtonText: 'Confirm'
+      confirmButtonText: 'Confirm',
     }).then((result) => {
       if (result.isConfirmed) {
-        setUserData({...userData, accountStatus: AccountStatusEnum.NotSetPrivateKey});
+        setUserData({
+          accountStatus: AccountStatusEnum.NotSetPrivateKey,
+          isChecking: false,
+          errorMessage: ''
+        });
       }
-    })
+    });
   };
 
-  return {resetPrivateKeyHandler}
-}
+  return { resetPrivateKeyHandler };
+};
