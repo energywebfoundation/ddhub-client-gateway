@@ -30,6 +30,7 @@ export const useSetUserDataEffect = () => {
     const accountStatus = checkAccountStatus(res);
 
     setUserData({
+      ...userData,
       accountStatus,
       isChecking: false,
     });
@@ -39,12 +40,22 @@ export const useSetUserDataEffect = () => {
     redirect(accountStatus).catch(console.error);
   };
 
+  const setDataOnError = (error: { message: string }) => {
+    setUserData({
+      ...userData,
+      accountStatus: AccountStatusEnum.ErrorOccur,
+      isChecking: false,
+      errorMessage: error.message,
+    });
+    router.push(routerConst.InitialPage);
+  };
+
   const setIsChecking = (value: boolean) => {
     setUserData({
       ...userData,
       isChecking: value,
     });
-  }
+  };
 
-  return { setUserData: setData, userData, setIsChecking };
+  return { setUserData: setData, userData, setIsChecking, setDataOnError };
 };
