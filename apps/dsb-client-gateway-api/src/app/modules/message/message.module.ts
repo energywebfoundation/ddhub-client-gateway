@@ -14,6 +14,8 @@ import { StorageModule } from '../storage/storage.module';
 import { SymmetricKeysRepositoryModule } from '@dsb-client-gateway/dsb-client-gateway-storage';
 import { EnrolmentModule } from '../enrolment/enrolment.module';
 import { DdhubClientGatewayMessageBrokerModule } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
+import { DsbMessagePoolingService } from './service/dsb-message-pooling.service';
+import { WsClientService } from './service/ws-client.service';
 
 @Module({
   imports: [
@@ -33,8 +35,10 @@ import { DdhubClientGatewayMessageBrokerModule } from '@dsb-client-gateway/ddhub
     RefreshSymmetricKeysCacheCronService,
     RefreshSymmetricKeysCacheHandler,
     MessageService,
+    WsClientService,
+    DsbMessagePoolingService,
   ],
   exports: [MessageService],
   controllers: [MessageControlller],
 })
-export class MessageModule {}
+export class MessageModule { }

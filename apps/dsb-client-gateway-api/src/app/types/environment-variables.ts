@@ -41,7 +41,7 @@ export class EnvironmentVariables {
   WEBSOCKET = WebSocketImplementation.NONE;
 
   @IsString()
-  CLIENT_ID = 'WS_CONSUMER';
+  CLIENT_ID = 'WS-CONSUMER';
 
   @IsPositive()
   EVENTS_MAX_PER_SECOND = 2;
@@ -83,7 +83,7 @@ export class EnvironmentVariables {
 
   @IsPositive()
   @ValidateIf(EnvironmentVariables.isClientWebSocketEnabled)
-  WEBSOCKET_RECONNECT_TIMEOUT = 1000;
+  WEBSOCKET_RECONNECT_TIMEOUT = 5000;
 
   @Transform(EnvironmentVariables.transformBoolean('WEBSOCKET_RECONNECT'))
   @ValidateIf(EnvironmentVariables.isClientWebSocketEnabled)
@@ -92,6 +92,9 @@ export class EnvironmentVariables {
   @IsPositive()
   @ValidateIf(EnvironmentVariables.isClientWebSocketEnabled)
   WEBSOCKET_RECONNECT_MAX_RETRIES = 10;
+
+  @IsPositive()
+  WEBSOCKET_POOLING_TIMEOUT = 5000;
 
   @IsEnum(SecretsEngine)
   SECRETS_ENGINE = SecretsEngine.VAULT;
