@@ -15,5 +15,5 @@ export const usePrivateKeyEffects = () => {
     mutate({data: {privateKey}});
   };
 
-  return {isLoading, submit, status: userData.accountStatus};
+  return {isLoading: isLoading || userData.isChecking, submit, status: userData.accountStatus};
 };
