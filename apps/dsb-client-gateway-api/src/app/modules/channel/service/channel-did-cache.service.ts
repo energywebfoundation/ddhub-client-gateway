@@ -1,7 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { IamService } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
 import { ChannelService } from './channel.service';
-import { IdentityService } from '../../identity/service/identity.service';
 import { Span } from 'nestjs-otel';
 import {
   ChannelEntity,
@@ -15,6 +14,7 @@ import {
   TopicVersion,
   TopicVersionResponse,
 } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
+import { IdentityService } from '@dsb-client-gateway/ddhub-client-gateway-identity';
 
 @Injectable()
 export class ChannelDidCacheService {

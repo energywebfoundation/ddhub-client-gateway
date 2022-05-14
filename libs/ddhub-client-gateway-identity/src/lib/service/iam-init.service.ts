@@ -1,9 +1,15 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import {
+  forwardRef,
+  Inject,
+  Injectable,
+  Logger,
+  OnModuleInit,
+} from '@nestjs/common';
 import { IamService } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
 import { SecretsEngineService } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
 import { Span } from 'nestjs-otel';
-import { EnrolmentService } from '../../enrolment/service/enrolment.service';
 import { IdentityService } from './identity.service';
+import { EnrolmentService } from '@dsb-client-gateway/ddhub-client-gateway-enrolment';
 
 @Injectable()
 export class IamInitService implements OnModuleInit {
@@ -12,6 +18,7 @@ export class IamInitService implements OnModuleInit {
   constructor(
     protected readonly iamService: IamService,
     protected readonly secretsEngine: SecretsEngineService,
+    @Inject(forwardRef(() => EnrolmentService))
     protected readonly enrolmentService: EnrolmentService,
     protected readonly identityService: IdentityService
   ) {}

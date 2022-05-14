@@ -8,6 +8,8 @@ import { DdhubClientGatewayTracingModule } from '@dsb-client-gateway/ddhub-clien
 import { DsbClientGatewayStorageModule } from '@dsb-client-gateway/dsb-client-gateway-storage';
 import { AppInitService } from './app-init.service';
 import { DdhubClientGatewayUtilsModule } from '@dsb-client-gateway/ddhub-client-gateway-utils';
+import { TopicModule } from './modules/topic/topic.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -16,11 +18,13 @@ import { DdhubClientGatewayUtilsModule } from '@dsb-client-gateway/ddhub-client-
       validate: configValidate,
     }),
     DdhubClientGatewayUtilsModule,
+    ScheduleModule.forRoot(),
     DdhubClientGatewayTracingModule.forRoot(),
     DsbClientGatewayStorageModule,
     IamModule,
     DidModule,
     SecretsEngineModule,
+    TopicModule,
   ],
   controllers: [],
   providers: [AppInitService],

@@ -16,17 +16,18 @@ import { DidAuthModule } from '@dsb-client-gateway/ddhub-client-gateway-did-auth
 import { SecretsEngineModule } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
 import { Type } from '@nestjs/common/interfaces/type.interface';
 import { ForwardReference } from '@nestjs/common/interfaces/modules/forward-reference.interface';
+import { DdhubClientGatewayEnrolmentModule } from '@dsb-client-gateway/ddhub-client-gateway-enrolment';
 
 @Module({})
 export class DdhubClientGatewayMessageBrokerModule {
   public static forRootAsync(
     imports: Array<
       Type<any> | DynamicModule | Promise<DynamicModule> | ForwardReference
-    >
+    > = []
   ): DynamicModule {
     return {
       imports: [
-        ...imports,
+        DdhubClientGatewayEnrolmentModule,
         HttpModule.registerAsync({
           imports: [ConfigModule],
           useFactory: (configService: ConfigService) => {

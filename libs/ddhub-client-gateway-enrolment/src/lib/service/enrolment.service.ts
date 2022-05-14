@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import {
   Role,
   RoleStatus,
@@ -17,9 +17,12 @@ import {
 
 @Injectable()
 export class EnrolmentService {
+  protected readonly logger = new Logger(EnrolmentService.name);
+
   constructor(
     protected readonly iamService: IamService,
     protected readonly configService: ConfigService,
+    @Inject(forwardRef(() => RoleListenerService))
     protected readonly roleListenerService: RoleListenerService,
     protected readonly wrapper: EnrolmentWrapperRepository
   ) {}
@@ -49,8 +52,11 @@ export class EnrolmentService {
 
   @Span('enrolment_generateEnrolment')
   public async generateEnrolment(): Promise<EnrolmentEntity> {
+    this.logger.log('creating new enrolment');
+
     const existingClaimsWithStatus: Claim[] =
       await this.iamService.getClaimsWithStatus();
+
     const requiredRoles: string[] = this.getRequiredRoles();
 
     const claimsToRoles: Role[] = existingClaimsWithStatus.map((claim) => {
@@ -81,6 +87,8 @@ export class EnrolmentService {
     };
 
     await this.wrapper.enrolmentRepository.createOne(enrolment);
+
+    this.logger.log(`stored enrolment for ${this.iamService.getDIDAddress()}`);
 
     return enrolment;
   }

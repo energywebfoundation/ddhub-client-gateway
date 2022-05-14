@@ -2,10 +2,10 @@ import { Injectable, Logger } from '@nestjs/common';
 import { IamService } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
 import { SymmetricKeyEntity } from '../entity/message.entity';
 import { ConfigService } from '@nestjs/config';
-import { IdentityService } from '../../identity/service/identity.service';
 import { SymmetricKeysRepositoryWrapper } from '@dsb-client-gateway/dsb-client-gateway-storage';
-import { EnrolmentService } from '../../enrolment/service/enrolment.service';
 import { DdhubMessagesService } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
+import { EnrolmentService } from '@dsb-client-gateway/ddhub-client-gateway-enrolment';
+import { IdentityService } from '@dsb-client-gateway/ddhub-client-gateway-identity';
 
 @Injectable()
 export class SymmetricKeysCacheService {

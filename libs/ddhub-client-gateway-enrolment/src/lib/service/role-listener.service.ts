@@ -1,5 +1,4 @@
 import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
-import { IdentityService } from '../../identity/service/identity.service';
 import { EnrolmentService } from './enrolment.service';
 import {
   BalanceState,
@@ -7,11 +6,14 @@ import {
   Identity,
   RoleStatus,
 } from '@dsb-client-gateway/dsb-client-gateway/identity/models';
-import { ClaimListenerService } from './claim-listener.service';
 import { IamService } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
-import { NoPrivateKeyException } from '../../storage/exceptions/no-private-key.exception';
-import { NotEnoughBalanceException } from '../../identity/exceptions/not-enough-balance.exception';
 import { Span } from 'nestjs-otel';
+import {
+  IdentityService,
+  NotEnoughBalanceException,
+} from '@dsb-client-gateway/ddhub-client-gateway-identity';
+import { NoPrivateKeyException } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
+import { ClaimListenerService } from './claim-listener.service';
 
 @Injectable()
 export class RoleListenerService {
@@ -22,8 +24,9 @@ export class RoleListenerService {
     protected readonly identityService: IdentityService,
     @Inject(forwardRef(() => EnrolmentService))
     protected readonly enrolmentService: EnrolmentService,
-    protected readonly claimListenerService: ClaimListenerService,
-    protected readonly iamService: IamService
+    protected readonly iamService: IamService,
+    @Inject(forwardRef(() => ClaimListenerService))
+    protected readonly claimListenerService: ClaimListenerService
   ) {}
 
   @Span('roleListener_requestClaimsForRequiredRoles')

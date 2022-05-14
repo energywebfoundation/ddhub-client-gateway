@@ -1,19 +1,19 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { EthersService } from '../../utils/service/ethers.service';
+import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import {
   Claims,
   IamService,
 } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
-import { NoPrivateKeyException } from '../../storage/exceptions/no-private-key.exception';
-import { EnrolmentService } from '../../enrolment/service/enrolment.service';
 import {
   Enrolment,
   Identity,
   IdentityWithEnrolment,
 } from '@dsb-client-gateway/dsb-client-gateway/identity/models';
-import { SecretsEngineService } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
+import {
+  NoPrivateKeyException,
+  SecretsEngineService,
+} from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
 import { CommandBus } from '@nestjs/cqrs';
-import { RefreshKeysCommand } from '../../keys/command/refresh-keys.command';
+// import { RefreshKeysCommand } from '../../keys/command/refresh-keys.command';
 import { Span } from 'nestjs-otel';
 import {
   BalanceState,
@@ -21,6 +21,8 @@ import {
   IdentityRepositoryWrapper,
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
 import { LoginCommand } from '@dsb-client-gateway/ddhub-client-gateway-did-auth';
+import { EnrolmentService } from '@dsb-client-gateway/ddhub-client-gateway-enrolment';
+import { EthersService } from '@dsb-client-gateway/ddhub-client-gateway-utils';
 
 @Injectable()
 export class IdentityService {
@@ -31,6 +33,7 @@ export class IdentityService {
     protected readonly wrapper: IdentityRepositoryWrapper,
     protected readonly secretsEngineService: SecretsEngineService,
     protected readonly iamService: IamService,
+    @Inject(forwardRef(() => EnrolmentService))
     protected readonly enrolmentService: EnrolmentService,
     protected readonly commandBus: CommandBus
   ) {}
@@ -134,7 +137,7 @@ export class IdentityService {
       return;
     }
 
-    await this.commandBus.execute(new RefreshKeysCommand());
+    // await this.commandBus.execute(new RefreshKeysCommand());
     await this.commandBus.execute(
       new LoginCommand(privateKey, this.iamService.getDIDAddress())
     );
