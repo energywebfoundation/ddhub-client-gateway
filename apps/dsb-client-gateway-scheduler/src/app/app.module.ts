@@ -10,6 +10,7 @@ import { AppInitService } from './app-init.service';
 import { DdhubClientGatewayUtilsModule } from '@dsb-client-gateway/ddhub-client-gateway-utils';
 import { TopicModule } from './modules/topic/topic.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { KeysModule } from './modules/keys/keys.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     DidModule,
     SecretsEngineModule,
     TopicModule,
+    KeysModule,
   ],
   controllers: [],
   providers: [AppInitService],

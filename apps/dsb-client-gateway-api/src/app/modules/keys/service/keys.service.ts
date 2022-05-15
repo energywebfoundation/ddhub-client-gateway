@@ -3,9 +3,7 @@ import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { IamService } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
 import { SecretsEngineService } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
 import { DIDPublicKeyTags } from '../keys.const';
-import { SymmetricKeysCacheService } from '../../message/service/symmetric-keys-cache.service';
 import { KeysEntity } from '../keys.interface';
-import { EthersService } from '../../utils/service/ethers.service';
 import {
   id,
   joinSignature,
@@ -27,6 +25,8 @@ import {
   IdentityService,
 } from '@dsb-client-gateway/ddhub-client-gateway-identity';
 import { Wallet } from 'ethers/lib/ethers';
+import { SymmetricKeysCacheService } from '@dsb-client-gateway/ddhub-client-gateway-encryption';
+import { EthersService } from '@dsb-client-gateway/ddhub-client-gateway-utils';
 
 @Injectable()
 export class KeysService implements OnModuleInit {

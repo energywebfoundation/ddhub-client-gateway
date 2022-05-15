@@ -20,6 +20,9 @@
       "@dsb-client-gateway/ddhub-client-gateway-did-auth": [
         "libs/ddhub-client-gateway-did-auth/src/index.ts"
       ],
+      "@dsb-client-gateway/ddhub-client-gateway-encryption": [
+        "libs/ddhub-client-gateway-encryption/src/index.ts"
+      ],
       "@dsb-client-gateway/ddhub-client-gateway-enrolment": [
         "libs/ddhub-client-gateway-enrolment/src/index.ts"
       ],

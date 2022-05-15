@@ -4,7 +4,6 @@ import { ChannelService } from './service/channel.service';
 import { CqrsModule } from '@nestjs/cqrs';
 import { ChannelDidCacheService } from './service/channel-did-cache.service';
 import { RefreshAllChannelsCacheDataHandler } from './handlers/refresh-all-channels-cache-data.handler';
-import { RefreshTopicsCacheCronService } from './service/refresh-topics-cache-cron.service';
 import { TopicService } from './service/topic.service';
 import { RefreshChannelCacheDataHandler } from './handlers/refresh-channel-cache-data.handler';
 import {
@@ -31,7 +30,6 @@ import { DdhubClientGatewayEnrolmentModule } from '@dsb-client-gateway/ddhub-cli
     ChannelService,
     ChannelDidCacheService,
     RefreshAllChannelsCacheDataHandler,
-    RefreshTopicsCacheCronService,
     RefreshChannelCacheDataHandler,
     TopicService,
   ],

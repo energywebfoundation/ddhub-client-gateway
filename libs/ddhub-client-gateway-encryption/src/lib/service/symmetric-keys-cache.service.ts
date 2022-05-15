@@ -1,9 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { IamService } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
-import { SymmetricKeyEntity } from '../entity/message.entity';
 import { ConfigService } from '@nestjs/config';
 import { SymmetricKeysRepositoryWrapper } from '@dsb-client-gateway/dsb-client-gateway-storage';
-import { DdhubMessagesService } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
+import {
+  DdhubMessagesService,
+  SymmetricKeyEntity,
+} from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
 import { EnrolmentService } from '@dsb-client-gateway/ddhub-client-gateway-enrolment';
 import { IdentityService } from '@dsb-client-gateway/ddhub-client-gateway-identity';
 
@@ -58,8 +60,6 @@ export class SymmetricKeysCacheService {
             retries: 1,
           }
         );
-
-      this.logger.log('symmetric keys', JSON.stringify(symmetricKeys));
 
       if (symmetricKeys.length === 0) {
         this.logger.log('No symmetric keys fetched from MB, job not running');
