@@ -7,6 +7,12 @@ export const useStyles = makeStyles()((theme) => ({
     fontWeight: 400,
     color: theme.palette.grey[300],
   },
+  topic: {
+    display: 'flex',
+    flexDirection: 'column',
+    cursor: 'pointer',
+    marginBottom: 3,
+  },
   topicLabel: {
     fontSize: 14,
     lineHeight: '21px',

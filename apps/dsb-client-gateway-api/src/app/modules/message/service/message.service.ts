@@ -27,7 +27,7 @@ import {
 import { ChannelType } from '../../../modules/channel/channel.const';
 import { KeysService } from '../../keys/service/keys.service';
 import { v4 as uuidv4 } from 'uuid';
-import { EncryptedMessageType } from '../../message/message.const';
+import { EncryptedMessageType, WebSocketImplementation } from '../../message/message.const';
 import { SecretsEngineService } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
 import {
   ChannelEntity,
@@ -40,6 +40,7 @@ import {
   Message,
 } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
 import { TopicNotRelatedToChannelException } from '../exceptions/topic-not-related-to-channel.exception';
+import { WsClientService } from './ws-client.service';
 
 export enum EventEmitMode {
   SINGLE = 'SINGLE',
@@ -53,16 +54,17 @@ export class MessageService {
   constructor(
     protected readonly secretsEngineService: SecretsEngineService,
     protected readonly gateway: EventsGateway,
+    protected readonly wsClient: WsClientService,
     protected readonly configService: ConfigService,
     protected readonly channelService: ChannelService,
     protected readonly topicService: TopicService,
     protected readonly keyService: KeysService,
     protected readonly ddhubMessageService: DdhubMessagesService,
     protected readonly ddhubFilesService: DdhubFilesService
-  ) {}
+  ) { }
 
   public async sendMessagesToSubscribers(
-    messages: Message[],
+    messages: GetMessageResponse[],
     fqcn: string
   ): Promise<void> {
     const emitMode: EventEmitMode = this.configService.get(
@@ -76,15 +78,24 @@ export class MessageService {
       return;
     }
 
-    messages.forEach((message: Message) => {
+    messages.forEach((message: GetMessageResponse) => {
       this.broadcast({ ...message, fqcn });
     });
   }
 
   private broadcast(data): void {
-    this.gateway.server.clients.forEach((client) => {
-      client.send(JSON.stringify(data));
-    });
+    const websocketMode = this.configService.get(
+      'WEBSOCKET',
+      WebSocketImplementation.NONE
+    );
+
+    if (websocketMode === WebSocketImplementation.SERVER) {
+      this.gateway.server.clients.forEach((client) => {
+        client.send(JSON.stringify(data));
+      });
+    } else {
+      this.wsClient.rws.send(JSON.stringify(data));
+    }
   }
 
   private checkTopicForChannel(
@@ -213,7 +224,9 @@ export class MessageService {
   }: GetMessagesDto): Promise<GetMessageResponse[]> {
     const getMessagesResponse: Array<GetMessageResponse> = [];
 
-    const channel = await this.channelService.getChannelOrThrow(fqcn);
+    const channel: ChannelEntity = await this.channelService.getChannelOrThrow(
+      fqcn
+    );
 
     // topic owner and topic name should be present
     if ((topicOwner && !topicName) || (!topicOwner && topicName)) {
@@ -225,7 +238,10 @@ export class MessageService {
     if (!topicName && !topicOwner) {
       topicIds = channel.conditions.topics.map((topic) => topic.topicId);
     } else {
-      const topic = await this.topicService.getTopic(topicName, topicOwner);
+      const topic: TopicEntity = await this.topicService.getTopic(
+        topicName,
+        topicOwner
+      );
 
       if (!topic) {
         this.logger.error(
@@ -256,10 +272,13 @@ export class MessageService {
     //validate signature and decrypt messages
     await Promise.allSettled(
       messages.map(async (message: SearchMessageResponseDto) => {
+        const topicFromCache: TopicEntity =
+          await this.topicService.getTopicById(message.topicId);
+
         const result: GetMessageResponse = {
           id: message.messageId,
-          topicName: topicName,
-          topicOwner: topicOwner,
+          topicName: topicFromCache.name,
+          topicOwner: topicFromCache.owner,
           topicVersion: message.topicVersion,
           payload: message.payload,
           signature: message.signature,

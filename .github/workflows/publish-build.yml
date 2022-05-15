@@ -3,6 +3,8 @@ name: Build and publish images
 on:
   push:
     branches: [ ddhub-dev ]
+    paths-ignore:
+      - 'devops/**'
 env:
   SECRETS_ENGINE: vault
 

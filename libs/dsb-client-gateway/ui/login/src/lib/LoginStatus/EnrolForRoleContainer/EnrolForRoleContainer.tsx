@@ -3,12 +3,15 @@ import EnrolForRole from '../EnrolForRole/EnrolForRole';
 import { useEnrolForRoleEffects } from './EnrolForRoleContainer.effects';
 
 export function EnrolForRoleContainer() {
-  const {isEnrolRequested, enrolmentHandler} = useEnrolForRoleEffects();
+  const { isEnrolRequested, enrolmentHandler } = useEnrolForRoleEffects();
 
   return (
     <>
-      {isEnrolRequested ? (<RequestingEnrolment/>) : (
-        <EnrolForRole onEnrolmentSubmit={enrolmentHandler}/>)}
+      {isEnrolRequested ? (
+        <RequestingEnrolment />
+      ) : (
+        <EnrolForRole onEnrolmentSubmit={enrolmentHandler} />
+      )}
     </>
   );
 }

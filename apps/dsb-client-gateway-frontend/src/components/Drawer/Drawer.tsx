@@ -6,10 +6,12 @@ import {
   List,
   Box,
   Divider,
+  Collapse,
 } from '@mui/material';
 import Link from 'next/link';
 import clsx from 'clsx';
 import {
+  ChevronRight,
   Home,
   Layers,
   GitMerge,
@@ -17,6 +19,7 @@ import {
   Command,
   Database,
   Disc,
+  Circle,
 } from 'react-feather';
 import { routerConst } from '@dsb-client-gateway/ui/utils';
 import { useDrawerEffects } from './Drawer.effects';
@@ -24,7 +27,13 @@ import { useStyles } from './Drawer.styles';
 
 export const Drawer = () => {
   const { classes } = useStyles();
-  const { isActive } = useDrawerEffects();
+  const {
+    isActive,
+    dataOpen,
+    largeDataOpen,
+    handleDataOpen,
+    handleLargeDataOpen,
+  } = useDrawerEffects();
 
   return (
     <div>
@@ -130,35 +139,113 @@ export const Drawer = () => {
           </ListItem>
         </Link>
 
-        <Link href="/files" passHref>
-          <ListItem
-            button
-            className={clsx(classes.navLink, isActive('/files'))}
-            component="a"
-          >
-            <Database className={classes.icon} size={18} />
-            <ListItemText>
-              <Typography variant="body1" className={classes.listItemText}>
-                Data Messaging
-              </Typography>
-            </ListItemText>
-          </ListItem>
-        </Link>
+        <ListItem
+          button
+          className={classes.navLink}
+          onClick={handleLargeDataOpen}
+        >
+          <Database className={classes.icon} size={18} />
+          <ListItemText>
+            <Typography variant="body1" className={classes.listItemText}>
+              Large Data Messaging
+            </Typography>
+          </ListItemText>
+          <ChevronRight
+            size={16}
+            className={clsx(classes.menuIcon, {
+              [classes.menuIconActive]: largeDataOpen,
+            })}
+          />
+        </ListItem>
 
-        <Link href="#" passHref>
-          <ListItem
-            button
-            className={clsx(classes.navLink, isActive('#'))}
-            component="a"
-          >
-            <Database className={classes.icon} size={18} />
-            <ListItemText>
-              <Typography variant="body1" className={classes.listItemText}>
-                Large Data Messaging
-              </Typography>
-            </ListItemText>
-          </ListItem>
-        </Link>
+        <Collapse in={largeDataOpen} timeout="auto" unmountOnExit>
+          <List component="div" disablePadding>
+            <Link href={routerConst.LargeDataMessagingFileUpload} passHref>
+              <ListItem
+                className={clsx(
+                  classes.navLink,
+                  isActive(routerConst.LargeDataMessagingFileUpload)
+                )}
+                component="a"
+              >
+                <Circle className={classes.subMenuIcon} size={10} />
+                <ListItemText>
+                  <Typography variant="body1" className={classes.listItemText}>
+                    File upload
+                  </Typography>
+                </ListItemText>
+              </ListItem>
+            </Link>
+            <Link href={routerConst.LargeDataMessagingFileDownload} passHref>
+              <ListItem
+                className={clsx(
+                  classes.navLink,
+                  isActive(routerConst.LargeDataMessagingFileDownload)
+                )}
+                component="a"
+              >
+                <Circle className={classes.subMenuIcon} size={10} />
+                <ListItemText>
+                  <Typography variant="body1" className={classes.listItemText}>
+                    File download
+                  </Typography>
+                </ListItemText>
+              </ListItem>
+            </Link>
+          </List>
+        </Collapse>
+
+        <ListItem button className={classes.navLink} onClick={handleDataOpen}>
+          <Database className={classes.icon} size={18} />
+          <ListItemText>
+            <Typography variant="body1" className={classes.listItemText}>
+              Data Messaging
+            </Typography>
+          </ListItemText>
+          <ChevronRight
+            size={16}
+            className={clsx(classes.menuIcon, {
+              [classes.menuIconActive]: dataOpen,
+            })}
+          />
+        </ListItem>
+
+        <Collapse in={dataOpen} timeout="auto" unmountOnExit>
+          <List component="div" disablePadding>
+            <Link href={routerConst.DataMessagingFileUpload} passHref>
+              <ListItem
+                className={clsx(
+                  classes.navLink,
+                  isActive(routerConst.DataMessagingFileUpload)
+                )}
+                component="a"
+              >
+                <Circle className={classes.subMenuIcon} size={10} />
+                <ListItemText>
+                  <Typography variant="body1" className={classes.listItemText}>
+                    File upload
+                  </Typography>
+                </ListItemText>
+              </ListItem>
+            </Link>
+            <Link href={routerConst.DataMessagingFileDownload} passHref>
+              <ListItem
+                className={clsx(
+                  classes.navLink,
+                  isActive(routerConst.DataMessagingFileDownload)
+                )}
+                component="a"
+              >
+                <Circle className={classes.subMenuIcon} size={10} />
+                <ListItemText>
+                  <Typography variant="body1" className={classes.listItemText}>
+                    File download
+                  </Typography>
+                </ListItemText>
+              </ListItem>
+            </Link>
+          </List>
+        </Collapse>
       </List>
     </div>
   );

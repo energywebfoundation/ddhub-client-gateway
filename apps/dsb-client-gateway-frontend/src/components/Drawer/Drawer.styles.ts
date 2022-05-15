@@ -7,13 +7,14 @@ export const useStyles = makeStyles()((theme) => ({
     borderRadius: 5,
     marginBottom: 3,
     '&:hover': {
-      background: alpha(theme.palette.primary.main, 0.4),
+      backgroundColor: alpha(theme.palette.primary.main, 0.12),
+      color: theme.palette.primary.main
     },
     '&:hover .MuiTypography-root': {
-      color: theme.palette.common.white,
+      color: theme.palette.primary.main,
     },
     '&:hover svg': {
-      stroke: theme.palette.common.white,
+      stroke: theme.palette.primary.main,
     },
   },
   active: {
@@ -28,10 +29,29 @@ export const useStyles = makeStyles()((theme) => ({
     '&:hover': {
       background: theme.palette.primary.main,
       transform: 'none',
+      '& .MuiTypography-root': {
+        color: theme.palette.common.white,
+      },
+      '& svg': {
+        stroke: theme.palette.common.white,
+      }
     },
   },
   icon: {
-    marginRight: 20,
+    marginRight: 10,
+  },
+  subMenuIcon: {
+    margin: '0 14px 0 4px'
+  },
+  menuIcon: {
+    position: 'absolute',
+    right: 4,
+    transition: theme.transitions.create('transform', {
+      duration: theme.transitions.duration.short,
+    }),
+  },
+  menuIconActive: {
+    transform: 'rotate(90deg)'
   },
   listItemText: {
     fontSize: 15,

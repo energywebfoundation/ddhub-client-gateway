@@ -77,6 +77,14 @@ export function makeServer({ environment = 'development' }) {
       this.post('channels', (_schema, request) => {
         return { channel: JSON.parse(request.requestBody) };
       });
+
+      this.post('messages', () => {
+        return {};
+      });
+
+      this.post('messages/upload', () => {
+        return {};
+      });
     },
   });
 }

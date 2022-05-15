@@ -17,15 +17,21 @@ interface AutocompleteProps {
   ) => void;
   onInputChange?: (event: React.SyntheticEvent, value: string) => void;
   renderOption?: (props: any, option: any) => ReactNode;
+  freeSolo?: boolean;
+  className?: string;
   label?: string;
+  value?: string | undefined;
   inputValue?: string;
   popupIcon?: ReactNode;
   loading?: boolean;
+  disabled?: boolean;
   placeholder?: string;
   wrapperProps?: BoxProps;
 }
 
 export const Autocomplete: FC<AutocompleteProps> = ({
+  className,
+  freeSolo,
   label,
   onChange,
   onInputChange,
@@ -33,10 +39,12 @@ export const Autocomplete: FC<AutocompleteProps> = ({
   placeholder,
   options,
   popupIcon,
+  value,
   inputValue,
   renderOption,
   loading,
-  wrapperProps
+  disabled,
+  wrapperProps,
 }) => {
   const { classes } = useStyles();
   return (
@@ -44,19 +52,27 @@ export const Autocomplete: FC<AutocompleteProps> = ({
       {label && <InputLabel className={classes.label}>{label}</InputLabel>}
       <MuiAutocomplete
         disablePortal
+        filterSelectedOptions
+        disableClearable={!value}
+        disabled={disabled}
+        freeSolo={freeSolo}
         onChange={onChange}
         onInputChange={onInputChange}
         options={options}
-        popupIcon={popupIcon ?? <ChevronDown size={20} />}
+        value={value}
         inputValue={inputValue}
         loading={loading}
         renderOption={renderOption}
+        popupIcon={
+          popupIcon ?? <ChevronDown className={classes.popupIcon} size={20} />
+        }
+        className={className}
         classes={{
           popupIndicator: classes.popupIcon,
           clearIndicator: classes.clearIndicator,
           option: classes.menuItem,
           listbox: classes.listBox,
-          paper: classes.paper
+          paper: classes.paper,
         }}
         renderInput={(params) => (
           <TextField

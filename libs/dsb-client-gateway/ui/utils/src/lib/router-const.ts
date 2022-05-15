@@ -1,5 +1,6 @@
 export enum Queries {
   Namespace = 'namespace',
+  Owner = 'owner',
   TopicId = 'topicId',
   FQCN = 'fqcn',
 }
@@ -13,9 +14,11 @@ export const routerConst = {
   Channels: '/channels',
   Channel: `/channels/[${Queries.FQCN}]`,
   IntegrationAPIs: '/integration',
-  LargeDataMessagingFileUpload: '/large-file-upload',
-  LargeDataMessagingFileDownload: '/large-file-download',
-  DataMessagingFileUpload: '/file-upload',
-  DataMessagingFileDownload: '/file-download',
+  LargeDataMessagingFileUpload: '/messages/large-file-upload',
+  LargeDataMessagingFileDownload: '/messages/large-file-download',
+  LargeFileDownloadChannel: `/messages/large-file-download/[${Queries.FQCN}]`,
+  DataMessagingFileUpload: '/messages/file-upload',
+  DataMessagingFileDownload: '/messages/file-download',
   VersionHistory: `/applications/[${Queries.Namespace}]/[${Queries.TopicId}]/version-history`,
+  ChannelTopicVersionHistory: `/channels/[${Queries.Owner}]/[${Queries.TopicId}]/version-history`,
 };

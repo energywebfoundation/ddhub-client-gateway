@@ -7,22 +7,24 @@ export interface LoginFormProps {
 }
 
 export function LoginForm(props: LoginFormProps) {
-  const {register, handleSubmit, errorMessage} = useLoginFormEffects();
+  const { register, handleSubmit, errorMessage } = useLoginFormEffects();
 
   return (
     <form>
       <Typography variant="caption">Enter your private key here</Typography>
-      <TextField placeholder="Private key" {...register}/>
+      <TextField placeholder="Private key" {...register} />
       <Typography variant="inherit" color="error">
         {errorMessage}
       </Typography>
       <Button
         variant="contained"
         color="primary"
-        sx={{marginTop: '17px'}}
-        onClick={handleSubmit((data: LoginData) => props.onPrivateKeySubmit(data.privateKey)
+        sx={{ marginTop: '17px' }}
+        onClick={handleSubmit((data: LoginData) =>
+          props.onPrivateKeySubmit(data.privateKey)
         )}
-        fullWidth>
+        fullWidth
+      >
         Import
       </Button>
     </form>

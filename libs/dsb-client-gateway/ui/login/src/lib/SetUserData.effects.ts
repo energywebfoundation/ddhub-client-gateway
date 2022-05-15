@@ -1,6 +1,12 @@
-import { AccountStatusEnum, checkAccountStatus } from './check-account-status/check-account-status';
+import {
+  AccountStatusEnum,
+  checkAccountStatus,
+} from './check-account-status/check-account-status';
 import { getIdentityControllerGetQueryKey } from '@dsb-client-gateway/dsb-client-gateway-api-client';
-import { IdentityWithEnrolment, RoleStatus } from '@dsb-client-gateway/dsb-client-gateway/identity/models';
+import {
+  IdentityWithEnrolment,
+  RoleStatus,
+} from '@dsb-client-gateway/dsb-client-gateway/identity/models';
 import { routerConst } from '@dsb-client-gateway/ui/utils';
 import { useRouter } from 'next/router';
 import { useContext } from 'react';
@@ -9,7 +15,7 @@ import { useQueryClient } from 'react-query';
 
 export const useSetUserDataEffect = () => {
   const router = useRouter();
-  const {userData, setUserData} = useContext(UserDataContext);
+  const { userData, setUserData } = useContext(UserDataContext);
   const queryClient = useQueryClient();
 
   const setData = (res: IdentityWithEnrolment) => {
@@ -24,13 +30,32 @@ export const useSetUserDataEffect = () => {
     const accountStatus = checkAccountStatus(res);
 
     setUserData({
-      accountStatus
+      ...userData,
+      accountStatus,
+      isChecking: false,
     });
 
     queryClient.setQueryData(getIdentityControllerGetQueryKey(), res);
 
     redirect(accountStatus).catch(console.error);
-  }
+  };
 
-  return {setUserData: setData, userData};
-}
+  const setDataOnError = (error: { message: string }) => {
+    setUserData({
+      ...userData,
+      accountStatus: AccountStatusEnum.ErrorOccur,
+      isChecking: false,
+      errorMessage: error.message,
+    });
+    router.push(routerConst.InitialPage);
+  };
+
+  const setIsChecking = (value: boolean) => {
+    setUserData({
+      ...userData,
+      isChecking: value,
+    });
+  };
+
+  return { setUserData: setData, userData, setIsChecking, setDataOnError };
+};
