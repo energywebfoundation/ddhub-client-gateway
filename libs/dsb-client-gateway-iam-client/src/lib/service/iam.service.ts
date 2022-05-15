@@ -247,11 +247,26 @@ export class IamService {
   }
 
   @Span('iam_getDid')
-  public getDid(did?: string, includeClaims = false) {
-    return this.didRegistry.getDidDocument({
-      did,
-      includeClaims,
-    });
+  public async getDid(did?: string, includeClaims = false) {
+    return promiseRetry(
+      async (retryFn, attempt) => {
+        this.logger.log(`attempting to receive DID ${did}, attempt ${attempt}`);
+
+        return this.didRegistry
+          .getDidDocument({
+            did,
+            includeClaims,
+          })
+          .catch((e) => {
+            this.logger.error(`Failed fetching did ${did}`, e);
+
+            return retryFn(e);
+          });
+      },
+      {
+        ...this.retryConfigService.config,
+      }
+    );
   }
 
   public getDIDAddress(): string | null {

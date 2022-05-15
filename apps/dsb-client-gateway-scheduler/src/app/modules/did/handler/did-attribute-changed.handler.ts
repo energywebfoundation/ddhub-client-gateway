@@ -4,6 +4,9 @@ import { Logger } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import {
   ChannelWrapperRepository,
+  CronJobType,
+  CronStatus,
+  CronWrapperRepository,
   DidWrapperRepository,
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
 import { Span } from 'nestjs-otel';
@@ -17,7 +20,8 @@ export class DidAttributeChangedHandler
   constructor(
     protected readonly wrapper: DidWrapperRepository,
     protected readonly channelWrapper: ChannelWrapperRepository,
-    protected readonly iamService: IamService
+    protected readonly iamService: IamService,
+    protected readonly cronWrapper: CronWrapperRepository
   ) {}
 
   @Span('didListener_attributeChanged')
@@ -71,5 +75,11 @@ export class DidAttributeChangedHandler
     });
 
     this.logger.log(`Updated ${did}`);
+
+    await this.cronWrapper.cronRepository.save({
+      jobName: CronJobType.DID_LISTENER,
+      latestStatus: CronStatus.SUCCESS,
+      executedAt: new Date(),
+    });
   }
 }

@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import {
   ChannelEntity,
+  CronEntity,
   DidEntity,
   EnrolmentEntity,
   IdentityEntity,
@@ -25,6 +26,7 @@ import { ConfigService } from '@nestjs/config';
             TopicEntity,
             SymmetricKeysEntity,
             DidEntity,
+            CronEntity,
           ],
         };
       },

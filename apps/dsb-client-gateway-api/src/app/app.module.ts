@@ -19,6 +19,7 @@ import { MessageModule } from './modules/message/message.module';
 import { ApplicationModule } from './modules/application/application.module';
 import { TopicModule } from './modules/topic/topic.module';
 import { DdhubClientGatewayTracingModule } from '@dsb-client-gateway/ddhub-client-gateway-tracing';
+import { CronModule } from './modules/cron/cron.module';
 
 @Module({})
 export class AppModule {
@@ -45,6 +46,7 @@ export class AppModule {
       KeysModule,
       ApplicationModule,
       TopicModule,
+      CronModule,
     ];
 
     const providers = [
