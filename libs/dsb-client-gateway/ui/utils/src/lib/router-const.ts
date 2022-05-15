@@ -11,6 +11,8 @@ export const routerConst = {
   GatewaySettings: '/gateway-settings',
   AppsAndTopics: '/applications',
   Topics: `/applications/[${Queries.Namespace}]`,
+  MyAppsAndTopics: '/my-applications',
+  MyAppsTopics: `/my-applications/[${Queries.Namespace}]`,
   Channels: '/channels',
   Channel: `/channels/[${Queries.FQCN}]`,
   IntegrationAPIs: '/integration',
