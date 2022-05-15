@@ -1,14 +1,16 @@
 import { FC } from 'react';
 import { Box, BoxProps, Grid, Typography, Button } from '@mui/material';
 import { TextField } from '@dsb-client-gateway/ui/core';
+import { TFileType } from './UploadForm.types';
 import { useUploadFormEffects } from './UploadForm.effects';
 import { useStyles } from './UploadForm.styles';
 
-const bytesToMegaBytes = (bytes: number) => (bytes / (1024 * 1024)).toFixed(2);
-
 export interface UploadFormProps {
   acceptedFiles: File[];
+  acceptedFileType: TFileType;
+  maxFileSize: number;
   onFileChange: (acceptedFiles: File[]) => void;
+  fileSizeInfo?: string;
   wrapperProps?: BoxProps;
 }
 
@@ -16,11 +18,16 @@ export const UploadForm: FC<UploadFormProps> = ({
   onFileChange,
   acceptedFiles,
   wrapperProps,
+  acceptedFileType,
+  maxFileSize,
+  fileSizeInfo,
 }) => {
   const { classes } = useStyles();
-  const { open, files, fileTextValue } = useUploadFormEffects({
+  const { open, fileTextValue } = useUploadFormEffects({
     onFileChange,
     acceptedFiles,
+    acceptedFileType,
+    maxFileSize,
   });
 
   return (
@@ -40,16 +47,12 @@ export const UploadForm: FC<UploadFormProps> = ({
               mb={4.1}
               sx={{ minHeight: '44px' }}
             >
-              {files?.map((file) => {
-                return (
-                  <Box key={file.name} display="flex" flexDirection="column">
-                    <Typography variant="body1">File:</Typography>
-                    <Typography variant="body2">
-                      JSON size {bytesToMegaBytes(file.size)}mb.
-                    </Typography>
-                  </Box>
-                );
-              })}
+              {acceptedFileType && (
+                <Box display="flex" flexDirection="column">
+                  <Typography variant="body1">File:</Typography>
+                  <Typography variant="body2">{fileSizeInfo}</Typography>
+                </Box>
+              )}
             </Box>
             <TextField
               placeholder="Choose a file"
@@ -65,6 +68,7 @@ export const UploadForm: FC<UploadFormProps> = ({
                     size="large"
                     color="primary"
                     onClick={open}
+                    disabled={!acceptedFileType}
                   >
                     <Typography className={classes.buttonText} variant="body2">
                       Browse

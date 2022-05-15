@@ -1,17 +1,23 @@
 import { useDropzone, FileWithPath } from 'react-dropzone';
 import { UploadFormProps } from './UploadForm';
+import { acceptedFileTypes } from './UploadForm.utils';
 
-export const useUploadFormEffects = ({ onFileChange, acceptedFiles }: UploadFormProps) => {
+export const useUploadFormEffects = ({
+  onFileChange,
+  acceptedFiles,
+  acceptedFileType,
+  maxFileSize,
+}: UploadFormProps) => {
+  const fileType = acceptedFileTypes[acceptedFileType];
+
   const { open } = useDropzone({
     onDrop: onFileChange,
     noClick: true,
     noKeyboard: true,
     maxFiles: 1,
-    maxSize: 50000000,
+    maxSize: maxFileSize,
     multiple: false,
-    accept: {
-      'application/JSON': ['.json'],
-    },
+    accept: fileType,
   });
 
   const files = acceptedFiles?.map((file: FileWithPath) => file);
@@ -20,7 +26,6 @@ export const useUploadFormEffects = ({ onFileChange, acceptedFiles }: UploadForm
 
   return {
     open,
-    files,
     fileTextValue,
   };
 };

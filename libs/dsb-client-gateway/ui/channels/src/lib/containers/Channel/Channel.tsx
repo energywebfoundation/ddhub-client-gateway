@@ -1,41 +1,20 @@
 import { FC } from 'react';
 import { useRouter } from 'next/router';
-import { Edit } from 'react-feather';
 import { Stack, Box } from '@mui/material';
 import {
   ChannelTopic,
-  GetChannelResponseDto,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { useChannel } from '@dsb-client-gateway/ui/api-hooks';
 import {
   GenericTable,
-  TTableComponentAction,
 } from '@dsb-client-gateway/ui/core';
-import { Queries, theme } from '@dsb-client-gateway/ui/utils';
+import { Queries } from '@dsb-client-gateway/ui/utils';
 import { ChannelInfo } from '../../components/ChannelInfo';
 
 interface RestrictionsProps {
   value: string[];
   type: string;
 }
-
-const actions: TTableComponentAction<GetChannelResponseDto>[] = [
-  {
-    label: 'Update',
-    icon: (
-      <Edit
-        style={{
-          stroke: theme.palette.primary.main,
-          width: '18px',
-          height: '18px',
-        }}
-      />
-    ),
-    onClick: () => {
-      console.log('edit');
-    },
-  },
-];
 
 const Restrictions: FC<RestrictionsProps> = ({ value, type }) => (
   <div>{value.length === 0 ? '--' : type}</div>
@@ -76,7 +55,6 @@ export const Channel: FC = () => {
   );
 
   return (
-    <>
       <Stack spacing={2} direction="row">
         <ChannelInfo channel={channel} />
         <Box flexGrow={1}>
@@ -89,6 +67,5 @@ export const Channel: FC = () => {
           />
         </Box>
       </Stack>
-    </>
   );
 };
