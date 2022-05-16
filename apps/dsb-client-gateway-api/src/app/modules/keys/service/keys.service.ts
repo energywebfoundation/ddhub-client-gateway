@@ -249,8 +249,7 @@ export class KeysService implements OnModuleInit {
       .toString();
   }
 
-  @Span('keys_generate')
-  public async onModuleInit(): Promise<void> {
+  public async generateKeys(overwrite = false): Promise<void> {
     this.logger.log('Starting keys onModuleInit');
 
     const rootKey: string | null =
@@ -289,12 +288,15 @@ export class KeysService implements OnModuleInit {
     const did = await this.iamService.getDid();
 
     await this.updateSignatureKey(did, wallet);
-    await this.updatePublicRSAKey(did);
-
-    this.logger.log('Updated DID document with public RSA key');
+    await this.updatePublicRSAKey(did, overwrite);
   }
 
-  protected async updatePublicRSAKey(did): Promise<void> {
+  @Span('keys_generate')
+  public async onModuleInit(): Promise<void> {
+    await this.generateKeys(false);
+  }
+
+  protected async updatePublicRSAKey(did, overwrite: boolean): Promise<void> {
     this.logger.log('Attempting to update public RSA key');
 
     const existingKeyInDid = did.publicKey.filter(
@@ -307,10 +309,10 @@ export class KeysService implements OnModuleInit {
 
     const didAddress = this.iamService.getDIDAddress();
 
-    let shouldGenerateNewPrivateRSAKey = false;
+    let shouldGenerateNewPrivateRSAKey = overwrite;
     const walletPrivateKey = await this.secretsEngineService.getPrivateKey();
 
-    if (existingKeyInDid.length > 0) {
+    if (existingKeyInDid.length > 0 && !shouldGenerateNewPrivateRSAKey) {
       this.logger.log('Testing public RSA key');
 
       const randomString = crypto.randomBytes(20).toString('hex');

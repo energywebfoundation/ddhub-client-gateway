@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { IamService } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
 import { ConfigService } from '@nestjs/config';
 import { SymmetricKeysRepositoryWrapper } from '@dsb-client-gateway/dsb-client-gateway-storage';
@@ -16,6 +16,7 @@ export class SymmetricKeysCacheService {
   constructor(
     protected readonly enrolmentService: EnrolmentService,
     protected readonly iamService: IamService,
+    @Inject(forwardRef(() => IdentityService))
     protected readonly identityService: IdentityService,
     protected readonly wrapper: SymmetricKeysRepositoryWrapper,
     protected readonly configService: ConfigService,

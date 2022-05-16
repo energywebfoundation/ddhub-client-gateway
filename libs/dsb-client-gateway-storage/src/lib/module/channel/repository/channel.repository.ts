@@ -1,6 +1,6 @@
 import { ChannelEntity } from '../entity/channel.entity';
 import { EntityRepository, Repository } from 'typeorm';
-import { ChannelType } from '../../../../../../../apps/dsb-client-gateway-api/src/app/modules/channel/channel.const';
+import { ChannelType } from '@dsb-client-gateway/dsb-client-gateway-storage';
 
 @EntityRepository(ChannelEntity)
 export class ChannelRepository extends Repository<ChannelEntity> {

@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { SymmetricKeysCacheService } from './service';
 import { DdhubClientGatewayEnrolmentModule } from '@dsb-client-gateway/ddhub-client-gateway-enrolment';
 import { DdhubClientGatewayIdentityModule } from '@dsb-client-gateway/ddhub-client-gateway-identity';
@@ -8,7 +8,7 @@ import { DdhubClientGatewayMessageBrokerModule } from '@dsb-client-gateway/ddhub
 @Module({
   imports: [
     DdhubClientGatewayEnrolmentModule,
-    DdhubClientGatewayIdentityModule,
+    forwardRef(() => DdhubClientGatewayIdentityModule),
     SymmetricKeysRepositoryModule,
     DdhubClientGatewayMessageBrokerModule.forRootAsync(),
   ],

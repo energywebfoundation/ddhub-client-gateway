@@ -42,8 +42,6 @@ export class EnrolmentService {
     if (!currentEnrolment) {
       const createdEnrolment: EnrolmentEntity = await this.generateEnrolment();
 
-      await this.wrapper.enrolmentRepository.insert(createdEnrolment);
-
       return createdEnrolment;
     }
 
