@@ -1,7 +1,11 @@
 import { useState, useRef } from 'react';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 
-export const useEditorEffects = (showPlaceholder: boolean) => {
+type TUseEditorEffects = {
+  showPlaceholder?: boolean;
+}
+
+export const useEditorEffects = ({ showPlaceholder }: TUseEditorEffects) => {
   const [isEditorReady, setIsEditorReady] = useState(false);
   const [placeholder, setPlaceholder] = useState(true);
 
@@ -53,11 +57,16 @@ export const useEditorEffects = (showPlaceholder: boolean) => {
     suggestOnTriggerCharacters: false,
   } as monaco.editor.IStandaloneEditorConstructionOptions;
 
+  const formatValue = (value: string | undefined) => {
+    return JSON.stringify(value ?? {}, null, 2);
+  }
+
   return {
     placeholder,
     isEditorReady,
     handleEditorDidMount,
     handlePlaceholder,
-    options
+    options,
+    formatValue
   };
 };

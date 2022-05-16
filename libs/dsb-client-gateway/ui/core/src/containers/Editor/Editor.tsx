@@ -27,7 +27,8 @@ export const Editor: FC<EditorProps> = memo(
       handleEditorDidMount,
       placeholder,
       options,
-    } = useEditorEffects(showPlaceholder);
+      formatValue,
+    } = useEditorEffects({ showPlaceholder });
 
     const { name } = register(field.name);
 
@@ -50,7 +51,9 @@ export const Editor: FC<EditorProps> = memo(
             key={`${name}`}
             name={name}
             control={control}
-            render={({ field: { value, onChange }}) => {
+            render={({ field: { value, onChange } }) => {
+              const formattedValue =
+                typeof value === 'object' ? formatValue(value) : value;
               return (
                 <MonacoEditor
                   height="calc(100% - 19px)"
@@ -60,9 +63,13 @@ export const Editor: FC<EditorProps> = memo(
                   onChange={(value: string | undefined) => {
                     onChange(value);
                   }}
-                  value={value}
+                  value={formattedValue}
                   onMount={handleEditorDidMount}
-                  loading={<CircularProgress style={{ width: '25px', height: '25px' }} />}
+                  loading={
+                    <CircularProgress
+                      style={{ width: '25px', height: '25px' }}
+                    />
+                  }
                 />
               );
             }}
