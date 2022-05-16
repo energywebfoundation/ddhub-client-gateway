@@ -7,9 +7,10 @@ import EnrolForRoleContainer from '../EnrolForRoleContainer/EnrolForRoleContaine
 import RequestingEnrolment from './RequestingEnrolment';
 import AwaitingSyncing from '../AwaitingSyncing/AwaitingSyncing';
 import ResetPrivateKey from '../../ResetPrivateKey/ResetPrivateKey';
+import LoadingInfo from '../../LoadingInfo/LoadingInfo';
 
 export const useLoginStatusEffects = () => {
-  const {isLoading, submit, status} = usePrivateKeyEffects();
+  const { isLoading, submit, status, errorMessage } = usePrivateKeyEffects();
 
   const privateKeyHandler = (privateKey: string) => {
     submit(privateKey);
@@ -19,22 +20,30 @@ export const useLoginStatusEffects = () => {
     switch (status) {
       case AccountStatusEnum.NotSetPrivateKey:
         return <LoginForm onPrivateKeySubmit={privateKeyHandler} />;
+      case AccountStatusEnum.ErrorOccur:
+        return (
+          <>
+            <div>Ops! Error occur! {errorMessage}</div>
+            <ResetPrivateKey />
+          </>
+        );
       case AccountStatusEnum.InsufficientFund:
-        return <InsufficientFund/>;
+        return <InsufficientFund />;
       case RoleStatus.NOT_ENROLLED:
-        return <EnrolForRoleContainer/>;
+        return <EnrolForRoleContainer />;
       case RoleStatus.AWAITING_APPROVAL:
-        return <RequestingEnrolment/>;
+        return <RequestingEnrolment />;
       case RoleStatus.APPROVED:
-        return <AwaitingSyncing/>;
+        return <AwaitingSyncing />;
       default:
         return (
           <>
-            <div>Ops! Something went wrong!</div>
-            <ResetPrivateKey/>
-          </>);
+            <LoadingInfo>Checking identity</LoadingInfo>
+            <ResetPrivateKey />
+          </>
+        );
     }
   };
 
-  return {statusFactory, isLoading}
-}
+  return { statusFactory, isLoading };
+};

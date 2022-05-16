@@ -1,19 +1,27 @@
 import { IdentityWithEnrolment } from '@dsb-client-gateway/dsb-client-gateway/identity/models';
 import { useIdentityControllerPost } from '@dsb-client-gateway/dsb-client-gateway-api-client';
-import { useSetUserDataEffect } from './set-user-data.effect';
+import { useSetUserDataEffect } from './SetUserData.effects';
 
 export const usePrivateKeyEffects = () => {
-  const {setUserData, userData} = useSetUserDataEffect();
+  const { setUserData, userData, setIsChecking, setDataOnError } =
+    useSetUserDataEffect();
 
-  const {mutate, isLoading} = useIdentityControllerPost({
+  const { mutate, isLoading } = useIdentityControllerPost({
     mutation: {
-      onSuccess: (res) => setUserData(res as IdentityWithEnrolment)
-    }
+      onMutate: () => setIsChecking(true),
+      onSuccess: (res) => setUserData(res as IdentityWithEnrolment),
+      onError: (error: Error) => setDataOnError(error),
+    },
   });
 
-  const submit = async (privateKey: string) => {
-    mutate({data: {privateKey}});
+  const submit = (privateKey: string) => {
+    mutate({ data: { privateKey } });
   };
 
-  return {isLoading, submit, status: userData.accountStatus};
+  return {
+    isLoading: isLoading || userData.isChecking,
+    submit,
+    status: userData.accountStatus,
+    errorMessage: userData.errorMessage,
+  };
 };

@@ -1,4 +1,4 @@
-import { darken } from '@mui/material';
+import { alpha, darken } from '@mui/material';
 import { makeStyles } from 'tss-react/mui';
 
 export const useStyles = makeStyles()((theme) => ({
@@ -20,7 +20,12 @@ export const useStyles = makeStyles()((theme) => ({
     minWidth: 84,
     '&:hover': {
       backgroundColor: darken(theme.palette.primary.main, 0.2)
-    }
+    },
+    '&.Mui-disabled': {
+      '& .MuiTypography-root': {
+        color: alpha(theme.palette.common.black, 0.26),
+      },
+    },
   },
   buttonText: {
     fontSize: 12,
