@@ -8,7 +8,7 @@ import {
   RegistrationTypes,
   SignerService,
 } from 'iam-client-lib';
-import { IAppDefinition } from '@energyweb/iam-contracts';
+import { IAppDefinition } from '@energyweb/credential-governance';
 import { IamFactoryService } from './iam-factory.service';
 import { ConfigService } from '@nestjs/config';
 import { ApplicationDTO, Claim } from '../iam.interface';
@@ -80,7 +80,9 @@ export class IamService {
 
   @Span('iam_getUserClaimsFromDID')
   public async getUserClaimsFromDID() {
-    return this.claimsService.getUserClaims();
+    return this.claimsService.getUserClaims({
+      did: this.getDIDAddress(),
+    });
   }
 
   @Span('iam_setVerificationMethod')
@@ -254,7 +256,7 @@ export class IamService {
 
         return this.didRegistry
           .getDidDocument({
-            did,
+            did: this.getDIDAddress(),
             includeClaims,
           })
           .catch((e) => {
