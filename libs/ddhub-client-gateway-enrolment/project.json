@@ -1,0 +1,22 @@
+{
+  "root": "libs/ddhub-client-gateway-enrolment",
+  "sourceRoot": "libs/ddhub-client-gateway-enrolment/src",
+  "targets": {
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/ddhub-client-gateway-enrolment/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/libs/ddhub-client-gateway-enrolment"],
+      "options": {
+        "jestConfig": "libs/ddhub-client-gateway-enrolment/jest.config.js",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": []
+}

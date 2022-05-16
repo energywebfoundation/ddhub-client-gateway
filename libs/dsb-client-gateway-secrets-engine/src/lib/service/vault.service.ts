@@ -75,6 +75,7 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
       });
   }
 
+  @Span('vault_getPrivateKey')
   public async getPrivateKey(): Promise<string> {
     this.logger.log('Retrieving private key');
 

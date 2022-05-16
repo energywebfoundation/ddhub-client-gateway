@@ -3,9 +3,11 @@ import { HttpModule } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { SecretsEngineModule } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
 import { DidAuthApiService, DidAuthService, LoginHandler } from './service';
+import { DdhubClientGatewayUtilsModule } from '@dsb-client-gateway/ddhub-client-gateway-utils';
 
 @Module({
   imports: [
+    DdhubClientGatewayUtilsModule,
     HttpModule.registerAsync({
       useFactory: (configService: ConfigService) => {
         return {
