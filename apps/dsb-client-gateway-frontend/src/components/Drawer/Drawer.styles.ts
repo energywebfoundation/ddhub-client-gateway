@@ -8,7 +8,7 @@ export const useStyles = makeStyles()((theme) => ({
     marginBottom: 3,
     '&:hover': {
       backgroundColor: alpha(theme.palette.primary.main, 0.12),
-      color: theme.palette.primary.main
+      color: theme.palette.primary.main,
     },
     '&:hover .MuiTypography-root': {
       color: theme.palette.primary.main,
@@ -17,31 +17,11 @@ export const useStyles = makeStyles()((theme) => ({
       stroke: theme.palette.primary.main,
     },
   },
-  active: {
-    color: theme.palette.common.white,
-    background: theme.palette.primary.main,
-    '& .MuiTypography-root': {
-      color: theme.palette.common.white,
-    },
-    '& svg': {
-      stroke: theme.palette.common.white,
-    },
-    '&:hover': {
-      background: theme.palette.primary.main,
-      transform: 'none',
-      '& .MuiTypography-root': {
-        color: theme.palette.common.white,
-      },
-      '& svg': {
-        stroke: theme.palette.common.white,
-      }
-    },
-  },
   icon: {
     marginRight: 10,
   },
   subMenuIcon: {
-    margin: '0 14px 0 4px'
+    margin: '0 14px 0 4px',
   },
   menuIcon: {
     position: 'absolute',
@@ -51,13 +31,7 @@ export const useStyles = makeStyles()((theme) => ({
     }),
   },
   menuIconActive: {
-    transform: 'rotate(90deg)'
-  },
-  listItemText: {
-    fontSize: 15,
-    lineHeight: '24px',
-    fontWeight: 500,
-    color: theme.palette.grey[200],
+    transform: 'rotate(90deg)',
   },
   logo: {
     height: '38px',
