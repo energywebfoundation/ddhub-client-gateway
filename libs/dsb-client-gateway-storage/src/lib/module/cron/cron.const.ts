@@ -3,6 +3,7 @@ export enum CronJobType {
   CHANNEL_ROLES = 'CHANNEL_ROLES',
   TOPIC_REFRESH = 'TOPIC_REFRESH',
   SYMMETRIC_KEYS = 'SYMMETRIC_KEYS',
+  PRIVATE_KEY = 'PRIVATE_KEY',
 }
 
 export enum CronStatus {

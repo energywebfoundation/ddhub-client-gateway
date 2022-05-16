@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { configValidate } from './utils/config.validate';
 import { DdhubClientGatewayTracingModule } from '@dsb-client-gateway/ddhub-client-gateway-tracing';
-import { AppInitService } from './app-init.service';
+import { AppInitService } from './service/app-init.service';
 import { DdhubClientGatewayUtilsModule } from '@dsb-client-gateway/ddhub-client-gateway-utils';
 import { ScheduleModule } from '@nestjs/schedule';
 import { IamModule } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
@@ -11,6 +11,8 @@ import { KeysModule } from './modules/keys/keys.module';
 import { TopicModule } from './modules/topic/topic.module';
 import { DidModule } from './modules/did/did.module';
 import { StorageModule } from '../../../dsb-client-gateway-api/src/app/modules/storage/storage.module';
+import { PrivateKeyWatcherService } from './service/private-key-watcher.service';
+import { CronRepositoryModule } from '@dsb-client-gateway/dsb-client-gateway-storage';
 
 @Module({
   imports: [
@@ -24,11 +26,12 @@ import { StorageModule } from '../../../dsb-client-gateway-api/src/app/modules/s
     DdhubClientGatewayTracingModule.forRoot(),
     IamModule,
     DidModule,
+    CronRepositoryModule,
     SecretsEngineModule,
     TopicModule,
     KeysModule,
   ],
   controllers: [],
-  providers: [AppInitService],
+  providers: [AppInitService, PrivateKeyWatcherService],
 })
 export class AppModule {}
