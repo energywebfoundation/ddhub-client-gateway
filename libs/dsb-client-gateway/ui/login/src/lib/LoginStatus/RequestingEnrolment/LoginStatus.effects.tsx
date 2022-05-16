@@ -7,6 +7,7 @@ import EnrolForRoleContainer from '../EnrolForRoleContainer/EnrolForRoleContaine
 import RequestingEnrolment from './RequestingEnrolment';
 import AwaitingSyncing from '../AwaitingSyncing/AwaitingSyncing';
 import ResetPrivateKey from '../../ResetPrivateKey/ResetPrivateKey';
+import LoadingInfo from '../../LoadingInfo/LoadingInfo';
 
 export const useLoginStatusEffects = () => {
   const { isLoading, submit, status, errorMessage } = usePrivateKeyEffects();
@@ -19,6 +20,13 @@ export const useLoginStatusEffects = () => {
     switch (status) {
       case AccountStatusEnum.NotSetPrivateKey:
         return <LoginForm onPrivateKeySubmit={privateKeyHandler} />;
+      case AccountStatusEnum.ErrorOccur:
+        return (
+          <>
+            <div>Ops! Error occur! {errorMessage}</div>
+            <ResetPrivateKey />
+          </>
+        );
       case AccountStatusEnum.InsufficientFund:
         return <InsufficientFund />;
       case RoleStatus.NOT_ENROLLED:
@@ -30,7 +38,7 @@ export const useLoginStatusEffects = () => {
       default:
         return (
           <>
-            <div>Ops! Error occured! {errorMessage}</div>
+            <LoadingInfo>Checking identity</LoadingInfo>
             <ResetPrivateKey />
           </>
         );
