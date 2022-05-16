@@ -1,5 +1,6 @@
 import Head from 'next/head';
 import { Applications } from '@dsb-client-gateway/ui/applications';
+import { routerConst } from '@dsb-client-gateway/ui/utils';
 
 export default function ListApplications() {
   return (
@@ -13,7 +14,7 @@ export default function ListApplications() {
       </Head>
 
       <main>
-        <Applications role="user" />
+        <Applications role="user" topicUrl={routerConst.ChannelTopics} />
       </main>
     </>
   );

@@ -1,19 +1,12 @@
-import { useRouter } from 'next/router';
-import {
-  useTopicsModalsDispatch,
-  TopicsModalsActionsEnum,
-} from '../../context';
-import {
-  useTopics,
-  useCachedApplications,
-  useRemoveTopic,
-} from '@dsb-client-gateway/ui/api-hooks';
-import { TTableComponentAction } from '@dsb-client-gateway/ui/core';
-import { GetTopicDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
-import { routerConst, Queries } from '@dsb-client-gateway/ui/utils';
-import { useStyles } from './Topics.styles';
+import { useRouter } from "next/router";
+import { TopicsModalsActionsEnum, useTopicsModalsDispatch } from "../../context";
+import { useCachedApplications, useRemoveTopic, useTopics } from "@dsb-client-gateway/ui/api-hooks";
+import { TTableComponentAction } from "@dsb-client-gateway/ui/core";
+import { GetTopicDto } from "@dsb-client-gateway/dsb-client-gateway-api-client";
+import { Queries } from "@dsb-client-gateway/ui/utils";
+import { useStyles } from "./Topics.styles";
 
-export const useTopicsEffects = () => {
+export const useTopicsEffects = (versionHistoryUrl: string) => {
   const { theme } = useStyles();
   const router = useRouter();
 
@@ -62,7 +55,7 @@ export const useTopicsEffects = () => {
 
   const navigateToVersionHistory = (data: GetTopicDto) => {
     router.push({
-      pathname: routerConst.VersionHistory,
+      pathname: versionHistoryUrl,
       query: { namespace: data.owner, topicId: data.id },
     });
   }

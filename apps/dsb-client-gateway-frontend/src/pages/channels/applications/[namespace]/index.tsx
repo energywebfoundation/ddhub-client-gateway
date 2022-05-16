@@ -1,5 +1,6 @@
 import Head from 'next/head';
 import { TopicsContainer } from '@dsb-client-gateway/ui/topics';
+import { routerConst } from '@dsb-client-gateway/ui/utils';
 
 export default function Topics() {
   return (
@@ -11,7 +12,9 @@ export default function Topics() {
       </Head>
 
       <main>
-        <TopicsContainer />
+        <TopicsContainer
+          versionHistoryUrl={routerConst.ChannelTopicVersionHistory}
+        />
       </main>
     </div>
   );
