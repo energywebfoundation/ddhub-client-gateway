@@ -19,6 +19,7 @@ import {
 import { makeServer } from '../services/mock.service';
 import 'nprogress/nprogress.css';
 import '../styles/globals.css';
+import { BackdropContextProvider } from "@dsb-client-gateway/ui/core";
 
 if (
   process.env.NODE_ENV !== 'production' &&
@@ -82,13 +83,15 @@ function MyApp(props: MyAppProps) {
       </Head>
       <DDHubThemeProvider>
         <CssBaseline />
-        <UserDataContext.Provider value={userDataValue}>
-          <QueryClientProvider client={queryClient}>
-            <InitializeAccountStatus>
-              {getLayout(<Component {...pageProps} />)}
-            </InitializeAccountStatus>
-          </QueryClientProvider>
-        </UserDataContext.Provider>
+        <BackdropContextProvider>
+          <UserDataContext.Provider value={userDataValue}>
+            <QueryClientProvider client={queryClient}>
+              <InitializeAccountStatus>
+                {getLayout(<Component {...pageProps} />)}
+              </InitializeAccountStatus>
+            </QueryClientProvider>
+          </UserDataContext.Provider>
+        </BackdropContextProvider>
       </DDHubThemeProvider>
     </CacheProvider>
   );
