@@ -90,7 +90,6 @@ export class MessageControlller {
 
     try {
       const stream = Readable.from(file.data.toString());
-      res.write(file.data.toString());
       return stream.pipe(res);
     } catch (e) {
       this.logger.error('error in file download', e);
