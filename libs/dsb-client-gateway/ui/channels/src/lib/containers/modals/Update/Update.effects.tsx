@@ -20,6 +20,7 @@ type TGetActionButtonsProps = TActionButtonsProps['nextClickButtonProps'];
 
 const initialState = {
   type: '' as UpdateChannelDtoType,
+  payloadEncryption: false,
   conditions: {
     roles: [] as string[],
     dids: [] as string[],
@@ -45,7 +46,8 @@ export const useUpdateChannelEffects = () => {
      if (open) {
       setChannelValues({
         type: channel.type,
-        conditions: channel.conditions
+        conditions: channel.conditions,
+        payloadEncryption: channel.payloadEncryption
       })
      } else {
       resetToInitialState();
@@ -110,6 +112,7 @@ export const useUpdateChannelEffects = () => {
     const data = {
       fqcn: channel.fqcn,
       type: channelValues.type,
+      payloadEncryption: channelValues.payloadEncryption,
       conditions: {
         ...channelValues.conditions,
         topics,
