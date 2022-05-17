@@ -1,18 +1,23 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
   CacheClient,
   ClaimsService,
   DidRegistry,
+  ILogger,
   initWithPrivateKeySigner,
+  LogLevel,
   setCacheConfig,
   setChainConfig,
+  setLogger,
   SignerService,
 } from 'iam-client-lib';
 import { Span } from 'nestjs-otel';
 
 @Injectable()
 export class IamFactoryService {
+  protected readonly logger = new Logger(IamFactoryService.name);
+
   @Span('iam_initialize')
   public async initialize(
     privateKey: string,
@@ -36,7 +41,9 @@ export class IamFactoryService {
     const { connectToCacheServer, signerService } =
       await initWithPrivateKeySigner(privateKey, rpcUrl);
 
-    setChainConfig(73799, {
+    setLogger(this.getLogger());
+
+    setChainConfig(chainId, {
       claimManagerAddress: configService.get<string>(
         'CLAIM_MANAGER_ADDRESS',
         '0x5339adE9332A604A1c957B9bC1C6eee0Bcf7a031'
@@ -48,17 +55,48 @@ export class IamFactoryService {
     });
 
     try {
+      this.logger.log('connecting to cache server');
+
       const { cacheClient, connectToDidRegistry } =
         await connectToCacheServer();
+
+      this.logger.log(
+        'connected to iam cache server, connecting to did registry'
+      );
 
       const { claimsService, didRegistry } = await connectToDidRegistry();
 
       await didRegistry.init();
       await claimsService.init();
 
+      this.logger.log('connected to did registry, iam setup finalized');
+
       return { cacheClient, claimsService, didRegistry, signerService };
     } catch (e) {
-      console.error(e);
+      this.logger.error('error druing setup iam', e);
     }
+  }
+
+  protected getLogger(): ILogger {
+    const logger = new Logger('IAM-Client-Lib');
+
+    return {
+      log: (message) => {
+        console.log(message);
+      },
+      error: (message) => {
+        console.error(message);
+      },
+      info: (message) => {
+        console.log(message);
+      },
+      warn: (message) => {
+        console.warn(message);
+      },
+      debug: (message) => {
+        console.debug(message);
+      },
+      _logLevel: LogLevel.debug,
+    } as unknown as ILogger;
   }
 }
