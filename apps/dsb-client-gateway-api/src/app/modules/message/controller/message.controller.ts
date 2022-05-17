@@ -38,7 +38,7 @@ export class MessageControlller {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Message recieved successfully',
-    type: () => GetMessagesResponseDto,
+    type: [GetMessagesResponseDto],
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,

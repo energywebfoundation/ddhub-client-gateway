@@ -54,7 +54,13 @@ export const mapUrlToBreadcrumbs = new Map<string, Breadcrumb[]>()
   .set(routerConst.LargeFileDownloadChannel, [
     { title: 'Large data messaging file download' },
     { title: 'Large data messaging file download' },
-    { title: 'Channel name' },
+    { title: 'Channel topics' },
+  ])
+  .set(routerConst.LargeFileDownloadChannelTopic, [
+    { title: 'Large data messaging file download' },
+    { title: 'Large data messaging file download' },
+    { title: 'Channel topics' },
+    { title: 'Messages' },
   ])
   .set(routerConst.LargeDataMessagingFileUpload, [
     { title: 'Large data messaging file upload' },

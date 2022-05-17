@@ -2,7 +2,9 @@ export enum Queries {
   Namespace = 'namespace',
   Owner = 'owner',
   TopicId = 'topicId',
+  TopicName = 'topicName',
   FQCN = 'fqcn',
+  MessageId = 'messageId'
 }
 
 export const routerConst = {
@@ -19,6 +21,7 @@ export const routerConst = {
   LargeDataMessagingFileUpload: '/messages/large-file-upload',
   LargeDataMessagingFileDownload: '/messages/large-file-download',
   LargeFileDownloadChannel: `/messages/large-file-download/[${Queries.FQCN}]`,
+  LargeFileDownloadChannelTopic: `/messages/large-file-download/[${Queries.FQCN}]/[${Queries.TopicName}]`,
   DataMessagingFileUpload: '/messages/file-upload',
   DataMessagingFileDownload: '/messages/file-download',
   VersionHistory: `/applications/[${Queries.Namespace}]/[${Queries.TopicId}]/version-history`,

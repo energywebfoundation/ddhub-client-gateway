@@ -7,6 +7,7 @@ import {
   getTopicsControllerGetTopicHistoryByIdAndVersionMock,
   getChannelControllerGetByTypeMock,
   getChannelControllerGetMock,
+  getChannelMessagesMock
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 
 export function makeServer({ environment = 'development' }) {
@@ -76,6 +77,14 @@ export function makeServer({ environment = 'development' }) {
 
       this.post('channels', (_schema, request) => {
         return { channel: JSON.parse(request.requestBody) };
+      });
+
+      this.get('messages', () => {
+        return getChannelMessagesMock();
+      });
+
+      this.get('messages/download', () => {
+        return {};
       });
 
       this.post('messages', () => {

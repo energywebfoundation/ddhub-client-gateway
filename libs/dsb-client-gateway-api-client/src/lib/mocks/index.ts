@@ -137,7 +137,7 @@ export const getChannelControllerGetByTypeMock = () => [
         },
       ],
     },
-  }
+  },
 ];
 
 export const getChannelControllerGetMock = () => ({
@@ -145,7 +145,10 @@ export const getChannelControllerGetMock = () => ({
   type: 'sub',
   conditions: {
     dids: ['did:ethr:volta:0x09Df5d33f1242E1b8aA5E0E0F6BfA687E6846993'],
-    roles: ['marketoperator.roles', 'operator.roles.application.apps.energyweb.iam.ewc'],
+    roles: [
+      'marketoperator.roles',
+      'operator.roles.application.apps.energyweb.iam.ewc',
+    ],
     topics: [
       {
         topicName: 'operatorEnvelope',
@@ -155,3 +158,32 @@ export const getChannelControllerGetMock = () => ({
     ],
   },
 });
+
+export const getChannelMessagesMock = () => [
+  {
+    id: '110',
+    topicName: 'operatorEnvelope',
+    topicOwner: 'torta.apps.eggplant.vege.iam.ewc',
+    topicVersion: '1.0.0',
+    payload: '624bfd4f4c6cf04abfc20041',
+    signature:
+      '0x0abc6026b01856a756de47ec6f44d9c14fe69009bbf3b9b6cf522d8d783a1c654425848381affca5dab9284d8715fa2f9e34155374bafd923d75c219496cbe161c',
+    sender: 'did:ethr:volta:0x03830466Ce257f9B798B0f27359D7639dFB6457D',
+    timestampNanos: 1649147198388,
+    transactionId: '1649147198388',
+    signatureValid: true,
+  },
+  {
+    id: '111',
+    topicName: 'operatorEnvelope',
+    topicOwner: 'ddhub.apps.energyweb.iam.ewc',
+    topicVersion: '1.0.0',
+    payload: '624bfd4f4c6cf04abfc20042',
+    signature:
+      '0x0abc6026b01856a756de47ec6f44d9c14fe69009bbf3b9b6cf522d8d783a1c654425848381affca5dab9284d8715fa2f9e34155374bafd923d75c219496cbe161c',
+    sender: 'did:ethr:volta:0x03830466Ce257f9B798B0f27359D7639dFB6457D',
+    timestampNanos: 1649147198388,
+    transactionId: '1649147198389',
+    signatureValid: true,
+  },
+];

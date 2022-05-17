@@ -1,5 +1,5 @@
 import { makeStyles } from 'tss-react/mui';
-import { lighten, alpha, darken } from '@mui/material/styles';
+import { lighten } from '@mui/material/styles';
 
 export const useStyles = makeStyles()((theme) => ({
   root: {
@@ -12,9 +12,14 @@ export const useStyles = makeStyles()((theme) => ({
     padding: '22px 23px',
   },
   cardHeader: {
+    marginBottom: 16,
+  },
+  primary: {
+    color: theme.palette.primary.main
+  },
+  cardHeaderWithBorder: {
     borderBottom: `1px solid ${lighten(theme.palette.background.paper, 0.2)}`,
-    marginBottom: 18,
-    paddingBottom: 14,
+    paddingBottom: 14
   },
   cardHeaderText: {
     fontSize: 14,
