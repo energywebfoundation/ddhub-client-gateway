@@ -165,12 +165,7 @@ export class ChannelService {
       topics: topicsWithIds,
     };
 
-    await this.wrapperRepository.channelRepository.update(
-      {
-        fqcn: channel.fqcn,
-      },
-      channel
-    );
+    await this.wrapperRepository.channelRepository.save(channel);
 
     await this.commandBus.execute(new RefreshChannelCacheDataCommand(fqcn));
   }
