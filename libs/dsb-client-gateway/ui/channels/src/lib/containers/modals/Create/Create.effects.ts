@@ -26,6 +26,7 @@ type TGetActionButtonsProps = TActionButtonsProps['nextClickButtonProps'] & {
 const initialState = {
   fqcn: '',
   type: CreateChannelDtoType.sub,
+  payloadEncryption: false,
   conditions: {
     roles: [] as string[],
     dids: [] as string[],
@@ -163,6 +164,7 @@ export const useCreateChannelEffects = () => {
       fqcn: values.fqcn,
       type: values.type,
       conditions: values.conditions,
+      payloadEncryption: values.payloadEncryption
     };
     createChannelHandler(channelCreateValues, onCreate, onCreateError);
   };
