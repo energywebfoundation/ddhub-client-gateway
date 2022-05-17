@@ -27,7 +27,10 @@ import {
 import { ChannelType } from '../../../modules/channel/channel.const';
 import { KeysService } from '../../keys/service/keys.service';
 import { v4 as uuidv4 } from 'uuid';
-import { EncryptedMessageType, WebSocketImplementation } from '../../message/message.const';
+import {
+  EncryptedMessageType,
+  WebSocketImplementation,
+} from '../../message/message.const';
 import { SecretsEngineService } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
 import {
   ChannelEntity,
@@ -37,10 +40,10 @@ import { FileNotFoundException } from '../exceptions/file-not-found.exception';
 import {
   DdhubFilesService,
   DdhubMessagesService,
-  Message,
 } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
 import { TopicNotRelatedToChannelException } from '../exceptions/topic-not-related-to-channel.exception';
 import { WsClientService } from './ws-client.service';
+import { Span } from 'nestjs-otel';
 
 export enum EventEmitMode {
   SINGLE = 'SINGLE',
@@ -61,7 +64,7 @@ export class MessageService {
     protected readonly keyService: KeysService,
     protected readonly ddhubMessageService: DdhubMessagesService,
     protected readonly ddhubFilesService: DdhubFilesService
-  ) { }
+  ) {}
 
   public async sendMessagesToSubscribers(
     messages: GetMessageResponse[],
@@ -107,6 +110,7 @@ export class MessageService {
     );
   }
 
+  @Span('message_sendMessage')
   public async sendMessage(dto: SendMessageDto): Promise<SendMessageResponse> {
     const channel: ChannelEntity = await this.channelService.getChannelOrThrow(
       dto.fqcn
@@ -214,6 +218,7 @@ export class MessageService {
     );
   }
 
+  @Span('message_getMessages')
   public async getMessages({
     fqcn,
     from,
@@ -286,7 +291,7 @@ export class MessageService {
           timestampNanos: message.timestampNanos,
           transactionId: message.transactionId,
           signatureValid: false,
-          decryption: { status: true },
+          decryption: { status: false },
         };
 
         if (!message.isFile) {
@@ -306,18 +311,24 @@ export class MessageService {
             result.signatureValid = true;
 
             try {
-              const decryptedMessage = await this.keyService.decryptMessage(
-                message.payload,
-                message.clientGatewayMessageId,
-                message.senderDid
-              );
+              const decryptedMessage: string | null =
+                await this.keyService.decryptMessage(
+                  message.payload,
+                  message.clientGatewayMessageId,
+                  message.senderDid
+                );
 
               if (!decryptedMessage) {
                 result.decryption.status = false;
                 result.decryption.errorMessage = 'Decryption failed.';
                 result.payload = '';
+
+                this.logger.error(
+                  `failed to decrypt ${message.clientGatewayMessageId}`
+                );
               } else {
                 result.payload = decryptedMessage;
+                result.decryption.status = true;
               }
 
               this.logger.debug(

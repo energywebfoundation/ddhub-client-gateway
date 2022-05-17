@@ -10,19 +10,6 @@ export class TopicService {
 
   constructor(protected readonly wrapper: TopicRepositoryWrapper) {}
 
-  public async createOrUpdateTopic(topicEntity: TopicEntity): Promise<void> {
-    await this.wrapper.topicRepository.save(topicEntity);
-  }
-
-  public async getTopics(name: string, owner: string): Promise<TopicEntity[]> {
-    return this.wrapper.topicRepository.find({
-      where: {
-        name,
-        owner,
-      },
-    });
-  }
-
   public async getTopic(
     name: string,
     owner: string,
