@@ -12,9 +12,14 @@ export const useStyles = makeStyles()((theme) => ({
       lineHeight: '24px',
       fontWeight: 400,
       padding: '4px 0 4px 12px',
-      '&.Mui-disabled .MuiOutlinedInput-notchedOutline': {
-        border: `1px solid ${theme.palette.grey[500]}`,
-      },
+      '&.Mui-disabled': {
+        '& .MuiOutlinedInput-notchedOutline': {
+          border: `1px solid ${theme.palette.grey[500]}`,
+        },
+        '& svg': {
+          visibility: 'hidden'
+        }
+      }
     },
     '& .MuiOutlinedInput-notchedOutline': {
       border: `1px solid ${theme.palette.grey[500]}`,
@@ -49,23 +54,29 @@ export const useStyles = makeStyles()((theme) => ({
     },
   },
   menuItem: {
-    fontSize: 14,
-    lineHeight: '21px',
-    fontWeight: 400,
-    color: theme.palette.text.primary,
-    minHeight: 22,
-    fontFamily: theme.typography.body2.fontFamily,
-    padding: '8px 16px',
+    '&.MuiAutocomplete-option': {
+      fontSize: 14,
+      lineHeight: '21px',
+      fontWeight: 400,
+      color: theme.palette.text.primary,
+      minHeight: 22,
+      fontFamily: theme.typography.body2.fontFamily,
+      padding: '10px 16px 9px',
+    }
   },
   clearIndicator: {
     position: 'absolute',
-    top: 0,
-    right: 25,
+    top: 1,
+    right: 20,
+  },
+  progress: {
+    position: 'absolute',
+    right: 20,
   },
   popupIcon: {
     position: 'absolute',
     top: 2,
-    right: 4,
+    right: 2,
     transform: 'none',
     '& svg': {
       stroke: theme.palette.common.white,
@@ -80,7 +91,8 @@ export const useStyles = makeStyles()((theme) => ({
     borderRadius: 6,
     '& .MuiAutocomplete-option': {
        '&:hover, &.Mui-focused': {
-         backgroundColor: alpha(theme.palette.primary.dark, 0.12)
+         backgroundColor: alpha(theme.palette.primary.main, 0.12),
+         color: theme.palette.primary.main
        }
     },
     '&::-webkit-scrollbar': {

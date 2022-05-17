@@ -14,6 +14,15 @@ export class TopicService {
     await this.wrapper.topicRepository.save(topicEntity);
   }
 
+  public async getTopics(name: string, owner: string): Promise<TopicEntity[]> {
+    return this.wrapper.topicRepository.find({
+      where: {
+        name,
+        owner,
+      },
+    });
+  }
+
   public async getTopic(
     name: string,
     owner: string,
@@ -33,6 +42,14 @@ export class TopicService {
         name,
         owner,
         version,
+      },
+    });
+  }
+
+  public async getTopicById(id: string): Promise<TopicEntity | null> {
+    return this.wrapper.topicRepository.findOne({
+      where: {
+        id,
       },
     });
   }

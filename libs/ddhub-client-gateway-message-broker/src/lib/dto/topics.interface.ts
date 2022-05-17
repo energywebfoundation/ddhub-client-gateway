@@ -12,6 +12,7 @@ export interface TopicVersion {
   owner: string;
   name: string;
   schemaType: string;
+  tags: string[];
 }
 
 export interface Topic {

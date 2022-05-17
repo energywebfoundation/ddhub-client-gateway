@@ -4,6 +4,7 @@ export enum ModalActionsEnum {
   SHOW_CREATE = 'SHOW_CREATE',
   SHOW_UPDATE = 'SHOW_UPDATE',
   SHOW_DETAILS = 'SHOW_DETAILS',
+  SHOW_TOPIC_DETAILS = 'SHOW_TOPIC_DETAILS',
   HIDE_UPDATE = 'HIDE_UPDATE',
   HIDE_CREATE = 'HIDE_CREATE',
 }
@@ -14,9 +15,13 @@ export const modalInitialState: IModalStore = {
   },
   update: {
     open: false,
-    data: undefined
+    data: undefined,
   },
   details: {
+    open: false,
+    data: undefined,
+  },
+  topicDetails: {
     open: false,
     data: undefined,
   },
@@ -33,6 +38,8 @@ export const modalsReducer = (
       return { ...state, update: action.payload };
     case ModalActionsEnum.SHOW_DETAILS:
       return { ...state, details: action.payload };
+    case ModalActionsEnum.SHOW_TOPIC_DETAILS:
+      return { ...state, topicDetails: action.payload };
     case ModalActionsEnum.HIDE_CREATE:
       return {
         ...state,

@@ -9,19 +9,27 @@ export function InsufficientFund() {
   return (
     <>
       <Stack spacing={1} alignItems="center" direction={'row'}>
-        <ErrorOutline color={'warning'}/>
-        <Typography variant={'h6'}>
-          Insufficient fund
-        </Typography>
+        <ErrorOutline color={'warning'} />
+        <Typography variant={'h6'}>Insufficient fund</Typography>
       </Stack>
-      {isDevEnv ? <Container sx={{marginLeft: '8px'}}>
-        <Typography>
-          Please refresh or reset private key. <Link href={'https://voltafaucet.energyweb.org/'} rel={'noreferrer'}
-                                                     target={'_blank'}>Top up using volta faucet </Link>
-        </Typography>
-      </Container> : ''}
-      <RefreshPage/>
-      <ResetPrivateKey/>
+      {isDevEnv ? (
+        <Container sx={{ marginLeft: '8px' }}>
+          <Typography>
+            Please refresh or reset private key.{' '}
+            <Link
+              href={'https://voltafaucet.energyweb.org/'}
+              rel={'noreferrer'}
+              target={'_blank'}
+            >
+              Top up using volta faucet{' '}
+            </Link>
+          </Typography>
+        </Container>
+      ) : (
+        ''
+      )}
+      <RefreshPage />
+      <ResetPrivateKey />
     </>
   );
 }

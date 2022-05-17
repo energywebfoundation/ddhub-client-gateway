@@ -6,38 +6,33 @@ export const useStyles = makeStyles()((theme) => ({
     height: '42px',
     borderRadius: 5,
     marginBottom: 3,
+    cursor: 'pointer',
     '&:hover': {
-      background: alpha(theme.palette.primary.main, 0.4),
+      backgroundColor: alpha(theme.palette.primary.main, 0.12),
+      color: theme.palette.primary.main,
     },
     '&:hover .MuiTypography-root': {
-      color: theme.palette.common.white,
+      color: theme.palette.primary.main,
     },
     '&:hover svg': {
-      stroke: theme.palette.common.white,
-    },
-  },
-  active: {
-    color: theme.palette.common.white,
-    background: theme.palette.primary.main,
-    '& .MuiTypography-root': {
-      color: theme.palette.common.white,
-    },
-    '& svg': {
-      stroke: theme.palette.common.white,
-    },
-    '&:hover': {
-      background: theme.palette.primary.main,
-      transform: 'none',
+      stroke: theme.palette.primary.main,
     },
   },
   icon: {
-    marginRight: 20,
+    marginRight: 10,
   },
-  listItemText: {
-    fontSize: 15,
-    lineHeight: '24px',
-    fontWeight: 500,
-    color: theme.palette.grey[200],
+  subMenuIcon: {
+    margin: '0 14px 0 4px',
+  },
+  menuIcon: {
+    position: 'absolute',
+    right: 4,
+    transition: theme.transitions.create('transform', {
+      duration: theme.transitions.duration.short,
+    }),
+  },
+  menuIconActive: {
+    transform: 'rotate(90deg)',
   },
   logo: {
     height: '38px',
