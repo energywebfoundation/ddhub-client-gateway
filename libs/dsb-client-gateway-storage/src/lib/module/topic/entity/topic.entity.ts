@@ -11,10 +11,10 @@ export class TopicEntity {
   @PrimaryColumn()
   id: string;
 
-  @Column()
+  @PrimaryColumn()
   name: string;
 
-  @Column()
+  @PrimaryColumn()
   schemaType: string;
 
   @Column({

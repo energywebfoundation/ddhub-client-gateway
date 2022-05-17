@@ -1,12 +1,17 @@
 import {
   useMessageControlllerUploadFile,
+  useMessageControlllerCreate,
   UploadMessageBodyDto,
+  SendMessageDto,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { useCustomAlert } from '@dsb-client-gateway/ui/core';
 
-export const useUploadMessage = () => {
+export const useUploadMessage = (isLarge: boolean) => {
   const Swal = useCustomAlert();
-  const { mutate, isLoading } = useMessageControlllerUploadFile();
+  const { mutate: messageCreateMutate, isLoading: messageCreating } =
+    useMessageControlllerCreate();
+  const { mutate: messageUploadMutate, isLoading: messageUploading } =
+    useMessageControlllerUploadFile();
 
   const uploadMessageSuccess = async () => {
     await Swal.success({
@@ -24,7 +29,7 @@ export const useUploadMessage = () => {
     values: UploadMessageBodyDto,
     onUpload: () => void
   ) => {
-    mutate(
+    messageUploadMutate(
       {
         data: values,
       },
@@ -38,8 +43,38 @@ export const useUploadMessage = () => {
     );
   };
 
+  const createMessageHandler = async (
+    values: UploadMessageBodyDto,
+    onUpload: () => void
+  ) => {
+    const { file, ...rest } = values;
+    const payload = await file.text();
+    const formattedValues = {
+      ...rest,
+      payload,
+    } as SendMessageDto;
+
+    messageCreateMutate(
+      {
+        data: formattedValues,
+      },
+      {
+        onSuccess: () => {
+          uploadMessageSuccess();
+          onUpload();
+        },
+        onError: uploadMessageError,
+      }
+    );
+  };
+
+  const isLoading = messageCreating || messageUploading;
+  const messageSubmitHandler = isLarge
+    ? uploadMessageHandler
+    : createMessageHandler;
+
   return {
     isLoading,
-    uploadMessageHandler,
+    messageSubmitHandler,
   };
 };

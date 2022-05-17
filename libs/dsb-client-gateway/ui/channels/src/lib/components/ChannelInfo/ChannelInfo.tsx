@@ -47,6 +47,7 @@ export const ChannelInfo: FC<ChannelInfoProps> = ({ channel }) => {
                 key={role}
                 className={classes.subTitle}
                 variant="body2"
+                noWrap
               >
                 {role}
               </Typography>

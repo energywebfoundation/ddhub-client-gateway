@@ -19,6 +19,7 @@ interface TopicDetailsProps {
     value: string;
   }[];
   buttons: {
+    name: string,
     icon: React.ReactElement;
     onClick: () => void;
     wrapperClassName?: string;
@@ -56,6 +57,7 @@ export const TopicDetails: FC<TopicDetailsProps> = ({
             {buttons.map((button) => {
               return (
                 <IconButton
+                  key={button.name}
                   className={button.wrapperClassName}
                   onClick={button.onClick}
                 >

@@ -2,15 +2,16 @@ import { Button } from '@mui/material';
 import { useResetPrivateKeyEffects } from './ResetPrivateKey.effects';
 
 export function ResetPrivateKey() {
-  const {resetPrivateKeyHandler} = useResetPrivateKeyEffects()
+  const { resetPrivateKeyHandler } = useResetPrivateKeyEffects();
 
   return (
     <Button
       variant="contained"
       color="primary"
-      sx={{marginTop: '17px'}}
+      sx={{ marginTop: '17px' }}
       onClick={() => resetPrivateKeyHandler()}
-      fullWidth>
+      fullWidth
+    >
       Reset private key
     </Button>
   );

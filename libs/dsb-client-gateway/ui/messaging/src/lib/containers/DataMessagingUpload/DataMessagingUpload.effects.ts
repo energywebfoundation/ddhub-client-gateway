@@ -5,29 +5,46 @@ import {
   useUploadMessage,
   useTopicVersionHistory,
 } from '@dsb-client-gateway/ui/api-hooks';
+import { UpdateChannelDtoType } from '@dsb-client-gateway/dsb-client-gateway-api-client';
+import { DataMessagingUploadProps } from './DataMessagingUpload';
+import { TFileType } from '../UploadForm/UploadForm.types';
+import { TOption } from './DataMessagingUpload.types';
+import {
+  MIN_FILE_SIZE,
+  MAX_FILE_SIZE,
+  bytesToMegaBytes,
+  FileType,
+} from './DataMessagingUpload.utils';
 
-type TOption = {
-  label: string;
-  value: string;
-};
+export const useDataMessagingUploadEffects = ({
+  isLarge = false,
+}: DataMessagingUploadProps) => {
+  const [selectedChannel, setSelectedChannel] = useState<string>('');
+  const [selectedTopic, setSelectedTopic] = useState<string>('');
+  const [selectedTopicVersion, setSelectedTopicVersion] = useState<string>('');
+  const [selectedFile, setSelectedFile] = useState<File>();
 
-export const useDataMessagingUploadEffects = () => {
-  const { uploadMessageHandler, isLoading: isUploading } = useUploadMessage();
+  const { messageSubmitHandler, isLoading: isUploading } =
+    useUploadMessage(isLarge);
   const {
     channels,
     channelsByName,
     isLoading: channelsLoading,
   } = useChannels();
 
-  const [selectedChannel, setSelectedChannel] = useState<string>('');
-  const [selectedTopic, setSelectedTopic] = useState<string>('');
-  const [selectedFile, setSelectedFile] = useState<File>();
-  const [selectedTopicVersion, setSelectedTopicVersion] = useState<string>('');
+  const filteredChannels = channels.filter((channel) =>
+    isLarge
+      ? channel.type === UpdateChannelDtoType.upload
+      : channel.type === UpdateChannelDtoType.pub
+  );
 
-  const { topicHistory, isLoading: topicHistoryLoading } =
-    useTopicVersionHistory(selectedTopic);
+  const {
+    topicHistory,
+    topicHistoryByVersion,
+    isLoading: topicHistoryLoading,
+  } = useTopicVersionHistory(selectedTopic);
 
-  const channelOptions = channels.map((channel) => ({
+  const channelOptions = filteredChannels.map((channel) => ({
     label: channel.fqcn,
     value: channel.fqcn,
   }));
@@ -39,15 +56,32 @@ export const useDataMessagingUploadEffects = () => {
 
   const topics = channelsByName[selectedChannel]?.conditions?.topics ?? [];
   const topicsById = keyBy(topics, 'topicId');
+  const selectedTopicWithSchema = topicHistoryByVersion[selectedTopicVersion];
+
+  const topicInputValue = topicsById[selectedTopic]?.topicName ?? '';
+  const acceptedFiles = selectedFile ? [selectedFile] : [];
+  const uploadFileType = isLarge
+    ? FileType[selectedTopicWithSchema?.schemaType]
+    : ('json' as TFileType);
+  const maxFileSize = isLarge ? MAX_FILE_SIZE : MIN_FILE_SIZE;
+  const fileSizeInfo = isLarge
+    ? `${uploadFileType} file size between ${bytesToMegaBytes(
+        MIN_FILE_SIZE
+      )}mb and ${bytesToMegaBytes(MAX_FILE_SIZE)}mb.`
+    : `${uploadFileType} size ${bytesToMegaBytes(MIN_FILE_SIZE)}mb.`;
 
   const topicsOptions =
-    channelsByName[selectedChannel]?.conditions?.topics.map((topic) => ({
+    topics.map((topic) => ({
       label: topic.topicName,
       value: topic.topicId,
     })) || [];
 
   const onFileChange = (acceptedFiles: File[]) => {
-    setSelectedFile(acceptedFiles[0]);
+    const file = acceptedFiles[0];
+    if (isLarge && file.size < MIN_FILE_SIZE) {
+      return;
+    }
+    setSelectedFile(file);
   };
 
   const onChannelChange = (
@@ -55,6 +89,7 @@ export const useDataMessagingUploadEffects = () => {
     newInputValue: TOption
   ) => {
     if (newInputValue === null) {
+      setSelectedChannel('');
       setSelectedTopic('');
       setSelectedTopicVersion('');
     } else {
@@ -67,6 +102,7 @@ export const useDataMessagingUploadEffects = () => {
     newInputValue: TOption
   ) => {
     if (newInputValue === null) {
+      setSelectedTopic('');
       setSelectedTopicVersion('');
     } else {
       setSelectedTopic(newInputValue?.value);
@@ -87,19 +123,24 @@ export const useDataMessagingUploadEffects = () => {
     setSelectedFile(undefined);
   };
 
-  const submitHandler = () => {
-    uploadMessageHandler({
-      file: selectedFile as Blob,
-      fqcn: selectedChannel,
-      topicName: topicsById[selectedTopic]?.topicName,
-      topicOwner: topicsById[selectedTopic]?.owner,
-      topicVersion: selectedTopicVersion,
-    }, onUpload);
+  const submitHandler = async () => {
+    messageSubmitHandler(
+      {
+        file: selectedFile as Blob,
+        fqcn: selectedChannel,
+        topicName: topicsById[selectedTopic]?.topicName,
+        topicOwner: topicsById[selectedTopic]?.owner,
+        topicVersion: selectedTopicVersion,
+      },
+      onUpload
+    );
   };
 
-  const topicsFieldDisabled = topicsOptions.length === 0;
-  const topicVersionsFieldDisabled = topicHistoryOptions.length === 0;
-  const buttonDisabled = !selectedChannel || !selectedTopic || !selectedFile;
+  const buttonDisabled =
+    !selectedChannel ||
+    !selectedTopic ||
+    !selectedFile ||
+    !selectedTopicVersion;
 
   return {
     channelOptions,
@@ -108,18 +149,18 @@ export const useDataMessagingUploadEffects = () => {
     topicHistoryLoading,
     onChannelChange,
     onTopicChange,
-    topicsFieldDisabled,
     topicsOptions,
-    selectedTopic,
     selectedChannel,
     onFileChange,
     isUploading,
     submitHandler,
-    topicsById,
     buttonDisabled,
     selectedTopicVersion,
     onTopicVersionChange,
-    topicVersionsFieldDisabled,
-    selectedFile
+    acceptedFiles,
+    uploadFileType,
+    maxFileSize,
+    fileSizeInfo,
+    topicInputValue,
   };
 };

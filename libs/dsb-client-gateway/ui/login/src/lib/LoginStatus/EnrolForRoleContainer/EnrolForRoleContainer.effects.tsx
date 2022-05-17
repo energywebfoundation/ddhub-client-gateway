@@ -9,5 +9,5 @@ export const useEnrolForRoleEffects = () => {
     setIsEnrolRequested(true);
   };
 
-  return {isEnrolRequested, enrolmentHandler}
-}
+  return { isEnrolRequested, enrolmentHandler };
+};

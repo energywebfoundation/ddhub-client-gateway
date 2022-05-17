@@ -86,7 +86,7 @@ export const getTopicsControllerGetTopicHistoryByIdAndVersionMock = () => ({
   id: faker.datatype.uuid(),
   name: faker.word.noun(),
   owner: 'ddhub.apps.energyweb.iam.ewc',
-  schema: '{"data":"test"}',
+  schema: {"data":"test"},
   schemaType: faker.random.arrayElement(['JSD7', 'XML', 'CSV', 'TSV']),
   tags: [faker.word.noun()],
   version: '1.0.0',
@@ -108,6 +108,36 @@ export const getChannelControllerGetByTypeMock = () => [
       ],
     },
   },
+  {
+    fqcn: 'channel.name.2',
+    type: 'pub',
+    conditions: {
+      dids: ['did:ethr:volta:0x09Df5d33f1242E1b8aA5E0E0F6BfA687E6846993'],
+      roles: ['marketoperator.roles'],
+      topics: [
+        {
+          topicName: 'operatorEnvelope',
+          owner: 'ddhub.apps.energyweb.iam.ewc',
+          topicId: '622fed6e4258501225095046',
+        },
+      ],
+    },
+  },
+  {
+    fqcn: 'channel.name.3',
+    type: 'upload',
+    conditions: {
+      dids: ['did:ethr:volta:0x09Df5d33f1242E1b8aA5E0E0F6BfA687E6846993'],
+      roles: ['marketoperator.roles'],
+      topics: [
+        {
+          topicName: 'operatorEnvelope',
+          owner: 'ddhub.apps.energyweb.iam.ewc',
+          topicId: '622fed6e4258501225095047',
+        },
+      ],
+    },
+  }
 ];
 
 export const getChannelControllerGetMock = () => ({

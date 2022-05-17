@@ -40,6 +40,7 @@ export const useChannelTopicDetailsEffects = () => {
 
   const buttons = [
     {
+      name: 'download',
       icon: <Download className={classes.icon} />,
       onClick: exportSchema,
       wrapperClassName: classes.downloadIconButton

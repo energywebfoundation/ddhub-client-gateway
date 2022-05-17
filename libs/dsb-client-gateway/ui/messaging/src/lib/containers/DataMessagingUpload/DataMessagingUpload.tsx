@@ -5,7 +5,11 @@ import { UploadForm } from '../UploadForm';
 import { useDataMessagingUploadEffects } from './DataMessagingUpload.effects';
 import { useStyles } from './DataMessagingUpload.styles';
 
-export const DataMessagingUpload: FC = () => {
+export interface DataMessagingUploadProps {
+  isLarge?: boolean;
+}
+
+export const DataMessagingUpload: FC<DataMessagingUploadProps> = (props) => {
   const { classes, theme } = useStyles();
   const {
     topicHistoryOptions,
@@ -14,20 +18,20 @@ export const DataMessagingUpload: FC = () => {
     channelsLoading,
     onChannelChange,
     onTopicChange,
-    topicsFieldDisabled,
     topicsOptions,
-    selectedTopic,
     selectedChannel,
     onFileChange,
-    topicsById,
+    topicInputValue,
     submitHandler,
     isUploading,
     buttonDisabled,
     selectedTopicVersion,
     onTopicVersionChange,
-    topicVersionsFieldDisabled,
-    selectedFile,
-  } = useDataMessagingUploadEffects();
+    acceptedFiles,
+    uploadFileType,
+    maxFileSize,
+    fileSizeInfo,
+  } = useDataMessagingUploadEffects(props);
 
   return (
     <Box>
@@ -47,8 +51,7 @@ export const DataMessagingUpload: FC = () => {
           </Grid>
           <Grid item xs={6}>
             <Autocomplete
-              value={topicsById[selectedTopic]?.topicName ?? ''}
-              disabled={topicsFieldDisabled}
+              value={topicInputValue}
               options={topicsOptions}
               label="Topic name"
               placeholder="Topic name"
@@ -64,17 +67,19 @@ export const DataMessagingUpload: FC = () => {
         <Autocomplete
           value={selectedTopicVersion ?? ''}
           loading={topicHistoryLoading}
-          disabled={topicVersionsFieldDisabled}
           options={topicHistoryOptions}
           label="Schema version"
           placeholder="Select"
-          wrapperProps={{ flexGrow: 1, mb: 2.7, width: 266 }}
           className={classes.field}
           onChange={onTopicVersionChange}
+          wrapperProps={{ flexGrow: 1, mb: 2.7, width: 266 }}
         />
         <UploadForm
-          acceptedFiles={selectedFile ? [selectedFile] : []}
+          acceptedFileType={uploadFileType}
+          acceptedFiles={acceptedFiles}
           onFileChange={onFileChange}
+          maxFileSize={maxFileSize}
+          fileSizeInfo={fileSizeInfo}
           wrapperProps={{ mt: 3.8 }}
         />
         <Box display="flex" justifyContent="flex-end" mt={3.7}>
