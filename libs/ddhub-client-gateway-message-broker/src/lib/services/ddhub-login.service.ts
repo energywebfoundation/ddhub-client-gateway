@@ -6,11 +6,11 @@ import { TlsAgentService } from './tls-agent.service';
 import { Span } from 'nestjs-otel';
 import { RoleStatus } from '@dsb-client-gateway/dsb-client-gateway/identity/models';
 import promiseRetry from 'promise-retry';
-import { EnrolmentService } from '../../../../../apps/dsb-client-gateway-api/src/app/modules/enrolment/service/enrolment.service';
 import { SecretsEngineService } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
 import { IamService } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
 import { lastValueFrom } from 'rxjs';
 import { UnableToLoginException } from '../exceptions';
+import { EnrolmentService } from '@dsb-client-gateway/ddhub-client-gateway-enrolment';
 
 @Injectable()
 export class DdhubLoginService {

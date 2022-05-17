@@ -1,13 +1,16 @@
 import { Module } from '@nestjs/common';
-import { DidModule } from './modules/did/did.module';
 import { ConfigModule } from '@nestjs/config';
-import { SecretsEngineModule } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
 import { configValidate } from './utils/config.validate';
-import { IamModule } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
 import { DdhubClientGatewayTracingModule } from '@dsb-client-gateway/ddhub-client-gateway-tracing';
-import { DsbClientGatewayStorageModule } from '@dsb-client-gateway/dsb-client-gateway-storage';
 import { AppInitService } from './app-init.service';
 import { DdhubClientGatewayUtilsModule } from '@dsb-client-gateway/ddhub-client-gateway-utils';
+import { ScheduleModule } from '@nestjs/schedule';
+import { IamModule } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
+import { SecretsEngineModule } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
+import { KeysModule } from './modules/keys/keys.module';
+import { TopicModule } from './modules/topic/topic.module';
+import { DidModule } from './modules/did/did.module';
+import { StorageModule } from '../../../dsb-client-gateway-api/src/app/modules/storage/storage.module';
 
 @Module({
   imports: [
@@ -15,12 +18,15 @@ import { DdhubClientGatewayUtilsModule } from '@dsb-client-gateway/ddhub-client-
       isGlobal: true,
       validate: configValidate,
     }),
+    StorageModule,
     DdhubClientGatewayUtilsModule,
+    ScheduleModule.forRoot(),
     DdhubClientGatewayTracingModule.forRoot(),
-    DsbClientGatewayStorageModule,
     IamModule,
     DidModule,
     SecretsEngineModule,
+    TopicModule,
+    KeysModule,
   ],
   controllers: [],
   providers: [AppInitService],

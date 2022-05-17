@@ -2,6 +2,9 @@
   "version": 2,
   "projects": {
     "ddhub-client-gateway-did-auth": "libs/ddhub-client-gateway-did-auth",
+    "ddhub-client-gateway-encryption": "libs/ddhub-client-gateway-encryption",
+    "ddhub-client-gateway-enrolment": "libs/ddhub-client-gateway-enrolment",
+    "ddhub-client-gateway-identity": "libs/ddhub-client-gateway-identity",
     "ddhub-client-gateway-message-broker": "libs/ddhub-client-gateway-message-broker",
     "ddhub-client-gateway-tracing": "libs/ddhub-client-gateway-tracing",
     "ddhub-client-gateway-utils": "libs/ddhub-client-gateway-utils",

@@ -4,7 +4,7 @@ import { CreateChannelDto, TopicDto } from '../dto/request/create-channel.dto';
 import { ChannelNotFoundException } from '../exceptions/channel-not-found.exception';
 import { ChannelUpdateRestrictedFieldsException } from '../exceptions/channel-update-restricted-fields.exception';
 import { CommandBus } from '@nestjs/cqrs';
-import { ChannelQualifiedDids, TopicEntity } from '../channel.interface';
+import { ChannelQualifiedDids } from '../channel.interface';
 import { ChannelType } from '../channel.const';
 import { UpdateChannelDto } from '../dto/request/update-channel.dto';
 import { RefreshChannelCacheDataCommand } from '../command/refresh-channel-cache-data.command';
@@ -63,7 +63,6 @@ export class ChannelService {
         dids: payload.conditions.dids,
         roles: payload.conditions.roles,
         qualifiedDids: [],
-        topicsVersions: {},
       },
     });
 
@@ -72,22 +71,6 @@ export class ChannelService {
     await this.commandBus.execute(
       new RefreshChannelCacheDataCommand(payload.fqcn)
     );
-  }
-
-  @Span('channels_updateChannelTopic')
-  public async updateChannelTopic(
-    fqcn: string,
-    topicId: string,
-    topicVersions: TopicEntity[]
-  ): Promise<void> {
-    const channel: ChannelEntity = await this.getChannel(fqcn);
-
-    channel.conditions.topicsVersions = {
-      ...channel.conditions.topicsVersions,
-      [topicId]: topicVersions,
-    };
-
-    await this.wrapperRepository.channelRepository.update(fqcn, channel);
   }
 
   @Span('channels_updateQualifiedDids')

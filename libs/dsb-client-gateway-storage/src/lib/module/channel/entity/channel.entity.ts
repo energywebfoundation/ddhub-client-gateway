@@ -101,8 +101,6 @@ export class ChannelConditions {
   })
   topics: ChannelTopic[] = [];
 
-  topicsVersions: { [topicId: string]: any[] };
-
   @IsOptional()
   @IsString({
     each: true,

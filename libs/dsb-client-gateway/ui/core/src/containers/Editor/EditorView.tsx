@@ -10,19 +10,22 @@ interface EditorViewProps {
 
 export const EditorView: FC<EditorViewProps> = ({ value }) => {
   const { classes } = useStyles();
-  const { options } = useEditorEffects(false);
+  const { options, formatValue } = useEditorEffects({
+    showPlaceholder: false,
+  });
 
   return (
-    <Box height={132} sx={{ position: 'relative', width: '100%', pointerEvents: 'none' }}>
+    <Box
+      height={132}
+      sx={{ position: 'relative', width: '100%', pointerEvents: 'none' }}
+    >
       <Box className={classes.wrapper}>
         <MonacoEditor
           height="calc(100% - 19px)"
           theme="vs-dark"
           language="json"
           options={{ ...options, readOnly: true }}
-          defaultValue={
-            value ? JSON.stringify(JSON.parse(value), null, 2) : value
-          }
+          defaultValue={formatValue(value)}
           loading={
             <CircularProgress style={{ width: '25px', height: '25px' }} />
           }

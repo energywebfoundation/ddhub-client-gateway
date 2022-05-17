@@ -55,11 +55,13 @@ export const useViewTopicDetailsEffects = () => {
 
   const buttons = [
     {
+      name: 'download',
       icon: <Download className={classes.icon} />,
       onClick: exportSchema,
       wrapperClassName: classes.downloadIconButton
     },
     {
+      name: 'edit',
       icon: <Edit className={classes.icon} />,
       onClick: openUpdateTopic,
       wrapperClassName: classes.editIconButton

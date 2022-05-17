@@ -1,22 +1,12 @@
-import { forwardRef, Module } from '@nestjs/common';
-import { EnrolmentService } from './service/enrolment.service';
+import { Module } from '@nestjs/common';
 import { EnrolmentController } from './enrolment.controller';
-import { UtilsModule } from '../utils/utils.module';
-import { StorageModule } from '../storage/storage.module';
-import { IdentityModule } from '../identity/identity.module';
-import { ClaimListenerService } from './service/claim-listener.service';
-import { RoleListenerService } from './service/role-listener.service';
 import { EnrolmentRepositoryModule } from '@dsb-client-gateway/dsb-client-gateway-storage';
+import { DdhubClientGatewayEnrolmentModule } from '@dsb-client-gateway/ddhub-client-gateway-enrolment';
 
 @Module({
-  imports: [
-    UtilsModule,
-    StorageModule,
-    forwardRef(() => IdentityModule),
-    EnrolmentRepositoryModule,
-  ],
-  providers: [EnrolmentService, ClaimListenerService, RoleListenerService],
+  imports: [EnrolmentRepositoryModule, DdhubClientGatewayEnrolmentModule],
+  providers: [],
   controllers: [EnrolmentController],
-  exports: [EnrolmentService],
+  exports: [],
 })
 export class EnrolmentModule {}

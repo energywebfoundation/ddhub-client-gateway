@@ -40,6 +40,16 @@ export class ChannelConditions {
   roles: string[];
 
   @ApiProperty({
+    description: 'List of qualified dids',
+    example: [
+      'did:ethr:volta:0x09Df5d33f1242E1b8aA5E0E0F6BfA687E6846993',
+      'did:ethr:volta:0x3Ce3B60427b4Bf0Ce366d9963BeC5ef3CBD06ad5',
+    ],
+    type: [String],
+  })
+  qualifiedDids: string[];
+
+  @ApiProperty({
     description: 'Array of topics',
     type: () => [ChannelTopic],
   })
@@ -56,7 +66,12 @@ export class GetChannelResponseDto {
 
   @ApiProperty({
     description: 'Channel type',
-    enum: [ChannelType.SUB, ChannelType.PUB],
+    enum: [
+      ChannelType.SUB,
+      ChannelType.PUB,
+      ChannelType.DOWNLOAD,
+      ChannelType.UPLOAD,
+    ],
     example: 'sub',
   })
   type: ChannelType;

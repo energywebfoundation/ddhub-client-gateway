@@ -1,25 +1,11 @@
 import { Module } from '@nestjs/common';
-import { UtilsModule } from '../utils/utils.module';
-import { IdentityService } from './service/identity.service';
 import { IdentityController } from './identity.controller';
-import { StorageModule } from '../storage/storage.module';
-import { EnrolmentModule } from '../enrolment/enrolment.module';
-import { SecretsEngineModule } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
-import { IamInitService } from './service/iam-init.service';
-import { CqrsModule } from '@nestjs/cqrs';
-import { IdentityRepositoryModule } from '@dsb-client-gateway/dsb-client-gateway-storage';
+import { DdhubClientGatewayIdentityModule } from '@dsb-client-gateway/ddhub-client-gateway-identity';
 
 @Module({
-  imports: [
-    UtilsModule,
-    StorageModule,
-    SecretsEngineModule,
-    EnrolmentModule,
-    CqrsModule,
-    IdentityRepositoryModule,
-  ],
-  providers: [IdentityService, IamInitService],
+  imports: [DdhubClientGatewayIdentityModule],
+  providers: [],
   controllers: [IdentityController],
-  exports: [IdentityService, IamInitService],
+  exports: [],
 })
 export class IdentityModule {}
