@@ -23,5 +23,5 @@ export const routerConst = {
   DataMessagingFileUpload: '/messages/file-upload',
   DataMessagingFileDownload: '/messages/file-download',
   VersionHistory: `/applications/[${Queries.Namespace}]/[${Queries.TopicId}]/version-history`,
-  ChannelTopicVersionHistory: `/channels/[${Queries.Namespace}]/[${Queries.TopicId}]/version-history`,
+  ChannelTopicVersionHistory: `/channels/applications/[${Queries.Namespace}]/[${Queries.TopicId}]/version-history`,
 };

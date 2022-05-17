@@ -12,7 +12,7 @@ export default function Topics() {
       </Head>
 
       <main>
-        <TopicsContainer
+        <TopicsContainer readonly={true}
           versionHistoryUrl={routerConst.ChannelTopicVersionHistory}
         />
       </main>

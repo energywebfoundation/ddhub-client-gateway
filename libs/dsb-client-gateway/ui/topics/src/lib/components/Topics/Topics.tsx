@@ -7,12 +7,13 @@ import { useStyles } from "./Topics.styles";
 
 export interface TopicsProps {
   versionHistoryUrl: string;
+  readonly: boolean;
 }
 
-export const Topics: FC<TopicsProps> = ({versionHistoryUrl}: TopicsProps) => {
+export const Topics: FC<TopicsProps> = ({versionHistoryUrl, readonly}: TopicsProps) => {
   const { classes } = useStyles();
   const { openCreateTopic, topics, actions, topicsFetched, handleRowClick } =
-    useTopicsEffects(versionHistoryUrl);
+    useTopicsEffects(versionHistoryUrl, readonly);
 
   return (
     <section className={classes.table}>
@@ -23,7 +24,7 @@ export const Topics: FC<TopicsProps> = ({versionHistoryUrl}: TopicsProps) => {
         onRowClick={handleRowClick}
         loading={!topicsFetched}
       >
-        <CreateButton onCreate={openCreateTopic} />
+        {!readonly && <CreateButton onCreate={openCreateTopic} />}
       </GenericTable>
     </section>
   );

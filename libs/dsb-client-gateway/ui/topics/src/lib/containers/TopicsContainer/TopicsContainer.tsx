@@ -6,14 +6,16 @@ import { routerConst } from '@dsb-client-gateway/ui/utils';
 
 export interface TopicsContainerProps {
   versionHistoryUrl?: string;
+  readonly?: boolean;
 }
 
 export const TopicsContainer: FC<TopicsContainerProps> = ({
   versionHistoryUrl = routerConst.VersionHistory,
+  readonly = false,
 }: TopicsContainerProps) => {
   return (
     <TopicsModalsProvider>
-      <Topics versionHistoryUrl={versionHistoryUrl} />
+      <Topics readonly={readonly} versionHistoryUrl={versionHistoryUrl} />
       <TopicsModalsCenter />
     </TopicsModalsProvider>
   );
