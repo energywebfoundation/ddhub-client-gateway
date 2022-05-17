@@ -58,6 +58,7 @@ export class ChannelService {
     await this.wrapperRepository.channelRepository.save({
       fqcn: payload.fqcn,
       type: payload.type,
+      payloadEncryption: payload.payloadEncryption,
       conditions: {
         topics: topicsWithIds,
         dids: payload.conditions.dids,
@@ -153,6 +154,9 @@ export class ChannelService {
     const topicsWithIds: ChannelTopic[] = await this.getTopicsWithIds(
       dto.conditions.topics
     );
+
+    channel.payloadEncryption =
+      dto.payloadEncryption ?? channel.payloadEncryption;
 
     channel.conditions = {
       ...channel.conditions,
