@@ -7,11 +7,11 @@ import {
 } from '@ddhub-client-gateway-frontend/ui/api-hooks';
 import { Queries, didFormatMinifier } from '@ddhub-client-gateway-frontend/ui/utils';
 import { TTableComponentAction } from '@ddhub-client-gateway-frontend/ui/core';
-import { TMessage } from './Message.type';
-import { FileContentType } from './Message.utils';
-import { MessageProps } from './Message';
+import { TMessage } from './Messages.type';
+import { FileContentType } from './Messages.utils';
+import { MessageProps } from './Messages';
 
-export const useMessageEffects = ({ isLarge = false }: MessageProps) => {
+export const useMessagesEffects = ({ isLarge = false }: MessageProps) => {
   const router = useRouter();
   const { identity } = useIdentity();
 
@@ -25,7 +25,7 @@ export const useMessageEffects = ({ isLarge = false }: MessageProps) => {
     fqcn: router.query[Queries.FQCN] as string,
     topicName: topic?.topicName,
     topicOwner: topic?.owner,
-    clientId: `${identity?.enrolment?.did}-${dayjs().format('YYYY-MM-DD HH:mm')}`
+    clientId: `${identity?.enrolment?.did}-${dayjs().format('YYYY-MM-DD HH:mm:ss')}`
   });
 
   const loading = !messagesLoaded;

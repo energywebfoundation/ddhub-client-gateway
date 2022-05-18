@@ -79,4 +79,15 @@ export const mapUrlToBreadcrumbs = new Map<string, Breadcrumb[]>()
   .set(routerConst.DataMessagingFileUpload, [
     { title: 'Data messaging file upload' },
     { title: 'Data messaging file upload' },
+  ])
+  .set(routerConst.FileDownloadChannel, [
+    { title: 'Data messaging file upload' },
+    { title: 'Data messaging file upload' },
+    { title: 'Channel topics' },
+  ])
+  .set(routerConst.FileDownloadChannelTopic, [
+    { title: 'Data messaging file upload' },
+    { title: 'Data messaging file upload' },
+    { title: 'Channel topics' },
+    { title: 'Messages' },
   ]);

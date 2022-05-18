@@ -4,8 +4,12 @@ import { Stack, Box } from '@mui/material';
 import { ChannelTopic } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { useChannel } from '@ddhub-client-gateway-frontend/ui/api-hooks';
 import { GenericTable } from '@ddhub-client-gateway-frontend/ui/core';
-import { Queries, routerConst } from '@ddhub-client-gateway-frontend/ui/utils';
+import { Queries } from '@ddhub-client-gateway-frontend/ui/utils';
 import { ChannelInfo } from '../../components/ChannelInfo';
+
+interface ChannelProps {
+  topicsUrl: string;
+}
 
 export const CHANNEL_TOPICS_HEADERS = [
   {
@@ -14,13 +18,13 @@ export const CHANNEL_TOPICS_HEADERS = [
   },
 ];
 
-export const Channel: FC = () => {
+export const Channel: FC<ChannelProps> = ({ topicsUrl }) => {
   const router = useRouter();
   const { channel, channelLoaded } = useChannel(router.query[Queries.FQCN] as string);
 
   const navigateToMessages = (data: ChannelTopic) => {
     router.push({
-      pathname: routerConst.LargeFileDownloadChannelTopic,
+      pathname: topicsUrl,
       query: {
         fqcn: router.query[Queries.FQCN] as string,
         topicId: data.topicId,

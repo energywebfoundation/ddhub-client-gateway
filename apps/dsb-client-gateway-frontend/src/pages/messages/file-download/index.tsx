@@ -5,8 +5,8 @@ import { routerConst } from '@ddhub-client-gateway-frontend/ui/utils';
 export default function LargeFileDownload() {
   return (
     <DataMessagingDownload
-      channelUrl={routerConst.LargeFileDownloadChannel}
-      channelType={GetChannelResponseDtoType.download}
+      channelUrl={routerConst.FileDownloadChannel}
+      channelType={GetChannelResponseDtoType.sub}
     />
   );
 }

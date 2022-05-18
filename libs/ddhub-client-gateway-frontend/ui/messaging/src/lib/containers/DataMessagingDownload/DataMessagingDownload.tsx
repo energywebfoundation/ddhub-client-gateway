@@ -1,10 +1,12 @@
 import { FC } from "react";
 import { Box } from "@mui/material";
+import { GetChannelResponseDtoType } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { GenericTable, TableHeader } from "@ddhub-client-gateway-frontend/ui/core";
 import { useDataMessagingDownloadEffects } from "./DataMessagingDownload.effects";
 
 export interface DataMessagingDownloadProps {
-  isLarge?: boolean;
+  channelType: GetChannelResponseDtoType;
+  channelUrl: string;
 }
 
 const headers: TableHeader[] = [
