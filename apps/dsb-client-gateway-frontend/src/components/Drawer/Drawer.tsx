@@ -9,7 +9,7 @@ import {
   Layers,
   Settings,
 } from 'react-feather';
-import { routerConst } from '@dsb-client-gateway/ui/utils';
+import { routerConst } from '@ddhub-client-gateway-frontend/ui/utils';
 import { useStyles } from './Drawer.styles';
 import { CollapsableMenu } from './CollapsableMenu/CollapsableMenu';
 import { MenuItem } from './MenuItem/MenuItem';

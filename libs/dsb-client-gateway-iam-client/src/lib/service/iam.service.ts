@@ -12,7 +12,7 @@ import { IAppDefinition } from '@energyweb/credential-governance';
 import { IamFactoryService } from './iam-factory.service';
 import { ConfigService } from '@nestjs/config';
 import { ApplicationDTO, Claim } from '../iam.interface';
-import { RoleStatus } from '@dsb-client-gateway/dsb-client-gateway/identity/models';
+import { RoleStatus } from '@ddhub-client-gateway/identity/models';
 import { Span } from 'nestjs-otel';
 import promiseRetry from 'promise-retry';
 import { Encoding, PubKeyType } from '@ew-did-registry/did-resolver-interface';
