@@ -51,8 +51,8 @@ export const Drawer = () => {
         <CollapsableMenu
           menuTitle="Channels"
           subMenu={[
-            { title: 'My apps and topics', href: routerConst.MyAppsAndTopics },
-            { title: 'Channel management', href: routerConst.Channels },
+            { title: 'My apps and topics', href: routerConst.ChannelApps },
+            { title: 'Channel management', href: routerConst.ChannelsManagement },
           ]}
           menuIcon={<Command className={classes.icon} size={18} />}
         />

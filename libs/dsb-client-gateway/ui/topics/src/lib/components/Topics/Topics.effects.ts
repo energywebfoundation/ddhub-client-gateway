@@ -1,19 +1,22 @@
 import { useRouter } from 'next/router';
 import {
-  useTopicsModalsDispatch,
   TopicsModalsActionsEnum,
+  useTopicsModalsDispatch,
 } from '../../context';
 import {
-  useTopics,
   useCachedApplications,
   useRemoveTopic,
+  useTopics,
 } from '@dsb-client-gateway/ui/api-hooks';
 import { TTableComponentAction } from '@dsb-client-gateway/ui/core';
 import { GetTopicDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
-import { routerConst, Queries } from '@dsb-client-gateway/ui/utils';
+import { Queries } from '@dsb-client-gateway/ui/utils';
 import { useStyles } from './Topics.styles';
 
-export const useTopicsEffects = () => {
+export const useTopicsEffects = (
+  versionHistoryUrl: string,
+  readonly: boolean
+) => {
   const { theme } = useStyles();
   const router = useRouter();
 
@@ -62,30 +65,39 @@ export const useTopicsEffects = () => {
 
   const navigateToVersionHistory = (data: GetTopicDto) => {
     router.push({
-      pathname: routerConst.VersionHistory,
+      pathname: versionHistoryUrl,
       query: { namespace: data.owner, topicId: data.id },
     });
-  }
+  };
 
   const actions: TTableComponentAction<GetTopicDto>[] = [
     {
       label: 'View details',
-      onClick: (topic: GetTopicDto) => openTopicDetails(topic)
+      readonly: true,
+      onClick: (topic: GetTopicDto) => openTopicDetails(topic),
     },
     {
       label: 'Update',
+      readonly: false,
       onClick: (topic: GetTopicDto) => openUpdateTopic(topic),
     },
     {
       label: 'View version history',
-      onClick: (topic: GetTopicDto) => navigateToVersionHistory(topic)
+      readonly: true,
+      onClick: (topic: GetTopicDto) => navigateToVersionHistory(topic),
     },
     {
       label: 'Remove',
+      readonly: false,
       color: theme.palette.error.main,
       onClick: async (topic: GetTopicDto) => removeTopicHandler(topic.id),
     },
-  ];
+  ].filter((action) => {
+    if (readonly) {
+      return action.readonly;
+    }
+    return true;
+  });
 
   const handleRowClick = (topic: GetTopicDto) => openTopicDetails(topic);
 

@@ -1,13 +1,21 @@
 import { BreadcrumbsType, mapUrlToBreadcrumbs } from './map-url-to-breadcrumbs';
 import { useCachedApplications } from '@dsb-client-gateway/ui/api-hooks';
-import { Queries } from '@dsb-client-gateway/ui/utils';
+import { Queries, routerConst } from '@dsb-client-gateway/ui/utils';
 import { useRouter } from 'next/router';
 
 type TBreadcrumbs = { title: string; imageUrl?: string }[];
 
 export const useBreadcrumbsEffects = (): TBreadcrumbs => {
   const router = useRouter();
-  const { applicationsByNamespace } = useCachedApplications();
+
+  const getUsedRoleForApplication = router.pathname.includes(
+    routerConst.Channels
+  )
+    ? 'user'
+    : undefined;
+  const { applicationsByNamespace } = useCachedApplications(
+    getUsedRoleForApplication
+  );
 
   const pathName = router.pathname;
 
