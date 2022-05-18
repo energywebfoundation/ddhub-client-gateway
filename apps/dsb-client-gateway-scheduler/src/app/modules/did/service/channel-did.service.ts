@@ -11,6 +11,7 @@ import { DdhubDidService } from '@dsb-client-gateway/ddhub-client-gateway-messag
 import { SchedulerRegistry } from '@nestjs/schedule';
 import { CronJob } from 'cron';
 import { Span } from 'nestjs-otel';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class ChannelDidService implements OnApplicationBootstrap {
@@ -21,15 +22,30 @@ export class ChannelDidService implements OnApplicationBootstrap {
     protected readonly iamService: IamService,
     protected readonly ddhubDidService: DdhubDidService,
     protected readonly schedulerRegistry: SchedulerRegistry,
-    protected readonly cronWrapper: CronWrapperRepository
+    protected readonly cronWrapper: CronWrapperRepository,
+    protected readonly configService: ConfigService
   ) {}
 
   public async onApplicationBootstrap(): Promise<void> {
-    const cronJob = new CronJob(`*/1 * * * *`, async () => {
-      this.logger.log(`Executing channel DID refresh `);
+    const isCronEnabled: boolean = this.configService.get<boolean>(
+      'CHANNEL_DID_CRON_ENABLED',
+      true
+    );
 
-      await this.refreshChannelDids();
-    });
+    if (!isCronEnabled) {
+      this.logger.warn(`Channel did cron job is disabled`);
+
+      return;
+    }
+
+    const cronJob = new CronJob(
+      this.configService.get<string>('CHANNEL_DID_CRON_SCHEDULE'),
+      async () => {
+        this.logger.log(`Executing channel DID refresh`);
+
+        await this.refreshChannelDids();
+      }
+    );
 
     await this.schedulerRegistry.addCronJob(CronJobType.CHANNEL_ROLES, cronJob);
 

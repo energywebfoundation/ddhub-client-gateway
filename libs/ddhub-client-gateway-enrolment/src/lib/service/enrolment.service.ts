@@ -2,7 +2,7 @@ import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import {
   Role,
   RoleStatus,
-} from '@dsb-client-gateway/dsb-client-gateway/identity/models';
+} from '@ddhub-client-gateway/identity/models';
 import {
   Claim,
   IamService,

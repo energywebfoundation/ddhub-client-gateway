@@ -1,5 +1,5 @@
 import Head from 'next/head';
-import { TopicsContainer } from '@dsb-client-gateway/ui/topics';
+import { TopicsContainer } from '@ddhub-client-gateway-frontend/ui/topics';
 
 export default function Topics() {
 

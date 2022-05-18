@@ -1,0 +1,27 @@
+{
+  "root": "libs/ddhub-client-gateway-frontend/identity/models",
+  "sourceRoot": "libs/ddhub-client-gateway-frontend/identity/models/src",
+  "projectType": "library",
+  "targets": {
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": [
+          "libs/ddhub-client-gateway-frontend/identity/models/**/*.ts"
+        ]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": [
+        "coverage/libs/ddhub-client-gateway-frontend/identity/models"
+      ],
+      "options": {
+        "jestConfig": "libs/ddhub-client-gateway-frontend/identity/models/jest.config.js",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": []
+}

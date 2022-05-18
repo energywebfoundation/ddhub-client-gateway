@@ -1,5 +1,6 @@
 import { IsString } from 'class-validator';
 import {
+  Column,
   CreateDateColumn,
   Entity,
   PrimaryColumn,
@@ -13,9 +14,15 @@ export class DidEntity {
   did: string;
 
   @IsString()
+  @Column({
+    default: null,
+  })
   publicRSAKey: string;
 
   @IsString()
+  @Column({
+    default: null,
+  })
   publicSignatureKey: string;
 
   @CreateDateColumn()

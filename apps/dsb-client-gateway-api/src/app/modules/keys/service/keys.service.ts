@@ -10,7 +10,7 @@ import {
   recoverPublicKey,
   SigningKey,
 } from 'ethers/lib/utils';
-import { BalanceState } from '@dsb-client-gateway/dsb-client-gateway/identity/models';
+import { BalanceState } from '@ddhub-client-gateway/identity/models';
 import { Span } from 'nestjs-otel';
 import {
   DidEntity,
@@ -318,18 +318,25 @@ export class KeysService implements OnModuleInit {
       const randomString = crypto.randomBytes(20).toString('hex');
       const privateKey = await this.secretsEngineService.getRSAPrivateKey();
 
-      const encryptedSymmetricKey = await this.encryptSymmetricKey(
-        randomString,
-        didAddress
-      );
-      const decryptedSymmetricKey = this.decryptSymmetricKey(
-        privateKey,
-        encryptedSymmetricKey,
-        walletPrivateKey
-      );
+      try {
+        const encryptedSymmetricKey = await this.encryptSymmetricKey(
+          randomString,
+          didAddress
+        );
+        const decryptedSymmetricKey = this.decryptSymmetricKey(
+          privateKey,
+          encryptedSymmetricKey,
+          walletPrivateKey
+        );
 
-      if (randomString === decryptedSymmetricKey) {
-        return;
+        if (randomString === decryptedSymmetricKey) {
+          return;
+        }
+      } catch (e) {
+        this.logger.error(
+          'something is wrong with private RSA key, creating new one',
+          e
+        );
       }
 
       this.logger.error(

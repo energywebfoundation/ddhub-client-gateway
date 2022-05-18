@@ -12,10 +12,10 @@ import { IAppDefinition } from '@energyweb/credential-governance';
 import { IamFactoryService } from './iam-factory.service';
 import { ConfigService } from '@nestjs/config';
 import { ApplicationDTO, Claim } from '../iam.interface';
-import { RoleStatus } from '@dsb-client-gateway/dsb-client-gateway/identity/models';
+import { RoleStatus } from '@ddhub-client-gateway/identity/models';
 import { Span } from 'nestjs-otel';
 import promiseRetry from 'promise-retry';
-import { Encoding } from '@ew-did-registry/did-resolver-interface';
+import { Encoding, PubKeyType } from '@ew-did-registry/did-resolver-interface';
 import { KeyType } from '@ew-did-registry/keys';
 import { RetryConfigService } from '@dsb-client-gateway/ddhub-client-gateway-utils';
 
@@ -101,7 +101,7 @@ export class IamService {
             did: this.getDIDAddress(),
             didAttribute: DIDAttribute.PublicKey,
             data: {
-              type: DIDAttribute.PublicKey,
+              type: PubKeyType.VerificationKey2018,
               encoding: Encoding.HEX,
               algo: KeyType.RSA,
               value: {

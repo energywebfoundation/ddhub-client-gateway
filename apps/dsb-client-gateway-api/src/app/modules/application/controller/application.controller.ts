@@ -1,15 +1,15 @@
-import { Controller, Get, UseGuards, HttpStatus, Query } from '@nestjs/common';
+import { Controller, Get, HttpStatus, Query, UseGuards } from '@nestjs/common';
 import { DigestGuard } from '../../utils/guards/digest.guard';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
-import { GetApplicationsQueryDto, ApplicationDTO } from '../dto';
-import { TopicService } from '../service/topic.service';
+import { ApplicationDTO, GetApplicationsQueryDto } from '../dto';
+import { ApplicationsService } from '../service/applications.service';
 
 @Controller('applications')
 @ApiTags('Applications')
 @UseGuards(DigestGuard)
 export class ApplicationsController {
-  constructor(protected readonly topicService: TopicService) {}
+  constructor(protected readonly topicService: ApplicationsService) {}
 
   @Get('')
   @ApiOperation({

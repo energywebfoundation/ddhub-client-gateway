@@ -1,5 +1,6 @@
 import {
   ArrayUnique,
+  IsBoolean,
   IsEnum,
   IsOptional,
   IsString,
@@ -84,6 +85,14 @@ export class UpdateChannelDto {
     example: 'sub',
   })
   type: ChannelType;
+
+  @ApiProperty({
+    description: 'Channel encryption',
+    type: Boolean,
+    example: true,
+  })
+  @IsBoolean()
+  payloadEncryption: boolean;
 
   @ValidateNested()
   @IsOptional()

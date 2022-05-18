@@ -106,6 +106,54 @@ export class EnvironmentVariables {
   OTEL_ENVIRONMENT = 'local';
 
   @IsString()
+  APPLICATION_CRON_SCHEDULE = '*/1 * * * *';
+
+  @IsBoolean()
+  @Transform(EnvironmentVariables.transformBoolean('APPLICATION_CRON_ENABLED'))
+  APPLICATION_CRON_ENABLED = true;
+
+  @IsString()
+  CHANNEL_DID_CRON_SCHEDULE = '*/1 * * * *';
+
+  @IsBoolean()
+  @Transform(EnvironmentVariables.transformBoolean('CHANNEL_DID_CRON_ENABLED'))
+  CHANNEL_DID_CRON_ENABLED = true;
+
+  @IsString()
+  SYMMETRIC_KEYS_CRON_SCHEDULE = '*/1 * * * *';
+
+  @IsBoolean()
+  @Transform(
+    EnvironmentVariables.transformBoolean('SYMMETRIC_KEYS_CRON_ENABLED')
+  )
+  SYMMETRIC_KEYS_CRON_ENABLED = true;
+
+  @IsString()
+  TOPICS_CRON_SCHEDULE = '*/1 * * * *';
+
+  @IsBoolean()
+  @Transform(EnvironmentVariables.transformBoolean('TOPICS_CRON_ENABLED'))
+  TOPICS_CRON_ENABLED = true;
+
+  @IsString()
+  PRIVATE_KEY_CRON_SCHEDULE = '*/11 * * * *';
+
+  @IsBoolean()
+  @Transform(EnvironmentVariables.transformBoolean('PRIVATE_KEY_CRON_ENABLED'))
+  PRIVATE_KEY_CRON_ENABLED = true;
+
+  @IsString()
+  HEARTBEAT_CRON_SCHEDULE = '30 * * * * *';
+
+  @IsBoolean()
+  @Transform(EnvironmentVariables.transformBoolean('HEARTBEAT_CRON_ENABLED'))
+  HEARTBEAT_CRON_ENABLED = true;
+
+  @IsBoolean()
+  @Transform(EnvironmentVariables.transformBoolean('TOPICS_CRON_ENABLED'))
+  DID_LISTENER_ENABLED = true;
+
+  @IsString()
   DB_NAME = 'local.db';
 
   static isOTELEnabled(values: EnvironmentVariables): boolean {
