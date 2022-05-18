@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { ApplicationEntity } from '@dsb-client-gateway/dsb-client-gateway-storage';
 
 export class GetApplicationsQueryDto {
   @IsNotEmpty()
@@ -11,7 +12,7 @@ export class GetApplicationsQueryDto {
   public roleName: string;
 }
 
-export class ApplicationDTO {
+export class ApplicationDTO implements ApplicationEntity {
   @IsString()
   @ApiProperty({
     description: 'app Name',
@@ -46,6 +47,22 @@ export class ApplicationDTO {
     example: 'description',
   })
   public description?: string;
+
+  @IsString()
+  @ApiProperty({
+    description: 'When application got stored in cache',
+    type: String,
+    example: '2022-05-18T11:19:07.000Z',
+  })
+  public createdDate: Date;
+
+  @IsString()
+  @ApiProperty({
+    description: 'When application got stored in cache',
+    type: String,
+    example: '2022-05-18T11:19:07.000Z',
+  })
+  public updatedDate: Date;
 
   @IsString()
   @IsOptional()

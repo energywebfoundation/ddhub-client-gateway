@@ -14,27 +14,27 @@ export class ApplicationEntity {
   @Column({
     nullable: true,
   })
-  public logoUrl: string | null;
+  public logoUrl?: string | null;
 
   @Column({
     nullable: true,
   })
-  public websiteUrl: string | null;
+  public websiteUrl?: string | null;
 
   @Column({
     nullable: true,
   })
-  public description: string | null;
+  public description?: string | null;
 
   @Column({
     nullable: true,
   })
-  public namespace: string | null;
+  public namespace?: string | null;
 
   @Column({
     nullable: true,
   })
-  public topicsCount: number | null;
+  public topicsCount?: number | null;
 
   @CreateDateColumn()
   createdDate!: Date;
