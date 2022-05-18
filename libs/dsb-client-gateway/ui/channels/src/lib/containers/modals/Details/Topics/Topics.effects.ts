@@ -8,7 +8,7 @@ export const useTopicsEffects = () => {
   const navigateToVersionHistory = (data: ChannelTopic) => {
     router.push({
       pathname: routerConst.ChannelTopicVersionHistory,
-      query: { owner: data.owner, topicId: data.topicId },
+      query: { namespace: data.owner, topicId: data.topicId },
     });
   };
 

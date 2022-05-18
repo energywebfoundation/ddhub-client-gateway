@@ -11,7 +11,7 @@ export const useTopicVersionHistoryEffects = () => {
   const router = useRouter();
   const dispatch = useModalDispatch();
   const topicId = router.query[Queries.TopicId] as string;
-  const applicationNamespace = router.query[Queries.Owner] as string;
+  const applicationNamespace = router.query[Queries.Namespace] as string;
   // TODO: add useApplication
   const { applicationsByNamespace, applicationsFetched } =
     useApplications('user');
