@@ -280,6 +280,7 @@ export class MessageService {
           topicName: topicFromCache.name,
           topicOwner: topicFromCache.owner,
           topicVersion: message.topicVersion,
+          topicSchemaType: topicFromCache.schemaType,
           payload: message.payload,
           signature: message.signature,
           sender: message.senderDid,
