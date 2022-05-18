@@ -4,11 +4,24 @@ import { DidAttributeChangedHandler } from './handler/did-attribute-changed.hand
 import { DidListenerService } from './service/did-listener.service';
 import {
   ChannelRepositoryModule,
+  CronRepositoryModule,
   DidRepositoryModule,
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
+import { ChannelDidService } from './service/channel-did.service';
+import { DdhubClientGatewayMessageBrokerModule } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
 
 @Module({
-  imports: [DidRegistryModule, DidRepositoryModule, ChannelRepositoryModule],
-  providers: [DidAttributeChangedHandler, DidListenerService],
+  imports: [
+    DidRegistryModule,
+    DidRepositoryModule,
+    ChannelRepositoryModule,
+    CronRepositoryModule,
+    DdhubClientGatewayMessageBrokerModule.forRootAsync(),
+  ],
+  providers: [
+    DidAttributeChangedHandler,
+    DidListenerService,
+    ChannelDidService,
+  ],
 })
 export class DidModule {}

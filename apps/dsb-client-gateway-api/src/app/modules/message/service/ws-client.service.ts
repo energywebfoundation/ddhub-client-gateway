@@ -1,19 +1,20 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import ReconnectingWebSocket from 'reconnecting-websocket';
+import WebSocket from 'ws';
 import { WebSocketImplementation } from '../message.const';
-import {
-  client as WsClient,
-  connection as WsClientConnection,
-} from 'websocket';
+import { MessageService } from './message.service';
 
 @Injectable()
 export class WsClientService implements OnModuleInit {
   private readonly logger = new Logger(WsClientService.name);
-  private ws: WsClient;
-  private connection: WsClientConnection;
-  private retryCount = 0;
+  public rws: ReconnectingWebSocket;
 
-  constructor(protected readonly configService: ConfigService) {}
+  constructor(
+    protected readonly configService: ConfigService,
+    @Inject(forwardRef(() => MessageService))
+    protected readonly messageService: MessageService
+  ) { }
 
   public async onModuleInit(): Promise<void> {
     const websocketMode = this.configService.get(
@@ -21,7 +22,7 @@ export class WsClientService implements OnModuleInit {
       WebSocketImplementation.NONE
     );
 
-    if (websocketMode === WebSocketImplementation.NONE) {
+    if (websocketMode !== WebSocketImplementation.CLIENT) {
       this.logger.log(`Websockets are disabled, client is disabled`);
 
       return;
@@ -40,88 +41,46 @@ export class WsClientService implements OnModuleInit {
     await this.connect();
   }
 
-  private async connect(): Promise<void> {
+  public async connect(): Promise<void> {
     const wsUrl: string = this.configService.get<string>('WEBSOCKET_URL');
-    const protocol: string =
-      this.configService.get<string>('WEBSOCKET_PROTOCOL');
-
     return new Promise((resolve, reject) => {
-      const ws: WsClient = new WsClient();
-
-      ws.on('connectFailed', reject);
-      ws.on('connect', (connection) => {
-        this.ws = ws;
-        resolve();
-      });
       try {
-        ws.connect(wsUrl, protocol);
+        if (this.rws === undefined) {
+          const options = {
+            WebSocket: WebSocket, // custom WebSocket constructor
+            connectionTimeout: this.configService.get<number>('WEBSOCKET_RECONNECT_TIMEOUT'),
+          };
+          const _ws = new ReconnectingWebSocket(wsUrl, [], options);
+          _ws.addEventListener('open', () => {
+            if (this.rws === undefined) {
+              this.rws = _ws;
+              this.logger.log(`Websockets are connected`);
+            } else {
+              this.logger.log(`Websockets are re-connected`);
+            }
+
+            _ws.addEventListener('message', (event) => {
+              this.logger.log(`${wsUrl} ${JSON.stringify(event.data)}`);
+              this.messageService.sendMessage(event.data).then((response) => {
+                _ws.send(JSON.stringify(response));
+              }).catch((ex) => {
+                this.logger.error(`${wsUrl} ${JSON.stringify(ex.response)}`);
+                _ws.send(JSON.stringify(ex.response));
+              });
+            });
+
+            resolve();
+          });
+          _ws.addEventListener('close', () => {
+            resolve();
+          });
+        } else {
+          resolve();
+        }
+
       } catch (err) {
         reject(err);
       }
     });
-  }
-
-  private async reconnect(reason?: {
-    err: string;
-    code?: number;
-  }): Promise<void> {
-    if (!this.canReconnect()) {
-      return;
-    }
-    if (reason) {
-      this.logger.log('WebSocket Client error:', reason.code, reason.err);
-    }
-    this.logger.log(
-      `WebSocket Client attempting reconnect [${this.retryCount}]...`
-    );
-
-    const reconnectTimeout: number = this.configService.get<number>(
-      'WEBSOCKET_RECONNECT_TIMEOUT',
-      10000
-    );
-
-    const wsUrl: string = this.configService.get<string>('WEBSOCKET_URL');
-    const protocol: string =
-      this.configService.get<string>('WEBSOCKET_PROTOCOL');
-
-    return new Promise((resolve) => {
-      this.ws.on('connectFailed', (err) => {
-        console.log('WebSocket Client failed to reconnect:', err.message);
-        this.reconnect();
-      });
-      this.ws.on('connect', (connection) => {
-        this.update(connection);
-        resolve();
-      });
-      const timeout = reconnectTimeout ?? 10 * 1000;
-      setTimeout(() => {
-        this.ws.connect(wsUrl, protocol);
-        this.retryCount += 1;
-      }, timeout);
-    });
-  }
-
-  private update(connection: WsClientConnection) {
-    this.retryCount = 0;
-    this.connection = connection;
-  }
-
-  private canReconnect(): boolean {
-    const canReconnect: boolean = this.configService.get<boolean>(
-      'WEBSOCKET_RECONNECT',
-      true
-    );
-
-    if (!canReconnect) {
-      return false;
-    }
-
-    const reconnectMaxRetries: number = this.configService.get<number>(
-      'WEBSOCKET_RECONNECT_MAX_RETRIES',
-      10
-    );
-
-    const maxRetries = reconnectMaxRetries ?? 10;
-    return this.retryCount < maxRetries;
   }
 }

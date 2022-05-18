@@ -311,6 +311,10 @@ export class GetMessagesQueryDto {
 
 export class GetTopicsCountQueryDto {
   @IsNotEmpty()
+  @IsValidApplicationNameSpace(new ConfigService(), {
+    message: 'Malformed owner name. Please enter correct owner name',
+    each: true,
+  })
   @ApiProperty({
     example: [
       'torta.apps.eggplant.vege.iam.ewc',
@@ -407,7 +411,7 @@ export class PaginatedResponse {
     type: Number,
     example: 1,
   })
-  public total: number;
+  public count: number;
 
   @ApiProperty({
     description: 'limit of channels',
@@ -440,7 +444,7 @@ export class PaginatedSearchTopicResponse {
     type: Number,
     example: 1,
   })
-  public total: number;
+  public count: number;
 
   @ApiProperty({
     description: 'limit of channels',

@@ -5,7 +5,7 @@ import { FormSelectOption } from '../FormSelect';
 export const useSelectAutocompleteEffects = (
   onChange: (newValue: FormSelectOption[]) => void,
   field: GenericFormField,
-  currentValue: FormSelectOption[]
+  currentValue: FormSelectOption[] = []
 ) => {
   const [textValue, setTextValue] = useState<string>('');
 
@@ -41,7 +41,7 @@ export const useSelectAutocompleteEffects = (
   };
 
   const onBlur = (event: any) => {
-    add(event.target.value);
+    event.target.value && add(event.target.value);
   }
 
   const options = field.options || [];

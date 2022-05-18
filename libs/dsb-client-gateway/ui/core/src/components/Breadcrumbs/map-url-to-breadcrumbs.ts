@@ -24,13 +24,25 @@ export const mapUrlToBreadcrumbs = new Map<string, Breadcrumb[]>()
     { title: 'Apps and Topics' },
     { title: 'Topics' },
   ])
+  .set(routerConst.MyAppsAndTopics, [
+    { title: 'My Apps and Topics' },
+    { title: 'My Apps and Topics' },
+  ])
+  .set(routerConst.MyAppsTopics, [
+    { type: BreadcrumbsType.App, title: '' },
+    { title: 'My Apps and Topics' },
+    { title: 'Topics' },
+  ])
   .set(routerConst.VersionHistory, [
     { type: BreadcrumbsType.App, title: '' },
     { title: 'Apps and Topics' },
     { title: 'Topics' },
-    { title: 'Version history'}
+    { title: 'Version history' },
   ])
-  .set(routerConst.Channels, [{ title: 'Channels' }, { title: 'Channels' }])
+  .set(routerConst.Channels, [
+    { title: 'Channels management' },
+    { title: 'Channels management' },
+  ])
   .set(routerConst.IntegrationAPIs, [
     { title: 'Integration APIs' },
     { title: 'Integration APIs' },
@@ -38,6 +50,11 @@ export const mapUrlToBreadcrumbs = new Map<string, Breadcrumb[]>()
   .set(routerConst.LargeDataMessagingFileDownload, [
     { title: 'Large data messaging file download' },
     { title: 'Large data messaging file download' },
+  ])
+  .set(routerConst.LargeFileDownloadChannel, [
+    { title: 'Large data messaging file download' },
+    { title: 'Large data messaging file download' },
+    { title: 'Channel name' },
   ])
   .set(routerConst.LargeDataMessagingFileUpload, [
     { title: 'Large data messaging file upload' },

@@ -43,6 +43,8 @@ export const useStyles = makeStyles()((theme) => ({
         fontSize: 12,
         lineHeight: '24px',
         fontWeight: 400,
+        letterSpacing: '0.4px',
+        fontFamily: theme.typography.body2.fontFamily,
         color: theme.palette.grey[300],
         opacity: 1,
       },

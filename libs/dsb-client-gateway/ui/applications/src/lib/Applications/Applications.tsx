@@ -5,8 +5,12 @@ import { useRouter } from 'next/router';
 import { ApplicationDTO } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { routerConst } from '@dsb-client-gateway/ui/utils';
 
-export function Applications() {
-  const { applications, applicationsFetched } = useApplications();
+export interface ApplicationsProps {
+  role?: string;
+}
+
+export function Applications({role}: ApplicationsProps) {
+  const { applications, applicationsFetched } = useApplications(role);
   const router = useRouter();
 
   const handleRowClick = (data: ApplicationDTO) => {

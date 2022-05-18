@@ -8,14 +8,14 @@ import {
   RegistrationTypes,
   SignerService,
 } from 'iam-client-lib';
-import { IAppDefinition } from '@energyweb/iam-contracts';
+import { IAppDefinition } from '@energyweb/credential-governance';
 import { IamFactoryService } from './iam-factory.service';
 import { ConfigService } from '@nestjs/config';
 import { ApplicationDTO, Claim } from '../iam.interface';
 import { RoleStatus } from '@dsb-client-gateway/dsb-client-gateway/identity/models';
 import { Span } from 'nestjs-otel';
 import promiseRetry from 'promise-retry';
-import { Encoding } from '@ew-did-registry/did-resolver-interface';
+import { Encoding, PubKeyType } from '@ew-did-registry/did-resolver-interface';
 import { KeyType } from '@ew-did-registry/keys';
 import { RetryConfigService } from '@dsb-client-gateway/ddhub-client-gateway-utils';
 
@@ -80,7 +80,9 @@ export class IamService {
 
   @Span('iam_getUserClaimsFromDID')
   public async getUserClaimsFromDID() {
-    return this.claimsService.getUserClaims();
+    return this.claimsService.getUserClaims({
+      did: this.getDIDAddress(),
+    });
   }
 
   @Span('iam_setVerificationMethod')
@@ -99,7 +101,7 @@ export class IamService {
             did: this.getDIDAddress(),
             didAttribute: DIDAttribute.PublicKey,
             data: {
-              type: DIDAttribute.PublicKey,
+              type: PubKeyType.VerificationKey2018,
               encoding: Encoding.HEX,
               algo: KeyType.RSA,
               value: {
@@ -247,11 +249,26 @@ export class IamService {
   }
 
   @Span('iam_getDid')
-  public getDid(did?: string, includeClaims = false) {
-    return this.didRegistry.getDidDocument({
-      did,
-      includeClaims,
-    });
+  public async getDid(did?: string, includeClaims = false) {
+    return promiseRetry(
+      async (retryFn, attempt) => {
+        this.logger.log(`attempting to receive DID ${did}, attempt ${attempt}`);
+
+        return this.didRegistry
+          .getDidDocument({
+            did: this.getDIDAddress(),
+            includeClaims,
+          })
+          .catch((e) => {
+            this.logger.error(`Failed fetching did ${did}`, e);
+
+            return retryFn(e);
+          });
+      },
+      {
+        ...this.retryConfigService.config,
+      }
+    );
   }
 
   public getDIDAddress(): string | null {

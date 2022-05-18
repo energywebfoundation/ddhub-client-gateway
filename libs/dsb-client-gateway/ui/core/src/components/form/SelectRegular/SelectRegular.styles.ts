@@ -48,9 +48,16 @@ export const useStyles = makeStyles()((theme) => ({
   },
   menuItem: {
     fontSize: 12,
+    lineHeight: '21px',
+    fontWeight: 400,
     color: theme.palette.common.white,
     minHeight: 22,
+    padding: '9px 16px 10px',
     fontFamily: theme.typography.body2.fontFamily,
+    '&:hover, &.Mui-selected': {
+      backgroundColor: alpha(theme.palette.primary.main, 0.12),
+      color: theme.palette.primary.main
+    }
   },
   icon: {
     top: 9,
