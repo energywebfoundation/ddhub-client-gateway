@@ -5,7 +5,7 @@ import { ChannelTopic } from '@dsb-client-gateway/dsb-client-gateway-api-client'
 import { useChannel } from '@dsb-client-gateway/ui/api-hooks';
 import { GenericTable } from '@dsb-client-gateway/ui/core';
 import { Queries, routerConst } from '@dsb-client-gateway/ui/utils';
-import { ChannelInfo } from '../../components/ChannelInfo';
+import { ChannelInfo } from '@dsb-client-gateway/ui/channels';
 
 export const CHANNEL_TOPICS_HEADERS = [
   {
@@ -17,6 +17,8 @@ export const CHANNEL_TOPICS_HEADERS = [
 export const Channel: FC = () => {
   const router = useRouter();
   const { channel, channelLoaded } = useChannel(router.query[Queries.FQCN] as string);
+
+  const topics = channel.conditions?.topics || [];
 
   const navigateToMessages = (data: ChannelTopic) => {
     router.push({
@@ -34,7 +36,7 @@ export const Channel: FC = () => {
       <Box flexGrow={1}>
         <GenericTable<ChannelTopic>
           headers={CHANNEL_TOPICS_HEADERS}
-          tableRows={channel.conditions?.topics || []}
+          tableRows={topics}
           onRowClick={navigateToMessages}
           loading={!channelLoaded}
           showSearch={false}

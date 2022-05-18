@@ -1,23 +1,18 @@
 import { useRouter } from 'next/router';
-import { Download } from 'react-feather';
 import dayjs from 'dayjs';
-import { CircularProgress } from '@mui/material';
 import {
   useCachedChannel,
-  useCachedMessages,
-  useTopicVersion,
-  useDownloadMessage,
   useMessages,
   useIdentity
 } from '@dsb-client-gateway/ui/api-hooks';
 import { Queries, didFormatMinifier } from '@dsb-client-gateway/ui/utils';
-import { useStyles } from './Message.styles';
+import { TTableComponentAction } from '@dsb-client-gateway/ui/core';
 import { TMessage } from './Message.type';
+import { FileContentType } from './Message.utils';
+import { MessageProps } from './Message';
 
-export const useMessageEffects = () => {
-  const { classes, theme } = useStyles();
+export const useMessageEffects = ({ isLarge = false }: MessageProps) => {
   const router = useRouter();
-
   const { identity } = useIdentity();
 
   const { cachedChannel, topicsById } = useCachedChannel(
@@ -30,54 +25,35 @@ export const useMessageEffects = () => {
     fqcn: router.query[Queries.FQCN] as string,
     topicName: topic?.topicName,
     topicOwner: topic?.owner,
-    clientId: identity?.enrolment?.did
+    clientId: `${identity?.enrolment?.did}-${dayjs().format('YYYY-MM-DD HH:mm')}`
   });
 
-  // const { cachedMessages, messagesById } = useCachedMessages({
-  //   fqcn: router.query[Queries.FQCN] as string,
-  // });
-
-  // const message = messagesById[router.query[Queries.MessageId] as string];
-
-  // const { topic: topicWithSchema, topicLoaded } = useTopicVersion(
-  //   topic?.topicId,
-  //   message?.topicVersion
-  // );
-
-  const loading = !router.isReady || !messagesLoaded;
+  const loading = !messagesLoaded;
 
   const data: TMessage[] = messages.map(message => {
     return {
       timestampNanos: dayjs(message?.timestampNanos).format('MM/DD/YYYY'),
       sender: didFormatMinifier(message?.sender),
+      schemaType: message?.topicSchemaType,
       fileData: {
         payload: message?.payload,
-        version: message?.topicVersion,
-        topicId: topic?.topicId
+        contentType: FileContentType[message?.topicSchemaType]
       }
     };
   })
 
-  // const actions: TTableComponentAction<TMessage>[] = [
-  //   {
-  //     label: 'Download',
-  //     onClick: (message: TMessage) => downloadMessageHandler('hello'),
-  //     icon: isDownloading ? (
-  //       <CircularProgress
-  //         size={17}
-  //         sx={{ color: theme.palette.primary.main }}
-  //       />
-  //     ) : (
-  //       <Download className={classes.icon} />
-  //     ),
-  //   },
-  // ];
-
+  const actions: TTableComponentAction<TMessage>[] = [
+    {
+      label: 'View details',
+      onClick: () => console.log('view'),
+    }
+  ];
 
   return {
     topic,
     channel: cachedChannel,
     messages: data,
     loading,
+    actions
   };
 };

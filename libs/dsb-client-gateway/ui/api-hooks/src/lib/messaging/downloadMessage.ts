@@ -14,13 +14,17 @@ export const useDownloadMessage = () => {
   const Swal = useCustomAlert();
   const [fileData, setFileData] = useState<TDownloadData>(initialState);
 
+  const resetState = () => {
+    setFileData(initialState);
+  };
+
   const downloadMessageError = async () => {
     await Swal.error({
       text: 'Error while dowloading the message',
     });
   };
 
-  const { isLoading, remove } = useMessageControlllerDownloadMessage(
+  const { isLoading } = useMessageControlllerDownloadMessage(
     {
       fileId: fileData.fileId,
     },
@@ -33,19 +37,15 @@ export const useDownloadMessage = () => {
             name: fileData.fileId,
             contentType: fileData.contentType,
           });
+          resetState();
         },
         onError: () => {
           downloadMessageError();
-          reset();
+          resetState();
         },
       },
     }
   );
-
-  function reset() {
-    remove();
-    setFileData(initialState);
-  }
 
   const downloadMessageHandler = async (data: TDownloadData) => {
     if (!data?.fileId) {

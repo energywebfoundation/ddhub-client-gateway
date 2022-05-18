@@ -15,7 +15,9 @@ export const useStyles = makeStyles()((theme) => ({
     marginBottom: 16,
   },
   primary: {
-    color: theme.palette.primary.main
+    '&.MuiTypography-root': {
+      color: theme.palette.primary.main
+    }
   },
   cardHeaderWithBorder: {
     borderBottom: `1px solid ${lighten(theme.palette.background.paper, 0.2)}`,

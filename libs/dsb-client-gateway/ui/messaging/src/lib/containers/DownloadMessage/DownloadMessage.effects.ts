@@ -1,13 +1,6 @@
 import { useDownloadMessage, TDownloadData } from '@dsb-client-gateway/ui/api-hooks';
 import { DownloadMessageProps } from './DownloadMessage';
-
-const getPayload = (fileId: string) => {
-  try {
-    return fileId ? JSON.parse(fileId) : fileId;
-  } catch (error) {
-    return null;
-  }
-};
+import { getPayload } from './DownloadMessage.utils';
 
 export const useDownloadMessageEffects = ({ value }: DownloadMessageProps) => {
   const {
@@ -22,7 +15,7 @@ export const useDownloadMessageEffects = ({ value }: DownloadMessageProps) => {
 
   const data: TDownloadData = {
     fileId,
-    contentType: 'text/csv'
+    contentType: value.contentType
   };
 
   return {

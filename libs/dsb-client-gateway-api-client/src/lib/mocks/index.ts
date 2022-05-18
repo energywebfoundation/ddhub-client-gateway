@@ -138,6 +138,21 @@ export const getChannelControllerGetByTypeMock = () => [
       ],
     },
   },
+  {
+    fqcn: 'channel.name.4',
+    type: 'download',
+    conditions: {
+      dids: ['did:ethr:volta:0x09Df5d33f1242E1b8aA5E0E0F6BfA687E6846993'],
+      roles: ['marketoperator.roles'],
+      topics: [
+        {
+          topicName: 'operatorEnvelope',
+          owner: 'ddhub.apps.energyweb.iam.ewc',
+          topicId: '622fed6e4258501225095048',
+        },
+      ],
+    },
+  },
 ];
 
 export const getChannelControllerGetMock = () => ({
@@ -163,6 +178,7 @@ export const getChannelMessagesMock = () => [
   {
     id: '6283374fbe281c73d1ba252b',
     topicVersion: '1.0.0',
+    topicSchemaType: 'CSV',
     payload: '{"fileId":"62833e6ebe281c73d1ba2535"}',
     signature:
       '0xd3a2e04d344261ee648d00baba8477a575030371862ee9f11d339726cff8d47b579321dc99312c84d63ab33e065e752c9639a5615ed5c9bf757a634772c506dc1b',
@@ -177,6 +193,7 @@ export const getChannelMessagesMock = () => [
   {
     id: '6283374fbe281c73d1ba252b',
     topicVersion: '1.0.0',
+    topicSchemaType: 'CSV',
     payload: '{ data: 45 }',
     signature:
       '0xd3a2e04d344261ee648d00baba8477a575030371862ee9f11d339726cff8d47b579321dc99312c84d63ab33e065e752c9639a5615ed5c9bf757a634772c506dc1b',

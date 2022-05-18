@@ -2,48 +2,26 @@ import { FC } from 'react';
 import { Stack, Box } from '@mui/material';
 import { ChannelInfo } from '@dsb-client-gateway/ui/channels';
 import { GenericTable } from '@dsb-client-gateway/ui/core';
-import { DownloadMessage } from '../DownloadMessage';
 import { useMessageEffects } from './Message.effects';
 import { TMessage } from './Message.type';
+import { LARGE_MESSAGES_HEADERS, MESSAGES_HEADERS } from './models/message-headers';
 
-export enum FileContentType {
-  CSV = 'text/csv',
-  TSV = 'text/tsv',
-  XML = 'application/xml',
-  JSD7 = 'application/json',
-  XSD6 = 'application/json',
+export interface MessageProps {
+  isLarge?: boolean;
 }
 
-const MESSAGES_HEADERS = [
-  {
-    Header: 'DATE',
-    accessor: 'timestampNanos',
-  },
-  {
-    Header: 'FROM',
-    accessor: 'sender',
-  },
-  {
-    Header: 'SCHEMA TYPE',
-    accessor: 'schemaType',
-  },
-  {
-    accessor: 'fileData',
-    Cell: DownloadMessage,
-  },
-];
-
-export const Message: FC = () => {
-  const { channel, topic, messages, loading } = useMessageEffects();
+export const Message: FC<MessageProps> = (props) => {
+  const { channel, topic, messages, loading, actions } = useMessageEffects(props);
 
   return (
     <Stack spacing={2} direction="row">
       <ChannelInfo channel={channel} topicName={topic?.topicName} />
       <Box flexGrow={1}>
         <GenericTable<TMessage>
-          headers={MESSAGES_HEADERS}
+          headers={props.isLarge ? LARGE_MESSAGES_HEADERS : MESSAGES_HEADERS}
           tableRows={messages}
           loading={loading}
+          actions={props.isLarge ? undefined : actions}
           showSearch={false}
           loadingRows={2}
         />
