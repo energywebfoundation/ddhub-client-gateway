@@ -72,7 +72,7 @@ export class DsbMessagePoolingService implements OnModuleInit {
         return;
       }
 
-      const subscriptions: ChannelEntity[] = await (await this.channelService.getChannels()).filter((entity) => entity.type == ChannelType.SUB);
+      const subscriptions: ChannelEntity[] = (await this.channelService.getChannels()).filter((entity) => entity.type == ChannelType.SUB);
 
       if (subscriptions.length === 0) {
         this.logger.log(
@@ -105,11 +105,13 @@ export class DsbMessagePoolingService implements OnModuleInit {
     let msgCount = 0;
     if (websocketMode === WebSocketImplementation.SERVER && this.gateway.server.clients.size > 0) {
       await this.ddhubLoginService.login();
-      await this.gateway.server.clients.forEach(async (client) => {
-        await this.pullMessages(subscriptions, client).then((totalMsg) => {
-          msgCount += totalMsg;
-        }).catch();
-      });
+      await Promise.allSettled(
+        Array.from(this.gateway.server.clients.values()).map(async (client) => {
+          await this.pullMessages(subscriptions, client).then((totalMsg) => {
+            msgCount += totalMsg;
+          }).catch();
+        })
+      );
     } else if (this.wsClient.rws) {
       await this.ddhubLoginService.login();
       await this.pullMessages(subscriptions, this.wsClient.rws).then((totalMsg) => {

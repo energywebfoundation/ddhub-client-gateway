@@ -27,7 +27,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayInit {
   public server: Server;
 
   private readonly logger = new Logger(EventsGateway.name);
-  private readonly protocol: string = 'dsb-protocol';
+  private readonly protocol: string = 'ddhub-protocol';
 
   constructor(
     protected readonly configService: ConfigService,
