@@ -58,6 +58,7 @@ export class ChannelService {
     await this.wrapperRepository.channelRepository.save({
       fqcn: payload.fqcn,
       type: payload.type,
+      payloadEncryption: payload.payloadEncryption,
       conditions: {
         topics: topicsWithIds,
         dids: payload.conditions.dids,
@@ -154,6 +155,9 @@ export class ChannelService {
       dto.conditions.topics
     );
 
+    channel.payloadEncryption =
+      dto.payloadEncryption ?? channel.payloadEncryption;
+
     channel.conditions = {
       ...channel.conditions,
       dids: dto.conditions.dids,
@@ -161,12 +165,7 @@ export class ChannelService {
       topics: topicsWithIds,
     };
 
-    await this.wrapperRepository.channelRepository.update(
-      {
-        fqcn: channel.fqcn,
-      },
-      channel
-    );
+    await this.wrapperRepository.channelRepository.save(channel);
 
     await this.commandBus.execute(new RefreshChannelCacheDataCommand(fqcn));
   }
