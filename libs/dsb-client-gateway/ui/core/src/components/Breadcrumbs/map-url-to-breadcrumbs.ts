@@ -24,11 +24,11 @@ export const mapUrlToBreadcrumbs = new Map<string, Breadcrumb[]>()
     { title: 'Apps and Topics' },
     { title: 'Topics' },
   ])
-  .set(routerConst.MyAppsAndTopics, [
+  .set(routerConst.ChannelApps, [
     { title: 'My Apps and Topics' },
     { title: 'My Apps and Topics' },
   ])
-  .set(routerConst.MyAppsTopics, [
+  .set(routerConst.ChannelTopics, [
     { type: BreadcrumbsType.App, title: '' },
     { title: 'My Apps and Topics' },
     { title: 'Topics' },
@@ -39,7 +39,13 @@ export const mapUrlToBreadcrumbs = new Map<string, Breadcrumb[]>()
     { title: 'Topics' },
     { title: 'Version history' },
   ])
-  .set(routerConst.Channels, [
+  .set(routerConst.ChannelTopicVersionHistory, [
+    { type: BreadcrumbsType.App, title: '' },
+    { title: 'Apps and Topics' },
+    { title: 'Topics' },
+    { title: 'Version history' },
+  ])
+  .set(routerConst.ChannelsManagement, [
     { title: 'Channels management' },
     { title: 'Channels management' },
   ])

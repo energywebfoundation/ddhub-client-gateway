@@ -1,23 +1,16 @@
-import { useApplications } from '@dsb-client-gateway/ui/api-hooks';
-import { GenericTable } from '@dsb-client-gateway/ui/core';
-import { APPLICATIONS_HEADERS } from '../models/applications-header';
-import { useRouter } from 'next/router';
-import { ApplicationDTO } from '@dsb-client-gateway/dsb-client-gateway-api-client';
-import { routerConst } from '@dsb-client-gateway/ui/utils';
+import { useApplications } from "@dsb-client-gateway/ui/api-hooks";
+import { GenericTable } from "@dsb-client-gateway/ui/core";
+import { APPLICATIONS_HEADERS } from "../models/applications-header";
+import { ApplicationDTO } from "@dsb-client-gateway/dsb-client-gateway-api-client";
 
 export interface ApplicationsProps {
   role?: string;
+  topicUrl?: string;
 }
 
-export function Applications({role}: ApplicationsProps) {
-  const { applications, applicationsFetched } = useApplications(role);
-  const router = useRouter();
+export function Applications({role, topicUrl}: ApplicationsProps) {
+  const { applications, applicationsFetched, handleRowClick } = useApplications(role, topicUrl);
 
-  const handleRowClick = (data: ApplicationDTO) => {
-    router.push(
-      routerConst.Topics.replace('[namespace]', data.namespace)
-    );
-  };
   return (
     <section style={{ marginTop: 16 }}>
       <GenericTable<ApplicationDTO>

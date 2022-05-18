@@ -1,3 +1,4 @@
+import { IsBoolean } from 'class-validator';
 import { ChannelType } from '../../channel.const';
 import { ApiProperty } from '@nestjs/swagger';
 
@@ -63,6 +64,14 @@ export class GetChannelResponseDto {
     example: 'channel.name',
   })
   fqcn: string;
+
+  @ApiProperty({
+    description: 'Channel encryption',
+    type: Boolean,
+    example: true,
+  })
+  @IsBoolean()
+  payloadEncryption: boolean;
 
   @ApiProperty({
     description: 'Channel type',
