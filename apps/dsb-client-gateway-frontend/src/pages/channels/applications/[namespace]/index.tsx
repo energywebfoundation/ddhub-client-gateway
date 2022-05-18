@@ -1,6 +1,6 @@
 import Head from 'next/head';
-import { TopicsContainer } from '@dsb-client-gateway/ui/topics';
-import { routerConst } from '@dsb-client-gateway/ui/utils';
+import { TopicsContainer } from '@ddhub-client-gateway-frontend/ui/topics';
+import { routerConst } from '@ddhub-client-gateway-frontend/ui/utils';
 
 export default function Topics() {
   return (
