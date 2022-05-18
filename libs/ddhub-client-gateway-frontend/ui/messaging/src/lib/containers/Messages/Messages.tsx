@@ -11,7 +11,7 @@ export interface MessageProps {
 }
 
 export const Messages: FC<MessageProps> = (props) => {
-  const { channel, topic, messages, loading, actions } = useMessagesEffects(props);
+  const { channel, topic, messages, loading, actions } = useMessagesEffects();
 
   return (
     <Stack spacing={2} direction="row">

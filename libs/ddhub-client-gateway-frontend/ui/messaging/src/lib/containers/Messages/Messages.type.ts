@@ -7,5 +7,11 @@ export type TMessage = {
     payload: string;
     contentType: string;
   }
-  schemaType?: PostTopicDtoSchemaType;
+  details: {
+    topicOwner: string;
+    topicName: string;
+    topicVersion: string;
+    messageId: string;
+  },
+  schemaType: PostTopicDtoSchemaType;
 };

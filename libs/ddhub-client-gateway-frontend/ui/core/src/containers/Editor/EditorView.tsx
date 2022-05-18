@@ -5,7 +5,7 @@ import { useEditorEffects } from './Editor.effects';
 import { useStyles } from './Editor.styles';
 
 interface EditorViewProps {
-  value: string;
+  value: object | string;
 }
 
 export const EditorView: FC<EditorViewProps> = ({ value }) => {

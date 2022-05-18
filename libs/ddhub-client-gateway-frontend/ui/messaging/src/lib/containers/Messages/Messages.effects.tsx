@@ -9,11 +9,26 @@ import { Queries, didFormatMinifier } from '@ddhub-client-gateway-frontend/ui/ut
 import { TTableComponentAction } from '@ddhub-client-gateway-frontend/ui/core';
 import { TMessage } from './Messages.type';
 import { FileContentType } from './Messages.utils';
-import { MessageProps } from './Messages';
+import { useModalDispatch, ModalActionsEnum } from '../../context';
 
-export const useMessagesEffects = ({ isLarge = false }: MessageProps) => {
+export const useMessagesEffects = () => {
   const router = useRouter();
+  const dispatch = useModalDispatch();
   const { identity } = useIdentity();
+
+  const openDetailsModal = (data: TMessage) => {
+    const { details, fileData } = data;
+    dispatch({
+      type: ModalActionsEnum.SHOW_DETAILS,
+      payload: {
+        open: true,
+        data: {
+          ...details,
+          payload: fileData?.payload
+        }
+      }
+    })
+  }
 
   const { cachedChannel, topicsById } = useCachedChannel(
     router.query[Queries.FQCN] as string
@@ -35,6 +50,12 @@ export const useMessagesEffects = ({ isLarge = false }: MessageProps) => {
       timestampNanos: dayjs(message?.timestampNanos).format('MM/DD/YYYY'),
       sender: didFormatMinifier(message?.sender),
       schemaType: message?.topicSchemaType,
+      details: {
+        topicOwner: topic.owner,
+        topicName: topic.topicName,
+        topicVersion: message?.topicVersion,
+        messageId: message?.id
+      },
       fileData: {
         payload: message?.payload,
         contentType: FileContentType[message?.topicSchemaType]
@@ -45,7 +66,7 @@ export const useMessagesEffects = ({ isLarge = false }: MessageProps) => {
   const actions: TTableComponentAction<TMessage>[] = [
     {
       label: 'View details',
-      onClick: () => console.log('view'),
+      onClick: (message: TMessage) => openDetailsModal(message),
     }
   ];
 
