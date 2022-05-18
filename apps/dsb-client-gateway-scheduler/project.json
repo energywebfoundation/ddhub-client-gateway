@@ -10,7 +10,8 @@
         "outputPath": "dist/apps/dsb-client-gateway-scheduler",
         "main": "apps/dsb-client-gateway-scheduler/src/main.ts",
         "tsConfig": "apps/dsb-client-gateway-scheduler/tsconfig.app.json",
-        "assets": ["apps/dsb-client-gateway-scheduler/src/assets"]
+        "assets": ["apps/dsb-client-gateway-scheduler/src/assets"],
+        "generatePackageJson": true
       },
       "configurations": {
         "production": {
