@@ -63,6 +63,7 @@ export interface GetMessageResponse {
   topicName: string;
   topicOwner: string;
   topicVersion: string;
+  topicSchemaType: string;
   payload: string;
   signature: string;
   sender: string;

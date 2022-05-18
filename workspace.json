@@ -2,6 +2,9 @@
   "version": 2,
   "projects": {
     "ddhub-client-gateway-did-auth": "libs/ddhub-client-gateway-did-auth",
+    "ddhub-client-gateway-encryption": "libs/ddhub-client-gateway-encryption",
+    "ddhub-client-gateway-enrolment": "libs/ddhub-client-gateway-enrolment",
+    "ddhub-client-gateway-identity": "libs/ddhub-client-gateway-identity",
     "ddhub-client-gateway-message-broker": "libs/ddhub-client-gateway-message-broker",
     "ddhub-client-gateway-tracing": "libs/ddhub-client-gateway-tracing",
     "ddhub-client-gateway-utils": "libs/ddhub-client-gateway-utils",
@@ -20,6 +23,7 @@
     "dsb-client-gateway-ui-api-hooks": "libs/dsb-client-gateway/ui/api-hooks",
     "dsb-client-gateway-ui-applications": "libs/dsb-client-gateway/ui/applications",
     "dsb-client-gateway-ui-channels": "libs/dsb-client-gateway/ui/channels",
+    "dsb-client-gateway-ui-context": "libs/dsb-client-gateway/ui/context",
     "dsb-client-gateway-ui-integration": "libs/dsb-client-gateway/ui/integration",
     "dsb-client-gateway-ui-login": "libs/dsb-client-gateway/ui/login",
     "dsb-client-gateway-ui-messaging": "libs/dsb-client-gateway/ui/messaging",

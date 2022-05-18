@@ -8,6 +8,7 @@ export type TTableComponentAction<T = Record<string, unknown>> = {
   label?: string;
   color?: string;
   icon?: React.ReactElement;
+  readonly?: boolean;
 };
 
 interface TableComponentActionsProps<T> {

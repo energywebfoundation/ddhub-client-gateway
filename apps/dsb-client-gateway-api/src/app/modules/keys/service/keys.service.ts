@@ -3,18 +3,14 @@ import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { IamService } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
 import { SecretsEngineService } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
 import { DIDPublicKeyTags } from '../keys.const';
-import { SymmetricKeysCacheService } from '../../message/service/symmetric-keys-cache.service';
 import { KeysEntity } from '../keys.interface';
-import { EthersService } from '../../utils/service/ethers.service';
 import {
   id,
   joinSignature,
   recoverPublicKey,
   SigningKey,
 } from 'ethers/lib/utils';
-import { IdentityService } from '../../identity/service/identity.service';
 import { BalanceState } from '@dsb-client-gateway/dsb-client-gateway/identity/models';
-import { IamInitService } from '../../identity/service/iam-init.service';
 import { Span } from 'nestjs-otel';
 import {
   DidEntity,
@@ -24,6 +20,13 @@ import {
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
 import { ConfigService } from '@nestjs/config';
 import moment from 'moment';
+import {
+  IamInitService,
+  IdentityService,
+} from '@dsb-client-gateway/ddhub-client-gateway-identity';
+import { Wallet } from 'ethers/lib/ethers';
+import { SymmetricKeysCacheService } from '@dsb-client-gateway/ddhub-client-gateway-encryption';
+import { EthersService } from '@dsb-client-gateway/ddhub-client-gateway-utils';
 
 @Injectable()
 export class KeysService implements OnModuleInit {
@@ -197,12 +200,11 @@ export class KeysService implements OnModuleInit {
     symmetricKey: string,
     receiverDid: string
   ): Promise<any | null> {
-
-    this.logger.log(`fetching did for receiverDid:${receiverDid}`)
+    this.logger.log(`fetching did for receiverDid:${receiverDid}`);
 
     const did: DidEntity | null = await this.getDid(receiverDid);
 
-    this.logger.log(`did fetched for receiverDid:${receiverDid}`)
+    this.logger.log(`did fetched for receiverDid:${receiverDid}`);
 
     if (!did) {
       this.logger.error('IAM not initialized');
@@ -247,8 +249,7 @@ export class KeysService implements OnModuleInit {
       .toString();
   }
 
-  @Span('keys_generate')
-  public async onModuleInit(): Promise<void> {
+  public async generateKeys(overwrite = false): Promise<void> {
     this.logger.log('Starting keys onModuleInit');
 
     const rootKey: string | null =
@@ -282,7 +283,110 @@ export class KeysService implements OnModuleInit {
     this.logger.log('Initializing IAM connection');
     await this.iamInitService.onModuleInit();
 
-    this.logger.log('Attempting to update signature key');
+    this.logger.log('Retrieving DID document');
+
+    const did = await this.iamService.getDid();
+
+    await this.updateSignatureKey(did, wallet);
+    await this.updatePublicRSAKey(did, overwrite);
+  }
+
+  @Span('keys_generate')
+  public async onModuleInit(): Promise<void> {
+    await this.generateKeys(false);
+  }
+
+  protected async updatePublicRSAKey(did, overwrite: boolean): Promise<void> {
+    this.logger.log('Attempting to update public RSA key');
+
+    const existingKeyInDid = did.publicKey.filter(
+      (c) =>
+        c.id ===
+        `${this.iamService.getDIDAddress()}#${
+          DIDPublicKeyTags.DSB_SYMMETRIC_ENCRYPTION
+        }`
+    );
+
+    const didAddress = this.iamService.getDIDAddress();
+
+    let shouldGenerateNewPrivateRSAKey = overwrite;
+    const walletPrivateKey = await this.secretsEngineService.getPrivateKey();
+
+    if (existingKeyInDid.length > 0 && !shouldGenerateNewPrivateRSAKey) {
+      this.logger.log('Testing public RSA key');
+
+      const randomString = crypto.randomBytes(20).toString('hex');
+      const privateKey = await this.secretsEngineService.getRSAPrivateKey();
+
+      try {
+        const encryptedSymmetricKey = await this.encryptSymmetricKey(
+          randomString,
+          didAddress
+        );
+        const decryptedSymmetricKey = this.decryptSymmetricKey(
+          privateKey,
+          encryptedSymmetricKey,
+          walletPrivateKey
+        );
+
+        if (randomString === decryptedSymmetricKey) {
+          return;
+        }
+      } catch (e) {
+        this.logger.error(
+          'something is wrong with private RSA key, creating new one',
+          e
+        );
+      }
+
+      this.logger.error(
+        'there is a mismatch between public and private RSA key, generating new one'
+      );
+
+      shouldGenerateNewPrivateRSAKey = true;
+    } else {
+      shouldGenerateNewPrivateRSAKey = true;
+    }
+
+    if (!shouldGenerateNewPrivateRSAKey) {
+      return;
+    }
+
+    this.logger.log('Generating new private RSA key');
+
+    const { publicKey, privateKey } = this.deriveRSAKey(walletPrivateKey);
+
+    await this.secretsEngineService.setRSAPrivateKey(privateKey);
+
+    await this.iamService.setVerificationMethod(
+      publicKey,
+      DIDPublicKeyTags.DSB_SYMMETRIC_ENCRYPTION
+    );
+  }
+
+  protected async updateSignatureKey(did, wallet: Wallet): Promise<void> {
+    this.logger.log('Attempting to update public signature key');
+
+    const existingKeyInDid = did.publicKey.filter(
+      (c) =>
+        c.id ===
+        `${this.iamService.getDIDAddress()}#${
+          DIDPublicKeyTags.DSB_SIGNATURE_KEY
+        }`
+    );
+
+    if (
+      existingKeyInDid.length > 0 &&
+      existingKeyInDid[0].publicKeyHex === wallet.publicKey
+    ) {
+      this.logger.log(
+        `Public signature key already exists for ${wallet.address}`
+      );
+
+      return;
+    }
+
+    this.logger.log(`Updating ${wallet.address} signature key`);
 
     await this.iamService.setVerificationMethod(
       wallet.publicKey,
@@ -290,35 +394,6 @@ export class KeysService implements OnModuleInit {
     );
 
     this.logger.log(`Updated ${wallet.address} signature key`);
-
-    const did = await this.iamService.getDid();
-
-    const existingKeyInDid =
-      did.publicKey.filter(
-        (c) =>
-          c.id ===
-          `${this.iamService.getDIDAddress()}#${
-            DIDPublicKeyTags.DSB_SYMMETRIC_ENCRYPTION
-          }`
-      ).length > 0;
-
-    const existingRSAKey: string | null =
-      await this.secretsEngineService.getRSAPrivateKey();
-
-    if (existingRSAKey && existingKeyInDid) {
-      this.logger.log('RSA key already generated');
-    }
-
-    const { publicKey, privateKey } = this.deriveRSAKey(rootKey);
-
-    await this.iamService.setVerificationMethod(
-      publicKey,
-      DIDPublicKeyTags.DSB_SYMMETRIC_ENCRYPTION
-    );
-
-    await this.secretsEngineService.setRSAPrivateKey(privateKey);
-
-    this.logger.log('Updated DID document with public RSA key');
   }
 
   public deriveRSAKey(derivedKeyPrivateKey: string): {

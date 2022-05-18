@@ -20,6 +20,15 @@
       "@dsb-client-gateway/ddhub-client-gateway-did-auth": [
         "libs/ddhub-client-gateway-did-auth/src/index.ts"
       ],
+      "@dsb-client-gateway/ddhub-client-gateway-encryption": [
+        "libs/ddhub-client-gateway-encryption/src/index.ts"
+      ],
+      "@dsb-client-gateway/ddhub-client-gateway-enrolment": [
+        "libs/ddhub-client-gateway-enrolment/src/index.ts"
+      ],
+      "@dsb-client-gateway/ddhub-client-gateway-identity": [
+        "libs/ddhub-client-gateway-identity/src/index.ts"
+      ],
       "@dsb-client-gateway/ddhub-client-gateway-message-broker": [
         "libs/ddhub-client-gateway-message-broker/src/index.ts"
       ],
@@ -53,11 +62,8 @@
       "@dsb-client-gateway/dsb-client-gateway/identity/models": [
         "libs/dsb-client-gateway/identity/models/src/index.ts"
       ],
-      "@dsb-client-gateway/ui/messaging": [
-        "libs/dsb-client-gateway/ui/messaging/src/index.ts"
-      ],
-      "@dsb-client-gateway/ui/integration": [
-        "libs/dsb-client-gateway/ui/integration/src/index.ts"
+      "@dsb-client-gateway/ui/context": [
+        "libs/dsb-client-gateway/ui/context/src/index.ts"
       ],
       "@dsb-client-gateway/ui/api-hooks": [
         "libs/dsb-client-gateway/ui/api-hooks/src/index.ts"
@@ -71,8 +77,14 @@
       "@dsb-client-gateway/ui/core": [
         "libs/dsb-client-gateway/ui/core/src/index.ts"
       ],
+      "@dsb-client-gateway/ui/integration": [
+        "libs/dsb-client-gateway/ui/integration/src/index.ts"
+      ],
       "@dsb-client-gateway/ui/login": [
         "libs/dsb-client-gateway/ui/login/src/index.ts"
+      ],
+      "@dsb-client-gateway/ui/messaging": [
+        "libs/dsb-client-gateway/ui/messaging/src/index.ts"
       ],
       "@dsb-client-gateway/ui/topics": [
         "libs/dsb-client-gateway/ui/topics/src/index.ts"

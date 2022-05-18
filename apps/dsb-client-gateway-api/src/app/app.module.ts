@@ -19,6 +19,8 @@ import { MessageModule } from './modules/message/message.module';
 import { ApplicationModule } from './modules/application/application.module';
 import { TopicModule } from './modules/topic/topic.module';
 import { DdhubClientGatewayTracingModule } from '@dsb-client-gateway/ddhub-client-gateway-tracing';
+import { CronModule } from './modules/cron/cron.module';
+import { StorageModule } from './modules/storage/storage.module';
 
 @Module({})
 export class AppModule {
@@ -28,6 +30,7 @@ export class AppModule {
         isGlobal: true,
         validate: shouldValidate && configValidate,
       }),
+      StorageModule,
       DdhubClientGatewayTracingModule.forRoot(),
       MulterModule.register({
         dest: './files',
@@ -45,6 +48,7 @@ export class AppModule {
       KeysModule,
       ApplicationModule,
       TopicModule,
+      CronModule,
     ];
 
     const providers = [

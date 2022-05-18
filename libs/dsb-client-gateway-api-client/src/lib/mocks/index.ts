@@ -86,7 +86,7 @@ export const getTopicsControllerGetTopicHistoryByIdAndVersionMock = () => ({
   id: faker.datatype.uuid(),
   name: faker.word.noun(),
   owner: 'ddhub.apps.energyweb.iam.ewc',
-  schema: '{"data":"test"}',
+  schema: {"data":"test"},
   schemaType: faker.random.arrayElement(['JSD7', 'XML', 'CSV', 'TSV']),
   tags: [faker.word.noun()],
   version: '1.0.0',

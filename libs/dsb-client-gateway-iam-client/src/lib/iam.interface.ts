@@ -1,4 +1,4 @@
-import { IAppDefinition } from '@energyweb/iam-contracts';
+import { IAppDefinition } from '@energyweb/credential-governance';
 import { RoleStatus } from '@dsb-client-gateway/dsb-client-gateway/identity/models';
 
 export class ApplicationDTO implements IAppDefinition {

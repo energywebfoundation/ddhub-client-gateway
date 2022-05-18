@@ -6,6 +6,7 @@ export const useStyles = makeStyles()((theme) => ({
     height: '42px',
     borderRadius: 5,
     marginBottom: 3,
+    cursor: 'pointer',
     '&:hover': {
       backgroundColor: alpha(theme.palette.primary.main, 0.12),
       color: theme.palette.primary.main,

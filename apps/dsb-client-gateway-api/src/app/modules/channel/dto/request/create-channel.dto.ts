@@ -1,5 +1,6 @@
 import {
   ArrayUnique,
+  IsBoolean,
   IsEnum,
   IsOptional,
   IsString,
@@ -83,6 +84,14 @@ export class CreateChannelDto {
     example: 'channel.name',
   })
   fqcn: string;
+
+  @ApiProperty({
+    description: 'Channel encryption',
+    type: Boolean,
+    example: true,
+  })
+  @IsBoolean()
+  payloadEncryption: boolean;
 
   @IsEnum(ChannelType)
   @ApiProperty({
