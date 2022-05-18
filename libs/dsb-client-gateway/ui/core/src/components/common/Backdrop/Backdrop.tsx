@@ -8,7 +8,7 @@ import {
 import { useStyles } from './Backdrop.styles';
 import { alpha } from '@mui/material/styles';
 
-interface BackdropProps {
+export interface BackdropProps {
   open: boolean;
 }
 
