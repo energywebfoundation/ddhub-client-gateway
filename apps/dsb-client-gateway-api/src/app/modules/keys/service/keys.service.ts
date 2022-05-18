@@ -10,7 +10,7 @@ import {
   recoverPublicKey,
   SigningKey,
 } from 'ethers/lib/utils';
-import { BalanceState } from '@dsb-client-gateway/dsb-client-gateway/identity/models';
+import { BalanceState } from '@ddhub-client-gateway/identity/models';
 import { Span } from 'nestjs-otel';
 import {
   DidEntity,

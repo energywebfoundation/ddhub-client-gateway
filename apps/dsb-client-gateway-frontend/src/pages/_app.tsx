@@ -5,17 +5,19 @@ import NProgress from 'nprogress';
 import Head from 'next/head';
 import Axios from 'axios';
 import { QueryClient, QueryClientProvider } from 'react-query';
-import { DDHubThemeProvider } from '@dsb-client-gateway/ui/utils';
+import { DDHubThemeProvider } from '@ddhub-client-gateway-frontend/ui/utils';
 import { CacheProvider, EmotionCache } from '@emotion/react';
 import { CssBaseline } from '@mui/material';
 import createCache from '@emotion/cache';
 import { Layout } from '../components/Layout';
 import { queryClientOptions } from '../utils';
+import { BackdropContextProvider, useBackdropContext } from "@ddhub-client-gateway-frontend/ui/context";
+import { Backdrop } from '@ddhub-client-gateway-frontend/ui/core'
 import {
   useCheckAccountOnInitEffects,
   UserDataContext,
   useUserData,
-} from '@dsb-client-gateway/ui/login';
+} from '@ddhub-client-gateway-frontend/ui/login';
 import { makeServer } from '../services/mock.service';
 import 'nprogress/nprogress.css';
 import '../styles/globals.css';
@@ -45,6 +47,7 @@ function InitializeAccountStatus(props) {
 function MyApp(props: MyAppProps) {
   const { Component, pageProps } = props;
   const { userDataValue } = useUserData();
+  const { open } = useBackdropContext();
   const [queryClient] = React.useState(
     () =>
       new QueryClient({
@@ -82,13 +85,16 @@ function MyApp(props: MyAppProps) {
       </Head>
       <DDHubThemeProvider>
         <CssBaseline />
-        <UserDataContext.Provider value={userDataValue}>
-          <QueryClientProvider client={queryClient}>
-            <InitializeAccountStatus>
-              {getLayout(<Component {...pageProps} />)}
-            </InitializeAccountStatus>
-          </QueryClientProvider>
-        </UserDataContext.Provider>
+        <BackdropContextProvider>
+          <UserDataContext.Provider value={userDataValue}>
+            <QueryClientProvider client={queryClient}>
+              <InitializeAccountStatus>
+                {getLayout(<Component {...pageProps} />)}
+                <Backdrop open={open} />
+              </InitializeAccountStatus>
+            </QueryClientProvider>
+          </UserDataContext.Provider>
+        </BackdropContextProvider>
       </DDHubThemeProvider>
     </CacheProvider>
   );

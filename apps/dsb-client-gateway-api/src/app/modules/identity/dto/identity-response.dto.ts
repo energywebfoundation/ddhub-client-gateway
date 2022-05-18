@@ -4,7 +4,7 @@ import {
   IdentityWithEnrolment,
   Role,
   RoleStatus,
-} from '@dsb-client-gateway/dsb-client-gateway/identity/models';
+} from '@ddhub-client-gateway/identity/models';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class RoleDto implements Role {

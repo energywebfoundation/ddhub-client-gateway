@@ -5,7 +5,7 @@ import {
   Enrolment,
   Identity,
   RoleStatus,
-} from '@dsb-client-gateway/dsb-client-gateway/identity/models';
+} from '@ddhub-client-gateway/identity/models';
 import { IamService } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
 import { Span } from 'nestjs-otel';
 import {

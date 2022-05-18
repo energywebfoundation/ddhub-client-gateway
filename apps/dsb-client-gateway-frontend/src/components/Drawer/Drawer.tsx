@@ -9,7 +9,7 @@ import {
   Layers,
   Settings,
 } from 'react-feather';
-import { routerConst } from '@dsb-client-gateway/ui/utils';
+import { routerConst } from '@ddhub-client-gateway-frontend/ui/utils';
 import { useStyles } from './Drawer.styles';
 import { CollapsableMenu } from './CollapsableMenu/CollapsableMenu';
 import { MenuItem } from './MenuItem/MenuItem';
@@ -51,8 +51,8 @@ export const Drawer = () => {
         <CollapsableMenu
           menuTitle="Channels"
           subMenu={[
-            { title: 'My apps and topics', href: routerConst.MyAppsAndTopics },
-            { title: 'Channel management', href: routerConst.Channels },
+            { title: 'My apps and topics', href: routerConst.ChannelApps },
+            { title: 'Channel management', href: routerConst.ChannelsManagement },
           ]}
           menuIcon={<Command className={classes.icon} size={18} />}
         />

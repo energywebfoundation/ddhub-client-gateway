@@ -1,5 +1,5 @@
 import { Column, Entity, PrimaryColumn } from 'typeorm';
-import { RoleStatus } from '@dsb-client-gateway/dsb-client-gateway/identity/models';
+import { RoleStatus } from '@ddhub-client-gateway/identity/models';
 
 export class Role {
   namespace: string;

@@ -1,5 +1,5 @@
 import { GatewayError } from './errors';
-import { BalanceState, Enrolment, EnrolmentState } from '@dsb-client-gateway/dsb-client-gateway/identity/models';
+import { BalanceState, Enrolment, EnrolmentState } from '@ddhub-client-gateway/identity/models';
 
 export type Result<T = boolean, E = GatewayError> = {
   ok?: T;

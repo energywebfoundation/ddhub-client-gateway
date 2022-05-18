@@ -1,5 +1,5 @@
 import { Typography } from '@mui/material';
-import { didFormatMinifier } from '@dsb-client-gateway/ui/utils';
+import { didFormatMinifier } from '@ddhub-client-gateway-frontend/ui/utils';
 import { useStyles } from './Header.styles';
 import { useHeaderEffects } from './Header.effects';
 

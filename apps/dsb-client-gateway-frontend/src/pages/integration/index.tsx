@@ -1,5 +1,5 @@
 import Head from 'next/head';
-import { IntegrationContainer } from '@dsb-client-gateway/ui/integration';
+import { IntegrationContainer } from '@ddhub-client-gateway-frontend/ui/integration';
 
 export default function Documentation() {
   return (
