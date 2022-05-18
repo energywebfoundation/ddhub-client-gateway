@@ -1,6 +1,7 @@
 import LoadingInfo from '../LoadingInfo/LoadingInfo';
 import { useLoginStatusEffects } from './RequestingEnrolment/LoginStatus.effects';
-import {Backdrop, useBackdropContext} from "@dsb-client-gateway/ui/core";
+import { Backdrop } from "@dsb-client-gateway/ui/core";
+import { useBackdropContext } from "../../../../../../../apps/dsb-client-gateway-frontend/src/context"
 
 export function LoginStatus() {
   const {isLoading, statusFactory} = useLoginStatusEffects();

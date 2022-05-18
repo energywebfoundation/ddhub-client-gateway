@@ -19,7 +19,7 @@ import {
 import { makeServer } from '../services/mock.service';
 import 'nprogress/nprogress.css';
 import '../styles/globals.css';
-import { BackdropContextProvider } from "@dsb-client-gateway/ui/core";
+import { BackdropContextProvider } from "../context";
 
 if (
   process.env.NODE_ENV !== 'production' &&
