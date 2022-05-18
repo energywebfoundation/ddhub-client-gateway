@@ -1,7 +1,7 @@
 import { FC } from 'react';
 import { Download } from 'react-feather';
 import { CircularProgress, IconButton } from '@mui/material';
-import { TMessage } from '../Message/Message.type';
+import { TMessage } from '../Messages/Messages.type';
 import { useDownloadMessageEffects } from './DownloadMessage.effects';
 import { useStyles } from './DownloadMessage.styles';
 
