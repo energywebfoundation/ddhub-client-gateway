@@ -5,3 +5,4 @@ export * from './symmetric-keys';
 export * from './topic';
 export * from './did';
 export * from './cron';
+export * from './applications';

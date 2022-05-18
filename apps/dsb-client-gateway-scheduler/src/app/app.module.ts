@@ -13,6 +13,8 @@ import { DidModule } from './modules/did/did.module';
 import { StorageModule } from '../../../dsb-client-gateway-api/src/app/modules/storage/storage.module';
 import { PrivateKeyWatcherService } from './service/private-key-watcher.service';
 import { CronRepositoryModule } from '@dsb-client-gateway/dsb-client-gateway-storage';
+import { ApplicationModule } from './modules/ application/application.module';
+import { HeartbeatModule } from './modules/heartbeat/heartbeat.module';
 
 @Module({
   imports: [
@@ -30,6 +32,8 @@ import { CronRepositoryModule } from '@dsb-client-gateway/dsb-client-gateway-sto
     SecretsEngineModule,
     TopicModule,
     KeysModule,
+    ApplicationModule,
+    HeartbeatModule,
   ],
   controllers: [],
   providers: [AppInitService, PrivateKeyWatcherService],
