@@ -23,7 +23,7 @@ export const Channel: FC = () => {
       pathname: routerConst.LargeFileDownloadChannelTopic,
       query: {
         fqcn: router.query[Queries.FQCN] as string,
-        topicName: data.topicName,
+        topicId: data.topicId,
       },
     });
   };

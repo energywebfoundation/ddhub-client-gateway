@@ -7,7 +7,8 @@ import {
   getTopicsControllerGetTopicHistoryByIdAndVersionMock,
   getChannelControllerGetByTypeMock,
   getChannelControllerGetMock,
-  getChannelMessagesMock
+  getChannelMessagesMock,
+  getDownloadMessageMock
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 
 export function makeServer({ environment = 'development' }) {
@@ -84,7 +85,7 @@ export function makeServer({ environment = 'development' }) {
       });
 
       this.get('messages/download', () => {
-        return {};
+        return getDownloadMessageMock();
       });
 
       this.post('messages', () => {

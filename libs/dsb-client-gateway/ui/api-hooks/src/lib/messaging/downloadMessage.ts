@@ -1,38 +1,63 @@
 import { useState } from 'react';
-import {
-  getMessageControlllerDownloadMessageQueryKey,
-  useMessageControlllerDownloadMessage,
-} from '@dsb-client-gateway/dsb-client-gateway-api-client';
+import { useMessageControlllerDownloadMessage } from '@dsb-client-gateway/dsb-client-gateway-api-client';
+import { useCustomAlert } from '@dsb-client-gateway/ui/core';
+import { downloadFile } from '@dsb-client-gateway/ui/utils';
+
+export type TDownloadData = {
+  fileId: string;
+  contentType: string;
+};
+
+const initialState = { fileId: '', contentType: '' };
 
 export const useDownloadMessage = () => {
-  const [fileId, setFileId] = useState<string>('');
+  const Swal = useCustomAlert();
+  const [fileData, setFileData] = useState<TDownloadData>(initialState);
 
-  const { refetch, isLoading, remove } = useMessageControlllerDownloadMessage(
-    undefined,
+  const downloadMessageError = async () => {
+    await Swal.error({
+      text: 'Error while dowloading the message',
+    });
+  };
+
+  const { isLoading, remove } = useMessageControlllerDownloadMessage(
+    {
+      fileId: fileData.fileId,
+    },
     {
       query: {
-        enabled: false,
-        onSuccess: reset,
-        onError: reset,
+        enabled: !!fileData.fileId,
+        onSuccess: (data: string) => {
+          downloadFile({
+            data,
+            name: fileData.fileId,
+            contentType: fileData.contentType,
+          });
+        },
+        onError: () => {
+          downloadMessageError();
+          reset();
+        },
       },
     }
   );
 
   function reset() {
     remove();
-    setFileId('');
+    setFileData(initialState);
   }
 
-  const downloadMessageHandler = (fileId: string) => {
-    setFileId(fileId);
-    refetch({
-      queryKey: getMessageControlllerDownloadMessageQueryKey({ fileId }),
-    });
+  const downloadMessageHandler = async (data: TDownloadData) => {
+    if (!data?.fileId) {
+      downloadMessageError();
+    } else {
+      setFileData(data);
+    }
   };
 
   return {
     downloadMessageHandler,
-    fileId,
+    fileId: fileData.fileId,
     isLoading,
   };
 };

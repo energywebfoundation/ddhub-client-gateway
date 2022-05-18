@@ -14,10 +14,10 @@ export const useCachedChannel = (fqcn: string) => {
   const cachedChannel = data ?? ({} as GetChannelResponseDto);
   const topics = cachedChannel?.conditions?.topics ?? ([] as ChannelTopic[]);
 
-  const topicsByName = keyBy(topics, 'topicName');
+  const topicsById = keyBy(topics, 'topicId');
 
   return {
     cachedChannel,
-    topicsByName,
+    topicsById,
   };
 };

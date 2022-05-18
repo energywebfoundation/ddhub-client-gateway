@@ -161,29 +161,33 @@ export const getChannelControllerGetMock = () => ({
 
 export const getChannelMessagesMock = () => [
   {
-    id: '110',
-    topicName: 'operatorEnvelope',
-    topicOwner: 'torta.apps.eggplant.vege.iam.ewc',
+    id: '6283374fbe281c73d1ba252b',
     topicVersion: '1.0.0',
-    payload: '624bfd4f4c6cf04abfc20041',
+    payload: '{"fileId":"62833e6ebe281c73d1ba2535"}',
     signature:
-      '0x0abc6026b01856a756de47ec6f44d9c14fe69009bbf3b9b6cf522d8d783a1c654425848381affca5dab9284d8715fa2f9e34155374bafd923d75c219496cbe161c',
+      '0xd3a2e04d344261ee648d00baba8477a575030371862ee9f11d339726cff8d47b579321dc99312c84d63ab33e065e752c9639a5615ed5c9bf757a634772c506dc1b',
     sender: 'did:ethr:volta:0x03830466Ce257f9B798B0f27359D7639dFB6457D',
-    timestampNanos: 1649147198388,
-    transactionId: '1649147198388',
-    signatureValid: true,
+    timestampNanos: 1652768367254,
+    transactionId: "''",
+    signatureValid: false,
+    decryption: {
+      status: true,
+    },
   },
   {
-    id: '111',
-    topicName: 'operatorEnvelope',
-    topicOwner: 'ddhub.apps.energyweb.iam.ewc',
+    id: '6283374fbe281c73d1ba252b',
     topicVersion: '1.0.0',
-    payload: '624bfd4f4c6cf04abfc20042',
+    payload: '{ data: 45 }',
     signature:
-      '0x0abc6026b01856a756de47ec6f44d9c14fe69009bbf3b9b6cf522d8d783a1c654425848381affca5dab9284d8715fa2f9e34155374bafd923d75c219496cbe161c',
+      '0xd3a2e04d344261ee648d00baba8477a575030371862ee9f11d339726cff8d47b579321dc99312c84d63ab33e065e752c9639a5615ed5c9bf757a634772c506dc1b',
     sender: 'did:ethr:volta:0x03830466Ce257f9B798B0f27359D7639dFB6457D',
-    timestampNanos: 1649147198388,
-    transactionId: '1649147198389',
+    timestampNanos: 1652768367254,
+    transactionId: "''",
     signatureValid: true,
+    decryption: {
+      status: true,
+    },
   },
 ];
+
+export const getDownloadMessageMock = () => ('text')

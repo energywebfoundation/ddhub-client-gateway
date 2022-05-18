@@ -11,7 +11,6 @@ import {
   useIdentity
 } from '@dsb-client-gateway/ui/api-hooks';
 import { Queries, didFormatMinifier } from '@dsb-client-gateway/ui/utils';
-import { TTableComponentAction } from '@dsb-client-gateway/ui/core';
 import { useStyles } from './Message.styles';
 import { TMessage } from './Message.type';
 
@@ -21,11 +20,11 @@ export const useMessageEffects = () => {
 
   const { identity } = useIdentity();
 
-  const { cachedChannel, topicsByName } = useCachedChannel(
+  const { cachedChannel, topicsById } = useCachedChannel(
     router.query[Queries.FQCN] as string
   );
 
-  const topic = topicsByName[router.query[Queries.TopicName] as string];
+  const topic = topicsById[router.query[Queries.TopicId] as string];
 
     const { messages, messagesLoaded } = useMessages({
     fqcn: router.query[Queries.FQCN] as string,
@@ -45,15 +44,17 @@ export const useMessageEffects = () => {
   //   message?.topicVersion
   // );
 
-  const { downloadMessageHandler, isLoading: isDownloading, fileId } = useDownloadMessage();
-
   const loading = !router.isReady || !messagesLoaded;
 
   const data: TMessage[] = messages.map(message => {
     return {
       timestampNanos: dayjs(message?.timestampNanos).format('MM/DD/YYYY'),
       sender: didFormatMinifier(message?.sender),
-      fileId: message?.payload
+      fileData: {
+        payload: message?.payload,
+        version: message?.topicVersion,
+        topicId: topic?.topicId
+      }
     };
   })
 
@@ -72,19 +73,11 @@ export const useMessageEffects = () => {
   //   },
   // ];
 
-  const downloadData = {
-    loading: isDownloading,
-    fileId
-  }
-
-  console.log(downloadData, 'downloadData');
 
   return {
     topic,
     channel: cachedChannel,
-    downloadMessageHandler,
     messages: data,
     loading,
-    downloadData
   };
 };

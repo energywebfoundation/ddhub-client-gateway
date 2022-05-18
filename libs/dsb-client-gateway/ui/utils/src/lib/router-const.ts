@@ -21,7 +21,7 @@ export const routerConst = {
   LargeDataMessagingFileUpload: '/messages/large-file-upload',
   LargeDataMessagingFileDownload: '/messages/large-file-download',
   LargeFileDownloadChannel: `/messages/large-file-download/[${Queries.FQCN}]`,
-  LargeFileDownloadChannelTopic: `/messages/large-file-download/[${Queries.FQCN}]/[${Queries.TopicName}]`,
+  LargeFileDownloadChannelTopic: `/messages/large-file-download/[${Queries.FQCN}]/[${Queries.TopicId}]`,
   DataMessagingFileUpload: '/messages/file-upload',
   DataMessagingFileDownload: '/messages/file-download',
   VersionHistory: `/applications/[${Queries.Namespace}]/[${Queries.TopicId}]/version-history`,
