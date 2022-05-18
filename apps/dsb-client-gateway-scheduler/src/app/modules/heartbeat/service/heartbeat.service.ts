@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron, SchedulerRegistry } from '@nestjs/schedule';
 import { CronJob } from 'cron';
+import { CronJobType } from '@dsb-client-gateway/dsb-client-gateway-storage';
 
 @Injectable()
 export class HeartbeatService {
@@ -9,7 +10,7 @@ export class HeartbeatService {
   constructor(protected readonly schedulerRegistry: SchedulerRegistry) {}
 
   @Cron('30 * * * * *', {
-    name: 'HEARTBEAT',
+    name: CronJobType.HEARTBEAT,
   })
   public handleCron(): void {
     const cronJobs: Map<string, CronJob> = this.schedulerRegistry.getCronJobs();

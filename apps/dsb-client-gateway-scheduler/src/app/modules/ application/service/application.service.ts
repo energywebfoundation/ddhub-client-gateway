@@ -5,7 +5,10 @@ import {
   CronStatus,
   CronWrapperRepository,
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
-import { IamService } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
+import {
+  ApplicationDTO,
+  IamService,
+} from '@dsb-client-gateway/dsb-client-gateway-iam-client';
 import { CronJob } from 'cron';
 import { Span } from 'nestjs-otel';
 import { SchedulerRegistry } from '@nestjs/schedule';
@@ -45,8 +48,7 @@ export class ApplicationService implements OnApplicationBootstrap {
       async () => {
         this.logger.log(`Executing applications refresh`);
 
-        await this.refreshApplications('user');
-        await this.refreshApplications('topiccreator');
+        await this.refreshApplications();
       }
     );
 
@@ -59,9 +61,7 @@ export class ApplicationService implements OnApplicationBootstrap {
   }
 
   @Span('applications_refresh')
-  protected async refreshApplications(
-    roleName: 'user' | 'topiccreator'
-  ): Promise<void> {
+  protected async refreshApplications(): Promise<void> {
     try {
       const isInitialized: boolean = this.iamService.isInitialized();
 
@@ -71,21 +71,38 @@ export class ApplicationService implements OnApplicationBootstrap {
         return;
       }
 
-      this.logger.log('fetching all available applications for ' + roleName);
+      const userApplications =
+        await this.iamService.getApplicationsByOwnerAndRole(
+          'user',
+          this.iamService.getDIDAddress()
+        );
 
-      const applications = await this.iamService.getApplicationsByOwnerAndRole(
-        roleName,
-        this.iamService.getDIDAddress()
+      const topicCreatorApplications =
+        await this.iamService.getApplicationsByOwnerAndRole(
+          'topiccreator',
+          this.iamService.getDIDAddress()
+        );
+
+      const userApplicationRoles = this.getRoles(userApplications, 'user');
+      const allApplicationsRoles = this.getRoles(
+        topicCreatorApplications,
+        'topiccreator',
+        userApplicationRoles
       );
 
-      const namespaces = applications
+      const combinedApplications: ApplicationDTO[] = [
+        ...userApplications,
+        ...topicCreatorApplications,
+      ];
+
+      const namespaces: string[] = combinedApplications
         .map(({ namespace }) => namespace)
         .filter(Boolean);
 
       const topicsCount: Topic[] =
         await this.ddhubTopicService.getTopicsCountByOwner(namespaces);
 
-      for (const application of applications) {
+      for (const application of combinedApplications) {
         await this.applicationWrapper.repository.save({
           appName: application.appName,
           description: application.description,
@@ -93,6 +110,7 @@ export class ApplicationService implements OnApplicationBootstrap {
           websiteUrl: application.websiteUrl,
           namespace: application.namespace,
           topicsCount: topicsCount[application.namespace] || 0,
+          roles: allApplicationsRoles[this.getKey(application)] || [],
         });
 
         this.logger.log(
@@ -114,5 +132,35 @@ export class ApplicationService implements OnApplicationBootstrap {
 
       this.logger.error('refresh applications failed', e);
     }
+  }
+
+  protected getRoles(
+    applications: ApplicationDTO[],
+    role: string,
+    initialApplicationRoles: Record<string, string[]> = {}
+  ): Record<string, string[]> {
+    const applicationRoles: Record<string, string[]> = initialApplicationRoles;
+
+    applications.forEach((application) => {
+      const key = this.getKey(application);
+
+      if (!applicationRoles[key]) {
+        applicationRoles[key] = [role];
+
+        return;
+      }
+
+      if (applicationRoles[key].includes(role)) {
+        return;
+      }
+
+      applicationRoles[key].push(role);
+    });
+
+    return applicationRoles;
+  }
+
+  protected getKey(application: ApplicationDTO): string {
+    return `${application.appName}_${application.namespace}`;
   }
 }

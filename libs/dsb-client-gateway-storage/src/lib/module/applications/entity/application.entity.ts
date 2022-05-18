@@ -36,6 +36,20 @@ export class ApplicationEntity {
   })
   public topicsCount?: number | null;
 
+  @Column({
+    type: 'text',
+    transformer: {
+      to(value: any): any {
+        return JSON.stringify(value);
+      },
+      from(value: any): any {
+        return JSON.parse(value);
+      },
+    },
+    default: '[]',
+  })
+  public roles: string[];
+
   @CreateDateColumn()
   createdDate!: Date;
 

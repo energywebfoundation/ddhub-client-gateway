@@ -76,6 +76,15 @@ export class ApplicationDTO implements ApplicationEntity {
   @IsString()
   @IsOptional()
   @ApiProperty({
+    description: 'application assigned roles',
+    type: [String],
+    example: ['user', 'topiccreator'],
+  })
+  public roles: string[];
+
+  @IsString()
+  @IsOptional()
+  @ApiProperty({
     description: 'number of topics',
     type: Number,
     example: '4',

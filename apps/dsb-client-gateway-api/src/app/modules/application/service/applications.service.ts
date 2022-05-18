@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import {
   ApplicationEntity,
   ApplicationWrapperRepository,
@@ -6,12 +6,15 @@ import {
 
 @Injectable()
 export class ApplicationsService {
-  private readonly logger = new Logger(ApplicationsService.name);
   constructor(
     protected readonly applicationsWrapper: ApplicationWrapperRepository
   ) {}
 
-  public async getApplications(roleName): Promise<ApplicationEntity[]> {
-    return this.applicationsWrapper.repository.find({});
+  public async getApplications(roleName: string): Promise<ApplicationEntity[]> {
+    return this.applicationsWrapper.repository
+      .find()
+      .then((applications: ApplicationEntity[]) =>
+        applications.filter(({ roles }) => roles.includes(roleName))
+      );
   }
 }
