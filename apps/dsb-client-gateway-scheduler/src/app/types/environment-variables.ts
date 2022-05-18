@@ -142,6 +142,13 @@ export class EnvironmentVariables {
   @Transform(EnvironmentVariables.transformBoolean('PRIVATE_KEY_CRON_ENABLED'))
   PRIVATE_KEY_CRON_ENABLED = true;
 
+  @IsString()
+  HEARTBEAT_CRON_SCHEDULE = '30 * * * * *';
+
+  @IsBoolean()
+  @Transform(EnvironmentVariables.transformBoolean('HEARTBEAT_CRON_ENABLED'))
+  HEARTBEAT_CRON_ENABLED = true;
+
   @IsBoolean()
   @Transform(EnvironmentVariables.transformBoolean('TOPICS_CRON_ENABLED'))
   DID_LISTENER_ENABLED = true;
