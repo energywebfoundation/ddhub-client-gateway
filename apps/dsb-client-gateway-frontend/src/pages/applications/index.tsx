@@ -1,5 +1,5 @@
 import Head from 'next/head';
-import { Applications } from '@dsb-client-gateway/ui/applications';
+import { Applications } from '@ddhub-client-gateway-frontend/ui/applications';
 
 export default function ListApplications() {
   return (

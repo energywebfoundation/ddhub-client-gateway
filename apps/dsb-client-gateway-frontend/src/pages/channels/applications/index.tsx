@@ -1,6 +1,6 @@
 import Head from 'next/head';
-import { Applications } from '@dsb-client-gateway/ui/applications';
-import { routerConst } from '@dsb-client-gateway/ui/utils';
+import { Applications } from '@ddhub-client-gateway-frontend/ui/applications';
+import { routerConst } from '@ddhub-client-gateway-frontend/ui/utils';
 
 export default function ListApplications() {
   return (

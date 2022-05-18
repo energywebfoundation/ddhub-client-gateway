@@ -22,7 +22,7 @@
     "**/*.js",
     "**/*.jsx",
     "next-env.d.ts",
-    "../../libs/dsb-client-gateway/ui/core/react-table-config.d.ts"
+    "../../libs/ddhub-client-gateway-frontend/ui/core/react-table-config.d.ts"
   ],
   "exclude": [
     "node_modules"

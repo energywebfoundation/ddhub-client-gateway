@@ -10,7 +10,7 @@ import {
 import { CreateIdentityDto } from './dto/create-identity.dto';
 import { DigestGuard } from '../utils/guards/digest.guard';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
-import { Identity } from '@dsb-client-gateway/dsb-client-gateway/identity/models';
+import { Identity } from '@ddhub-client-gateway/identity/models';
 import { ClaimsResponseDto } from './dto/claims-response.dto';
 import { IdentityResponseDto } from './dto/identity-response.dto';
 import { IdentityService } from '@dsb-client-gateway/ddhub-client-gateway-identity';
