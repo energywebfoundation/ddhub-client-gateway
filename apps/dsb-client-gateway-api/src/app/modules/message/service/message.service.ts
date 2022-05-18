@@ -40,6 +40,7 @@ import {
   SendMessageResponse
 } from '../message.interface';
 import { WsClientService } from './ws-client.service';
+import { Span } from 'nestjs-otel';
 
 export enum EventEmitMode {
   SINGLE = 'SINGLE',
@@ -71,6 +72,7 @@ export class MessageService {
     );
   }
 
+  @Span('message_sendMessage')
   public async sendMessage(dto: SendMessageDto): Promise<SendMessageResponse> {
     const channel: ChannelEntity = await this.channelService.getChannelOrThrow(
       dto.fqcn
@@ -178,6 +180,7 @@ export class MessageService {
     );
   }
 
+  @Span('message_getMessages')
   public async getMessages({
     fqcn,
     from,
@@ -251,7 +254,7 @@ export class MessageService {
           timestampNanos: message.timestampNanos,
           transactionId: message.transactionId,
           signatureValid: false,
-          decryption: { status: true },
+          decryption: { status: false },
         };
 
         if (!message.isFile) {
@@ -271,18 +274,24 @@ export class MessageService {
             result.signatureValid = true;
 
             try {
-              const decryptedMessage = await this.keyService.decryptMessage(
-                message.payload,
-                message.clientGatewayMessageId,
-                message.senderDid
-              );
+              const decryptedMessage: string | null =
+                await this.keyService.decryptMessage(
+                  message.payload,
+                  message.clientGatewayMessageId,
+                  message.senderDid
+                );
 
               if (!decryptedMessage) {
                 result.decryption.status = false;
                 result.decryption.errorMessage = 'Decryption failed.';
                 result.payload = '';
+
+                this.logger.error(
+                  `failed to decrypt ${message.clientGatewayMessageId}`
+                );
               } else {
                 result.payload = decryptedMessage;
+                result.decryption.status = true;
               }
 
               this.logger.debug(

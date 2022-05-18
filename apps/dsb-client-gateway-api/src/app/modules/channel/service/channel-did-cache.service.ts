@@ -2,9 +2,15 @@ import { Injectable, Logger } from '@nestjs/common';
 import { IamService } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
 import { ChannelService } from './channel.service';
 import { Span } from 'nestjs-otel';
-import { ChannelEntity } from '@dsb-client-gateway/dsb-client-gateway-storage';
-import { TopicService } from './topic.service';
-import { DdhubDidService } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
+import {
+  ChannelEntity,
+  TopicRepositoryWrapper,
+} from '@dsb-client-gateway/dsb-client-gateway-storage';
+import {
+  DdhubDidService,
+  DdhubTopicsService,
+  TopicVersionResponse,
+} from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
 import { IdentityService } from '@dsb-client-gateway/ddhub-client-gateway-identity';
 
 @Injectable()
@@ -15,8 +21,9 @@ export class ChannelDidCacheService {
     protected readonly iamService: IamService,
     protected readonly channelService: ChannelService,
     protected readonly identityService: IdentityService,
-    protected readonly topicService: TopicService,
-    protected readonly ddhubDidService: DdhubDidService
+    protected readonly ddhubTopicService: DdhubTopicsService,
+    protected readonly ddhubDidService: DdhubDidService,
+    protected readonly wrapper: TopicRepositoryWrapper
   ) {}
 
   @Span('channel_refreshChannelCache')
@@ -56,5 +63,27 @@ export class ChannelDidCacheService {
       internalChannel.fqcn,
       uniqueDids
     );
+
+    for (const { topicId, owner, topicName } of internalChannel.conditions
+      .topics) {
+      const topicVersions: TopicVersionResponse =
+        await this.ddhubTopicService.getTopicVersions(topicId);
+
+      for (const topicVersion of topicVersions.records) {
+        await this.wrapper.topicRepository.save({
+          id: topicId,
+          owner: owner,
+          name: topicName,
+          schemaType: topicVersion.schemaType,
+          version: topicVersion.version,
+          schema: topicVersion.schema,
+          tags: topicVersion.tags,
+        });
+
+        this.logger.log(
+          `stored topic with name ${topicVersion.name} and owner ${topicVersion.owner} with version ${topicVersion.version}`
+        );
+      }
+    }
   }
 }
