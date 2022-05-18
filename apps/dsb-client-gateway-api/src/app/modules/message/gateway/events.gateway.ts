@@ -28,7 +28,6 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayInit {
 
   private readonly logger = new Logger(EventsGateway.name);
   private readonly protocol: string = 'dsb-protocol';
-  private clientId = 'ws-default';
 
   constructor(
     protected readonly configService: ConfigService,
@@ -57,11 +56,6 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayInit {
     // Also Auth Guards do not work with HandleConnection, that's why we are not using Guards
     server.on('connection', (socket, request) => {
       socket['request'] = request;
-      // eslint-disable-next-line prefer-const
-      const _clientId = new URLSearchParams(request.url).get("/events?clientId");
-      if (_clientId) {
-        this.clientId = _clientId;
-      }
     });
   }
 
@@ -75,6 +69,20 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayInit {
     if (protocol !== this.protocol) {
       client.close(1002, 'Protocol Not Supported');
 
+      return;
+    }
+
+    const _clientId = new URLSearchParams(client.request.url.split("?")[1]).get("clientId");
+    const _size = new URLSearchParams(client.request.url.split("?")[1]).get("size");
+
+    if (_clientId === null) {
+      client.close(1003, 'Required paramater \'clientId\' ex. ws://localhost:3333/events?clientId=id_name');
+      return;
+    }
+
+    const clientIdRegex = new RegExp(/^[a-zA-Z0-9\-:]+$/);
+    if (!clientIdRegex.test(_clientId)) {
+      client.close(1003, 'Required paramater \'clientId\' with format Alphanumeric string');
       return;
     }
 
