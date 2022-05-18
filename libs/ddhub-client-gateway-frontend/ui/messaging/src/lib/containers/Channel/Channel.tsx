@@ -2,10 +2,10 @@ import { FC } from 'react';
 import { useRouter } from 'next/router';
 import { Stack, Box } from '@mui/material';
 import { ChannelTopic } from '@dsb-client-gateway/dsb-client-gateway-api-client';
-import { useChannel } from '@dsb-client-gateway/ui/api-hooks';
-import { GenericTable } from '@dsb-client-gateway/ui/core';
-import { Queries, routerConst } from '@dsb-client-gateway/ui/utils';
-import { ChannelInfo } from '@dsb-client-gateway/ui/channels';
+import { useChannel } from '@ddhub-client-gateway-frontend/ui/api-hooks';
+import { GenericTable } from '@ddhub-client-gateway-frontend/ui/core';
+import { Queries, routerConst } from '@ddhub-client-gateway-frontend/ui/utils';
+import { ChannelInfo } from '@ddhub-client-gateway-frontend/ui/channels';
 
 export const CHANNEL_TOPICS_HEADERS = [
   {
