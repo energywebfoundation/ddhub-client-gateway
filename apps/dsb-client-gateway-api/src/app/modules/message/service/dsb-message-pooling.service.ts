@@ -94,7 +94,7 @@ export class DsbMessagePoolingService implements OnModuleInit {
       this.schedulerRegistry.addTimeout(SCHEDULER_HANDLERS.MESSAGES, timeout);
     } catch (e) {
       this.logger.error(e);
-      const timeout = setTimeout(callback, this.configService.get<number>('WEBSOCKET_POOLING_TIMEOUT', 5000));
+      const timeout = setTimeout(callback, this.configService.get<number>('WEBSOCKET_POOLING_TIMEOUT', 5000) * 12);
       this.schedulerRegistry.addTimeout(SCHEDULER_HANDLERS.MESSAGES, timeout);
     }
   }
@@ -103,22 +103,18 @@ export class DsbMessagePoolingService implements OnModuleInit {
 
     const websocketMode = this.configService.get('WEBSOCKET', WebSocketImplementation.NONE);
     let msgCount = 0;
-    if (websocketMode === WebSocketImplementation.SERVER) {
-      if (this.gateway.server.clients.size > 0) {
-        await this.ddhubLoginService.login();
-        await this.gateway.server.clients.forEach(async (client) => {
-          await this.pullMessages(subscriptions, client).then((msg) => {
-            msgCount += msg;
-          }).catch();
-        });
-      }
-    } else {
-      if (this.wsClient.rws) {
-        await this.ddhubLoginService.login();
-        await this.pullMessages(subscriptions, this.wsClient.rws).then((msg) => {
-          msgCount += msg;
+    if (websocketMode === WebSocketImplementation.SERVER && this.gateway.server.clients.size > 0) {
+      await this.ddhubLoginService.login();
+      await this.gateway.server.clients.forEach(async (client) => {
+        await this.pullMessages(subscriptions, client).then((totalMsg) => {
+          msgCount += totalMsg;
         }).catch();
-      }
+      });
+    } else if (this.wsClient.rws) {
+      await this.ddhubLoginService.login();
+      await this.pullMessages(subscriptions, this.wsClient.rws).then((totalMsg) => {
+        msgCount += totalMsg;
+      }).catch();
     }
 
     return msgCount;
