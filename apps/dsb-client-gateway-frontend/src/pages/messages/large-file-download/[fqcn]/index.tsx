@@ -1,4 +1,4 @@
-import { Channel } from "@dsb-client-gateway/ui/channels";
+import { Channel } from "@ddhub-client-gateway-frontend/ui/channels";
 
 export default function Index() {
   return <Channel />

@@ -1,5 +1,5 @@
 import { Controller, Get, Post, UseGuards } from '@nestjs/common';
-import { Enrolment } from '@dsb-client-gateway/dsb-client-gateway/identity/models';
+import { Enrolment } from '@ddhub-client-gateway/identity/models';
 import { DigestGuard } from '../utils/guards/digest.guard';
 import { ApiTags } from '@nestjs/swagger';
 import { EnrolmentService } from '@dsb-client-gateway/ddhub-client-gateway-enrolment';

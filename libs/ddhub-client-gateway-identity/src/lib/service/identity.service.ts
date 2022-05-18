@@ -7,7 +7,7 @@ import {
   Enrolment,
   Identity,
   IdentityWithEnrolment,
-} from '@dsb-client-gateway/dsb-client-gateway/identity/models';
+} from '@ddhub-client-gateway/identity/models';
 import {
   NoPrivateKeyException,
   SecretsEngineService,

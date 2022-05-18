@@ -5,19 +5,19 @@ import NProgress from 'nprogress';
 import Head from 'next/head';
 import Axios from 'axios';
 import { QueryClient, QueryClientProvider } from 'react-query';
-import { DDHubThemeProvider } from '@dsb-client-gateway/ui/utils';
+import { DDHubThemeProvider } from '@ddhub-client-gateway-frontend/ui/utils';
 import { CacheProvider, EmotionCache } from '@emotion/react';
 import { CssBaseline } from '@mui/material';
 import createCache from '@emotion/cache';
 import { Layout } from '../components/Layout';
 import { queryClientOptions } from '../utils';
-import { BackdropContextProvider, useBackdropContext } from "@dsb-client-gateway/ui/context";
-import { Backdrop } from '@dsb-client-gateway/ui/core'
+import { BackdropContextProvider, useBackdropContext } from "@ddhub-client-gateway-frontend/ui/context";
+import { Backdrop } from '@ddhub-client-gateway-frontend/ui/core'
 import {
   useCheckAccountOnInitEffects,
   UserDataContext,
   useUserData,
-} from '@dsb-client-gateway/ui/login';
+} from '@ddhub-client-gateway-frontend/ui/login';
 import { makeServer } from '../services/mock.service';
 import 'nprogress/nprogress.css';
 import '../styles/globals.css';
