@@ -1,5 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsBoolean, IsNumber, IsString } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsString,
+  IsNumber,
+  IsEnum,
+  IsBoolean
+} from 'class-validator';
+import { SchemaType } from '../../../topic/topic.const';
 
 export class GetMessagesResponseDto {
   @IsString()
@@ -32,6 +39,24 @@ export class GetMessagesResponseDto {
     example: '1.0.0',
   })
   topicVersion: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @IsEnum(SchemaType)
+  @ApiProperty({
+    description: 'schema type of the topic',
+    type: String,
+    enum: [
+      SchemaType.JSD7,
+      SchemaType.XML,
+      SchemaType.XSD6,
+      SchemaType.CSV,
+      SchemaType.TSV,
+    ],
+    example: 'JSD7',
+  })
+  topicSchemaType: SchemaType;
+
   @IsString()
   @ApiProperty({
     description: 'Payload sent to message',
