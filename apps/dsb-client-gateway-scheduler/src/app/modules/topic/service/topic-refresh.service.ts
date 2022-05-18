@@ -1,5 +1,7 @@
 import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import {
+  ApplicationEntity,
+  ApplicationWrapperRepository,
   CronJobType,
   CronStatus,
   CronWrapperRepository,
@@ -14,6 +16,7 @@ import {
 import { SchedulerRegistry } from '@nestjs/schedule';
 import { CronJob } from 'cron';
 import { Span } from 'nestjs-otel';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class TopicRefreshService implements OnApplicationBootstrap {
@@ -22,19 +25,35 @@ export class TopicRefreshService implements OnApplicationBootstrap {
   constructor(
     protected readonly wrapper: TopicRepositoryWrapper,
     protected readonly iamService: IamService,
+    protected readonly applicationsWrapper: ApplicationWrapperRepository,
     protected readonly ddhubTopicsService: DdhubTopicsService,
     protected readonly schedulerRegistry: SchedulerRegistry,
-    protected readonly cronWrapper: CronWrapperRepository
+    protected readonly cronWrapper: CronWrapperRepository,
+    protected readonly configService: ConfigService
   ) {}
 
   public async onApplicationBootstrap(): Promise<void> {
-    const cronJob = new CronJob(`*/1 * * * *`, async () => {
-      this.logger.log(`Executing topic refresh `);
+    const isCronEnabled: boolean = this.configService.get<boolean>(
+      'TOPICS_CRON_ENABLED',
+      true
+    );
 
-      await this.refreshTopics();
-    });
+    if (!isCronEnabled) {
+      this.logger.warn(`Topics refresh cron job is disabled`);
 
-    await this.schedulerRegistry.addCronJob('refresh_topics', cronJob);
+      return;
+    }
+
+    const cronJob = new CronJob(
+      this.configService.get<string>('TOPICS_CRON_SCHEDULE'),
+      async () => {
+        this.logger.log(`Executing topic refresh `);
+
+        await this.refreshTopics();
+      }
+    );
+
+    await this.schedulerRegistry.addCronJob(CronJobType.TOPIC_REFRESH, cronJob);
 
     cronJob.start();
   }
@@ -50,14 +69,10 @@ export class TopicRefreshService implements OnApplicationBootstrap {
         return;
       }
 
-      await this.wrapper.topicRepository.clear();
-
       this.logger.log('fetching all available applications');
 
-      const applications = await this.iamService.getApplicationsByOwnerAndRole(
-        'user',
-        this.iamService.getDIDAddress()
-      );
+      const applications: ApplicationEntity[] =
+        await this.applicationsWrapper.repository.find();
 
       this.logger.log(`fetched ${applications.length} applications`);
 
