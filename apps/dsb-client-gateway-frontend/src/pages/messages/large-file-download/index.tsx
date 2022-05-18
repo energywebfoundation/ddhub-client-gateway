@@ -1,4 +1,4 @@
-import { DataMessagingDownload } from "@dsb-client-gateway/ui/messaging";
+import { DataMessagingDownload } from "@ddhub-client-gateway-frontend/ui/messaging";
 
 export default function LargeFileDownload() {
   return <DataMessagingDownload isLarge />;

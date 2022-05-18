@@ -4,7 +4,7 @@ import { RetryConfigService } from '@dsb-client-gateway/ddhub-client-gateway-uti
 import { DidAuthService } from '@dsb-client-gateway/ddhub-client-gateway-did-auth';
 import { TlsAgentService } from './tls-agent.service';
 import { Span } from 'nestjs-otel';
-import { RoleStatus } from '@dsb-client-gateway/dsb-client-gateway/identity/models';
+import { RoleStatus } from '@ddhub-client-gateway/identity/models';
 import promiseRetry from 'promise-retry';
 import { SecretsEngineService } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
 import { IamService } from '@dsb-client-gateway/dsb-client-gateway-iam-client';

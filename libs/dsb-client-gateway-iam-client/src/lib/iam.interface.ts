@@ -1,5 +1,5 @@
 import { IAppDefinition } from '@energyweb/credential-governance';
-import { RoleStatus } from '@dsb-client-gateway/dsb-client-gateway/identity/models';
+import { RoleStatus } from '@ddhub-client-gateway/identity/models';
 
 export class ApplicationDTO implements IAppDefinition {
   appName: string;
