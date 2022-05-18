@@ -11,6 +11,8 @@ import { CssBaseline } from '@mui/material';
 import createCache from '@emotion/cache';
 import { Layout } from '../components/Layout';
 import { queryClientOptions } from '../utils';
+import { BackdropContextProvider, useBackdropContext } from "@dsb-client-gateway/ui/context";
+import { Backdrop } from '@dsb-client-gateway/ui/core'
 import {
   useCheckAccountOnInitEffects,
   UserDataContext,
@@ -19,7 +21,6 @@ import {
 import { makeServer } from '../services/mock.service';
 import 'nprogress/nprogress.css';
 import '../styles/globals.css';
-import { BackdropContextProvider } from "../context";
 
 if (
   process.env.NODE_ENV !== 'production' &&
@@ -46,6 +47,7 @@ function InitializeAccountStatus(props) {
 function MyApp(props: MyAppProps) {
   const { Component, pageProps } = props;
   const { userDataValue } = useUserData();
+  const { open } = useBackdropContext();
   const [queryClient] = React.useState(
     () =>
       new QueryClient({
@@ -88,6 +90,7 @@ function MyApp(props: MyAppProps) {
             <QueryClientProvider client={queryClient}>
               <InitializeAccountStatus>
                 {getLayout(<Component {...pageProps} />)}
+                <Backdrop open={open} />
               </InitializeAccountStatus>
             </QueryClientProvider>
           </UserDataContext.Provider>

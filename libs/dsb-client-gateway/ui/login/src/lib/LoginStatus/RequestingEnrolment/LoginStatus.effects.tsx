@@ -7,17 +7,12 @@ import EnrolForRoleContainer from '../EnrolForRoleContainer/EnrolForRoleContaine
 import RequestingEnrolment from './RequestingEnrolment';
 import AwaitingSyncing from '../AwaitingSyncing/AwaitingSyncing';
 import ResetPrivateKey from '../../ResetPrivateKey/ResetPrivateKey';
-import { useBackdropContext } from "../../../../../../../../apps/dsb-client-gateway-frontend/src/context"
 import LoadingInfo from '../../LoadingInfo/LoadingInfo';
 
 export const useLoginStatusEffects = () => {
   const { isLoading, submit, status, errorMessage } = usePrivateKeyEffects();
-  const { setLoader } = useBackdropContext();
 
   const privateKeyHandler = (privateKey: string) => {
-    if (setLoader) {
-      setLoader(true);
-    }
     submit(privateKey);
   };
 

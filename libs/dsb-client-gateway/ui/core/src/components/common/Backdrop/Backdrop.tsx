@@ -10,7 +10,6 @@ import { alpha } from '@mui/material/styles';
 
 export interface BackdropProps {
   open: boolean;
-  setLoader?: (open: boolean) => void;
 }
 
 export const Backdrop: FC<BackdropProps> = ({ open }) => {
