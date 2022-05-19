@@ -103,6 +103,8 @@ export class ApplicationService implements OnApplicationBootstrap {
         await this.ddhubTopicService.getTopicsCountByOwner(namespaces);
 
       this.logger.log('START: List of combined apps');
+      this.logger.log('topicsCount: ' + JSON.stringify(topicsCount));
+      this.logger.log('allApplicationsRoles: ' + JSON.stringify(allApplicationsRoles));
       for (const application of combinedApplications) {
         this.logger.log(JSON.stringify(application));
         await this.applicationWrapper.repository.save({
