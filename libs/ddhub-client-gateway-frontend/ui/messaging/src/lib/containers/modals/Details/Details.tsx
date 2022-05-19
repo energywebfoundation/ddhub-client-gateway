@@ -47,7 +47,7 @@ export const Details: FC = () => {
                     variant="body2"
                     className={classes.label}
                   >
-                    Message
+                    Message:
                   </Typography>
                   <EditorView value={parsedPayload} />
                 </Box>
