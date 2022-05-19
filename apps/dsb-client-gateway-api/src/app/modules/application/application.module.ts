@@ -1,7 +1,10 @@
 import { Module } from '@nestjs/common';
 import { ApplicationsController } from './controller/application.controller';
-import { DsbClientGatewayStorageModule } from '@dsb-client-gateway/dsb-client-gateway-storage';
-import { TopicService } from './service/topic.service';
+import {
+  ApplicationRepositoryModule,
+  DsbClientGatewayStorageModule,
+} from '@dsb-client-gateway/dsb-client-gateway-storage';
+import { ApplicationsService } from './service/applications.service';
 import { DdhubClientGatewayMessageBrokerModule } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
 import { EnrolmentModule } from '../enrolment/enrolment.module';
 
@@ -9,8 +12,9 @@ import { EnrolmentModule } from '../enrolment/enrolment.module';
   imports: [
     DsbClientGatewayStorageModule,
     DdhubClientGatewayMessageBrokerModule.forRootAsync([EnrolmentModule]),
+    ApplicationRepositoryModule,
   ],
-  providers: [TopicService],
+  providers: [ApplicationsService],
   exports: [],
   controllers: [ApplicationsController],
 })

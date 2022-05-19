@@ -7,6 +7,7 @@ import {
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
 import { SchedulerRegistry } from '@nestjs/schedule';
 import { SymmetricKeysCacheService } from '@dsb-client-gateway/ddhub-client-gateway-encryption';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class SymmetricKeysCronService implements OnApplicationBootstrap {
@@ -15,15 +16,30 @@ export class SymmetricKeysCronService implements OnApplicationBootstrap {
   constructor(
     protected readonly symmetricKeysCacheService: SymmetricKeysCacheService,
     protected readonly schedulerRegistry: SchedulerRegistry,
-    protected readonly cronWrapper: CronWrapperRepository
+    protected readonly cronWrapper: CronWrapperRepository,
+    protected readonly configService: ConfigService
   ) {}
 
   public async onApplicationBootstrap(): Promise<void> {
-    const cronJob = new CronJob(`*/1 * * * *`, async () => {
-      this.logger.log(`Executing symmetric keys service`);
+    const isCronEnabled: boolean = this.configService.get<boolean>(
+      'SYMMETRIC_KEYS_CRON_ENABLED',
+      true
+    );
 
-      await this.refreshSymmetricKeysCache();
-    });
+    if (!isCronEnabled) {
+      this.logger.warn(`Symmetric keys cron job is disabled`);
+
+      return;
+    }
+
+    const cronJob = new CronJob(
+      this.configService.get<string>('SYMMETRIC_KEYS_CRON_SCHEDULE'),
+      async () => {
+        this.logger.log(`Executing symmetric keys service`);
+
+        await this.refreshSymmetricKeysCache();
+      }
+    );
 
     await this.schedulerRegistry.addCronJob(
       CronJobType.SYMMETRIC_KEYS,

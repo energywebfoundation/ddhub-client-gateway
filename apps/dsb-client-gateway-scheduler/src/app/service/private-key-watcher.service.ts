@@ -10,6 +10,7 @@ import {
   CronWrapperRepository,
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
 import { SchedulerRegistry } from '@nestjs/schedule';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class PrivateKeyWatcherService implements OnApplicationBootstrap {
@@ -20,15 +21,30 @@ export class PrivateKeyWatcherService implements OnApplicationBootstrap {
     protected readonly ethersService: EthersService,
     protected readonly iamService: IamService,
     protected readonly schedulerRegistry: SchedulerRegistry,
-    protected readonly cronWrapper: CronWrapperRepository
+    protected readonly cronWrapper: CronWrapperRepository,
+    protected readonly configService: ConfigService
   ) {}
 
   public async onApplicationBootstrap(): Promise<void> {
-    const cronJob = new CronJob(`*/1 * * * *`, async () => {
-      this.logger.log(`Executing private key watcher`);
+    const isCronEnabled: boolean = this.configService.get<boolean>(
+      'PRIVATE_KEY_CRON_ENABLED',
+      true
+    );
 
-      await this.watch();
-    });
+    if (!isCronEnabled) {
+      this.logger.warn(`Channel did cron job is disabled`);
+
+      return;
+    }
+
+    const cronJob = new CronJob(
+      this.configService.get<string>('PRIVATE_KEY_CRON_SCHEDULE'),
+      async () => {
+        this.logger.log(`Executing private key watcher`);
+
+        await this.watch();
+      }
+    );
 
     await this.schedulerRegistry.addCronJob(CronJobType.PRIVATE_KEY, cronJob);
 
