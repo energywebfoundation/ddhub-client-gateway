@@ -1,4 +1,4 @@
-import { DownloadMessage } from '../../DownloadMessage';
+import { DownloadMessage } from '../containers/DownloadMessage';
 
 export const LARGE_MESSAGES_HEADERS = [
   {
@@ -24,6 +24,10 @@ export const MESSAGES_HEADERS = [
   {
     Header: 'DATE',
     accessor: 'timestampNanos',
+  },
+  {
+    Header: 'SCHEMA VERSION',
+    accessor: 'details.topicVersion',
   },
   {
     Header: 'FROM',

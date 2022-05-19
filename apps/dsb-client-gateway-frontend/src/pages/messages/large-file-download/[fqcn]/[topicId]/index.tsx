@@ -1,5 +1,5 @@
-import { MessagesContainer } from '@ddhub-client-gateway-frontend/ui/messaging';
+import { LargeMessagesContainer } from '@ddhub-client-gateway-frontend/ui/messaging';
 
 export default function Index() {
-  return <MessagesContainer isLarge />;
+  return <LargeMessagesContainer />;
 }

@@ -1,8 +1,8 @@
-import { FC, useReducer, useContext, createContext } from 'react';
+import { FC, useReducer, useContext, createContext, Dispatch } from 'react';
 import { TModalAction, IModalStore } from './types';
 import { modalInitialState, modalsReducer } from './reducer';
 
-const ModalDispatch = createContext<React.Dispatch<TModalAction>>(null);
+const ModalDispatch = createContext<Dispatch<TModalAction>>(null);
 const ModalStore = createContext<IModalStore>(null);
 
 export const ModalProvider: FC = ({ children }) => {
