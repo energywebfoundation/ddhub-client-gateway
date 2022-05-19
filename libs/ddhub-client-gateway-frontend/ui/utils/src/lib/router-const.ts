@@ -2,8 +2,7 @@ export enum Queries {
   Namespace = 'namespace',
   Owner = 'owner',
   TopicId = 'topicId',
-  FQCN = 'fqcn',
-  MessageId = 'messageId'
+  FQCN = 'fqcn'
 }
 
 export const routerConst = {
