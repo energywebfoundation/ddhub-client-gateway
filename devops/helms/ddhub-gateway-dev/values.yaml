@@ -40,6 +40,22 @@ ddhub-client-gateway-api:
       secret_engine_endpoint: http://vault.ddhub-dev.svc:8200
       node_env: test
       db_name: ./data/local.db
+      opentelemetry_enabled: false
+    scheduler:
+      enabled: true
+      image:
+        repository: aemocontainerregistry.azurecr.io/ddhub-client-gateway-scheduler
+        pullPolicy: IfNotPresent
+        # Overrides the image tag whose default is the chart appVersion.
+        tag: canary
+      podAnnotations: {}
+      resources: {}
+      probes: 
+        liveness: true
+        readiness: true
+      appConfig:
+        DID_AUTH_URL: "http://ddhub-messagebroker-proxy-dev.ddhub-dev.svc"
+        DID_REGISTRY_ADDRESS: "0xc15d5a57a8eb0e1dcbe5d88b8f9a82017e5cc4af"
   image:
     # repository: 098061033856.dkr.ecr.us-east-1.amazonaws.com/ew-dos-dsb-ecr
     repository: aemocontainerregistry.azurecr.io/ddhub-client-gateway-backend
