@@ -2,7 +2,6 @@ export enum Queries {
   Namespace = 'namespace',
   Owner = 'owner',
   TopicId = 'topicId',
-  TopicName = 'topicName',
   FQCN = 'fqcn',
   MessageId = 'messageId'
 }

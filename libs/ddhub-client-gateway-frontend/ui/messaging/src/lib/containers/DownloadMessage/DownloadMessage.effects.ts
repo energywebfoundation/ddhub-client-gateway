@@ -1,6 +1,6 @@
 import { useDownloadMessage, TDownloadData } from '@ddhub-client-gateway-frontend/ui/api-hooks';
 import { DownloadMessageProps } from './DownloadMessage';
-import { getPayload } from './DownloadMessage.utils';
+import { parsePayload } from '../../utils';
 
 export const useDownloadMessageEffects = ({ value }: DownloadMessageProps) => {
   const {
@@ -9,7 +9,7 @@ export const useDownloadMessageEffects = ({ value }: DownloadMessageProps) => {
     fileId: activeFileId,
   } = useDownloadMessage();
 
-  const parsedPayload = getPayload(value?.payload);
+  const parsedPayload = parsePayload(value?.payload);
   const fileId = parsedPayload?.fileId as string;
   const isDownloading = isLoading && fileId === activeFileId;
 

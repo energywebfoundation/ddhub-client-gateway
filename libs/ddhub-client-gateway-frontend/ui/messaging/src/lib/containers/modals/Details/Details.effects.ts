@@ -4,7 +4,7 @@ import {
   ModalActionsEnum,
 } from '../../../context';
 import { downloadJson } from '@ddhub-client-gateway-frontend/ui/utils';
-import { parsePayload } from './Details.utils';
+import { parsePayload } from '../../../utils';
 
 export const useDetailsEffects = () => {
   const dispatch = useModalDispatch();

@@ -8,3 +8,4 @@ export const validationSchema = yup
     tags: yup.array().optional(),
     version: yup.string().required(),
   })
+  .required();

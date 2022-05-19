@@ -17,8 +17,6 @@ export const useDataMessagingDownloadEffects = ({
     });
   };
 
-  console.log(channelType, channels);
-
   const filteredChannels = channels.filter(
     (channel) => channel.type === channelType
   );
