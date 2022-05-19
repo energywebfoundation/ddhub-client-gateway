@@ -1,11 +1,11 @@
-import React, { createContext, useContext, useReducer } from 'react';
+import { FC, useReducer, useContext, createContext } from 'react';
+import { TModalAction, IModalStore } from './types';
 import { modalInitialState, modalsReducer } from './reducer';
-import { IModalStore, TModalAction } from './types';
 
-const ModalStore = createContext<IModalStore>(null);
 const ModalDispatch = createContext<React.Dispatch<TModalAction>>(null);
+const ModalStore = createContext<IModalStore>(null);
 
-export const ModalProvider: React.FC = ({ children }) => {
+export const ModalProvider: FC = ({ children }) => {
   const [state, dispatch] = useReducer(modalsReducer, modalInitialState);
 
   return (
@@ -17,10 +17,10 @@ export const ModalProvider: React.FC = ({ children }) => {
   );
 };
 
-export const useModalStore = () => {
-  return useContext(ModalStore);
-};
-
 export const useModalDispatch = () => {
   return useContext(ModalDispatch);
+};
+
+export const useModalStore = () => {
+  return useContext(ModalStore);
 };
