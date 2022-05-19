@@ -2,7 +2,7 @@ name: Build and publish images
 
 on:
   push:
-    branches: [ ddhub-dev, AEMO-363-scheduler-deployment ]
+    branches: [ ddhub-dev ]
     paths-ignore:
       - 'devops/**'
 env:
@@ -79,19 +79,19 @@ jobs:
           docker tag energyweb/ddhub-client-gateway-scheduler ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-scheduler:canary
           docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-scheduler:canary
 
-      # - name: ArgoCD login
-      #   uses: clowdhaus/argo-cd-action/@main
-      #   id: argocd_login
-      #   with:
-      #     command: login ${{ secrets.ARGOCD_DEV_URL }}
-      #     options: --insecure --password ${{ secrets.ARGOCD_DEV_PASS }} --username ${{ secrets.ARGOCD_DEV_USERNAME }}
+      - name: ArgoCD login
+        uses: clowdhaus/argo-cd-action/@main
+        id: argocd_login
+        with:
+          command: login ${{ secrets.ARGOCD_DEV_URL }}
+          options: --insecure --password ${{ secrets.ARGOCD_DEV_PASS }} --username ${{ secrets.ARGOCD_DEV_USERNAME }}
 
-      # - name: ArgoCD overwrite DEV image tag
-      #   uses: clowdhaus/argo-cd-action/@main
-      #   id: argocd_image_tag_overwrite
-      #   with:
-      #     command: app set ddhub-gateway-dev
-      #     options: -p ddhub-client-gateway-api.image.tag=${{needs.unique_id.outputs.unique_id}}
+      - name: ArgoCD overwrite DEV image tag
+        uses: clowdhaus/argo-cd-action/@main
+        id: argocd_image_tag_overwrite
+        with:
+          command: app set ddhub-gateway-dev
+          options: -p ddhub-client-gateway-api.clientgateway.scheduler.image.tag=${{needs.unique_id.outputs.unique_id}}
 
       # - name: ArgoCD overwrite DEMO image tag
       #   uses: clowdhaus/argo-cd-action/@main
@@ -99,147 +99,147 @@ jobs:
       #   with:
       #     command: app set ddhub-gateway-demo
       #     options: -p ddhub-client-gateway-api.image.tag=${{needs.unique_id.outputs.unique_id}}
-  # build-be:
-  #   name: Build Backend
-  #   runs-on: ubuntu-latest
-  #   needs: [cancel-previous, unique_id]
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #       with:
-  #         fetch-depth: 0
-  #     - uses: actions/setup-node@v2-beta
-  #       with:
-  #         node-version: '16.14.2'
-  #     - name: Setup app dependencies
-  #       uses: actions/setup-node@v1
-  #       with:
-  #         node-version: ${{ matrix.node-version }}
-  #     - name: Cache node modules
-  #       uses: actions/cache@v2
-  #       env:
-  #         cache-name: cache-node-modules
-  #       with:
-  #         # npm cache files are stored in `~/.npm` on Linux/macOS
-  #         path: ~/.npm
-  #         key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-  #         restore-keys: |
-  #           ${{ runner.os }}-build-${{ env.cache-name }}-
-  #           ${{ runner.os }}-build-
-  #           ${{ runner.os }}-
-  #     - name: Install NX, NPM
-  #       run: npm install -g nx npm@8.5.0
-  #     - name: Install dependencies
-  #       run: npm ci
-  #     - name: Build
-  #       run: nx build dsb-client-gateway-api --prod
+  build-be:
+    name: Build Backend
+    runs-on: ubuntu-latest
+    needs: [cancel-previous, unique_id]
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v2-beta
+        with:
+          node-version: '16.14.2'
+      - name: Setup app dependencies
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Cache node modules
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          # npm cache files are stored in `~/.npm` on Linux/macOS
+          path: ~/.npm
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+      - name: Install NX, NPM
+        run: npm install -g nx npm@8.5.0
+      - name: Install dependencies
+        run: npm ci
+      - name: Build
+        run: nx build dsb-client-gateway-api --prod
 
-  #     - name: 'Login via Azure CLI'
-  #       uses: azure/login@v1
-  #       with:
-  #         creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: 'Login via Azure CLI'
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-  #     - name: 'Build and push image (Back-end)'
-  #       uses: azure/docker-login@v1
-  #       with:
-  #         login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
-  #         username: ${{ secrets.REGISTRY_USERNAME }}
-  #         password: ${{ secrets.REGISTRY_PASSWORD }}
-  #     - run: |
-  #         docker build -f ci/Docker/Dockerfile.backend -t energyweb/ddhub-client-gateway-backend .
-  #         docker tag energyweb/ddhub-client-gateway-backend ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-backend:${{needs.unique_id.outputs.unique_id}}
-  #         docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-backend:${{needs.unique_id.outputs.unique_id}}
-  #         docker tag energyweb/ddhub-client-gateway-backend ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-backend:canary
-  #         docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-backend:canary
+      - name: 'Build and push image (Back-end)'
+        uses: azure/docker-login@v1
+        with:
+          login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+      - run: |
+          docker build -f ci/Docker/Dockerfile.backend -t energyweb/ddhub-client-gateway-backend .
+          docker tag energyweb/ddhub-client-gateway-backend ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-backend:${{needs.unique_id.outputs.unique_id}}
+          docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-backend:${{needs.unique_id.outputs.unique_id}}
+          docker tag energyweb/ddhub-client-gateway-backend ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-backend:canary
+          docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-backend:canary
 
-  #     - name: ArgoCD login
-  #       uses: clowdhaus/argo-cd-action/@main
-  #       id: argocd_login
-  #       with:
-  #         command: login ${{ secrets.ARGOCD_DEV_URL }}
-  #         options: --insecure --password ${{ secrets.ARGOCD_DEV_PASS }} --username ${{ secrets.ARGOCD_DEV_USERNAME }}
+      - name: ArgoCD login
+        uses: clowdhaus/argo-cd-action/@main
+        id: argocd_login
+        with:
+          command: login ${{ secrets.ARGOCD_DEV_URL }}
+          options: --insecure --password ${{ secrets.ARGOCD_DEV_PASS }} --username ${{ secrets.ARGOCD_DEV_USERNAME }}
 
-  #     - name: ArgoCD overwrite DEV image tag
-  #       uses: clowdhaus/argo-cd-action/@main
-  #       id: argocd_image_tag_overwrite
-  #       with:
-  #         command: app set ddhub-gateway-dev
-  #         options: -p ddhub-client-gateway-api.image.tag=${{needs.unique_id.outputs.unique_id}}
+      - name: ArgoCD overwrite DEV image tag
+        uses: clowdhaus/argo-cd-action/@main
+        id: argocd_image_tag_overwrite
+        with:
+          command: app set ddhub-gateway-dev
+          options: -p ddhub-client-gateway-api.image.tag=${{needs.unique_id.outputs.unique_id}}
 
-  #     - name: ArgoCD overwrite DEMO image tag
-  #       uses: clowdhaus/argo-cd-action/@main
-  #       id: argocd_image_tag_overwrite_demo
-  #       with:
-  #         command: app set ddhub-gateway-demo
-  #         options: -p ddhub-client-gateway-api.image.tag=${{needs.unique_id.outputs.unique_id}}
-  # build-fe:
-  #   name: Build Frontend
-  #   runs-on: ubuntu-latest
-  #   needs: [cancel-previous, unique_id]
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #       with:
-  #         fetch-depth: 0
-  #     - uses: actions/setup-node@v2-beta
-  #       with:
-  #         node-version: '16.14.2'
-  #     - name: Setup app dependencies
-  #       uses: actions/setup-node@v1
-  #       with:
-  #         node-version: ${{ matrix.node-version }}
-  #     - name: Cache node modules
-  #       uses: actions/cache@v2
-  #       env:
-  #         cache-name: cache-node-modules
-  #       with:
-  #         # npm cache files are stored in `~/.npm` on Linux/macOS
-  #         path: ~/.npm
-  #         key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-  #         restore-keys: |
-  #           ${{ runner.os }}-build-${{ env.cache-name }}-
-  #           ${{ runner.os }}-build-
-  #           ${{ runner.os }}-
-  #     - name: Install NX, NPM
-  #       run: npm install -g nx npm@8.5.0
-  #     - name: Install dependencies
-  #       run: npm ci
-  #     - name: Build
-  #       run: npm run export
+      - name: ArgoCD overwrite DEMO image tag
+        uses: clowdhaus/argo-cd-action/@main
+        id: argocd_image_tag_overwrite_demo
+        with:
+          command: app set ddhub-gateway-demo
+          options: -p ddhub-client-gateway-api.image.tag=${{needs.unique_id.outputs.unique_id}}
+  build-fe:
+    name: Build Frontend
+    runs-on: ubuntu-latest
+    needs: [cancel-previous, unique_id]
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v2-beta
+        with:
+          node-version: '16.14.2'
+      - name: Setup app dependencies
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Cache node modules
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          # npm cache files are stored in `~/.npm` on Linux/macOS
+          path: ~/.npm
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+      - name: Install NX, NPM
+        run: npm install -g nx npm@8.5.0
+      - name: Install dependencies
+        run: npm ci
+      - name: Build
+        run: npm run export
 
-  #     - name: 'Login via Azure CLI'
-  #       uses: azure/login@v1
-  #       with:
-  #         creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: 'Login via Azure CLI'
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-  #     - name: 'Build and push image (Front-end)'
-  #       uses: azure/docker-login@v1
-  #       with:
-  #         login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
-  #         username: ${{ secrets.REGISTRY_USERNAME }}
-  #         password: ${{ secrets.REGISTRY_PASSWORD }}
-  #     - run: |
-  #         docker build -f ci/Docker/Dockerfile.frontend -t energyweb/ddhub-client-gateway-frontend .
-  #         docker tag energyweb/ddhub-client-gateway-frontend ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-frontend:${{needs.unique_id.outputs.unique_id}}
-  #         docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-frontend:${{needs.unique_id.outputs.unique_id}}
-  #         docker tag energyweb/ddhub-client-gateway-frontend ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-frontend:canary
-  #         docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-frontend:canary
+      - name: 'Build and push image (Front-end)'
+        uses: azure/docker-login@v1
+        with:
+          login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+      - run: |
+          docker build -f ci/Docker/Dockerfile.frontend -t energyweb/ddhub-client-gateway-frontend .
+          docker tag energyweb/ddhub-client-gateway-frontend ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-frontend:${{needs.unique_id.outputs.unique_id}}
+          docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-frontend:${{needs.unique_id.outputs.unique_id}}
+          docker tag energyweb/ddhub-client-gateway-frontend ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-frontend:canary
+          docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-frontend:canary
 
-  #     - name: ArgoCD login
-  #       uses: clowdhaus/argo-cd-action/@main
-  #       id: argocd_login
-  #       with:
-  #         command: login ${{ secrets.ARGOCD_DEV_URL }}
-  #         options: --insecure --password ${{ secrets.ARGOCD_DEV_PASS }} --username ${{ secrets.ARGOCD_DEV_USERNAME }}
+      - name: ArgoCD login
+        uses: clowdhaus/argo-cd-action/@main
+        id: argocd_login
+        with:
+          command: login ${{ secrets.ARGOCD_DEV_URL }}
+          options: --insecure --password ${{ secrets.ARGOCD_DEV_PASS }} --username ${{ secrets.ARGOCD_DEV_USERNAME }}
 
-  #     - name: ArgoCD overwrite DEV image tag
-  #       uses: clowdhaus/argo-cd-action/@main
-  #       id: argocd_image_tag_overwrite
-  #       with:
-  #         command: app set ddhub-gateway-dev
-  #         options: -p ddhub-client-gateway-api.ddhub-client-gateway-ui.image.tag=${{needs.unique_id.outputs.unique_id}}
+      - name: ArgoCD overwrite DEV image tag
+        uses: clowdhaus/argo-cd-action/@main
+        id: argocd_image_tag_overwrite
+        with:
+          command: app set ddhub-gateway-dev
+          options: -p ddhub-client-gateway-api.ddhub-client-gateway-ui.image.tag=${{needs.unique_id.outputs.unique_id}}
 
-  #     - name: ArgoCD overwrite DEMO image tag
-  #       uses: clowdhaus/argo-cd-action/@main
-  #       id: argocd_image_tag_overwrite_demo
-  #       with:
-  #         command: app set ddhub-gateway-demo
-  #         options: -p ddhub-client-gateway-api.ddhub-client-gateway-ui.image.tag=${{needs.unique_id.outputs.unique_id}}
+      - name: ArgoCD overwrite DEMO image tag
+        uses: clowdhaus/argo-cd-action/@main
+        id: argocd_image_tag_overwrite_demo
+        with:
+          command: app set ddhub-gateway-demo
+          options: -p ddhub-client-gateway-api.ddhub-client-gateway-ui.image.tag=${{needs.unique_id.outputs.unique_id}}
