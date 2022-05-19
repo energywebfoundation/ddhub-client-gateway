@@ -1,4 +1,5 @@
 import { ChannelType, Restrictions, RestrictionsProps } from '../components';
+import { didFormatMinifier } from "@ddhub-client-gateway-frontend/ui/utils";
 
 export const CHANNELS_HEADERS = [
   {
@@ -15,7 +16,7 @@ export const CHANNELS_HEADERS = [
     Header: 'RESTRICTIONS DID',
     accessor: 'conditions.dids',
     Cell: ({ value }: Omit<RestrictionsProps, 'type'>) => (
-      <Restrictions value={value} type="DID" />
+      <Restrictions value={value?.map(item => didFormatMinifier(item))} type="DID" />
     ),
   },
   {
