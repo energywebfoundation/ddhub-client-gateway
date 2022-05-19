@@ -1,4 +1,5 @@
 import { FC } from 'react';
+import clsx from 'clsx';
 import { CardContent, Paper, Typography, Box } from '@mui/material';
 import { GetChannelResponseDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { useStyles } from './ChannelInfo.styles';
@@ -7,19 +8,45 @@ import { didFormatMinifier } from '@ddhub-client-gateway-frontend/ui/utils';
 
 interface ChannelInfoProps {
   channel: GetChannelResponseDto;
+  topicName?: string;
 }
 
-export const ChannelInfo: FC<ChannelInfoProps> = ({ channel }) => {
+export const ChannelInfo: FC<ChannelInfoProps> = ({ channel, topicName }) => {
   const { classes } = useStyles();
   return (
     <Paper className={classes.root}>
       <CardContent className={classes.card}>
-        <Box className={classes.cardHeader}>
+        {topicName && (
+          <Box
+            className={clsx(classes.cardHeader, {
+              [classes.cardHeaderWithBorder]: topicName,
+            })}
+          >
+            <Typography className={classes.title} variant="body2">
+              Topic
+            </Typography>
+            <Box display="flex" alignItems="center">
+              <Typography className={classes.subTitle} noWrap>
+                {topicName}
+              </Typography>
+            </Box>
+          </Box>
+        )}
+        <Box
+          className={clsx(classes.cardHeader, {
+            [classes.cardHeaderWithBorder]: !topicName,
+          })}
+        >
           <Typography className={classes.title} variant="body2">
             Channel
           </Typography>
           <Box display="flex" alignItems="center">
-            <Typography className={classes.subTitle} noWrap>
+            <Typography
+              className={clsx(classes.subTitle, {
+                [classes.primary]: topicName,
+              })}
+              noWrap
+            >
               {channel.fqcn}
             </Typography>
           </Box>
@@ -38,7 +65,7 @@ export const ChannelInfo: FC<ChannelInfoProps> = ({ channel }) => {
           <Typography className={classes.title} variant="h4">
             Restrictions
           </Typography>
-          <Box sx={{ marginTop: '10px' }}>
+          <Box sx={{ marginBottom: '10px', marginTop: '1px' }}>
             <Typography className={classes.subTitle} variant="body2">
               Roles
             </Typography>
@@ -53,7 +80,7 @@ export const ChannelInfo: FC<ChannelInfoProps> = ({ channel }) => {
               </Typography>
             ))}
           </Box>
-          <Box sx={{ marginTop: '10px' }}>
+          <Box sx={{ marginBottom: '10px' }}>
             <Typography className={classes.subTitle} variant="body2">
               DIDs
             </Typography>
