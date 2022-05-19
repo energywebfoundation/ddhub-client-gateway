@@ -1,94 +1,114 @@
+# DDHUB Client Gateway
 
+DDHUB Client Gateway is a set of applications to communicate with [DDHUB Message Broker](https://github.com/energywebfoundation/ddhub-message-broker).  
+This repository contains several applications.
 
-# DsbClientGateway
+### Frontend
+![img.png](docs/images/img.png)
 
-This project was generated using [Nx](https://nx.dev).
+This application allows us to configure client gateway backend
 
-<p style="text-align: center;"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="450"></p>
+### API
 
-🔎 **Smart, Fast and Extensible Build System**
+Communicates directly with message broker for topics, messaging etc.
 
-## Adding capabilities to your workspace
+### Scheduler
 
-Nx supports many plugins which add capabilities for developing different types of applications and different tools.
+Retrieves and caches data for performance purposes
 
-These capabilities include generating applications, libraries, etc as well as the devtools to test, and build projects as well.
+## Environment variables
 
-Below are our core plugins:
+### API
 
-- [React](https://reactjs.org)
-  - `npm install --save-dev @nrwl/react`
-- Web (no framework frontends)
-  - `npm install --save-dev @nrwl/web`
-- [Angular](https://angular.io)
-  - `npm install --save-dev @nrwl/angular`
-- [Nest](https://nestjs.com)
-  - `npm install --save-dev @nrwl/nest`
-- [Express](https://expressjs.com)
-  - `npm install --save-dev @nrwl/express`
-- [Node](https://nodejs.org)
-  - `npm install --save-dev @nrwl/node`
+| KEY                                      	| TYPE    	| DEFAULT VALUE                              	| ALLOWED VALUES                                                     	| DESCRIPTION                                                                                                                 	| DEPENDENCY KEY               	|
+|------------------------------------------	|---------	|--------------------------------------------	|--------------------------------------------------------------------	|-----------------------------------------------------------------------------------------------------------------------------	|------------------------------	|
+| NODE_ENV                                 	| String  	| null                                       	| production, development, test                                      	|                                                                                                                             	|                              	|
+| PORT                                     	| Number  	| 3333                                       	| Any positive integer                                               	| Port on which application should listen                                                                                     	|                              	|
+| RPC_URL                                  	| String  	| https://volta-rpc.energyweb.org/           	| Any string (URL)                                                   	| RPC network                                                                                                                 	|                              	|
+| DSB_BASE_URL                             	| String  	| https://dsb-demo.energyweb.org             	| Any string (URL)                                                   	| Message broker URL. Note that this key will change to MB_URL                                                                	|                              	|
+| CLIENT_ID                                	| String  	| WS-CONSUMER                                	| Any string                                                         	| Client ID used for WebSocket messaging                                                                                      	|                              	|
+| EVENTS_MAX_PER_SECOND                    	| Number  	| 2                                          	| Any positive integer                                               	| Maximum amount of messages to receive                                                                                       	|                              	|
+| PARENT_NAMESPACE                         	| String  	| dsb.apps.energyweb.iam.ewc                 	| Any string                                                         	| Default namespace for enrolment configuration                                                                               	|                              	|
+| EVENT_SERVER_URL                         	| String  	| identityevents-dev.energyweb.org           	| Any string (URL)                                                   	| Events URL on which application should listen during enrolment                                                              	|                              	|
+| NATS_ENV_NAME                            	| String  	| ewf-dev                                    	| Any string                                                         	|                                                                                                                             	|                              	|
+| CHAIN_ID                                 	| Number  	| 73799                                      	| 73799 - development network (VOLTA) 456 - production network (EWC) 	| RPC Network chain id                                                                                                        	|                              	|
+| CACHE_SERVER_URL                         	| String  	| https://identitycache-dev.energyweb.org/v1 	| Any string (URL)                                                   	| IAM Cache Server URL                                                                                                        	|                              	|
+| CLAIM_MANAGER_ADDRESS                    	| String  	| 0x5339adE9332A604A1c957B9bC1C6eee0Bcf7a031 	| Any string (address)                                               	| Overridden claim manager address                                                                                            	|                              	|
+| EVENTS_EMIT_MODE                         	| String  	| BULK                                       	| Any string (BULK, SINGLE)                                          	| Should emit websocket messages in bulk or single message                                                                    	| WEBSOCKET != 'NONE'          	|
+| DID_TTL                                  	| Number  	| 60                                         	| Any positive integer                                               	| How long DID should be cached for messaging purposes (seconds)                                                              	|                              	|
+| WEBSOCKET                                	| String  	| NONE                                       	| Any string (NONE, SERVER, CLIENT)                                  	| Determines if WebSocket is enabled (only for SERVER and CLIENT we enable WS)  and how it should run (client or server mode) 	|                              	|
+| WEBSOCKET_URL                            	| String  	| null                                       	| Any string (URL)                                                   	| Determines to which WS Server should application connect                                                                    	| WEBSOCKET = 'CLIENT'         	|
+| WEBSOCKET_PROTOCOL                       	| String  	| dsb-protocol                               	| Any string                                                         	| Which protocol should use when connecting to WS Server                                                                      	| WEBSOCKET = 'CLIENT'         	|
+| WEBSOCKET_RECONNECT_TIMEOUT              	| Number  	| 5000                                       	| Any positive integer                                               	| How long application should wait to reconnect                                                                               	| WEBSOCKET = 'CLIENT'         	|
+| WEBSOCKET_RECONNECT                      	| Boolean 	| true                                       	| Boolean                                                            	| Should WS attempt to reconnect to server                                                                                    	| WEBSOCKET = 'CLIENT'         	|
+| WEBSOCKET_RECONNECT_MAX_RETRIES          	| Number  	| 10                                         	| Any positive integer                                               	| How many times WS should attempt reconnecting                                                                               	| WEBSOCKET = 'CLIENT'         	|
+| WEBSOCKET_POOLING_TIMEOUT                	| Number  	| 5000                                       	| Any positive integer                                               	| How often server should poll for messages                                                                                   	|                              	|
+| SECRETS_ENGINE                           	| String  	| vault                                      	| Any string (vault)                                                 	| Which secrets engine it should use to store secret data                                                                     	|                              	|
+| VAULT_ENDPOINT                           	| String  	| null                                       	| Any string (URL)                                                   	| Vault endpoint                                                                                                              	| SECRETS_ENGINE = 'VAULT'     	|
+| VAULT_TOKEN                              	| String  	| root                                       	| Any string                                                         	| Vault token                                                                                                                 	| SECRETS_ENGINE = 'VAULT'     	|
+| USERNAME                                 	| String  	| null                                       	| Any string                                                         	| Username for API authentication. Not implemented YET.                                                                       	|                              	|
+| PASSWORD                                 	| String  	| null                                       	| Any string                                                         	| Password for API authentication. Not implemented YET.                                                                       	|                              	|
+| MAX_RETRIES                              	| Number  	| 3                                          	| Any positive integer                                               	| How many times application should attempt to make a request to message broker                                               	|                              	|
+| DID_CLAIM_NAMESPACE                      	| String  	| message.broker.app.namespace               	| Any string                                                         	| Namespace for fetching applications                                                                                         	|                              	|
+| MAX_FILE_SIZE                            	| Number  	| 100000000                                  	| Any positive integer                                               	| Maximum file size for large data messaging (100 MB)                                                                         	|                              	|
+| SYMMETRIC_KEY_CLIENT_ID                  	| String  	| test                                       	| Any string                                                         	| Client ID for fetching Symmetric Keys.                                                                                      	|                              	|
+| AMOUNT_OF_SYMMETRIC_KEYS_FETCHED         	| Number  	| 100                                        	| Any positive integer                                               	| How many symmetric keys should be fetched                                                                                   	|                              	|
+| OPENTELEMETRY_ENABLED                    	| Boolean 	| false                                      	| Boolean                                                            	| Should enable OTEL                                                                                                          	|                              	|
+| OTEL_IGNORED_ROUTES                      	| String  	| health,api/v2/health                       	| Any string separated by `,`                                        	| Ignored routes for tracing                                                                                                  	| OPENTELEMETRY_ENABLED = true 	|
+| OTEL_TRACING_URL                         	| String  	| http://localhost:4318/v1/traces            	| Any string (URL)                                                   	| OTEL Collector tracing URL                                                                                                  	| OPENTELEMETRY_ENABLED = true 	|
+| OTEL_SERVICE_NAME                        	| String  	| ddhub-client-gateway                       	| Any string                                                         	| OTEL service name identifier                                                                                                	| OPENTELEMETRY_ENABLED = true 	|
+| OTEL_ENVIRONMENT                         	| String  	| local                                      	| Any string                                                         	| OTEL environment                                                                                                            	| OPENTELEMETRY_ENABLED = true 	|
+| APPLICATION_NAMESPACE_REGULAR_EXPRESSION 	| String  	| `\\ w.apps.* \\ w.iam.ewc`                 	| Any string (regular expression)                                    	|                                                                                                                             	|                              	|
+| DB_NAME                                  	| String  	| local.db                                   	| Any string (path)                                                  	| Where database file should be created                                                                                       	|                              	|
 
-There are also many [community plugins](https://nx.dev/community) you could add.
+### Frontend
+| KEY                         	| TYPE             	| DEFAULT VALUE 	| ALLOWED VALUES 	| DESCRIPTION                                                                 	| DEPENDENCY KEY 	|
+|-----------------------------	|------------------	|---------------	|----------------	|-----------------------------------------------------------------------------	|----------------	|
+| NEXT_PUBLIC_SERVER_BASE_URL 	| Any string (URL) 	|               	|                	|                                                                             	|                	|
+| NEXT_PUBLIC_MOCK            	| Boolean          	| false         	| Boolean        	| Should mock DDHUB Client GW server. Use this only for development purposes. 	|                	|
 
-## Generate an application
+## How to run
 
-Run `nx g @nrwl/react:app my-app` to generate an application.
+After configuring environment variables (in `.env` file) run following commands
 
-> You can use any of the plugins above to generate applications as well.
+### Development mode
 
-When using Nx, you can create multiple applications and libraries in the same workspace.
+```shell
+$ npm ci
 
-## Generate a library
+$ nx serve dsb-client-gateway-scheduler
+$ nx serve dsb-client-gateway-api
+$ nx serve dsb-client-gateway-frontend
+```
 
-Run `nx g @nrwl/react:lib my-lib` to generate a library.
+### Production mode
 
-> You can also use any of the plugins above to generate libraries as well.
+```shell
+$ npm ci
 
-Libraries are shareable across libraries and applications. They can be imported from `@dsb-client-gateway/mylib`.
+$ nx build dsb-client-gateway-scheduler
+$ nx build dsb-client-gateway-api
 
-## Development server
+$ node dist/apps/dsb-client-gateway-api/main.js
+$ node dist/apps/dsb-client-gateway-scheduler/main.js
+```
 
-Run `nx serve my-app` for a dev server. Navigate to http://localhost:4200/. The app will automatically reload if you change any of the source files.
+Running pure `node` in production is not recommended. Use any process manager (pm2, docker etc.) for stability.  
+You can find docker images in `ci` directory.
 
-## Code scaffolding
+## Swagger
+Swagger is available on route `{{API_HOST}}/docs`.    
+Postman collection to import is available under `${{API_HOST}}/docs-json`
 
-Run `nx g @nrwl/react:component my-component --project=my-app` to generate a new component.
+## Helpful links
 
-## Build
+- [HELM](https://github.com/energywebfoundation/dsb-client-gateway-helm)
+- [Message Broker](https://github.com/energywebfoundation/ddhub-message-broker)
 
-Run `nx build my-app` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
+## Contributing
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
-## Running unit tests
+Please make sure to update tests as appropriate.
 
-Run `nx test my-app` to execute the unit tests via [Jest](https://jestjs.io).
-
-Run `nx affected:test` to execute the unit tests affected by a change.
-
-## Running end-to-end tests
-
-Run `ng e2e my-app` to execute the end-to-end tests via [Cypress](https://www.cypress.io).
-
-Run `nx affected:e2e` to execute the end-to-end tests affected by a change.
-
-## Understand your workspace
-
-Run `nx graph` to see a diagram of the dependencies of your projects.
-
-## Further help
-
-Visit the [Nx Documentation](https://nx.dev) to learn more.
-
-
-
-## ☁ Nx Cloud
-
-### Distributed Computation Caching & Distributed Task Execution
-
-<p style="text-align: center;"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-cloud-card.png"></p>
-
-Nx Cloud pairs with Nx in order to enable you to build and test code more rapidly, by up to 10 times. Even teams that are new to Nx can connect to Nx Cloud and start saving time instantly.
-
-Teams using Nx gain the advantage of building full-stack applications with their preferred framework alongside Nx’s advanced code generation and project dependency graph, plus a unified experience for both frontend and backend developers.
-
-Visit [Nx Cloud](https://nx.app/) to learn more.
+## License
+[MIT](https://choosealicense.com/licenses/mit/)
