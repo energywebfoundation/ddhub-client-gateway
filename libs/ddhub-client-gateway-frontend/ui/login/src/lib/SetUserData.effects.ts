@@ -32,7 +32,7 @@ export const getRoutesToDisplay = (
     .filter(
       (role) =>
         role.status === RoleStatus.SYNCED &&
-        role.namespace.includes(process.env['PARENT_NAMESPACE'] ?? 'dsb.apps.energyweb.iam.ewc')
+        role.namespace.includes(process.env['PARENT_NAMESPACE'] ?? 'ddhub.apps.energyweb.iam.ewc')
     )
     .map((role) => role.namespace);
   if (roles.length === 0) {

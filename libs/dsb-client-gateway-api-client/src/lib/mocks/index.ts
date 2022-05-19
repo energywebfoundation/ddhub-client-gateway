@@ -7,12 +7,12 @@ export const getIdentityControllerGetMock = () => ({
     did: 'did:ethr:volta:0xfeFBb03EFc1054Cc4e3Fbf36362689cc1F5924a8',
     roles: [
       {
-        namespace: 'user.roles.dsb.apps.energyweb.iam.ewc',
+        namespace: 'user.roles.ddhub.apps.energyweb.iam.ewc',
         required: true,
         status: 'SYNCED',
       },
       {
-        namespace: 'topiccreator.roles.dsb.apps.energyweb.iam.ewc',
+        namespace: 'topiccreator.roles.ddhub.apps.energyweb.iam.ewc',
         required: true,
         status: 'SYNCED',
       },

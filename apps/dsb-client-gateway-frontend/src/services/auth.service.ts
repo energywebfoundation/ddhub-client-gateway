@@ -1,4 +1,4 @@
-import { config } from '../../../../libs/ddhub-client-gateway-frontend/ui/utils/src/lib/config'
+import { config } from '../config'
 import { ErrorCode, Result } from '../utils'
 
 type Auth = {
