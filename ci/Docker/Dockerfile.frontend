@@ -3,3 +3,7 @@ ARG IMAGE=nginx:alpine
 FROM $IMAGE
 
 COPY dist/apps/dsb-client-gateway-frontend/exported /usr/share/nginx/html
+
+
+# -----Note-------#
+# # # The build is commented out due to local build issue, this dockerfile is used after build in Github action

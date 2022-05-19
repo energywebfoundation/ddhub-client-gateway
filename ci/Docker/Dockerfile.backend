@@ -1,6 +1,8 @@
 ARG IMAGE=node:16.10-alpine
 ARG NODE_ENV=production
 
+# -----Note-------#
+# # # The build is commented out due to local build issue, this dockerfile is used after build in Github action
 # FROM $IMAGE as build
 # WORKDIR /usr/app
 
