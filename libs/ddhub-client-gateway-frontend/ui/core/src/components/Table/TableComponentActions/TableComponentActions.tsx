@@ -35,7 +35,7 @@ export function TableComponentActions<T>({
             action.onClick(data);
           };
           return (
-            <IconButton disableRipple onClick={handleAction}>
+            <IconButton key={action.label} disableRipple onClick={handleAction}>
               {action.icon}
             </IconButton>
           );

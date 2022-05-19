@@ -43,6 +43,10 @@ export class ApplicationEntity {
         return JSON.stringify(value);
       },
       from(value: any): any {
+        if (Array.isArray(value)) {
+          return JSON.stringify(value);
+        }
+
         return JSON.parse(value);
       },
     },
