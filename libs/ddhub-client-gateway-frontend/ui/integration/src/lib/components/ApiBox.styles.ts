@@ -43,6 +43,7 @@ export const useStyles = makeStyles()((theme) => ({
     fontWeight: 400,
     color: theme.palette.common.white,
     fontFamily: theme.typography.body2.fontFamily,
+    cursor: 'pointer',
     transition: theme.transitions.create('color', {
       duration: theme.transitions.duration.short,
     }),

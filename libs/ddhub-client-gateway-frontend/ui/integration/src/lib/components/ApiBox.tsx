@@ -25,7 +25,7 @@ export const ApiBox = ({
       <span className={classes.link}>Open</span>
     </Link>
   ) : (
-    <a href={url} target="_blank" className={classes.link}>
+    <a href={url} target="_blank" rel="noreferrer" className={classes.link}>
       Open
     </a>
   );
