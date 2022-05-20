@@ -1,6 +1,7 @@
 import { Edit, Download } from 'react-feather';
+import { useRouter } from 'next/router';
 import { useTopicVersion } from '@ddhub-client-gateway-frontend/ui/api-hooks';
-import { downloadJson } from '@ddhub-client-gateway-frontend/ui/utils';
+import { downloadJson, Queries } from '@ddhub-client-gateway-frontend/ui/utils';
 import {
   useTopicsModalsStore,
   useTopicsModalsDispatch,
@@ -11,10 +12,13 @@ import { useStyles } from './ViewTopicDetails.styles';
 
 export const useViewTopicDetailsEffects = () => {
   const { classes } = useStyles();
+  const router = useRouter();
   const {
     topicDetails: { open, topic, application },
   } = useTopicsModalsStore();
   const dispatch = useTopicsModalsDispatch();
+
+  const topicId = router.query[Queries.TopicId as string];
 
   const { topic: topicWithSchema, isLoading } = useTopicVersion(
     topic?.id,
@@ -39,7 +43,7 @@ export const useViewTopicDetailsEffects = () => {
       type: TopicsModalsActionsEnum.SHOW_UPDATE_TOPIC,
       payload: {
         open: true,
-        canUpdateSchema: true,
+        canUpdateSchema: !!topicId,
         application,
         topic,
       },
