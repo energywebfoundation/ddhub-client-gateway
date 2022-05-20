@@ -141,7 +141,7 @@ export class DsbMessagePoolingService implements OnModuleInit {
         }
       );
 
-      this.logger.log(`Found ${messages.length} in ${subscription.fqcn}`);
+      this.logger.log(`Found ${messages.length} in ${subscription.fqcn} for ${_clientId ? _clientId : clientId}`);
 
       if (messages && messages.length > 0) {
         msgCount += messages.length;
