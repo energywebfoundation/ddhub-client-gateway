@@ -27,7 +27,7 @@ export const CollapsableMenu = ({
   const { isOpen, handleOpening } = useCollapsableListItemEffects();
   return (
     <>
-      <ListItem className={classes.navLink} onClick={handleOpening}>
+      {subMenu.length > 0 && <ListItem className={classes.navLink} onClick={handleOpening}>
         {menuIcon}
         <MenuItemText title={menuTitle} />
         <ChevronRight
@@ -36,7 +36,7 @@ export const CollapsableMenu = ({
             [classes.menuIconActive]: isOpen,
           })}
         />
-      </ListItem>
+      </ListItem> }
 
       <Collapse in={isOpen} timeout="auto" unmountOnExit>
         <List component="div" disablePadding>

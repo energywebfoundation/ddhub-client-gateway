@@ -9,6 +9,7 @@ import {
 } from '@mui/material';
 import { Drawer } from '../Drawer';
 import { useSidebarEffects } from './Sidebar.effects';
+import SidebarFooter from './SidebarFooter/SidebarFooter';
 import { useStyles } from './Sidebar.styles';
 
 function Sidebar() {
@@ -53,6 +54,7 @@ function Sidebar() {
               <CloseIcon />
             </IconButton>
             <Drawer />
+            <SidebarFooter />
           </MuiDrawer>
         </Hidden>
         <Hidden xsDown implementation="css">
@@ -64,6 +66,7 @@ function Sidebar() {
             }}
           >
             <Drawer />
+            <SidebarFooter />
           </MuiDrawer>
         </Hidden>
       </nav>
