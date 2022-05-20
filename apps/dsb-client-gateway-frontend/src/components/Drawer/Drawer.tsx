@@ -13,8 +13,12 @@ import { routerConst } from '@ddhub-client-gateway-frontend/ui/utils';
 import { useStyles } from './Drawer.styles';
 import { CollapsableMenu } from './CollapsableMenu/CollapsableMenu';
 import { MenuItem } from './MenuItem/MenuItem';
+import { useSetUserDataEffect } from '@ddhub-client-gateway-frontend/ui/login';
 
 export const Drawer = () => {
+  const {
+    userData: { displayedRoutes },
+  } = useSetUserDataEffect();
   const { classes } = useStyles();
 
   return (
@@ -42,18 +46,23 @@ export const Drawer = () => {
           icon={<Settings className={classes.icon} size={18} />}
         />
 
-        <MenuItem
-          href={routerConst.AppsAndTopics}
-          title="Topic management"
-          icon={<Layers className={classes.icon} size={16} />}
-        />
+        {displayedRoutes.has(routerConst.AppsAndTopics) && (
+          <MenuItem
+            href={routerConst.AppsAndTopics}
+            title="Topic management"
+            icon={<Layers className={classes.icon} size={16} />}
+          />
+        )}
 
         <CollapsableMenu
           menuTitle="Channels"
           subMenu={[
             { title: 'My apps and topics', href: routerConst.ChannelApps },
-            { title: 'Channel management', href: routerConst.ChannelsManagement },
-          ]}
+            {
+              title: 'Channel management',
+              href: routerConst.ChannelsManagement,
+            },
+          ].filter((menu) => displayedRoutes.has(menu.href))}
           menuIcon={<Command className={classes.icon} size={18} />}
         />
 
@@ -81,7 +90,7 @@ export const Drawer = () => {
               title: 'File download',
               href: routerConst.LargeDataMessagingFileDownload,
             },
-          ]}
+          ].filter((menu) => displayedRoutes.has(menu.href))}
           menuIcon={<Database className={classes.icon} size={18} />}
         />
 
@@ -93,7 +102,7 @@ export const Drawer = () => {
               title: 'File download',
               href: routerConst.DataMessagingFileDownload,
             },
-          ]}
+          ].filter((menu) => displayedRoutes.has(menu.href))}
           menuIcon={<Database className={classes.icon} size={18} />}
         />
       </List>
