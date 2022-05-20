@@ -1,7 +1,5 @@
 export const useIntegrationContainerEffects = () => {
-  const restApiUrl = process.env['BACKEND_API_URL'] + '/docs';
-  const websocketApiUrl = `ws://${process.env['BACKEND_API_URL']
-    ?.split('://')
-    .pop()}`;
+  const restApiUrl = '/docs';
+  const websocketApiUrl = ``;
   return { restApiUrl, websocketApiUrl };
 };
