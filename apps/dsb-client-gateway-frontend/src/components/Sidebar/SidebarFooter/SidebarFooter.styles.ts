@@ -25,15 +25,12 @@ export const useStyles = makeStyles()((theme) => ({
     paddingLeft: 7
   },
   logo: {
-    width: 30,
-    height: 30
-  },
-  logoText: {
-    height: 13,
-    marginTop: 2
+    width: 102,
+    height: 29
   },
   label: {
     fontSize: 12,
+    lineHeight: '21px',
     color: alpha(theme.palette.text.primary, 0.7)
   }
 }));
