@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
+import { parseJson } from '@ddhub-client-gateway-frontend/ui/utils';
 
 type TUseEditorEffects = {
   showPlaceholder?: boolean;
@@ -57,8 +58,8 @@ export const useEditorEffects = ({ showPlaceholder }: TUseEditorEffects) => {
     suggestOnTriggerCharacters: false,
   } as monaco.editor.IStandaloneEditorConstructionOptions;
 
-  const formatValue = (value: string | undefined) => {
-    return JSON.stringify(value ?? {}, null, 2);
+  const formatValue = (value: object | string) => {
+    return parseJson(value);
   };
 
   return {
