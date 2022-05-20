@@ -19,6 +19,7 @@ import {
   useUserData,
 } from '@ddhub-client-gateway-frontend/ui/login';
 import { makeServer } from '../services/mock.service';
+import '@asyncapi/react-component/styles/default.min.css';
 import 'nprogress/nprogress.css';
 import '../styles/globals.css';
 

@@ -1,23 +1,19 @@
-import { useState } from 'react';
-import { useQueryClient } from 'react-query';
+import { useState } from "react";
+import { useQueryClient } from "react-query";
 import {
+  ChannelTopic,
   CreateChannelDto,
   CreateChannelDtoType,
-  getChannelControllerGetByTypeQueryKey,
-} from '@dsb-client-gateway/dsb-client-gateway-api-client';
-import { useCustomAlert } from '@ddhub-client-gateway-frontend/ui/core';
-import {
-  ModalActionsEnum,
-  useModalDispatch,
-  useModalStore,
-} from '../../../context';
-import { useCreateChannel } from '@ddhub-client-gateway-frontend/ui/api-hooks';
-import { ChannelTopic } from '@dsb-client-gateway/dsb-client-gateway-api-client';
-import { Topic } from './Topics/Topics.effects';
-import { TActionButtonsProps } from './ActionButtons/ActionButtons';
-import { ICreateChannel } from '../models/create-channel.interface';
-import { ChannelType } from '../../../models/channel-type.enum';
-import { ConnectionType } from './Details/models/connection-type.enum';
+  getChannelControllerGetByTypeQueryKey
+} from "@dsb-client-gateway/dsb-client-gateway-api-client";
+import { useCustomAlert } from "@ddhub-client-gateway-frontend/ui/core";
+import { ModalActionsEnum, useModalDispatch, useModalStore } from "../../../context";
+import { useCreateChannel } from "@ddhub-client-gateway-frontend/ui/api-hooks";
+import { Topic } from "./Topics/Topics.effects";
+import { TActionButtonsProps } from "./ActionButtons/ActionButtons";
+import { ICreateChannel } from "../models/create-channel.interface";
+import { ChannelType } from "../../../models/channel-type.enum";
+import { ConnectionType } from "./Details/models/connection-type.enum";
 
 type TGetActionButtonsProps = TActionButtonsProps['nextClickButtonProps'] & {
   canGoBack: boolean;
@@ -86,6 +82,7 @@ export const useCreateChannelEffects = () => {
     fqcn: string;
     connectionType: ConnectionType;
     channelType: ChannelType;
+    payloadEncryption: boolean;
   }) => {
     setActiveStep(activeStep + 1);
     setChannelValues({

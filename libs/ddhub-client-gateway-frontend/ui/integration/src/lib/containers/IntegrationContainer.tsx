@@ -15,6 +15,7 @@ export const IntegrationContainer = () => {
           url={restApiUrl}
           subtitle="Neque porro quisquam est qui dolorem ipsum quia dolor sit amet,
 consectetur."
+          isNextLink={false}
         />
       </Grid>
       <Grid item xs={6}>
@@ -24,6 +25,7 @@ consectetur."
           url={websocketApiUrl}
           subtitle="Neque porro quisquam est qui dolorem ipsum quia dolor sit amet,
 consectetur."
+          isNextLink={true}
         />
       </Grid>
     </Grid>

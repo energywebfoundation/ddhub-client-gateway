@@ -27,4 +27,6 @@ export const routerConst = {
   DataMessagingFileDownload: '/messages/file-download',
   VersionHistory: `/applications/[${Queries.Namespace}]/[${Queries.TopicId}]/version-history`,
   ChannelTopicVersionHistory: `/channels/applications/[${Queries.Namespace}]/[${Queries.TopicId}]/version-history`,
+  WS: '/integration/ws',
+  RestApiDocs: '/docs'
 };

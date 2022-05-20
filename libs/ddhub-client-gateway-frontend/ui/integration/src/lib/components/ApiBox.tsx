@@ -2,16 +2,33 @@ import Box from '@mui/material/Box';
 import { Avatar, Card, CardContent, CardHeader, Stack, Typography } from '@mui/material';
 import React from 'react';
 import { useStyles } from './ApiBox.styles';
+import Link from 'next/link';
 
 export interface ApiBoxProps {
   icon: React.ReactNode;
   url: string;
   title: string;
   subtitle: string;
+  isNextLink: boolean;
 }
 
-export const ApiBox = ({ icon, url, title, subtitle }: ApiBoxProps) => {
+export const ApiBox = ({
+  icon,
+  url,
+  title,
+  subtitle,
+  isNextLink,
+}: ApiBoxProps) => {
   const { classes } = useStyles();
+  const displayedUrl = isNextLink ? (
+    <Link href={url}>
+      <span className={classes.link}>Open</span>
+    </Link>
+  ) : (
+    <a href={url} target="_blank" className={classes.link}>
+      Open
+    </a>
+  );
   return (
     <Card className={classes.card}>
       <Box>
@@ -23,9 +40,7 @@ export const ApiBox = ({ icon, url, title, subtitle }: ApiBoxProps) => {
         />
         <CardContent className={classes.cardContent}>
           <Stack direction="row" justifyContent="flex-end">
-            <a href={url} target="_blank" className={classes.link}>
-              Open
-            </a>
+            {displayedUrl}
           </Stack>
         </CardContent>
       </Box>
