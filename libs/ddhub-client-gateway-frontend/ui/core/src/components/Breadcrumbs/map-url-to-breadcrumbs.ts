@@ -90,4 +90,9 @@ export const mapUrlToBreadcrumbs = new Map<string, Breadcrumb[]>()
     { title: 'Data messaging file upload' },
     { title: 'Channel topics' },
     { title: 'Messages' },
+  ])
+  .set(routerConst.WS, [
+    { title: 'Integration APIs' },
+    { title: 'Integration APIs' },
+    { title: 'Websocket API' },
   ]);

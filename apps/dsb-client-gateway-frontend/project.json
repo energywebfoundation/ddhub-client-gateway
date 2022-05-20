@@ -10,7 +10,10 @@
       "options": {
         "root": "apps/dsb-client-gateway-frontend",
         "outputPath": "dist/apps/dsb-client-gateway-frontend",
-        "assets": ["apps/dsb-client-gateway-frontend/public/frontend-config.json"]
+        "assets": [
+          "apps/dsb-client-gateway-frontend/public/frontend-config.json",
+          "apps/dsb-client-gateway-frontend/public/ws.yaml"
+        ]
       },
       "configurations": {
         "production": {}
