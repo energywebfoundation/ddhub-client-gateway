@@ -73,7 +73,7 @@ export class IamFactoryService {
 
       return { cacheClient, claimsService, didRegistry, signerService };
     } catch (e) {
-      this.logger.error('error druing setup iam', e);
+      this.logger.error('error during setup iam', e);
     }
   }
 
