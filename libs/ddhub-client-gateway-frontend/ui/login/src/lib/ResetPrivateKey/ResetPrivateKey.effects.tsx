@@ -5,7 +5,7 @@ import { theme } from '@ddhub-client-gateway-frontend/ui/utils';
 import { AccountStatusEnum } from '../check-account-status/check-account-status';
 
 export const useResetPrivateKeyEffects = () => {
-  const { setUserData } = useContext(UserDataContext);
+  const {userData, setUserData } = useContext(UserDataContext);
 
   const resetPrivateKeyHandler = () => {
     Swal.fire({
@@ -19,6 +19,7 @@ export const useResetPrivateKeyEffects = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         setUserData({
+          ...userData,
           accountStatus: AccountStatusEnum.NotSetPrivateKey,
           isChecking: false,
           errorMessage: '',
