@@ -21,7 +21,7 @@ export const useSetUserDataEffect = () => {
   const setData = (res: IdentityWithEnrolment) => {
     const redirect = async (status: AccountStatusEnum | RoleStatus) => {
       if (status === RoleStatus.SYNCED) {
-        return router.push(routerConst.Dashboard);
+        return router.push(routerConst.IntegrationAPIs);
       } else {
         return router.push(routerConst.InitialPage);
       }
