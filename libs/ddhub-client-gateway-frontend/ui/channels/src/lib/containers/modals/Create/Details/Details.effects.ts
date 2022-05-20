@@ -1,17 +1,18 @@
-import { useEffect } from 'react';
-import { FieldValues, useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import * as yup from 'yup';
-import { ConnectionType } from './models/connection-type.enum';
-import { ChannelType } from '../../../../models/channel-type.enum';
-import { ICreateChannel } from '../../models/create-channel.interface';
-import { pick } from 'lodash';
+import { useEffect } from "react";
+import { FieldValues, useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+import { ConnectionType } from "./models/connection-type.enum";
+import { ChannelType } from "../../../../models/channel-type.enum";
+import { ICreateChannel } from "../../models/create-channel.interface";
+import { pick } from "lodash";
 
 const validationSchema = yup
   .object({
     fqcn: yup.string().required(),
     channelType: yup.string().required(),
     connectionType: yup.string().required(),
+    payloadEncryption: yup.boolean().optional()
   })
   .required();
 
@@ -44,6 +45,10 @@ const fields = {
       { label: 'Publish', value: ConnectionType.Publish },
     ],
   },
+  payloadEncryption: {
+    name: 'payloadEncryption',
+    label: 'Payload Encryption'
+  }
 };
 
 export const useDetailsEffects = (channelValues: ICreateChannel) => {
@@ -51,6 +56,7 @@ export const useDetailsEffects = (channelValues: ICreateChannel) => {
     fqcn: '',
     channelType: '',
     connectionType: '',
+    payloadEncryption: false,
   };
 
   const {
@@ -73,6 +79,7 @@ export const useDetailsEffects = (channelValues: ICreateChannel) => {
       'channelType',
       'connectionType',
       'fqcn',
+      'payloadEncryption'
     ]);
     Object.entries(details).forEach(([name, value]) => {
       setValue(name, value);
