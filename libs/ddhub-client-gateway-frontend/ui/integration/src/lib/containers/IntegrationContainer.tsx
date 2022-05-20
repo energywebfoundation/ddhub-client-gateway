@@ -7,7 +7,7 @@ import { useIntegrationContainerEffects } from './IntegrationContainer.effects';
 export const IntegrationContainer = () => {
   const { websocketApiUrl, restApiUrl } = useIntegrationContainerEffects();
   return (
-    <Grid container spacing={2}>
+    <Grid container spacing={4}>
       <Grid item xs={6}>
         <ApiBox
           title="REST API"
