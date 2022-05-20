@@ -61,7 +61,7 @@ export class WsClientService implements OnModuleInit {
 
             _ws.addEventListener('message', (event) => {
               this.logger.log(`${wsUrl} ${JSON.stringify(event.data)}`);
-              this.messageService.sendMessage(event.data).then((response) => {
+              this.messageService.sendMessage(JSON.parse(event.data)).then((response) => {
                 _ws.send(JSON.stringify(response));
               }).catch((ex) => {
                 this.logger.error(`${wsUrl} ${JSON.stringify(ex.response)}`);
