@@ -11,6 +11,7 @@ import {
   useUpdateTopics,
   useTopicVersion,
 } from '@ddhub-client-gateway-frontend/ui/api-hooks';
+import { parseJson } from '@ddhub-client-gateway-frontend/ui/utils';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { fields, validationSchema } from '../../../models';
 import {
@@ -134,6 +135,7 @@ export const useUpdateTopicEffects = () => {
     const fomattedValues = {
       ...values,
       id: topic.id,
+      schema: parseJson(values.schema),
     };
     updateTopicHandler(
       fomattedValues as PostTopicDto,
