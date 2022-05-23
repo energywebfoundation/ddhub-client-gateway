@@ -11,10 +11,6 @@ export function Login() {
         <Typography variant={'h5'} sx={{ margin: 0 }}>
           <span className={classes.highlight}>Energy Web</span> Client Gateway
         </Typography>
-        <Typography>
-          Import private key. Learn more about imported accounts{' '}
-          <span className={classes.highlight}>here</span>
-        </Typography>
         <LoginStatus />
       </Container>
     </Stack>
