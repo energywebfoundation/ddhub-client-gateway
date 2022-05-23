@@ -166,7 +166,6 @@ export const useUpdateTopicEffects = () => {
 
   return {
     open,
-    closeModal,
     openCancelModal,
     fields,
     register,
