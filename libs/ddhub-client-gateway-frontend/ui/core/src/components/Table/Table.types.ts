@@ -6,8 +6,7 @@ export interface TableHeader {
   accessor: string;
   Header?: string;
   filter?: string;
-  isSorted?: boolean;
-  isSortedDesc?: boolean;
+  isSortable?: boolean;
   style?: TableCellProps['style'];
 }
 
