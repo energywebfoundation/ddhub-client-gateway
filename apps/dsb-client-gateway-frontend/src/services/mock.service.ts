@@ -7,6 +7,9 @@ import {
   getTopicsControllerGetTopicHistoryByIdAndVersionMock,
   getChannelControllerGetByTypeMock,
   getChannelControllerGetMock,
+  getChannelMessagesMock,
+  getDownloadMessageMock,
+  getFrontendConfigMock,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 
 export function makeServer({ environment = 'development' }) {
@@ -15,6 +18,10 @@ export function makeServer({ environment = 'development' }) {
     routes() {
       this.passthrough('/_next/static/development/_devPagesManifest.json');
       this.passthrough('/_next/static/development/_devMiddlewareManifest.json');
+      this.get('/frontend-config.json', () => {
+        return getFrontendConfigMock();
+      });
+
       this.namespace = 'api/v2';
       this.urlPrefix = 'http://localhost:3333';
 
@@ -76,6 +83,14 @@ export function makeServer({ environment = 'development' }) {
 
       this.post('channels', (_schema, request) => {
         return { channel: JSON.parse(request.requestBody) };
+      });
+
+      this.get('messages', () => {
+        return getChannelMessagesMock();
+      });
+
+      this.get('messages/download', () => {
+        return getDownloadMessageMock();
       });
 
       this.post('messages', () => {

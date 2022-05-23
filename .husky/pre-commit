@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+#nx run-many --all --target=lint
+npm run build:client
+nx run-many --all --target=build

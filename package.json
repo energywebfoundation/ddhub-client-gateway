@@ -7,6 +7,7 @@
     "npm": ">=8.5.0"
   },
   "scripts": {
+    "commit": "git-cz",
     "start": "nx serve",
     "start:ui": "wait-on tcp:3333 && nx serve",
     "start:api": "nx serve dsb-client-gateway-api",
@@ -16,11 +17,12 @@
     "build:client": "nx run dsb-client-gateway-api-client:build-all",
     "export": "npm run build:client && nx export dsb-client-gateway-frontend",
     "build:api": "nx build dsb-client-gateway-api",
-    "test": "nx test"
+    "test": "nx test",
+    "prepare": "husky install"
   },
   "private": true,
   "dependencies": {
-    "@asyncapi/react-component": "^1.0.0-next.15",
+    "@asyncapi/react-component": "1.0.0-next.38",
     "@aws-sdk/client-ssm": "^3.51.0",
     "@aws-sdk/client-sts": "^3.51.0",
     "@emotion/react": "^11.8.2",
@@ -103,8 +105,6 @@
     "rxjs": "^7.0.0",
     "sqlite": "^4.0.25",
     "sqlite3": "^5.0.4",
-    "swagger-ui-express": "^4.3.0",
-    "swagger-ui-react": "^4.6.1",
     "sweetalert2": "^11.4.6",
     "sweetalert2-react-content": "^4.2.0",
     "tslib": "^2.0.0",
@@ -114,7 +114,16 @@
     "websocket": "^1.0.34",
     "yup": "^0.32.11"
   },
+  "config": {
+    "commitizen": {
+      "path": "@commitlint/cz-commitlint"
+    }
+  },
   "devDependencies": {
+    "@commitlint/cli": "^17.0.0",
+    "@commitlint/config-conventional": "^17.0.0",
+    "@commitlint/config-nx-scopes": "^17.0.0",
+    "@commitlint/cz-commitlint": "^17.0.0",
     "@emotion/sheet": "^1.1.0",
     "@mikro-orm/cli": "^5.1.2",
     "@nestjs/schematics": "^8.0.0",
@@ -145,12 +154,12 @@
     "@types/react-copy-to-clipboard": "^5.0.2",
     "@types/react-dom": "17.0.9",
     "@types/react-table": "^7.7.10",
-    "@types/swagger-ui-react": "^4.1.1",
     "@types/websocket": "^1.0.5",
     "@typescript-eslint/eslint-plugin": "~5.10.0",
     "@typescript-eslint/parser": "~5.10.0",
     "babel-jest": "27.2.3",
     "barrelsby": "^2.3.3",
+    "commitizen": "^4.2.4",
     "cypress": "^9.1.0",
     "eslint": "~8.7.0",
     "eslint-config-next": "12.0.7",
@@ -160,6 +169,8 @@
     "eslint-plugin-jsx-a11y": "6.5.1",
     "eslint-plugin-react": "7.27.0",
     "eslint-plugin-react-hooks": "4.3.0",
+    "git-cz": "^4.9.0",
+    "husky": "^8.0.1",
     "jest": "27.2.3",
     "json-to-pretty-yaml": "^1.2.2",
     "miragejs": "^0.1.43",

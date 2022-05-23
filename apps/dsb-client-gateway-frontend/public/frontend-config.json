@@ -1,0 +1,23 @@
+{
+  "topicManagement": {
+    "allowedRoles": ["topiccreator"]
+  },
+  "myAppsAndTopics": {
+    "allowedRoles": ["user"]
+  },
+  "channelManagement": {
+    "allowedRoles": ["user"]
+  },
+  "largeFileUpload": {
+    "allowedRoles": ["user"]
+  },
+  "largeFileDownload": {
+    "allowedRoles": ["user"]
+  },
+  "fileUpload": {
+    "allowedRoles": ["user"]
+  },
+  "fileDownload": {
+    "allowedRoles": ["user"]
+  }
+}

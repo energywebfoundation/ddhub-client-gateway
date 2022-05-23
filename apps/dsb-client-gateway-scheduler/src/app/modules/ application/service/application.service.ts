@@ -102,7 +102,11 @@ export class ApplicationService implements OnApplicationBootstrap {
       const topicsCount: Topic[] =
         await this.ddhubTopicService.getTopicsCountByOwner(namespaces);
 
+      this.logger.log('START: List of combined apps');
+      this.logger.log('topicsCount: ' + JSON.stringify(topicsCount));
+      this.logger.log('allApplicationsRoles: ' + JSON.stringify(allApplicationsRoles));
       for (const application of combinedApplications) {
+        this.logger.log(JSON.stringify(application));
         await this.applicationWrapper.repository.save({
           appName: application.appName,
           description: application.description,
@@ -117,6 +121,7 @@ export class ApplicationService implements OnApplicationBootstrap {
           `stored application ${application.appName} with namespace ${application.namespace}`
         );
       }
+      this.logger.log('END: List of combined apps');
 
       await this.cronWrapper.cronRepository.save({
         jobName: CronJobType.APPLICATIONS_REFRESH,

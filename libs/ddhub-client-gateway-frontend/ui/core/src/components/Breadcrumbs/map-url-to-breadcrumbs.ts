@@ -60,7 +60,13 @@ export const mapUrlToBreadcrumbs = new Map<string, Breadcrumb[]>()
   .set(routerConst.LargeFileDownloadChannel, [
     { title: 'Large data messaging file download' },
     { title: 'Large data messaging file download' },
-    { title: 'Channel name' },
+    { title: 'Channel topics' },
+  ])
+  .set(routerConst.LargeFileDownloadChannelTopic, [
+    { title: 'Large data messaging file download' },
+    { title: 'Large data messaging file download' },
+    { title: 'Channel topics' },
+    { title: 'Messages' },
   ])
   .set(routerConst.LargeDataMessagingFileUpload, [
     { title: 'Large data messaging file upload' },
@@ -73,4 +79,20 @@ export const mapUrlToBreadcrumbs = new Map<string, Breadcrumb[]>()
   .set(routerConst.DataMessagingFileUpload, [
     { title: 'Data messaging file upload' },
     { title: 'Data messaging file upload' },
+  ])
+  .set(routerConst.FileDownloadChannel, [
+    { title: 'Data messaging file upload' },
+    { title: 'Data messaging file upload' },
+    { title: 'Channel topics' },
+  ])
+  .set(routerConst.FileDownloadChannelTopic, [
+    { title: 'Data messaging file upload' },
+    { title: 'Data messaging file upload' },
+    { title: 'Channel topics' },
+    { title: 'Messages' },
+  ])
+  .set(routerConst.WS, [
+    { title: 'Integration APIs' },
+    { title: 'Integration APIs' },
+    { title: 'Websocket API' },
   ]);

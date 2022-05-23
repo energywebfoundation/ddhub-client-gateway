@@ -1,5 +1,6 @@
-import { Channel } from "@ddhub-client-gateway-frontend/ui/channels";
+import { Channel } from '@ddhub-client-gateway-frontend/ui/messaging';
+import { routerConst } from '@ddhub-client-gateway-frontend/ui/utils';
 
 export default function Index() {
-  return <Channel />
+  return <Channel topicsUrl={routerConst.LargeFileDownloadChannelTopic} />;
 }

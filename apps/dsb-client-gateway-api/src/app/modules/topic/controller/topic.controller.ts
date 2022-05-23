@@ -30,12 +30,16 @@ import {
   UpdateTopicHistoryBodyDto,
 } from '../dto';
 import { DdhubTopicsService } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
+import { TopicService } from '../service/topic.service';
 
 @Controller('topics')
 @UseGuards(DigestGuard)
 @ApiTags('Topics')
 export class TopicsController {
-  constructor(protected readonly ddhubTopicsService: DdhubTopicsService) {}
+  constructor(
+    protected readonly ddhubTopicsService: DdhubTopicsService,
+    protected readonly topicService: TopicService
+  ) {}
 
   @Get('')
   @ApiResponse({
@@ -50,7 +54,7 @@ export class TopicsController {
   public async getTopics(
     @Query() { limit, name, owner, page, tags }: GetTopicsQueryDto
   ) {
-    return this.ddhubTopicsService.getTopics(limit, name, owner, page, tags);
+    return this.topicService.getTopics(limit, name, owner, page, tags);
   }
 
   @Get('/:id/versions')
