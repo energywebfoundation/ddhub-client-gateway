@@ -1,7 +1,7 @@
+import { routerConst } from "@ddhub-client-gateway-frontend/ui/utils";
+
 export const useIntegrationContainerEffects = () => {
-  const restApiUrl = process.env['BACKEND_API_URL'] + '/docs';
-  const websocketApiUrl = `ws://${process.env['BACKEND_API_URL']
-    ?.split('://')
-    .pop()}`;
+  const restApiUrl = routerConst.RestApiDocs;
+  const websocketApiUrl = routerConst.WS;
   return { restApiUrl, websocketApiUrl };
 };

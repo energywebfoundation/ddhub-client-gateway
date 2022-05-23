@@ -116,9 +116,6 @@ export class EnvironmentVariables {
   @IsOptional()
   PASSWORD: string;
 
-  @IsString()
-  DID_AUTH_URL = 'http://localhost:8080';
-
   @IsPositive()
   @IsOptional()
   MAX_RETRIES = 3;
@@ -143,9 +140,6 @@ export class EnvironmentVariables {
   MAX_FILE_SIZE = 100000000;
 
   @IsString()
-  FILES_DIRECTORY = '/../../../files/';
-
-  @IsString()
   SYMMETRIC_KEY_CLIENT_ID = 'test';
 
   @IsPositive()
@@ -155,16 +149,9 @@ export class EnvironmentVariables {
   )
   AMOUNT_OF_SYMMETRIC_KEYS_FETCHED = 100;
 
-  @IsString()
-  REFRESH_SYMMETRIC_KEY_CRON_TIME = '*/2 * * * * *';
-
   @IsBoolean()
   @Transform(EnvironmentVariables.transformBoolean('OPENTELEMETRY_ENABLED'))
   OPENTELEMETRY_ENABLED = false;
-
-  @IsEnum(OpenTelemetryExporters)
-  @ValidateIf(EnvironmentVariables.isOTELEnabled)
-  OPEN_TELEMETRY_EXPORTER = OpenTelemetryExporters.ZIPKIN;
 
   @IsString()
   @ValidateIf(EnvironmentVariables.isOTELEnabled)
