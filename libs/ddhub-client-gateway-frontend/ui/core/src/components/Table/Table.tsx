@@ -19,32 +19,11 @@ import { TableComponentActions } from './TableComponentActions';
 import { TableRowsLoadingComponent } from './TableRowsLoadingComponent';
 import { EmptyRow } from './EmptyRow/EmptyRow';
 import { EmptyTable } from './EmptyTable/EmptyTable';
-import { Order, useTableEffects } from "./Table.effects";
+import { useTableEffects } from "./Table.effects";
 import { useStyles } from './Table.styles';
 import { TableProps } from './Table.types';
 import { visuallyHidden } from '@mui/utils';
 
-function descendingComparator(a: Record<string, string>, b: Record<string, string>, orderBy: string) {
-  if (b[orderBy] < a[orderBy]) {
-    return -1;
-  }
-  if (b[orderBy] > a[orderBy]) {
-    return 1;
-  }
-  return 0;
-}
-
-function getComparator(
-  order: Order,
-  orderBy: string
-): (
-  a: { values: Record<string, string> },
-  b: { values: Record<string, string> }
-) => number {
-  return order === 'desc'
-    ? (a, b) => descendingComparator(a.values, b.values, orderBy)
-    : (a, b) => -descendingComparator(a.values, b.values, orderBy);
-}
 
 export function GenericTable<T>({
   headers,
@@ -74,7 +53,8 @@ export function GenericTable<T>({
     handleRowClick,
     handleRequestSort,
     order,
-    orderBy
+    orderBy,
+    getComparator,
   } = useTableEffects({ headers, tableRows, onRowClick });
 
   return (
