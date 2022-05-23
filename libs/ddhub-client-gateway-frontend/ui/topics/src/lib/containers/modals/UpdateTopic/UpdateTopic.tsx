@@ -27,7 +27,6 @@ export const UpdateTopic: FC = () => {
   const { classes } = useStyles();
   const {
     open,
-    closeModal,
     openCancelModal,
     fields,
     register,
@@ -42,7 +41,7 @@ export const UpdateTopic: FC = () => {
   } = useUpdateTopicEffects();
 
   return (
-    <Dialog open={open} onClose={closeModal}>
+    <Dialog open={open} onClose={openCancelModal}>
       {isLoading ? (
         <Box className={classes.progress}>
           <CircularProgress />
@@ -139,7 +138,7 @@ export const UpdateTopic: FC = () => {
                 )}
               </Button>
               <Box className={classes.closeButtonWrapper}>
-                <CloseButton onClose={closeModal} />
+                <CloseButton onClose={openCancelModal} />
               </Box>
             </DialogActions>
           </form>
