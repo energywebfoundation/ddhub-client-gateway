@@ -54,7 +54,10 @@ export const Create = () => {
               canGoBack: true,
               onClick: setTopics,
             })}
-            topics={channelValues.conditions?.topics || []}
+            channelValues={{
+              topics: channelValues.conditions?.topics || [],
+              channelType: channelValues.type,
+            }}
           />
         );
       case 3:

@@ -1,14 +1,14 @@
-import { UpdateChannelDtoType } from '@dsb-client-gateway/dsb-client-gateway-api-client';
+import { GetChannelResponseDtoType } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { ChannelType } from '../models/channel-type.enum';
 
-export const getChannelType = (type: UpdateChannelDtoType) => {
+export const getChannelType = (type: GetChannelResponseDtoType) => {
   switch (type) {
-    case UpdateChannelDtoType.pub:
-    case UpdateChannelDtoType.sub:
+    case GetChannelResponseDtoType.pub:
+    case GetChannelResponseDtoType.sub:
       return ChannelType.Messaging;
 
-    case UpdateChannelDtoType.upload:
-    case UpdateChannelDtoType.download:
+    case GetChannelResponseDtoType.upload:
+    case GetChannelResponseDtoType.download:
       return ChannelType.FileTransfer;
 
     default:

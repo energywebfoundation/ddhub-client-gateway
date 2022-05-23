@@ -4,24 +4,48 @@ import {
 } from '@ddhub-client-gateway-frontend/ui/api-hooks';
 import { useState } from 'react';
 import { differenceBy } from 'lodash';
-import { GetTopicDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
+import {
+  GetTopicDto,
+  GetTopicDtoSchemaType,
+} from '@dsb-client-gateway/dsb-client-gateway-api-client';
+import { ChannelType } from '../../../../models';
+import { getChannelType } from '../../../../utils';
+import { TopicsProps } from './Topics';
+
+const topicsFilters: Record<ChannelType, GetTopicDtoSchemaType[]> = {
+  [ChannelType.Messaging]: [GetTopicDtoSchemaType.JSD7],
+  [ChannelType.FileTransfer]: [
+    GetTopicDtoSchemaType.CSV,
+    GetTopicDtoSchemaType.TSV,
+    GetTopicDtoSchemaType.XML,
+  ],
+};
 
 export interface Topic extends Partial<GetTopicDto> {
   owner: string;
   topicName: string;
 }
 
-export const useTopicsEffects = (topicsState: Topic[]) => {
+export const useTopicsEffects = (channelValues: TopicsProps['channelValues']) => {
   const [selectedApplication, setSelectedApplication] = useState('');
-  const [selectedTopics, setSelectedTopics] = useState<Topic[]>(topicsState);
+  const [selectedTopics, setSelectedTopics] = useState<Topic[]>(
+    channelValues.topics
+  );
   const { applications, isLoading: isLoadingApplications } =
     useApplications('user');
 
   const { topics } = useTopics(selectedApplication);
 
+  const channelType = getChannelType(channelValues.channelType);
+  const filters = topicsFilters[channelType as ChannelType];
+  const filteredTopics = topics.filter(
+    (item) => !filters.includes(item.schemaType)
+  );
+
   const addSelectedTopic = (selectedTopic: Topic) => {
     const exist =
-      topics.findIndex((topic) => topic.name === selectedTopic.name) > -1;
+    filteredTopics.findIndex((topic) => topic.name === selectedTopic.name) >
+    -1;
     if (!exist) {
       return;
     }
@@ -40,7 +64,7 @@ export const useTopicsEffects = (topicsState: Topic[]) => {
   };
 
   const availableTopics: Topic[] = differenceBy(
-    topics,
+    filteredTopics,
     selectedTopics,
     'id'
   ).map((topic: GetTopicDto) => ({
