@@ -48,7 +48,10 @@ export const Update = () => {
               onClick: channelUpdateHandler,
               loading: isUpdating,
             })}
-            topics={channelValues.conditions?.topics || []}
+            channelValues={{
+              topics: channelValues.conditions?.topics || [],
+              channelType: channelValues.type,
+            }}
           />
         );
       default:
