@@ -93,7 +93,8 @@ export class EnvironmentVariables {
   @ValidateIf(EnvironmentVariables.isClientWebSocketEnabled)
   WEBSOCKET_RECONNECT_MAX_RETRIES = 10;
 
-  @IsPositive()
+  @IsNumber()
+  @Transform(EnvironmentVariables.transformNumber('WEBSOCKET_POOLING_TIMEOUT'))
   WEBSOCKET_POOLING_TIMEOUT = 5000;
 
   @IsEnum(SecretsEngine)
