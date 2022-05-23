@@ -113,7 +113,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayInit {
   @SubscribeMessage('message')
   public async handleMessage(@ConnectedSocket() client: any, @MessageBody() data): Promise<void> {
     this.logger.log(`${client.request.connection.remoteAddress}:${client.request.connection.remotePort}${client.request.url} ${JSON.stringify(data)}`);
-    this.messageService.sendMessage(data).then((response) => {
+    this.messageService.sendMessage(JSON.parse(data)).then((response) => {
       client.send(JSON.stringify(response));
     }).catch((ex) => {
       this.logger.error(`${client.request.connection.remoteAddress}:${client.request.connection.remotePort}${client.request.url} ${JSON.stringify(ex.response)}`);
