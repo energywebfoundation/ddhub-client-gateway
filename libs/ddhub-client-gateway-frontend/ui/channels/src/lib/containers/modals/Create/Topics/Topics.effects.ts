@@ -39,7 +39,7 @@ export const useTopicsEffects = (channelValues: TopicsProps['channelValues']) =>
   const channelType = getChannelType(channelValues.channelType);
   const filters = topicsFilters[channelType as ChannelType];
   const filteredTopics = topics.filter(
-    (item) => !filters.includes(item.schemaType)
+    (item) => filters.includes(item.schemaType)
   );
 
   const addSelectedTopic = (selectedTopic: Topic) => {
