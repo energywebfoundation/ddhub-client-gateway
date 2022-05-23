@@ -129,6 +129,8 @@ export class DdhubMessagesService extends DdhubBaseService {
       clientGatewayMessageId,
     };
 
+    console.log(messageData);
+
     try {
       const result = await this.request<null>(
         () =>

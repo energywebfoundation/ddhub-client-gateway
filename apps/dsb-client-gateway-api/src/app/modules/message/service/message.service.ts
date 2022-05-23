@@ -173,6 +173,8 @@ export class MessageService {
           clientGatewayMessageId,
           encryptedSymmetricKey
         );
+
+        contextLogger.debug(`send symmetric key to ${recipientDid}`);
       })
     ).catch((e) => {
       contextLogger.error(
@@ -250,21 +252,23 @@ export class MessageService {
       };
     }
 
-    if (payloadEncryption) {
-      return {
-        ...baseMessage,
-        signatureValid: EncryptionStatus.NOT_REQUIRED,
-        decryption: {
-          status: EncryptionStatus.NOT_REQUIRED,
-        },
-      };
-    }
-
     const isSignatureValid: boolean = await this.keyService.verifySignature(
       message.senderDid,
       message.signature,
       message.payload
     );
+
+    if (!payloadEncryption) {
+      return {
+        ...baseMessage,
+        signatureValid: isSignatureValid
+          ? EncryptionStatus.SUCCESS
+          : EncryptionStatus.FAILED,
+        decryption: {
+          status: EncryptionStatus.NOT_REQUIRED,
+        },
+      };
+    }
 
     if (!isSignatureValid) {
       return {
@@ -415,12 +419,15 @@ export class MessageService {
     this.logger.log('Generating Random Key');
     const randomKey: string = this.keyService.generateRandomKey();
 
-    this.logger.log('Encrypting Payload');
-    const encryptedMessage = this.keyService.encryptMessage(
-      JSON.stringify(file.buffer),
-      randomKey,
-      EncryptedMessageType['UTF-8']
-    );
+    this.logger.log('Encrypting Payload', channel.payloadEncryption);
+
+    const encryptedMessage = channel.payloadEncryption
+      ? this.keyService.encryptMessage(
+          JSON.stringify(file.buffer),
+          randomKey,
+          EncryptedMessageType['UTF-8']
+        )
+      : JSON.stringify(file.buffer);
 
     this.logger.log('fetching private key');
     const privateKey = await this.secretsEngineService.getPrivateKey();
@@ -430,8 +437,9 @@ export class MessageService {
     }
 
     this.logger.log('Generating Signature');
+    const dataHash = this.keyService.createHash(encryptedMessage);
     const signature = this.keyService.createSignature(
-      encryptedMessage,
+      dataHash,
       '0x' + privateKey
     );
 
@@ -439,25 +447,11 @@ export class MessageService {
       'Sending CipherText as Internal Message to all qualified dids'
     );
 
-    await Promise.allSettled(
-      qualifiedDids.map(async (recipientDid: string) => {
-        this.logger.debug(
-          `generating encrypted symmetric key for recipientId: ${recipientDid} `
-        );
-        const decryptionCiphertext = await this.keyService.encryptSymmetricKey(
-          randomKey,
-          recipientDid
-        );
-
-        this.logger.debug(
-          `sending encrypted symmetric key for recipientId: ${recipientDid} `
-        );
-        await this.ddhubMessageService.sendMessageInternal(
-          recipientDid,
-          clientGatewayMessageId,
-          decryptionCiphertext
-        );
-      })
+    await this.sendSymmetricKeys(
+      this.logger,
+      qualifiedDids,
+      randomKey,
+      clientGatewayMessageId
     );
 
     //uploading file
@@ -469,6 +463,7 @@ export class MessageService {
       signature,
       encryptedMessage,
       clientGatewayMessageId,
+      channel.payloadEncryption,
       dto.transactionId
     );
   }
@@ -493,11 +488,20 @@ export class MessageService {
 
     fileName = fileName.replace(/"/g, '');
 
+    console.log(fileResponse);
+
+    const encryptionEnabled: boolean =
+      fileResponse.headers.payloadencryption === 'true';
+
     //Verifying signature
     const isSignatureValid: boolean = await this.keyService.verifySignature(
       fileResponse.headers.ownerdid,
       fileResponse.headers.signature,
-      fileResponse.data
+      this.keyService.createHash(
+        encryptionEnabled
+          ? fileResponse.data
+          : JSON.stringify(fileResponse.data)
+      )
     );
 
     // Return error that signature is invalid
@@ -513,11 +517,13 @@ export class MessageService {
         // Decrypting File Content
         this.logger.debug(`decrypting Message for File Id  ${fileId}`);
 
-        decryptedMessage = await this.keyService.decryptMessage(
-          fileResponse.data,
-          fileResponse.headers.clientgatewaymessageid,
-          fileResponse.headers.ownerdid
-        );
+        decryptedMessage = encryptionEnabled
+          ? await this.keyService.decryptMessage(
+              fileResponse.data,
+              fileResponse.headers.clientgatewaymessageid,
+              fileResponse.headers.ownerdid
+            )
+          : fileResponse.data;
 
         this.logger.debug(`Completed decryption for file id:${fileId}`);
       } catch (e) {
@@ -531,7 +537,9 @@ export class MessageService {
 
       try {
         // Parsing Decrypted data
-        decrypted = JSON.parse(decryptedMessage);
+        decrypted = encryptionEnabled
+          ? JSON.parse(decryptedMessage)
+          : decryptedMessage;
       } catch (e) {
         this.logger.debug(`Parsing failed for file id:${fileId}`);
         throw new MessageDecryptionFailedException(

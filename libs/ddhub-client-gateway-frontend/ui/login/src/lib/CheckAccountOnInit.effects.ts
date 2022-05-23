@@ -20,7 +20,7 @@ export const useCheckAccountOnInitEffects = () => {
       identityControllerGet
     );
     const routeRestrictions: RouteRestrictions = (
-      await axios.get('frontend-config.json?' + queryParam, { baseURL: '' })
+      await axios.get('/frontend-config.json?' + queryParam, { baseURL: '' })
     ).data;
 
     return { identityData, routeRestrictions };
