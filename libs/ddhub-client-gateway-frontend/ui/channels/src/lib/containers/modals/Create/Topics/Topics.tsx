@@ -1,4 +1,5 @@
 import { Grid, Typography } from '@mui/material';
+import { GetChannelResponseDtoType } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { SelectedTopicList } from './SelectedTopicList/SelectedTopicList';
 import { Autocomplete } from '@ddhub-client-gateway-frontend/ui/core';
 import { TopicItem } from './TopicItem/TopicItem';
@@ -8,12 +9,15 @@ import { Topic, useTopicsEffects } from './Topics.effects';
 import { useStyles } from './Topics.styles';
 
 export interface TopicsProps {
-  topics: Topic[];
+  channelValues: {
+    topics: Topic[];
+    channelType: GetChannelResponseDtoType;
+  }
   actionButtonsProps: TActionButtonsProps;
 }
 
 export const Topics = ({
-  topics: topicsState,
+  channelValues,
   actionButtonsProps,
 }: TopicsProps) => {
   const { classes } = useStyles();
@@ -25,7 +29,7 @@ export const Topics = ({
     addSelectedTopic,
     selectedTopics,
     removeSelectedTopic,
-  } = useTopicsEffects(topicsState);
+  } = useTopicsEffects(channelValues);
 
   return (
     <Grid
