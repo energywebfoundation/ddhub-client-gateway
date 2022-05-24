@@ -151,6 +151,7 @@ export class MessageService {
       topic.version,
       signature,
       clientGatewayMessageId,
+      channel.payloadEncryption,
       dto.transactionId
     );
   }
@@ -257,6 +258,18 @@ export class MessageService {
       message.signature,
       message.payload
     );
+
+    if (!payloadEncryption && message.payloadEncryption) {
+      return {
+        ...baseMessage,
+        signatureValid: isSignatureValid
+          ? EncryptionStatus.SUCCESS
+          : EncryptionStatus.FAILED,
+        decryption: {
+          status: EncryptionStatus.REQUIRED_NOT_PERFORMED,
+        },
+      };
+    }
 
     if (!payloadEncryption) {
       return {
@@ -487,8 +500,6 @@ export class MessageService {
     }
 
     fileName = fileName.replace(/"/g, '');
-
-    console.log(fileResponse);
 
     const encryptionEnabled: boolean =
       fileResponse.headers.payloadencryption === 'true';

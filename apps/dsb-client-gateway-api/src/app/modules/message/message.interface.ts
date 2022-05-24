@@ -53,6 +53,7 @@ export interface SearchMessageResponseDto {
   senderDid: string;
   timestampNanos: number;
   isFile: boolean;
+  payloadEncryption: boolean;
   clientGatewayMessageId: string;
 }
 

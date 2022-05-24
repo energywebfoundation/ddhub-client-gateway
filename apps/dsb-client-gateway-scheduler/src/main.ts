@@ -12,8 +12,11 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 
 async function bootstrap() {
-  if (process.env.OPENTELEMETRY_ENABLED) {
+  if (process.env.OPENTELEMETRY_ENABLED === 'true') {
+    Logger.log('starting open telemetry');
     await otelSDK.start();
+  } else {
+    Logger.log('open telemetry disabled');
   }
 
   await NestFactory.createApplicationContext(AppModule);
