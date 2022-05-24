@@ -10,6 +10,7 @@ import {
   TablePagination,
   TableRow,
   Box,
+  TableSortLabel,
 } from '@mui/material';
 import { ColumnInstance } from 'react-table';
 import { Search } from './Search';
@@ -18,9 +19,11 @@ import { TableComponentActions } from './TableComponentActions';
 import { TableRowsLoadingComponent } from './TableRowsLoadingComponent';
 import { EmptyRow } from './EmptyRow/EmptyRow';
 import { EmptyTable } from './EmptyTable/EmptyTable';
-import { useTableEffects } from './Table.effects';
+import { useTableEffects } from "./Table.effects";
 import { useStyles } from './Table.styles';
 import { TableProps } from './Table.types';
+import { visuallyHidden } from '@mui/utils';
+
 
 export function GenericTable<T>({
   headers,
@@ -35,6 +38,7 @@ export function GenericTable<T>({
   showFooter = true,
 }: TableProps<T>) {
   const { classes } = useStyles();
+
   const {
     getTableProps,
     prepareRow,
@@ -47,6 +51,10 @@ export function GenericTable<T>({
     emptyRows,
     handleChangePage,
     handleRowClick,
+    handleRequestSort,
+    order,
+    orderBy,
+    getComparator,
   } = useTableEffects({ headers, tableRows, onRowClick });
 
   return (
@@ -74,16 +82,25 @@ export function GenericTable<T>({
                   <TableCell
                     style={{ ...column?.style }}
                     classes={{ head: classes.head }}
-                    key={column.accessor}
+                    key={column?.accessor}
+                    sortDirection={orderBy === column.accessor ? order : false}
                   >
-                    {column.Header}
-                    <span>
-                      {column?.isSorted
-                        ? column.isSortedDesc
-                          ? ' 🔽'
-                          : ' 🔼'
-                        : ''}
-                    </span>
+                    {column.isSortable ? <TableSortLabel
+                      active={orderBy === column.accessor}
+                      direction={orderBy === column.accessor ? order : 'asc'}
+                      onClick={(event) =>
+                        handleRequestSort(event, column.accessor)
+                      }
+                    >
+                      {column.Header}
+                      {orderBy === column.accessor ? (
+                        <Box component="span" sx={visuallyHidden}>
+                          {order === 'desc'
+                            ? 'sorted descending'
+                            : 'sorted ascending'}
+                        </Box>
+                      ) : null}
+                    </TableSortLabel> : (<>{column.Header}</>)}
                   </TableCell>
                 ))}
                 {actions && (
@@ -96,11 +113,11 @@ export function GenericTable<T>({
             </TableHead>
             <TableBody>
               {(pageSize > 0
-                ? rows.slice(
+                ? rows.sort(getComparator(order, orderBy)).slice(
                     pageIndex * pageSize,
                     pageIndex * pageSize + pageSize
                   )
-                : rows
+                : rows.sort(getComparator(order, orderBy))
               ).map((row) => {
                 const data = row.original as any;
                 prepareRow(row);
