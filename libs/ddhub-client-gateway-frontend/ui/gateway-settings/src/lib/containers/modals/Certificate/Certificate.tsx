@@ -21,6 +21,9 @@ export const Certificate: FC = () => {
     openCancelModal,
     values,
     clear,
+    createConfig,
+    isUploading,
+    buttonDisabled,
   } = useCertificateEffects();
   return (
     <Dialog
@@ -33,6 +36,7 @@ export const Certificate: FC = () => {
       <Box mt={5.7}>
         <UploadInput
           label="Certificate"
+          placeholder="Upload a .pem file"
           acceptedFileType={FileTypesEnum.PEM}
           value={values.certificate}
           onChange={onCertificateChange}
@@ -40,6 +44,7 @@ export const Certificate: FC = () => {
         />
         <UploadInput
           label="Private Key"
+          placeholder="Upload a .key file"
           acceptedFileType={FileTypesEnum.KEY}
           value={values.privateKey}
           onChange={onPrivateKeyChange}
@@ -47,6 +52,7 @@ export const Certificate: FC = () => {
         />
         <UploadInput
           label="CA Certificate (Optional)"
+          placeholder="Upload a .crt file"
           acceptedFileType={FileTypesEnum.CRT}
           value={values.caCertificate}
           onChange={onCACertificateChange}
@@ -74,7 +80,14 @@ export const Certificate: FC = () => {
         >
           Clear
         </Button>
-        <Button>Save</Button>
+        <Button
+          type="submit"
+          loading={isUploading}
+          disabled={buttonDisabled}
+          onClick={createConfig}
+        >
+          Save
+        </Button>
       </Box>
       <Box className={classes.closeButtonWrapper}>
         <CloseButton onClose={openCancelModal} />

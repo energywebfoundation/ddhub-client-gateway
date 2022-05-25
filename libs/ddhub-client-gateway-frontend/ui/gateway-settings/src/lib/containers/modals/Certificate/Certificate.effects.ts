@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { FileWithPath } from 'react-dropzone';
+import { useCertificateSave } from '@ddhub-client-gateway-frontend/ui/api-hooks';
 import { useCustomAlert } from '@ddhub-client-gateway-frontend/ui/core';
 import {
   useModalDispatch,
@@ -7,7 +8,7 @@ import {
   ModalActionsEnum,
 } from '../../../context';
 
-enum FileSetters {
+enum Config {
   Certificate = 'certificate',
   PrivateKey = 'privateKey',
   CACertificate = 'caCertificate',
@@ -21,9 +22,9 @@ export const useCertificateEffects = () => {
     useState<FileWithPath>();
 
   const fileSetters = {
-    [FileSetters.Certificate]: setSelectedCertificate,
-    [FileSetters.PrivateKey]: setSelectedPrivateKey,
-    [FileSetters.CACertificate]: setSelectedCACertificate,
+    [Config.Certificate]: setSelectedCertificate,
+    [Config.PrivateKey]: setSelectedPrivateKey,
+    [Config.CACertificate]: setSelectedCACertificate,
   };
 
   const {
@@ -32,6 +33,8 @@ export const useCertificateEffects = () => {
   const dispatch = useModalDispatch();
 
   const Swal = useCustomAlert();
+  const { createConfigurationHandler, isLoading: isUploading } =
+    useCertificateSave();
 
   const closeModal = () => {
     dispatch({
@@ -70,7 +73,7 @@ export const useCertificateEffects = () => {
     }
   };
 
-  const onFileChange = (acceptedFiles: File[], key: FileSetters) => {
+  const onFileChange = (acceptedFiles: File[], key: Config) => {
     const setFile = fileSetters[key];
     const file = acceptedFiles[0];
 
@@ -83,14 +86,40 @@ export const useCertificateEffects = () => {
     setSelectedCACertificate(undefined);
   };
 
+  const onSuccess = () => {
+    clear();
+    closeModal();
+    Swal.success({
+      text: 'You have successfully configured the certificate',
+    });
+  };
+
+  const onError = () => {
+    Swal.error({
+      text: 'Error while configuring the certificate',
+    });
+  };
+
+
+  const createConfig = () => {
+    const data = {
+      [Config.Certificate]: selectedCertificate,
+      [Config.PrivateKey]: selectedPrivateKey,
+      ...(selectedCACertificate && {
+        [Config.CACertificate]: selectedCACertificate,
+      }),
+    };
+    createConfigurationHandler(data, onSuccess, onError);
+  };
+
   const onCertificateChange = (acceptedFiles: File[]) =>
-    onFileChange(acceptedFiles, FileSetters.Certificate);
+    onFileChange(acceptedFiles, Config.Certificate);
 
   const onPrivateKeyChange = (acceptedFiles: File[]) =>
-    onFileChange(acceptedFiles, FileSetters.PrivateKey);
+    onFileChange(acceptedFiles, Config.PrivateKey);
 
   const onCACertificateChange = (acceptedFiles: File[]) =>
-    onFileChange(acceptedFiles, FileSetters.CACertificate);
+    onFileChange(acceptedFiles, Config.CACertificate);
 
   const certificateTextValue = selectedCertificate?.path ?? '';
   const privateKeyTextValue = selectedPrivateKey?.path ?? '';
@@ -102,6 +131,8 @@ export const useCertificateEffects = () => {
     caCertificate: caCertificateTextValue,
   };
 
+  const buttonDisabled = !selectedCertificate || !selectedPrivateKey;
+
   return {
     open,
     closeModal,
@@ -111,5 +142,8 @@ export const useCertificateEffects = () => {
     values,
     clear,
     openCancelModal,
+    createConfig,
+    isUploading,
+    buttonDisabled,
   };
 };
