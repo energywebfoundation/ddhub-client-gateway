@@ -128,7 +128,6 @@ export const useCreateTopicEffects = () => {
 
   return {
     open,
-    closeModal,
     openCancelModal,
     fields,
     register,

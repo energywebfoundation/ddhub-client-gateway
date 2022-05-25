@@ -35,6 +35,7 @@ export class DdhubFilesService extends DdhubBaseService {
     signature: string,
     encryptedMessage: string,
     clientGatewayMessageId: string,
+    payloadEncryption: boolean,
     transactionId?: string
   ): Promise<SendMessageResponseFile> {
     this.logger.log('Uploading File');
@@ -48,6 +49,10 @@ export class DdhubFilesService extends DdhubBaseService {
       formData.append('topicId', topicId);
       formData.append('topicVersion', topicVersion);
       formData.append('clientGatewayMessageId', clientGatewayMessageId);
+      formData.append(
+        'payloadEncryption',
+        payloadEncryption ? 'true' : 'false'
+      );
 
       if (transactionId) {
         formData.append('transactionId', transactionId);

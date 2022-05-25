@@ -1,3 +1,5 @@
+import { EncryptionStatus } from './message.const';
+
 export interface SendMessageSuccessResponse {
   did: string;
   messageId: string;
@@ -51,11 +53,12 @@ export interface SearchMessageResponseDto {
   senderDid: string;
   timestampNanos: number;
   isFile: boolean;
+  payloadEncryption: boolean;
   clientGatewayMessageId: string;
 }
 
 export interface Decryption {
-  status: boolean;
+  status: EncryptionStatus;
   errorMessage?: string;
 }
 export interface GetMessageResponse {
@@ -69,7 +72,7 @@ export interface GetMessageResponse {
   sender: string;
   timestampNanos: number;
   transactionId: string;
-  signatureValid: boolean;
+  signatureValid: EncryptionStatus;
   decryption: Decryption;
 }
 

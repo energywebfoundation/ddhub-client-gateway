@@ -26,7 +26,6 @@ export const CreateTopic: FC = () => {
   const { classes } = useStyles();
   const {
     open,
-    closeModal,
     openCancelModal,
     fields,
     register,
@@ -38,7 +37,7 @@ export const CreateTopic: FC = () => {
   } = useCreateTopicEffects();
 
   return (
-    <Dialog open={open} onClose={closeModal}>
+    <Dialog open={open} onClose={openCancelModal}>
       <DialogTitle>Create topic</DialogTitle>
       <form onSubmit={onSubmit}>
         <DialogContent sx={{ padding: 0 }}>
@@ -114,7 +113,7 @@ export const CreateTopic: FC = () => {
             )}
           </Button>
           <Box className={classes.closeButtonWrapper}>
-            <CloseButton onClose={closeModal} />
+            <CloseButton onClose={openCancelModal} />
           </Box>
         </DialogActions>
       </form>

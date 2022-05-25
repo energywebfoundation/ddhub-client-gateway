@@ -8,11 +8,16 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 import { otelSDK } from '@dsb-client-gateway/ddhub-client-gateway-tracing';
 
-dotenv.config();
+dotenv.config({
+  path: '.env',
+});
 
 async function bootstrap() {
-  if (process.env.OPENTELEMETRY_ENABLED) {
+  if (process.env.OPENTELEMETRY_ENABLED === 'true') {
+    Logger.log('starting open telemetry');
     await otelSDK.start();
+  } else {
+    Logger.log('open telemetry disabled');
   }
 
   const app = await NestFactory.create(
