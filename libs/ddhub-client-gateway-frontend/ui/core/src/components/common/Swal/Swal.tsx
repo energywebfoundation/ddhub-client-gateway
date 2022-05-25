@@ -19,7 +19,7 @@ export const Swal = () => {
   const { classes, theme } = useStyles();
 
   const icons: Record<SweetAlertIcon, ReactElement> = {
-    warning: <AlertCircle style={{ stroke: theme.palette.error.main }} />,
+    warning: <AlertCircle style={{ stroke: theme.palette.warning.main }} />,
     success: <Check className={classes.successIcon} />,
     error: <XCircle style={{ stroke: theme.palette.error.main }} />,
     question: <HelpCircle />,
