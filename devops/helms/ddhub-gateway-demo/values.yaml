@@ -37,11 +37,27 @@ ddhub-client-gateway-api:
       # -- Sets the Energy Web IAM application namespace. DSB related roles, such as user and messagebroker should fall under this namespace.
       parent_namespace: ddhub.apps.energyweb.iam.ewc
       secret_engine: vault
-      vault_endpoint: http://demo-vault.ddhub-demo.svc:8200
+      secret_engine_endpoint: http://demo-vault.ddhub-demo.svc:8200
       # -- Enable basic auth. (Once enabled, associated secret is required, eg: "ddhub-client-gateway-api-secret")
       basic_auth_enabled: true
       node_env: test
       db_name: ./data/local.db
+      opentelemetry_enabled: false
+    scheduler:
+      enabled: true
+      image:
+        repository: aemocontainerregistry.azurecr.io/ddhub-client-gateway-scheduler
+        pullPolicy: IfNotPresent
+        # Overrides the image tag whose default is the chart appVersion.
+        tag: canary
+      podAnnotations: {}
+      resources: {}
+      probes: 
+        liveness: true
+        readiness: true
+      appConfig:
+        DID_AUTH_URL: "https://ddhub-demo.energyweb.org"
+        DID_REGISTRY_ADDRESS: "0xc15d5a57a8eb0e1dcbe5d88b8f9a82017e5cc4af"
   image:
     # repository: 098061033856.dkr.ecr.us-east-1.amazonaws.com/ew-dos-dsb-ecr
     repository: aemocontainerregistry.azurecr.io/ddhub-client-gateway-backend

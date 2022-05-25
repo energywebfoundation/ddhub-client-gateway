@@ -8,6 +8,7 @@ export interface SearchMessageResponseDto {
   signature: string;
   payload: string;
   senderDid: string;
+  payloadEncryption: boolean;
   timestampNanos: number;
   isFile: boolean;
   clientGatewayMessageId: string;
@@ -16,6 +17,7 @@ export interface SearchMessageResponseDto {
 export interface SendMessageData {
   fqcns: string[];
   payload: string;
+  payloadEncryption: boolean;
   clientGatewayMessageId: string;
   transactionId?: string;
   topicId: string;

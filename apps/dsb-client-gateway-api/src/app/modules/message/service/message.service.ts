@@ -1,11 +1,11 @@
 import {
   DdhubFilesService,
-  DdhubMessagesService
+  DdhubMessagesService,
 } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
 import { SecretsEngineService } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
 import {
   ChannelEntity,
-  TopicEntity
+  TopicEntity,
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -14,13 +14,16 @@ import { ChannelType } from '../../../modules/channel/channel.const';
 import { ChannelService } from '../../channel/service/channel.service';
 import { TopicService } from '../../channel/service/topic.service';
 import { KeysService } from '../../keys/service/keys.service';
-import { EncryptedMessageType } from '../../message/message.const';
+import {
+  EncryptedMessageType,
+  EncryptionStatus,
+} from '../../message/message.const';
 import { NoPrivateKeyException } from '../../storage/exceptions/no-private-key.exception';
 import { IsSchemaValid } from '../../utils/validator/decorators/IsSchemaValid';
 import { GetMessagesDto } from '../dto/request/get-messages.dto';
 import {
   SendMessageDto,
-  uploadMessageBodyDto
+  uploadMessageBodyDto,
 } from '../dto/request/send-message.dto';
 import { ChannelTypeNotPubException } from '../exceptions/channel-type-not-pub.exception';
 import { FileNotFoundException } from '../exceptions/file-not-found.exception';
@@ -37,7 +40,7 @@ import {
   DownloadMessageResponse,
   GetMessageResponse,
   SearchMessageResponseDto,
-  SendMessageResponse
+  SendMessageResponse,
 } from '../message.interface';
 import { WsClientService } from './ws-client.service';
 import { Span } from 'nestjs-otel';
@@ -61,16 +64,7 @@ export class MessageService {
     protected readonly keyService: KeysService,
     protected readonly ddhubMessageService: DdhubMessagesService,
     protected readonly ddhubFilesService: DdhubFilesService
-  ) { }
-
-  private checkTopicForChannel(
-    channel: ChannelEntity,
-    topic: TopicEntity
-  ): boolean {
-    return !channel.conditions.topics.find(
-      (topicOfChannel) => topicOfChannel.topicId === topic.id
-    );
-  }
+  ) {}
 
   @Span('message_sendMessage')
   public async sendMessage(dto: SendMessageDto): Promise<SendMessageResponse> {
@@ -84,28 +78,10 @@ export class MessageService {
       dto.topicVersion
     );
 
-    if (
-      !topic ||
-      !topic.id ||
-      !topic.schema ||
-      !topic.schemaType ||
-      !topic.version
-    ) {
-      throw new TopicNotFoundException('NOT Found');
-    }
-
-    const isTopicNotRelatedToChannel: boolean = this.checkTopicForChannel(
-      channel,
-      topic
-    );
-
-    if (isTopicNotRelatedToChannel) {
-      throw new TopicNotRelatedToChannelException(
-        `topic with ${topic.name} and owner ${topic.owner} not related to channel with name ${dto.fqcn}`
-      );
-    }
+    this.validateTopic(topic, channel);
 
     const qualifiedDids = channel.conditions.qualifiedDids;
+
     if (qualifiedDids.length === 0) {
       throw new RecipientsNotFoundException();
     }
@@ -113,44 +89,84 @@ export class MessageService {
     if (channel.type !== ChannelType.PUB) {
       throw new ChannelTypeNotPubException();
     }
-
-    this.logger.log('Validating schema');
-    IsSchemaValid(topic.schemaType, topic.schema, dto.payload);
-
-    this.logger.log('generating Client Gateway Message Id');
     const clientGatewayMessageId: string = uuidv4();
 
-    this.logger.log('Generating Random Key');
-    const randomKey: string = this.keyService.generateRandomKey();
-
-    this.logger.log('Encrypting Payload');
-
-    const encryptedMessage = this.keyService.encryptMessage(
-      dto.payload,
-      randomKey,
-      EncryptedMessageType['UTF-8']
+    // @TODO this is not a ideal solution, change once new logger is introduced
+    const messageLoggerContext = new Logger(
+      MessageService.name + '_' + clientGatewayMessageId
     );
 
-    this.logger.log('fetching private key');
+    messageLoggerContext.debug('validating schema');
+    IsSchemaValid(topic.schemaType, topic.schema, dto.payload);
+
+    messageLoggerContext.debug('generating random key');
+    const randomKey: string = this.keyService.generateRandomKey();
+
+    messageLoggerContext.debug(
+      'attempting to encrypt payload, encryption enabled: ' +
+        channel.payloadEncryption
+    );
+
+    const message = channel.payloadEncryption
+      ? this.keyService.encryptMessage(
+          dto.payload,
+          randomKey,
+          EncryptedMessageType['UTF-8']
+        )
+      : dto.payload;
+
+    messageLoggerContext.debug('fetching private key');
     const privateKey = await this.secretsEngineService.getPrivateKey();
 
     if (!privateKey) {
       throw new NoPrivateKeyException();
     }
 
-    this.logger.log('Generating Signature');
+    messageLoggerContext.debug('generating signature');
 
     const signature = this.keyService.createSignature(
-      encryptedMessage,
+      message,
       '0x' + privateKey
     );
 
-    this.logger.log('Sending CipherText as Internal Message');
+    if (channel.payloadEncryption) {
+      messageLoggerContext.debug('sending symmetric keys');
 
+      await this.sendSymmetricKeys(
+        messageLoggerContext,
+        qualifiedDids,
+        randomKey,
+        clientGatewayMessageId
+      );
+    }
+
+    messageLoggerContext.debug(
+      `sending messages to ${qualifiedDids.length} DIDs`
+    );
+
+    return this.ddhubMessageService.sendMessage(
+      qualifiedDids,
+      message,
+      topic.id,
+      topic.version,
+      signature,
+      clientGatewayMessageId,
+      channel.payloadEncryption,
+      dto.transactionId
+    );
+  }
+
+  @Span('message_sendSymmetricKeys')
+  protected async sendSymmetricKeys(
+    contextLogger: Logger,
+    qualifiedDids: string[],
+    decryptionKey: string,
+    clientGatewayMessageId: string
+  ): Promise<void> {
     await Promise.allSettled(
       qualifiedDids.map(async (recipientDid: string) => {
         const encryptedSymmetricKey = await this.keyService.encryptSymmetricKey(
-          randomKey,
+          decryptionKey,
           recipientDid
         );
         await this.ddhubMessageService.sendMessageInternal(
@@ -158,43 +174,24 @@ export class MessageService {
           clientGatewayMessageId,
           encryptedSymmetricKey
         );
+
+        contextLogger.debug(`send symmetric key to ${recipientDid}`);
       })
     ).catch((e) => {
-      this.logger.error(
+      contextLogger.error(
         'Error while Sending CipherText as Internal Message to recipients',
         e
       );
+
       throw new Error(e);
     });
-
-    this.logger.log('Sending Message');
-
-    return this.ddhubMessageService.sendMessage(
-      qualifiedDids,
-      encryptedMessage,
-      topic.id,
-      topic.version,
-      signature,
-      clientGatewayMessageId,
-      dto.transactionId
-    );
   }
 
-  @Span('message_getMessages')
-  public async getMessages({
-    fqcn,
-    from,
-    amount,
-    topicName,
+  protected async getTopicsIds(
+    channel: ChannelEntity,
     topicOwner,
-    clientId,
-  }: GetMessagesDto): Promise<GetMessageResponse[]> {
-    const getMessagesResponse: Array<GetMessageResponse> = [];
-
-    const channel: ChannelEntity = await this.channelService.getChannelOrThrow(
-      fqcn
-    );
-
+    topicName
+  ): Promise<string[]> {
     // topic owner and topic name should be present
     if ((topicOwner && !topicName) || (!topicOwner && topicName)) {
       throw new TopicOwnerTopicNameRequiredException('');
@@ -221,10 +218,139 @@ export class MessageService {
       topicIds.push(topic.id);
     }
 
-    // call message search
+    return topicIds;
+  }
+
+  @Span('message_processMessage')
+  private async processMessage(
+    payloadEncryption: boolean,
+    topic: TopicEntity,
+    message: SearchMessageResponseDto
+  ): Promise<GetMessageResponse> {
+    const baseMessage: Omit<
+      GetMessageResponse,
+      'signatureValid' | 'decryption'
+    > = {
+      id: message.messageId,
+      topicName: topic.name,
+      topicOwner: topic.owner,
+      topicVersion: message.topicVersion,
+      topicSchemaType: topic.schemaType,
+      payload: message.payload,
+      signature: message.signature,
+      sender: message.senderDid,
+      timestampNanos: message.timestampNanos,
+      transactionId: message.transactionId,
+    };
+
+    if (message.isFile) {
+      return {
+        ...baseMessage,
+        signatureValid: EncryptionStatus.NOT_REQUIRED,
+        decryption: {
+          status: EncryptionStatus.NOT_REQUIRED,
+        },
+      };
+    }
+
+    const isSignatureValid: boolean = await this.keyService.verifySignature(
+      message.senderDid,
+      message.signature,
+      message.payload
+    );
+
+    if (!payloadEncryption && message.payloadEncryption) {
+      return {
+        ...baseMessage,
+        signatureValid: isSignatureValid
+          ? EncryptionStatus.SUCCESS
+          : EncryptionStatus.FAILED,
+        decryption: {
+          status: EncryptionStatus.REQUIRED_NOT_PERFORMED,
+        },
+      };
+    }
+
+    if (!payloadEncryption) {
+      return {
+        ...baseMessage,
+        signatureValid: isSignatureValid
+          ? EncryptionStatus.SUCCESS
+          : EncryptionStatus.FAILED,
+        decryption: {
+          status: EncryptionStatus.NOT_REQUIRED,
+        },
+      };
+    }
+
+    if (!isSignatureValid) {
+      return {
+        ...baseMessage,
+        signatureValid: EncryptionStatus.FAILED,
+        decryption: {
+          status: EncryptionStatus.NOT_PERFORMED,
+        },
+      };
+    }
+
+    const decryptedMessage: string | null =
+      await this.keyService.decryptMessage(
+        message.payload,
+        message.clientGatewayMessageId,
+        message.senderDid
+      );
+
+    if (!decryptedMessage) {
+      return {
+        ...baseMessage,
+        signatureValid: EncryptionStatus.SUCCESS,
+        decryption: {
+          status: EncryptionStatus.FAILED,
+          errorMessage: '',
+        },
+      };
+    }
+
+    return {
+      ...baseMessage,
+      signatureValid: EncryptionStatus.SUCCESS,
+      decryption: {
+        status: EncryptionStatus.SUCCESS,
+      },
+      payload: decryptedMessage,
+    };
+  }
+
+  @Span('message_getMessages')
+  public async getMessages({
+    fqcn,
+    from,
+    amount,
+    topicName,
+    topicOwner,
+    clientId,
+  }: GetMessagesDto): Promise<GetMessageResponse[]> {
+    const loggerContextKey: string = `${MessageService.name}_${fqcn}_${topicName}_${topicOwner}_${clientId};`;
+
+    const messageLoggerContext = new Logger(loggerContextKey);
+
+    messageLoggerContext.debug('attempting to receive messages');
+
+    const channel: ChannelEntity = await this.channelService.getChannelOrThrow(
+      fqcn
+    );
+
+    const topicsIds: string[] = await this.getTopicsIds(
+      channel,
+      topicOwner,
+      topicName
+    );
+
+    messageLoggerContext.debug(`found topics`, topicsIds);
+
     const messages: Array<SearchMessageResponseDto> =
       await this.ddhubMessageService.messagesSearch(
-        topicIds,
+        topicsIds,
         channel.conditions.qualifiedDids,
         clientId,
         from,
@@ -233,78 +359,28 @@ export class MessageService {
 
     //no messages then return empty array
     if (messages.length === 0) {
+      messageLoggerContext.debug('no messages found');
+
       return [];
     }
 
-    //validate signature and decrypt messages
+    const getMessagesResponse: GetMessageResponse[] = [];
+
     await Promise.allSettled(
       messages.map(async (message: SearchMessageResponseDto) => {
-        const topicFromCache: TopicEntity =
-          await this.topicService.getTopicById(message.topicId);
+        const topic: TopicEntity = await this.topicService.getTopicById(
+          message.topicId
+        );
 
-        const result: GetMessageResponse = {
-          id: message.messageId,
-          topicName: topicFromCache.name,
-          topicOwner: topicFromCache.owner,
-          topicVersion: message.topicVersion,
-          topicSchemaType: topicFromCache.schemaType,
-          payload: message.payload,
-          signature: message.signature,
-          sender: message.senderDid,
-          timestampNanos: message.timestampNanos,
-          transactionId: message.transactionId,
-          signatureValid: false,
-          decryption: { status: false },
-        };
+        messageLoggerContext.debug(`processing message ${message.messageId}`);
 
-        if (!message.isFile) {
-          //signature validation
-          const isSignatureValid = await this.keyService.verifySignature(
-            message.senderDid,
-            message.signature,
-            message.payload
-          );
+        const processedMessage: GetMessageResponse = await this.processMessage(
+          channel.payloadEncryption,
+          topic,
+          message
+        );
 
-          this.logger.debug(
-            `signature matching result for message with id ${message.messageId}`,
-            isSignatureValid
-          );
-
-          if (isSignatureValid) {
-            result.signatureValid = true;
-
-            try {
-              const decryptedMessage: string | null =
-                await this.keyService.decryptMessage(
-                  message.payload,
-                  message.clientGatewayMessageId,
-                  message.senderDid
-                );
-
-              if (!decryptedMessage) {
-                result.decryption.status = false;
-                result.decryption.errorMessage = 'Decryption failed.';
-                result.payload = '';
-
-                this.logger.error(
-                  `failed to decrypt ${message.clientGatewayMessageId}`
-                );
-              } else {
-                result.payload = decryptedMessage;
-                result.decryption.status = true;
-              }
-
-              this.logger.debug(
-                `decrypting Message for message with id ${message.messageId}`
-              );
-            } catch (error) {
-              result.decryption.status = false;
-              result.decryption.errorMessage = JSON.stringify(error);
-            }
-          }
-        }
-
-        getMessagesResponse.push(result);
+        getMessagesResponse.push(processedMessage);
       })
     );
 
@@ -336,17 +412,7 @@ export class MessageService {
       dto.topicVersion
     );
 
-    //Check if topic exists
-
-    if (
-      !topic ||
-      !topic.id ||
-      !topic.schema ||
-      !topic.schemaType ||
-      !topic.version
-    ) {
-      throw new TopicNotFoundException('NOT Found');
-    }
+    this.validateTopic(topic, channel);
 
     //System gets internal channel details
     const qualifiedDids = channel.conditions.qualifiedDids;
@@ -366,12 +432,15 @@ export class MessageService {
     this.logger.log('Generating Random Key');
     const randomKey: string = this.keyService.generateRandomKey();
 
-    this.logger.log('Encrypting Payload');
-    const encryptedMessage = this.keyService.encryptMessage(
-      JSON.stringify(file.buffer),
-      randomKey,
-      EncryptedMessageType['UTF-8']
-    );
+    this.logger.log('Encrypting Payload', channel.payloadEncryption);
+
+    const encryptedMessage = channel.payloadEncryption
+      ? this.keyService.encryptMessage(
+          JSON.stringify(file.buffer),
+          randomKey,
+          EncryptedMessageType['UTF-8']
+        )
+      : JSON.stringify(file.buffer);
 
     this.logger.log('fetching private key');
     const privateKey = await this.secretsEngineService.getPrivateKey();
@@ -381,8 +450,9 @@ export class MessageService {
     }
 
     this.logger.log('Generating Signature');
+    const dataHash = this.keyService.createHash(encryptedMessage);
     const signature = this.keyService.createSignature(
-      encryptedMessage,
+      dataHash,
       '0x' + privateKey
     );
 
@@ -390,25 +460,11 @@ export class MessageService {
       'Sending CipherText as Internal Message to all qualified dids'
     );
 
-    await Promise.allSettled(
-      qualifiedDids.map(async (recipientDid: string) => {
-        this.logger.debug(
-          `generating encrypted symmetric key for recipientId: ${recipientDid} `
-        );
-        const decryptionCiphertext = await this.keyService.encryptSymmetricKey(
-          randomKey,
-          recipientDid
-        );
-
-        this.logger.debug(
-          `sending encrypted symmetric key for recipientId: ${recipientDid} `
-        );
-        await this.ddhubMessageService.sendMessageInternal(
-          recipientDid,
-          clientGatewayMessageId,
-          decryptionCiphertext
-        );
-      })
+    await this.sendSymmetricKeys(
+      this.logger,
+      qualifiedDids,
+      randomKey,
+      clientGatewayMessageId
     );
 
     //uploading file
@@ -420,6 +476,7 @@ export class MessageService {
       signature,
       encryptedMessage,
       clientGatewayMessageId,
+      channel.payloadEncryption,
       dto.transactionId
     );
   }
@@ -444,11 +501,18 @@ export class MessageService {
 
     fileName = fileName.replace(/"/g, '');
 
+    const encryptionEnabled: boolean =
+      fileResponse.headers.payloadencryption === 'true';
+
     //Verifying signature
     const isSignatureValid: boolean = await this.keyService.verifySignature(
       fileResponse.headers.ownerdid,
       fileResponse.headers.signature,
-      fileResponse.data
+      this.keyService.createHash(
+        encryptionEnabled
+          ? fileResponse.data
+          : JSON.stringify(fileResponse.data)
+      )
     );
 
     // Return error that signature is invalid
@@ -464,11 +528,13 @@ export class MessageService {
         // Decrypting File Content
         this.logger.debug(`decrypting Message for File Id  ${fileId}`);
 
-        decryptedMessage = await this.keyService.decryptMessage(
-          fileResponse.data,
-          fileResponse.headers.clientgatewaymessageid,
-          fileResponse.headers.ownerdid
-        );
+        decryptedMessage = encryptionEnabled
+          ? await this.keyService.decryptMessage(
+              fileResponse.data,
+              fileResponse.headers.clientgatewaymessageid,
+              fileResponse.headers.ownerdid
+            )
+          : fileResponse.data;
 
         this.logger.debug(`Completed decryption for file id:${fileId}`);
       } catch (e) {
@@ -482,7 +548,9 @@ export class MessageService {
 
       try {
         // Parsing Decrypted data
-        decrypted = JSON.parse(decryptedMessage);
+        decrypted = encryptionEnabled
+          ? JSON.parse(decryptedMessage)
+          : decryptedMessage;
       } catch (e) {
         this.logger.debug(`Parsing failed for file id:${fileId}`);
         throw new MessageDecryptionFailedException(
@@ -498,5 +566,37 @@ export class MessageService {
       clientGatewayMessageId: fileResponse.headers.clientgatewaymessageid,
       data: Buffer.from(decrypted.data),
     };
+  }
+
+  private validateTopic(topic: TopicEntity, channel: ChannelEntity): void {
+    if (
+      !topic ||
+      !topic.id ||
+      !topic.schema ||
+      !topic.schemaType ||
+      !topic.version
+    ) {
+      throw new TopicNotFoundException('Not found');
+    }
+
+    const isTopicNotRelatedToChannel: boolean = this.checkTopicForChannel(
+      channel,
+      topic
+    );
+
+    if (isTopicNotRelatedToChannel) {
+      throw new TopicNotRelatedToChannelException(
+        `topic with ${topic.name} and owner ${topic.owner} not related to channel with name ${channel.fqcn}`
+      );
+    }
+  }
+
+  private checkTopicForChannel(
+    channel: ChannelEntity,
+    topic: TopicEntity
+  ): boolean {
+    return !channel.conditions.topics.find(
+      (topicOfChannel) => topicOfChannel.topicId === topic.id
+    );
   }
 }

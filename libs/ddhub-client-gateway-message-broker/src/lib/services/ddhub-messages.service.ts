@@ -117,6 +117,7 @@ export class DdhubMessagesService extends DdhubBaseService {
     topicVersion: string,
     signature: string,
     clientGatewayMessageId: string,
+    payloadEncryption: boolean,
     transactionId?: string
   ): Promise<SendMessageResponse> {
     const messageData: SendMessageData = {
@@ -127,6 +128,7 @@ export class DdhubMessagesService extends DdhubBaseService {
       topicVersion,
       signature,
       clientGatewayMessageId,
+      payloadEncryption,
     };
 
     try {
