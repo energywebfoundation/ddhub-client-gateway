@@ -11,8 +11,8 @@ import { CssBaseline } from '@mui/material';
 import createCache from '@emotion/cache';
 import { Layout } from '../components/Layout';
 import { queryClientOptions } from '../utils';
-import { BackdropContextProvider, useBackdropContext } from "@ddhub-client-gateway-frontend/ui/context";
-import { Backdrop } from '@ddhub-client-gateway-frontend/ui/core';
+import { BackdropContextProvider } from "@ddhub-client-gateway-frontend/ui/context";
+import { Backdrop } from '@ddhub-client-gateway-frontend/ui/core'
 import {
   useCheckAccountOnInitEffects,
   UserDataContext,
@@ -48,7 +48,6 @@ function InitializeAccountStatus(props) {
 function MyApp(props: MyAppProps) {
   const { Component, pageProps } = props;
   const { userDataValue } = useUserData();
-  const { open } = useBackdropContext();
   const [queryClient] = React.useState(
     () =>
       new QueryClient({
@@ -91,7 +90,7 @@ function MyApp(props: MyAppProps) {
             <QueryClientProvider client={queryClient}>
               <InitializeAccountStatus>
                 {getLayout(<Component {...pageProps} />)}
-                <Backdrop open={open} />
+                <Backdrop />
               </InitializeAccountStatus>
             </QueryClientProvider>
           </UserDataContext.Provider>
