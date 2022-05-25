@@ -8,6 +8,7 @@ import RequestingEnrolment from './RequestingEnrolment';
 import AwaitingSyncing from '../AwaitingSyncing/AwaitingSyncing';
 import ResetPrivateKey from '../../ResetPrivateKey/ResetPrivateKey';
 import LoadingInfo from '../../LoadingInfo/LoadingInfo';
+import { Typography } from '@mui/material';
 
 export const useLoginStatusEffects = () => {
   const { isLoading, submit, status, errorMessage } = usePrivateKeyEffects();
@@ -23,7 +24,7 @@ export const useLoginStatusEffects = () => {
       case AccountStatusEnum.ErrorOccur:
         return (
           <>
-            <div>Ops! Error occur! {errorMessage}</div>
+            <Typography variant={'body2'}>Ops! Error occur! {errorMessage}</Typography>
             <ResetPrivateKey />
           </>
         );
