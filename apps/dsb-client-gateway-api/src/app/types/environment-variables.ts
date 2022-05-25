@@ -175,6 +175,12 @@ export class EnvironmentVariables {
   @IsString()
   DB_NAME = 'local.db';
 
+  @IsString()
+  UPLOAD_FILES_DIR = './upload';
+
+  @IsString()
+  DOWNLOAD_FILES_DIR = './download';
+
   static isOTELEnabled(values: EnvironmentVariables): boolean {
     return values.OPENTELEMETRY_ENABLED;
   }
