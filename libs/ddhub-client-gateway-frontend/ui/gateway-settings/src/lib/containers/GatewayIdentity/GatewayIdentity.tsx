@@ -1,12 +1,12 @@
 import { FC } from 'react';
-import { Box, Grid, Typography } from '@mui/material';
-import { SettingsItem, Badge } from '../../components';
+import { Box, Typography } from '@mui/material';
+import { SettingsItem } from '../../components';
 import { useGatewayIdentityEffects } from './GatewayIdentity.effects';
 import { useStyles } from '../../components/SettingsItem/SettingsItem.styles';
 
 export const GatewayIdentity: FC = () => {
   const { classes, theme } = useStyles();
-  const { update } = useGatewayIdentityEffects();
+  const { update, identity, namespace } = useGatewayIdentityEffects();
   return (
     <SettingsItem
       title="Gateway identity"
@@ -20,7 +20,7 @@ export const GatewayIdentity: FC = () => {
               ID
             </Typography>
             <Typography variant="body2" className={classes.value}>
-              0x133CEF1178BC392a1bFe067595E3846B96097818
+              {identity?.enrolment?.did}
             </Typography>
           </Box>
           <Box display="flex">
@@ -32,28 +32,10 @@ export const GatewayIdentity: FC = () => {
               style={{ color: theme.palette.primary.main }}
               className={classes.value}
             >
-              user.roles.ddhub.app.aemo.iam.ewc
+              {namespace}
             </Typography>
           </Box>
         </>
-      }
-      footer={
-        <Grid container>
-          <Grid item xs={5}>
-            <Box display="flex" flexDirection="column">
-              <Typography variant="body2" className={classes.label}>
-                STATUS
-              </Typography>
-              <Badge text="Enrolment Complete" />
-            </Box>
-          </Grid>
-          <Grid item xs={4}>
-            <Typography variant="body2" className={classes.label}>
-              DID DOCUMENT
-            </Typography>
-            <Badge text="Synced" />
-          </Grid>
-        </Grid>
       }
     />
   );

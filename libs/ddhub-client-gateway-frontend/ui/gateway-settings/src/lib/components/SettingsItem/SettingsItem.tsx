@@ -7,8 +7,8 @@ interface SettingsItemProps {
   icon: string;
   buttonText: string;
   content: React.ReactElement;
-  footer: React.ReactElement;
-  onClick?: () => void;
+  onClick: () => void;
+  footer?: React.ReactElement;
 }
 
 export const SettingsItem: FC<SettingsItemProps> = ({

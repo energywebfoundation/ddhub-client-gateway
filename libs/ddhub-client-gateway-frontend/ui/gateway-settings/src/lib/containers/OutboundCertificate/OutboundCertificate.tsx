@@ -16,8 +16,7 @@ export const OutboundCertificate: FC = () => {
       content={
         <Box display="flex" mt={0.5}>
           <Typography variant="body2" className={classes.value}>
-            Neque porro quisquam est qui dolorem ipsum quia dolor sit amet,
-            consectetur.
+            Certificates to enable mTLS connection to the Message Broker
           </Typography>
         </Box>
       }
