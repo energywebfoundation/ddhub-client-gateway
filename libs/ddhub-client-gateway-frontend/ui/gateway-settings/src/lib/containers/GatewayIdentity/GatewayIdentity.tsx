@@ -1,15 +1,18 @@
 import { FC } from 'react';
 import { Box, Grid, Typography } from '@mui/material';
 import { SettingsItem, Badge } from '../../components';
+import { useGatewayIdentityEffects } from './GatewayIdentity.effects';
 import { useStyles } from '../../components/SettingsItem/SettingsItem.styles';
 
 export const GatewayIdentity: FC = () => {
   const { classes, theme } = useStyles();
+  const { update } = useGatewayIdentityEffects();
   return (
     <SettingsItem
       title="Gateway identity"
       icon="/icons/gateway-identity.svg"
       buttonText="Update"
+      onClick={update}
       content={
         <>
           <Box display="flex" mt={1.6} mb={0.7}>
