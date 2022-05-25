@@ -2,7 +2,6 @@ import { ModalActionsEnum } from './reducer';
 
 type TCertificate = {
   open: boolean;
-  data: undefined;
 };
 
 export interface IModalStore {
@@ -14,9 +13,4 @@ interface IShowCertificateAction {
   payload: TCertificate;
 }
 
-interface IHideCertificateAction {
-  type: ModalActionsEnum.HIDE_CERTIFICATE;
-  payload: boolean;
-}
-
-export type TModalAction = IShowCertificateAction | IHideCertificateAction;
+export type TModalAction = IShowCertificateAction;

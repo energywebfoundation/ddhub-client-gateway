@@ -7,8 +7,7 @@ export const useOutboundCertificateEffects = () => {
     dispatch({
       type: ModalActionsEnum.SHOW_CERTIFICATE,
       payload: {
-        open: true,
-        data: undefined,
+        open: true
       },
     });
   };

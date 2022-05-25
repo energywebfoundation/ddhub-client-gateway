@@ -41,36 +41,17 @@ export const useCertificateEffects = () => {
       type: ModalActionsEnum.SHOW_CERTIFICATE,
       payload: {
         open: false,
-        data: undefined,
       },
-    });
-  };
-
-  const hideModal = () => {
-    dispatch({
-      type: ModalActionsEnum.HIDE_CERTIFICATE,
-      payload: true,
     });
   };
 
   const showModal = () => {
     dispatch({
-      type: ModalActionsEnum.HIDE_CERTIFICATE,
-      payload: false,
+      type: ModalActionsEnum.SHOW_CERTIFICATE,
+      payload: {
+        open: true,
+      },
     });
-  };
-
-  const openCancelModal = async () => {
-    hideModal();
-    const result = await Swal.warning({
-      text: 'you will close configure certificate form',
-    });
-
-    if (result.isConfirmed) {
-      closeModal();
-    } else {
-      showModal();
-    }
   };
 
   const onFileChange = (acceptedFiles: File[], key: Config) => {
@@ -86,6 +67,20 @@ export const useCertificateEffects = () => {
     setSelectedCACertificate(undefined);
   };
 
+  const openCancelModal = async () => {
+    closeModal();
+    const result = await Swal.warning({
+      text: 'you will close configure certificate form',
+    });
+
+    if (result.isConfirmed) {
+      clear();
+      closeModal();
+    } else {
+      showModal();
+    }
+  };
+
   const onSuccess = () => {
     clear();
     closeModal();
@@ -99,7 +94,6 @@ export const useCertificateEffects = () => {
       text: 'Error while configuring the certificate',
     });
   };
-
 
   const createConfig = () => {
     const data = {
