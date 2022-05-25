@@ -2,6 +2,12 @@ import { makeStyles } from 'tss-react/mui';
 import { alpha, darken } from '@mui/material/styles';
 
 export const useStyles = makeStyles()((theme) => ({
+  progress: {
+    width: '100%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   buttonText: {
     fontSize: 14,
     lineHeight: '17px',

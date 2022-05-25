@@ -13,6 +13,7 @@ export interface UploadInputProps {
   maxSize?: number;
   maxFiles?: number;
   multiple?: boolean;
+  placeholder?: string;
   wrapperProps?: BoxProps;
 }
 
@@ -25,7 +26,7 @@ export const UploadInput: FC<UploadInputProps> = (props) => {
         <InputLabel className={classes.label}>{props.label}</InputLabel>
       )}
       <TextField
-        placeholder="Choose a file"
+        placeholder={props?.placeholder ?? 'Choose a file'}
         className={classes.input}
         value={props.value}
         disabled
