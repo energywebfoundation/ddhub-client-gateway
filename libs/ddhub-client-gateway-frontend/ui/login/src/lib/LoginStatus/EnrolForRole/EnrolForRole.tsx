@@ -1,23 +1,27 @@
 import { Button, Container, Stack, Typography } from '@mui/material';
 import { ErrorOutline } from '@mui/icons-material';
+import { useStyles } from '../../Login.styles';
 
 export interface EnrolForRoleProps {
   onEnrolmentSubmit: () => void;
 }
 
 export function EnrolForRole(props: EnrolForRoleProps) {
+  const { classes } = useStyles();
+
   return (
     <>
-      <Stack spacing={1} alignItems="center" direction={'row'}>
+      <Stack spacing={'11px'} alignItems="center" direction={'row'} paddingTop={'33px'}>
         <ErrorOutline color={'warning'} />
-        <Typography variant={'h6'}>Unauthorized</Typography>
+        <Typography variant={'body2'} fontSize={'18px'}>Unauthorized</Typography>
       </Stack>
-      <Container sx={{ marginLeft: '8px' }}>
-        <Typography>No Role to access DDHub Client GW.</Typography>
+      <Container sx={{ marginLeft: '11px', paddingTop: '6px' }}>
+        <Typography variant={'body2'}>No Role to access DDHub Client GW.</Typography>
         <Button
+          className={classes.submitBtn}
           variant="contained"
           color="primary"
-          sx={{ marginTop: '17px' }}
+          sx={{ marginTop: '26px' }}
           onClick={() => props.onEnrolmentSubmit()}
           fullWidth
         >

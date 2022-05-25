@@ -8,13 +8,13 @@ export function InsufficientFund() {
 
   return (
     <>
-      <Stack spacing={1} alignItems="center" direction={'row'}>
+      <Stack spacing={'11px'} paddingTop={'33px'} alignItems="center" direction={'row'}>
         <ErrorOutline color={'warning'} />
-        <Typography variant={'h6'}>Insufficient fund</Typography>
+        <Typography variant={'body2'} fontSize={'18px'}>Insufficient fund</Typography>
       </Stack>
       {isDevEnv ? (
-        <Container sx={{ marginLeft: '8px' }}>
-          <Typography>
+        <Container sx={{ marginLeft: '11px', paddingTop: '6px' }}>
+          <Typography variant={'body2'}>
             Please refresh or reset private key.{' '}
             <Link
               href={'https://voltafaucet.energyweb.org/'}
