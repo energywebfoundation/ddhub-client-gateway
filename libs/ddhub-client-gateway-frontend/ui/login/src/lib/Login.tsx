@@ -7,8 +7,8 @@ export function Login() {
 
   return (
     <Stack direction="column" alignItems="center">
-      <Container>
-        <Typography variant={'h5'} sx={{ margin: 0 }}>
+      <Container className={classes.container}>
+        <Typography className={classes.mainLabel} sx={{ margin: 0 }}>
           <span className={classes.highlight}>Energy Web</span> Client Gateway
         </Typography>
         <LoginStatus />
