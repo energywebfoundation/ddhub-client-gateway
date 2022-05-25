@@ -12,7 +12,7 @@ import createCache from '@emotion/cache';
 import { Layout } from '../components/Layout';
 import { queryClientOptions } from '../utils';
 import { BackdropContextProvider, useBackdropContext } from "@ddhub-client-gateway-frontend/ui/context";
-import { Backdrop } from '@ddhub-client-gateway-frontend/ui/core'
+import { Backdrop } from '@ddhub-client-gateway-frontend/ui/core';
 import {
   useCheckAccountOnInitEffects,
   UserDataContext,
