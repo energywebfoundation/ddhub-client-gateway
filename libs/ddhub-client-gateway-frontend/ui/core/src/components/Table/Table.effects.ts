@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from "react";
 import { fuzzyTextFilterFn } from './filters/fuzzy-text-filter';
 import { textFilter } from './filters/text-filter';
 import {
@@ -10,11 +10,15 @@ import {
 } from 'react-table';
 import { TableProps } from './Table.types';
 
+export type Order = 'asc' | 'desc';
+
 export function useTableEffects<T>({
   tableRows,
   headers,
   onRowClick,
 }: TableProps<T>) {
+  const [order, setOrder] = useState<Order>('asc');
+  const [orderBy, setOrderBy] = useState('');
   const data = React.useMemo(
     () => tableRows,
     [tableRows]
@@ -66,6 +70,37 @@ export function useTableEffects<T>({
     onRowClick(selectedRow);
   };
 
+  const handleRequestSort = (
+    event: React.MouseEvent<unknown>,
+    property: string
+  ) => {
+    const isAsc = orderBy === property && order === 'asc';
+    setOrder(isAsc ? 'desc' : 'asc');
+    setOrderBy(property);
+  };
+
+  function descendingComparator(a: Record<string, string>, b: Record<string, string>, orderBy: string) {
+    if (b[orderBy] < a[orderBy]) {
+      return -1;
+    }
+    if (b[orderBy] > a[orderBy]) {
+      return 1;
+    }
+    return 0;
+  }
+
+  function getComparator(
+    order: Order,
+    orderBy: string
+  ): (
+    a: { values: Record<string, string> },
+    b: { values: Record<string, string> }
+  ) => number {
+    return order === 'desc'
+      ? (a, b) => descendingComparator(a.values, b.values, orderBy)
+      : (a, b) => -descendingComparator(a.values, b.values, orderBy);
+  }
+
   return {
     getTableProps,
     prepareRow,
@@ -78,5 +113,9 @@ export function useTableEffects<T>({
     emptyRows,
     handleChangePage,
     handleRowClick,
+    handleRequestSort,
+    order,
+    orderBy,
+    getComparator,
   };
 }

@@ -7,15 +7,13 @@ import {
 } from '@mui/material';
 import { useStyles } from './Backdrop.styles';
 import { alpha } from '@mui/material/styles';
+import { useBackdropContext } from "@ddhub-client-gateway-frontend/ui/context";
 
-export interface BackdropProps {
-  open: boolean;
-}
-
-export const Backdrop: FC<BackdropProps> = ({ open }) => {
+export const Backdrop: FC = () => {
+  const { isLoading } = useBackdropContext();
   const { classes, theme } = useStyles();
   return (
-    <MaterialBackdrop open={open} className={classes.root}>
+    <MaterialBackdrop open={isLoading} className={classes.root}>
       <Box className={classes.wrapper}>
         <svg style={{ position: 'absolute' }}>
           <defs>
