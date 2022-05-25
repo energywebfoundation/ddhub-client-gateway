@@ -149,7 +149,6 @@ export const useUpdateChannelEffects = () => {
   return {
     open,
     channel,
-    closeModal,
     openCancelModal,
     activeStep,
     setRestrictions,

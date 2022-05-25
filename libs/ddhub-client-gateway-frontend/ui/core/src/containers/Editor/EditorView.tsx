@@ -17,7 +17,7 @@ export const EditorView: FC<EditorViewProps> = ({ value }) => {
   return (
     <Box
       height={132}
-      sx={{ position: 'relative', width: '100%', pointerEvents: 'none' }}
+      sx={{ position: 'relative', width: '100%' }}
     >
       <Box className={classes.wrapper}>
         <MonacoEditor
@@ -25,7 +25,7 @@ export const EditorView: FC<EditorViewProps> = ({ value }) => {
           theme="vs-dark"
           language="json"
           options={{ ...options, readOnly: true }}
-          defaultValue={formatValue(value)}
+          value={formatValue(value)}
           loading={
             <CircularProgress style={{ width: '25px', height: '25px' }} />
           }

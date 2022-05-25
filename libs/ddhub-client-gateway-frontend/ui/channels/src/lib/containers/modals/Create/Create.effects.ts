@@ -131,7 +131,6 @@ export const useCreateChannelEffects = () => {
       type: ModalActionsEnum.HIDE_CREATE,
       payload: true,
     });
-    resetToInitialState();
   };
 
   const showModal = () => {
@@ -201,7 +200,6 @@ export const useCreateChannelEffects = () => {
 
   return {
     open,
-    closeModal,
     openCancelModal,
     isCreating,
     activeStep,

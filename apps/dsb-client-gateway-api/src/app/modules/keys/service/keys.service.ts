@@ -226,6 +226,11 @@ export class KeysService implements OnModuleInit {
     return encryptedData.toString('base64');
   }
 
+  @Span('keys_createHash')
+  public createHash(data: string): string {
+    return crypto.createHash('sha256').update(data).digest('hex');
+  }
+
   @Span('keys_decryptSymetricKey')
   public decryptSymmetricKey(
     privateKey: string,

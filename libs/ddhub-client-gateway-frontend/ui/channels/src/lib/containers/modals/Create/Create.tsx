@@ -16,7 +16,7 @@ import { useStyles } from './Create.styles';
 export const Create = () => {
   const {
     open,
-    closeModal,
+    openCancelModal,
     activeStep,
     setDetails,
     setTopics,
@@ -54,7 +54,10 @@ export const Create = () => {
               canGoBack: true,
               onClick: setTopics,
             })}
-            topics={channelValues.conditions?.topics || []}
+            channelValues={{
+              topics: channelValues.conditions?.topics || [],
+              channelType: channelValues.type,
+            }}
           />
         );
       case 3:
@@ -76,7 +79,7 @@ export const Create = () => {
   };
 
   return (
-    <Dialog open={open} onClose={closeModal} paperClassName={classes.paper}>
+    <Dialog open={open} onClose={openCancelModal} paperClassName={classes.paper}>
       <DialogTitle className={classes.title}>Create Channel</DialogTitle>
       <DialogSubTitle>{subTitle}</DialogSubTitle>
       <Grid container className={classes.content}>
@@ -88,7 +91,7 @@ export const Create = () => {
         </Grid>
       </Grid>
       <Box className={classes.closeButtonWrapper}>
-        <CloseButton onClose={closeModal} />
+        <CloseButton onClose={openCancelModal} />
       </Box>
     </Dialog>
   );

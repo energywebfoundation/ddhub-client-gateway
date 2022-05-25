@@ -18,7 +18,7 @@ export const Update = () => {
   const {
     open,
     channel,
-    closeModal,
+    openCancelModal,
     activeStep,
     setRestrictions,
     channelValues,
@@ -48,7 +48,10 @@ export const Update = () => {
               onClick: channelUpdateHandler,
               loading: isUpdating,
             })}
-            topics={channelValues.conditions?.topics || []}
+            channelValues={{
+              topics: channelValues.conditions?.topics || [],
+              channelType: channelValues.type,
+            }}
           />
         );
       default:
@@ -57,7 +60,7 @@ export const Update = () => {
   };
 
   return (
-    <Dialog open={open} onClose={closeModal} paperClassName={classes.paper}>
+    <Dialog open={open} onClose={openCancelModal} paperClassName={classes.paper}>
       <DialogTitle className={classes.title}>Update Channel</DialogTitle>
       <DialogSubTitle>{subTitle}</DialogSubTitle>
       <Grid container className={classes.content}>
@@ -107,7 +110,7 @@ export const Update = () => {
         </Grid>
       </Grid>
       <Box className={classes.closeButtonWrapper}>
-        <CloseButton onClose={closeModal} />
+        <CloseButton onClose={openCancelModal} />
       </Box>
     </Dialog>
   );
