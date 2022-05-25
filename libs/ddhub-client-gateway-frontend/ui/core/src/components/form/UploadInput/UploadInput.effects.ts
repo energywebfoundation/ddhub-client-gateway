@@ -4,9 +4,10 @@ import { acceptedFileTypes } from './UploadInput.utils';
 
 export const useUploadInputEffects = ({
   acceptedFileType,
-  maxSize,
-  maxFiles,
   onChange,
+  maxSize = Infinity,
+  maxFiles = 1,
+  multiple = false
 }: Omit<UploadInputProps, 'value'>) => {
   const fileType = acceptedFileTypes[acceptedFileType];
 
@@ -16,7 +17,7 @@ export const useUploadInputEffects = ({
     noKeyboard: true,
     maxFiles,
     maxSize,
-    multiple: false,
+    multiple,
     accept: fileType,
   });
 
