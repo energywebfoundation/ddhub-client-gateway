@@ -41,3 +41,5 @@ export interface Enrolment {
   did: string | null;
   roles: Role[];
 }
+
+export const IMPORT_PRIVATE_KEY = 'import';
