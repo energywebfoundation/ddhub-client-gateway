@@ -1,4 +1,5 @@
 import { useRouter } from 'next/router';
+import { IMPORT_PRIVATE_KEY } from '@ddhub-client-gateway/identity/models';
 import { useCustomAlert } from '@ddhub-client-gateway-frontend/ui/core';
 import { useIdentity } from '@ddhub-client-gateway-frontend/ui/api-hooks';
 import { routerConst } from '@ddhub-client-gateway-frontend/ui/utils';
@@ -20,7 +21,7 @@ export const useGatewayIdentityEffects = () => {
     if (result.isConfirmed) {
       router.push({
         pathname: routerConst.InitialPage,
-        query: { import: true },
+        query: { privateKey: IMPORT_PRIVATE_KEY },
       });
     }
   };
