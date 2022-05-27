@@ -18,8 +18,15 @@ export const Topics: FC<TopicsProps> = ({
   readonly,
 }: TopicsProps) => {
   const { classes } = useStyles();
-  const { openCreateTopic, topics, actions, topicsFetched, handleRowClick } =
-    useTopicsEffects(versionHistoryUrl, readonly);
+  const {
+    openCreateTopic,
+    topics,
+    actions,
+    topicsFetched,
+    handleRowClick,
+    pagination,
+    handlePageChange,
+  } = useTopicsEffects(versionHistoryUrl, readonly);
 
   return (
     <section className={classes.table}>
@@ -27,7 +34,9 @@ export const Topics: FC<TopicsProps> = ({
         headers={TOPICS_HEADERS}
         tableRows={topics}
         actions={actions}
+        paginationProps={pagination}
         onRowClick={handleRowClick}
+        onPageChange={handlePageChange}
         loading={!topicsFetched}
       >
         {!readonly && <CreateButton onCreate={openCreateTopic} />}

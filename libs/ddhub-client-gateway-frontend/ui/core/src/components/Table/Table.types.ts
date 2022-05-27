@@ -10,6 +10,12 @@ export interface TableHeader {
   style?: TableCellProps['style'];
 }
 
+export interface TablePagination {
+  limit: number;
+  count: number;
+  page: number;
+}
+
 export interface TableProps<T> {
   headers: TableHeader[];
   tableRows: T[];
@@ -21,4 +27,6 @@ export interface TableProps<T> {
   showFooter?: boolean;
   containerProps?: TableContainerProps;
   loadingRows?: number;
+  paginationProps?: TablePagination;
+  onPageChange?: (newPage: number) => void;
 }

@@ -20,9 +20,12 @@ export const useTopicsEffects = (
   const { theme } = useStyles();
   const router = useRouter();
 
-  const { topics, topicsFetched } = useTopics(
-    router.query[Queries.Namespace] as string
-  );
+  const { topics, topicsFetched, getTopics, pagination } = useTopics({
+    limit: 6,
+    page: 1,
+    owner: router.query[Queries.Namespace] as string,
+  });
+
   const { applicationsByNamespace } = useCachedApplications();
   const { removeTopicHandler } = useRemoveTopic();
 
@@ -101,6 +104,10 @@ export const useTopicsEffects = (
 
   const handleRowClick = (topic: GetTopicDto) => openTopicDetails(topic);
 
+  const handlePageChange = (newPage: number) => {
+    getTopics({ page: newPage });
+  };
+
   return {
     openCreateTopic,
     application,
@@ -108,5 +115,7 @@ export const useTopicsEffects = (
     actions,
     topicsFetched,
     handleRowClick,
+    pagination,
+    handlePageChange,
   };
 };
