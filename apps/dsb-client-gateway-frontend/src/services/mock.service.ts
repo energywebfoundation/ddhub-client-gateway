@@ -33,8 +33,8 @@ export function makeServer({ environment = 'development' }) {
         return getIdentityControllerGetMock();
       });
 
-      this.get('/topics', () => {
-        return getTopicsControllerGetTopicsMock();
+      this.get('/topics', (schema, request) => {
+        return getTopicsControllerGetTopicsMock(request.queryParams);
       });
 
       this.get('/channels', () => {
