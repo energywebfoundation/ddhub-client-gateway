@@ -12,7 +12,7 @@ export interface Breadcrumb {
 export const mapUrlToBreadcrumbs = new Map<string, Breadcrumb[]>()
   .set(routerConst.Dashboard, [{ title: 'Dashboard' }])
   .set(routerConst.GatewaySettings, [
-    { title: 'Dashboard' },
+    { title: 'Gateway settings' },
     { title: 'Gateway Settings' },
   ])
   .set(routerConst.AppsAndTopics, [

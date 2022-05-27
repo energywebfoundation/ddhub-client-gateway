@@ -100,6 +100,10 @@ export function makeServer({ environment = 'development' }) {
       this.post('messages/upload', () => {
         return {};
       });
+
+      this.post('certificate', () => {
+        return {};
+      });
     },
   });
 }
