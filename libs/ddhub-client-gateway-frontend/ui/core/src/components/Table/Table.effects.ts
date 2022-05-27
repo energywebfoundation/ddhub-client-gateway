@@ -16,6 +16,8 @@ export function useTableEffects<T>({
   tableRows,
   headers,
   onRowClick,
+  paginationProps,
+  onPageChange,
 }: TableProps<T>) {
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState('');
@@ -60,7 +62,12 @@ export function useTableEffects<T>({
     _event: React.MouseEvent<HTMLButtonElement> | null,
     newPage: number
   ) => {
-    gotoPage(newPage);
+    if (paginationProps && onPageChange) {
+      // page starts at 0 index
+      onPageChange(newPage + 1);
+    } else {
+      gotoPage(newPage);
+    }
   };
 
   const handleRowClick = (selectedRow: T) => {

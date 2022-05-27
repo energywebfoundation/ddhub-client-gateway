@@ -36,6 +36,8 @@ export function GenericTable<T>({
   loadingRows,
   showSearch = true,
   showFooter = true,
+  paginationProps,
+  onPageChange,
 }: TableProps<T>) {
   const { classes } = useStyles();
 
@@ -55,7 +57,7 @@ export function GenericTable<T>({
     order,
     orderBy,
     getComparator,
-  } = useTableEffects({ headers, tableRows, onRowClick });
+  } = useTableEffects({ headers, tableRows, onRowClick, onPageChange, paginationProps });
 
   return (
     <>
@@ -158,9 +160,9 @@ export function GenericTable<T>({
                     labelDisplayedRows={({ from, to, count }) =>
                       `Showing ${from} to ${to} of ${count} entries`
                     }
-                    count={totalLength}
-                    rowsPerPage={pageSize}
-                    page={pageIndex}
+                    count={paginationProps ? paginationProps.count : totalLength}
+                    rowsPerPage={paginationProps ? paginationProps.limit : pageSize}
+                    page={paginationProps ? (paginationProps.page - 1) : pageIndex}
                     onPageChange={handleChangePage}
                     ActionsComponent={TablePaginationActions}
                     classes={{
