@@ -25,6 +25,7 @@ const dsbTheme: ThemeOptions = {
     info: {
       main: '#0B80DF',
       dark: '#1c2338',
+      light: '#00CFE8'
     },
     action: {
       hover: '#CC98FF',
