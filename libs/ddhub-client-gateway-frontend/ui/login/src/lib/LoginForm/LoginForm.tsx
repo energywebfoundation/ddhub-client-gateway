@@ -1,36 +1,41 @@
-import { Button, TextField, Typography } from '@mui/material';
-import { LoginData } from '../login-data.interface';
+import { Button, Typography, Box } from '@mui/material';
+import { FormInput } from '@ddhub-client-gateway-frontend/ui/core';
 import { useLoginFormEffects } from './LoginForm.effects';
+import { useStyles } from '../Login.styles';
 
 export interface LoginFormProps {
   onPrivateKeySubmit: (privateKey: string) => void;
 }
 
 export function LoginForm(props: LoginFormProps) {
-  const { register, handleSubmit, errorMessage } = useLoginFormEffects();
+  const { register, onSubmit, errorMessage, field, buttonDisabled } =
+    useLoginFormEffects(props);
+  const { classes } = useStyles();
 
   return (
-    <>
-      <Typography>Import private key.</Typography>
-      <form>
-        <Typography variant="caption">Enter your private key here</Typography>
-        <TextField placeholder="Private key" {...register} />
-        <Typography variant="inherit" color="error">
-          {errorMessage}
-        </Typography>
-        <Button
-          variant="contained"
-          color="primary"
-          sx={{ marginTop: '17px' }}
-          onClick={handleSubmit((data: LoginData) =>
-            props.onPrivateKeySubmit(data.privateKey)
-          )}
-          fullWidth
-        >
+    <form style={{ minWidth: 342 }}>
+      <Box className={classes.inputWrapper}>
+        <FormInput
+          variant="outlined"
+          field={field}
+          register={register}
+          errorText={errorMessage}
+        />
+      </Box>
+      <Button
+        className={classes.submitBtn}
+        variant="contained"
+        color="primary"
+        sx={{ marginTop: '26px' }}
+        onClick={onSubmit}
+        disabled={buttonDisabled}
+        fullWidth
+      >
+        <Typography className={classes.submitBtnText} variant="body2">
           Import
-        </Button>
-      </form>
-    </>
+        </Typography>
+      </Button>
+    </form>
   );
 }
 

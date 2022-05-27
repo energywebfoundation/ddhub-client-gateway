@@ -6,7 +6,7 @@ export function RequestingEnrolment() {
   return (
     <>
       <LoadingInfo>Requesting enrolment</LoadingInfo>
-      <Container sx={{ marginLeft: '8px' }}>
+      <Container sx={{ marginLeft: '8px', paddingTop: '7px' }}>
         <Typography>Pending approval</Typography>
         <ResetPrivateKey />
       </Container>

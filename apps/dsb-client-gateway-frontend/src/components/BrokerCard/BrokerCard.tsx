@@ -1,31 +1,41 @@
-import { Card, Avatar, CardContent, CardHeader, Typography } from '@mui/material';
+import {
+  Card,
+  Avatar,
+  CardContent,
+  CardHeader,
+  Typography,
+  Box,
+} from '@mui/material';
 import { Mail } from 'react-feather';
-import React from 'react';
+import { Badge } from '@ddhub-client-gateway-frontend/ui/core';
 import { useStyles } from './BrokerCard.styles';
-import Box from '@mui/material/Box';
-import Status, { StatusTypeEnum } from '../Status/Status';
 
 export function BrokerCard() {
-  const {classes} = useStyles();
+  const { classes } = useStyles();
   return (
-    <Card>
+    <Card className={classes.card}>
       <Box>
-        <Status text='Online' type={StatusTypeEnum.Up}/>
         <CardHeader
+          title={'DDHub message broker'}
           avatar={
             <Avatar className={classes.avatar}>
-              <Mail size={20} className={classes.mailIcon}/>
+              <Mail size={24} className={classes.mailIcon} />
             </Avatar>
           }
+          classes={{
+            title: classes.title,
+          }}
         />
-        <CardContent>
-          <Typography variant='h5'>
-            DDHub message broker
-          </Typography>
+        <CardContent style={{ padding: '28px 16px 0' }}>
+          <Box display="flex" flexDirection="column">
+            <Typography variant="body2" className={classes.label}>
+              STATUS
+            </Typography>
+            <Badge text="Online" />
+          </Box>
         </CardContent>
       </Box>
     </Card>
-
   );
 }
 

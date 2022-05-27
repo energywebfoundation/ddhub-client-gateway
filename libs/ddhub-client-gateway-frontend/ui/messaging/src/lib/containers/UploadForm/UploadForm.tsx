@@ -1,6 +1,6 @@
 import { FC } from 'react';
-import { Box, BoxProps, Grid, Typography, Button } from '@mui/material';
-import { TextField } from '@ddhub-client-gateway-frontend/ui/core';
+import { Box, BoxProps, Grid, Typography } from '@mui/material';
+import { UploadInput } from '@ddhub-client-gateway-frontend/ui/core';
 import { TFileType } from './UploadForm.types';
 import { useUploadFormEffects } from './UploadForm.effects';
 import { useStyles } from './UploadForm.styles';
@@ -23,11 +23,8 @@ export const UploadForm: FC<UploadFormProps> = ({
   fileSizeInfo,
 }) => {
   const { classes } = useStyles();
-  const { open, fileTextValue } = useUploadFormEffects({
-    onFileChange,
+  const { fileTextValue } = useUploadFormEffects({
     acceptedFiles,
-    acceptedFileType,
-    maxFileSize,
   });
 
   return (
@@ -54,28 +51,11 @@ export const UploadForm: FC<UploadFormProps> = ({
                 </Box>
               )}
             </Box>
-            <TextField
-              placeholder="Choose a file"
-              className={classes.input}
+            <UploadInput
+              acceptedFileType={acceptedFileType}
               value={fileTextValue}
-              disabled
-              InputProps={{
-                endAdornment: (
-                  <Button
-                    variant="contained"
-                    component="span"
-                    className={classes.button}
-                    size="large"
-                    color="primary"
-                    onClick={open}
-                    disabled={!acceptedFileType}
-                  >
-                    <Typography className={classes.buttonText} variant="body2">
-                      Browse
-                    </Typography>
-                  </Button>
-                ),
-              }}
+              onChange={onFileChange}
+              maxSize={maxFileSize}
             />
           </Box>
         </Grid>

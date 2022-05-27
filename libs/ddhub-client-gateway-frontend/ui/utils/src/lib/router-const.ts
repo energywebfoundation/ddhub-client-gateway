@@ -2,7 +2,8 @@ export enum Queries {
   Namespace = 'namespace',
   Owner = 'owner',
   TopicId = 'topicId',
-  FQCN = 'fqcn'
+  FQCN = 'fqcn',
+  PrivateKey = 'privateKey'
 }
 
 export const routerConst = {
