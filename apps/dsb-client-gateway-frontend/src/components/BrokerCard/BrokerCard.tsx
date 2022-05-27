@@ -26,7 +26,7 @@ export function BrokerCard() {
             title: classes.title,
           }}
         />
-        <CardContent>
+        <CardContent style={{ padding: '28px 16px 0' }}>
           <Box display="flex" flexDirection="column">
             <Typography variant="body2" className={classes.label}>
               STATUS
