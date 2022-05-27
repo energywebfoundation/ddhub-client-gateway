@@ -1,19 +1,21 @@
 import { keyBy } from 'lodash';
-import { useQueryClient } from 'react-query';
 import {
   GetTopicDto,
   PaginatedResponse,
   useTopicsControllerGetTopics,
   TopicsControllerGetTopicsParams,
-  getTopicsControllerGetTopicsQueryKey,
-  topicsControllerGetTopics
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
-import {useState} from "react";
+import { useState } from 'react';
 
-export const useTopics = ({ limit = 0, page = 1, owner }: TopicsControllerGetTopicsParams) => {
-  const queryClient = useQueryClient();
+export const useTopics = ({
+  page = 1,
+  limit = 0,
+  owner,
+}: TopicsControllerGetTopicsParams) => {
+  const [params, setParams] = useState({ page, limit });
+
   const { data, isLoading, isSuccess, isError } = useTopicsControllerGetTopics(
-    { owner, limit, page },
+    { page: params.page, limit: params.limit, owner },
     {
       query: {
         enabled: !!owner,
@@ -22,29 +24,21 @@ export const useTopics = ({ limit = 0, page = 1, owner }: TopicsControllerGetTop
   );
 
   const paginated = data ?? ({} as PaginatedResponse);
-  const topicsInitialState = paginated.records ?? ([] as GetTopicDto[]);
-  const [topics, setTopics] = useState(topicsInitialState);
+  const topics = paginated.records ?? ([] as GetTopicDto[]);
   const topicsById = keyBy(topics, 'id');
   const topicsFetched = isSuccess && data !== undefined && !isError;
-  const paginationInitialState = {
-    limit: paginated.limit,
-    count: paginated.count,
-    page: paginated.page,
+
+  const getTopics = async ({
+    page = 1,
+    limit = 6,
+  }: Omit<TopicsControllerGetTopicsParams, 'owner'>) => {
+    setParams({ page, limit });
   };
-  const [pagination, setPagination] = useState(paginationInitialState);
 
-  const getTopics = async ({ limit = 6, owner, page }: TopicsControllerGetTopicsParams) => {
-    const topicData = await queryClient.fetchQuery({
-      queryKey: getTopicsControllerGetTopicsQueryKey({ limit, owner, page }),
-      queryFn: () => topicsControllerGetTopics({ limit, page, owner })
-    });
-
-    setTopics(topicData.records);
-    setPagination({
-      limit: topicData.limit,
-      page: topicData.page,
-      count: topicData.count,
-    });
+  const pagination = {
+    limit: paginated?.limit,
+    count: paginated?.count,
+    page: paginated?.page,
   };
 
   return {
