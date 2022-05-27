@@ -105,11 +105,7 @@ export const useTopicsEffects = (
   const handleRowClick = (topic: GetTopicDto) => openTopicDetails(topic);
 
   const handlePageChange = (newPage: number) => {
-    getTopics({
-      limit: 6,
-      page: newPage,
-      owner: router.query[Queries.Namespace] as string,
-    });
+    getTopics({ page: newPage });
   };
 
   return {
@@ -120,6 +116,6 @@ export const useTopicsEffects = (
     topicsFetched,
     handleRowClick,
     pagination,
-    handlePageChange
+    handlePageChange,
   };
 };
