@@ -37,6 +37,10 @@ export function makeServer({ environment = 'development' }) {
         return getTopicsControllerGetTopicsMock(request.queryParams);
       });
 
+      this.post('/identity', () => {
+        return getIdentityControllerGetMock();
+      });
+
       this.get('/channels', () => {
         return getChannelControllerGetByTypeMock();
       });
@@ -98,6 +102,10 @@ export function makeServer({ environment = 'development' }) {
       });
 
       this.post('messages/upload', () => {
+        return {};
+      });
+
+      this.post('certificate', () => {
         return {};
       });
     },

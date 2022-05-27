@@ -19,6 +19,7 @@ export const useStyles = makeStyles()((theme) => ({
       fontSize: 12,
       lineHeight: '17px',
       fontWeight: 400,
+      color: theme.palette.error.main,
       fontFamily: theme.typography.body2.fontFamily,
       letterSpacing: '0.4px',
     },

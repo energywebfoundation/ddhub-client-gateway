@@ -17,6 +17,7 @@ const dsbTheme: ThemeOptions = {
     },
     warning: {
       main: '#FF5A00',
+      light: '#FF9F43'
     },
     success: {
       main: '#2EB67D',
@@ -24,6 +25,7 @@ const dsbTheme: ThemeOptions = {
     info: {
       main: '#0B80DF',
       dark: '#1c2338',
+      light: '#00CFE8'
     },
     action: {
       hover: '#CC98FF',
