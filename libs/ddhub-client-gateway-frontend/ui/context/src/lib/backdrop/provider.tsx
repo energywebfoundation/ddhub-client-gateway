@@ -1,19 +1,21 @@
 import React, { createContext, useContext, useState, useMemo } from 'react';
 
 type TState = {
-  open: boolean;
+  isLoading: boolean;
+  setIsLoading: (value: boolean) => void;
 };
 
 const defaultState = {
-  open: false,
+  isLoading: false,
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  setIsLoading: (value: boolean) => {},
 };
 const BackdropContext = createContext<TState>(defaultState);
 
 export const BackdropContextProvider: React.FC = ({ children }) => {
-  const [open, setOpen] = useState(defaultState.open);
+  const [isLoading, setIsLoading] = useState(defaultState.isLoading);
 
-  const value = useMemo(() => ({ open, setOpen }), [open]);
-
+  const value = useMemo(() => ({ isLoading, setIsLoading }), [isLoading]);
   return (
     <BackdropContext.Provider value={value}>
       {children}

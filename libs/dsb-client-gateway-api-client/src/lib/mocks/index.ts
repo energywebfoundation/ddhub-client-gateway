@@ -65,22 +65,24 @@ export const getApplicationsControllerGetApplicationsMock = () => [
   },
 ];
 
-export const getTopicsControllerGetTopicsMock = () => ({
-  count: 6,
-  limit: 6,
-  page: 1,
-  records: [...Array(6)].map(() => ({
-    id: faker.datatype.uuid(),
-    name: faker.word.noun(),
-    owner: faker.random.arrayElement([
-      'ddhub.apps.energyweb.iam.ewc',
-      'torta.apps.eggplant.vege.iam.ewc',
-    ]),
-    schemaType: faker.random.arrayElement(['JSD7', 'XML', 'CSV', 'TSV']),
-    tags: [...Array(3)].map(() => faker.word.noun()),
-    version: '1.0.0',
-  })),
-});
+export const getTopicsControllerGetTopicsMock = (queryParams: any) => ({
+      count: 24,
+      limit: Number(queryParams.limit),
+      page: Number(queryParams.page),
+      records: [...Array(Number(queryParams.limit))].map(() => ({
+        id: faker.datatype.uuid(),
+        name: faker.word.noun(),
+        owner: faker.random.arrayElement([
+          'ddhub.apps.energyweb.iam.ewc',
+          'torta.apps.eggplant.vege.iam.ewc',
+        ]),
+        schemaType: faker.random.arrayElement(['JSD7', 'XML', 'CSV', 'TSV']),
+        tags: [...Array(3)].map(() => faker.word.noun()),
+        version: '1.0.0',
+      })),
+    }
+
+);
 
 export const getTopicsControllerPostTopicsMock = () => ({
   id: faker.random.word(),

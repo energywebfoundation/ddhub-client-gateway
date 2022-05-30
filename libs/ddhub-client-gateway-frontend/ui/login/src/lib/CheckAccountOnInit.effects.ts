@@ -8,20 +8,24 @@ import { useQueryClient } from 'react-query';
 import { useSetUserDataEffect } from './SetUserData.effects';
 import axios from 'axios';
 import { RouteRestrictions } from './config/route-restrictions.interface';
+import { useBackdropContext } from '@ddhub-client-gateway-frontend/ui/context';
 
 export const useCheckAccountOnInitEffects = () => {
   const queryClient = useQueryClient();
   const { setUserData, setIsChecking, setDataOnError } = useSetUserDataEffect();
-
+  const { setIsLoading } = useBackdropContext();
   const getIdentityData = async () => {
     const queryParam = `t=${new Date(Date.now()).getTime()}`;
+    setIsLoading(true);
+
+    const routeRestrictions: RouteRestrictions = (
+      await axios.get('/frontend-config.json?' + queryParam, { baseURL: '' })
+    ).data;
+
     const identityData = await queryClient.fetchQuery(
       getIdentityControllerGetQueryKey(),
       identityControllerGet
     );
-    const routeRestrictions: RouteRestrictions = (
-      await axios.get('/frontend-config.json?' + queryParam, { baseURL: '' })
-    ).data;
 
     return { identityData, routeRestrictions };
   };
@@ -34,6 +38,7 @@ export const useCheckAccountOnInitEffects = () => {
           res.identityData as IdentityWithEnrolment,
           res.routeRestrictions
         );
+        setIsLoading(false);
       })
       .catch((error) => {
         console.error(error);

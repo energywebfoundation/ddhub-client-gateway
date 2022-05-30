@@ -1,10 +1,10 @@
 import { render } from '@testing-library/react';
 
-import StatisticItem from './StatisticItem';
+import { Scheduler } from './Scheduler';
 
-describe('StatisticItem', () => {
+describe('Scheduler', () => {
   it('should render successfully', () => {
-    const { baseElement } = render(<StatisticItem />);
+    const { baseElement } = render(<Scheduler />);
     expect(baseElement).toBeTruthy();
   });
 });

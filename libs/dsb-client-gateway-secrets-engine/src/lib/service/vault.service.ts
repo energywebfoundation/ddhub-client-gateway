@@ -131,9 +131,10 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
   public async setCertificateDetails(
     certificateDetails: CertificateDetails
   ): Promise<void> {
+    this.logger.log('saving certificate to vault');
     await this.client.write(PATHS.CERTIFICATE, certificateDetails);
 
-    this.logger.log('Writing certificate');
+    this.logger.log('certificates successfully saved to the vault');
   }
 
   @Span('vault_setPrivateKey')

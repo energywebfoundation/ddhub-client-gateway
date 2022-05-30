@@ -1,5 +1,8 @@
 import {
+  Body,
   Controller,
+  HttpCode,
+  HttpStatus,
   Post,
   UploadedFiles,
   UseGuards,
@@ -8,7 +11,8 @@ import {
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { CertificateService } from './service/certificate.service';
 import { DigestGuard } from '../utils/guards/digest.guard';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiConsumes, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { UploadCertificateBodyDto } from './dto/request/upload-certificates-body.dto';
 
 @Controller('certificate')
 @UseGuards(DigestGuard)
@@ -17,6 +21,22 @@ export class CertificateController {
   constructor(protected readonly certificateService: CertificateService) {}
 
   @Post()
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Certificates Uploaded Successfully',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description:
+      'Validation failed or some requirements were not fully satisfied',
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Unauthorized',
+  })
+  @HttpCode(HttpStatus.CREATED)
+  @HttpCode(HttpStatus.OK)
+  @ApiConsumes('multipart/form-data')
   @UseInterceptors(
     FileFieldsInterceptor([
       {
@@ -43,7 +63,8 @@ export class CertificateController {
       certificate;
       privateKey;
       caCertificate;
-    }
+    },
+    @Body() dto: UploadCertificateBodyDto
   ): Promise<void> {
     await this.certificateService.save(
       certificate[0],

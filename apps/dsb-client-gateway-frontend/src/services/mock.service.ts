@@ -33,8 +33,12 @@ export function makeServer({ environment = 'development' }) {
         return getIdentityControllerGetMock();
       });
 
-      this.get('/topics', () => {
-        return getTopicsControllerGetTopicsMock();
+      this.get('/topics', (_schema, request) => {
+        return getTopicsControllerGetTopicsMock(request.queryParams);
+      });
+
+      this.post('/identity', () => {
+        return getIdentityControllerGetMock();
       });
 
       this.get('/channels', () => {
@@ -98,6 +102,10 @@ export function makeServer({ environment = 'development' }) {
       });
 
       this.post('messages/upload', () => {
+        return {};
+      });
+
+      this.post('certificate', () => {
         return {};
       });
     },

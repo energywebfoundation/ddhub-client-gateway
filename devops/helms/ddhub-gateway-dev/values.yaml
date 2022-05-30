@@ -38,7 +38,7 @@ ddhub-client-gateway-api:
       parent_namespace: ddhub.apps.energyweb.iam.ewc
       secret_engine: vault
       secret_engine_endpoint: http://vault.ddhub-dev.svc:8200
-      node_env: test
+      node_env: development
       db_name: ./data/local.db
       opentelemetry_enabled: false
     scheduler:

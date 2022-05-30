@@ -13,13 +13,14 @@ export interface SwalProps {
   showCancelButton?: boolean;
   confirmButtonText?: string;
   width?: string;
+  html?: string | HTMLElement
 }
 
 export const Swal = () => {
   const { classes, theme } = useStyles();
 
   const icons: Record<SweetAlertIcon, ReactElement> = {
-    warning: <AlertCircle style={{ stroke: theme.palette.error.main }} />,
+    warning: <AlertCircle style={{ stroke: theme.palette.warning.main }} />,
     success: <Check className={classes.successIcon} />,
     error: <XCircle style={{ stroke: theme.palette.error.main }} />,
     question: <HelpCircle />,
@@ -33,6 +34,7 @@ export const Swal = () => {
     showCancelButton,
     confirmButtonText,
     width,
+    html,
   }: SwalProps) =>
     SwalCustom.mixin({
       title,
@@ -41,6 +43,7 @@ export const Swal = () => {
       showCancelButton,
       confirmButtonText: confirmButtonText ?? 'Confirm',
       width: width ?? '512px',
+      html,
       customClass: {
         icon: classes.icon,
         title: classes.title,
