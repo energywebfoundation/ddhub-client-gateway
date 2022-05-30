@@ -5,3 +5,4 @@ export * from './SelectRegular';
 export * from './FormRadio/FormRadio';
 export * from './Autocomplete';
 export * from './TextField';
+export * from './UploadInput';

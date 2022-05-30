@@ -1,0 +1,27 @@
+{
+  "root": "libs/ddhub-client-gateway-frontend/ui/gateway-settings",
+  "sourceRoot": "libs/ddhub-client-gateway-frontend/ui/gateway-settings/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": [
+          "libs/ddhub-client-gateway-frontend/ui/gateway-settings/**/*.{ts,tsx,js,jsx}"
+        ]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": [
+        "coverage/libs/ddhub-client-gateway-frontend/ui/gateway-settings"
+      ],
+      "options": {
+        "jestConfig": "libs/ddhub-client-gateway-frontend/ui/gateway-settings/jest.config.js",
+        "passWithNoTests": true
+      }
+    }
+  }
+}
