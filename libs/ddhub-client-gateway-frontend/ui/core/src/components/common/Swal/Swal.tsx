@@ -13,6 +13,7 @@ export interface SwalProps {
   showCancelButton?: boolean;
   confirmButtonText?: string;
   width?: string;
+  html?: string | HTMLElement
 }
 
 export const Swal = () => {
@@ -33,6 +34,7 @@ export const Swal = () => {
     showCancelButton,
     confirmButtonText,
     width,
+    html,
   }: SwalProps) =>
     SwalCustom.mixin({
       title,
@@ -41,6 +43,7 @@ export const Swal = () => {
       showCancelButton,
       confirmButtonText: confirmButtonText ?? 'Confirm',
       width: width ?? '512px',
+      html,
       customClass: {
         icon: classes.icon,
         title: classes.title,
