@@ -31,6 +31,7 @@ import { Readable } from 'stream';
 import { AppendInitVect } from './append-init-vect';
 import * as fs from 'fs';
 import { join } from 'path';
+import * as zlib from 'zlib';
 
 @Injectable()
 export class KeysService implements OnModuleInit {
@@ -156,7 +157,7 @@ export class KeysService implements OnModuleInit {
       initVect
     );
 
-    return readStream.pipe(decipher);
+    return readStream.pipe(decipher).pipe(zlib.createBrotliDecompress());
   }
 
   @Span('keys_checksumFile')
@@ -194,8 +195,9 @@ export class KeysService implements OnModuleInit {
     const promise = () =>
       new Promise((resolve, reject) => {
         message
-          .pipe(new AppendInitVect(iv))
+          .pipe(zlib.createBrotliCompress())
           .pipe(cipher)
+          .pipe(new AppendInitVect(iv))
           .pipe(writeStream)
           .on('finish', () => {
             resolve(null);
