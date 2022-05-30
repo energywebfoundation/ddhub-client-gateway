@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import { fuzzyTextFilterFn } from './filters/fuzzy-text-filter';
 import { textFilter } from './filters/text-filter';
 import {
@@ -16,6 +16,8 @@ export function useTableEffects<T>({
   tableRows,
   headers,
   onRowClick,
+  paginationProps,
+  onPageChange,
 }: TableProps<T>) {
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState('');
@@ -60,7 +62,12 @@ export function useTableEffects<T>({
     _event: React.MouseEvent<HTMLButtonElement> | null,
     newPage: number
   ) => {
-    gotoPage(newPage);
+    if (paginationProps && onPageChange) {
+      // page starts at 0 index
+      onPageChange(newPage + 1);
+    } else {
+      gotoPage(newPage);
+    }
   };
 
   const handleRowClick = (selectedRow: T) => {
@@ -79,7 +86,11 @@ export function useTableEffects<T>({
     setOrderBy(property);
   };
 
-  function descendingComparator(a: Record<string, string>, b: Record<string, string>, orderBy: string) {
+  function descendingComparator(
+    a: Record<string, string>,
+    b: Record<string, string>,
+    orderBy: string
+  ) {
     if (b[orderBy] < a[orderBy]) {
       return -1;
     }
@@ -101,6 +112,18 @@ export function useTableEffects<T>({
       : (a, b) => -descendingComparator(a.values, b.values, orderBy);
   }
 
+  const pagination = paginationProps
+    ? {
+        count: paginationProps.count,
+        limit: paginationProps.limit,
+        page: paginationProps.page - 1,
+      }
+    : {
+        count: totalLength,
+        limit: pageSize,
+        page: pageIndex,
+      };
+
   return {
     getTableProps,
     prepareRow,
@@ -117,5 +140,6 @@ export function useTableEffects<T>({
     order,
     orderBy,
     getComparator,
+    pagination
   };
 }

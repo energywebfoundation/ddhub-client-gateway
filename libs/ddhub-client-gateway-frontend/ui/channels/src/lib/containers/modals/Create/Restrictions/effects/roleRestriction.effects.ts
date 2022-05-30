@@ -1,7 +1,9 @@
 import { useState } from 'react';
 
 // TODO: create regex
-const roleRegex = new RegExp(/^\w+/);
+const roleRegex = new RegExp(
+  /^[a-z0-9]+\.roles\.((\w+).)*(ewc)$/gm
+);
 
 export const useRolesRestrictionEffects = (currentRoles: string[]) => {
   const [roles, setRoles] = useState<string[]>(currentRoles);
