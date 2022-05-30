@@ -39,7 +39,10 @@ import { ConfigService } from '@nestjs/config';
             fileSize: configService.get<number>('MAX_FILE_SIZE'),
           },
           storage: multer.diskStorage({
-            destination: 'uploads',
+            destination: configService.get<string>(
+              'MULTER_UPLOADS_PATH',
+              'uploads'
+            ),
           }),
         };
       },

@@ -95,22 +95,6 @@ export class MessageControlller {
       this.logger.error('error in file download', e);
       throw e;
     }
-
-    // res.set({
-    //   'Content-Type': 'multipart/form-data',
-    //   'Content-Disposition': `attachment; filename=${file.fileName}`,
-    //   sender: file.sender,
-    //   signature: file.signature,
-    //   clientGatewayMessageId: file.clientGatewayMessageId,
-    // });
-    //
-    // try {
-    //   const stream = Readable.from(file.data.toString());
-    //   return stream.pipe(res);
-    // } catch (e) {
-    //   this.logger.error('error in file download', e);
-    //   throw e;
-    // }
   }
 
   @Post('/')

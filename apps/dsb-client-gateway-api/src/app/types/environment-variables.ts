@@ -181,6 +181,9 @@ export class EnvironmentVariables {
   @IsString()
   DOWNLOAD_FILES_DIR = './download';
 
+  @IsString()
+  MULTER_UPLOADS_PATH = 'uploads';
+
   static isOTELEnabled(values: EnvironmentVariables): boolean {
     return values.OPENTELEMETRY_ENABLED;
   }
