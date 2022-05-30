@@ -4,6 +4,7 @@ import {
   TopicRepositoryWrapper,
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
 import { Span } from 'nestjs-otel';
+import { GetTopicResponse } from '../entity/topic.entity';
 @Injectable()
 export class TopicService {
   protected readonly logger = new Logger(TopicService.name);
@@ -17,16 +18,27 @@ export class TopicService {
     owner: string,
     page: number,
     tags: string[]
-  ): Promise<TopicEntity[]> {
+  ): Promise<GetTopicResponse | []> {
     try {
-      const result: TopicEntity[] = [];
-      const topics = await this.wrapper.topicRepository.getTopics(
-        limit,
-        name,
-        owner,
-        page,
-        tags
-      );
+      //arraging topics according to the latest version
+      const latestTopicsFromCache: TopicEntity[] = [];
+
+      //modifying the result according to the MB response
+      const result: GetTopicResponse = {
+        records: [],
+        count: 0,
+        limit: 1,
+        page: 1,
+      };
+      //fetching all topics from cache
+      const topics: TopicEntity[] =
+        await this.wrapper.topicRepository.getTopics(
+          limit,
+          name,
+          owner,
+          page,
+          tags
+        );
 
       if (topics.length === 0) {
         return [];
@@ -39,8 +51,13 @@ export class TopicService {
 
       for (const topicName in topicsGroupByVersion) {
         const length = topicsGroupByVersion[topicName].length;
-        result.push(topicsGroupByVersion[topicName][length - 1]);
+        latestTopicsFromCache.push(topicsGroupByVersion[topicName][length - 1]);
       }
+
+      result.records = latestTopicsFromCache;
+      result.count = latestTopicsFromCache.length;
+      result.limit = limit ? limit : 1;
+      result.page = page ? page : 1;
 
       this.logger.log(`get topics with owner:${owner} successful`);
       return result;
