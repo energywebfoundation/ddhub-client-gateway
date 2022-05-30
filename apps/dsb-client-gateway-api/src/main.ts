@@ -2,7 +2,7 @@ import * as dotenv from 'dotenv';
 import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { WsAdapter } from '@nestjs/platform-ws';
-
+import * as bodyParser from 'body-parser';
 import { AppModule } from './app/app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
@@ -35,6 +35,16 @@ async function bootstrap() {
   app.setGlobalPrefix(globalPrefix);
 
   const configService = app.get<ConfigService>(ConfigService);
+
+  app.use(
+    bodyParser.json({ limit: configService.get<string>('REQUEST_BODY_SIZE') })
+  );
+  app.use(
+    bodyParser.urlencoded({
+      limit: configService.get<string>('REQUEST_BODY_SIZE'),
+      extended: true,
+    })
+  );
 
   const config = new DocumentBuilder()
     .setTitle('DDHub Client Gateway')
