@@ -20,17 +20,15 @@ export class TopicService {
     tags: string[]
   ): Promise<GetTopicResponse | []> {
     try {
-      //arraging topics according to the latest version
       const latestTopicsFromCache: TopicEntity[] = [];
 
-      //modifying the result according to the MB response
       const result: GetTopicResponse = {
         records: [],
         count: 0,
         limit: 1,
         page: 1,
       };
-      //fetching all topics from cache
+
       const topics: TopicEntity[] =
         await this.wrapper.topicRepository.getTopics(
           limit,
