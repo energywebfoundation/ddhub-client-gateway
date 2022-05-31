@@ -20,7 +20,7 @@ export const useTopicsEffects = (
   const { theme } = useStyles();
   const router = useRouter();
 
-  const { topics, topicsFetched, getTopics, pagination } = useTopics({
+  const { topics, topicsFetched, getTopics, pagination, isLoading } = useTopics({
     limit: 6,
     page: 1,
     owner: router.query[Queries.Namespace] as string,
@@ -114,6 +114,7 @@ export const useTopicsEffects = (
     topics,
     actions,
     topicsFetched,
+    isLoading,
     handleRowClick,
     pagination,
     handlePageChange,

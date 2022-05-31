@@ -6,7 +6,7 @@ import { useChannelListEffects } from './ChannelList.effects';
 import { CHANNELS_HEADERS } from '../../models';
 
 export function ChannelList() {
-  const { channels, onCreateHandler, actions, channelsLoaded } =
+  const { channels, onCreateHandler, actions, isLoading } =
     useChannelListEffects();
 
   return (
@@ -15,7 +15,7 @@ export function ChannelList() {
         headers={CHANNELS_HEADERS}
         tableRows={channels}
         actions={actions}
-        loading={!channelsLoaded}
+        loading={isLoading}
       >
         <CreateButton onCreate={onCreateHandler} />
       </GenericTable>
