@@ -32,7 +32,7 @@ export const Certificate: FC = () => {
       paperClassName={classes.paper}
     >
       <DialogTitle className={classes.title}>Outbound Certificate</DialogTitle>
-      <DialogSubTitle>add or update certificates, private key</DialogSubTitle>
+      <DialogSubTitle>Add or update certificates, private key</DialogSubTitle>
       <Box mt={5.7}>
         <UploadInput
           label="Certificate"

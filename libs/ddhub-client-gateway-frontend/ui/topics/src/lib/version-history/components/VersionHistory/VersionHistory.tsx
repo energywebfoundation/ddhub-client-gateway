@@ -11,7 +11,7 @@ export function VersionHistory() {
     topicHistory,
     topicId,
     actions,
-    topicHistoryLoaded,
+    isLoading
   } = useVersionHistoryEffects();
 
   return (
@@ -26,7 +26,7 @@ export function VersionHistory() {
           tableRows={topicHistory}
           showSearch={false}
           actions={actions}
-          loading={!topicHistoryLoaded}
+          loading={isLoading}
         />
       </div>
     </Stack>
