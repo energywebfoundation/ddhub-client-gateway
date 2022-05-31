@@ -77,7 +77,7 @@ function MyApp(props: MyAppProps) {
   return (
     <CacheProvider value={muiCache ?? createMuiCache()}>
       <Head>
-        <title>DSB Client Gateway</title>
+        <title>DDHub Client Gateway</title>
         <meta
           name="viewport"
           content="minimum-scale=1, initial-scale=1, width=device-width"
