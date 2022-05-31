@@ -4,8 +4,10 @@ import {
   IdentityResponseDto,
   useIdentityControllerGet,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
+import { useCustomAlert } from '@ddhub-client-gateway-frontend/ui/core';
 
 export const useIdentity = () => {
+  const Swal = useCustomAlert();
   const queryClient = useQueryClient();
   const cachedIdentity: IdentityResponseDto | undefined =
     queryClient.getQueryData(getIdentityControllerGetQueryKey());
@@ -13,6 +15,10 @@ export const useIdentity = () => {
   const { data, isLoading } = useIdentityControllerGet({
     query: {
       enabled: !cachedIdentity,
+      onError: (err: { message: string }) => {
+        console.error(err);
+        Swal.error({ text: err.message });
+      },
     },
   });
 
