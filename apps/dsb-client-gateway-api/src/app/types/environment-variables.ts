@@ -175,6 +175,9 @@ export class EnvironmentVariables {
   @IsString()
   DB_NAME = 'local.db';
 
+  @IsString()
+  REQUEST_BODY_SIZE = '50mb';
+
   static isOTELEnabled(values: EnvironmentVariables): boolean {
     return values.OPENTELEMETRY_ENABLED;
   }
