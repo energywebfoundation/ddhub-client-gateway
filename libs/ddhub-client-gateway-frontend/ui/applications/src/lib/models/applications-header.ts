@@ -1,5 +1,6 @@
 import { ImageWithWrapper } from '@ddhub-client-gateway-frontend/ui/core';
 import { AppNamespace } from '../AppNamespace';
+import dayjs from 'dayjs';
 
 export const APPLICATIONS_HEADERS = [
   {
@@ -21,5 +22,12 @@ export const APPLICATIONS_HEADERS = [
   {
     Header: 'NO. OF TOPICS',
     accessor: 'topicsCount',
+  },
+  {
+    Header: 'UPDATED DATE',
+    accessor: 'updatedDate',
+    Cell: (props: any) => {
+      return dayjs(props.value).format('DD/MM/YYYY HH:mm:ssA');
+    }
   },
 ];
