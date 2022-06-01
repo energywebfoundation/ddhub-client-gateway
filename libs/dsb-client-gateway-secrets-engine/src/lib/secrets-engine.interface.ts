@@ -7,6 +7,7 @@ export abstract class SecretsEngineService {
   abstract getCertificateDetails(): Promise<CertificateDetails>;
   abstract getEncryptionKeys(): Promise<EncryptionKeys>;
   abstract getRSAPrivateKey(): Promise<string | null>;
+  abstract deleteAll(): Promise<void>;
 }
 
 export interface CertificateDetails {
