@@ -177,6 +177,69 @@ export class PostTopicDto {
   tags: string[];
 }
 
+export class PutTopicDto {
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({
+    description: 'id of the topic',
+    type: String,
+    example: '62545547fe37f174d7715ff3',
+  })
+  id: string;
+
+  @IsValidTopicName({
+    message:
+      'Malformed topic name. Name should contain only alphanumeric lowercase letters, use . as a separator. Max length 255',
+  })
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({
+    description: 'name of the topic',
+    type: String,
+    example: 'Topic_JSON_V12',
+  })
+  name: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @IsEnum(SchemaType)
+  @ApiProperty({
+    description: 'schema type of the topic',
+    type: String,
+    enum: [
+      SchemaType.JSD7,
+      SchemaType.XML,
+      SchemaType.XSD6,
+      SchemaType.CSV,
+      SchemaType.TSV,
+    ],
+    example: 'JSD7',
+  })
+  schemaType: SchemaType;
+
+  @IsString()
+  @IsNotEmpty()
+  @IsValidApplicationNameSpace(new ConfigService(), {
+    message: 'Malformed owner name. Please enter correct owner name',
+  })
+  @ApiProperty({
+    description: 'owner of the topic',
+    type: String,
+    example: 'torta.apps.eggplant.vege.iam.ewc',
+  })
+  owner: string;
+
+  @IsArray()
+  @IsNotEmpty()
+  @ArrayUnique()
+  @ApiProperty({
+    description: 'tags of the topic',
+    type: [String],
+    example: `["aggregator"]`,
+  })
+  tags: string[];
+}
+
 export class GetTopicSearchDto {
   @IsString()
   @IsNotEmpty()

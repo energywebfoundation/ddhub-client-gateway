@@ -24,6 +24,7 @@ import {
   PaginatedSearchTopicResponse,
   PostTopicBodyDto,
   PostTopicDto,
+  PutTopicDto,
   TopicsByIdAndVersionParamsDto,
   TopicsCountResponse,
   UpdateTopicBodyDto,
@@ -169,7 +170,7 @@ export class TopicsController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Topic updated successfully',
-    type: () => PostTopicDto,
+    type: () => PutTopicDto,
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
