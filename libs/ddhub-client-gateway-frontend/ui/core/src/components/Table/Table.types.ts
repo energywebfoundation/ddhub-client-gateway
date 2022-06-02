@@ -16,6 +16,10 @@ export interface TablePagination {
   page: number;
 }
 
+export interface TableCustomStyle {
+  tableMinWidth: string;
+}
+
 export interface TableProps<T> {
   headers: TableHeader[];
   tableRows: T[];
@@ -29,4 +33,5 @@ export interface TableProps<T> {
   loadingRows?: number;
   paginationProps?: TablePagination;
   onPageChange?: (newPage: number) => void;
+  customStyle?: TableCustomStyle;
 }
