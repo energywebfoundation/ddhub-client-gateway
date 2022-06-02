@@ -13,30 +13,21 @@ import {
 import {
   CertificateDetails,
   EncryptionKeys,
+  PATHS,
   SecretsEngineService,
   SetCertificateDetailsResponse,
   SetEncryptionKeysResponse,
   SetPrivateKeyResponse,
   SetRSAPrivateKeyResponse,
 } from '../secrets-engine.interface';
-import { VaultService } from './vault.service';
 import { Span } from 'nestjs-otel';
-
-enum PATHS {
-  IDENTITY_PRIVATE_KEY = 'identity/private_key',
-  CERTIFICATE = 'certificate/certificate',
-  CERTIFICATE_KEY = 'certificate/private_key',
-  CA_CERTIFICATE = 'certificate/ca_certificate',
-  KEYS = 'keys',
-  RSA_KEY = 'rsa_key',
-}
 
 @Injectable()
 export class AwsSecretsManagerService
   extends SecretsEngineService
   implements OnModuleInit
 {
-  private readonly logger = new Logger(VaultService.name);
+  private readonly logger = new Logger(AwsSecretsManagerService.name);
 
   protected client: SecretsManagerClient;
   protected readonly prefix: string;

@@ -3,6 +3,15 @@ import {
   PutSecretValueResponse,
 } from '@aws-sdk/client-secrets-manager';
 
+export const enum PATHS {
+  IDENTITY_PRIVATE_KEY = 'identity/private_key',
+  CERTIFICATE = 'certificate/certificate',
+  CERTIFICATE_KEY = 'certificate/private_key',
+  CA_CERTIFICATE = 'certificate/ca_certificate',
+  KEYS = 'keys',
+  RSA_KEY = 'rsa_key',
+}
+
 export abstract class SecretsEngineService {
   abstract setPrivateKey(privateKey: string): Promise<SetPrivateKeyResponse>;
   abstract getPrivateKey(): Promise<string | null>;
