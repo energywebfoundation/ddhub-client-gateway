@@ -28,8 +28,6 @@ export interface TopicResultDTO {
   id: string;
   name: string;
   schemaType: string;
-  schema: string;
-  version: string;
   owner: string;
   tags: string[];
 }
