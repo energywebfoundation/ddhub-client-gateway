@@ -113,7 +113,7 @@ export class ApplicationService implements OnApplicationBootstrap {
 
         const countOfTopics = topicsCount.find(
           (topic) => topic.owner === application.namespace
-        ).count;
+        );
 
         await this.applicationWrapper.repository.save({
           appName: application.appName,
@@ -121,7 +121,7 @@ export class ApplicationService implements OnApplicationBootstrap {
           logoUrl: application.logoUrl,
           websiteUrl: application.websiteUrl,
           namespace: application.namespace,
-          topicsCount: countOfTopics ? countOfTopics : 0,
+          topicsCount: countOfTopics ? countOfTopics.count : 0,
           roles: allApplicationsRoles[this.getKey(application)] || [],
         });
 
