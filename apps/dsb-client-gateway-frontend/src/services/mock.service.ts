@@ -10,6 +10,7 @@ import {
   getChannelMessagesMock,
   getDownloadMessageMock,
   getFrontendConfigMock,
+  getCronMock,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 
 export function makeServer({ environment = 'development' }) {
@@ -108,6 +109,10 @@ export function makeServer({ environment = 'development' }) {
       this.post('certificate', () => {
         return {};
       });
+
+      this.get('cron', () => {
+        return getCronMock();
+      })
     },
   });
 }

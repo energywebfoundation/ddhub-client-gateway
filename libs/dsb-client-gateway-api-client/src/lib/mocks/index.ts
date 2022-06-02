@@ -242,4 +242,37 @@ export const getChannelMessagesMock = () => [
   },
 ];
 
-export const getDownloadMessageMock = () => ('text')
+export const getDownloadMessageMock = () => ('text');
+
+export const getCronMock = () => {
+  return [
+    {
+      "jobName": "CHANNEL_ROLES",
+      "latestStatus": "SUCCESS",
+      "executedAt": "2022-06-02T09:06:00.521Z",
+      "createdDate": "2022-05-25T22:35:00.000Z",
+      "updatedDate": "2022-06-02T09:06:00.000Z"
+    },
+    {
+      "jobName": "TOPIC_REFRESH",
+      "latestStatus": "SUCCESS",
+      "executedAt": "2022-06-02T09:06:40.663Z",
+      "createdDate": "2022-05-25T22:35:00.000Z",
+      "updatedDate": "2022-06-02T09:06:40.000Z"
+    },
+    {
+      "jobName": "APPLICATIONS_REFRESH",
+      "latestStatus": "SUCCESS",
+      "executedAt": "2022-06-02T09:06:00.870Z",
+      "createdDate": "2022-05-25T22:35:05.000Z",
+      "updatedDate": "2022-06-02T09:06:00.000Z"
+    },
+    {
+      "jobName": "SYMMETRIC_KEYS",
+      "latestStatus": "SUCCESS",
+      "executedAt": "2022-06-02T09:06:03.339Z",
+      "createdDate": "2022-05-25T22:36:07.000Z",
+      "updatedDate": "2022-06-02T09:06:03.000Z"
+    }
+  ]
+}
