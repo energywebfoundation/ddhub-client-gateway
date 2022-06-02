@@ -3,17 +3,11 @@ import {
   CertificateDetails,
   EncryptionKeys,
   SecretsEngineService,
+  PATHS,
 } from '../secrets-engine.interface';
 import { ConfigService } from '@nestjs/config';
 import nv from 'node-vault';
 import { Span } from 'nestjs-otel';
-
-enum PATHS {
-  IDENTITY_PRIVATE_KEY = 'dsb/identity/privateKey',
-  CERTIFICATE = 'dsb/certificate',
-  KEYS = 'dsb/keys',
-  RSA_KEY = 'dsb/rsa_key',
-}
 
 @Injectable()
 export class VaultService extends SecretsEngineService implements OnModuleInit {
@@ -131,7 +125,7 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
 
   public async setCertificateDetails(
     certificateDetails: CertificateDetails
-    ): Promise<null> {
+  ): Promise<null> {
     this.logger.log('saving certificate to vault');
     await this.client.write(PATHS.CERTIFICATE, certificateDetails);
 
