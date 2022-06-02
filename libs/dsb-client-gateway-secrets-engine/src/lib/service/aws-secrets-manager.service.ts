@@ -2,9 +2,11 @@ import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
   CreateSecretCommand,
+  CreateSecretCommandOutput,
   GetSecretValueCommand,
   InvalidRequestException,
   PutSecretValueCommand,
+  PutSecretValueCommandOutput,
   ResourceNotFoundException,
   SecretsManagerClient,
 } from '@aws-sdk/client-secrets-manager';
@@ -12,6 +14,10 @@ import {
   CertificateDetails,
   EncryptionKeys,
   SecretsEngineService,
+  SetCertificateDetailsResponse,
+  SetEncryptionKeysResponse,
+  SetPrivateKeyResponse,
+  SetRSAPrivateKeyResponse,
 } from '../secrets-engine.interface';
 import { VaultService } from './vault.service';
 import { Span } from 'nestjs-otel';
@@ -52,7 +58,9 @@ export class AwsSecretsManagerService
   }
 
   @Span('aws_ssm_setRSAKey')
-  public async setRSAPrivateKey(privateKey: string): Promise<void> {
+  public async setRSAPrivateKey(
+    privateKey: string
+  ): Promise<SetRSAPrivateKeyResponse> {
     const command = new PutSecretValueCommand({
       SecretId: `${this.prefix}${PATHS.RSA_KEY}`,
       SecretString: privateKey,
@@ -62,18 +70,19 @@ export class AwsSecretsManagerService
       .send(command)
       .then((response) => {
         this.logger.log(response);
-        return;
+        return response;
       })
-      .catch((err) => {
+      .catch(async (err) => {
         if (err instanceof ResourceNotFoundException) {
           this.logger.log('RSA key secret not found, creating...');
           const createCommand = new CreateSecretCommand({
             Name: `${this.prefix}${PATHS.RSA_KEY}`,
             SecretString: privateKey,
           });
-          return this.client
-            .send(createCommand)
-            .then((response) => this.logger.log(response));
+          return this.client.send(createCommand).then((response) => {
+            this.logger.log('Created secret', response);
+            return response;
+          });
         } else if (err instanceof InvalidRequestException) {
           this.logger.error(err.message);
           // Secret has been deleted...do something?
@@ -85,7 +94,7 @@ export class AwsSecretsManagerService
   }
 
   @Span('aws_ssm_getRSAKey')
-  public async getRSAPrivateKey(): Promise<string | null> {
+  public async getRSAPrivateKey(): Promise<string | void> {
     const command = new GetSecretValueCommand({
       SecretId: `${this.prefix}${PATHS.RSA_KEY}`,
     });
@@ -95,7 +104,7 @@ export class AwsSecretsManagerService
       .then(({ SecretString }) => SecretString)
       .catch((err) => {
         this.logger.error(err.message);
-        return null;
+        return;
       });
   }
 
@@ -104,7 +113,7 @@ export class AwsSecretsManagerService
     caCertificate,
     certificate,
     privateKey,
-  }: CertificateDetails): Promise<void> {
+  }: CertificateDetails): Promise<SetCertificateDetailsResponse> {
     const commands: PutSecretValueCommand[] = [
       new PutSecretValueCommand({
         SecretId: `${this.prefix}${PATHS.CERTIFICATE_KEY}`,
@@ -119,26 +128,85 @@ export class AwsSecretsManagerService
     if (caCertificate) {
       commands.push(
         new PutSecretValueCommand({
-          SecretId: `${this.prefix}${PATHS.CERTIFICATE}`,
+          SecretId: `${this.prefix}${PATHS.CA_CERTIFICATE}`,
           SecretString: caCertificate,
         })
       );
     }
 
     const responses = await Promise.allSettled(
-      commands.map((command) => this.client.send(command))
+      commands.map((command) =>
+        this.client.send(command).catch((err) => {
+          throw new Error(
+            JSON.stringify({
+              SecretId: command.input.SecretId,
+              SecretString: command.input.SecretString,
+              error: err,
+            })
+          );
+        })
+      )
     );
 
     const errors = responses.filter(
       ({ status }) => status === 'rejected'
     ) as PromiseRejectedResult[];
+
+    // Check if any ResourceNotFoundExceptions occurred, if so, create the secret
     if (errors.length > 0) {
-      this.logger.error(errors.map(({ reason }) => reason.message).join(', '));
+      const createCommands = [];
+      const unknownErrors = [];
+
+      for (const error of errors) {
+        const message = JSON.parse(error.reason.message);
+        if (message.error.name === 'ResourceNotFoundException') {
+          this.logger.log(`${message.SecretId} not found, creating...`);
+          createCommands.push(
+            new CreateSecretCommand({
+              Name: message.SecretId,
+              SecretString: message.SecretString,
+            })
+          );
+        } else {
+          unknownErrors.push(error);
+        }
+      }
+
+      const createResponses = await Promise.allSettled(
+        createCommands.map((command) =>
+          this.client.send(command).then((response) => {
+            this.logger.log('Created secret', response);
+            return response;
+          })
+        )
+      );
+      const createErrors = createResponses.filter(
+        ({ status }) => status === 'rejected'
+      ) as PromiseRejectedResult[];
+
+      // Return any errors that occurred during secret creation, or any unknown errors that occurred before creation
+      if (createErrors.length > 0 || unknownErrors.length > 0) {
+        return [...createErrors, ...unknownErrors];
+      } else {
+        const successes = createResponses
+          .filter(({ status }) => status === 'fulfilled')
+          .map((response) =>
+            response.status === 'fulfilled' ? response.value : null
+          ) as CreateSecretCommandOutput[];
+        return successes;
+      }
+    } else {
+      const successes = responses
+        .filter(({ status }) => status === 'fulfilled')
+        .map((response) =>
+          response.status === 'fulfilled' ? response.value : null
+        ) as PutSecretValueCommandOutput[];
+      return successes;
     }
   }
 
   @Span('aws_ssm_getCertificateDetails')
-  public async getCertificateDetails(): Promise<CertificateDetails | null> {
+  public async getCertificateDetails(): Promise<CertificateDetails> {
     const [privateKeyCommand, certificateCommand, caCertificateCommand] = [
       new GetSecretValueCommand({
         SecretId: `${this.prefix}${PATHS.CERTIFICATE_KEY}`,
@@ -156,6 +224,7 @@ export class AwsSecretsManagerService
       this.client.send(certificateCommand),
       this.client.send(caCertificateCommand),
     ]);
+    console.log(responses);
 
     const errors = responses.filter(
       ({ status }) => status === 'rejected'
@@ -183,7 +252,7 @@ export class AwsSecretsManagerService
   }
 
   @Span('aws_ssm_setPrivateKey')
-  public async setPrivateKey(key: string): Promise<void> {
+  public async setPrivateKey(key: string): Promise<SetPrivateKeyResponse> {
     const putCommand = new PutSecretValueCommand({
       SecretId: `${this.prefix}${PATHS.IDENTITY_PRIVATE_KEY}`,
       SecretString: key,
@@ -193,7 +262,7 @@ export class AwsSecretsManagerService
       .send(putCommand)
       .then((response) => {
         this.logger.log(response);
-        return;
+        return response;
       })
       .catch(async (err) => {
         if (err instanceof ResourceNotFoundException) {
@@ -202,9 +271,10 @@ export class AwsSecretsManagerService
             Name: `${this.prefix}${PATHS.IDENTITY_PRIVATE_KEY}`,
             SecretString: key,
           });
-          return this.client
-            .send(createCommand)
-            .then((response) => this.logger.log(response));
+          return this.client.send(createCommand).then((response) => {
+            this.logger.log('Created secret', response);
+            return response;
+          });
         } else if (err instanceof InvalidRequestException) {
           this.logger.error(err.message);
           // Secret has been deleted...do something?
@@ -236,7 +306,9 @@ export class AwsSecretsManagerService
   }
 
   @Span('aws_ssm_setEncryptionKeys')
-  async setEncryptionKeys(keys: EncryptionKeys): Promise<void> {
+  async setEncryptionKeys(
+    keys: EncryptionKeys
+  ): Promise<SetEncryptionKeysResponse> {
     const command = new PutSecretValueCommand({
       SecretId: `${this.prefix}${PATHS.KEYS}`,
       SecretString: JSON.stringify(keys),
@@ -246,7 +318,7 @@ export class AwsSecretsManagerService
       .send(command)
       .then((response) => {
         this.logger.log(response);
-        return;
+        return response;
       })
       .catch((err) => {
         if (err instanceof ResourceNotFoundException) {
@@ -255,9 +327,10 @@ export class AwsSecretsManagerService
             Name: `${this.prefix}${PATHS.KEYS}`,
             SecretString: JSON.stringify(keys),
           });
-          return this.client
-            .send(createCommand)
-            .then((response) => this.logger.log(response));
+          return this.client.send(createCommand).then((response) => {
+            this.logger.log(response);
+            return response;
+          });
         } else if (err instanceof InvalidRequestException) {
           this.logger.error(err.message);
           // Secret has been deleted...do something?

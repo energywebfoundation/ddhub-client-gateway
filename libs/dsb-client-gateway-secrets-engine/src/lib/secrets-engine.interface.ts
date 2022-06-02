@@ -1,12 +1,23 @@
+import {
+  CreateSecretResponse,
+  PutSecretValueResponse,
+} from '@aws-sdk/client-secrets-manager';
+
 export abstract class SecretsEngineService {
-  abstract setPrivateKey(privateKey: string): Promise<void>;
-  abstract getPrivateKey(): Promise<string | null>;
-  abstract setCertificateDetails(details: CertificateDetails): Promise<void>;
+  abstract setPrivateKey(privateKey: string): Promise<SetPrivateKeyResponse>;
+  abstract getPrivateKey(): Promise<string | void>;
+  abstract setCertificateDetails(
+    details: CertificateDetails
+  ): Promise<SetCertificateDetailsResponse>;
   abstract getCertificateDetails(): Promise<CertificateDetails>;
-  abstract setEncryptionKeys(keys: EncryptionKeys): Promise<void>;
+  abstract setEncryptionKeys(
+    keys: EncryptionKeys
+  ): Promise<SetEncryptionKeysResponse>;
   abstract getEncryptionKeys(): Promise<EncryptionKeys>;
-  abstract setRSAPrivateKey(privateKey: string): Promise<void>;
-  abstract getRSAPrivateKey(): Promise<string | null>;
+  abstract setRSAPrivateKey(
+    privateKey: string
+  ): Promise<SetRSAPrivateKeyResponse>;
+  abstract getRSAPrivateKey(): Promise<string | void>;
 }
 
 export interface CertificateDetails {
@@ -21,3 +32,20 @@ export interface EncryptionKeys {
   publicMasterKey: string;
   privateMasterKey: string;
 }
+
+export type SetPrivateKeyResponse =
+  | PutSecretValueResponse
+  | CreateSecretResponse
+  | void;
+export type SetRSAPrivateKeyResponse =
+  | PutSecretValueResponse
+  | CreateSecretResponse
+  | void;
+export type SetCertificateDetailsResponse =
+  | CreateSecretResponse[]
+  | PutSecretValueResponse[]
+  | void;
+export type SetEncryptionKeysResponse =
+  | CreateSecretResponse
+  | PutSecretValueResponse
+  | void;
