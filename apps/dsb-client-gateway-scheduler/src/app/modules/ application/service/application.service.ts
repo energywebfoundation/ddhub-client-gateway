@@ -116,7 +116,9 @@ export class ApplicationService implements OnApplicationBootstrap {
           logoUrl: application.logoUrl,
           websiteUrl: application.websiteUrl,
           namespace: application.namespace,
-          topicsCount: topicsCount[application.namespace] || 0,
+          topicsCount: topicsCount.find(
+            (topic) => topic.owner === application.namespace
+          ).count,
           roles: allApplicationsRoles[this.getKey(application)] || [],
         });
 
