@@ -6,7 +6,10 @@ import { Span } from 'nestjs-otel';
 import { DidAuthService } from '@dsb-client-gateway/ddhub-client-gateway-did-auth';
 import { TlsAgentService } from './tls-agent.service';
 import {
+  DeleteTopicResponseDto,
+  PostTopicBodyDto,
   Topic,
+  TopicCountDto,
   TopicDataResponse,
   TopicResultDTO,
   TopicVersion,
@@ -59,10 +62,10 @@ export class DdhubTopicsService extends DdhubBaseService {
   }
 
   @Span('ddhub_mb_deleteTopic')
-  public async deleteTopic(id: string): Promise<TopicResultDTO> {
+  public async deleteTopic(id: string): Promise<DeleteTopicResponseDto> {
     try {
       this.logger.log('topic to be deleted', id);
-      const result = await this.request<TopicResultDTO>(
+      const result = await this.request<DeleteTopicResponseDto>(
         () =>
           this.httpService.delete(`/topics/${id}`, {
             httpsAgent: this.tlsAgentService.get(),
@@ -88,12 +91,12 @@ export class DdhubTopicsService extends DdhubBaseService {
   public async deleteTopicByVersion(
     id: string,
     version: string
-  ): Promise<TopicResultDTO> {
+  ): Promise<DeleteTopicResponseDto> {
     try {
       this.logger.log(
         `topic to be deleted with version: ${version} and id:${id}`
       );
-      const { data } = await this.request<TopicResultDTO>(
+      const { data } = await this.request<DeleteTopicResponseDto>(
         () =>
           this.httpService.delete(`/topics/${id}/versions/${version}`, {
             httpsAgent: this.tlsAgentService.get(),
@@ -125,10 +128,10 @@ export class DdhubTopicsService extends DdhubBaseService {
     topicData: UpdateTopicHistoryDTO,
     id: string,
     versionNumber: string
-  ): Promise<TopicResultDTO> {
+  ): Promise<Topic> {
     try {
       this.logger.log('topic data to be updated', topicData);
-      const result = await this.request<TopicResultDTO>(
+      const result = await this.request<Topic>(
         () =>
           this.httpService.put(
             `/topics/${id}/versions/${versionNumber}`,
@@ -189,7 +192,7 @@ export class DdhubTopicsService extends DdhubBaseService {
   }
 
   @Span('ddhub_mb_postTopics')
-  public async postTopics(topicData: UpdateTopicBodyDTO): Promise<Topic> {
+  public async postTopics(topicData: PostTopicBodyDto): Promise<Topic> {
     try {
       const { data } = await this.request<null>(
         () =>
@@ -216,12 +219,12 @@ export class DdhubTopicsService extends DdhubBaseService {
   @Span('ddhub_mb_getTopicHistoryByIdAndVersion')
   public async getTopicHistoryByIdAndVersion(
     id: string,
-    version: string
-  ): Promise<TopicDataResponse> {
+    versionNumber: string
+  ): Promise<Topic> {
     try {
-      const { data } = await this.request<TopicDataResponse>(
+      const { data } = await this.request<Topic>(
         () =>
-          this.httpService.get(`/topics/${id}/versions/${version}`, {
+          this.httpService.get(`/topics/${id}/versions/${versionNumber}`, {
             httpsAgent: this.tlsAgentService.get(),
             headers: {
               Authorization: `Bearer ${this.didAuthService.getToken()}`,
@@ -233,12 +236,12 @@ export class DdhubTopicsService extends DdhubBaseService {
       );
 
       this.logger.log(
-        `get topics history with id:${id} and version: ${version} successful`
+        `get topics history with id:${id} and version: ${versionNumber} successful`
       );
       return data;
     } catch (e) {
       this.logger.error(
-        `get topics history with id:${id} and version: ${version} failed`,
+        `get topics history with id:${id} and version: ${versionNumber} failed`,
         e
       );
       throw e;
@@ -274,14 +277,14 @@ export class DdhubTopicsService extends DdhubBaseService {
     keyword: string,
     limit?: number,
     page?: number
-  ): Promise<Topic[]> {
+  ): Promise<TopicDataResponse | []> {
     if (!keyword) {
       this.logger.debug(`no keyword given so returning empty array`);
       return [];
     }
 
     try {
-      const result = await this.request<null>(
+      const result = await this.request<TopicDataResponse>(
         () =>
           this.httpService.get('/topics/search', {
             params: {
@@ -308,13 +311,15 @@ export class DdhubTopicsService extends DdhubBaseService {
   }
 
   @Span('ddhub_mb_getTopicsCountByOwner')
-  public async getTopicsCountByOwner(owners: string[]): Promise<Topic[]> {
+  public async getTopicsCountByOwner(
+    owners: string[]
+  ): Promise<TopicCountDto[]> {
     if (!owners || owners.length === 0) {
       return [];
     }
 
     try {
-      const result = await this.request<Topic[]>(
+      const result = await this.request<TopicCountDto[]>(
         () =>
           this.httpService.get('/topics/count', {
             params: {
