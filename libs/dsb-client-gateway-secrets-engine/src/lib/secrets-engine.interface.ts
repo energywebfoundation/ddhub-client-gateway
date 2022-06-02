@@ -5,7 +5,7 @@ import {
 
 export abstract class SecretsEngineService {
   abstract setPrivateKey(privateKey: string): Promise<SetPrivateKeyResponse>;
-  abstract getPrivateKey(): Promise<string | void>;
+  abstract getPrivateKey(): Promise<string | null>;
   abstract setCertificateDetails(
     details: CertificateDetails
   ): Promise<SetCertificateDetailsResponse>;
@@ -13,11 +13,11 @@ export abstract class SecretsEngineService {
   abstract setEncryptionKeys(
     keys: EncryptionKeys
   ): Promise<SetEncryptionKeysResponse>;
-  abstract getEncryptionKeys(): Promise<EncryptionKeys>;
+  abstract getEncryptionKeys(): Promise<EncryptionKeys | null>;
   abstract setRSAPrivateKey(
     privateKey: string
   ): Promise<SetRSAPrivateKeyResponse>;
-  abstract getRSAPrivateKey(): Promise<string | void>;
+  abstract getRSAPrivateKey(): Promise<string | null>;
 }
 
 export interface CertificateDetails {
@@ -36,16 +36,16 @@ export interface EncryptionKeys {
 export type SetPrivateKeyResponse =
   | PutSecretValueResponse
   | CreateSecretResponse
-  | void;
+  | null;
 export type SetRSAPrivateKeyResponse =
   | PutSecretValueResponse
   | CreateSecretResponse
-  | void;
+  | null;
 export type SetCertificateDetailsResponse =
   | CreateSecretResponse[]
   | PutSecretValueResponse[]
-  | void;
+  | null;
 export type SetEncryptionKeysResponse =
   | CreateSecretResponse
   | PutSecretValueResponse
-  | void;
+  | null;

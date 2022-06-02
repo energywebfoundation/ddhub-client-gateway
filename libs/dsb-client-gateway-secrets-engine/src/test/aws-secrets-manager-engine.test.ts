@@ -30,6 +30,19 @@ describe('Secrets Manager Engine', () => {
     expect(key).toEqual(SecretString);
   });
 
+  it('should return null for an RSA Private Key that does not exist', async () => {
+    const smMockClient = mockClient(SecretsManagerClient);
+
+    smMockClient
+      .on(GetSecretValueCommand)
+      .rejectsOnce(
+        new ResourceNotFoundException({ Message: 'test', $metadata: {} })
+      );
+
+    const key = await service.getRSAPrivateKey();
+    expect(key).toBeNull();
+  });
+
   it('should create an RSA Private Key if it does not exist', async () => {
     const smMockClient = mockClient(SecretsManagerClient);
 
@@ -75,6 +88,20 @@ describe('Secrets Manager Engine', () => {
     const key = await service.getPrivateKey();
     expect(key).toBeDefined();
     expect(key).toEqual(SecretString);
+  });
+
+  it('should return null for a Private Identity Key that does not exist', async () => {
+    const smMockClient = mockClient(SecretsManagerClient);
+
+    smMockClient.on(GetSecretValueCommand).rejectsOnce(
+      new ResourceNotFoundException({
+        Message: 'test',
+        $metadata: {},
+      })
+    );
+
+    const key = await service.getPrivateKey();
+    expect(key).toBeNull();
   });
 
   it('should create a Private Identity Key if it does not exist', async () => {
@@ -124,6 +151,20 @@ describe('Secrets Manager Engine', () => {
     const key = await service.getEncryptionKeys();
     expect(key).toBeDefined();
     expect(key).toEqual(JSON.parse(SecretString));
+  });
+
+  it('should return null for an Encryption Keys secret that does not exist', async () => {
+    const smMockClient = mockClient(SecretsManagerClient);
+
+    smMockClient.on(GetSecretValueCommand).rejectsOnce(
+      new ResourceNotFoundException({
+        Message: 'test',
+        $metadata: {},
+      })
+    );
+
+    const key = await service.getEncryptionKeys();
+    expect(key).toBeNull();
   });
 
   it('should create an Encryption Keys secret if it does not exist', async () => {
@@ -205,6 +246,27 @@ describe('Secrets Manager Engine', () => {
     for (const key in details) {
       expect(details[key]).toBeDefined();
       expect(details[key]).toEqual(testData[key].SecretString);
+    }
+  });
+
+  it('should return null for each Certificate Details secret that does not exist', async () => {
+    const smMockClient = mockClient(SecretsManagerClient);
+
+    smMockClient
+      .on(GetSecretValueCommand)
+      .rejectsOnce(
+        new ResourceNotFoundException({ Message: 'test', $metadata: {} })
+      )
+      .rejectsOnce(
+        new ResourceNotFoundException({ Message: 'test', $metadata: {} })
+      )
+      .rejectsOnce(
+        new ResourceNotFoundException({ Message: 'test', $metadata: {} })
+      );
+    const details = await service.getCertificateDetails();
+    expect(details).toBeDefined();
+    for (const key in details) {
+      expect(details[key]).toBeNull();
     }
   });
 

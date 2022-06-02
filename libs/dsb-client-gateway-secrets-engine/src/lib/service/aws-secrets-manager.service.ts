@@ -89,12 +89,12 @@ export class AwsSecretsManagerService
         } else {
           this.logger.error(err.message);
         }
-        return;
+        return null;
       });
   }
 
   @Span('aws_ssm_getRSAKey')
-  public async getRSAPrivateKey(): Promise<string | void> {
+  public async getRSAPrivateKey(): Promise<string | null> {
     const command = new GetSecretValueCommand({
       SecretId: `${this.prefix}${PATHS.RSA_KEY}`,
     });
@@ -104,7 +104,7 @@ export class AwsSecretsManagerService
       .then(({ SecretString }) => SecretString)
       .catch((err) => {
         this.logger.error(err.message);
-        return;
+        return null;
       });
   }
 
@@ -224,7 +224,6 @@ export class AwsSecretsManagerService
       this.client.send(certificateCommand),
       this.client.send(caCertificateCommand),
     ]);
-    console.log(responses);
 
     const errors = responses.filter(
       ({ status }) => status === 'rejected'
@@ -281,7 +280,7 @@ export class AwsSecretsManagerService
         } else {
           this.logger.error(err.message);
         }
-        return;
+        return null;
       });
   }
 
@@ -337,7 +336,7 @@ export class AwsSecretsManagerService
         } else {
           this.logger.error(err.message);
         }
-        return;
+        return null;
       });
   }
 

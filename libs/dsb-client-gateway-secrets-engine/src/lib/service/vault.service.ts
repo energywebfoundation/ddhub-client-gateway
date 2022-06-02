@@ -98,12 +98,13 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
   }
 
   @Span('vault_setRSAKey')
-  public async setRSAPrivateKey(privateKey: string): Promise<void> {
+  public async setRSAPrivateKey(privateKey: string): Promise<null> {
     this.logger.log('Attempting to write private RSA key');
 
     await this.client.write(PATHS.RSA_KEY, { privateKey });
 
     this.logger.log('Writing private RSA key');
+    return null;
   }
 
   @Span('vault_getRSAPrivateKey')
@@ -130,26 +131,29 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
 
   public async setCertificateDetails(
     certificateDetails: CertificateDetails
-  ): Promise<void> {
+    ): Promise<null> {
     this.logger.log('saving certificate to vault');
     await this.client.write(PATHS.CERTIFICATE, certificateDetails);
 
     this.logger.log('certificates successfully saved to the vault');
+    return null;
   }
 
   @Span('vault_setPrivateKey')
-  public async setPrivateKey(key: string): Promise<void> {
+  public async setPrivateKey(key: string): Promise<null> {
     this.logger.log('Attempting to write private key');
 
     await this.client.write(PATHS.IDENTITY_PRIVATE_KEY, { key });
 
     this.logger.log('Writing private key');
+    return null;
   }
 
   @Span('vault_setEncryptionKeys')
-  public async setEncryptionKeys(keys: EncryptionKeys): Promise<void> {
+  public async setEncryptionKeys(keys: EncryptionKeys): Promise<null> {
     await this.client.write(PATHS.KEYS, keys);
 
     this.logger.log('Writing encryption keys');
+    return null;
   }
 }
