@@ -110,15 +110,18 @@ export class ApplicationService implements OnApplicationBootstrap {
       );
       for (const application of combinedApplications) {
         this.logger.log(JSON.stringify(application));
+
+        const countOfTopics = topicsCount.find(
+          (topic) => topic.owner === application.namespace
+        ).count;
+
         await this.applicationWrapper.repository.save({
           appName: application.appName,
           description: application.description,
           logoUrl: application.logoUrl,
           websiteUrl: application.websiteUrl,
           namespace: application.namespace,
-          topicsCount: topicsCount.find(
-            (topic) => topic.owner === application.namespace
-          ).count,
+          topicsCount: countOfTopics ? countOfTopics : 0,
           roles: allApplicationsRoles[this.getKey(application)] || [],
         });
 
