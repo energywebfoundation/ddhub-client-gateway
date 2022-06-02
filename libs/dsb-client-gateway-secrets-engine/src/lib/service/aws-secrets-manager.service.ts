@@ -179,20 +179,18 @@ export class AwsSecretsManagerService
       if (createErrors.length > 0 || unknownErrors.length > 0) {
         return [...createErrors, ...unknownErrors];
       } else {
-        const successes = createResponses
+        return createResponses
           .filter(({ status }) => status === 'fulfilled')
           .map((response) =>
             response.status === 'fulfilled' ? response.value : null
           ) as CreateSecretCommandOutput[];
-        return successes;
       }
     } else {
-      const successes = responses
+      return responses
         .filter(({ status }) => status === 'fulfilled')
         .map((response) =>
           response.status === 'fulfilled' ? response.value : null
         ) as PutSecretValueCommandOutput[];
-      return successes;
     }
   }
 
