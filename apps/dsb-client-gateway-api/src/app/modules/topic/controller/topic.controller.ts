@@ -24,8 +24,8 @@ import {
   PaginatedSearchTopicResponse,
   PostTopicBodyDto,
   PostTopicDto,
+  TopicCountDto,
   TopicsByIdAndVersionParamsDto,
-  TopicsCountResponse,
   UpdateTopicBodyDto,
   UpdateTopicHistoryBodyDto,
 } from '../dto';
@@ -94,7 +94,7 @@ export class TopicsController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Get Topics Count by Owner',
-    type: () => TopicsCountResponse,
+    type: [TopicCountDto],
   })
   public async getTopicsCountByOwner(
     @Query() { owner }: GetTopicsCountQueryDto
