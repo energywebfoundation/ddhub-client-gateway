@@ -533,15 +533,24 @@ export class PaginatedSearchTopicResponse {
   public records: GetTopicSearchDto[];
 }
 
-export class TopicsCountResponse {
+export class TopicCountDto {
   @IsNumber()
   @ApiProperty({
-    description: 'owner name',
+    description: 'number of topics',
     type: Number,
     example: 2,
   })
-  public owner: number;
+  public count: number;
+
+  @IsString()
+  @ApiProperty({
+    description: 'owner name',
+    type: String,
+    example: 'torta.apps.eggplant.vege.iam.ewc',
+  })
+  public owner: string;
 }
+
 export class GetTopicsParamsDto {
   @IsString()
   @ApiProperty({
