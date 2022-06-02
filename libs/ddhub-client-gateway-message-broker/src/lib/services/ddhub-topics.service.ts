@@ -11,7 +11,7 @@ import {
   Topic,
   TopicCountDto,
   TopicDataResponse,
-  TopicResultDTO,
+  UpdateTopicResponeDto,
   TopicVersion,
   TopicVersionResponse,
   UpdateTopicBodyDTO,
@@ -166,10 +166,10 @@ export class DdhubTopicsService extends DdhubBaseService {
   public async updateTopic(
     data: UpdateTopicBodyDTO,
     id: string
-  ): Promise<TopicResultDTO> {
+  ): Promise<UpdateTopicResponeDto> {
     try {
       this.logger.log('topic to be updated', data);
-      const result = await this.request<TopicResultDTO>(
+      const result = await this.request<UpdateTopicResponeDto>(
         () =>
           this.httpService.put(`/topics/${id}`, data, {
             httpsAgent: this.tlsAgentService.get(),

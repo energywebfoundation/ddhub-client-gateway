@@ -46,7 +46,7 @@ export interface TopicCountDto {
   count: number;
   owner: string;
 }
-export interface TopicResultDTO {
+export interface UpdateTopicResponeDto {
   id: string;
   name: string;
   schemaType: SchemaType;
