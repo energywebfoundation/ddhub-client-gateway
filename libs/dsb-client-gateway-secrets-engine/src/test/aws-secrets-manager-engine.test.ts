@@ -305,7 +305,7 @@ describe('Secrets Manager Engine', () => {
     expect(details).toBeDefined();
     if (details && details.length) {
       for (const cert of details) {
-        expect(cert.Name).toMatch(RegExp('^/dsb-gw/certificate/?'));
+        expect(cert.Name).toMatch(/^\/dsb-gw\/certificate\/?/);
       }
     }
   });
@@ -333,7 +333,7 @@ describe('Secrets Manager Engine', () => {
     expect(details).toBeDefined();
     if (details && details.length) {
       for (const cert of details) {
-        expect(cert.Name).toMatch(RegExp('^/dsb-gw/certificate/?'));
+        expect(cert.Name).toMatch(/^\/dsb-gw\/certificate\/?/);
       }
     }
   });
