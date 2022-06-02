@@ -21,17 +21,9 @@ export class DidAuthService {
   public async login(privateKey: string, did: string): Promise<void> {
     this.logger.log('Attempting to login');
 
-    this.logger.log('Creating proof');
     const proof = await this.ethersService.createProof(privateKey, did);
-    this.logger.log('Created proof');
-    this.logger.log(proof);
 
-    this.logger.log('Logging in now...');
-    const response = await this.didAuthApiService
-      .login(proof)
-      .catch((err) => this.logger.error(err));
-    this.logger.log('Logging in response');
-    this.logger.log(response);
+    const response = await this.didAuthApiService.login(proof);
 
     if (!response) {
       throw new Error();
