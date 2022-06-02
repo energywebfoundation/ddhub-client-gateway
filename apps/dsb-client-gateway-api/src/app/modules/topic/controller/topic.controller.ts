@@ -139,7 +139,7 @@ export class TopicsController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Topic updated successfully',
-    type: () => PostTopicDto,
+    type: () => PutTopicDto,
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
