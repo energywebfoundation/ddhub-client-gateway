@@ -143,55 +143,54 @@ export class AwsSecretsManagerService
       ({ status }) => status === 'rejected'
     ) as PromiseRejectedResult[];
 
-    // Check if any ResourceNotFoundExceptions occurred, if so, create the secret
-    if (errors.length > 0) {
-      const createCommands = [];
-      const unknownErrors = [];
-
-      for (const error of errors) {
-        const message = JSON.parse(error.reason.message);
-        if (message.error.name === 'ResourceNotFoundException') {
-          this.logger.log(`${message.SecretId} not found, creating...`);
-          createCommands.push(
-            new CreateSecretCommand({
-              Name: message.SecretId,
-              SecretString: message.SecretString,
-            })
-          );
-        } else {
-          unknownErrors.push(error);
-        }
-      }
-
-      const createResponses = await Promise.allSettled(
-        createCommands.map((command) =>
-          this.client.send(command).then((response) => {
-            this.logger.log('Created secret', response);
-            return response;
-          })
-        )
-      );
-      const createErrors = createResponses.filter(
-        ({ status }) => status === 'rejected'
-      ) as PromiseRejectedResult[];
-
-      // Return any errors that occurred during secret creation, or any unknown errors that occurred before creation
-      if (createErrors.length > 0 || unknownErrors.length > 0) {
-        return [...createErrors, ...unknownErrors];
-      } else {
-        return createResponses
-          .filter(({ status }) => status === 'fulfilled')
-          .map((response) =>
-            response.status === 'fulfilled' ? response.value : null
-          ) as CreateSecretCommandOutput[];
-      }
-    } else {
+    if (errors.length === 0) {
       return responses
         .filter(({ status }) => status === 'fulfilled')
         .map((response) =>
           response.status === 'fulfilled' ? response.value : null
         ) as PutSecretValueCommandOutput[];
     }
+
+    // Check if any ResourceNotFoundExceptions occurred, if so, create the missing secrets
+    const createCommands = [];
+    const unknownErrors = [];
+
+    for (const err of errors) {
+      const { SecretId, SecretString, error } = JSON.parse(err.reason.message);
+      if (error.name === 'ResourceNotFoundException') {
+        this.logger.log(`${SecretId} not found, creating...`);
+        createCommands.push(
+          new CreateSecretCommand({
+            Name: SecretId,
+            SecretString,
+          })
+        );
+      } else {
+        unknownErrors.push(error);
+      }
+    }
+
+    const createResponses = await Promise.allSettled(
+      createCommands.map((command) =>
+        this.client.send(command).then((response) => {
+          this.logger.log('Created secret', response);
+          return response;
+        })
+      )
+    );
+    const createErrors = createResponses.filter(
+      ({ status }) => status === 'rejected'
+    ) as PromiseRejectedResult[];
+
+    // Return any errors that occurred during secret creation, or any unknown errors that occurred before creation
+    if (createErrors.length > 0 || unknownErrors.length > 0) {
+      return [...createErrors, ...unknownErrors];
+    }
+    return createResponses
+      .filter(({ status }) => status === 'fulfilled')
+      .map((response) =>
+        response.status === 'fulfilled' ? response.value : null
+      ) as CreateSecretCommandOutput[];
   }
 
   @Span('aws_ssm_getCertificateDetails')
