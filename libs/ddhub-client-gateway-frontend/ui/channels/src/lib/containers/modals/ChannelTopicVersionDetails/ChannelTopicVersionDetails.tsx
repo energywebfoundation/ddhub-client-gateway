@@ -3,7 +3,7 @@ import { Dialog, CloseButton } from '@ddhub-client-gateway-frontend/ui/core';
 import { DialogContent, Box, DialogActions } from '@mui/material';
 import { useStyles } from './ChannelTopicVersionDetails.styles';
 import { useChannelTopicVersionDetailsEffects } from './ChannelTopicVersionDetails.effects';
-import { TopicVersionDetails } from '@ddhub-client-gateway-frontend/ui/topics';
+import { TopicsVersionContainer } from '@ddhub-client-gateway-frontend/ui/topics';
 
 export const ChannelTopicVersionDetails: FC = () => {
   const { classes } = useStyles();
@@ -12,10 +12,9 @@ export const ChannelTopicVersionDetails: FC = () => {
   return (
     <Dialog paperClassName={classes.paper} open={open} onClose={closeModal}>
       <DialogContent sx={{ padding: 0 }}>
-        <TopicVersionDetails
-          fields={fields}
-          topicVersionDetails={topicVersionDetails}>
-        </TopicVersionDetails>
+        <TopicsVersionContainer
+          topicVersionDetails={topicVersionDetails} fields={fields}>
+        </TopicsVersionContainer>
       </DialogContent>
       <DialogActions className={classes.actions}>
         <Box className={classes.closeButtonWrapper}>
