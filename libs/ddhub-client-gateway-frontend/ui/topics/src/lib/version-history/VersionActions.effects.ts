@@ -83,11 +83,6 @@ export const useVersionActionsEffects = (
           topicId,
           topic.version,
           removeTopicVersionSuccess,
-          (error) => {
-            Swal.error({
-              text: error?.message,
-            });
-          }
         );
       },
     },

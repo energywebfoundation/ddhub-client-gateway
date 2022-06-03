@@ -17,9 +17,10 @@ export const useRemoveTopic = () => {
     queryClient.invalidateQueries(getTopicsControllerGetTopicsQueryKey());
   };
 
-  const removeTopicError = async () => {
+  const removeTopicError = async (err: any) => {
+    console.error(err);
     await Swal.error({
-      text: 'Error while deleting the topic',
+      text: err?.message,
     });
   };
 

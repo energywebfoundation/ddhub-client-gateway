@@ -85,14 +85,9 @@ export const useCertificateEffects = () => {
     clear();
     closeModal();
     Swal.success({
-      html: 'You have successfully configured the certificates. <br />' +
+      html:
+        'You have successfully configured the certificates. <br />' +
         'Please restart the Client GW Backend to reflect these changes',
-    });
-  };
-
-  const onError = () => {
-    Swal.error({
-      text: 'Error while configuring the certificate',
     });
   };
 
@@ -104,7 +99,7 @@ export const useCertificateEffects = () => {
         [Config.CACertificate]: selectedCACertificate,
       }),
     };
-    createConfigurationHandler(data, onSuccess, onError);
+    createConfigurationHandler(data, onSuccess);
   };
 
   const onCertificateChange = (acceptedFiles: File[]) =>

@@ -12,7 +12,7 @@ export const useTopicVersion = (id: string, version: string) => {
         enabled: id !== undefined && version !== undefined,
         onError: (err: { message: string }) => {
           console.error(err);
-          Swal.error({ text: err.message });
+          Swal.error({ text: err?.message });
         },
       },
     });
