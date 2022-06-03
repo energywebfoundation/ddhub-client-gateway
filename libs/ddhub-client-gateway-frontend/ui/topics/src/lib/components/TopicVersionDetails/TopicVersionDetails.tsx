@@ -8,8 +8,9 @@ import {
 import { Image, GenericTable } from '@ddhub-client-gateway-frontend/ui/core';
 import { useStyles } from './TopicVersionDetails.styles';
 import { TOPIC_VERSIONS_HEADERS } from '../../models';
+import { useTopicVersionEffects } from './TopicVersionDetails.effects';
 
-interface TopicVersionDetailsProps {
+export interface TopicVersionDetailsProps {
   topicVersionDetails: {
     versions: GetTopicSearchDto[],
     topic: ChannelTopic;
@@ -27,6 +28,7 @@ export const TopicVersionDetails: FC<TopicVersionDetailsProps> = (
     topicVersionDetails: { topic, versions, application },
   }) => {
   const { classes } = useStyles();
+  const { handleRowClick } = useTopicVersionEffects();
 
   const getValue = (labelName: string) => {
     return topic && topic[labelName as keyof ChannelTopic];
@@ -63,6 +65,7 @@ export const TopicVersionDetails: FC<TopicVersionDetailsProps> = (
           tableRows={versions}
           showFooter={false}
           showSearch={false}
+          onRowClick={handleRowClick}
           customStyle={{ tableMinWidth: 'auto' }}
         />
       </Box>
