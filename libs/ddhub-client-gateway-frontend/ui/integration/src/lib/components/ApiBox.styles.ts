@@ -48,4 +48,11 @@ export const useStyles = makeStyles()((theme) => ({
       duration: theme.transitions.duration.short,
     }),
   },
+  customLabel: {
+    fontStyle: 'normal',
+    fontWeight: 405,
+    fontSize: 18,
+    lineHeight: '21px',
+    color: theme.palette.secondary.main,
+  }
 }));
