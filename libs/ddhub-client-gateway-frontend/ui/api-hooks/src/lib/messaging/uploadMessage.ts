@@ -19,9 +19,10 @@ export const useUploadMessage = (isLarge: boolean) => {
     });
   };
 
-  const uploadMessageError = async () => {
+  const uploadMessageError = async (err: any) => {
+    console.log(err);
     await Swal.error({
-      text: 'Error while uploading the message',
+      text: err?.message,
     });
   };
 

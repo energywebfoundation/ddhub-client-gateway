@@ -17,6 +17,6 @@ export const useCachedMessages = (
 
   return {
     cachedMessages,
-    messagesById
+    messagesById,
   };
 };

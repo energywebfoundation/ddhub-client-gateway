@@ -148,12 +148,6 @@ export const useCreateChannelEffects = () => {
     });
   };
 
-  const onCreateError = () => {
-    Swal.error({
-      text: 'Error while creating channel',
-    });
-  };
-
   const channelSubmitHandler = () => {
     const values = channelValues;
     const channelCreateValues: CreateChannelDto = {
@@ -162,7 +156,7 @@ export const useCreateChannelEffects = () => {
       conditions: values.conditions,
       payloadEncryption: values.payloadEncryption,
     };
-    createChannelHandler(channelCreateValues, onCreate, onCreateError);
+    createChannelHandler(channelCreateValues, onCreate);
   };
 
   const openCancelModal = async () => {
