@@ -7,10 +7,9 @@ import request from 'supertest';
 import { DsbClientGatewayErrors } from '@dsb-client-gateway/dsb-client-gateway-errors';
 import { IamService } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
 
-const feature = loadFeature(
-  'apps/dsb-client-gateway-api-e2e/src/feature/identity.feature'
-);
-
+const feature = loadFeature('../feature/identity.feature', {
+  loadRelativePath: true,
+});
 jest.setTimeout(100000);
 
 const roleExists = (
@@ -33,7 +32,9 @@ defineFeature(feature, (test) => {
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
-      imports: [AppModule.register({ shouldValidate: true })],
+      imports: [
+        AppModule.register({ shouldValidate: true, envFilePath: '.env.test' }),
+      ],
     })
       .setLogger(new Logger())
       .compile();
@@ -44,7 +45,6 @@ defineFeature(feature, (test) => {
   });
 
   beforeEach(async () => {
-    await clearSecrets(app);
     response = null;
   });
 
