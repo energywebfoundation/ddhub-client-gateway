@@ -6,12 +6,14 @@ import {
   TopicsControllerGetTopicsParams,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { useState } from 'react';
+import { useCustomAlert } from '@ddhub-client-gateway-frontend/ui/core';
 
 export const useTopics = ({
   page = 1,
   limit = 0,
   owner,
 }: TopicsControllerGetTopicsParams) => {
+  const Swal = useCustomAlert();
   const [params, setParams] = useState({ page, limit });
 
   const { data, isLoading, isSuccess, isError } = useTopicsControllerGetTopics(
@@ -19,6 +21,10 @@ export const useTopics = ({
     {
       query: {
         enabled: !!owner,
+        onError: (err: { message: string }) => {
+          console.error(err);
+          Swal.error({ text: err?.message });
+        },
       },
     }
   );

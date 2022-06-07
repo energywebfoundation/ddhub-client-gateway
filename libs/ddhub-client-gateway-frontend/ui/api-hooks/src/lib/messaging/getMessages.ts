@@ -4,9 +4,10 @@ import {
   MessageControlllerGetMessageParams,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { keyBy } from 'lodash';
+import { useCustomAlert } from '@ddhub-client-gateway-frontend/ui/core';
 
 export const useMessages = (params?: MessageControlllerGetMessageParams) => {
-
+  const Swal = useCustomAlert();
   const { data, isLoading, isSuccess, isError } =
     useMessageControlllerGetMessage(params, {
       query: {
@@ -15,6 +16,10 @@ export const useMessages = (params?: MessageControlllerGetMessageParams) => {
           !!params?.topicName &&
           !!params?.topicOwner &&
           !!params?.clientId,
+        onError: (err: { message: string }) => {
+          console.error(err);
+          Swal.error({ text: err?.message });
+        },
       },
     });
 

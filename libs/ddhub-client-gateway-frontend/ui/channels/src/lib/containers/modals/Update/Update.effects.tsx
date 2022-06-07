@@ -102,12 +102,6 @@ export const useUpdateChannelEffects = () => {
     });
   };
 
-  const onUpdateError = () => {
-    Swal.error({
-      text: 'Error while updating channel',
-    });
-  };
-
   const channelUpdateHandler = (topics: Topic[]) => {
     const data = {
       fqcn: channel.fqcn,
@@ -118,7 +112,7 @@ export const useUpdateChannelEffects = () => {
         topics,
       },
     };
-    updateChannelHandler(data, onUpdate, onUpdateError);
+    updateChannelHandler(data, onUpdate);
   };
 
   const openCancelModal = async () => {
