@@ -27,7 +27,7 @@ export const useMessagesEffects = () => {
     topicName: topic?.topicName,
     topicOwner: topic?.owner,
     clientId: `${identity?.enrolment?.did}-${dayjs().format(
-      'YYYY-MM-DD HH:mm:ss'
+      'YYYYMMDD_HHmmss'
     )}`,
   });
 
