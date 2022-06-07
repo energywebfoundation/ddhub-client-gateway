@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import {
   CreateSecretCommand,
   CreateSecretCommandOutput,
+  CreateSecretResponse,
   GetSecretValueCommand,
   InvalidRequestException,
   PutSecretValueCommand,
@@ -12,11 +13,9 @@ import {
 } from '@aws-sdk/client-secrets-manager';
 import {
   CertificateDetails,
-  EncryptionKeys,
   PATHS,
   SecretsEngineService,
   SetCertificateDetailsResponse,
-  SetEncryptionKeysResponse,
   SetPrivateKeyResponse,
   SetRSAPrivateKeyResponse,
 } from '../secrets-engine.interface';
@@ -52,8 +51,9 @@ export class AwsSecretsManagerService
   public async setRSAPrivateKey(
     privateKey: string
   ): Promise<SetRSAPrivateKeyResponse> {
+    const name = `${this.prefix}${PATHS.RSA_KEY}`;
     const command = new PutSecretValueCommand({
-      SecretId: `${this.prefix}${PATHS.RSA_KEY}`,
+      SecretId: name,
       SecretString: privateKey,
     });
 
@@ -64,23 +64,7 @@ export class AwsSecretsManagerService
         return response;
       })
       .catch(async (err) => {
-        if (err instanceof ResourceNotFoundException) {
-          this.logger.log('RSA key secret not found, creating...');
-          const createCommand = new CreateSecretCommand({
-            Name: `${this.prefix}${PATHS.RSA_KEY}`,
-            SecretString: privateKey,
-          });
-          return this.client.send(createCommand).then((response) => {
-            this.logger.log('Created secret', response);
-            return response;
-          });
-        } else if (err instanceof InvalidRequestException) {
-          this.logger.error(err.message);
-          // Secret has been deleted...do something?
-        } else {
-          this.logger.error(err.message);
-        }
-        return null;
+        return await this.handlePutSecretValueError(err, name, privateKey);
       });
   }
 
@@ -240,8 +224,9 @@ export class AwsSecretsManagerService
 
   @Span('aws_ssm_setPrivateKey')
   public async setPrivateKey(key: string): Promise<SetPrivateKeyResponse> {
+    const name = `${this.prefix}${PATHS.IDENTITY_PRIVATE_KEY}`;
     const putCommand = new PutSecretValueCommand({
-      SecretId: `${this.prefix}${PATHS.IDENTITY_PRIVATE_KEY}`,
+      SecretId: name,
       SecretString: key,
     });
 
@@ -252,23 +237,7 @@ export class AwsSecretsManagerService
         return response;
       })
       .catch(async (err) => {
-        if (err instanceof ResourceNotFoundException) {
-          this.logger.log('Private key secret not found, creating...');
-          const createCommand = new CreateSecretCommand({
-            Name: `${this.prefix}${PATHS.IDENTITY_PRIVATE_KEY}`,
-            SecretString: key,
-          });
-          return this.client.send(createCommand).then((response) => {
-            this.logger.log('Created secret', response);
-            return response;
-          });
-        } else if (err instanceof InvalidRequestException) {
-          this.logger.error(err.message);
-          // Secret has been deleted...do something?
-        } else {
-          this.logger.error(err.message);
-        }
-        return null;
+        return await this.handlePutSecretValueError(err, name, key);
       });
   }
 
@@ -290,5 +259,29 @@ export class AwsSecretsManagerService
         this.logger.error(err.message);
         return null;
       });
+  }
+
+  private async handlePutSecretValueError(
+    err: Error,
+    name: string,
+    value: string
+  ): Promise<CreateSecretResponse | null> {
+    if (err instanceof ResourceNotFoundException) {
+      this.logger.log(`${name} not found, creating...`);
+      const createCommand = new CreateSecretCommand({
+        Name: name,
+        SecretString: value,
+      });
+      return this.client.send(createCommand).then((response) => {
+        this.logger.log('Created secret', response);
+        return response;
+      });
+    } else if (err instanceof InvalidRequestException) {
+      this.logger.error(err.message);
+      // Secret has been deleted...do something?
+    } else {
+      this.logger.error(err.message);
+    }
+    return null;
   }
 }

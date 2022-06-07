@@ -1,7 +1,6 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import {
   CertificateDetails,
-  EncryptionKeys,
   SecretsEngineService,
   PATHS,
 } from '../secrets-engine.interface';

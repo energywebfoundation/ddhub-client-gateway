@@ -30,13 +30,6 @@ export interface CertificateDetails {
   caCertificate?: string;
 }
 
-export interface EncryptionKeys {
-  createdAt: string;
-  privateDerivedKey: string;
-  publicMasterKey: string;
-  privateMasterKey: string;
-}
-
 export type SetPrivateKeyResponse =
   | PutSecretValueResponse
   | CreateSecretResponse
@@ -46,10 +39,6 @@ export type SetRSAPrivateKeyResponse =
   | CreateSecretResponse
   | null;
 export type SetCertificateDetailsResponse =
-  | CreateSecretResponse[]
-  | PutSecretValueResponse[]
-  | null;
-export type SetEncryptionKeysResponse =
   | CreateSecretResponse[]
   | PutSecretValueResponse[]
   | null;
