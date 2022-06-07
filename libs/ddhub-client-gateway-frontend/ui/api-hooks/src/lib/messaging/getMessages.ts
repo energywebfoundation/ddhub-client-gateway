@@ -25,7 +25,7 @@ export const useMessages = (params?: MessageControlllerGetMessageParams) => {
 
   const messages = data ?? ([] as GetMessagesResponseDto[]);
   const messagesById = keyBy(messages, 'id');
-  const messagesLoaded = data !== undefined && isSuccess && !isError;
+  const messagesLoaded = (data !== undefined && isSuccess) || isError;
 
   return {
     messages,
