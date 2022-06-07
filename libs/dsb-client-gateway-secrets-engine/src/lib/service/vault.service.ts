@@ -58,17 +58,6 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
       });
   }
 
-  public async getEncryptionKeys(): Promise<EncryptionKeys | null> {
-    return this.client
-      .read(PATHS.KEYS)
-      .then(({ data }) => data)
-      .catch((err) => {
-        this.logger.error(err.message);
-
-        return null;
-      });
-  }
-
   @Span('vault_getPrivateKey')
   public async getPrivateKey(): Promise<string> {
     this.logger.log('Retrieving private key');
@@ -140,14 +129,6 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
     await this.client.write(PATHS.IDENTITY_PRIVATE_KEY, { key });
 
     this.logger.log('Writing private key');
-    return null;
-  }
-
-  @Span('vault_setEncryptionKeys')
-  public async setEncryptionKeys(keys: EncryptionKeys): Promise<null> {
-    await this.client.write(PATHS.KEYS, keys);
-
-    this.logger.log('Writing encryption keys');
     return null;
   }
 }

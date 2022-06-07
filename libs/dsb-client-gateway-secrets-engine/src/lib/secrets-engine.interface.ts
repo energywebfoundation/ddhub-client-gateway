@@ -8,7 +8,6 @@ export const enum PATHS {
   CERTIFICATE = 'certificate/certificate',
   CERTIFICATE_KEY = 'certificate/private_key',
   CA_CERTIFICATE = 'certificate/ca_certificate',
-  KEYS = 'keys',
   RSA_KEY = 'rsa_key',
 }
 
@@ -19,10 +18,6 @@ export abstract class SecretsEngineService {
     details: CertificateDetails
   ): Promise<SetCertificateDetailsResponse>;
   abstract getCertificateDetails(): Promise<CertificateDetails>;
-  abstract setEncryptionKeys(
-    keys: EncryptionKeys
-  ): Promise<SetEncryptionKeysResponse>;
-  abstract getEncryptionKeys(): Promise<EncryptionKeys | null>;
   abstract setRSAPrivateKey(
     privateKey: string
   ): Promise<SetRSAPrivateKeyResponse>;
@@ -55,6 +50,6 @@ export type SetCertificateDetailsResponse =
   | PutSecretValueResponse[]
   | null;
 export type SetEncryptionKeysResponse =
-  | CreateSecretResponse
-  | PutSecretValueResponse
+  | CreateSecretResponse[]
+  | PutSecretValueResponse[]
   | null;
