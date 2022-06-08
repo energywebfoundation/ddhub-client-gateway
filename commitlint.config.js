@@ -16,6 +16,7 @@ module.exports = {
             projectType === 'library'
           );
         })),
+        'devops'
       ],
     ],
   },
