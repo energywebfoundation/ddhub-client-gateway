@@ -10,6 +10,7 @@ import {
   getChannelMessagesMock,
   getDownloadMessageMock,
   getFrontendConfigMock,
+  getTopicsControllerGetTopicsSearchMock,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 
 export function makeServer({ environment = 'development' }) {
@@ -59,6 +60,10 @@ export function makeServer({ environment = 'development' }) {
 
       this.post('/topics', (_schema, request) => {
         return { topic: JSON.parse(request.requestBody) };
+      });
+
+      this.get('/topics/search', (_schema, request) => {
+        return getTopicsControllerGetTopicsSearchMock(request.queryParams);
       });
 
       this.get('/topics/:id/versions', () => {
