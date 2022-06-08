@@ -64,7 +64,7 @@ export class AwsSecretsManagerService
         return response;
       })
       .catch(async (err) => {
-        return await this.handlePutSecretValueError(err, name, privateKey);
+        return this.handlePutSecretValueError(err, name, privateKey);
       });
   }
 
@@ -237,7 +237,7 @@ export class AwsSecretsManagerService
         return response;
       })
       .catch(async (err) => {
-        return await this.handlePutSecretValueError(err, name, key);
+        return this.handlePutSecretValueError(err, name, key);
       });
   }
 
