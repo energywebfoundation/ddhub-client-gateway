@@ -38,6 +38,8 @@ export function GenericTable<T>({
   paginationProps,
   onPageChange,
   onSearchInput,
+  defaultOrder,
+  defaultSortBy,
 }: TableProps<T>) {
   const { classes } = useStyles();
 
@@ -65,6 +67,8 @@ export function GenericTable<T>({
     onPageChange,
     paginationProps,
     onSearchInput,
+    defaultOrder,
+    defaultSortBy,
   });
 
   return (

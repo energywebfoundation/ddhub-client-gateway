@@ -22,6 +22,8 @@ export function Applications({ role, topicUrl }: ApplicationsProps) {
         onRowClick={handleRowClick}
         loading={isLoading}
         showFooter={false}
+        defaultSortBy='namespace'
+        defaultOrder='asc'
       />
     </section>
   );

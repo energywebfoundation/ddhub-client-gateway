@@ -19,9 +19,11 @@ export function useTableEffects<T>({
   paginationProps,
   onPageChange,
   onSearchInput,
+  defaultOrder = 'asc',
+  defaultSortBy = '',
 }: TableProps<T>) {
-  const [order, setOrder] = useState<Order>('asc');
-  const [orderBy, setOrderBy] = useState('');
+  const [order, setOrder] = useState<Order>(defaultOrder);
+  const [orderBy, setOrderBy] = useState(defaultSortBy);
   const data = React.useMemo(
     () => tableRows,
     [tableRows]

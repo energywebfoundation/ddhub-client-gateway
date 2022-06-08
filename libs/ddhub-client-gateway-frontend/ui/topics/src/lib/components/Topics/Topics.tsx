@@ -40,6 +40,8 @@ export const Topics: FC<TopicsProps> = ({
         onPageChange={handlePageChange}
         onSearchInput={handleSearchInput}
         loading={isLoading}
+        defaultSortBy='name'
+        defaultOrder='asc'
       >
         {!readonly && <CreateButton onCreate={openCreateTopic} />}
       </GenericTable>
