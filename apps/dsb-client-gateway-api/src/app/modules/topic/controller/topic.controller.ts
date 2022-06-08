@@ -24,6 +24,7 @@ import {
   PaginatedSearchTopicResponse,
   PostTopicBodyDto,
   PostTopicDto,
+  PutTopicDto,
   TopicCountDto,
   TopicsByIdAndVersionParamsDto,
   UpdateTopicBodyDto,
@@ -67,7 +68,9 @@ export class TopicsController {
     status: HttpStatus.UNAUTHORIZED,
     description: 'Unauthorized',
   })
-  public async getTopicsHistoryById(@Param() { id }: GetTopicsParamsDto) {
+  public async getTopicsHistoryById(
+    @Param() { id }: GetTopicsParamsDto
+  ): Promise<PaginatedSearchTopicResponse> {
     return this.ddhubTopicsService.getTopicHistoryById(id);
   }
 
@@ -83,7 +86,7 @@ export class TopicsController {
   })
   public async getTopicHistoryByIdAndVersion(
     @Param() { id, versionNumber }: TopicsByIdAndVersionParamsDto
-  ) {
+  ): Promise<PostTopicDto> {
     return this.ddhubTopicsService.getTopicHistoryByIdAndVersion(
       id,
       versionNumber
@@ -98,7 +101,7 @@ export class TopicsController {
   })
   public async getTopicsCountByOwner(
     @Query() { owner }: GetTopicsCountQueryDto
-  ) {
+  ): Promise<TopicCountDto[]> {
     return this.ddhubTopicsService.getTopicsCountByOwner(owner);
   }
 
@@ -110,7 +113,7 @@ export class TopicsController {
   })
   public async getTopicsBySearch(
     @Query() { keyword, limit, page }: GetTopicsSearchQueryDto
-  ) {
+  ): Promise<PaginatedSearchTopicResponse | []> {
     return this.ddhubTopicsService.getTopicsBySearch(keyword, limit, page);
   }
 
@@ -130,7 +133,9 @@ export class TopicsController {
     description: 'Unauthorized',
   })
   @HttpCode(HttpStatus.CREATED)
-  public async postTopics(@Body() data: PostTopicBodyDto) {
+  public async postTopics(
+    @Body() data: PostTopicBodyDto
+  ): Promise<PostTopicDto> {
     return this.ddhubTopicsService.postTopics(data);
   }
 
@@ -157,7 +162,7 @@ export class TopicsController {
   public async updateTopicsByIdAndVersion(
     @Param() { id, versionNumber }: TopicsByIdAndVersionParamsDto,
     @Body() data: UpdateTopicHistoryBodyDto
-  ) {
+  ): Promise<PostTopicDto> {
     return this.ddhubTopicsService.updateTopicByIdAndVersion(
       data,
       id,
@@ -169,7 +174,7 @@ export class TopicsController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Topic updated successfully',
-    type: () => PostTopicDto,
+    type: () => PutTopicDto,
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
@@ -188,7 +193,7 @@ export class TopicsController {
   public async updateTopics(
     @Param() { id }: GetTopicsParamsDto,
     @Body() data: UpdateTopicBodyDto
-  ) {
+  ): Promise<PutTopicDto> {
     return this.ddhubTopicsService.updateTopic(data, id);
   }
 
@@ -212,7 +217,9 @@ export class TopicsController {
     description: 'Topic not found',
   })
   @HttpCode(HttpStatus.OK)
-  public async deleteTopics(@Param() { id }: GetTopicsParamsDto) {
+  public async deleteTopics(
+    @Param() { id }: GetTopicsParamsDto
+  ): Promise<DeleteTopic> {
     return this.ddhubTopicsService.deleteTopic(id);
   }
 
@@ -238,7 +245,7 @@ export class TopicsController {
   @HttpCode(HttpStatus.OK)
   public async deleteTopicsByVersion(
     @Param() { id, version }: DeleteTopicsVersionParamsDto
-  ) {
+  ): Promise<DeleteTopic> {
     return this.ddhubTopicsService.deleteTopicByVersion(id, version);
   }
 }
