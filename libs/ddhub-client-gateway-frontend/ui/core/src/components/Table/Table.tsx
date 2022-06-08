@@ -37,6 +37,7 @@ export function GenericTable<T>({
   showFooter = true,
   paginationProps,
   onPageChange,
+  onSearchInput,
 }: TableProps<T>) {
   const { classes } = useStyles();
 
@@ -56,19 +57,21 @@ export function GenericTable<T>({
     orderBy,
     getComparator,
     pagination,
+    handleSearchInput,
   } = useTableEffects({
     headers,
     tableRows,
     onRowClick,
     onPageChange,
     paginationProps,
+    onSearchInput,
   });
 
   return (
     <>
       {showSearch ? (
         <Box display="flex">
-          <Search filter={globalFilter} setFilter={setGlobalFilter} />
+          <Search filter={globalFilter} onSearchInput={handleSearchInput} debounceTime={500} />
           {children}
         </Box>
       ) : (

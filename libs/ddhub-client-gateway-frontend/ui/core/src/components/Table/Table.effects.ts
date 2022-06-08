@@ -18,6 +18,7 @@ export function useTableEffects<T>({
   onRowClick,
   paginationProps,
   onPageChange,
+  onSearchInput,
 }: TableProps<T>) {
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState('');
@@ -86,6 +87,14 @@ export function useTableEffects<T>({
     setOrderBy(property);
   };
 
+  const handleSearchInput = (searchInput: string) => {
+    if (!onSearchInput) {
+      return;
+    }
+
+    onSearchInput(searchInput);
+  };
+
   function descendingComparator(
     a: Record<string, string>,
     b: Record<string, string>,
@@ -140,6 +149,7 @@ export function useTableEffects<T>({
     order,
     orderBy,
     getComparator,
-    pagination
+    pagination,
+    handleSearchInput
   };
 }
