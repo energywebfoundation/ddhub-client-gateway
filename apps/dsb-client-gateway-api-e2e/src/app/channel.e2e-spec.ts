@@ -12,7 +12,7 @@ const feature = loadFeature('../feature/channel.feature', {
 
 jest.setTimeout(100000);
 
-describe('Feature', () => {
+describe('Channel Feature', () => {
   let app: INestApplication;
 
   const getApp = () => app;
