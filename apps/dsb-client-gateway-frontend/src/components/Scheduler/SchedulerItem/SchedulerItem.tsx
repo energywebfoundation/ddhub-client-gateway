@@ -2,8 +2,8 @@ import { FC } from 'react';
 import { Icon } from 'react-feather';
 import { Typography, Box, alpha } from '@mui/material';
 import { useStyles } from './SchedulerItem.styles';
-import Status, { StatusTypeEnum } from "../../Status/Status";
-import { capitalizeFirstLetter } from "@ddhub-client-gateway-frontend/ui/utils";
+import Status, { StatusTypeEnum } from '../../Status/Status';
+import { capitalizeFirstLetter } from '@ddhub-client-gateway-frontend/ui/utils';
 
 export interface SchedulerItemProps {
   name: string;
@@ -24,12 +24,7 @@ export const SchedulerItem: FC<SchedulerItemProps> = ({
   return (
     <Box display="flex" mb={1.2} mt={1.2}>
       <Box className={classes.iconWrappper}>
-        <Box
-          sx={{ backgroundColor: alpha(color, 0.12) }}
-          className={classes.iconWrapper}
-        >
-          <SchedulerIcon size={20} style={{ stroke: color }} />
-        </Box>
+        <SchedulerIcon size={20} />
       </Box>
       <Box display="flex" justifyContent="space-between" flex={1}>
         <Box display="flex" flexDirection="column">

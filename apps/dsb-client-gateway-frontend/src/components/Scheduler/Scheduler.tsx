@@ -4,6 +4,7 @@ import { Card, Box, Typography, Grid, Divider } from '@mui/material';
 import { SchedulerItem } from './SchedulerItem';
 import { useStyles } from './Scheduler.styles';
 import { useScheduler } from '../../../../../libs/ddhub-client-gateway-frontend/ui/api-hooks/src/lib/scheduler/getScheduler';
+import { schedulerIconMap } from "./schedulerIconMap";
 
 export const Scheduler = () => {
   const { jobs } = useScheduler();
@@ -24,7 +25,7 @@ export const Scheduler = () => {
                   key={job.jobName}
                   name={job.jobName}
                   date={dayjs(job.updatedDate).format('DD/MM/YYYY HH:mm:ssA')}
-                  icon={Book}
+                  icon={schedulerIconMap.get(job.jobName)}
                   color={theme.palette.primary.main}
                   status={job.latestStatus}
                 />
