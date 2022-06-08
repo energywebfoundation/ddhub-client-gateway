@@ -20,7 +20,7 @@ export const useTopicsEffects = (
   const { theme } = useStyles();
   const router = useRouter();
 
-  const { topics, topicsFetched, getTopics, pagination, isLoading } = useTopics({
+  const { topics, topicsFetched, getTopics, pagination, isLoading, getTopicsBySearch } = useTopics({
     limit: 6,
     page: 1,
     owner: router.query[Queries.Namespace] as string,
@@ -108,6 +108,10 @@ export const useTopicsEffects = (
     getTopics({ page: newPage });
   };
 
+  const handleSearchInput = (searchInput: string) => {
+    getTopicsBySearch({ keyword: searchInput });
+  };
+
   return {
     openCreateTopic,
     application,
@@ -118,5 +122,6 @@ export const useTopicsEffects = (
     handleRowClick,
     pagination,
     handlePageChange,
+    handleSearchInput,
   };
 };

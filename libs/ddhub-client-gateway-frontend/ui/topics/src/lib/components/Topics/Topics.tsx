@@ -26,6 +26,7 @@ export const Topics: FC<TopicsProps> = ({
     handleRowClick,
     pagination,
     handlePageChange,
+    handleSearchInput,
   } = useTopicsEffects(versionHistoryUrl, readonly);
 
   return (
@@ -37,6 +38,7 @@ export const Topics: FC<TopicsProps> = ({
         paginationProps={pagination}
         onRowClick={handleRowClick}
         onPageChange={handlePageChange}
+        onSearchInput={handleSearchInput}
         loading={isLoading}
       >
         {!readonly && <CreateButton onCreate={openCreateTopic} />}
