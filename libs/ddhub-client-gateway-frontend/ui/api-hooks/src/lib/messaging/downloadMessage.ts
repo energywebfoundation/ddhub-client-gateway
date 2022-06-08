@@ -18,9 +18,10 @@ export const useDownloadMessage = () => {
     setFileData(initialState);
   };
 
-  const downloadMessageError = async () => {
+  const downloadMessageError = async (err: any) => {
+    console.error(err);
     await Swal.error({
-      text: 'Error while dowloading the message',
+      text: err?.message,
     });
   };
 
@@ -39,8 +40,8 @@ export const useDownloadMessage = () => {
           });
           resetState();
         },
-        onError: () => {
-          downloadMessageError();
+        onError: (err: any) => {
+          downloadMessageError(err);
           resetState();
         },
       },
@@ -49,7 +50,7 @@ export const useDownloadMessage = () => {
 
   const downloadMessageHandler = async (data: TDownloadData) => {
     if (!data?.fileId) {
-      downloadMessageError();
+      downloadMessageError({message: 'Error while dowloading the message'});
     } else {
       setFileData(data);
     }

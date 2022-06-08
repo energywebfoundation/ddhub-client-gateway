@@ -84,26 +84,14 @@ export const useCreateTopicEffects = () => {
   const onCreateTopic = () => {
     queryClient.invalidateQueries(getTopicsControllerGetTopicsQueryKey());
     closeModal();
-    Swal.fire({
-      title: 'Success',
+    Swal.success({
       text: 'You have successfully created the topic',
-      type: 'success',
-      confirmButtonText: 'Dismiss',
-    });
-  };
-
-  const onCreateTopicError = () => {
-    Swal.fire({
-      title: 'Error',
-      text: 'Error while creating topic',
-      type: 'error',
-      confirmButtonText: 'Dismiss',
     });
   };
 
   const topicSubmitHandler: SubmitHandler<FieldValues> = (data) => {
     const values = data as PostTopicBodyDto;
-    createTopicHandler(values, onCreateTopic, onCreateTopicError);
+    createTopicHandler(values, onCreateTopic);
   };
 
   const onSubmit = handleSubmit(topicSubmitHandler);

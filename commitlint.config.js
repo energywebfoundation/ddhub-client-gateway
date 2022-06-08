@@ -13,6 +13,7 @@ module.exports = {
         ...(await getProjects(ctx, ({ name, projectType }) => {
           return projectType == 'application' || projectType === 'library';
         })),
+        'devops'
       ],
     ],
   },

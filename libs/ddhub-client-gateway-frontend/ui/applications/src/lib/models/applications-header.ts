@@ -1,8 +1,11 @@
-import { ImageWithWrapper } from '@ddhub-client-gateway-frontend/ui/core';
+import {
+  ImageWithWrapper,
+  TableHeader,
+} from '@ddhub-client-gateway-frontend/ui/core';
 import { AppNamespace } from '../AppNamespace';
 import dayjs from 'dayjs';
 
-export const APPLICATIONS_HEADERS = [
+export const APPLICATIONS_HEADERS: TableHeader[] = [
   {
     accessor: 'logoUrl',
     Cell: ImageWithWrapper,
@@ -12,11 +15,13 @@ export const APPLICATIONS_HEADERS = [
     Header: 'APPLICATION NAME',
     accessor: 'appName',
     filter: 'includes',
+    isSortable: true,
   },
   {
     Header: 'APPLICATION NAMESPACE',
     accessor: 'namespace',
     filter: 'fuzzyText',
+    isSortable: true,
     Cell: AppNamespace,
   },
   {
@@ -26,8 +31,9 @@ export const APPLICATIONS_HEADERS = [
   {
     Header: 'UPDATED DATE',
     accessor: 'updatedDate',
+    isSortable: true,
     Cell: (props: any) => {
       return dayjs(props.value).format('DD/MM/YYYY HH:mm:ssA');
-    }
+    },
   },
 ];
