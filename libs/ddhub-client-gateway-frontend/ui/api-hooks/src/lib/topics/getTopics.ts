@@ -4,9 +4,11 @@ import {
   PaginatedResponse,
   useTopicsControllerGetTopics,
   TopicsControllerGetTopicsParams,
+  TopicsControllerGetTopicsBySearchParams
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { useState } from 'react';
 import { useCustomAlert } from '@ddhub-client-gateway-frontend/ui/core';
+import { useTopicsSearch } from './getTopicBySearch';
 
 export const useTopics = ({
   page = 1,
@@ -14,7 +16,15 @@ export const useTopics = ({
   owner,
 }: TopicsControllerGetTopicsParams) => {
   const Swal = useCustomAlert();
+  const [keyword, setKeyword] = useState('');
   const [params, setParams] = useState({ page, limit });
+  const [searchParams, setSearchParams] = useState({ page, limit, keyword });
+
+  const { topicsBySearch, topicsBySearchLoaded } = useTopicsSearch({
+    limit: searchParams.limit,
+    page: searchParams.page,
+    keyword: searchParams.keyword,
+  });
 
   const { data, isLoading, isSuccess, isError } = useTopicsControllerGetTopics(
     { page: params.page, limit: params.limit, owner },
@@ -29,16 +39,48 @@ export const useTopics = ({
     }
   );
 
-  const paginated = data ?? ({} as PaginatedResponse);
-  const topics = paginated.records ?? ([] as GetTopicDto[]);
-  const topicsById = keyBy(topics, 'id');
-  const topicsFetched = isSuccess && data !== undefined && !isError;
+  let paginated = {} as PaginatedResponse;
+  let topics = [] as GetTopicDto[];
+  let topicsById;
+  let topicsFetched;
+
+  const setReturnValues = (data: any) => {
+    if (data && data.records) {
+      paginated = data;
+      topics = paginated.records;
+      topicsById = keyBy(topics, 'id');
+    } else {
+      paginated = {} as PaginatedResponse;
+      topics = [] as GetTopicDto[];
+    }
+  }
+
+  if (keyword) {
+    setReturnValues(topicsBySearch);
+    topicsFetched = topicsBySearchLoaded;
+  } else {
+    setReturnValues(data);
+    topicsFetched = isSuccess && data !== undefined && !isError;
+  }
+
+  const getTopicsBySearch = async ({
+    page = 1,
+    limit = 6,
+    keyword = ''
+  }: TopicsControllerGetTopicsBySearchParams) => {
+    setKeyword(keyword);
+    setSearchParams({ page, limit, keyword });
+  };
 
   const getTopics = async ({
     page = 1,
     limit = 6,
   }: Omit<TopicsControllerGetTopicsParams, 'owner'>) => {
-    setParams({ page, limit });
+    if (keyword) {
+      await getTopicsBySearch({ page, limit, keyword });
+    } else {
+      setParams({ page, limit });
+    }
   };
 
   const pagination = {
@@ -52,6 +94,7 @@ export const useTopics = ({
     topicsById,
     isLoading,
     topicsFetched,
+    getTopicsBySearch,
     getTopics,
     pagination,
   };
