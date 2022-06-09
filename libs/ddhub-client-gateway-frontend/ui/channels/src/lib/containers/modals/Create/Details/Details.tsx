@@ -1,4 +1,4 @@
-import { Checkbox, FormControlLabel, Grid, Switch, Divider } from "@mui/material";
+import { FormControlLabel, Grid, Divider } from "@mui/material";
 import { FormInput, FormRadio } from "@ddhub-client-gateway-frontend/ui/core";
 import { ActionButton } from "../ActionButton";
 import { ICreateChannel } from "../../models/create-channel.interface";
