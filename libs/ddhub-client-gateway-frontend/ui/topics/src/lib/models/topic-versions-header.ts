@@ -6,11 +6,11 @@ export const TOPIC_VERSIONS_HEADERS = [
     accessor: 'version',
     color: '#fff',
   },
-  // {
-  //   Header: 'UPDATED DATE',
-  //   accessor: 'updatedDate',
-  //   Cell: (props: any) => {
-  //     return dayjs(props.value).format('DD/MM/YYYY HH:mm:ssA');
-  //   }
-  // }
+  {
+    Header: 'UPDATED DATE',
+    accessor: 'updatedDate',
+    Cell: (props: any) => {
+      return dayjs(props.value).format('DD/MM/YYYY HH:mm:ssA');
+    }
+  },
 ]
