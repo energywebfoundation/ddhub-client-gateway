@@ -10,6 +10,7 @@ export interface ApiBoxProps {
   title: string;
   subtitle: string;
   isNextLink: boolean;
+  customLabel?: string;
 }
 
 export const ApiBox = ({
@@ -18,6 +19,7 @@ export const ApiBox = ({
   title,
   subtitle,
   isNextLink,
+  customLabel = '',
 }: ApiBoxProps) => {
   const { classes } = useStyles();
   const displayedUrl = isNextLink ? (
@@ -40,7 +42,7 @@ export const ApiBox = ({
         />
         <CardContent className={classes.cardContent}>
           <Stack direction="row" justifyContent="flex-end">
-            {displayedUrl}
+            { customLabel ? <Typography variant="body2" className={classes.customLabel}>{customLabel}</Typography> : displayedUrl}
           </Stack>
         </CardContent>
       </Box>

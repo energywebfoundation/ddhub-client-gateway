@@ -177,6 +177,69 @@ export class PostTopicDto {
   tags: string[];
 }
 
+export class PutTopicDto {
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({
+    description: 'id of the topic',
+    type: String,
+    example: '62545547fe37f174d7715ff3',
+  })
+  id: string;
+
+  @IsValidTopicName({
+    message:
+      'Malformed topic name. Name should contain only alphanumeric lowercase letters, use . as a separator. Max length 255',
+  })
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({
+    description: 'name of the topic',
+    type: String,
+    example: 'Topic_JSON_V12',
+  })
+  name: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @IsEnum(SchemaType)
+  @ApiProperty({
+    description: 'schema type of the topic',
+    type: String,
+    enum: [
+      SchemaType.JSD7,
+      SchemaType.XML,
+      SchemaType.XSD6,
+      SchemaType.CSV,
+      SchemaType.TSV,
+    ],
+    example: 'JSD7',
+  })
+  schemaType: SchemaType;
+
+  @IsString()
+  @IsNotEmpty()
+  @IsValidApplicationNameSpace(new ConfigService(), {
+    message: 'Malformed owner name. Please enter correct owner name',
+  })
+  @ApiProperty({
+    description: 'owner of the topic',
+    type: String,
+    example: 'torta.apps.eggplant.vege.iam.ewc',
+  })
+  owner: string;
+
+  @IsArray()
+  @IsNotEmpty()
+  @ArrayUnique()
+  @ApiProperty({
+    description: 'tags of the topic',
+    type: [String],
+    example: `["aggregator"]`,
+  })
+  tags: string[];
+}
+
 export class GetTopicSearchDto {
   @IsString()
   @IsNotEmpty()
@@ -260,6 +323,26 @@ export class GetTopicSearchDto {
     example: `["aggregator"]`,
   })
   tags: string[];
+
+  @IsOptional()
+  @IsString()
+  @ApiProperty({
+    description: 'timestamp of the topic updated',
+    type: String,
+    example: '2022-06-08T05:43:15.510Z',
+    required: false,
+  })
+  public createdDate?: string;
+
+  @IsOptional()
+  @IsString()
+  @ApiProperty({
+    description: 'timestamp of the topic updated',
+    type: String,
+    example: '2022-06-08T05:43:15.510Z',
+    required: false,
+  })
+  public updatedDate?: string;
 }
 
 export class UpdateTopicBodyDto {
@@ -437,7 +520,7 @@ export class PaginatedResponse {
   public records: GetTopicDto[];
 }
 
-export class PaginatedSearchTopicResponse {
+export class PaginatedTopicResponse {
   @IsNumber()
   @ApiProperty({
     description: 'total number of channels',
@@ -470,15 +553,24 @@ export class PaginatedSearchTopicResponse {
   public records: GetTopicSearchDto[];
 }
 
-export class TopicsCountResponse {
+export class TopicCountDto {
   @IsNumber()
   @ApiProperty({
-    description: 'owner name',
+    description: 'number of topics',
     type: Number,
     example: 2,
   })
-  public owner: number;
+  public count: number;
+
+  @IsString()
+  @ApiProperty({
+    description: 'owner name',
+    type: String,
+    example: 'torta.apps.eggplant.vege.iam.ewc',
+  })
+  public owner: string;
 }
+
 export class GetTopicsParamsDto {
   @IsString()
   @ApiProperty({

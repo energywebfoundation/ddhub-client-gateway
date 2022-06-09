@@ -15,6 +15,7 @@ import { SchedulerRegistry } from '@nestjs/schedule';
 import {
   DdhubTopicsService,
   Topic,
+  TopicCountDto,
 } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
 import { ConfigService } from '@nestjs/config';
 
@@ -99,21 +100,28 @@ export class ApplicationService implements OnApplicationBootstrap {
         .map(({ namespace }) => namespace)
         .filter(Boolean);
 
-      const topicsCount: Topic[] =
+      const topicsCount: TopicCountDto[] =
         await this.ddhubTopicService.getTopicsCountByOwner(namespaces);
 
       this.logger.log('START: List of combined apps');
       this.logger.log('topicsCount: ' + JSON.stringify(topicsCount));
-      this.logger.log('allApplicationsRoles: ' + JSON.stringify(allApplicationsRoles));
+      this.logger.log(
+        'allApplicationsRoles: ' + JSON.stringify(allApplicationsRoles)
+      );
       for (const application of combinedApplications) {
         this.logger.log(JSON.stringify(application));
+
+        const countOfTopics = topicsCount.find(
+          (topic) => topic.owner === application.namespace
+        );
+
         await this.applicationWrapper.repository.save({
           appName: application.appName,
           description: application.description,
           logoUrl: application.logoUrl,
           websiteUrl: application.websiteUrl,
           namespace: application.namespace,
-          topicsCount: topicsCount[application.namespace] || 0,
+          topicsCount: countOfTopics ? countOfTopics.count : 0,
           roles: allApplicationsRoles[this.getKey(application)] || [],
         });
 

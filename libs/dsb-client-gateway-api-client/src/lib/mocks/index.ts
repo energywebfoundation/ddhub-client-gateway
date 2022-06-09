@@ -54,6 +54,8 @@ export const getApplicationsControllerGetApplicationsMock = () => [
     description: faker.random.word(),
     namespace: 'ddhub.apps.energyweb.iam.ewc',
     topicsCount: faker.datatype.number({ min: 1, max: 10 }),
+    createdDate: "2022-05-18T11:19:07.000Z",
+    updatedDate: "2022-05-18T11:19:07.000Z",
   },
   {
     appName: 'Torta',
@@ -62,6 +64,8 @@ export const getApplicationsControllerGetApplicationsMock = () => [
     description: faker.random.word(),
     namespace: 'torta.apps.eggplant.vege.iam.ewc',
     topicsCount: faker.datatype.number({ min: 1, max: 10 }),
+    createdDate: "2022-05-31T11:19:07.000Z",
+    updatedDate: "2022-05-31T11:19:07.000Z",
   },
 ];
 
