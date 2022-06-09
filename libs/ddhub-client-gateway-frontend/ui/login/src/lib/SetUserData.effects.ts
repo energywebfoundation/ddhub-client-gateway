@@ -77,7 +77,7 @@ export const useSetUserDataEffect = () => {
 
       setUserData({
         ...userData,
-        accountStatus: RoleStatus.SYNCED,
+        accountStatus,
         isChecking: false,
         routeRestrictions,
         displayedRoutes,
