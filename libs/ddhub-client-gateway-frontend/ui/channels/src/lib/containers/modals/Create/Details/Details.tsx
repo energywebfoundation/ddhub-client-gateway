@@ -1,9 +1,9 @@
-import { Checkbox, FormControlLabel, Grid } from "@mui/material";
+import { Checkbox, FormControlLabel, Grid, Switch, Divider } from "@mui/material";
 import { FormInput, FormRadio } from "@ddhub-client-gateway-frontend/ui/core";
 import { ActionButton } from "../ActionButton";
 import { ICreateChannel } from "../../models/create-channel.interface";
 import { useDetailsEffects } from "./Details.effects";
-import { useStyles } from "./Details.styles";
+import { useStyles, CheckSwitch } from "./Details.styles";
 
 export interface DetailsProps {
   nextClick: (data) => void;
@@ -40,14 +40,20 @@ export const Details = ({ nextClick, channelValues }: DetailsProps) => {
             control={control}
             variant="outlined"
           />
+
+          <Divider className={classes.divider} />
+
           <FormControlLabel
+            className={classes.switchLabel}
             control={
-              <Checkbox
+              <CheckSwitch
+                defaultChecked
                 id={fields.payloadEncryption.name}
                 name={fields.payloadEncryption.name}
                 color="primary"
               />
             }
+            labelPlacement="start"
             id={fields.payloadEncryption.name}
             name={fields.payloadEncryption.name}
             label={fields.payloadEncryption.label}
