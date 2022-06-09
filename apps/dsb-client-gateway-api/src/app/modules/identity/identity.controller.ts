@@ -74,7 +74,6 @@ export class IdentityController {
     status: HttpStatus.UNAUTHORIZED,
     description: 'Unauthorized',
   })
-  @HttpCode(HttpStatus.CREATED)
   @HttpCode(HttpStatus.OK)
   public async post(
     @Body() { privateKey }: CreateIdentityDto

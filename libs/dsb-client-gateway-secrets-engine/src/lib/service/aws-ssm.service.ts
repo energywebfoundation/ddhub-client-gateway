@@ -29,6 +29,10 @@ export class AwsSsmService
     this.prefix = this.configService.get('AWS_SSM_PREFIX', '/dsb-gw/');
   }
 
+  deleteAll(): Promise<void> {
+    return Promise.resolve(undefined);
+  }
+
   public async onModuleInit(): Promise<void> {
     this.client = new SSMClient({
       region: this.configService.get('AWS_REGION'),
