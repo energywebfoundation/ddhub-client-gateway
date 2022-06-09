@@ -323,6 +323,26 @@ export class GetTopicSearchDto {
     example: `["aggregator"]`,
   })
   tags: string[];
+
+  @IsOptional()
+  @IsString()
+  @ApiProperty({
+    description: 'timestamp of the topic updated',
+    type: String,
+    example: '2022-06-08T05:43:15.510Z',
+    required: false,
+  })
+  public createdDate?: string;
+
+  @IsOptional()
+  @IsString()
+  @ApiProperty({
+    description: 'timestamp of the topic updated',
+    type: String,
+    example: '2022-06-08T05:43:15.510Z',
+    required: false,
+  })
+  public updatedDate?: string;
 }
 
 export class UpdateTopicBodyDto {
@@ -500,7 +520,7 @@ export class PaginatedResponse {
   public records: GetTopicDto[];
 }
 
-export class PaginatedSearchTopicResponse {
+export class PaginatedTopicResponse {
   @IsNumber()
   @ApiProperty({
     description: 'total number of channels',

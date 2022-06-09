@@ -21,7 +21,7 @@ import {
   GetTopicsQueryDto,
   GetTopicsSearchQueryDto,
   PaginatedResponse,
-  PaginatedSearchTopicResponse,
+  PaginatedTopicResponse,
   PostTopicBodyDto,
   PostTopicDto,
   PutTopicDto,
@@ -62,7 +62,7 @@ export class TopicsController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Get Topics List with same Id and different versions',
-    type: () => PaginatedSearchTopicResponse,
+    type: () => PaginatedTopicResponse,
   })
   @ApiResponse({
     status: HttpStatus.UNAUTHORIZED,
@@ -70,7 +70,7 @@ export class TopicsController {
   })
   public async getTopicsHistoryById(
     @Param() { id }: GetTopicsParamsDto
-  ): Promise<PaginatedSearchTopicResponse> {
+  ): Promise<PaginatedTopicResponse> {
     return this.ddhubTopicsService.getTopicHistoryById(id);
   }
 
@@ -109,11 +109,11 @@ export class TopicsController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Get Topics by Search',
-    type: () => PaginatedSearchTopicResponse,
+    type: () => PaginatedTopicResponse,
   })
   public async getTopicsBySearch(
     @Query() { keyword, limit, page }: GetTopicsSearchQueryDto
-  ): Promise<PaginatedSearchTopicResponse | []> {
+  ): Promise<PaginatedTopicResponse | []> {
     return this.ddhubTopicsService.getTopicsBySearch(keyword, limit, page);
   }
 

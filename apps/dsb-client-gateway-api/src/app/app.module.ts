@@ -24,10 +24,17 @@ import { StorageModule } from './modules/storage/storage.module';
 
 @Module({})
 export class AppModule {
-  static register({ shouldValidate = true }: { shouldValidate: boolean }) {
+  static register({
+    shouldValidate = true,
+    envFilePath,
+  }: {
+    shouldValidate: boolean;
+    envFilePath?: string;
+  }) {
     const imports = [
       ConfigModule.forRoot({
         isGlobal: true,
+        envFilePath: envFilePath,
         validate: shouldValidate && configValidate,
       }),
       StorageModule,
