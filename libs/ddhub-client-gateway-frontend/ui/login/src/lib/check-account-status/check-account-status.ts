@@ -13,6 +13,9 @@ export enum AccountStatusEnum {
 export const checkAccountStatus = (
   res: IdentityWithEnrolment
 ): AccountStatusEnum | RoleStatus => {
+  if (!res) {
+    return AccountStatusEnum.NotSetPrivateKey;
+  }
   if (isBalanceToLow(res.balance)) {
     return AccountStatusEnum.InsufficientFund;
   }
