@@ -9,8 +9,8 @@ export const useUpdateChannel = () => {
   const { mutate, isLoading } = useChannelControllerUpdate();
 
   const updateError = (err: any) => {
-    console.log(err);
-    Swal.error({ text: err?.message });
+    console.error(err);
+    Swal.httpError(err);
   };
 
   const updateChannelHandler = (
