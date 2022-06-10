@@ -10,7 +10,7 @@ export const useCreateChannel = () => {
 
   const createChannelError = (err: any) => {
     console.error(err);
-    Swal.error({ text: err?.message });
+    Swal.httpError(err);
   };
 
   const createChannelHandler = (

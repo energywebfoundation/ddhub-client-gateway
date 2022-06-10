@@ -31,7 +31,7 @@ export const useCheckAccountOnInitEffects = () => {
       return { identityData, routeRestrictions };
     } catch (e: any) {
       console.error(e);
-      Swal.error({ html: e?.message });
+      Swal.httpError(e);
       setDataOnError(e);
       return e;
     }

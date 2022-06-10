@@ -7,7 +7,7 @@ export const useScheduler = () => {
     query: {
       onError: (err: { message: string }) => {
         console.error(err);
-        Swal.error({ text: err?.message });
+        Swal.httpError(err);
       },
     },
   });

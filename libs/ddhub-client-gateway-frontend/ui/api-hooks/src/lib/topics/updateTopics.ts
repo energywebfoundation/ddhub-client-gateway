@@ -16,15 +16,14 @@ export const useUpdateTopics = (canUpdateSchema: boolean) => {
     isLoading: topicVersionByMutationLoading,
   } = useTopicsControllerUpdateTopicsByIdAndVersion();
 
-  const updateError = (error: any) => {
-    console.error(error);
-    Swal.error({ text: error.message });
+  const updateError = (err: any) => {
+    console.error(err);
+    Swal.httpError(err);
   };
 
   const updateTopic = (
     topic: PostTopicDto,
     onSuccess: () => void,
-    onError: () => void
   ) => {
     const { id, tags } = topic;
     mutateTopic(
@@ -34,7 +33,7 @@ export const useUpdateTopics = (canUpdateSchema: boolean) => {
       },
       {
         onSuccess,
-        onError,
+        onError: updateError,
       }
     );
   };
@@ -42,7 +41,6 @@ export const useUpdateTopics = (canUpdateSchema: boolean) => {
   const updateTopicByVersion = (
     topic: PostTopicDto,
     onSuccess: () => void,
-    onError: () => void
   ) => {
     const { id, version, schema } = topic;
     mutateTopicByVersion(
@@ -53,7 +51,7 @@ export const useUpdateTopics = (canUpdateSchema: boolean) => {
       },
       {
         onSuccess,
-        onError,
+        onError: updateError,
       }
     );
   };

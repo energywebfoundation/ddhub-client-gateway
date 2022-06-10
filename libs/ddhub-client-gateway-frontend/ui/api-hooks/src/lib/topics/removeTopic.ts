@@ -19,9 +19,7 @@ export const useRemoveTopic = () => {
 
   const removeTopicError = async (err: any) => {
     console.error(err);
-    await Swal.error({
-      text: err?.message,
-    });
+    Swal.httpError(err);
   };
 
   const removeTopicHandler = async (id: string) => {

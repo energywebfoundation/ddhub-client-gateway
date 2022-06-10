@@ -10,9 +10,9 @@ export const useChannel = (fqcn: string) => {
     fqcn,
     {
       query: {
-        onError: (err: { message: string }) => {
+        onError: (err: any) => {
           console.error(err);
-          Swal.error({ text: err.message });
+          Swal.httpError(err);
         },
       },
     }
