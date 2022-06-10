@@ -31,6 +31,8 @@ export interface Topic {
   version: string;
   owner: string;
   tags: string[];
+  createdDate?: string;
+  updatedDate?: string;
 }
 
 export interface PostTopicBodyDto {

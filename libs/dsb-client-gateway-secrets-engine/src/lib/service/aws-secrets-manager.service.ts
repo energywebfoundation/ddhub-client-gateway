@@ -284,4 +284,10 @@ export class AwsSecretsManagerService
     }
     return null;
   }
+
+  @Span('aws_ssm_deleteAll')
+  public async deleteAll(): Promise<undefined> {
+    this.logger.log('DeleteAll not implemented in AWS Secrets Engine');
+    return;
+  }
 }

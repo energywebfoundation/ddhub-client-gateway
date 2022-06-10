@@ -12,14 +12,16 @@ export const useStyles = makeStyles()((theme) => ({
   },
   name: {
     fontSize: 16,
-    lineHeight: '19px',
+    lineHeight: '23px',
     fontWeight: 400,
+    fontFamily: theme.typography.body1.fontFamily,
     color: theme.palette.text.primary,
   },
   date: {
     fontSize: 14,
-    lineHeight: '17px',
+    lineHeight: '21px',
     fontWeight: 400,
+    fontFamily: theme.typography.body2.fontFamily,
     color: theme.palette.text.primary,
   },
   iconWrapper: {

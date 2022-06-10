@@ -18,6 +18,16 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
     super();
   }
 
+  public async deleteAll(): Promise<void> {
+    await this.onModuleInit();
+
+    await Promise.all(
+      Object.values(PATHS).map(async (path) => {
+        await this.client.delete(path);
+      })
+    );
+  }
+
   @Span('vault_onModuleInit')
   public async onModuleInit(): Promise<void> {
     const vaultEndpoint: string = this.configService.get('VAULT_ENDPOINT');
