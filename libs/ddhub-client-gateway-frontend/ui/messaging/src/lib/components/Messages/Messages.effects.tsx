@@ -26,8 +26,8 @@ export const useMessagesEffects = () => {
     fqcn: router.query[Queries.FQCN] as string,
     topicName: topic?.topicName,
     topicOwner: topic?.owner,
-    clientId: `${identity?.enrolment?.did}-${dayjs().format(
-      'YYYYMMDD_HHmmss'
+    clientId: `${identity?.address}${dayjs().format(
+      'YYYYMMDDHHmmss'
     )}`,
   });
 
