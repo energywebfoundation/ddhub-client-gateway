@@ -31,24 +31,20 @@ export const useCheckAccountOnInitEffects = () => {
       return { identityData, routeRestrictions };
     } catch (e: any) {
       console.error(e);
-      Swal.error({ text: e?.message });
-      return {};
+      Swal.error({ html: e?.message });
+      setDataOnError(e);
+      return e;
     }
   };
 
   useEffect(() => {
     setIsChecking(true);
-    getIdentityData()
-      .then((res) => {
-        setUserData(
-          res.identityData as IdentityWithEnrolment,
-          res.routeRestrictions
-        );
-        setIsLoading(false);
-      })
-      .catch((error) => {
-        console.error(error);
-        setDataOnError(error);
-      });
+    getIdentityData().then((res) => {
+      setUserData(
+        res.identityData as IdentityWithEnrolment,
+        res.routeRestrictions
+      );
+      setIsLoading(false);
+    });
   }, []);
 };
