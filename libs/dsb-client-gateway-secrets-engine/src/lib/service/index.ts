@@ -1,2 +1,2 @@
-export * from './aws-ssm.service';
+export * from './aws-secrets-manager.service';
 export * from './vault.service';

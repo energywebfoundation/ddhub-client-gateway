@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { SecretsEngine } from './secrets-engine.const';
 import { ConfigService } from '@nestjs/config';
-import { AwsSsmService } from './service/aws-ssm.service';
+import { AwsSecretsManagerService } from './service/aws-secrets-manager.service';
 import { SecretsEngineService } from './secrets-engine.interface';
 import { VaultService } from './service/vault.service';
 
@@ -18,7 +18,7 @@ import { VaultService } from './service/vault.service';
 
         switch (secretsEngine) {
           case SecretsEngine.AWS:
-            return new AwsSsmService(configService);
+            return new AwsSecretsManagerService(configService);
           case SecretsEngine.VAULT:
             return new VaultService(configService);
           default:
