@@ -21,7 +21,7 @@ describe('Secrets Manager Engine', () => {
     const SecretString = 'test_rsa_key';
 
     smMockClient.on(GetSecretValueCommand).resolves({
-      Name: '/dsb-gw/rsa_key',
+      Name: '/ddhub/rsa_key',
       SecretString,
     });
 
@@ -52,13 +52,13 @@ describe('Secrets Manager Engine', () => {
         new ResourceNotFoundException({ Message: 'test', $metadata: {} })
       );
     smMockClient.on(CreateSecretCommand).resolves({
-      Name: '/dsb-gw/rsa_key',
+      Name: '/ddhub/rsa_key',
     });
 
     const key = await service.setRSAPrivateKey('test key');
     expect(key).toBeDefined();
     if (key && key.Name) {
-      expect(key.Name).toEqual('/dsb-gw/rsa_key');
+      expect(key.Name).toEqual('/ddhub/rsa_key');
     }
   });
 
@@ -66,13 +66,13 @@ describe('Secrets Manager Engine', () => {
     const smMockClient = mockClient(SecretsManagerClient);
 
     smMockClient.on(PutSecretValueCommand).resolves({
-      Name: '/dsb-gw/rsa_key',
+      Name: '/ddhub/rsa_key',
     });
 
     const key = await service.setRSAPrivateKey('test key');
     expect(key).toBeDefined();
     if (key && key.Name) {
-      expect(key.Name).toEqual('/dsb-gw/rsa_key');
+      expect(key.Name).toEqual('/ddhub/rsa_key');
     }
   });
 
@@ -81,7 +81,7 @@ describe('Secrets Manager Engine', () => {
     const SecretString = 'test_identity_key';
 
     smMockClient.on(GetSecretValueCommand).resolves({
-      Name: '/dsb-gw/identity/private_key',
+      Name: '/ddhub/identity/private_key',
       SecretString,
     });
 
@@ -113,13 +113,13 @@ describe('Secrets Manager Engine', () => {
         new ResourceNotFoundException({ Message: 'test', $metadata: {} })
       );
     smMockClient.on(CreateSecretCommand).resolves({
-      Name: '/dsb-gw/identity/private_key',
+      Name: '/ddhub/identity/private_key',
     });
 
     const key = await service.setPrivateKey('test key');
     expect(key).toBeDefined();
     if (key && key.Name) {
-      expect(key.Name).toEqual('/dsb-gw/identity/private_key');
+      expect(key.Name).toEqual('/ddhub/identity/private_key');
     }
   });
 
@@ -127,13 +127,13 @@ describe('Secrets Manager Engine', () => {
     const smMockClient = mockClient(SecretsManagerClient);
 
     smMockClient.on(PutSecretValueCommand).resolves({
-      Name: '/dsb-gw/identity/private_key',
+      Name: '/ddhub/identity/private_key',
     });
 
     const key = await service.setPrivateKey('test key');
     expect(key).toBeDefined();
     if (key && key.Name) {
-      expect(key.Name).toEqual('/dsb-gw/identity/private_key');
+      expect(key.Name).toEqual('/ddhub/identity/private_key');
     }
   });
 
@@ -142,15 +142,15 @@ describe('Secrets Manager Engine', () => {
 
     const testData = {
       privateKey: {
-        Name: '/dsb-gw/certificate/private_key',
+        Name: '/ddhub/certificate/private_key',
         SecretString: 'test_private_key',
       },
       certificate: {
-        Name: '/dsb-gw/certificate/certificate',
+        Name: '/ddhub/certificate/certificate',
         SecretString: 'test_certificate',
       },
       caCertificate: {
-        Name: '/dsb-gw/certificate/ca_certificate',
+        Name: '/ddhub/certificate/ca_certificate',
         SecretString: 'test_ca_certificate',
       },
     };
@@ -215,13 +215,13 @@ describe('Secrets Manager Engine', () => {
     smMockClient
       .on(CreateSecretCommand)
       .resolvesOnce({
-        Name: '/dsb-gw/certificate/private_key',
+        Name: '/ddhub/certificate/private_key',
       })
       .resolvesOnce({
-        Name: '/dsb-gw/certificate/certificate',
+        Name: '/ddhub/certificate/certificate',
       })
       .resolvesOnce({
-        Name: '/dsb-gw/certificate/ca_certificate',
+        Name: '/ddhub/certificate/ca_certificate',
       });
 
     const details = await service.setCertificateDetails({
@@ -244,13 +244,13 @@ describe('Secrets Manager Engine', () => {
     smMockClient
       .on(PutSecretValueCommand)
       .resolvesOnce({
-        Name: '/dsb-gw/certificate/private_key',
+        Name: '/ddhub/certificate/private_key',
       })
       .resolvesOnce({
-        Name: '/dsb-gw/certificate/certificate',
+        Name: '/ddhub/certificate/certificate',
       })
       .resolvesOnce({
-        Name: '/dsb-gw/certificate/ca_certificate',
+        Name: '/ddhub/certificate/ca_certificate',
       });
 
     const details = await service.setCertificateDetails({
