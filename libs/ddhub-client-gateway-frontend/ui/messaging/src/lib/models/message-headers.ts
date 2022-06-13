@@ -4,14 +4,17 @@ export const LARGE_MESSAGES_HEADERS = [
   {
     Header: 'DATE',
     accessor: 'timestampNanos',
+    isSortable: true,
   },
   {
     Header: 'FROM',
     accessor: 'sender',
+    isSortable: true,
   },
   {
     Header: 'SCHEMA TYPE',
     accessor: 'schemaType',
+    isSortable: true,
   },
   {
     accessor: 'fileData',
@@ -24,13 +27,16 @@ export const MESSAGES_HEADERS = [
   {
     Header: 'DATE',
     accessor: 'timestampNanos',
+    isSortable: true,
   },
   {
     Header: 'SCHEMA VERSION',
     accessor: 'details.topicVersion',
+    isSortable: true,
   },
   {
     Header: 'FROM',
     accessor: 'sender',
+    isSortable: true,
   },
 ];
