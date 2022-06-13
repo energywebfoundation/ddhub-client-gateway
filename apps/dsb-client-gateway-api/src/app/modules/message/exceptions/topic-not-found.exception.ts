@@ -1,12 +1,14 @@
-import { NotFoundException } from '@nestjs/common';
-import { DsbClientGatewayErrors } from '@dsb-client-gateway/dsb-client-gateway-errors';
+import {
+  BaseException,
+  DsbClientGatewayErrors,
+} from '@dsb-client-gateway/dsb-client-gateway-errors';
 
-export class TopicNotFoundException extends NotFoundException {
+export class TopicNotFoundException extends BaseException {
   public code: DsbClientGatewayErrors;
 
-  constructor(public readonly additionalDetails) {
-    super('Topic not found');
-
-    this.code = DsbClientGatewayErrors.TOPIC_NOT_FOUND;
+  constructor(topicId) {
+    super('Topic not found', DsbClientGatewayErrors.TOPIC_NOT_FOUND, {
+      topicId,
+    });
   }
 }

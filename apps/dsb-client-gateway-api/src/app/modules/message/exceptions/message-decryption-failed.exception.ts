@@ -1,11 +1,16 @@
-import { BadRequestException } from '@nestjs/common';
-import { DsbClientGatewayErrors } from '@dsb-client-gateway/dsb-client-gateway-errors';
+import {
+  BaseException,
+  DsbClientGatewayErrors,
+} from '@dsb-client-gateway/dsb-client-gateway-errors';
 
-export class MessageDecryptionFailedException extends BadRequestException {
+export class MessageDecryptionFailedException extends BaseException {
   public code: DsbClientGatewayErrors;
 
-  constructor(public readonly additionalDetails) {
-    super('Message Decryption Failed.');
-    this.code = DsbClientGatewayErrors.MESSAGE_DECRYPTION_FAILED;
+  constructor(additionalDetails?) {
+    super(
+      'Message decryption failed',
+      DsbClientGatewayErrors.MESSAGE_DECRYPTION_FAILED,
+      additionalDetails
+    );
   }
 }

@@ -42,7 +42,7 @@ export class ChannelService {
     const channel: ChannelEntity = await this.getChannel(payload.fqcn);
 
     if (channel) {
-      throw new ChannelAlreadyExistsException();
+      throw new ChannelAlreadyExistsException(payload.fqcn);
     }
 
     this.logger.debug(payload);
@@ -115,7 +115,7 @@ export class ChannelService {
       });
 
     if (!channel) {
-      throw new ChannelNotFoundException();
+      throw new ChannelNotFoundException(fqcn);
     }
 
     return channel;

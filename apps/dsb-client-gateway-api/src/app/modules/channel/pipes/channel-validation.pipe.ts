@@ -14,7 +14,7 @@ export class ChannelValidationPipe implements PipeTransform<unknown> {
     );
 
     if (channel) {
-      throw new ChannelAlreadyExistsException();
+      throw new ChannelAlreadyExistsException(value.fqcn);
     }
 
     return value;

@@ -2,15 +2,21 @@ import {
   ArgumentsHost,
   Catch,
   ExceptionFilter,
-  HttpException,
   HttpStatus,
+  Logger,
 } from '@nestjs/common';
-import { HttpAdapterHost } from '@nestjs/core';
-
-import { DsbMessageBrokerErrors } from '@dsb-client-gateway/dsb-client-gateway-errors';
+import { AbstractHttpAdapter, HttpAdapterHost } from '@nestjs/core';
+import { HttpArgumentsHost } from '@nestjs/common/interfaces';
+import { ResponseErrorDto } from '../dto/response-error.dto';
+import {
+  BaseException,
+  DsbClientGatewayErrors,
+} from '@dsb-client-gateway/dsb-client-gateway-errors';
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
+  protected readonly logger = new Logger(AllExceptionsFilter.name);
+
   constructor(private readonly httpAdapterHost: HttpAdapterHost) {}
 
   catch(exception: any, host: ArgumentsHost): void {
@@ -18,50 +24,48 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
     const ctx = host.switchToHttp();
 
-    if (exception.response) {
-      const httpStatus =
-        exception instanceof HttpException
-          ? exception.getStatus()
-          : HttpStatus.INTERNAL_SERVER_ERROR;
-
-      const responseBody = {
+    if (exception instanceof BaseException) {
+      const responseBody: ResponseErrorDto = {
         err: {
-          reason:
-            exception.response.data && exception.response.data.returnMessage
-              ? exception.response.data.returnMessage
-              : exception.response.message,
-          statusCode: httpStatus,
-          code:
-            exception.response.data && exception.response.data.returnCode
-              ? DsbMessageBrokerErrors[exception.response.data.returnCode]
-              : exception.code,
+          code: exception.code,
+          reason: exception.message,
           additionalDetails: exception.additionalDetails,
         },
-
-        statusCode: httpStatus,
         timestamp: new Date().toISOString(),
+        statusCode: exception.httpCode,
       };
 
-      httpAdapter.reply(ctx.getResponse(), responseBody, httpStatus);
+      this.emitError(ctx, httpAdapter, responseBody, exception.httpCode);
 
       return;
     }
 
-    const httpStatus =
-      exception instanceof HttpException
-        ? exception.getStatus()
-        : HttpStatus.INTERNAL_SERVER_ERROR;
-
-    const responseBody = {
+    const responseBody: ResponseErrorDto = {
       err: {
+        code: DsbClientGatewayErrors.MB_UNKNOWN,
         reason: exception.message,
-        statusCode: httpStatus,
-        code: exception.code,
+        additionalDetails: exception.additionalDetails,
       },
-      statusCode: httpStatus,
       timestamp: new Date().toISOString(),
+      statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
     };
 
-    httpAdapter.reply(ctx.getResponse(), responseBody, httpStatus);
+    this.emitError(
+      ctx,
+      httpAdapter,
+      responseBody,
+      HttpStatus.INTERNAL_SERVER_ERROR
+    );
+
+    return;
+  }
+
+  protected emitError(
+    context: HttpArgumentsHost,
+    httpAdapter: AbstractHttpAdapter,
+    responseBody: ResponseErrorDto,
+    httpStatus: HttpStatus
+  ): void {
+    httpAdapter.reply(context.getResponse(), responseBody, httpStatus);
   }
 }

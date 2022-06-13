@@ -11,14 +11,15 @@ import {
   Topic,
   TopicCountDto,
   TopicDataResponse,
-  UpdateTopicResponeDto,
   TopicVersion,
   TopicVersionResponse,
   UpdateTopicBodyDTO,
   UpdateTopicHistoryDTO,
+  UpdateTopicResponeDto,
 } from '../dto';
 import * as qs from 'qs';
 import { DdhubLoginService } from './ddhub-login.service';
+import { MessageBrokerErrors } from '../ddhub-client-gateway-message-broker.const';
 
 @Injectable()
 export class DdhubTopicsService extends DdhubBaseService {
@@ -48,7 +49,7 @@ export class DdhubTopicsService extends DdhubBaseService {
             },
           }),
         {
-          stopOnResponseCodes: ['10'],
+          stopOnResponseCodes: [MessageBrokerErrors.UNAUTHORIZED_ACCESS],
         }
       );
       this.logger.error(`Get topic with topicId: ${topicId} successful`);
@@ -74,7 +75,7 @@ export class DdhubTopicsService extends DdhubBaseService {
             },
           }),
         {
-          stopOnResponseCodes: ['10'],
+          stopOnResponseCodes: [MessageBrokerErrors.UNAUTHORIZED_ACCESS],
         }
       );
 
@@ -105,7 +106,7 @@ export class DdhubTopicsService extends DdhubBaseService {
             },
           }),
         {
-          stopOnResponseCodes: ['10'],
+          stopOnResponseCodes: [MessageBrokerErrors.UNAUTHORIZED_ACCESS],
         }
       );
 
@@ -144,7 +145,7 @@ export class DdhubTopicsService extends DdhubBaseService {
             }
           ),
         {
-          stopOnResponseCodes: ['10'],
+          stopOnResponseCodes: [MessageBrokerErrors.UNAUTHORIZED_ACCESS],
         }
       );
 
@@ -178,7 +179,7 @@ export class DdhubTopicsService extends DdhubBaseService {
             },
           }),
         {
-          stopOnResponseCodes: ['10'],
+          stopOnResponseCodes: [MessageBrokerErrors.UNAUTHORIZED_ACCESS],
         }
       );
 
@@ -203,7 +204,7 @@ export class DdhubTopicsService extends DdhubBaseService {
             },
           }),
         {
-          stopOnResponseCodes: ['10'],
+          stopOnResponseCodes: [MessageBrokerErrors.UNAUTHORIZED_ACCESS],
         }
       );
 
@@ -231,7 +232,7 @@ export class DdhubTopicsService extends DdhubBaseService {
             },
           }),
         {
-          stopOnResponseCodes: ['10'],
+          stopOnResponseCodes: [MessageBrokerErrors.UNAUTHORIZED_ACCESS],
         }
       );
 
@@ -260,7 +261,7 @@ export class DdhubTopicsService extends DdhubBaseService {
             },
           }),
         {
-          stopOnResponseCodes: ['10'],
+          stopOnResponseCodes: [MessageBrokerErrors.UNAUTHORIZED_ACCESS],
         }
       );
 
@@ -298,7 +299,7 @@ export class DdhubTopicsService extends DdhubBaseService {
             },
           }),
         {
-          stopOnResponseCodes: ['10'],
+          stopOnResponseCodes: [MessageBrokerErrors.UNAUTHORIZED_ACCESS],
         }
       );
 
@@ -334,7 +335,7 @@ export class DdhubTopicsService extends DdhubBaseService {
             },
           }),
         {
-          stopOnResponseCodes: ['10'],
+          stopOnResponseCodes: [MessageBrokerErrors.UNAUTHORIZED_ACCESS],
         }
       );
 
@@ -360,7 +361,7 @@ export class DdhubTopicsService extends DdhubBaseService {
             },
           }),
         {
-          stopOnResponseCodes: ['10'],
+          stopOnResponseCodes: [MessageBrokerErrors.UNAUTHORIZED_ACCESS],
         }
       );
 
@@ -399,7 +400,7 @@ export class DdhubTopicsService extends DdhubBaseService {
             },
           }),
         {
-          stopOnResponseCodes: ['10'],
+          stopOnResponseCodes: [MessageBrokerErrors.UNAUTHORIZED_ACCESS],
         }
       );
 
@@ -430,7 +431,7 @@ export class DdhubTopicsService extends DdhubBaseService {
             },
           }),
         {
-          stopOnResponseCodes: ['10'],
+          stopOnResponseCodes: [MessageBrokerErrors.UNAUTHORIZED_ACCESS],
         }
       );
 

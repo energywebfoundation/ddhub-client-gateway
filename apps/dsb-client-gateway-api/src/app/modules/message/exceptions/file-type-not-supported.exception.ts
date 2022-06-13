@@ -1,11 +1,15 @@
-import { BadRequestException } from '@nestjs/common';
-import { DsbClientGatewayErrors } from '@dsb-client-gateway/dsb-client-gateway-errors';
+import {
+  BaseException,
+  DsbClientGatewayErrors,
+} from '@dsb-client-gateway/dsb-client-gateway-errors';
 
-export class FIleTypeNotSupportedException extends BadRequestException {
+export class FileTypeNotSupportedException extends BaseException {
   public code: DsbClientGatewayErrors;
 
-  constructor(public readonly additionalDetails) {
-    super('File Type should be csv.');
-    this.code = DsbClientGatewayErrors.FILE_TYPE_NOT_MATCHED;
+  constructor() {
+    super(
+      'File type should be csv',
+      DsbClientGatewayErrors.FILE_TYPE_NOT_MATCHED
+    );
   }
 }
