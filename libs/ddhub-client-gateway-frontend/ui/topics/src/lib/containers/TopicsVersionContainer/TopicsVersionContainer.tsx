@@ -6,7 +6,7 @@ import { TopicVersionDetails, TopicVersionDetailsProps } from '../../components'
 export const TopicsVersionContainer: FC<TopicVersionDetailsProps> =
   ({
      topicVersionDetails,
-     fields
+     fields,
   }: TopicVersionDetailsProps) => {
   return (
     <TopicsModalsProvider>

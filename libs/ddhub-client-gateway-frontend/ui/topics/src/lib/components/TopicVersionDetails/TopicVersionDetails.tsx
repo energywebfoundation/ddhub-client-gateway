@@ -5,10 +5,11 @@ import {
   ChannelTopic,
   GetTopicSearchDto
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
-import { Image, GenericTable } from '@ddhub-client-gateway-frontend/ui/core';
+import { GenericTable } from '@ddhub-client-gateway-frontend/ui/core';
 import { useStyles } from './TopicVersionDetails.styles';
 import { TOPIC_VERSIONS_HEADERS } from '../../models';
 import { useTopicVersionEffects } from './TopicVersionDetails.effects';
+import { ApplicationInfoModal } from '../ApplicationInfoModal';
 
 export interface TopicVersionDetailsProps {
   topicVersionDetails: {
@@ -36,17 +37,7 @@ export const TopicVersionDetails: FC<TopicVersionDetailsProps> = (
 
   return (
     <Box sx={{ padding: 0 }}>
-      {application && (
-        <Box className={classes.appWrapper}>
-          <Image src={application.logoUrl} className={classes.appImage} />
-          <Typography className={classes.appName}>
-            {application.appName}
-          </Typography>
-          <Typography className={classes.namespace}>
-            {application.namespace}
-          </Typography>
-        </Box>
-      )}
+      {application && <ApplicationInfoModal application={application} /> }
 
       <Box className={classes.details}>
         <Typography className={classes.title}>Details</Typography>
