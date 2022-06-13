@@ -1,28 +1,23 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import {
   CertificateDetails,
-  EncryptionKeys,
   SecretsEngineService,
+  PATHS,
 } from '../secrets-engine.interface';
 import { ConfigService } from '@nestjs/config';
 import nv from 'node-vault';
 import { Span } from 'nestjs-otel';
-
-enum PATHS {
-  IDENTITY_PRIVATE_KEY = 'dsb/identity/privateKey',
-  CERTIFICATE = 'dsb/certificate',
-  KEYS = 'dsb/keys',
-  RSA_KEY = 'dsb/rsa_key',
-}
 
 @Injectable()
 export class VaultService extends SecretsEngineService implements OnModuleInit {
   private readonly logger = new Logger(VaultService.name);
 
   protected client: nv.client;
+  protected readonly prefix: string;
 
   constructor(protected readonly configService: ConfigService) {
     super();
+    this.prefix = this.configService.get('VAULT_SECRET_PREFIX', 'ddhub/');
   }
 
   public async deleteAll(): Promise<void> {
@@ -30,7 +25,7 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
 
     await Promise.all(
       Object.values(PATHS).map(async (path) => {
-        await this.client.delete(path);
+        await this.client.delete(`${this.prefix}${path}`);
       })
     );
   }
@@ -65,18 +60,7 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
     this.logger.log('Retrieving certificate');
 
     return this.client
-      .read(PATHS.CERTIFICATE)
-      .then(({ data }) => data)
-      .catch((err) => {
-        this.logger.error(err.message);
-
-        return null;
-      });
-  }
-
-  public async getEncryptionKeys(): Promise<EncryptionKeys | null> {
-    return this.client
-      .read(PATHS.KEYS)
+      .read(`${this.prefix}${PATHS.CERTIFICATE}`)
       .then(({ data }) => data)
       .catch((err) => {
         this.logger.error(err.message);
@@ -96,7 +80,7 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
     }
 
     return this.client
-      .read(PATHS.IDENTITY_PRIVATE_KEY)
+      .read(`${this.prefix}${PATHS.IDENTITY_PRIVATE_KEY}`)
       .then(({ data }) => data.key)
       .catch((err) => {
         this.logger.error(err.message);
@@ -108,12 +92,13 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
   }
 
   @Span('vault_setRSAKey')
-  public async setRSAPrivateKey(privateKey: string): Promise<void> {
+  public async setRSAPrivateKey(privateKey: string): Promise<null> {
     this.logger.log('Attempting to write private RSA key');
 
-    await this.client.write(PATHS.RSA_KEY, { privateKey });
+    await this.client.write(`${this.prefix}${PATHS.RSA_KEY}`, { privateKey });
 
     this.logger.log('Writing private RSA key');
+    return null;
   }
 
   @Span('vault_getRSAPrivateKey')
@@ -127,7 +112,7 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
     }
 
     return this.client
-      .read(PATHS.RSA_KEY)
+      .read(`${this.prefix}${PATHS.RSA_KEY}`)
       .then(({ data }) => data.privateKey)
       .catch((err) => {
         this.logger.error(err.message);
@@ -140,26 +125,26 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
 
   public async setCertificateDetails(
     certificateDetails: CertificateDetails
-  ): Promise<void> {
+  ): Promise<null> {
     this.logger.log('saving certificate to vault');
-    await this.client.write(PATHS.CERTIFICATE, certificateDetails);
+    await this.client.write(
+      `${this.prefix}${PATHS.CERTIFICATE}`,
+      certificateDetails
+    );
 
     this.logger.log('certificates successfully saved to the vault');
+    return null;
   }
 
   @Span('vault_setPrivateKey')
-  public async setPrivateKey(key: string): Promise<void> {
+  public async setPrivateKey(key: string): Promise<null> {
     this.logger.log('Attempting to write private key');
 
-    await this.client.write(PATHS.IDENTITY_PRIVATE_KEY, { key });
+    await this.client.write(`${this.prefix}${PATHS.IDENTITY_PRIVATE_KEY}`, {
+      key,
+    });
 
     this.logger.log('Writing private key');
-  }
-
-  @Span('vault_setEncryptionKeys')
-  public async setEncryptionKeys(keys: EncryptionKeys): Promise<void> {
-    await this.client.write(PATHS.KEYS, keys);
-
-    this.logger.log('Writing encryption keys');
+    return null;
   }
 }

@@ -41,10 +41,22 @@ export const useCustomAlert = () => {
     }).fire();
   };
 
+  const httpError = async (
+    error: any
+  ): Promise<SweetAlertResult> => {
+    return await CustomSwal({
+      title: 'Error',
+      type: 'error',
+      confirmButtonText: 'Dismiss',
+      html:
+        `${error?.response?.data?.err?.reason} <br /> ${error?.response?.data?.err?.additionalData ?? ''}`,
+    }).fire();
+  };
   return {
     fire,
     error,
     warning,
     success,
+    httpError
   };
 };

@@ -121,15 +121,6 @@ export const useUpdateTopicEffects = () => {
     });
   };
 
-  const onUpdateTopicsError = () => {
-    Swal.fire({
-      title: 'Error',
-      text: 'Error while updating topic',
-      type: 'error',
-      confirmButtonText: 'Dismiss',
-    });
-  };
-
   const topicSubmitHandler: SubmitHandler<FieldValues> = (data) => {
     const values = data as PostTopicDto;
     const fomattedValues = {
@@ -139,8 +130,7 @@ export const useUpdateTopicEffects = () => {
     };
     updateTopicHandler(
       fomattedValues as PostTopicDto,
-      onUpdateTopics,
-      onUpdateTopicsError
+      onUpdateTopics
     );
   };
 

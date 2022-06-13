@@ -3,7 +3,6 @@ import dayjs from 'dayjs';
 import {
   useCachedChannel,
   useMessages,
-  useIdentity,
 } from '@ddhub-client-gateway-frontend/ui/api-hooks';
 import {
   Queries,
@@ -11,24 +10,30 @@ import {
 } from '@ddhub-client-gateway-frontend/ui/utils';
 import { TMessage } from './Messages.type';
 import { FileContentType } from './Messages.utils';
+import moment from 'moment';
+import getConfig from 'next/config';
 
 export const useMessagesEffects = () => {
   const router = useRouter();
-  const { identity } = useIdentity();
 
   const { cachedChannel, topicsById } = useCachedChannel(
     router.query[Queries.FQCN] as string
   );
+  const { publicRuntimeConfig } = getConfig();
+  const messagingOffset = publicRuntimeConfig?.messagingOffset ?? 10;
+  const messagingAmount = publicRuntimeConfig?.messagingAmount ?? 100;
 
   const topic = topicsById[router.query[Queries.TopicId] as string];
+  const currentDate = moment().seconds(0).milliseconds(0);
+  const fromDate = currentDate.subtract(Number(messagingOffset), 'minutes');
 
   const { messages, messagesLoaded } = useMessages({
     fqcn: router.query[Queries.FQCN] as string,
     topicName: topic?.topicName,
     topicOwner: topic?.owner,
-    clientId: `${identity?.enrolment?.did}-${dayjs().format(
-      'YYYYMMDD_HHmmss'
-    )}`,
+    clientId: 'cgui',
+    from: fromDate.toISOString(),
+    amount: Number(messagingAmount),
   });
 
   const data: TMessage[] = messages.map((message) => {

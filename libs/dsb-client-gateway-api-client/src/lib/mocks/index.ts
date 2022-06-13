@@ -88,6 +88,24 @@ export const getTopicsControllerGetTopicsMock = (queryParams: any) => ({
 
 );
 
+export const getTopicsControllerGetTopicsSearchMock = (queryParams: any) => ({
+  count: 12,
+  limit: Number(queryParams.limit),
+  page: Number(queryParams.page),
+  records: [...Array(6)].map(() => ({
+    id: faker.datatype.uuid(),
+    name: faker.word.noun(),
+    owner: faker.random.arrayElement([
+      'ddhub.apps.energyweb.iam.ewc',
+      'torta.apps.eggplant.vege.iam.ewc',
+    ]),
+    schemaType: faker.random.arrayElement(['JSD7', 'XML', 'CSV', 'TSV']),
+    tags: [...Array(3)].map(() => faker.word.noun()),
+    version: '1.0.0',
+  })),
+}
+);
+
 export const getTopicsControllerPostTopicsMock = () => ({
   id: faker.random.word(),
   name: faker.random.word(),
@@ -113,6 +131,8 @@ export const getTopicsControllerGetTopicsHistoryByIdMock = () => {
       schemaType: faker.random.arrayElement(['JSD7', 'XML', 'CSV', 'TSV']),
       tags: [...Array(1)].map(() => faker.word.noun()),
       version: '1.0.0',
+      createdDate: "2022-06-08T05:43:15.510Z",
+      updatedDate: "2022-06-08T05:43:15.510Z",
     })),
   };
 };
@@ -242,4 +262,37 @@ export const getChannelMessagesMock = () => [
   },
 ];
 
-export const getDownloadMessageMock = () => ('text')
+export const getDownloadMessageMock = () => ('text');
+
+export const getCronMock = () => {
+  return [
+    {
+      "jobName": "CHANNEL_ROLES",
+      "latestStatus": "SUCCESS",
+      "executedAt": "2022-06-02T09:06:00.521Z",
+      "createdDate": "2022-05-25T22:35:00.000Z",
+      "updatedDate": "2022-06-02T09:06:00.000Z"
+    },
+    {
+      "jobName": "TOPIC_REFRESH",
+      "latestStatus": "SUCCESS",
+      "executedAt": "2022-06-02T09:06:40.663Z",
+      "createdDate": "2022-05-25T22:35:00.000Z",
+      "updatedDate": "2022-06-02T09:06:40.000Z"
+    },
+    {
+      "jobName": "APPLICATIONS_REFRESH",
+      "latestStatus": "SUCCESS",
+      "executedAt": "2022-06-02T09:06:00.870Z",
+      "createdDate": "2022-05-25T22:35:05.000Z",
+      "updatedDate": "2022-06-02T09:06:00.000Z"
+    },
+    {
+      "jobName": "SYMMETRIC_KEYS",
+      "latestStatus": "SUCCESS",
+      "executedAt": "2022-06-02T09:06:03.339Z",
+      "createdDate": "2022-05-25T22:36:07.000Z",
+      "updatedDate": "2022-06-02T09:06:03.000Z"
+    }
+  ]
+}

@@ -17,6 +17,10 @@ const moduleExports = {
     }
     return config;
   },
+  publicRuntimeConfig: {
+    messagingOffset: process.env.NEXT_PUBLIC_MESSAGING_OFFSET,
+    messagingAmount: process.env.NEXT_PUBLIC_MESSAGING_AMOUNT,
+  },
 };
 
 const SentryWebpackPluginOptions = {
