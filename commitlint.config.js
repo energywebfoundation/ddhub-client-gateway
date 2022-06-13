@@ -11,11 +11,9 @@ module.exports = {
       'always',
       [
         ...(await getProjects(ctx, ({ name, projectType }) => {
-          return (
-            (!name.includes('e2e') && projectType == 'application') ||
-            projectType === 'library'
-          );
+          return projectType == 'application' || projectType === 'library';
         })),
+        'devops'
       ],
     ],
   },

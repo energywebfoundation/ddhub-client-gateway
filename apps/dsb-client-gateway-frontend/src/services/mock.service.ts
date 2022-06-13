@@ -10,6 +10,7 @@ import {
   getChannelMessagesMock,
   getDownloadMessageMock,
   getFrontendConfigMock,
+  getCronMock,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 
 export function makeServer({ environment = 'development' }) {
@@ -33,12 +34,12 @@ export function makeServer({ environment = 'development' }) {
         return getIdentityControllerGetMock();
       });
 
-      this.post('/identity', () => {
-        return getIdentityControllerGetMock();
+      this.get('/topics', (_schema, request) => {
+        return getTopicsControllerGetTopicsMock(request.queryParams);
       });
 
-      this.get('/topics', () => {
-        return getTopicsControllerGetTopicsMock();
+      this.post('/identity', () => {
+        return getIdentityControllerGetMock();
       });
 
       this.get('/channels', () => {
@@ -108,6 +109,10 @@ export function makeServer({ environment = 'development' }) {
       this.post('certificate', () => {
         return {};
       });
+
+      this.get('cron', () => {
+        return getCronMock();
+      })
     },
   });
 }

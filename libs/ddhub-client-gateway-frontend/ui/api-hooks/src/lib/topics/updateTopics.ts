@@ -5,8 +5,10 @@ import {
   useTopicsControllerUpdateTopics,
   useTopicsControllerUpdateTopicsByIdAndVersion,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
+import { useCustomAlert } from '@ddhub-client-gateway-frontend/ui/core';
 
 export const useUpdateTopics = (canUpdateSchema: boolean) => {
+  const Swal = useCustomAlert();
   const { mutate: mutateTopic, isLoading: topicMutationLoading } =
     useTopicsControllerUpdateTopics();
   const {
@@ -14,10 +16,14 @@ export const useUpdateTopics = (canUpdateSchema: boolean) => {
     isLoading: topicVersionByMutationLoading,
   } = useTopicsControllerUpdateTopicsByIdAndVersion();
 
+  const updateError = (err: any) => {
+    console.error(err);
+    Swal.httpError(err);
+  };
+
   const updateTopic = (
     topic: PostTopicDto,
     onSuccess: () => void,
-    onError: () => void
   ) => {
     const { id, tags } = topic;
     mutateTopic(
@@ -27,7 +33,7 @@ export const useUpdateTopics = (canUpdateSchema: boolean) => {
       },
       {
         onSuccess,
-        onError,
+        onError: updateError,
       }
     );
   };
@@ -35,7 +41,6 @@ export const useUpdateTopics = (canUpdateSchema: boolean) => {
   const updateTopicByVersion = (
     topic: PostTopicDto,
     onSuccess: () => void,
-    onError: () => void
   ) => {
     const { id, version, schema } = topic;
     mutateTopicByVersion(
@@ -46,7 +51,7 @@ export const useUpdateTopics = (canUpdateSchema: boolean) => {
       },
       {
         onSuccess,
-        onError,
+        onError: updateError,
       }
     );
   };

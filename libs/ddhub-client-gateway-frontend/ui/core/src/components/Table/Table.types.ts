@@ -8,6 +8,14 @@ export interface TableHeader {
   filter?: string;
   isSortable?: boolean;
   style?: TableCellProps['style'];
+  Cell?: React.ReactNode,
+  color?: string;
+}
+
+export interface TablePagination {
+  limit: number;
+  count: number;
+  page: number;
 }
 
 export interface TableProps<T> {
@@ -21,4 +29,8 @@ export interface TableProps<T> {
   showFooter?: boolean;
   containerProps?: TableContainerProps;
   loadingRows?: number;
+  paginationProps?: TablePagination;
+  onPageChange?: (newPage: number) => void;
+  defaultSortBy?: string;
+  defaultOrder?: 'asc' | 'desc'
 }

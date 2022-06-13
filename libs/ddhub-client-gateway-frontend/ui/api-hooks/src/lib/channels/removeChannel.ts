@@ -18,10 +18,9 @@ export const useRemoveChannel = () => {
     queryClient.invalidateQueries(getChannelControllerGetByTypeQueryKey());
   };
 
-  const removeChannelError = async () => {
-    await Swal.error({
-      text: 'Error while deleting the channel',
-    });
+  const removeChannelError = async (err: any) => {
+    console.error(err);
+    Swal.httpError(err);
   };
 
   const removeChannelHandler = async (fqcn: string) => {

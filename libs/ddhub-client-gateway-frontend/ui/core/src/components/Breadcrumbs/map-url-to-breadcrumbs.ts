@@ -7,6 +7,7 @@ export enum BreadcrumbsType {
 export interface Breadcrumb {
   title: string;
   type?: BreadcrumbsType;
+  path?: string;
 }
 
 export const mapUrlToBreadcrumbs = new Map<string, Breadcrumb[]>()
@@ -21,7 +22,7 @@ export const mapUrlToBreadcrumbs = new Map<string, Breadcrumb[]>()
   ])
   .set(routerConst.Topics, [
     { type: BreadcrumbsType.App, title: '' },
-    { title: 'Apps and Topics' },
+    { title: 'Apps and Topics', path: routerConst.AppsAndTopics },
     { title: 'Topics' },
   ])
   .set(routerConst.ChannelApps, [
@@ -30,19 +31,19 @@ export const mapUrlToBreadcrumbs = new Map<string, Breadcrumb[]>()
   ])
   .set(routerConst.ChannelTopics, [
     { type: BreadcrumbsType.App, title: '' },
-    { title: 'My Apps and Topics' },
+    { title: 'My Apps and Topics', path: routerConst.ChannelApps },
     { title: 'Topics' },
   ])
   .set(routerConst.VersionHistory, [
     { type: BreadcrumbsType.App, title: '' },
-    { title: 'Apps and Topics' },
-    { title: 'Topics' },
+    { title: 'Apps and Topics', path: routerConst.AppsAndTopics },
+    { title: 'Topics', path: routerConst.Topics },
     { title: 'Version history' },
   ])
   .set(routerConst.ChannelTopicVersionHistory, [
     { type: BreadcrumbsType.App, title: '' },
-    { title: 'Apps and Topics' },
-    { title: 'Topics' },
+    { title: 'Apps and Topics', path: routerConst.ChannelApps },
+    { title: 'Topics', path: routerConst.ChannelTopics },
     { title: 'Version history' },
   ])
   .set(routerConst.ChannelsManagement, [
@@ -59,13 +60,13 @@ export const mapUrlToBreadcrumbs = new Map<string, Breadcrumb[]>()
   ])
   .set(routerConst.LargeFileDownloadChannel, [
     { title: 'Large data messaging file download' },
-    { title: 'Large data messaging file download' },
+    { title: 'Large data messaging file download', path: routerConst.LargeDataMessagingFileDownload },
     { title: 'Channel topics' },
   ])
   .set(routerConst.LargeFileDownloadChannelTopic, [
     { title: 'Large data messaging file download' },
-    { title: 'Large data messaging file download' },
-    { title: 'Channel topics' },
+    { title: 'Large data messaging file download', path: routerConst.LargeDataMessagingFileDownload },
+    { title: 'Channel topics', path: routerConst.LargeFileDownloadChannel },
     { title: 'Messages' },
   ])
   .set(routerConst.LargeDataMessagingFileUpload, [
@@ -82,17 +83,17 @@ export const mapUrlToBreadcrumbs = new Map<string, Breadcrumb[]>()
   ])
   .set(routerConst.FileDownloadChannel, [
     { title: 'Data messaging file upload' },
-    { title: 'Data messaging file upload' },
+    { title: 'Data messaging file upload', path: routerConst.DataMessagingFileDownload },
     { title: 'Channel topics' },
   ])
   .set(routerConst.FileDownloadChannelTopic, [
     { title: 'Data messaging file upload' },
-    { title: 'Data messaging file upload' },
-    { title: 'Channel topics' },
+    { title: 'Data messaging file upload', path: routerConst.DataMessagingFileDownload },
+    { title: 'Channel topics', path: routerConst.FileDownloadChannel },
     { title: 'Messages' },
   ])
   .set(routerConst.WS, [
     { title: 'Integration APIs' },
-    { title: 'Integration APIs' },
+    { title: 'Integration APIs', path: routerConst.IntegrationAPIs },
     { title: 'Websocket API' },
   ]);

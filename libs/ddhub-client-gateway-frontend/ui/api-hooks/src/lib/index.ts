@@ -4,3 +4,4 @@ export * from './applications';
 export * from './channels';
 export * from './messaging';
 export * from './settings';
+export * from './scheduler';

@@ -20,7 +20,7 @@ export const CHANNEL_TOPICS_HEADERS = [
 
 export const Channel: FC<ChannelProps> = ({ topicsUrl }) => {
   const router = useRouter();
-  const { channel, channelLoaded } = useChannel(router.query[Queries.FQCN] as string);
+  const { channel, isLoading } = useChannel(router.query[Queries.FQCN] as string);
 
   const topics = channel.conditions?.topics || [];
 
@@ -42,7 +42,7 @@ export const Channel: FC<ChannelProps> = ({ topicsUrl }) => {
           headers={CHANNEL_TOPICS_HEADERS}
           tableRows={topics}
           onRowClick={navigateToMessages}
-          loading={!channelLoaded}
+          loading={isLoading}
           showSearch={false}
           loadingRows={2}
         />

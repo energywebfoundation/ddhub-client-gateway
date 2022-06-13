@@ -34,7 +34,7 @@ export const useTopicsEffects = (channelValues: TopicsProps['channelValues']) =>
   const { applications, isLoading: isLoadingApplications } =
     useApplications('user');
 
-  const { topics } = useTopics(selectedApplication);
+  const { topics } = useTopics({ owner: selectedApplication });
 
   const channelType = getChannelType(channelValues.channelType);
   const filters = topicsFilters[channelType as ChannelType];

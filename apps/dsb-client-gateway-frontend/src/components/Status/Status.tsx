@@ -1,9 +1,10 @@
 import React from 'react';
 import { useStyles } from './Status.styles';
+import { capitalizeFirstLetter } from "@ddhub-client-gateway-frontend/ui/utils";
 
 export enum StatusTypeEnum {
-  Up = 'up',
-  Down = 'down'
+  Success = 'SUCCESS',
+  Failure = 'FAILURE'
 }
 
 export interface StatusProps {
@@ -13,10 +14,10 @@ export interface StatusProps {
 
 export function Status(props: StatusProps) {
   const {classes} = useStyles();
-  const isSuccess = props.type === StatusTypeEnum.Up;
+  const isSuccess = props.type === StatusTypeEnum.Success;
   const styles = `${classes.status} ${isSuccess ? classes.success : classes.failure}`;
   return (
-    <span className={styles}>{props.text}</span>
+    <span className={styles}>{capitalizeFirstLetter(props.text.toLowerCase())}</span>
   );
 }
 

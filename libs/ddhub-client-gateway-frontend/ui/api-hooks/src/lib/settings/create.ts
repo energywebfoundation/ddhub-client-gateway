@@ -2,16 +2,22 @@ import {
   useCertificateControllerSave,
   UploadCertificateBodyDto,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
+import { useCustomAlert } from '@ddhub-client-gateway-frontend/ui/core';
 
 export const useCertificateSave = () => {
+  const Swal = useCustomAlert();
   const { mutate, isLoading } = useCertificateControllerSave();
+
+  const createError = (err: any) => {
+    console.error(err);
+    Swal.httpError(err);
+  };
 
   const createConfigurationHandler = (
     data: UploadCertificateBodyDto,
-    onSuccess: () => void,
-    onError: () => void
+    onSuccess: () => void
   ) => {
-    mutate({ data }, { onSuccess, onError });
+    mutate({ data }, { onSuccess, onError: createError });
   };
 
   return {

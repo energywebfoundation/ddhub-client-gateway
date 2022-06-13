@@ -9,7 +9,7 @@ export interface ApplicationsProps {
 }
 
 export function Applications({ role, topicUrl }: ApplicationsProps) {
-  const { applications, applicationsFetched, handleRowClick } = useApplications(
+  const { applications, isLoading, handleRowClick } = useApplications(
     role,
     topicUrl
   );
@@ -20,8 +20,10 @@ export function Applications({ role, topicUrl }: ApplicationsProps) {
         headers={APPLICATIONS_HEADERS}
         tableRows={applications}
         onRowClick={handleRowClick}
-        loading={!applicationsFetched}
+        loading={isLoading}
         showFooter={false}
+        defaultSortBy='namespace'
+        defaultOrder='asc'
       />
     </section>
   );

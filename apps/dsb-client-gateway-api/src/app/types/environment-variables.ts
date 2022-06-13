@@ -184,6 +184,9 @@ export class EnvironmentVariables {
   @IsString()
   MULTER_UPLOADS_PATH = 'uploads';
 
+  @IsString()
+  REQUEST_BODY_SIZE = '50mb';
+
   static isOTELEnabled(values: EnvironmentVariables): boolean {
     return values.OPENTELEMETRY_ENABLED;
   }
