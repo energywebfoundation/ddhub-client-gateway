@@ -27,6 +27,8 @@ export function TopicVersionHistory() {
           onRowClick={openTopicDetails}
           showSearch={false}
           loading={loading}
+          defaultSortBy='name'
+          defaultOrder='asc'
         />
       </div>
     </Stack>
