@@ -6,9 +6,14 @@ export const useSearchEffects = ({
   setFilter,
   filter,
   debounceTime = 300,
+  onSearchInput,
 }: SearchProps) => {
   const onFilterChange = useAsyncDebounce((value: string) => {
-    setFilter(value || '');
+    if (setFilter) {
+      setFilter(value || '');
+    } else if (onSearchInput) {
+      onSearchInput(value || '');
+    }
   }, debounceTime);
 
   const { register, reset, watch } = useForm<FieldValues>({

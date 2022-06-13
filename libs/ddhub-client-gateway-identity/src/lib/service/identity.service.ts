@@ -50,8 +50,14 @@ export class IdentityService {
   }
 
   public async getIdentityWithEnrolment(): Promise<IdentityWithEnrolment> {
-    const identity: Identity = await this.getIdentity(true);
-    const enrolment: Enrolment = await this.enrolmentService.get();
+    if (!this.iamService.isInitialized()) {
+      throw new NoPrivateKeyException();
+    }
+
+    const [identity, enrolment]: [Identity, Enrolment] = await Promise.all([
+      this.getIdentity(true),
+      this.enrolmentService.get(),
+    ]);
 
     return {
       ...identity,

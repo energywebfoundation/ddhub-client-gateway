@@ -1,12 +1,18 @@
-import { BadRequestException } from '@nestjs/common';
-import { DsbClientGatewayErrors } from '@dsb-client-gateway/dsb-client-gateway-errors';
+import {
+  BaseException,
+  DsbClientGatewayErrors,
+} from '@dsb-client-gateway/dsb-client-gateway-errors';
 
-export class ChannelAlreadyExistsException extends BadRequestException {
+export class ChannelAlreadyExistsException extends BaseException {
   public code: DsbClientGatewayErrors;
 
-  constructor() {
-    super('Channel already exists');
-
-    this.code = DsbClientGatewayErrors.CHANNEL_ALREADY_EXISTS;
+  constructor(channelName: string) {
+    super(
+      'Channel already exists',
+      DsbClientGatewayErrors.CHANNEL_ALREADY_EXISTS,
+      {
+        channelName,
+      }
+    );
   }
 }

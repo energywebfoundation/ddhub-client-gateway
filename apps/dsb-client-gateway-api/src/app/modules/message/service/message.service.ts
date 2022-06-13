@@ -43,10 +43,10 @@ import {
 import { WsClientService } from './ws-client.service';
 import { Span } from 'nestjs-otel';
 import * as fs from 'fs';
-import { FIleTypeNotSupportedException } from '../exceptions/file-type-not-supported.exception';
 import { FileSizeException } from '../exceptions/file-size.exception';
-import { MessageSignatureNotValidException } from '../exceptions/message-signature-decrypt.exception';
 import { join } from 'path';
+import { FileTypeNotSupportedException } from '../exceptions/file-type-not-supported.exception';
+import { MessageSignatureNotValidException } from '../exceptions/messages-signature-not-valid.exception';
 
 export enum EventEmitMode {
   SINGLE = 'SINGLE',
@@ -97,7 +97,7 @@ export class MessageService {
     }
 
     if (channel.type !== ChannelType.PUB) {
-      throw new ChannelTypeNotPubException();
+      throw new ChannelTypeNotPubException(channel.fqcn);
     }
     const clientGatewayMessageId: string = uuidv4();
 
@@ -204,7 +204,7 @@ export class MessageService {
   ): Promise<string[]> {
     // topic owner and topic name should be present
     if ((topicOwner && !topicName) || (!topicOwner && topicName)) {
-      throw new TopicOwnerTopicNameRequiredException('');
+      throw new TopicOwnerTopicNameRequiredException();
     }
 
     //Get Topic Ids
@@ -404,11 +404,13 @@ export class MessageService {
     file.stream = fs.createReadStream(file.path);
 
     if (file.mimetype !== 'text/csv') {
-      throw new FIleTypeNotSupportedException();
+      throw new FileTypeNotSupportedException();
     }
 
-    if (file.size > this.configService.get<number>('MAX_FILE_SIZE')) {
-      throw new FileSizeException();
+    const maxFileSize = this.configService.get<number>('MAX_FILE_SIZE');
+
+    if (file.size > maxFileSize) {
+      throw new FileSizeException(maxFileSize);
     }
 
     const [channel, topic]: [ChannelEntity, TopicEntity] = await Promise.all([
@@ -425,7 +427,7 @@ export class MessageService {
     const qualifiedDids: string[] = channel.conditions.qualifiedDids;
 
     if (channel.type !== ChannelType.UPLOAD) {
-      throw new ChannelTypeNotPubException();
+      throw new ChannelTypeNotPubException(channel.fqcn);
     }
 
     if (!qualifiedDids.length) {
@@ -514,7 +516,8 @@ export class MessageService {
     if (!isSignatureValid) {
       this.logger.error(`invalid signature for file ${fileId}`);
       throw new MessageSignatureNotValidException(
-        `Signature not matched for file id: ${fileId}`
+        fileId,
+        fileMetadata.signature
       );
     }
 
@@ -559,7 +562,7 @@ export class MessageService {
       !topic.schemaType ||
       !topic.version
     ) {
-      throw new TopicNotFoundException('Not found');
+      throw new TopicNotFoundException(topic.id);
     }
 
     const isTopicNotRelatedToChannel: boolean = this.checkTopicForChannel(
@@ -568,9 +571,7 @@ export class MessageService {
     );
 
     if (isTopicNotRelatedToChannel) {
-      throw new TopicNotRelatedToChannelException(
-        `topic with ${topic.name} and owner ${topic.owner} not related to channel with name ${channel.fqcn}`
-      );
+      throw new TopicNotRelatedToChannelException();
     }
   }
 
