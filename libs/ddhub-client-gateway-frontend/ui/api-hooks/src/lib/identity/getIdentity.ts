@@ -17,7 +17,7 @@ export const useIdentity = () => {
       enabled: !cachedIdentity,
       onError: (err: { message: string }) => {
         console.error(err);
-        Swal.error({ text: err.message });
+        Swal.httpError(err);
       },
     },
   });

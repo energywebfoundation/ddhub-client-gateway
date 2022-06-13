@@ -20,9 +20,7 @@ export const useDownloadMessage = () => {
 
   const downloadMessageError = async (err: any) => {
     console.error(err);
-    await Swal.error({
-      text: err?.message,
-    });
+    Swal.httpError(err);
   };
 
   const { isLoading } = useMessageControlllerDownloadMessage(

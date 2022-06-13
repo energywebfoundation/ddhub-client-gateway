@@ -1,19 +1,12 @@
-import {
-  AccountStatusEnum,
-  checkAccountStatus,
-} from './check-account-status/check-account-status';
-import { getIdentityControllerGetQueryKey } from '@dsb-client-gateway/dsb-client-gateway-api-client';
-import {
-  IdentityWithEnrolment,
-  Role,
-  RoleStatus,
-} from '@ddhub-client-gateway/identity/models';
-import { routerConst } from '@ddhub-client-gateway-frontend/ui/utils';
-import { useRouter } from 'next/router';
-import { useContext } from 'react';
-import { UserDataContext } from './UserDataContext';
-import { useQueryClient } from 'react-query';
-import { RouteRestrictions } from './config/route-restrictions.interface';
+import { AccountStatusEnum, checkAccountStatus } from "./check-account-status/check-account-status";
+import { getIdentityControllerGetQueryKey } from "@dsb-client-gateway/dsb-client-gateway-api-client";
+import { IdentityWithEnrolment, Role, RoleStatus } from "@ddhub-client-gateway/identity/models";
+import { routerConst } from "@ddhub-client-gateway-frontend/ui/utils";
+import { useRouter } from "next/router";
+import { useContext } from "react";
+import { UserDataContext } from "./UserDataContext";
+import { useQueryClient } from "react-query";
+import { RouteRestrictions } from "./config/route-restrictions.interface";
 
 export const routeRestrictions = new Map()
   .set('topicManagement', routerConst.AppsAndTopics)
@@ -28,11 +21,17 @@ export const getRoutesToDisplay = (
   accountRoles: Role[],
   restrictions: RouteRestrictions
 ): Set<string> => {
+  if (!accountRoles) {
+    return new Set();
+  }
   const roles = accountRoles
     .filter(
       (role) =>
         role.status === RoleStatus.SYNCED &&
-        role.namespace.includes(process.env['NEXT_PUBLIC_PARENT_NAMESPACE'] ?? 'ddhub.apps.energyweb.iam.ewc')
+        role.namespace.includes(
+          process.env['NEXT_PUBLIC_PARENT_NAMESPACE'] ??
+            'ddhub.apps.energyweb.iam.ewc'
+        )
     )
     .map((role) => role.namespace);
   if (roles.length === 0) {
@@ -40,8 +39,9 @@ export const getRoutesToDisplay = (
   }
   const allowedRoutes = Object.keys(restrictions).map((key: string) => {
     if (
-      restrictions[key].allowedRoles.some((allowedRole: string) =>
-        roles.filter(role => role.includes(allowedRole)).length > 0
+      restrictions[key].allowedRoles.some(
+        (allowedRole: string) =>
+          roles.filter((role) => role.includes(allowedRole)).length > 0
       )
     ) {
       return routeRestrictions.get(key);
@@ -69,25 +69,34 @@ export const useSetUserDataEffect = () => {
     };
 
     const accountStatus = checkAccountStatus(res);
-    const displayedRoutes = getRoutesToDisplay(
-      res.enrolment.roles,
-      routeRestrictions
-    );
+    if (res?.enrolment?.roles) {
+      const displayedRoutes = getRoutesToDisplay(
+        res.enrolment.roles,
+        routeRestrictions
+      );
 
-    setUserData({
-      ...userData,
-      accountStatus,
-      isChecking: false,
-      routeRestrictions,
-      displayedRoutes,
-    });
+      setUserData({
+        ...userData,
+        accountStatus,
+        isChecking: false,
+        routeRestrictions,
+        displayedRoutes,
+      });
+    } else {
+      setUserData({
+        ...userData,
+        accountStatus,
+        isChecking: false,
+        routeRestrictions,
+      });
+    }
 
     queryClient.setQueryData(getIdentityControllerGetQueryKey(), res);
 
     redirect(accountStatus).catch(console.error);
   };
 
-  const setDataOnError = (error: { message: string }) => {
+  const setDataOnError = (error: any) => {
     setUserData({
       ...userData,
       accountStatus: AccountStatusEnum.ErrorOccur,

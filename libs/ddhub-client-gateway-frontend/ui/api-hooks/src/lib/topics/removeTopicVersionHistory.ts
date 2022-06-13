@@ -5,11 +5,9 @@ export const useRemoveTopicVersionHistory = () => {
   const Swal = useCustomAlert();
   const { mutate, isLoading } = useTopicsControllerDeleteTopicsByVersion();
 
-  const removeError = (error: any) => {
-    console.error(error);
-    Swal.error({
-      text: error?.message,
-    });
+  const removeError = (err: any) => {
+    console.error(err);
+    Swal.httpError(err);
   };
 
   const removeTopicVersionHistoryHandler = (
