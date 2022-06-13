@@ -109,6 +109,18 @@ export class EnvironmentVariables {
   VAULT_TOKEN = 'root';
 
   @IsString()
+  @ValidateIf(EnvironmentVariables.isVaultEnabled)
+  VAULT_SECRET_PREFIX = 'ddhub/';
+
+  @IsString()
+  @ValidateIf(EnvironmentVariables.isAWSSecretsManagerEnabled)
+  AWS_REGION = 'us-west-2';
+
+  @IsString()
+  @ValidateIf(EnvironmentVariables.isAWSSecretsManagerEnabled)
+  AWS_SECRET_PREFIX = '/ddhub/';
+
+  @IsString()
   @IsOptional()
   USERNAME: string;
 
@@ -184,6 +196,10 @@ export class EnvironmentVariables {
 
   static isVaultEnabled(values: EnvironmentVariables): boolean {
     return values.SECRETS_ENGINE === SecretsEngine.VAULT;
+  }
+
+  static isAWSSecretsManagerEnabled(values: EnvironmentVariables): boolean {
+    return values.SECRETS_ENGINE === SecretsEngine.AWS;
   }
 
   static isClientWebSocketEnabled(values: EnvironmentVariables): boolean {

@@ -15,6 +15,7 @@ export const CHANNEL_TOPICS_HEADERS = [
   {
     Header: 'TOPIC NAME',
     accessor: 'topicName',
+    isSortable: true,
   },
 ];
 
@@ -45,6 +46,7 @@ export const Channel: FC<ChannelProps> = ({ topicsUrl }) => {
           loading={isLoading}
           showSearch={false}
           loadingRows={2}
+          defaultSortBy='topicName'
         />
       </Box>
     </Stack>

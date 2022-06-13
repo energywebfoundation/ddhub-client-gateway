@@ -13,9 +13,11 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
   private readonly logger = new Logger(VaultService.name);
 
   protected client: nv.client;
+  protected readonly prefix: string;
 
   constructor(protected readonly configService: ConfigService) {
     super();
+    this.prefix = this.configService.get('VAULT_SECRET_PREFIX', 'ddhub/');
   }
 
   public async deleteAll(): Promise<void> {
@@ -23,7 +25,7 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
 
     await Promise.all(
       Object.values(PATHS).map(async (path) => {
-        await this.client.delete(path);
+        await this.client.delete(`${this.prefix}${path}`);
       })
     );
   }
@@ -58,7 +60,7 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
     this.logger.log('Retrieving certificate');
 
     return this.client
-      .read(PATHS.CERTIFICATE)
+      .read(`${this.prefix}${PATHS.CERTIFICATE}`)
       .then(({ data }) => data)
       .catch((err) => {
         this.logger.error(err.message);
@@ -78,7 +80,7 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
     }
 
     return this.client
-      .read(PATHS.IDENTITY_PRIVATE_KEY)
+      .read(`${this.prefix}${PATHS.IDENTITY_PRIVATE_KEY}`)
       .then(({ data }) => data.key)
       .catch((err) => {
         this.logger.error(err.message);
@@ -93,7 +95,7 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
   public async setRSAPrivateKey(privateKey: string): Promise<null> {
     this.logger.log('Attempting to write private RSA key');
 
-    await this.client.write(PATHS.RSA_KEY, { privateKey });
+    await this.client.write(`${this.prefix}${PATHS.RSA_KEY}`, { privateKey });
 
     this.logger.log('Writing private RSA key');
     return null;
@@ -110,7 +112,7 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
     }
 
     return this.client
-      .read(PATHS.RSA_KEY)
+      .read(`${this.prefix}${PATHS.RSA_KEY}`)
       .then(({ data }) => data.privateKey)
       .catch((err) => {
         this.logger.error(err.message);
@@ -125,7 +127,10 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
     certificateDetails: CertificateDetails
   ): Promise<null> {
     this.logger.log('saving certificate to vault');
-    await this.client.write(PATHS.CERTIFICATE, certificateDetails);
+    await this.client.write(
+      `${this.prefix}${PATHS.CERTIFICATE}`,
+      certificateDetails
+    );
 
     this.logger.log('certificates successfully saved to the vault');
     return null;
@@ -135,7 +140,9 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
   public async setPrivateKey(key: string): Promise<null> {
     this.logger.log('Attempting to write private key');
 
-    await this.client.write(PATHS.IDENTITY_PRIVATE_KEY, { key });
+    await this.client.write(`${this.prefix}${PATHS.IDENTITY_PRIVATE_KEY}`, {
+      key,
+    });
 
     this.logger.log('Writing private key');
     return null;
