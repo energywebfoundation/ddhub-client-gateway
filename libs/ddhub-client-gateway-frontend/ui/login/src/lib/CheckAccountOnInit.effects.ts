@@ -9,10 +9,8 @@ import { useSetUserDataEffect } from './SetUserData.effects';
 import axios from 'axios';
 import { RouteRestrictions } from './config/route-restrictions.interface';
 import { useBackdropContext } from '@ddhub-client-gateway-frontend/ui/context';
-import { useCustomAlert } from '@ddhub-client-gateway-frontend/ui/core';
 
 export const useCheckAccountOnInitEffects = () => {
-  const Swal = useCustomAlert();
   const queryClient = useQueryClient();
   const { setUserData, setIsChecking, setDataOnError } = useSetUserDataEffect();
   const { setIsLoading } = useBackdropContext();
@@ -31,7 +29,6 @@ export const useCheckAccountOnInitEffects = () => {
       return { identityData, routeRestrictions };
     } catch (e: any) {
       console.error(e);
-      Swal.httpError(e);
       setDataOnError(e);
       return e;
     }
