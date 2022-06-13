@@ -20,10 +20,8 @@ export const useUploadMessage = (isLarge: boolean) => {
   };
 
   const uploadMessageError = async (err: any) => {
-    console.log(err);
-    await Swal.error({
-      text: err?.message,
-    });
+    console.error(err);
+    Swal.httpError(err);
   };
 
   const uploadMessageHandler = (

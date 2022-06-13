@@ -31,9 +31,9 @@ export const useTopics = ({
     {
       query: {
         enabled: !!owner,
-        onError: (err: { message: string }) => {
+        onError: (err: any) => {
           console.error(err);
-          Swal.error({ text: err?.message });
+          Swal.httpError(err);
         },
       },
     }

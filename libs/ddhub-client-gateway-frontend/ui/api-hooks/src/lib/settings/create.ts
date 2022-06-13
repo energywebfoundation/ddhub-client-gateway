@@ -10,7 +10,7 @@ export const useCertificateSave = () => {
 
   const createError = (err: any) => {
     console.error(err);
-    Swal.error({ text: err?.message });
+    Swal.httpError(err);
   };
 
   const createConfigurationHandler = (
