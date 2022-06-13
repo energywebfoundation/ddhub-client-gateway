@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { AwsSsmService } from './service/aws-ssm.service';
 import { SecretsEngineService } from './secrets-engine.interface';
 import { VaultService } from './service/vault.service';
+import { InvalidEngineException } from './exceptions/invalid-engine.exception';
 
 @Module({
   providers: [
@@ -13,7 +14,7 @@ import { VaultService } from './service/vault.service';
         const secretsEngine = configService.get('SECRETS_ENGINE');
 
         if (!secretsEngine) {
-          throw new Error('You need to specify secrets engine');
+          throw new InvalidEngineException();
         }
 
         switch (secretsEngine) {
@@ -22,7 +23,7 @@ import { VaultService } from './service/vault.service';
           case SecretsEngine.VAULT:
             return new VaultService(configService);
           default:
-            throw new Error('Unspecified secrets engine');
+            throw new InvalidEngineException();
         }
       },
       inject: [ConfigService],

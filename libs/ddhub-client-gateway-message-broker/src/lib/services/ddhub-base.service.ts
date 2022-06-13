@@ -9,6 +9,8 @@ import {
   RetryOptions,
 } from '@dsb-client-gateway/ddhub-client-gateway-utils';
 import { DdhubLoginService } from './ddhub-login.service';
+import { MessageBrokerException } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
+import { DsbClientGatewayErrors } from '@dsb-client-gateway/dsb-client-gateway-errors';
 
 export abstract class DdhubBaseService {
   protected constructor(
@@ -52,7 +54,12 @@ export abstract class DdhubBaseService {
     if (!isAxiosError(e)) {
       this.logger.error('Request failed due to unknown error', e);
 
-      throw e;
+      throw new MessageBrokerException(
+        e.message,
+        DsbClientGatewayErrors.MB_UNKNOWN,
+        null,
+        null
+      );
     }
 
     const { status } = e.response;
@@ -67,7 +74,12 @@ export abstract class DdhubBaseService {
         defaults.stopOnStatusCodes
       );
 
-      throw e;
+      throw new MessageBrokerException(
+        e.message,
+        DsbClientGatewayErrors.MB_ERROR,
+        e.response.data.returnCode,
+        e.request.path
+      );
     }
 
     if (
@@ -80,7 +92,12 @@ export abstract class DdhubBaseService {
         defaults.stopOnResponseCodes
       );
 
-      throw e;
+      throw new MessageBrokerException(
+        e.message,
+        DsbClientGatewayErrors.MB_ERROR,
+        e.response.data.returnCode,
+        e.request.path
+      );
     }
 
     if (status === HttpStatus.UNAUTHORIZED) {
@@ -91,6 +108,11 @@ export abstract class DdhubBaseService {
       return retry();
     }
 
-    throw e;
+    throw new MessageBrokerException(
+      e.message,
+      DsbClientGatewayErrors.MB_ERROR,
+      e.response.data.returnCode,
+      e.request.path
+    );
   }
 }

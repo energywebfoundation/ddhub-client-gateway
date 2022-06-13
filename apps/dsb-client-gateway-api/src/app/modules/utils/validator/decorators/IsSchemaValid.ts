@@ -1,9 +1,10 @@
 import Ajv from 'ajv';
-const ajv = new Ajv({ allErrors: true, multipleOfPrecision: 1 });
 import { SchemaNotValidException } from '../../../message/exceptions/schema-not-valid.exception';
 import { SchemaType } from '../../../message/message.const';
 import addFormats from 'ajv-formats';
 import { MalformedJSONException } from '../../../message/exceptions/malformed-json.exception';
+
+const ajv = new Ajv({ allErrors: true, multipleOfPrecision: 1 });
 addFormats(ajv, {
   mode: 'fast',
   formats: [
@@ -50,7 +51,7 @@ function validateJSONSchema(schema: object, payload: string) {
   try {
     jsonPayload = JSON.parse(payload);
   } catch (e) {
-    throw new MalformedJSONException('Payload cannot be parsed to JSON object');
+    throw new MalformedJSONException();
   }
 
   try {

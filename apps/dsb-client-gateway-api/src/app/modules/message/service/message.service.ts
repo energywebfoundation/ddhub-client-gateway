@@ -26,9 +26,8 @@ import {
   uploadMessageBodyDto,
 } from '../dto/request/send-message.dto';
 import { ChannelTypeNotPubException } from '../exceptions/channel-type-not-pub.exception';
-import { FileNotFoundException } from '../exceptions/file-not-found.exception';
 import { FileSizeException } from '../exceptions/file-size.exception';
-import { FIleTypeNotSupportedException } from '../exceptions/file-type-not-supported.exception';
+import { FileTypeNotSupportedException } from '../exceptions/file-type-not-supported.exception';
 import { MessageDecryptionFailedException } from '../exceptions/message-decryption-failed.exception';
 import { MessageSignatureNotValidException } from '../exceptions/messages-signature-not-valid.exception';
 import { RecipientsNotFoundException } from '../exceptions/recipients-not-found-exception';
@@ -44,6 +43,7 @@ import {
 } from '../message.interface';
 import { WsClientService } from './ws-client.service';
 import { Span } from 'nestjs-otel';
+import { FileNameInvalidException } from '../exceptions/file-name-invalid.exception';
 
 export enum EventEmitMode {
   SINGLE = 'SINGLE',
@@ -87,7 +87,7 @@ export class MessageService {
     }
 
     if (channel.type !== ChannelType.PUB) {
-      throw new ChannelTypeNotPubException();
+      throw new ChannelTypeNotPubException(channel.fqcn);
     }
     const clientGatewayMessageId: string = uuidv4();
 
@@ -194,7 +194,7 @@ export class MessageService {
   ): Promise<string[]> {
     // topic owner and topic name should be present
     if ((topicOwner && !topicName) || (!topicOwner && topicName)) {
-      throw new TopicOwnerTopicNameRequiredException('');
+      throw new TopicOwnerTopicNameRequiredException();
     }
 
     //Get Topic Ids
@@ -393,11 +393,13 @@ export class MessageService {
   ): Promise<SendMessageResponse> {
     // file validations
     if (!file.originalname.match(/\.(csv)$/)) {
-      throw new FIleTypeNotSupportedException('');
+      throw new FileTypeNotSupportedException();
     }
 
-    if (file.size > this.configService.get('MAX_FILE_SIZE')) {
-      throw new FileSizeException('');
+    const maxFileSize = this.configService.get('MAX_FILE_SIZE');
+
+    if (file.size > maxFileSize) {
+      throw new FileSizeException(maxFileSize);
     }
 
     //Check if internal channel exists
@@ -423,7 +425,7 @@ export class MessageService {
     }
 
     if (channel.type !== ChannelType.UPLOAD) {
-      throw new ChannelTypeNotPubException();
+      throw new ChannelTypeNotPubException(channel.fqcn);
     }
 
     this.logger.log('generating Client Gateway Message Id');
@@ -496,7 +498,7 @@ export class MessageService {
         ?.filename ?? null;
 
     if (!fileName) {
-      throw new FileNotFoundException('');
+      throw new FileNameInvalidException();
     }
 
     fileName = fileName.replace(/"/g, '');
@@ -518,8 +520,10 @@ export class MessageService {
     // Return error that signature is invalid
     if (!isSignatureValid) {
       this.logger.error(`Signature not matched for file id: ${fileId}`);
+
       throw new MessageSignatureNotValidException(
-        `Signature not matched for file id: ${fileId}`
+        fileId,
+        fileResponse.headers.signature
       );
     } else {
       let decryptedMessage: string;
@@ -543,7 +547,7 @@ export class MessageService {
       }
 
       if (!decryptedMessage) {
-        throw new MessageDecryptionFailedException('');
+        throw new MessageDecryptionFailedException();
       }
 
       try {
@@ -576,7 +580,7 @@ export class MessageService {
       !topic.schemaType ||
       !topic.version
     ) {
-      throw new TopicNotFoundException('Not found');
+      throw new TopicNotFoundException(topic.id);
     }
 
     const isTopicNotRelatedToChannel: boolean = this.checkTopicForChannel(
@@ -585,9 +589,7 @@ export class MessageService {
     );
 
     if (isTopicNotRelatedToChannel) {
-      throw new TopicNotRelatedToChannelException(
-        `topic with ${topic.name} and owner ${topic.owner} not related to channel with name ${channel.fqcn}`
-      );
+      throw new TopicNotRelatedToChannelException();
     }
   }
 
