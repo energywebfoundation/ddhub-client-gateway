@@ -11,7 +11,7 @@ import {
 import { TMessage } from './Messages.type';
 import { FileContentType } from './Messages.utils';
 import moment from 'moment';
-import getConfig from 'next/config'
+import getConfig from 'next/config';
 
 export const useMessagesEffects = () => {
   const router = useRouter();
@@ -20,8 +20,8 @@ export const useMessagesEffects = () => {
     router.query[Queries.FQCN] as string
   );
   const { publicRuntimeConfig } = getConfig();
-  const messagingOffset = publicRuntimeConfig.messagingOffset ?? 10;
-  const messagingAmount = publicRuntimeConfig.messagingAmount ?? 100;
+  const messagingOffset = publicRuntimeConfig?.messagingOffset ?? 10;
+  const messagingAmount = publicRuntimeConfig?.messagingAmount ?? 100;
 
   const topic = topicsById[router.query[Queries.TopicId] as string];
   const currentDate = moment().seconds(0).milliseconds(0);
