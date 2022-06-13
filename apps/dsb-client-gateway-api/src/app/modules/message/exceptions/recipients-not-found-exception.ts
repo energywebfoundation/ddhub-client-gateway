@@ -1,11 +1,15 @@
-import { NotFoundException } from '@nestjs/common';
-import { DsbClientGatewayErrors } from '@dsb-client-gateway/dsb-client-gateway-errors';
+import {
+  BaseException,
+  DsbClientGatewayErrors,
+} from '@dsb-client-gateway/dsb-client-gateway-errors';
 
-export class RecipientsNotFoundException extends NotFoundException {
+export class RecipientsNotFoundException extends BaseException {
   public code: DsbClientGatewayErrors;
 
   constructor() {
-    super('No recipients present!');
-    this.code = DsbClientGatewayErrors.RECIPIENTS_NOT_PRESENT;
+    super(
+      'No recipients present',
+      DsbClientGatewayErrors.RECIPIENTS_NOT_PRESENT
+    );
   }
 }

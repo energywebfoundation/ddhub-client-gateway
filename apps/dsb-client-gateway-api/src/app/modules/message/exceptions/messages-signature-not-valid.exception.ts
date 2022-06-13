@@ -1,11 +1,19 @@
-import { BadRequestException } from '@nestjs/common';
-import { DsbClientGatewayErrors } from '@dsb-client-gateway/dsb-client-gateway-errors';
+import {
+  BaseException,
+  DsbClientGatewayErrors,
+} from '@dsb-client-gateway/dsb-client-gateway-errors';
 
-export class MessageSignatureNotValidException extends BadRequestException {
+export class MessageSignatureNotValidException extends BaseException {
   public code: DsbClientGatewayErrors;
 
-  constructor(public readonly additionalDetails) {
-    super('Signature verfication failed.');
-    this.code = DsbClientGatewayErrors.SIGNATURE_DOES_NOT_MATCH;
+  constructor(fileId: string, receivedSignature: string) {
+    super(
+      'Signature verfication failed',
+      DsbClientGatewayErrors.SIGNATURE_DOES_NOT_MATCH,
+      {
+        fileId,
+        receivedSignature,
+      }
+    );
   }
 }

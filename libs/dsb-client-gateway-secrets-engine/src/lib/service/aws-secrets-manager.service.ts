@@ -33,7 +33,7 @@ export class AwsSecretsManagerService
 
   constructor(protected readonly configService: ConfigService) {
     super();
-    this.prefix = this.configService.get('AWS_SECRET_PREFIX', '/dsb-gw/');
+    this.prefix = this.configService.get('AWS_SECRET_PREFIX', '/ddhub/');
   }
 
   @Span('aws_ssm_onModuleInit')

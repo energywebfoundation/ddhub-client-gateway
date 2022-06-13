@@ -7,6 +7,7 @@ import {
 import { Image, EditorView } from '@ddhub-client-gateway-frontend/ui/core';
 import { useStyles } from './TopicDetails.styles';
 import { TopicDetail } from './TopicDetail';
+import { ApplicationInfoModal } from '../ApplicationInfoModal';
 
 interface TopicDetailsProps {
   isLoading: boolean;
@@ -41,17 +42,7 @@ export const TopicDetails: FC<TopicDetailsProps> = ({
         </Box>
       ) : (
         <Box sx={{ padding: 0 }}>
-          {application && (
-            <Box className={classes.appWrapper}>
-              <Image src={application.logoUrl} className={classes.appImage} />
-              <Typography className={classes.appName}>
-                {application.appName}
-              </Typography>
-              <Typography className={classes.namespace}>
-                {application.namespace}
-              </Typography>
-            </Box>
-          )}
+          {application && <ApplicationInfoModal application={application} />}
           <Box className={classes.details}>
             <Typography className={classes.title}>Details</Typography>
             {buttons.map((button) => {

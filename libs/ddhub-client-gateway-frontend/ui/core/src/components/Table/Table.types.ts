@@ -1,6 +1,7 @@
 import { ReactElement } from 'react';
 import { TableCellProps, TableContainerProps } from '@mui/material';
 import { TTableComponentAction } from '../Table/TableComponentActions';
+import { FilterValue } from 'react-table';
 
 export interface TableHeader {
   accessor: string;
@@ -18,6 +19,10 @@ export interface TablePagination {
   page: number;
 }
 
+export interface TableCustomStyle {
+  tableMinWidth: string;
+}
+
 export interface TableProps<T> {
   headers: TableHeader[];
   tableRows: T[];
@@ -31,6 +36,8 @@ export interface TableProps<T> {
   loadingRows?: number;
   paginationProps?: TablePagination;
   onPageChange?: (newPage: number) => void;
+  onSearchInput?: (filterValue: FilterValue) => void;
   defaultSortBy?: string;
-  defaultOrder?: 'asc' | 'desc'
+  defaultOrder?: 'asc' | 'desc';
+  customStyle?: TableCustomStyle;
 }

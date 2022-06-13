@@ -11,7 +11,7 @@ interface TopicsProps {
 
 export const Topics: FC<TopicsProps> = ({ topics }) => {
   const { classes } = useStyles();
-  const { navigateToVersionHistory } = useTopicsEffects();
+  const { openTopicDetails } = useTopicsEffects();
 
   return (
     <>
@@ -24,7 +24,7 @@ export const Topics: FC<TopicsProps> = ({ topics }) => {
             <Box
               key={topic.topicId}
               className={classes.topic}
-              onClick={() => navigateToVersionHistory(topic)}
+              onClick={() => openTopicDetails(topic)}
             >
               <Typography className={classes.topicLabel} variant="body2">
                 {topic.topicName}
