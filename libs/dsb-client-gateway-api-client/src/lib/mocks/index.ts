@@ -131,6 +131,8 @@ export const getTopicsControllerGetTopicsHistoryByIdMock = () => {
       schemaType: faker.random.arrayElement(['JSD7', 'XML', 'CSV', 'TSV']),
       tags: [...Array(1)].map(() => faker.word.noun()),
       version: '1.0.0',
+      createdDate: "2022-06-08T05:43:15.510Z",
+      updatedDate: "2022-06-08T05:43:15.510Z",
     })),
   };
 };

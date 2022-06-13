@@ -37,6 +37,7 @@ export function GenericTable<T>({
   showFooter = true,
   paginationProps,
   onPageChange,
+  customStyle,
   onSearchInput,
   defaultOrder,
   defaultSortBy,
@@ -87,7 +88,7 @@ export function GenericTable<T>({
         ) : rows.length !== 0 ? (
           <Table
             className={classes.root}
-            sx={{ minWidth: 500 }}
+            sx={{ minWidth: customStyle?.tableMinWidth ?? 500 }}
             {...getTableProps()}
           >
             <TableHead>

@@ -2,6 +2,8 @@ import {
   GetTopicDto,
   ApplicationDTO,
   GetChannelResponseDto,
+  ChannelTopic,
+  GetTopicSearchDto,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { ModalActionsEnum } from './reducer';
 
@@ -27,11 +29,21 @@ type TTopicDetails = {
   };
 };
 
+type TTopicVersionDetails = {
+  open: boolean;
+  data: {
+    versions: GetTopicSearchDto[];
+    topic: ChannelTopic;
+    application: ApplicationDTO;
+  };
+};
+
 export interface IModalStore {
   create: TCreate;
   update: TUpdate;
   details: TDetails;
   topicDetails: TTopicDetails;
+  topicVersionDetails: TTopicVersionDetails;
 }
 
 interface IShowCreateAction {
@@ -54,6 +66,11 @@ interface IShowTopicDetailsAction {
   payload: TTopicDetails;
 }
 
+interface IShowChannelDetailsAction {
+  type: ModalActionsEnum.SHOW_TOPIC_VERSION_DETAILS;
+  payload: TTopicVersionDetails;
+}
+
 interface IHideCreateAction {
   type: ModalActionsEnum.HIDE_CREATE;
   payload: boolean;
@@ -64,10 +81,23 @@ interface IHideUpdateAction {
   payload: boolean;
 }
 
+interface IHideDetailsAction {
+  type: ModalActionsEnum.HIDE_DETAILS;
+  payload: boolean;
+}
+
+interface IHideTopicVersionAction {
+  type: ModalActionsEnum.HIDE_TOPIC_VERSION_DETAILS;
+  payload: boolean;
+}
+
 export type TModalAction =
   | IShowCreateAction
   | IShowUpdateAction
   | IHideCreateAction
   | IHideUpdateAction
   | IShowDetailsAction
-  | IShowTopicDetailsAction;
+  | IShowTopicDetailsAction
+  | IHideDetailsAction
+  | IShowChannelDetailsAction
+  | IHideTopicVersionAction;
