@@ -10,9 +10,9 @@ export const useTopicVersion = (id: string, version: string) => {
     useTopicsControllerGetTopicHistoryByIdAndVersion(id, version, {
       query: {
         enabled: id !== undefined && version !== undefined,
-        onError: (err: { message: string }) => {
+        onError: (err: any) => {
           console.error(err);
-          Swal.error({ text: err?.message });
+          Swal.httpError(err);
         },
       },
     });

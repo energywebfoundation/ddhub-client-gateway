@@ -16,9 +16,9 @@ export const useMessages = (params?: MessageControlllerGetMessageParams) => {
           !!params?.topicName &&
           !!params?.topicOwner &&
           !!params?.clientId,
-        onError: (err: { message: string }) => {
+        onError: (err: any) => {
           console.error(err);
-          Swal.error({ text: err?.message });
+          Swal.httpError(err);
         },
       },
     });

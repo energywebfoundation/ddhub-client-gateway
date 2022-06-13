@@ -20,9 +20,7 @@ export const useRemoveChannel = () => {
 
   const removeChannelError = async (err: any) => {
     console.error(err);
-    await Swal.error({
-      text: err?.message,
-    });
+    Swal.httpError(err);
   };
 
   const removeChannelHandler = async (fqcn: string) => {
