@@ -64,7 +64,7 @@ export class MessageService {
     protected readonly keyService: KeysService,
     protected readonly ddhubMessageService: DdhubMessagesService,
     protected readonly ddhubFilesService: DdhubFilesService
-  ) {}
+  ) { }
 
   @Span('message_sendMessage')
   public async sendMessage(dto: SendMessageDto): Promise<SendMessageResponse> {
@@ -104,15 +104,15 @@ export class MessageService {
 
     messageLoggerContext.debug(
       'attempting to encrypt payload, encryption enabled: ' +
-        channel.payloadEncryption
+      channel.payloadEncryption
     );
 
     const message = channel.payloadEncryption
       ? this.keyService.encryptMessage(
-          dto.payload,
-          randomKey,
-          EncryptedMessageType['UTF-8']
-        )
+        dto.payload,
+        randomKey,
+        EncryptedMessageType['UTF-8']
+      )
       : dto.payload;
 
     messageLoggerContext.debug('fetching private key');
@@ -352,7 +352,7 @@ export class MessageService {
       await this.ddhubMessageService.messagesSearch(
         topicsIds,
         channel.conditions.qualifiedDids,
-        clientId,
+        `${clientId}.${fqcn}`,
         from,
         amount
       );
@@ -438,10 +438,10 @@ export class MessageService {
 
     const encryptedMessage = channel.payloadEncryption
       ? this.keyService.encryptMessage(
-          JSON.stringify(file.buffer),
-          randomKey,
-          EncryptedMessageType['UTF-8']
-        )
+        JSON.stringify(file.buffer),
+        randomKey,
+        EncryptedMessageType['UTF-8']
+      )
       : JSON.stringify(file.buffer);
 
     this.logger.log('fetching private key');
@@ -534,10 +534,10 @@ export class MessageService {
 
         decryptedMessage = encryptionEnabled
           ? await this.keyService.decryptMessage(
-              fileResponse.data,
-              fileResponse.headers.clientgatewaymessageid,
-              fileResponse.headers.ownerdid
-            )
+            fileResponse.data,
+            fileResponse.headers.clientgatewaymessageid,
+            fileResponse.headers.ownerdid
+          )
           : fileResponse.data;
 
         this.logger.debug(`Completed decryption for file id:${fileId}`);
