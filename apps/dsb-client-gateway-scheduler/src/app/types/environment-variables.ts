@@ -1,6 +1,7 @@
 import {
   IsBoolean,
   IsEnum,
+  IsNumber,
   IsOptional,
   IsPositive,
   IsString,
@@ -134,6 +135,23 @@ export class EnvironmentVariables {
   @IsBoolean()
   @Transform(EnvironmentVariables.transformBoolean('TOPICS_CRON_ENABLED'))
   TOPICS_CRON_ENABLED = true;
+
+  @IsString()
+  FILE_CLEANER_CRON_SCHEDULE = '*/1 * * * *';
+
+  @IsBoolean()
+  @Transform(EnvironmentVariables.transformBoolean('FILE_CLEANER_CRON_ENABLED'))
+  FILE_CLEANER_CRON_ENABLED = true;
+
+  @IsNumber()
+  @Transform(EnvironmentVariables.transformNumber('DOWNLOAD_FILES_LIFETIME'))
+  DOWNLOAD_FILES_LIFETIME = 30; // minutes
+
+  @IsString()
+  UPLOAD_FILES_DIR = './upload';
+
+  @IsString()
+  DOWNLOAD_FILES_DIR = './download';
 
   @IsString()
   PRIVATE_KEY_CRON_SCHEDULE = '*/11 * * * *';

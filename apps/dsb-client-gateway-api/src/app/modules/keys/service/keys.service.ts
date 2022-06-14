@@ -27,6 +27,11 @@ import {
 import { Wallet } from 'ethers/lib/ethers';
 import { SymmetricKeysCacheService } from '@dsb-client-gateway/ddhub-client-gateway-encryption';
 import { EthersService } from '@dsb-client-gateway/ddhub-client-gateway-utils';
+import { Readable } from 'stream';
+import { AppendInitVect } from './append-init-vect';
+import * as fs from 'fs';
+import { join } from 'path';
+import * as zlib from 'zlib';
 
 @Injectable()
 export class KeysService implements OnModuleInit {
@@ -81,6 +86,127 @@ export class KeysService implements OnModuleInit {
 
   public generateRandomKey(): string {
     return crypto.randomBytes(32).toString('hex');
+  }
+
+  public async decryptMessageStream(
+    path: string,
+    clientGatewayMessageId: string,
+    senderDid: string
+  ): Promise<Readable> {
+    const symmetricKey: KeysEntity | null = await this.getSymmetricKey(
+      senderDid,
+      clientGatewayMessageId
+    );
+    if (!symmetricKey) {
+      this.logger.error(
+        `${senderDid}:${clientGatewayMessageId} does not have symmetric key`
+      );
+      return null;
+    }
+
+    const privateKey: string | null =
+      await this.secretsEngineService.getRSAPrivateKey();
+
+    if (!privateKey) {
+      this.logger.error('No private RSA key to decrypt');
+
+      return null;
+    }
+
+    const rootKey: string | null =
+      await this.secretsEngineService.getPrivateKey();
+
+    if (!rootKey) {
+      this.logger.error('No root key');
+
+      return null;
+    }
+
+    const decryptedKey: string = this.decryptSymmetricKey(
+      privateKey,
+      symmetricKey.payload,
+      rootKey
+    );
+
+    const readInitVect = fs.createReadStream(path, {
+      end: 15,
+      autoClose: false,
+    });
+
+    let initVect;
+
+    const readInitVectPromise = () =>
+      new Promise((resolve, reject) => {
+        readInitVect.on('data', (chunk) => {
+          initVect = chunk;
+
+          resolve(chunk);
+        });
+      });
+
+    await readInitVectPromise();
+
+    const readStream = fs.createReadStream(path, {
+      start: 16,
+      autoClose: false,
+    });
+
+    const decipher = crypto.createDecipheriv(
+      this.symmetricAlgorithm,
+      Buffer.from(decryptedKey, 'hex'),
+      initVect
+    );
+
+    return readStream.pipe(decipher).pipe(zlib.createBrotliDecompress());
+  }
+
+  @Span('keys_checksumFile')
+  public async checksumFile(path: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const hash = crypto.createHash('sha256');
+      const stream = fs.createReadStream(path);
+
+      stream.on('error', (err) => reject(err));
+      stream.on('data', (chunk) => hash.update(chunk));
+      stream.on('end', () => resolve(hash.digest('hex')));
+    });
+  }
+
+  @Span('keys_encryptMessageStream')
+  public async encryptMessageStream(
+    message: Readable,
+    computedSharedKey: string,
+    filename: string
+  ): Promise<string> {
+    const iv: Buffer = crypto.randomBytes(16);
+
+    const cipher = crypto.createCipheriv(
+      this.symmetricAlgorithm,
+      Buffer.from(computedSharedKey, 'hex'),
+      iv
+    );
+
+    const path = join(
+      this.configService.get<string>('MULTER_UPLOADS_PATH', 'uploads'),
+      filename + '.enc'
+    );
+    const writeStream = fs.createWriteStream(path);
+
+    const promise = () =>
+      new Promise((resolve, reject) => {
+        message
+          .pipe(zlib.createBrotliCompress())
+          .pipe(cipher)
+          .pipe(new AppendInitVect(iv))
+          .pipe(writeStream)
+          .on('finish', () => {
+            resolve(null);
+          });
+      });
+
+    await promise();
+
+    return path;
   }
 
   @Span('keys_encryptMessage')

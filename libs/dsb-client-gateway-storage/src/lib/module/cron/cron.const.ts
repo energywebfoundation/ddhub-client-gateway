@@ -6,6 +6,7 @@ export enum CronJobType {
   PRIVATE_KEY = 'PRIVATE_KEY',
   APPLICATIONS_REFRESH = 'APPLICATIONS_REFRESH',
   HEARTBEAT = 'HEARTBEAT',
+  FILE_CLEANER = 'FILE_CLEANER',
 }
 
 export enum CronStatus {

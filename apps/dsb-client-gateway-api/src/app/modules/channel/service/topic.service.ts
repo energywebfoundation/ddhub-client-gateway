@@ -40,4 +40,14 @@ export class TopicService {
       },
     });
   }
+
+  async getTopicOrThrow(name: string, owner: string, version: string) {
+    return this.wrapper.topicRepository.findOneOrFail({
+      where: {
+        name,
+        owner,
+        version,
+      },
+    });
+  }
 }

@@ -1,10 +1,13 @@
 import {
   DdhubFilesService,
   DdhubMessagesService,
+  SendMessageResponseFile,
 } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
 import { SecretsEngineService } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
 import {
   ChannelEntity,
+  FileMetadataEntity,
+  FileMetadataWrapperRepository,
   TopicEntity,
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
 import { Injectable, Logger } from '@nestjs/common';
@@ -26,10 +29,6 @@ import {
   uploadMessageBodyDto,
 } from '../dto/request/send-message.dto';
 import { ChannelTypeNotPubException } from '../exceptions/channel-type-not-pub.exception';
-import { FileSizeException } from '../exceptions/file-size.exception';
-import { FileTypeNotSupportedException } from '../exceptions/file-type-not-supported.exception';
-import { MessageDecryptionFailedException } from '../exceptions/message-decryption-failed.exception';
-import { MessageSignatureNotValidException } from '../exceptions/messages-signature-not-valid.exception';
 import { RecipientsNotFoundException } from '../exceptions/recipients-not-found-exception';
 import { TopicNotFoundException } from '../exceptions/topic-not-found.exception';
 import { TopicNotRelatedToChannelException } from '../exceptions/topic-not-related-to-channel.exception';
@@ -43,7 +42,11 @@ import {
 } from '../message.interface';
 import { WsClientService } from './ws-client.service';
 import { Span } from 'nestjs-otel';
-import { FileNameInvalidException } from '../exceptions/file-name-invalid.exception';
+import * as fs from 'fs';
+import { FileSizeException } from '../exceptions/file-size.exception';
+import { join } from 'path';
+import { FileTypeNotSupportedException } from '../exceptions/file-type-not-supported.exception';
+import { MessageSignatureNotValidException } from '../exceptions/messages-signature-not-valid.exception';
 
 export enum EventEmitMode {
   SINGLE = 'SINGLE',
@@ -53,6 +56,9 @@ export enum EventEmitMode {
 @Injectable()
 export class MessageService {
   protected readonly logger = new Logger(MessageService.name);
+  protected readonly uploadPath: string;
+  protected readonly downloadPath: string;
+  protected readonly ext: string = '.enc';
 
   constructor(
     protected readonly secretsEngineService: SecretsEngineService,
@@ -63,8 +69,12 @@ export class MessageService {
     protected readonly topicService: TopicService,
     protected readonly keyService: KeysService,
     protected readonly ddhubMessageService: DdhubMessagesService,
-    protected readonly ddhubFilesService: DdhubFilesService
-  ) {}
+    protected readonly ddhubFilesService: DdhubFilesService,
+    protected readonly fileMetadataWrapper: FileMetadataWrapperRepository
+  ) {
+    this.uploadPath = configService.get<string>('UPLOAD_FILES_DIR');
+    this.downloadPath = configService.get<string>('DOWNLOAD_FILES_DIR');
+  }
 
   @Span('message_sendMessage')
   public async sendMessage(dto: SendMessageDto): Promise<SendMessageResponse> {
@@ -391,184 +401,156 @@ export class MessageService {
     file: Express.Multer.File,
     dto: uploadMessageBodyDto
   ): Promise<SendMessageResponse> {
-    // file validations
-    if (!file.originalname.match(/\.(csv)$/)) {
+    file.stream = fs.createReadStream(file.path);
+
+    if (file.mimetype !== 'text/csv') {
       throw new FileTypeNotSupportedException();
     }
 
-    const maxFileSize = this.configService.get('MAX_FILE_SIZE');
+    const maxFileSize = this.configService.get<number>('MAX_FILE_SIZE');
 
     if (file.size > maxFileSize) {
       throw new FileSizeException(maxFileSize);
     }
 
-    //Check if internal channel exists
-    const channel: ChannelEntity = await this.channelService.getChannelOrThrow(
-      dto.fqcn
-    );
-
-    //System gets topic details from cache
-    const topic: TopicEntity | null = await this.topicService.getTopic(
-      dto.topicName,
-      dto.topicOwner,
-      dto.topicVersion
-    );
+    const [channel, topic]: [ChannelEntity, TopicEntity] = await Promise.all([
+      this.channelService.getChannelOrThrow(dto.fqcn),
+      this.topicService.getTopicOrThrow(
+        dto.topicName,
+        dto.topicOwner,
+        dto.topicVersion
+      ),
+    ]);
 
     this.validateTopic(topic, channel);
 
-    //System gets internal channel details
-    const qualifiedDids = channel.conditions.qualifiedDids;
-
-    // return error if no recipients
-    if (qualifiedDids.length === 0) {
-      throw new RecipientsNotFoundException();
-    }
+    const qualifiedDids: string[] = channel.conditions.qualifiedDids;
 
     if (channel.type !== ChannelType.UPLOAD) {
       throw new ChannelTypeNotPubException(channel.fqcn);
     }
 
-    this.logger.log('generating Client Gateway Message Id');
-    const clientGatewayMessageId: string = uuidv4();
-
-    this.logger.log('Generating Random Key');
-    const randomKey: string = this.keyService.generateRandomKey();
-
-    this.logger.log('Encrypting Payload', channel.payloadEncryption);
-
-    const encryptedMessage = channel.payloadEncryption
-      ? this.keyService.encryptMessage(
-          JSON.stringify(file.buffer),
-          randomKey,
-          EncryptedMessageType['UTF-8']
-        )
-      : JSON.stringify(file.buffer);
-
-    this.logger.log('fetching private key');
-    const privateKey = await this.secretsEngineService.getPrivateKey();
-
-    if (!privateKey) {
-      throw new NoPrivateKeyException();
+    if (!qualifiedDids.length) {
+      throw new RecipientsNotFoundException();
     }
 
-    this.logger.log('Generating Signature');
-    const dataHash = this.keyService.createHash(encryptedMessage);
-    const signature = this.keyService.createSignature(
-      dataHash,
-      '0x' + privateKey
-    );
+    const clientGatewayMessageId: string = uuidv4();
 
-    this.logger.log(
-      'Sending CipherText as Internal Message to all qualified dids'
+    const symmetricKey: string = this.keyService.generateRandomKey();
+
+    let filePath: string;
+
+    if (channel.payloadEncryption) {
+      filePath = await this.keyService.encryptMessageStream(
+        file.stream,
+        symmetricKey,
+        clientGatewayMessageId
+      );
+    } else {
+      filePath = join(this.uploadPath, clientGatewayMessageId + this.ext);
+
+      const stream = fs.createWriteStream(filePath);
+
+      const writeStream = file.stream.pipe(stream);
+
+      const promise = () =>
+        new Promise((resolve) => {
+          writeStream.on('finish', () => resolve(null));
+        });
+
+      await promise();
+    }
+
+    const privateKey = await this.secretsEngineService.getPrivateKey();
+    const checksum = await this.keyService.checksumFile(filePath);
+
+    const signature = this.keyService.createSignature(
+      checksum,
+      '0x' + privateKey
     );
 
     await this.sendSymmetricKeys(
       this.logger,
       qualifiedDids,
-      randomKey,
+      symmetricKey,
       clientGatewayMessageId
     );
 
     //uploading file
-    return this.ddhubFilesService.uploadFile(
-      file,
-      qualifiedDids,
-      topic.id,
-      topic.version,
-      signature,
-      encryptedMessage,
-      clientGatewayMessageId,
-      channel.payloadEncryption,
-      dto.transactionId
-    );
+    const result: SendMessageResponseFile =
+      await this.ddhubFilesService.uploadFile(
+        fs.createReadStream(filePath),
+        file.originalname,
+        qualifiedDids,
+        topic.id,
+        topic.version,
+        signature,
+        clientGatewayMessageId,
+        channel.payloadEncryption,
+        dto.transactionId
+      );
+
+    try {
+      fs.unlinkSync(filePath);
+      fs.unlinkSync(file.path);
+    } catch (e) {
+      this.logger.error('file unlink failed', e);
+    }
+
+    return result;
   }
 
   public async downloadMessages(
     fileId: string
   ): Promise<DownloadMessageResponse> {
-    //Calling download file API of message broker
-    const fileResponse = await this.ddhubFilesService.downloadFile(fileId);
-    let decrypted: { data: string };
+    const fileMetadata: FileMetadataEntity = await this.createMetadata(fileId);
 
-    const regExpFilename = /filename="(?<filename>.*)"/;
+    const fullPath: string = join(this.downloadPath, fileId + this.ext);
 
-    //validating file name
-    let fileName: string | null =
-      regExpFilename.exec(fileResponse.headers['content-disposition'])?.groups
-        ?.filename ?? null;
-
-    if (!fileName) {
-      throw new FileNameInvalidException();
-    }
-
-    fileName = fileName.replace(/"/g, '');
-
-    const encryptionEnabled: boolean =
-      fileResponse.headers.payloadencryption === 'true';
-
-    //Verifying signature
     const isSignatureValid: boolean = await this.keyService.verifySignature(
-      fileResponse.headers.ownerdid,
-      fileResponse.headers.signature,
-      this.keyService.createHash(
-        encryptionEnabled
-          ? fileResponse.data
-          : JSON.stringify(fileResponse.data)
-      )
+      fileMetadata.did,
+      fileMetadata.signature,
+      await this.keyService.checksumFile(fullPath)
     );
 
-    // Return error that signature is invalid
     if (!isSignatureValid) {
-      this.logger.error(`Signature not matched for file id: ${fileId}`);
-
+      this.logger.error(`invalid signature for file ${fileId}`);
       throw new MessageSignatureNotValidException(
         fileId,
-        fileResponse.headers.signature
+        fileMetadata.signature
       );
-    } else {
-      let decryptedMessage: string;
-
-      try {
-        // Decrypting File Content
-        this.logger.debug(`decrypting Message for File Id  ${fileId}`);
-
-        decryptedMessage = encryptionEnabled
-          ? await this.keyService.decryptMessage(
-              fileResponse.data,
-              fileResponse.headers.clientgatewaymessageid,
-              fileResponse.headers.ownerdid
-            )
-          : fileResponse.data;
-
-        this.logger.debug(`Completed decryption for file id:${fileId}`);
-      } catch (e) {
-        this.logger.debug(`Decryption failed for file id:${fileId}`);
-        throw new MessageDecryptionFailedException(JSON.stringify(e));
-      }
-
-      if (!decryptedMessage) {
-        throw new MessageDecryptionFailedException();
-      }
-
-      try {
-        // Parsing Decrypted data
-        decrypted = encryptionEnabled
-          ? JSON.parse(decryptedMessage)
-          : decryptedMessage;
-      } catch (e) {
-        this.logger.debug(`Parsing failed for file id:${fileId}`);
-        throw new MessageDecryptionFailedException(
-          'Decryted Message cannot be parsed to JSON object.'
-        );
-      }
     }
 
+    if (!fileMetadata.encrypted) {
+      this.logger.error(`returning unencrypted file`);
+
+      return {
+        fileName: fileId,
+        sender: fileMetadata.did,
+        signature: fileMetadata.signature,
+        clientGatewayMessageId: fileMetadata.clientGatewayMessageId,
+        data: fs.createReadStream(fullPath),
+      };
+    }
+
+    const decryptionStream = await this.keyService
+      .decryptMessageStream(
+        fullPath,
+        fileMetadata.clientGatewayMessageId,
+        fileMetadata.did
+      )
+      .catch((e) => {
+        this.logger.error(`decryption stream failed for ${fileId}`, e);
+
+        throw e;
+      });
+
     return {
-      fileName: fileName,
-      sender: fileResponse.headers.ownerdid,
-      signature: fileResponse.headers.signature,
-      clientGatewayMessageId: fileResponse.headers.clientgatewaymessageid,
-      data: Buffer.from(decrypted.data),
+      fileName: fileId,
+      sender: fileMetadata.did,
+      signature: fileMetadata.signature,
+      clientGatewayMessageId: fileMetadata.clientGatewayMessageId,
+      data: decryptionStream,
     };
   }
 
@@ -600,5 +582,87 @@ export class MessageService {
     return !channel.conditions.topics.find(
       (topicOfChannel) => topicOfChannel.topicId === topic.id
     );
+  }
+
+  private async createMetadata(fileId: string): Promise<FileMetadataEntity> {
+    const fileMetadata: FileMetadataEntity | null = await this.getFileMetadata(
+      fileId
+    );
+
+    const path: string = join(this.downloadPath, fileId + this.ext);
+
+    if (fileMetadata) {
+      this.logger.debug(`returning file from cache ${fileId}`);
+
+      return fileMetadata;
+    }
+
+    this.logger.debug(`${fileId} is not cached attempting to download`);
+
+    const { headers, data } = await this.ddhubFilesService.downloadFile(fileId);
+
+    const writeStream: fs.WriteStream = fs.createWriteStream(path);
+
+    const writeFilePromise = () => {
+      data.pipe(writeStream);
+
+      return new Promise((resolve, reject) => {
+        writeStream.on('finish', () => {
+          resolve(null);
+        });
+
+        writeStream.on('error', reject);
+      });
+    };
+
+    await writeFilePromise();
+
+    const encryptionEnabled: boolean = headers.payloadencryption === 'true';
+
+    return this.fileMetadataWrapper.repository.save({
+      clientGatewayMessageId: headers.clientgatewaymessageid,
+      signature: headers.signature,
+      did: headers.ownerdid,
+      fileId,
+      encrypted: encryptionEnabled,
+    });
+  }
+
+  private async getFileMetadata(
+    fileId: string
+  ): Promise<FileMetadataEntity | null> {
+    const fileMetadata: FileMetadataEntity | null =
+      await this.fileMetadataWrapper.repository.findOne({
+        where: {
+          fileId,
+        },
+      });
+
+    if (fileMetadata) {
+      this.logger.debug(`file metadata exists for file ${fileId}`);
+
+      const fullPath = join(this.downloadPath, fileId + this.ext);
+
+      const existsInStorage: boolean = fs.existsSync(fullPath);
+
+      if (!existsInStorage) {
+        this.logger.debug(
+          `corruption between database and file system for file ${fileId}`
+        );
+
+        await this.fileMetadataWrapper.repository.delete({
+          fileId,
+        });
+
+        return null;
+      }
+      this.logger.debug(
+        `returning file metadata from cache for file ${fileId}`
+      );
+
+      return fileMetadata;
+    }
+
+    return null;
   }
 }
