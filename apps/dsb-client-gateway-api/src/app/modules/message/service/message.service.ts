@@ -352,7 +352,7 @@ export class MessageService {
       await this.ddhubMessageService.messagesSearch(
         topicsIds,
         channel.conditions.qualifiedDids,
-        clientId + fqcn,
+        clientId + "." + fqcn,
         from,
         amount
       );
