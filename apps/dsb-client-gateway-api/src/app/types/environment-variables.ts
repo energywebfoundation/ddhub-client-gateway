@@ -121,6 +121,34 @@ export class EnvironmentVariables {
   AWS_SECRET_PREFIX = '/ddhub/';
 
   @IsString()
+  @ValidateIf(EnvironmentVariables.isAWSSecretsManagerEnabled)
+  AWS_ACCESS_KEY_ID: string;
+
+  @IsString()
+  @ValidateIf(EnvironmentVariables.isAWSSecretsManagerEnabled)
+  AWS_SECRET_ACCESS_KEY: string;
+
+  @IsString()
+  @ValidateIf(EnvironmentVariables.isAzureKeyVaultEnabled)
+  AZURE_VAULT_NAME: string;
+
+  @IsString()
+  @ValidateIf(EnvironmentVariables.isAzureKeyVaultEnabled)
+  AZURE_SECRET_PREFIX = 'ddhub/';
+
+  @IsString()
+  @ValidateIf(EnvironmentVariables.isAzureKeyVaultEnabled)
+  AZURE_CLIENT_ID: string;
+
+  @IsString()
+  @ValidateIf(EnvironmentVariables.isAzureKeyVaultEnabled)
+  AZURE_CLIENT_SECRET: string;
+
+  @IsString()
+  @ValidateIf(EnvironmentVariables.isAzureKeyVaultEnabled)
+  AZURE_TENANT_ID: string;
+
+  @IsString()
   @IsOptional()
   USERNAME: string;
 
@@ -200,6 +228,10 @@ export class EnvironmentVariables {
 
   static isAWSSecretsManagerEnabled(values: EnvironmentVariables): boolean {
     return values.SECRETS_ENGINE === SecretsEngine.AWS;
+  }
+
+  static isAzureKeyVaultEnabled(values: EnvironmentVariables): boolean {
+    return values.SECRETS_ENGINE === SecretsEngine.AZURE;
   }
 
   static isClientWebSocketEnabled(values: EnvironmentVariables): boolean {

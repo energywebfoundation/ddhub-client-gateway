@@ -71,7 +71,9 @@ defineFeature(feature, (test) => {
         });
     });
 
-    then('I should get validation error', () => {});
+    then('I should get validation error', () => {
+      return;
+    });
   });
 
   test('No private key', ({ given, when, then }) => {
