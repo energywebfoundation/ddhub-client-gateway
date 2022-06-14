@@ -76,7 +76,7 @@ export function GenericTable<T>({
     <>
       {showSearch ? (
         <Box display="flex">
-          <Search filter={globalFilter} onSearchInput={handleSearchInput} debounceTime={500} />
+          <Search filter={globalFilter} setFilter={setGlobalFilter} />
           {children}
         </Box>
       ) : (
