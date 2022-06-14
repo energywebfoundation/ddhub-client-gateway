@@ -1,16 +1,16 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
+  Logger,
   Post,
+  Query,
+  Response,
+  UploadedFile,
   UseGuards,
   UseInterceptors,
-  UploadedFile,
-  Query,
-  Get,
-  Response,
-  Logger,
 } from '@nestjs/common';
 import { ApiConsumes, ApiResponse, ApiTags } from '@nestjs/swagger';
 import {
@@ -77,19 +77,19 @@ export class MessageControlller {
     @Query() { fileId }: DownloadMessagesDto,
     @Response() res
   ): Promise<Readable> {
-    const file: DownloadMessageResponse =
-      await this.messageService.downloadMessages(fileId);
-
-    res.set({
-      'Content-Type': 'multipart/form-data',
-      'Content-Disposition': `attachment; filename=${file.fileName}`,
-      sender: file.sender,
-      signature: file.signature,
-      clientGatewayMessageId: file.clientGatewayMessageId,
-    });
-
     try {
-      const stream = Readable.from(file.data.toString());
+      const file: DownloadMessageResponse =
+        await this.messageService.downloadMessages(fileId);
+
+      res.set({
+        'Content-Type': 'multipart/form-data',
+        'Content-Disposition': `attachment; filename=${file.fileName}`,
+        sender: file.sender,
+        signature: file.signature,
+        clientGatewayMessageId: file.clientGatewayMessageId,
+      });
+
+      const stream = Readable.from(file.data);
       return stream.pipe(res);
     } catch (e) {
       this.logger.error('error in file download', e);
@@ -144,7 +144,7 @@ export class MessageControlller {
   })
   @HttpCode(HttpStatus.CREATED)
   @ApiConsumes('multipart/form-data')
-  @UseInterceptors(FileInterceptor('file', {}))
+  @UseInterceptors(FileInterceptor('file'))
   public async uploadFile(
     @UploadedFile('file') file: Express.Multer.File,
     @Body() dto: uploadMessageBodyDto

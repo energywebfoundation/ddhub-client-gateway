@@ -11,6 +11,7 @@ import {
   TopicEntity,
 } from './module';
 import { ConfigService } from '@nestjs/config';
+import { FileMetadataEntity } from './module/file-metadata';
 
 const ENTITIES = [
   ChannelEntity,
@@ -21,6 +22,7 @@ const ENTITIES = [
   DidEntity,
   CronEntity,
   ApplicationEntity,
+  FileMetadataEntity,
 ];
 
 @Module({

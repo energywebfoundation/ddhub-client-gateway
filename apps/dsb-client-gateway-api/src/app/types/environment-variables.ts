@@ -188,6 +188,15 @@ export class EnvironmentVariables {
   DB_NAME = 'local.db';
 
   @IsString()
+  UPLOAD_FILES_DIR = './upload';
+
+  @IsString()
+  DOWNLOAD_FILES_DIR = './download';
+
+  @IsString()
+  MULTER_UPLOADS_PATH = 'uploads';
+
+  @IsString()
   REQUEST_BODY_SIZE = '50mb';
 
   static isOTELEnabled(values: EnvironmentVariables): boolean {

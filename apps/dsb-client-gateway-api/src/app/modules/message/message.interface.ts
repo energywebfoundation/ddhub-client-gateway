@@ -1,4 +1,5 @@
 import { EncryptionStatus } from './message.const';
+import { Readable } from 'stream';
 
 export interface SendMessageSuccessResponse {
   did: string;
@@ -81,5 +82,5 @@ export interface DownloadMessageResponse {
   sender: string;
   signature: string;
   clientGatewayMessageId: string;
-  data: Buffer;
+  data: Readable;
 }

@@ -85,6 +85,7 @@
     "lokijs": "^1.5.12",
     "match-sorter": "^6.3.1",
     "moment": "^2.29.1",
+    "multer": "^1.4.4",
     "nats.ws": "^1.7.2",
     "nedb": "^1.8.0",
     "nestjs-otel": "^3.0.4",
