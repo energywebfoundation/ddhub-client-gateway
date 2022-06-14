@@ -16,7 +16,7 @@ import { IsValidTopicName } from '../../utils/validator/decorators/isValidTopicN
 import { ConfigService } from '@nestjs/config';
 import { IsValidVersion } from '../../utils/validator/decorators/isValidVersion';
 export class GetTopicDto {
-  constructor(protected readonly configService: ConfigService) {}
+  constructor(protected readonly configService: ConfigService) { }
 
   @IsString()
   @IsNotEmpty()
@@ -416,6 +416,15 @@ export class GetTopicsSearchQueryDto {
     type: String,
   })
   public keyword: string;
+
+  @IsString()
+  @IsOptional()
+  @ApiProperty({
+    example: 'ddhub.apps.energyweb.iam.ewc',
+    required: false,
+    type: String,
+  })
+  public owner: string;
 
   @IsOptional()
   @ApiProperty({
