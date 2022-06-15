@@ -78,9 +78,6 @@ export const useDataMessagingUploadEffects = ({
 
   const onFileChange = (acceptedFiles: File[]) => {
     const file = acceptedFiles[0];
-    if (isLarge && file.size < MIN_FILE_SIZE) {
-      return;
-    }
     setSelectedFile(file);
   };
 
