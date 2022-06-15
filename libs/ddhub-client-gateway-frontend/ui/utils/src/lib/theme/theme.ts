@@ -1,4 +1,4 @@
-import { createTheme, ThemeOptions } from '@mui/material/styles';
+import { createTheme, ThemeOptions, alpha } from '@mui/material/styles';
 
 // Create a theme instance.
 const dsbTheme: ThemeOptions = {
@@ -30,6 +30,7 @@ const dsbTheme: ThemeOptions = {
     action: {
       hover: '#CC98FF',
       selected: '#A466FF',
+      disabledBackground: alpha('#B989FF', 0.4),
     },
     text: {
       primary: '#CED1D5',
