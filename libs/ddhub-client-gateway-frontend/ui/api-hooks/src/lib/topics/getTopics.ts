@@ -24,6 +24,7 @@ export const useTopics = ({
     limit: searchParams.limit,
     page: searchParams.page,
     keyword: searchParams.keyword,
+    owner,
   });
 
   const { data, isLoading, isSuccess, isError } = useTopicsControllerGetTopics(
