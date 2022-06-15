@@ -10,7 +10,7 @@ import { DdhubClientGatewayMessageBrokerModule } from '@dsb-client-gateway/ddhub
     DdhubClientGatewayEnrolmentModule,
     forwardRef(() => DdhubClientGatewayIdentityModule),
     SymmetricKeysRepositoryModule,
-    DdhubClientGatewayMessageBrokerModule.forRootAsync(),
+    DdhubClientGatewayMessageBrokerModule,
   ],
   providers: [SymmetricKeysCacheService],
   exports: [SymmetricKeysCacheService],

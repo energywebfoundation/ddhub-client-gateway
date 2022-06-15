@@ -32,9 +32,10 @@ import {
 } from '../dto';
 import { DdhubTopicsService } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
 import { TopicService } from '../service/topic.service';
+import { MtlsGuard } from '../../certificate/guards/mtls.guard';
 
 @Controller('topics')
-@UseGuards(DigestGuard)
+@UseGuards(DigestGuard, MtlsGuard)
 @ApiTags('Topics')
 export class TopicsController {
   constructor(

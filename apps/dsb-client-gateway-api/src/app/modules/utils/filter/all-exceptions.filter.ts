@@ -2,6 +2,7 @@ import {
   ArgumentsHost,
   Catch,
   ExceptionFilter,
+  ForbiddenException,
   HttpStatus,
   Logger,
 } from '@nestjs/common';
@@ -11,8 +12,8 @@ import { ResponseErrorDto } from '../dto/response-error.dto';
 import {
   BaseException,
   DsbClientGatewayErrors,
+  ValidationException,
 } from '@dsb-client-gateway/dsb-client-gateway-errors';
-import { ValidationException } from '../../../../../../../libs/dsb-client-gateway-errors/src/lib/validation.exception';
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
@@ -24,6 +25,24 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const { httpAdapter } = this.httpAdapterHost;
 
     const ctx = host.switchToHttp();
+
+    if (exception instanceof ForbiddenException) {
+      const responseBody: ResponseErrorDto = {
+        err: {
+          code: DsbClientGatewayErrors.UNAUTHORIZED,
+          reason: exception.message,
+          additionalDetails: {
+            hint: 'check if mTLS is configured',
+          },
+        },
+        timestamp: new Date().toISOString(),
+        statusCode: HttpStatus.FORBIDDEN,
+      };
+
+      this.emitError(ctx, httpAdapter, responseBody, responseBody.statusCode);
+
+      return;
+    }
 
     if (exception instanceof ValidationException) {
       const responseBody: ResponseErrorDto = {
