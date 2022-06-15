@@ -49,6 +49,7 @@ sys
 files
 *.db-shm
 *.db-wal
-
+download
 local.db
 .next
+uploads

@@ -15,6 +15,7 @@ import { PrivateKeyWatcherService } from './service/private-key-watcher.service'
 import { CronRepositoryModule } from '@dsb-client-gateway/dsb-client-gateway-storage';
 import { ApplicationModule } from './modules/ application/application.module';
 import { HeartbeatModule } from './modules/heartbeat/heartbeat.module';
+import { FileMessagesModule } from './modules/files-messages/file-messages.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { HeartbeatModule } from './modules/heartbeat/heartbeat.module';
     KeysModule,
     ApplicationModule,
     HeartbeatModule,
+    FileMessagesModule,
   ],
   controllers: [],
   providers: [AppInitService, PrivateKeyWatcherService],
