@@ -35,6 +35,7 @@ export function GenericTable<T>({
   loadingRows,
   showSearch = true,
   showFooter = true,
+  backendSearch = false,
   paginationProps,
   onPageChange,
   customStyle,
@@ -76,7 +77,11 @@ export function GenericTable<T>({
     <>
       {showSearch ? (
         <Box display="flex">
-          <Search filter={globalFilter} setFilter={setGlobalFilter} />
+          { backendSearch ? (
+            <Search filter={globalFilter} onSearchInput={handleSearchInput} debounceTime={500} />
+          ) : (
+            <Search filter={globalFilter} setFilter={setGlobalFilter} />
+          )}
           {children}
         </Box>
       ) : (
