@@ -16,13 +16,13 @@ export const mapUrlToBreadcrumbs = new Map<string, Breadcrumb[]>()
     { title: 'Gateway settings' },
     { title: 'Gateway Settings' },
   ])
-  .set(routerConst.AppsAndTopics, [
+  .set(routerConst.TopicManagement, [
     { title: 'Apps and Topics' },
     { title: 'Apps and Topics' },
   ])
   .set(routerConst.Topics, [
     { type: BreadcrumbsType.App, title: '' },
-    { title: 'Apps and Topics', path: routerConst.AppsAndTopics },
+    { title: 'Apps and Topics', path: routerConst.TopicManagement },
     { title: 'Topics' },
   ])
   .set(routerConst.ChannelApps, [
@@ -36,7 +36,7 @@ export const mapUrlToBreadcrumbs = new Map<string, Breadcrumb[]>()
   ])
   .set(routerConst.VersionHistory, [
     { type: BreadcrumbsType.App, title: '' },
-    { title: 'Apps and Topics', path: routerConst.AppsAndTopics },
+    { title: 'Apps and Topics', path: routerConst.TopicManagement },
     { title: 'Topics', path: routerConst.Topics },
     { title: 'Version history' },
   ])
