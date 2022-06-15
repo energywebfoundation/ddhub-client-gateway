@@ -114,15 +114,15 @@ export class MessageService {
 
     messageLoggerContext.debug(
       'attempting to encrypt payload, encryption enabled: ' +
-        channel.payloadEncryption
+      channel.payloadEncryption
     );
 
     const message = channel.payloadEncryption
       ? this.keyService.encryptMessage(
-          dto.payload,
-          randomKey,
-          EncryptedMessageType['UTF-8']
-        )
+        dto.payload,
+        randomKey,
+        EncryptedMessageType['UTF-8']
+      )
       : dto.payload;
 
     messageLoggerContext.debug('fetching private key');
@@ -362,7 +362,7 @@ export class MessageService {
       await this.ddhubMessageService.messagesSearch(
         topicsIds,
         channel.conditions.qualifiedDids,
-        clientId,
+        `${clientId}.${fqcn}`,
         from,
         amount
       );
@@ -519,6 +519,7 @@ export class MessageService {
         fileId,
         fileMetadata.signature
       );
+
     }
 
     if (!fileMetadata.encrypted) {
