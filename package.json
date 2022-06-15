@@ -7,6 +7,11 @@
     "npm": ">=8.5.0"
   },
   "scripts": {
+    "generate:envs": "npm run generate:api:envs && npm run generate:scheduler:envs",
+    "generate:api:envs": "npm run build:api:envs && node dist/apps/dsb-client-gateway-api-envs/main.js",
+    "generate:scheduler:envs": "npm run build:scheduler:envs && node dist/apps/dsb-client-gateway-scheduler-envs/main.js",
+    "build:scheduler:envs": "nx build-envs dsb-client-gateway-scheduler",
+    "build:api:envs": "nx build-envs dsb-client-gateway-api",
     "test:e2e:api": "./test-prepare.sh && nx test dsb-client-gateway-api-e2e",
     "commit": "git-cz",
     "start": "nx serve",
@@ -151,6 +156,7 @@
     "@types/cucumber": "^7.0.0",
     "@types/hdkey": "^2.0.1",
     "@types/jest": "^27.0.2",
+    "@types/json2md": "^1.5.1",
     "@types/lokijs": "^1.5.7",
     "@types/multer": "^1.4.7",
     "@types/node": "16.11.7",
@@ -183,6 +189,7 @@
     "husky": "^8.0.1",
     "jest": "27.2.3",
     "json-to-pretty-yaml": "^1.2.2",
+    "json2md": "^1.12.0",
     "miragejs": "^0.1.43",
     "orval": "^6.7.0",
     "prettier": "^2.5.1",

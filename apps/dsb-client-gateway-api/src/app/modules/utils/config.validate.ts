@@ -1,18 +1,33 @@
-import { plainToClass } from 'class-transformer';
-import { EnvironmentVariables } from '../../types/environment-variables';
-import { validateSync } from 'class-validator';
+import * as Joi from 'joi';
+import {
+  BASIC_ENVS,
+  IAM_ENVS,
+  OPEN_TELEMETRY_ENVS,
+} from '@dsb-client-gateway/ddhub-client-gateway-env';
+import { Logger } from '@nestjs/common';
+import { API_ENVS } from '../../types/environment-variables';
+
+export const getSchema = (): Joi.ObjectSchema => {
+  return Joi.object()
+    .concat(API_ENVS)
+    .concat(BASIC_ENVS)
+    .concat(OPEN_TELEMETRY_ENVS)
+    .concat(IAM_ENVS);
+};
 
 export function configValidate(config: Record<string, unknown>) {
-  const validatedConfig = plainToClass(EnvironmentVariables, config, {
-    enableImplicitConversion: true,
+  const result = getSchema().validate(config, {
+    allowUnknown: true,
   });
 
-  const errors = validateSync(validatedConfig, {
-    skipMissingProperties: false,
-  });
+  if (result.error) {
+    const logger = new Logger('ConfigValidateApi');
 
-  if (errors.length > 0) {
-    throw new Error(errors.toString());
+    logger.error(result.error.message);
+    logger.error('Validation failed', JSON.stringify(result.error.details));
+
+    throw new Error();
   }
-  return validatedConfig;
+
+  return result.value;
 }

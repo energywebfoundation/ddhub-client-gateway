@@ -10,7 +10,7 @@ import {
   FileMetadataWrapperRepository,
   TopicEntity,
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
-import { Injectable, Logger } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { v4 as uuidv4 } from 'uuid';
 import { ChannelType } from '../../../modules/channel/channel.const';
@@ -62,6 +62,7 @@ export class MessageService {
 
   constructor(
     protected readonly secretsEngineService: SecretsEngineService,
+    @Inject(forwardRef(() => EventsGateway))
     protected readonly gateway: EventsGateway,
     protected readonly wsClient: WsClientService,
     protected readonly configService: ConfigService,

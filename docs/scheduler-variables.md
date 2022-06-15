@@ -1,25 +1,24 @@
-# API env. variables
+# Scheduler env. variables
 
 | KEY | TYPE | DEFAULT | DESCRIPTION | ALLOWED_VALUES | DEPENDENCY |
 | --- | ---- | ------- | ----------- | -------------- | ---------- |
-| PORT | number | 3333 | HTTP port |  |  |
-| WEBSOCKET | string | NONE | Websocket mode | NONE,SERVER,CLIENT |  |
-| EVENTS_MAX_PER_SECOND | number | 2 | Amount of messages to pull for each WebSocket run |  |  |
-| EVENTS_EMIT_MODE | string | BULK | Should Websocket emit messages as array or single object | SINGLE,BULK |  |
-| DID_TTL | number | 60 | How long cached DID attributes should be valid |  |  |
-| WEBSOCKET_URL | string |  | WebSocket Client URL to connect |  | WEBSOCKET == CLIENT |
-| WEBSOCKET_PROTOCOL | string | dsb-protocol | WebSocket Client protocol |  | WEBSOCKET == CLIENT |
-| WEBSOCKET_RECONNECT_TIMEOUT | number | 3000 | WebSocket Client reconnect timeout |  | WEBSOCKET == CLIENT |
-| WEBSOCKET_RECONNECT | number | 3000 | Should attempt to reconnect |  | WEBSOCKET == CLIENT |
-| WEBSOCKET_RECONNECT_MAX_RETRIES | number | 10 | How many times should attempt to reconnect |  | WEBSOCKET == CLIENT |
-| WEBSOCKET_POOLING_TIMEOUT | number | 5000 | How often should poll messages |  | WEBSOCKET == CLIENT |
-| DID_CLAIM_NAMESPACE | string | message.broker.app.namespace | Namespace for fetching applications |  |  |
-| MAX_FILE_SIZE | number | 100000000 | Maximum file size for large data messaging (100 MB) |  |  |
-| SYMMETRIC_KEY_CLIENT_ID | string | test | Client ID for fetching symmetric keys |  |  |
-| AMOUNT_OF_SYMMETRIC_KEYS_FETCHED | number |  | Amout of symmetric keys to fetch for each run |  |  |
-| MULTER_UPLOADS_PATH | string | uploads | Multer temporary file storage path |  |  |
-| APPLICATION_NAMESPACE_REGULAR_EXPRESSION | string | \w.apps.*\w.iam.ewc | Filter for application namespaces |  |  |
-| REQUEST_BODY_SIZE | string | 50mb | Maximum request size |  |  |
+| DID_REGISTRY_ADDRESS | string | 0xc15d5a57a8eb0e1dcbe5d88b8f9a82017e5cc4af | DID Registry Address used for DID Listener |  |  |
+| APPLICATION_CRON_SCHEDULE | string | */1 * * * * | How often should poll for applications data |  |  |
+| APPLICATION_CRON_ENABLED | boolean | true | Should poll for applications data |  |  |
+| CHANNEL_DID_CRON_SCHEDULE | string | */1 * * * * | How often should exchange channel roles for DIDs |  |  |
+| CHANNEL_DID_CRON_ENABLED | boolean | true | Should poll for channel DIDs |  |  |
+| SYMMETRIC_KEYS_CRON_SCHEDULE | string | */1 * * * * | How often should poll for symmetric keys |  |  |
+| SYMMETRIC_KEYS_CRON_ENABLED | boolean | true | Should poll for symmetric keys |  |  |
+| TOPICS_CRON_SCHEDULE | string | */1 * * * * | How often should poll for topics data |  |  |
+| TOPICS_CRON_ENABLED | boolean | true | Should poll for topics data |  |  |
+| FILE_CLEANER_CRON_SCHEDULE | string | */1 * * * * | How often should check and delete expired downloaded files |  |  |
+| FILE_CLEANER_CRON_ENABLED | boolean | true | Should check for downloaded/expired files |  |  |
+| PRIVATE_KEY_CRON_SCHEDULE | string | */11 * * * * | How often should check for private key changes in secrets engine |  |  |
+| PRIVATE_KEY_CRON_ENABLED | boolean | true | Should check for private key changes |  |  |
+| HEARTBEAT_CRON_SCHEDULE | string | 30 * * * * * | How often CRON JOB heartbeat should run |  |  |
+| HEARTBEAT_CRON_ENABLED | boolean | true | Should run heartbeat |  |  |
+| DOWNLOAD_FILES_LIFETIME | number | 30 | Specifies how long downloaded file should live (in minutes) |  |  |
+| DID_LISTENER_ENABLED | boolean | true | Should listen for DID attributes changes |  |  |
 | NODE_ENV | string |  | Node environment |  |  |
 | DSB_BASE_URL | string | https://dsb-demo.energyweb.org | Message broker URL |  |  |
 | UPLOAD_FILES_DIR | string | ./upload | Directory where we should store temporary files for upload |  |  |
