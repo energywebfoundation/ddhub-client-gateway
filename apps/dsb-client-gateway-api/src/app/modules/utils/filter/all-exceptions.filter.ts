@@ -12,6 +12,7 @@ import {
   BaseException,
   DsbClientGatewayErrors,
 } from '@dsb-client-gateway/dsb-client-gateway-errors';
+import { ValidationException } from '../../../../../../../libs/dsb-client-gateway-errors/src/lib/validation.exception';
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
@@ -23,6 +24,22 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const { httpAdapter } = this.httpAdapterHost;
 
     const ctx = host.switchToHttp();
+
+    if (exception instanceof ValidationException) {
+      const responseBody: ResponseErrorDto = {
+        err: {
+          code: exception.code,
+          reason: exception.message,
+          additionalDetails: exception.additionalDetails,
+        },
+        timestamp: new Date().toISOString(),
+        statusCode: exception.httpCode,
+      };
+
+      this.emitError(ctx, httpAdapter, responseBody, exception.httpCode);
+
+      return;
+    }
 
     if (exception instanceof BaseException) {
       const responseBody: ResponseErrorDto = {

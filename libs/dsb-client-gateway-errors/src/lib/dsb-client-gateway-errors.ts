@@ -54,6 +54,9 @@ export enum DsbClientGatewayErrors {
 
   // Secrets engine errors
   SECRETS_ENGINE_INVALID = 'SECRETS_ENGINE::INVALID',
+
+  // Validation errors
+  VALIDATION_FAILED = 'VALIDATION::FAILED',
 }
 
 export const DsbMessageBrokerErrors = {

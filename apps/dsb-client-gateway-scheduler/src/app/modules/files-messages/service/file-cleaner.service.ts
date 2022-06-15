@@ -110,7 +110,7 @@ export class FileCleanerService implements OnApplicationBootstrap {
         executedAt: new Date(),
       });
 
-      this.logger.error('refresh dids failed', e);
+      this.logger.error('file cleaner failed', e);
     }
   }
 }

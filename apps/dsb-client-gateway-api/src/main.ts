@@ -1,5 +1,5 @@
 import * as dotenv from 'dotenv';
-import { Logger } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { WsAdapter } from '@nestjs/platform-ws';
 import * as bodyParser from 'body-parser';
@@ -7,6 +7,7 @@ import { AppModule } from './app/app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 import { otelSDK } from '@dsb-client-gateway/ddhub-client-gateway-tracing';
+import { ValidationException } from '../../../libs/dsb-client-gateway-errors/src/lib/validation.exception';
 
 dotenv.config({
   path: '.env',
@@ -43,6 +44,18 @@ async function bootstrap() {
     bodyParser.urlencoded({
       limit: configService.get<string>('REQUEST_BODY_SIZE'),
       extended: true,
+    })
+  );
+
+  app.useGlobalPipes(
+    new ValidationPipe({
+      exceptionFactory: (errors) => {
+        const transformedErrors = errors
+          .map((error) => Object.values(error.constraints))
+          .flat();
+
+        return new ValidationException(transformedErrors);
+      },
     })
   );
 
