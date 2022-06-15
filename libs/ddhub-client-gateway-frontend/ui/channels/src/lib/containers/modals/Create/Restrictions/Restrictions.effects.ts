@@ -13,7 +13,7 @@ export const useRestrictionsEffects = (restrictions: ChannelConditionsDto) => {
     removeDID,
     didInputChangeHandler,
     isValid: isDIDValid,
-  } = useDIDRestrictionEffects(restrictions.dids);
+  } = useDIDRestrictionEffects(restrictions.dids ?? []);
   const {
     roles,
     roleInput,
@@ -22,7 +22,7 @@ export const useRestrictionsEffects = (restrictions: ChannelConditionsDto) => {
     addRole,
     rolesInputChangeHandler,
     isValid: isRoleValid,
-  } = useRolesRestrictionEffects(restrictions.roles);
+  } = useRolesRestrictionEffects(restrictions.roles ?? []);
   const [type, setType] = useState<RestrictionType>(RestrictionType.DID);
 
   const clear = () => {
