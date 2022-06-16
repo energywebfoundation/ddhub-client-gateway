@@ -1,11 +1,13 @@
 import {
   Body,
   Controller,
+  DefaultValuePipe,
   Delete,
   Get,
   HttpCode,
   HttpStatus,
   Param,
+  ParseIntPipe,
   Post,
   Put,
   Query,
@@ -54,7 +56,9 @@ export class TopicsController {
     description: 'Unauthorized',
   })
   public async getTopics(
-    @Query() { limit, name, owner, page, tags }: GetTopicsQueryDto
+    @Query('limit', ParseIntPipe) limit: number,
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query() { name, owner, tags }: GetTopicsQueryDto
   ) {
     return this.topicService.getTopics(limit, name, owner, page, tags);
   }

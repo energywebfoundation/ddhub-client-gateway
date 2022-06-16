@@ -27,35 +27,3 @@ export const IAM_ENVS = Joi.object({
     .default('https://volta-rpc-vkn5r5zx4ke71f9hcu0c.energyweb.org')
     .description('Will be deprecated - same as RPC_URL'),
 });
-//
-// export class IamEnv {
-//   @IsString()
-//   RPC_URL = 'https://volta-rpc.energyweb.org/';
-//
-//   @IsString()
-//   PARENT_NAMESPACE = 'dsb.apps.energyweb.iam.ewc';
-//
-//   @IsString()
-//   EVENT_SERVER_URL = 'identityevents-dev.energyweb.org';
-//
-//   @IsString()
-//   NATS_ENV_NAME = 'ewf-dev';
-//
-//   @IsPositive()
-//   @Transform(IamEnv.transformNumber('CHAIN_ID'))
-//   CHAIN_ID = 73799;
-//
-//   @IsString()
-//   CACHE_SERVER_URL = 'https://identitycache-dev.energyweb.org/v1';
-//
-//   @IsString()
-//   CLAIM_MANAGER_ADDRESS = '0x5339adE9332A604A1c957B9bC1C6eee0Bcf7a031';
-//
-//   static transformNumber(
-//     paramKey: string
-//   ): ({ obj }: { obj: IamEnv }) => number {
-//     return ({ obj }) => {
-//       return +obj[paramKey];
-//     };
-//   }
-// }
