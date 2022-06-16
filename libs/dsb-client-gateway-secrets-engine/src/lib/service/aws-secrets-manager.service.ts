@@ -243,6 +243,12 @@ export class AwsSecretsManagerService
 
   @Span('aws_ssm_getPrivateKey')
   public async getPrivateKey(): Promise<string | null> {
+    if (!this.client) {
+      this.logger.warn('AWS client not initialized during getPrivateKey');
+
+      return null;
+    }
+
     const command = new GetSecretValueCommand({
       SecretId: `${this.prefix}${PATHS.IDENTITY_PRIVATE_KEY}`,
     });
