@@ -182,11 +182,11 @@ export function GenericTable<T>({
                   <TablePagination
                     rowsPerPageOptions={[]}
                     labelDisplayedRows={({ from, to, count }) =>
-                      `Showing ${from} to ${to} of ${count} entries`
+                      `Showing ${from} to ${(rows.length < to ? rows.length : to)} of ${rows.length} entries`
                     }
                     count={pagination.count}
-                    rowsPerPage={pagination.limit}
-                    page={pagination.page}
+                    rowsPerPage={Number(pagination.limit)}
+                    page={Number(pagination.page)}
                     onPageChange={handleChangePage}
                     ActionsComponent={TablePaginationActions}
                     classes={{

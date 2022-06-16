@@ -623,7 +623,7 @@ export class DeleteTopicsVersionParamsDto {
     type: String,
     example: '1.0.9',
   })
-  public version: string;
+  public versionNumber: string;
 }
 
 export class DeleteTopic {

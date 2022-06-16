@@ -16,7 +16,7 @@ export const useRemoveTopicVersionHistory = () => {
     onSuccess?: () => void
   ) => {
     mutate(
-      { id, version: versionNumber },
+      { id, versionNumber },
       { onSuccess: onSuccess, onError: removeError }
     );
   };
