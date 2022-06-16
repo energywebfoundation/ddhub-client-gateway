@@ -23,13 +23,12 @@ export class AzureKeyVaultService
 
   constructor(protected readonly configService: ConfigService) {
     super();
-    this.prefix = this.configService.get('AZURE_KEY_PREFIX', 'ddhub/');
+    this.prefix = this.configService.get('SECRET_PREFIX', 'ddhub/');
   }
 
   @Span('azure_kv_onModuleInit')
   public async onModuleInit(): Promise<void> {
-    const vaultName = this.configService.get('AZURE_VAULT_NAME');
-    const url = `https://${vaultName}.vault.azure.net`;
+    const url = this.configService.get('AZURE_VAULT_URL');
     const credential = new DefaultAzureCredential();
 
     this.client = new SecretClient(url, credential);

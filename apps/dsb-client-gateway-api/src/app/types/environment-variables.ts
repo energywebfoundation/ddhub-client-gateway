@@ -101,6 +101,9 @@ export class EnvironmentVariables {
   SECRETS_ENGINE = SecretsEngine.VAULT;
 
   @IsString()
+  SECRET_PREFIX = 'ddhub/';
+
+  @IsString()
   @ValidateIf(EnvironmentVariables.isVaultEnabled)
   VAULT_ENDPOINT;
 
@@ -109,16 +112,8 @@ export class EnvironmentVariables {
   VAULT_TOKEN = 'root';
 
   @IsString()
-  @ValidateIf(EnvironmentVariables.isVaultEnabled)
-  VAULT_SECRET_PREFIX = 'ddhub/';
-
-  @IsString()
   @ValidateIf(EnvironmentVariables.isAWSSecretsManagerEnabled)
-  AWS_REGION = 'us-west-2';
-
-  @IsString()
-  @ValidateIf(EnvironmentVariables.isAWSSecretsManagerEnabled)
-  AWS_SECRET_PREFIX = '/ddhub/';
+  AWS_REGION = 'ap-southeast-2';
 
   @IsString()
   @ValidateIf(EnvironmentVariables.isAWSSecretsManagerEnabled)
@@ -130,11 +125,7 @@ export class EnvironmentVariables {
 
   @IsString()
   @ValidateIf(EnvironmentVariables.isAzureKeyVaultEnabled)
-  AZURE_VAULT_NAME: string;
-
-  @IsString()
-  @ValidateIf(EnvironmentVariables.isAzureKeyVaultEnabled)
-  AZURE_SECRET_PREFIX = 'ddhub/';
+  AZURE_VAULT_URL: string;
 
   @IsString()
   @ValidateIf(EnvironmentVariables.isAzureKeyVaultEnabled)

@@ -31,12 +31,12 @@ export class AwsSecretsManagerService
 
   constructor(protected readonly configService: ConfigService) {
     super();
-    this.prefix = this.configService.get('AWS_SECRET_PREFIX', '/ddhub/');
+    this.prefix = this.configService.get('SECRET_PREFIX', '/ddhub/');
   }
 
   @Span('aws_ssm_onModuleInit')
   public async onModuleInit(): Promise<void> {
-    const region = this.configService.get('AWS_REGION', 'us-east-1');
+    const region = this.configService.get('AWS_REGION', 'ap-southeast-2');
 
     this.client = new SecretsManagerClient({
       region,
