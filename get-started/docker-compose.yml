@@ -33,7 +33,7 @@ services:
       DSB_BASE_URL: https://ddhub-demo.energyweb.org
       CACHE_SERVER_URL: https://identitycache-staging.energyweb.org/v1
       EVENT_SERVER_URL: https://identityevents-staging.energyweb.org
-      SECRETS_ENGINE: vault
+      SECRETS_ENGINE: $SECRETS_ENGINE
       VAULT_ENDPOINT: http://vault_demo:8200
       VAULT_TOKEN: $VAULT_TOKEN
       AWS_REGION: $AWS_REGION
@@ -56,7 +56,7 @@ services:
   #     DSB_BASE_URL: https://ddhub-demo.energyweb.org
   #     CACHE_SERVER_URL: https://identitycache-staging.energyweb.org/v1
   #     EVENT_SERVER_URL: https://identityevents-staging.energyweb.org
-  #     SECRETS_ENGINE: vault
+  #     SECRETS_ENGINE: $SECRETS_ENGINE
   #     VAULT_ENDPOINT: http://vault_demo:8200
   #     VAULT_TOKEN: $VAULT_TOKEN
   #     AWS_REGION: $AWS_REGION
