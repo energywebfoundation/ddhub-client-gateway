@@ -25,8 +25,12 @@ export class CertificateService {
     const agent: Agent | undefined = this.tlsAgentService.get();
 
     if (agent) {
+      this.logger.debug('mTLS Agent configured, bypass');
+
       return true;
     }
+
+    this.logger.debug('attempting to configure mTLS Agent');
 
     await this.tlsAgentService.create();
 

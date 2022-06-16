@@ -7,7 +7,7 @@ import { AppModule } from './app/app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 import { otelSDK } from '@dsb-client-gateway/ddhub-client-gateway-tracing';
-import { ValidationException } from '../../../libs/dsb-client-gateway-errors/src/lib/validation.exception';
+import { ValidationException } from '@dsb-client-gateway/dsb-client-gateway-errors';
 
 dotenv.config({
   path: '.env',
@@ -49,6 +49,10 @@ async function bootstrap() {
 
   app.useGlobalPipes(
     new ValidationPipe({
+      transform: true,
+      transformOptions: {
+        enableImplicitConversion: true,
+      },
       exceptionFactory: (errors) => {
         const transformedErrors = errors
           .map((error) => Object.values(error.constraints))

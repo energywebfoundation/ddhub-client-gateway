@@ -1,13 +1,11 @@
 import {
   Body,
   Controller,
-  DefaultValuePipe,
   Delete,
   Get,
   HttpCode,
   HttpStatus,
   Param,
-  ParseIntPipe,
   Post,
   Put,
   Query,
@@ -56,11 +54,15 @@ export class TopicsController {
     description: 'Unauthorized',
   })
   public async getTopics(
-    @Query('limit', ParseIntPipe) limit: number,
-    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
-    @Query() { name, owner, tags }: GetTopicsQueryDto
+    @Query() { name, owner, tags, limit, page }: GetTopicsQueryDto
   ) {
-    return this.topicService.getTopics(limit, name, owner, page, tags);
+    return this.topicService.getTopics(
+      +limit,
+      name,
+      owner,
+      +page,
+      typeof tags === 'string' ? [tags] : tags
+    );
   }
 
   @Get('/:id/versions')
@@ -117,9 +119,14 @@ export class TopicsController {
     type: () => PaginatedTopicResponse,
   })
   public async getTopicsBySearch(
-    @Query() { keyword, limit, page }: GetTopicsSearchQueryDto
+    @Query() { keyword, owner, limit, page }: GetTopicsSearchQueryDto
   ): Promise<PaginatedTopicResponse | []> {
-    return this.ddhubTopicsService.getTopicsBySearch(keyword, limit, page);
+    return this.ddhubTopicsService.getTopicsBySearch(
+      keyword,
+      owner,
+      limit,
+      page
+    );
   }
 
   @Post('')
@@ -228,7 +235,7 @@ export class TopicsController {
     return this.ddhubTopicsService.deleteTopic(id);
   }
 
-  @Delete('/:id/versions/:version')
+  @Delete('/:id/versions/:versionNumber')
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Topic deleted successfully',
@@ -249,8 +256,8 @@ export class TopicsController {
   })
   @HttpCode(HttpStatus.OK)
   public async deleteTopicsByVersion(
-    @Param() { id, version }: DeleteTopicsVersionParamsDto
+    @Param() { id, versionNumber }: DeleteTopicsVersionParamsDto
   ): Promise<DeleteTopic> {
-    return this.ddhubTopicsService.deleteTopicByVersion(id, version);
+    return this.ddhubTopicsService.deleteTopicByVersion(id, versionNumber);
   }
 }

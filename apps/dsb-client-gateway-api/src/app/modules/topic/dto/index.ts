@@ -284,31 +284,6 @@ export class GetTopicSearchDto {
   @IsString()
   @IsNotEmpty()
   @ApiProperty({
-    description: 'schema of the topic',
-    type: String,
-    example: JSON.stringify({
-      type: 'object',
-      properties: {
-        data: {
-          type: 'number',
-        },
-      },
-    }),
-  })
-  schema: string;
-
-  @IsString()
-  @IsNotEmpty()
-  @ApiProperty({
-    description: 'version of the topic',
-    type: String,
-    example: '1.0.9',
-  })
-  version: string;
-
-  @IsString()
-  @IsNotEmpty()
-  @ApiProperty({
     description: 'owner of the topic',
     type: String,
     example: 'torta.apps.eggplant.vege.iam.ewc',
@@ -418,6 +393,15 @@ export class GetTopicsSearchQueryDto {
   })
   public keyword: string;
 
+  @IsString()
+  @IsOptional()
+  @ApiProperty({
+    example: 'ddhub.apps.energyweb.iam.ewc',
+    required: false,
+    type: String,
+  })
+  public owner: string;
+
   @IsOptional()
   @ApiProperty({
     example: 1,
@@ -440,13 +424,25 @@ export class GetTopicsSearchQueryDto {
 
 export class GetTopicsQueryDto {
   @IsOptional()
+  @IsNumber()
   @ApiProperty({
     example: 1,
     default: 0,
     required: false,
     type: Number,
   })
-  public limit: number;
+  public limit: number = 1;
+
+  @IsNumber()
+  @IsPositive()
+  @IsOptional()
+  @ApiProperty({
+    example: 1,
+    default: 0,
+    required: false,
+    type: Number,
+  })
+  public page: number = 1;
 
   @IsOptional()
   @ApiProperty({
@@ -468,15 +464,6 @@ export class GetTopicsQueryDto {
     type: String,
   })
   public owner: string;
-
-  @ApiProperty({
-    example: 1,
-    default: 1,
-    required: false,
-    type: Number,
-  })
-  @IsOptional()
-  public page: number = 1;
 
   @IsOptional()
   @ApiProperty({
@@ -614,7 +601,7 @@ export class DeleteTopicsVersionParamsDto {
     type: String,
     example: '1.0.9',
   })
-  public version: string;
+  public versionNumber: string;
 }
 
 export class DeleteTopic {

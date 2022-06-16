@@ -6,7 +6,7 @@ import { DsbClientGatewayErrors } from '@dsb-client-gateway/dsb-client-gateway-e
 import { IamService } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
 import { setupApp } from './helpers/app.helper';
 
-const feature = loadFeature('../feature/identity.feature', {
+const feature = loadFeature('../../feature/identity.feature', {
   loadRelativePath: true,
 });
 jest.setTimeout(100000);

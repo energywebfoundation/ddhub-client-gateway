@@ -2,18 +2,18 @@ import { useState } from 'react';
 import { keyBy } from 'lodash';
 import {
   useChannels,
-  useUploadMessage,
   useTopicVersionHistory,
+  useUploadMessage,
 } from '@ddhub-client-gateway-frontend/ui/api-hooks';
 import { UpdateChannelDtoType } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { DataMessagingUploadProps } from './DataMessagingUpload';
 import { TFileType } from '../UploadForm/UploadForm.types';
 import { TOption } from './DataMessagingUpload.types';
 import {
-  MIN_FILE_SIZE,
-  MAX_FILE_SIZE,
   bytesToMegaBytes,
   FileType,
+  MAX_FILE_SIZE,
+  MIN_FILE_SIZE,
 } from './DataMessagingUpload.utils';
 
 export const useDataMessagingUploadEffects = ({
@@ -50,8 +50,8 @@ export const useDataMessagingUploadEffects = ({
   }));
 
   const topicHistoryOptions = topicHistory.map((topic) => ({
-    label: topic.version,
-    value: topic.version,
+    label: '1.0.0', // @TODO - Frontend fix
+    value: '1.0.0',
   }));
 
   const topics = channelsByName[selectedChannel]?.conditions?.topics ?? [];
@@ -65,9 +65,7 @@ export const useDataMessagingUploadEffects = ({
     : ('json' as TFileType);
   const maxFileSize = isLarge ? MAX_FILE_SIZE : MIN_FILE_SIZE;
   const fileSizeInfo = isLarge
-    ? `${uploadFileType} file size between ${bytesToMegaBytes(
-        MIN_FILE_SIZE
-      )}mb and ${bytesToMegaBytes(MAX_FILE_SIZE)}mb.`
+    ? `${uploadFileType} size ${bytesToMegaBytes(MAX_FILE_SIZE)}mb.`
     : `${uploadFileType} size ${bytesToMegaBytes(MIN_FILE_SIZE)}mb.`;
 
   const topicsOptions =
@@ -78,9 +76,6 @@ export const useDataMessagingUploadEffects = ({
 
   const onFileChange = (acceptedFiles: File[]) => {
     const file = acceptedFiles[0];
-    if (isLarge && file.size < MIN_FILE_SIZE) {
-      return;
-    }
     setSelectedFile(file);
   };
 

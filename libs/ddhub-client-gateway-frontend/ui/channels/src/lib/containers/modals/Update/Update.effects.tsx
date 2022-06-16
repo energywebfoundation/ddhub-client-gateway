@@ -131,10 +131,11 @@ export const useUpdateChannelEffects = () => {
   const getActionButtonsProps = ({
     onClick,
     loading = false,
+    text = 'Save'
   }: TGetActionButtonsProps): TActionButtonsProps => ({
     nextClickButtonProps: {
       onClick,
-      text: 'Save',
+      text,
       loading,
     },
     onCancel: openCancelModal,

@@ -1,7 +1,7 @@
 import { INestApplication, Logger, ValidationPipe } from '@nestjs/common';
 import { ValidationException } from '@dsb-client-gateway/dsb-client-gateway-errors';
 import { Test } from '@nestjs/testing';
-import { AppModule } from '../../../../dsb-client-gateway-api/src/app/app.module';
+import { AppModule } from '../../../../../dsb-client-gateway-api/src/app/app.module';
 
 export const setupApp = async (): Promise<INestApplication> => {
   const moduleRef = await Test.createTestingModule({

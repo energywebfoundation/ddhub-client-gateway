@@ -277,6 +277,7 @@ export class DdhubTopicsService extends DdhubBaseService {
   @Span('ddhub_mb_getTopicsBySearch')
   public async getTopicsBySearch(
     keyword: string,
+    owner?: string,
     limit?: number,
     page?: number
   ): Promise<TopicDataResponse | []> {
@@ -291,6 +292,7 @@ export class DdhubTopicsService extends DdhubBaseService {
           this.httpService.get('/topics/search', {
             params: {
               keyword,
+              owner,
               limit,
               page,
             },

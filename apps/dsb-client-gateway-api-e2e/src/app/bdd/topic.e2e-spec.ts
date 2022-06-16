@@ -9,7 +9,7 @@ import {
 } from './helpers/topic.helper';
 import { setupApp } from './helpers/app.helper';
 
-const feature = loadFeature('../feature/topic.feature', {
+const feature = loadFeature('../../feature/topic.feature', {
   loadRelativePath: true,
 });
 

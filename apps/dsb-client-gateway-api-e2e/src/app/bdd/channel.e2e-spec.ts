@@ -5,7 +5,7 @@ import { givenIHaveEmptyListOfChannels } from './helpers/channel.helper';
 import request from 'supertest';
 import { setupApp } from './helpers/app.helper';
 
-const feature = loadFeature('../feature/channel.feature', {
+const feature = loadFeature('../../feature/channel.feature', {
   loadRelativePath: true,
 });
 
