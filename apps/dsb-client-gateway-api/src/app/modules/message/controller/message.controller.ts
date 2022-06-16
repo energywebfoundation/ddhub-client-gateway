@@ -26,10 +26,9 @@ import { GetMessagesResponseDto } from '../dto/response/get-message-response.dto
 import { DownloadMessageResponse } from '../entity/message.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Readable } from 'stream';
-import { MtlsGuard } from '../../certificate/guards/mtls.guard';
 
 @Controller('messages')
-@UseGuards(DigestGuard, MtlsGuard)
+@UseGuards(DigestGuard)
 @ApiTags('Messaging')
 export class MessageControlller {
   private readonly logger = new Logger();

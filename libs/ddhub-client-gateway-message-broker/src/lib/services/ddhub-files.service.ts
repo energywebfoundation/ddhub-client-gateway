@@ -23,8 +23,7 @@ export class DdhubFilesService extends DdhubBaseService {
     super(
       new Logger(DdhubFilesService.name),
       retryConfigService,
-      ddhubLoginService,
-      tlsAgentService
+      ddhubLoginService
     );
   }
 

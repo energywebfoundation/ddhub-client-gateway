@@ -21,8 +21,7 @@ export class DdhubDidService extends DdhubBaseService {
     super(
       new Logger(DdhubDidService.name),
       retryConfigService,
-      ddhubLoginService,
-      tlsAgentService
+      ddhubLoginService
     );
   }
 

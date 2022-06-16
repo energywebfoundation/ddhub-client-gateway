@@ -15,7 +15,6 @@ export const BASIC_ENVS = Joi.object({
     .description(
       'Directory where we should store downloaded files for limited time'
     ),
-  MTLS_ENABLED: Joi.boolean().default(true).description('Should enable mTLS'),
   DB_NAME: Joi.string()
     .default('local.db')
     .description('SQLite database file name'),

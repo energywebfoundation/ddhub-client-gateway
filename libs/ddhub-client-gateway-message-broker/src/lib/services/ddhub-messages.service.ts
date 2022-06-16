@@ -30,8 +30,7 @@ export class DdhubMessagesService extends DdhubBaseService {
     super(
       new Logger(DdhubMessagesService.name),
       retryConfigService,
-      ddhubLoginService,
-      tlsAgentService
+      ddhubLoginService
     );
   }
 

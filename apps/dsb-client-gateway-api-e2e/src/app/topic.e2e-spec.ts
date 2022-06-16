@@ -1,5 +1,7 @@
 import { defineFeature, loadFeature } from 'jest-cucumber';
 import { INestApplication } from '@nestjs/common';
+import { Test } from '@nestjs/testing';
+import { AppModule } from '../../../dsb-client-gateway-api/src/app/app.module';
 import { givenIHaveIdentitySet } from './helpers/identity.helper';
 import { givenEnrolmentStatus } from './helpers/enrolment.helper';
 import {
@@ -7,7 +9,6 @@ import {
   whenTopicWasRegisteredItShouldExists,
   whenUserCreatesTopic,
 } from './helpers/topic.helper';
-import { setupApp } from './helpers/app.helper';
 
 const feature = loadFeature('../feature/topic.feature', {
   loadRelativePath: true,
@@ -21,7 +22,13 @@ describe('Topic Feature', () => {
   const getApp = () => app;
 
   beforeAll(async () => {
-    app = await setupApp();
+    const moduleRef = await Test.createTestingModule({
+      imports: [AppModule.register({ shouldValidate: true })],
+    }).compile();
+
+    app = moduleRef.createNestApplication();
+
+    await app.init();
   });
 
   afterAll(async () => {

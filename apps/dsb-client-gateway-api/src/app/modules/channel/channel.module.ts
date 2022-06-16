@@ -13,7 +13,7 @@ import {
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
 import { DdhubClientGatewayMessageBrokerModule } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
 import { DdhubClientGatewayIdentityModule } from '@dsb-client-gateway/ddhub-client-gateway-identity';
-import { CertificateModule } from '../certificate/certificate.module';
+import { DdhubClientGatewayEnrolmentModule } from '@dsb-client-gateway/ddhub-client-gateway-enrolment';
 
 @Module({
   imports: [
@@ -22,8 +22,9 @@ import { CertificateModule } from '../certificate/certificate.module';
     DdhubClientGatewayIdentityModule,
     ChannelRepositoryModule,
     TopicRepositoryModule,
-    DdhubClientGatewayMessageBrokerModule,
-    CertificateModule,
+    DdhubClientGatewayMessageBrokerModule.forRootAsync([
+      DdhubClientGatewayEnrolmentModule,
+    ]),
   ],
   providers: [
     ChannelService,

@@ -12,7 +12,7 @@ import { DdhubClientGatewayMessageBrokerModule } from '@dsb-client-gateway/ddhub
     TopicRepositoryModule,
     CronRepositoryModule,
     ApplicationRepositoryModule,
-    DdhubClientGatewayMessageBrokerModule,
+    DdhubClientGatewayMessageBrokerModule.forRootAsync(),
   ],
   providers: [TopicRefreshService],
 })

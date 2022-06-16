@@ -5,15 +5,14 @@ import {
   TopicRepositoryModule,
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
 import { DdhubClientGatewayMessageBrokerModule } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
+import { EnrolmentModule } from '../enrolment/enrolment.module';
 import { TopicService } from './service/topic.service';
-import { CertificateModule } from '../certificate/certificate.module';
 
 @Module({
   imports: [
     DsbClientGatewayStorageModule,
     TopicRepositoryModule,
-    DdhubClientGatewayMessageBrokerModule,
-    CertificateModule,
+    DdhubClientGatewayMessageBrokerModule.forRootAsync([EnrolmentModule]),
   ],
   controllers: [TopicsController],
   providers: [TopicService],

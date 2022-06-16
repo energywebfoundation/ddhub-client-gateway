@@ -9,7 +9,6 @@ import {
   Post,
   Put,
   Query,
-  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -30,12 +29,10 @@ import { UpdateChannelDto } from '../dto/request/update-channel.dto';
 import { CommandBus } from '@nestjs/cqrs';
 import { RefreshAllChannelsCacheDataCommand } from '../command/refresh-all-channels-cache-data.command';
 import { ChannelEntity } from '@dsb-client-gateway/dsb-client-gateway-storage';
-import { MtlsGuard } from '../../certificate/guards/mtls.guard';
 
 @Controller('channels')
 @ApiTags('Channels')
 @UseInterceptors(LokiMetadataStripInterceptor)
-@UseGuards(MtlsGuard)
 export class ChannelController {
   constructor(
     protected readonly channelService: ChannelService,

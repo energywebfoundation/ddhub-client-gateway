@@ -1,9 +1,10 @@
 import { defineFeature, loadFeature } from 'jest-cucumber';
 import { HttpStatus, INestApplication } from '@nestjs/common';
+import { Test } from '@nestjs/testing';
+import { AppModule } from '../../../dsb-client-gateway-api/src/app/app.module';
 import { givenIHaveIdentitySet } from './helpers/identity.helper';
 import { givenIHaveEmptyListOfChannels } from './helpers/channel.helper';
 import request from 'supertest';
-import { setupApp } from './helpers/app.helper';
 
 const feature = loadFeature('../feature/channel.feature', {
   loadRelativePath: true,
@@ -14,11 +15,17 @@ jest.setTimeout(100000);
 describe('Channel Feature', () => {
   let app: INestApplication;
 
-  beforeAll(async () => {
-    app = await setupApp();
-  });
-
   const getApp = () => app;
+
+  beforeAll(async () => {
+    const moduleRef = await Test.createTestingModule({
+      imports: [AppModule.register({ shouldValidate: true })],
+    }).compile();
+
+    app = moduleRef.createNestApplication();
+
+    await app.init();
+  });
 
   afterAll(async () => {
     await app.close();

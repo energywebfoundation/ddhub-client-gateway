@@ -16,8 +16,7 @@ export class DdhubHealthService extends DdhubBaseService {
     super(
       new Logger(DdhubHealthService.name),
       retryConfigService,
-      ddhubLoginService,
-      tlsAgentService
+      ddhubLoginService
     );
   }
 

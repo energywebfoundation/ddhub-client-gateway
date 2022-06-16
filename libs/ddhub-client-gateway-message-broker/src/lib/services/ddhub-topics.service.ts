@@ -33,8 +33,7 @@ export class DdhubTopicsService extends DdhubBaseService {
     super(
       new Logger(DdhubTopicsService.name),
       retryConfigService,
-      ddhubLoginService,
-      tlsAgentService
+      ddhubLoginService
     );
   }
 

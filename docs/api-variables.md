@@ -24,7 +24,6 @@
 | DSB_BASE_URL | string | https://dsb-demo.energyweb.org | Message broker URL |  |  |
 | UPLOAD_FILES_DIR | string | ./upload | Directory where we should store temporary files for upload |  |  |
 | DOWNLOAD_FILES_DIR | string | ./download | Directory where we should store downloaded files for limited time |  |  |
-| MTLS_ENABLED | boolean | true | Should enable mTLS |  |  |
 | DB_NAME | string | local.db | SQLite database file name |  |  |
 | CLIENT_ID | string | WS_CONSUMER | WS client id |  |  |
 | SECRETS_ENGINE | string | vault | Secrets engine to use | aws,vault |  |

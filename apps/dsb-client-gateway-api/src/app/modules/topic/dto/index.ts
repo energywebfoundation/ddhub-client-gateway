@@ -1,21 +1,20 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { SchemaType } from '../topic.const';
 import {
-  ArrayUnique,
-  IsArray,
   IsDateString,
-  IsEnum,
   IsNotEmpty,
-  IsNumber,
   IsOptional,
   IsPositive,
   IsString,
+  IsArray,
+  ArrayUnique,
+  IsNumber,
+  IsEnum,
 } from 'class-validator';
 import { IsValidApplicationNameSpace } from '../../utils/validator/decorators/IsValidApplicationNameSpace';
 import { IsValidTopicName } from '../../utils/validator/decorators/isValidTopicName';
 import { ConfigService } from '@nestjs/config';
 import { IsValidVersion } from '../../utils/validator/decorators/isValidVersion';
-
 export class GetTopicDto {
   constructor(protected readonly configService: ConfigService) {}
 
@@ -469,6 +468,7 @@ export class GetTopicsQueryDto {
   })
   public owner: string;
 
+  @IsOptional()
   @ApiProperty({
     example: 1,
     default: 1,
@@ -476,7 +476,7 @@ export class GetTopicsQueryDto {
     type: Number,
   })
   @IsOptional()
-  public page: number = 1;
+  public page: number;
 
   @IsOptional()
   @ApiProperty({
