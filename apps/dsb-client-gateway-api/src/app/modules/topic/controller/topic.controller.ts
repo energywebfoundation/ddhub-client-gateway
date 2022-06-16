@@ -1,11 +1,13 @@
 import {
   Body,
   Controller,
+  DefaultValuePipe,
   Delete,
   Get,
   HttpCode,
   HttpStatus,
   Param,
+  ParseIntPipe,
   Post,
   Put,
   Query,
@@ -32,9 +34,10 @@ import {
 } from '../dto';
 import { DdhubTopicsService } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
 import { TopicService } from '../service/topic.service';
+import { MtlsGuard } from '../../certificate/guards/mtls.guard';
 
 @Controller('topics')
-@UseGuards(DigestGuard)
+@UseGuards(DigestGuard, MtlsGuard)
 @ApiTags('Topics')
 export class TopicsController {
   constructor(
@@ -53,7 +56,9 @@ export class TopicsController {
     description: 'Unauthorized',
   })
   public async getTopics(
-    @Query() { limit, name, owner, page, tags }: GetTopicsQueryDto
+    @Query('limit', ParseIntPipe) limit: number,
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query() { name, owner, tags }: GetTopicsQueryDto
   ) {
     return this.topicService.getTopics(limit, name, owner, page, tags);
   }

@@ -25,9 +25,7 @@ import { DdhubClientGatewayUtilsModule } from '@dsb-client-gateway/ddhub-client-
     StorageModule,
     DidRepositoryModule,
     DdhubClientGatewayUtilsModule,
-    DdhubClientGatewayMessageBrokerModule.forRootAsync([
-      DdhubClientGatewayEnrolmentModule,
-    ]),
+    DdhubClientGatewayMessageBrokerModule,
     DdhubClientGatewayEncryptionModule,
   ],
   providers: [KeysService, RefreshKeysHandler],

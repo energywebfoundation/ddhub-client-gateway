@@ -33,36 +33,42 @@ export const API_ENVS = Joi.object({
     .conditional('WEBSOCKET', {
       is: WebSocketImplementation.CLIENT,
       then: Joi.string().uri().required(),
+      otherwise: Joi.optional(),
     })
     .description('WebSocket Client URL to connect'),
   WEBSOCKET_PROTOCOL: Joi.alternatives()
     .conditional('WEBSOCKET', {
       is: WebSocketImplementation.CLIENT,
       then: Joi.string().default('dsb-protocol').required(),
+      otherwise: Joi.optional(),
     })
     .description('WebSocket Client protocol'),
   WEBSOCKET_RECONNECT_TIMEOUT: Joi.alternatives()
     .conditional('WEBSOCKET', {
       is: WebSocketImplementation.CLIENT,
       then: Joi.number().positive().default(3000).required(),
+      otherwise: Joi.optional(),
     })
     .description('WebSocket Client reconnect timeout'),
   WEBSOCKET_RECONNECT: Joi.alternatives()
     .conditional('WEBSOCKET', {
       is: WebSocketImplementation.CLIENT,
       then: Joi.number().positive().default(3000).required(),
+      otherwise: Joi.optional(),
     })
     .description('Should attempt to reconnect'),
   WEBSOCKET_RECONNECT_MAX_RETRIES: Joi.alternatives()
     .conditional('WEBSOCKET', {
       is: WebSocketImplementation.CLIENT,
       then: Joi.number().positive().default(10).required(),
+      otherwise: Joi.optional(),
     })
     .description('How many times should attempt to reconnect'),
   WEBSOCKET_POOLING_TIMEOUT: Joi.alternatives()
     .conditional('WEBSOCKET', {
       is: WebSocketImplementation.CLIENT,
       then: Joi.number().positive().default(5000).required(),
+      otherwise: Joi.optional(),
     })
     .description('How often should poll messages'),
   DID_CLAIM_NAMESPACE: Joi.string()

@@ -1,6 +1,7 @@
 export enum DsbClientGatewayErrors {
   // UNKNOWN
   UNKNOWN = 'DHCG::UNKNOWN',
+  UNAUTHORIZED = 'DHCG::UNAUTHORIZED',
 
   // IDENTITY ERRORS
   ID_NO_PRIVATE_KEY = 'ID::NO_PRIVATE_KEY',

@@ -1,4 +1,4 @@
-import { DynamicModule, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { HttpModule } from '@nestjs/axios';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import {
@@ -16,50 +16,46 @@ import { DidAuthModule } from '@dsb-client-gateway/ddhub-client-gateway-did-auth
 import { SecretsEngineModule } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
 import { DdhubClientGatewayEnrolmentModule } from '@dsb-client-gateway/ddhub-client-gateway-enrolment';
 
-@Module({})
-export class DdhubClientGatewayMessageBrokerModule {
-  public static forRootAsync(arr = []): DynamicModule {
-    return {
-      imports: [
-        DdhubClientGatewayEnrolmentModule,
-        HttpModule.registerAsync({
-          imports: [ConfigModule],
-          useFactory: (configService: ConfigService) => {
-            return {
-              baseURL: configService.get<string>(
-                'DSB_BASE_URL',
-                'https://dsb-demo.energyweb.org'
-              ),
-              headers: {
-                'Content-Type': 'application/json',
-              },
-            };
+@Module({
+  imports: [
+    DdhubClientGatewayEnrolmentModule,
+    HttpModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => {
+        return {
+          baseURL: configService.get<string>(
+            'DSB_BASE_URL',
+            'https://dsb-demo.energyweb.org'
+          ),
+          headers: {
+            'Content-Type': 'application/json',
           },
-          inject: [ConfigService],
-        }),
-        DidAuthModule,
-        SecretsEngineModule,
-        DdhubClientGatewayUtilsModule,
-        CqrsModule,
-      ],
-      providers: [
-        TlsAgentService,
-        DdhubTopicsService,
-        DdhubFilesService,
-        DdhubHealthService,
-        DdhubMessagesService,
-        DdhubLoginService,
-        DdhubDidService,
-      ],
-      exports: [
-        DdhubTopicsService,
-        DdhubFilesService,
-        DdhubHealthService,
-        DdhubMessagesService,
-        DdhubLoginService,
-        DdhubDidService,
-      ],
-      module: DdhubClientGatewayMessageBrokerModule,
-    };
-  }
-}
+        };
+      },
+      inject: [ConfigService],
+    }),
+    DidAuthModule,
+    SecretsEngineModule,
+    DdhubClientGatewayUtilsModule,
+    CqrsModule,
+  ],
+  providers: [
+    TlsAgentService,
+    DdhubTopicsService,
+    DdhubFilesService,
+    DdhubHealthService,
+    DdhubMessagesService,
+    DdhubLoginService,
+    DdhubDidService,
+  ],
+  exports: [
+    DdhubTopicsService,
+    DdhubFilesService,
+    DdhubHealthService,
+    DdhubMessagesService,
+    DdhubLoginService,
+    DdhubDidService,
+    TlsAgentService,
+  ],
+})
+export class DdhubClientGatewayMessageBrokerModule {}
