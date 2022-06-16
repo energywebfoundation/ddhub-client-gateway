@@ -9,7 +9,7 @@ import { GetTopicResponse } from '../entity/topic.entity';
 export class TopicService {
   protected readonly logger = new Logger(TopicService.name);
 
-  constructor(protected readonly wrapper: TopicRepositoryWrapper) {}
+  constructor(protected readonly wrapper: TopicRepositoryWrapper) { }
 
   @Span('topics_getTopics')
   public async getTopics(
@@ -29,8 +29,8 @@ export class TopicService {
         page: 1,
       };
 
-      const topics: TopicEntity[] =
-        await this.wrapper.topicRepository.getTopics(
+      const [topics, total] =
+        await this.wrapper.topicRepository.getTopicsAndCount(
           limit,
           name,
           owner,
@@ -53,7 +53,7 @@ export class TopicService {
       }
 
       result.records = latestTopicsFromCache;
-      result.count = latestTopicsFromCache.length;
+      result.count = total;
       result.limit = limit ? limit : 1;
       result.page = page ? page : 1;
 

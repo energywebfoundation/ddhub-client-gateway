@@ -20,4 +20,22 @@ export class TopicRepository extends Repository<TopicEntity> {
       skip: page,
     });
   }
+
+  public async getTopicsAndCount(
+    limit: number,
+    name: string,
+    owner: string,
+    page: number,
+    tags: string[]
+  ): Promise<[TopicEntity[], number]> {
+    return this.findAndCount({
+      where: {
+        ...(name ? { name } : null),
+        ...(owner ? { owner } : null),
+        ...(tags ? { tags } : null),
+      },
+      take: limit,
+      skip: page,
+    });
+  }
 }

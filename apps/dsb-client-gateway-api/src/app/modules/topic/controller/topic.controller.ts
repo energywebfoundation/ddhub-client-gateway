@@ -223,7 +223,7 @@ export class TopicsController {
     return this.ddhubTopicsService.deleteTopic(id);
   }
 
-  @Delete('/:id/versions/:version')
+  @Delete('/:id/versions/:versionNumber')
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Topic deleted successfully',
@@ -244,8 +244,8 @@ export class TopicsController {
   })
   @HttpCode(HttpStatus.OK)
   public async deleteTopicsByVersion(
-    @Param() { id, version }: DeleteTopicsVersionParamsDto
+    @Param() { id, versionNumber }: DeleteTopicsVersionParamsDto
   ): Promise<DeleteTopic> {
-    return this.ddhubTopicsService.deleteTopicByVersion(id, version);
+    return this.ddhubTopicsService.deleteTopicByVersion(id, versionNumber);
   }
 }
