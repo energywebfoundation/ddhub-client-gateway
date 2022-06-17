@@ -1,4 +1,5 @@
 import { makeStyles } from 'tss-react/mui';
+import { alpha } from '@mui/material';
 
 export const useStyles = makeStyles()((theme) => ({
   button: {
@@ -7,6 +8,11 @@ export const useStyles = makeStyles()((theme) => ({
     textTransform: 'capitalize',
     padding: '11px 22px',
     justifyContent: 'flex-start',
+    border: `1px solid ${theme.palette.primary.main}`,
+    '&:hover': {
+      backgroundColor: alpha(theme.palette.primary.main, 0.04),
+      border: `1px solid ${theme.palette.primary.main}`,
+    },
   },
   buttonText: {
     fontSize: 14,
