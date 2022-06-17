@@ -12,8 +12,12 @@ export const useStyles = makeStyles()((theme) => ({
     borderRadius: 5,
   },
   cancelButton: {
-    border: `1px solid ${alpha(theme.palette.secondary.main, 0.5)}`,
+    border: `1px solid ${theme.palette.secondary.main}`,
     marginRight: 7,
+    '&:hover': {
+      border: `1px solid ${theme.palette.secondary.main}`,
+      background: alpha(theme.palette.secondary.main, 0.04)
+    }
   },
   confirmButton: {
     width: 75,
