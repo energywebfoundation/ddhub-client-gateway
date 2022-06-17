@@ -21,7 +21,9 @@ export const useStyles = makeStyles()((theme) => ({
   },
   confirmButton: {
     width: 75,
-    border: `1px solid ${theme.palette.primary.main}`,
+    '&:not(.Mui-disabled)': {
+      border: `1px solid ${theme.palette.primary.main}`,
+    },
     '&:hover': {
       backgroundColor: darken(theme.palette.primary.main, 0.2),
     },
