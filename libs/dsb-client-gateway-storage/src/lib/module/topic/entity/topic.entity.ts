@@ -46,7 +46,7 @@ export class TopicEntity {
   @Column()
   owner: string;
 
-  @Column()
+  @PrimaryColumn()
   version: string;
 
   @CreateDateColumn()
