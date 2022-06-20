@@ -32,15 +32,16 @@ import {
 } from '../dto';
 import { DdhubTopicsService } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
 import { TopicService } from '../service/topic.service';
+import { MtlsGuard } from '../../certificate/guards/mtls.guard';
 
 @Controller('topics')
-@UseGuards(DigestGuard)
+@UseGuards(DigestGuard, MtlsGuard)
 @ApiTags('Topics')
 export class TopicsController {
   constructor(
     protected readonly ddhubTopicsService: DdhubTopicsService,
     protected readonly topicService: TopicService
-  ) { }
+  ) {}
 
   @Get('')
   @ApiResponse({
@@ -53,9 +54,15 @@ export class TopicsController {
     description: 'Unauthorized',
   })
   public async getTopics(
-    @Query() { limit, name, owner, page, tags }: GetTopicsQueryDto
+    @Query() { name, owner, tags, limit, page }: GetTopicsQueryDto
   ) {
-    return this.topicService.getTopics(limit || 0, name, owner, page || 1, tags);
+    return this.topicService.getTopics(
+      +limit,
+      name,
+      owner,
+      +page,
+      typeof tags === 'string' ? [tags] : tags
+    );
   }
 
   @Get('/:id/versions')
@@ -113,8 +120,13 @@ export class TopicsController {
   })
   public async getTopicsBySearch(
     @Query() { keyword, owner, limit, page }: GetTopicsSearchQueryDto
-  ) {
-    return this.topicService.getTopicsBySearch(keyword, owner, limit || 0, page || 1);
+  ): Promise<PaginatedTopicResponse | []> {
+    return this.ddhubTopicsService.getTopicsBySearch(
+      keyword,
+      owner,
+      limit,
+      page
+    );
   }
 
   @Post('')

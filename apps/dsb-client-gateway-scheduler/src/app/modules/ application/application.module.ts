@@ -10,7 +10,7 @@ import { DdhubClientGatewayMessageBrokerModule } from '@dsb-client-gateway/ddhub
   imports: [
     CronRepositoryModule,
     ApplicationRepositoryModule,
-    DdhubClientGatewayMessageBrokerModule.forRootAsync(),
+    DdhubClientGatewayMessageBrokerModule,
   ],
   providers: [ApplicationService],
 })

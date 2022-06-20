@@ -16,7 +16,7 @@ import { DdhubClientGatewayMessageBrokerModule } from '@dsb-client-gateway/ddhub
     DidRepositoryModule,
     ChannelRepositoryModule,
     CronRepositoryModule,
-    DdhubClientGatewayMessageBrokerModule.forRootAsync(),
+    DdhubClientGatewayMessageBrokerModule,
   ],
   providers: [
     DidAttributeChangedHandler,

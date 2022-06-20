@@ -2,18 +2,18 @@ import { useState } from 'react';
 import { keyBy } from 'lodash';
 import {
   useChannels,
-  useUploadMessage,
   useTopicVersionHistory,
+  useUploadMessage,
 } from '@ddhub-client-gateway-frontend/ui/api-hooks';
 import { UpdateChannelDtoType } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { DataMessagingUploadProps } from './DataMessagingUpload';
 import { TFileType } from '../UploadForm/UploadForm.types';
 import { TOption } from './DataMessagingUpload.types';
 import {
-  MIN_FILE_SIZE,
-  MAX_FILE_SIZE,
   bytesToMegaBytes,
   FileType,
+  MAX_FILE_SIZE,
+  MIN_FILE_SIZE,
 } from './DataMessagingUpload.utils';
 
 export const useDataMessagingUploadEffects = ({
@@ -50,8 +50,8 @@ export const useDataMessagingUploadEffects = ({
   }));
 
   const topicHistoryOptions = topicHistory.map((topic) => ({
-    label: topic.version,
-    value: topic.version,
+    label: '1.0.0', // @TODO - Frontend fix
+    value: '1.0.0',
   }));
 
   const topics = channelsByName[selectedChannel]?.conditions?.topics ?? [];
