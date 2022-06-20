@@ -12,8 +12,8 @@ import { useStyles } from './Search.styles';
 
 export interface SearchProps {
   filter: string;
-  setFilter?: (value: string) => void; // either one is required, setFilter is default for frontend search
-  onSearchInput?: (value: string) => void; // for backend search
+  setFilter?: (value: string) => void;
+  onSearchInput?: (value: string) => void;
   debounceTime?: number;
 }
 

@@ -39,6 +39,7 @@ export const Topics: FC<TopicsProps> = ({
         onRowClick={handleRowClick}
         onPageChange={handlePageChange}
         onSearchInput={handleSearchInput}
+        backendSearch={true}
         loading={isLoading}
         defaultSortBy='name'
         defaultOrder='asc'

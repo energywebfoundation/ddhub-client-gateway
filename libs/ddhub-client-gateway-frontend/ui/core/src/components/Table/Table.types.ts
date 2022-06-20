@@ -40,4 +40,5 @@ export interface TableProps<T> {
   defaultSortBy?: string;
   defaultOrder?: 'asc' | 'desc';
   customStyle?: TableCustomStyle;
+  backendSearch?: boolean;
 }
