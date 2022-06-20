@@ -9,7 +9,7 @@ import { useQueryClient } from "react-query";
 import { RouteRestrictions } from "./config/route-restrictions.interface";
 
 export const routeRestrictions = new Map()
-  .set('topicManagement', routerConst.AppsAndTopics)
+  .set('topicManagement', routerConst.TopicManagement)
   .set('myAppsAndTopics', routerConst.ChannelApps)
   .set('channelManagement', routerConst.ChannelsManagement)
   .set('largeFileUpload', routerConst.LargeDataMessagingFileUpload)

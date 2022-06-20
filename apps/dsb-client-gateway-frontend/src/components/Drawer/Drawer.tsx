@@ -46,9 +46,9 @@ export const Drawer = () => {
           icon={<Settings className={classes.icon} size={18} />}
         />
 
-        {displayedRoutes.has(routerConst.AppsAndTopics) && (
+        {displayedRoutes.has(routerConst.TopicManagement) && (
           <MenuItem
-            href={routerConst.AppsAndTopics}
+            href={routerConst.TopicManagement}
             title="Topic management"
             icon={<Layers className={classes.icon} size={16} />}
           />

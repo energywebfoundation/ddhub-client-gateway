@@ -55,7 +55,7 @@ export class TopicsController {
   public async getTopics(
     @Query() { limit, name, owner, page, tags }: GetTopicsQueryDto
   ) {
-    return this.topicService.getTopics(limit, name, owner, page, tags);
+    return this.topicService.getTopics(limit || 0, name, owner, page || 1, tags);
   }
 
   @Get('/:id/versions')
@@ -109,12 +109,12 @@ export class TopicsController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Get Topics by Search',
-    type: () => PaginatedTopicResponse,
+    type: () => PaginatedResponse,
   })
   public async getTopicsBySearch(
     @Query() { keyword, owner, limit, page }: GetTopicsSearchQueryDto
-  ): Promise<PaginatedTopicResponse | []> {
-    return this.ddhubTopicsService.getTopicsBySearch(keyword, owner, limit, page);
+  ) {
+    return this.topicService.getTopicsBySearch(keyword, owner, limit || 0, page || 1);
   }
 
   @Post('')
@@ -136,7 +136,10 @@ export class TopicsController {
   public async postTopics(
     @Body() data: PostTopicBodyDto
   ): Promise<PostTopicDto> {
-    return this.ddhubTopicsService.postTopics(data);
+    return this.ddhubTopicsService.postTopics(data).then((topic: PostTopicDto) => {
+      this.topicService.saveTopic(topic);
+      return topic;
+    });
   }
 
   @Put('/:id/versions/:versionNumber')
@@ -167,7 +170,10 @@ export class TopicsController {
       data,
       id,
       versionNumber
-    );
+    ).then((topic: PostTopicDto) => {
+      this.topicService.updateTopicVersion(topic);
+      return topic;
+    });
   }
 
   @Put('/:id')
@@ -194,7 +200,10 @@ export class TopicsController {
     @Param() { id }: GetTopicsParamsDto,
     @Body() data: UpdateTopicBodyDto
   ): Promise<PutTopicDto> {
-    return this.ddhubTopicsService.updateTopic(data, id);
+    return this.ddhubTopicsService.updateTopic(data, id).then((topic: PostTopicDto) => {
+      this.topicService.updateTopic(topic);
+      return topic;
+    });
   }
 
   @Delete('/:id')
@@ -220,7 +229,10 @@ export class TopicsController {
   public async deleteTopics(
     @Param() { id }: GetTopicsParamsDto
   ): Promise<DeleteTopic> {
-    return this.ddhubTopicsService.deleteTopic(id);
+    return this.ddhubTopicsService.deleteTopic(id).then((topic: DeleteTopic) => {
+      this.topicService.deleteTopic(id, undefined);
+      return topic;
+    });
   }
 
   @Delete('/:id/versions/:versionNumber')
@@ -246,6 +258,9 @@ export class TopicsController {
   public async deleteTopicsByVersion(
     @Param() { id, versionNumber }: DeleteTopicsVersionParamsDto
   ): Promise<DeleteTopic> {
-    return this.ddhubTopicsService.deleteTopicByVersion(id, versionNumber);
+    return this.ddhubTopicsService.deleteTopicByVersion(id, versionNumber).then((topic: DeleteTopic) => {
+      this.topicService.deleteTopic(id, versionNumber);
+      return topic;
+    });
   }
 }
