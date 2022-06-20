@@ -36,7 +36,11 @@ export const useStyles = makeStyles()((theme) => ({
     minHeight: 22,
     fontFamily: theme.typography.body2.fontFamily,
     padding: '9px 16px 10px',
-    '&:hover, &.Mui-selected': {
+    '&.Mui-selected': {
+      backgroundColor: theme.palette.primary.main,
+      color: theme.palette.common.white,
+    },
+    '&:hover': {
       backgroundColor: alpha(theme.palette.primary.main, 0.12),
       color: theme.palette.primary.main,
     },

@@ -114,8 +114,8 @@ body.swal2-height-auto.swal2-height-auto {
 
 .swal2-actions .swal2-styled.swal2-cancel {
   background: transparent !important;
-  border: 1px solid var(--primary-dark-color);
-  color: var(--primary-dark-color);
+  border: 1px solid var(--primary-color);
+  color: var(--primary-color);
   padding: 10px 24px;
 }
 
