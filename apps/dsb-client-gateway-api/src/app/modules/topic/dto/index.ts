@@ -431,7 +431,7 @@ export class GetTopicsQueryDto {
     required: false,
     type: Number,
   })
-  public limit: number = 1;
+  public limit: number = 5;
 
   @IsNumber()
   @IsPositive()

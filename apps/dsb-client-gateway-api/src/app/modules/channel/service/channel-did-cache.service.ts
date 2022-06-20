@@ -70,6 +70,8 @@ export class ChannelDidCacheService {
         await this.ddhubTopicService.getTopicVersions(topicId);
 
       for (const topicVersion of topicVersions.records) {
+        const [major, minor, patch]: string[] = topicVersion.version.split('.');
+
         await this.wrapper.topicRepository.save({
           id: topicId,
           owner: owner,
@@ -78,6 +80,9 @@ export class ChannelDidCacheService {
           version: topicVersion.version,
           schema: topicVersion.schema,
           tags: topicVersion.tags,
+          majorVersion: major,
+          minorVersion: minor,
+          patchVersion: patch,
         });
 
         this.logger.log(

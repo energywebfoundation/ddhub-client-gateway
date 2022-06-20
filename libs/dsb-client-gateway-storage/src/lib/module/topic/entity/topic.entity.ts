@@ -46,6 +46,21 @@ export class TopicEntity {
   @Column()
   owner: string;
 
+  @Column({
+    nullable: true,
+  })
+  majorVersion: string;
+
+  @Column({
+    nullable: true,
+  })
+  minorVersion: string;
+
+  @Column({
+    nullable: true,
+  })
+  patchVersion: string;
+
   @PrimaryColumn()
   version: string;
 

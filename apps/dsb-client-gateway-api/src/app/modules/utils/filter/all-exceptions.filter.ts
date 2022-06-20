@@ -78,9 +78,10 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
     const responseBody: ResponseErrorDto = {
       err: {
-        code: DsbClientGatewayErrors.MB_UNKNOWN,
+        code: DsbClientGatewayErrors.UNKNOWN,
         reason: exception.message,
         additionalDetails: exception.additionalDetails,
+        exception: JSON.stringify(exception),
       },
       timestamp: new Date().toISOString(),
       statusCode: HttpStatus.INTERNAL_SERVER_ERROR,

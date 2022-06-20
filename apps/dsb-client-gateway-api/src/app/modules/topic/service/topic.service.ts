@@ -8,12 +8,15 @@ import { Span } from 'nestjs-otel';
 import { GetTopicResponse } from '../entity/topic.entity';
 
 import { PostTopicDto } from '../dto';
+
 @Injectable()
 export class TopicService {
   protected readonly logger = new Logger(TopicService.name);
 
-  constructor(protected readonly wrapper: TopicRepositoryWrapper,
-    protected readonly applicationsWrapper: ApplicationWrapperRepository) { }
+  constructor(
+    protected readonly wrapper: TopicRepositoryWrapper,
+    protected readonly applicationsWrapper: ApplicationWrapperRepository
+  ) {}
 
   @Span('topics_getTopics')
   public async getTopics(
@@ -43,7 +46,12 @@ export class TopicService {
   }
 
   @Span('topics_getTopicsBySearch')
-  public async getTopicsBySearch(keyword: string, owner: string, limit: number, page: number) {
+  public async getTopicsBySearch(
+    keyword: string,
+    owner: string,
+    limit: number,
+    page: number
+  ) {
     const [topics, allCount] =
       await this.wrapper.topicRepository.getTopicsAndCountSearch(
         limit,
@@ -62,11 +70,14 @@ export class TopicService {
 
   @Span('topics_saveTopic')
   public async saveTopic(data: PostTopicDto): Promise<void> {
-    await this.applicationsWrapper.repository.update({
-      namespace: data.owner
-    }, {
-      topicsCount: () => "topicsCount + 1"
-    });
+    await this.applicationsWrapper.repository.update(
+      {
+        namespace: data.owner,
+      },
+      {
+        topicsCount: () => 'topicsCount + 1',
+      }
+    );
 
     await this.wrapper.topicRepository.save({
       id: data.id,
@@ -74,53 +85,68 @@ export class TopicService {
       name: data.name,
       schemaType: data.schemaType,
       version: data.version,
-      schema: (data.schema) as unknown as object,
+      schema: data.schema as unknown as object,
       tags: data.tags,
     });
   }
 
   @Span('topics_updateTopic')
   public async updateTopic(data: PostTopicDto): Promise<void> {
-    await this.wrapper.topicRepository.update({
-      id: data.id,
-    }, {
-      ...(data.tags ? { tags: data.tags } : null),
-      ...(data.schema ? { schema: (data.schema) as unknown as object } : null),
-    });
+    await this.wrapper.topicRepository.update(
+      {
+        id: data.id,
+      },
+      {
+        ...(data.tags ? { tags: data.tags } : null),
+        ...(data.schema ? { schema: data.schema as unknown as object } : null),
+      }
+    );
   }
 
   @Span('topics_updateTopicVersion')
   public async updateTopicVersion(data: PostTopicDto): Promise<void> {
-    const topic: TopicEntity = await this.wrapper.topicRepository.findOne({ where: { id: data.id, version: data.version } });
+    const topic: TopicEntity = await this.wrapper.topicRepository.findOne({
+      where: { id: data.id, version: data.version },
+    });
     if (topic) {
-      this.updateTopic(data);
+      await this.updateTopic(data);
     } else {
+      const [major, minor, patch]: string[] = data.version.split('.');
+
       await this.wrapper.topicRepository.save({
         id: data.id,
         owner: data.owner,
         name: data.name,
         schemaType: data.schemaType,
         version: data.version,
-        schema: (data.schema) as unknown as object,
+        schema: data.schema as unknown as object,
         tags: data.tags,
+        majorVersion: major,
+        minorVersion: minor,
+        patchVersion: patch,
       });
     }
   }
 
   @Span('topics_deleteTopic')
   public async deleteTopic(id: string, versionNumber: string): Promise<void> {
-    const data: TopicEntity = await this.wrapper.topicRepository.findOne({ where: { id } });
+    const data: TopicEntity = await this.wrapper.topicRepository.findOne({
+      where: { id },
+    });
     if (data) {
       await this.wrapper.topicRepository.delete({
         ...{ id },
-        ...(versionNumber ? { version: versionNumber } : null)
+        ...(versionNumber ? { version: versionNumber } : null),
       });
 
-      await this.applicationsWrapper.repository.update({
-        namespace: data.owner
-      }, {
-        topicsCount: () => "topicsCount - 1"
-      });
+      await this.applicationsWrapper.repository.update(
+        {
+          namespace: data.owner,
+        },
+        {
+          topicsCount: () => 'topicsCount - 1',
+        }
+      );
     }
   }
 }
