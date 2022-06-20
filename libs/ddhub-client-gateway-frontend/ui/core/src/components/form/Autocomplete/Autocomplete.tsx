@@ -27,6 +27,7 @@ interface AutocompleteProps {
   disabled?: boolean;
   placeholder?: string;
   wrapperProps?: BoxProps;
+  filterOptions?: (options: Array<any>, state: object) => Array<any>;
 }
 
 export const Autocomplete: FC<AutocompleteProps> = ({
@@ -45,6 +46,7 @@ export const Autocomplete: FC<AutocompleteProps> = ({
   loading,
   disabled,
   wrapperProps,
+  filterOptions,
 }) => {
   const { classes } = useStyles();
   return (
@@ -63,6 +65,7 @@ export const Autocomplete: FC<AutocompleteProps> = ({
         inputValue={inputValue}
         loading={loading}
         renderOption={renderOption}
+        filterOptions={filterOptions}
         popupIcon={
           popupIcon ?? <ChevronDown className={classes.popupIcon} size={20} />
         }
