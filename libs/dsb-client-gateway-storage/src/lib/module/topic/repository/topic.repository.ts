@@ -75,39 +75,41 @@ export class TopicRepository extends Repository<TopicEntity> {
     name: string,
     tags: string[]
   ): SelectQueryBuilder<TopicEntity> {
-    const query = this.createQueryBuilder('t');
+    const query = this.createQueryBuilder();
 
-    query.select('*');
+    query.select('e.*');
 
-    query.addSelect(
-      "MAX(CAST(REPLACE(version, '.', '') AS INTEGER)) castedVersion"
-    );
+    query.from((qb) => {
+      qb.from(TopicEntity, 't');
 
-    if (owner) {
-      query.where('t.owner = :owner', { owner });
-    }
+      if (owner) {
+        qb.where('owner = :owner', { owner });
+      }
 
-    if (name) {
-      query.andWhere('t.name = :name', { name });
-    }
+      if (name) {
+        qb.andWhere('name = :name', { name });
+      }
 
-    if (tags && tags.length) {
-      let tagQueryString = '(';
+      if (tags && tags.length) {
+        let tagQueryString = '(';
 
-      tags.forEach((tag, index) => {
-        if (index === 0) {
-          tagQueryString += ` '"' || tags || '"' LIKE '%${tag}%' `;
+        tags.forEach((tag, index) => {
+          if (index === 0) {
+            tagQueryString += ` '"' || tags || '"' LIKE '%${tag}%' `;
 
-          return;
-        }
+            return;
+          }
 
-        tagQueryString += ` OR '"' || tags || '"' LIKE '%${tag}%' `;
-      });
+          tagQueryString += ` OR '"' || tags || '"' LIKE '%${tag}%' `;
+        });
 
-      query.andWhere(tagQueryString + ')');
-    }
+        qb.andWhere(tagQueryString + ')');
+      }
 
-    query.groupBy('t.name').addGroupBy('t.owner');
+      return qb;
+    }, 'e');
+
+    query.groupBy('e.name').addGroupBy('e.owner');
 
     return query;
   }
