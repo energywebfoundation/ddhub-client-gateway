@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TopicsController } from './controller/topic.controller';
 import {
+  ApplicationRepositoryModule,
   DsbClientGatewayStorageModule,
   TopicRepositoryModule,
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
@@ -12,6 +13,7 @@ import { CertificateModule } from '../certificate/certificate.module';
   imports: [
     DsbClientGatewayStorageModule,
     TopicRepositoryModule,
+    ApplicationRepositoryModule,
     DdhubClientGatewayMessageBrokerModule,
     CertificateModule,
   ],

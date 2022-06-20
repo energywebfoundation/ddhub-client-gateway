@@ -3,6 +3,24 @@ import { TopicEntity } from '../entity/topic.entity';
 
 @EntityRepository(TopicEntity)
 export class TopicRepository extends Repository<TopicEntity> {
+  public async getTopicsAndCountSearch(
+    limit: number,
+    name: string,
+    owner: string,
+    page: number
+  ): Promise<[TopicEntity[], number]> {
+    const query = this.createQueryBuilder('t');
+    query.where('t.name like :name', { name: `%${name}%` });
+    query
+      .groupBy('t.id')
+      .limit(limit)
+      .offset(limit * (page - 1));
+    if (owner) {
+      query.andWhere('t.owner = :owner', { owner: owner });
+    }
+    return query.getManyAndCount();
+  }
+
   public async getCountOfLatest(
     name: string,
     owner: string,
