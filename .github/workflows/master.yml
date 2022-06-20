@@ -2,7 +2,7 @@ name: Build and publish images
 
 on:
   push:
-    branches: [ develop ]
+    branches: [ master, init-release ]
     paths-ignore:
       - 'devops/**'
 env:
@@ -76,21 +76,21 @@ jobs:
           docker build -f ci/Docker/Dockerfile.scheduler -t energyweb/ddhub-client-gateway-scheduler .
           docker tag energyweb/ddhub-client-gateway-scheduler ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-scheduler:${{needs.unique_id.outputs.unique_id}}
           docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-scheduler:${{needs.unique_id.outputs.unique_id}}
-          docker tag energyweb/ddhub-client-gateway-scheduler ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-scheduler:canary
-          docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-scheduler:canary
+          docker tag energyweb/ddhub-client-gateway-scheduler ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-scheduler:latest
+          docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-scheduler:latest
 
       - name: ArgoCD login
         uses: clowdhaus/argo-cd-action/@main
         id: argocd_login
         with:
-          command: login ${{ secrets.ARGOCD_DEV_URL }}
-          options: --insecure --password ${{ secrets.ARGOCD_DEV_PASS }} --username ${{ secrets.ARGOCD_DEV_USERNAME }}
+          command: login ${{ secrets.ARGOCD_STAGING_URL }}
+          options: --insecure --password ${{ secrets.ARGOCD_STAGING_PASS }} --username ${{ secrets.ARGOCD_STAGING_USERNAME }}
 
-      - name: ArgoCD overwrite Dev scheduler image tag
+      - name: ArgoCD overwrite DEMO scheduler image tag
         uses: clowdhaus/argo-cd-action/@main
-        id: argocd_image_tag_overwrite_dev_scheduler
+        id: argocd_image_tag_overwrite_demo_scheduler
         with:
-          command: app set ddhub-gateway-dev
+          command: app set ddhub-gateway-demo
           options: -p ddhub-client-gateway-api.clientgateway.scheduler.image.tag=${{needs.unique_id.outputs.unique_id}}
   build-be:
     name: Build Backend
@@ -141,21 +141,21 @@ jobs:
           docker build -f ci/Docker/Dockerfile.backend -t energyweb/ddhub-client-gateway-backend .
           docker tag energyweb/ddhub-client-gateway-backend ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-backend:${{needs.unique_id.outputs.unique_id}}
           docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-backend:${{needs.unique_id.outputs.unique_id}}
-          docker tag energyweb/ddhub-client-gateway-backend ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-backend:canary
-          docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-backend:canary
+          docker tag energyweb/ddhub-client-gateway-backend ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-backend:latest
+          docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-backend:latest
 
       - name: ArgoCD login
         uses: clowdhaus/argo-cd-action/@main
         id: argocd_login
         with:
-          command: login ${{ secrets.ARGOCD_DEV_URL }}
-          options: --insecure --password ${{ secrets.ARGOCD_DEV_PASS }} --username ${{ secrets.ARGOCD_DEV_USERNAME }}
+          command: login ${{ secrets.ARGOCD_STAGING_URL }}
+          options: --insecure --password ${{ secrets.ARGOCD_STAGING_PASS }} --username ${{ secrets.ARGOCD_STAGING_USERNAME }}
 
-      - name: ArgoCD overwrite DEV image tag
+      - name: ArgoCD overwrite DEMO image tag
         uses: clowdhaus/argo-cd-action/@main
-        id: argocd_image_tag_overwrite
+        id: argocd_image_tag_overwrite_demo_api
         with:
-          command: app set ddhub-gateway-dev
+          command: app set ddhub-gateway-demo
           options: -p ddhub-client-gateway-api.image.tag=${{needs.unique_id.outputs.unique_id}}
   build-fe:
     name: Build Frontend
@@ -206,19 +206,19 @@ jobs:
           docker build -f ci/Docker/Dockerfile.frontend -t energyweb/ddhub-client-gateway-frontend .
           docker tag energyweb/ddhub-client-gateway-frontend ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-frontend:${{needs.unique_id.outputs.unique_id}}
           docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-frontend:${{needs.unique_id.outputs.unique_id}}
-          docker tag energyweb/ddhub-client-gateway-frontend ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-frontend:canary
-          docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-frontend:canary
+          docker tag energyweb/ddhub-client-gateway-frontend ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-frontend:latest
+          docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-frontend:latest
 
       - name: ArgoCD login
         uses: clowdhaus/argo-cd-action/@main
         id: argocd_login
         with:
-          command: login ${{ secrets.ARGOCD_DEV_URL }}
-          options: --insecure --password ${{ secrets.ARGOCD_DEV_PASS }} --username ${{ secrets.ARGOCD_DEV_USERNAME }}
+          command: login ${{ secrets.ARGOCD_STAGING_URL }}
+          options: --insecure --password ${{ secrets.ARGOCD_STAGING_PASS }} --username ${{ secrets.ARGOCD_STAGING_USERNAME }}
 
-      - name: ArgoCD overwrite DEV image tag
+      - name: ArgoCD overwrite DEMO image tag
         uses: clowdhaus/argo-cd-action/@main
-        id: argocd_image_tag_overwrite_dev_ui
+        id: argocd_image_tag_overwrite_demo_ui
         with:
-          command: app set ddhub-gateway-dev
+          command: app set ddhub-gateway-demo
           options: -p ddhub-client-gateway-api.ddhub-client-gateway-ui.image.tag=${{needs.unique_id.outputs.unique_id}}
