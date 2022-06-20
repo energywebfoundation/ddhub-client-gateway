@@ -563,7 +563,9 @@ export class MessageService {
       !topic.schemaType ||
       !topic.version
     ) {
-      throw new TopicNotFoundException(topic.id);
+      if (!topic) throw new TopicNotFoundException("");
+      else
+        throw new TopicNotFoundException(topic.id);
     }
 
     const isTopicNotRelatedToChannel: boolean = this.checkTopicForChannel(
