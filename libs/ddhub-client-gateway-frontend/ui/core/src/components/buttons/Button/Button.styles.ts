@@ -23,7 +23,10 @@ export const useStyles = makeStyles()((theme) => ({
     textTransform: 'capitalize',
     padding: '11px 22px',
     justifyContent: 'center',
-    '&:hover': {
+    '&.MuiButton-outlined:hover': {
+      backgroundColor: alpha(theme.palette.secondary.main, 0.04),
+    },
+    '&:not([.MuiButton-outlined]):hover': {
       backgroundColor: darken(theme.palette.primary.main, 0.2),
     },
     '&.Mui-disabled': {
