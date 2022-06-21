@@ -124,6 +124,11 @@ ddhub-client-gateway-api:
           backend:
             serviceName: ddhub-gateway-api-dev
             servicePort: 80
+        - path: /
+          pathType: Prefix
+          backend:
+            serviceName: ddhub-gateway-api-dev-ui
+            servicePort: 80
     tls:
       - secretName: dsb-tls-secret
         hosts:
@@ -154,9 +159,8 @@ ddhub-client-gateway-api:
 
   affinity: {}
 
-  existingClaim:
+  pvc:
     enabled: true
-    claimName: azurefile-ddhub-gw-dev
     mountPath: /usr/app/data
 
   probes:
