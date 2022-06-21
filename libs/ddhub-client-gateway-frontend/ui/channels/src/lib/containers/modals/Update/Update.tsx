@@ -37,6 +37,7 @@ export const Update = () => {
           <Restrictions
             actionButtonsProps={getActionButtonsProps({
               onClick: setRestrictions,
+              text: 'Next',
             })}
             restrictions={channelValues.conditions}
           />
@@ -60,7 +61,11 @@ export const Update = () => {
   };
 
   return (
-    <Dialog open={open} onClose={openCancelModal} paperClassName={classes.paper}>
+    <Dialog
+      open={open}
+      onClose={openCancelModal}
+      paperClassName={classes.paper}
+    >
       <DialogTitle className={classes.title}>Update Channel</DialogTitle>
       <DialogSubTitle>{subTitle}</DialogSubTitle>
       <Grid container className={classes.content}>

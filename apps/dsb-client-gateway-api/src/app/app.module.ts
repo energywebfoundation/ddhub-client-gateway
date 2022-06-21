@@ -1,13 +1,12 @@
-import { Module, ValidationPipe } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { IdentityModule } from './modules/identity/identity.module';
 import { EnrolmentModule } from './modules/enrolment/enrolment.module';
 import { IamModule } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
 import { CertificateModule } from './modules/certificate/certificate.module';
-import { MulterModule } from '@nestjs/platform-express';
 import { KeysModule } from './modules/keys/keys.module';
 import { SecretsEngineModule } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
-import { APP_FILTER, APP_PIPE } from '@nestjs/core';
+import { APP_FILTER } from '@nestjs/core';
 import { AllExceptionsFilter } from './modules/utils/filter/all-exceptions.filter';
 import { TerminusModule } from '@nestjs/terminus';
 import { HealthController } from './modules/health/health.controller';
@@ -39,9 +38,6 @@ export class AppModule {
       }),
       StorageModule,
       DdhubClientGatewayTracingModule.forRoot(),
-      MulterModule.register({
-        dest: './files',
-      }),
       SecretsEngineModule,
       IamModule,
       IdentityModule,
@@ -62,10 +58,6 @@ export class AppModule {
       {
         provide: APP_FILTER,
         useClass: AllExceptionsFilter,
-      },
-      {
-        provide: APP_PIPE,
-        useClass: ValidationPipe,
       },
     ];
     const controllers = [HealthController];

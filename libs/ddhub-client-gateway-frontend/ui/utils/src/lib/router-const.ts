@@ -10,7 +10,7 @@ export const routerConst = {
   InitialPage: '/',
   Dashboard: '/dashboard',
   GatewaySettings: '/gateway-settings',
-  AppsAndTopics: '/applications',
+  TopicManagement: '/applications',
   Topics: `/applications/[${Queries.Namespace}]`,
   ChannelApps: '/channels/applications',
   ChannelTopics: `/channels/applications/[${Queries.Namespace}]`,

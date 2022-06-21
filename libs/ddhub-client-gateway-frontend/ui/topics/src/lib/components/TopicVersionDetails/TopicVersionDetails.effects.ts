@@ -1,12 +1,15 @@
 import { GetTopicSearchDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
-import { TopicsModalsActionsEnum, useTopicsModalsDispatch } from '../../context';
+import {
+  TopicsModalsActionsEnum,
+  useTopicsModalsDispatch,
+} from '../../context';
 import { useApplications } from '@ddhub-client-gateway-frontend/ui/api-hooks';
 
 export const useTopicVersionEffects = () => {
   const dispatch = useTopicsModalsDispatch();
   const { applicationsByNamespace } = useApplications('user');
 
-  const openTopicDetails = (topic: GetTopicSearchDto) => {
+  const openTopicDetails = (topic: GetTopicSearchDto & any) => {
     dispatch({
       type: TopicsModalsActionsEnum.SHOW_TOPIC_DETAILS,
       payload: {
@@ -20,6 +23,6 @@ export const useTopicVersionEffects = () => {
   const handleRowClick = (topic: GetTopicSearchDto) => openTopicDetails(topic);
 
   return {
-    handleRowClick
-  }
-}
+    handleRowClick,
+  };
+};

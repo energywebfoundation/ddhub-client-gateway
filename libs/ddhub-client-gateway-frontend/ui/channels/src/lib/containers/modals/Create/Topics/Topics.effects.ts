@@ -73,6 +73,25 @@ export const useTopicsEffects = (channelValues: TopicsProps['channelValues']) =>
     ...topic,
   }));
 
+  const filterTopics = (options: Topic[], state: any) => {
+    const keyword = state.inputValue.toLowerCase();
+
+    return options.filter((topicItem) => {
+      const topicName = topicItem['topicName'].toLowerCase();
+      const matchedTopics = topicName.includes(keyword);
+      let matchedTags = -1;
+
+      if (!matchedTopics) {
+        matchedTags = topicItem['tags'].findIndex((item) => {
+          const tagItem = item.toLowerCase();
+          return tagItem.includes(keyword);
+        });
+      }
+
+      return matchedTopics || matchedTags !== -1;
+    });
+  }
+
   return {
     applicationList: applications.map((application) => ({
       label: application.appName,
@@ -85,5 +104,6 @@ export const useTopicsEffects = (channelValues: TopicsProps['channelValues']) =>
     setSelectedApplication,
     topics: availableTopics,
     selectedTopics,
+    filterTopics,
   };
 };

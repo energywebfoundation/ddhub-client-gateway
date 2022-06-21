@@ -12,6 +12,12 @@ import { TableProps } from './Table.types';
 
 export type Order = 'asc' | 'desc';
 
+interface LabelRowProps {
+  from: number;
+  to: number;
+  count: number;
+}
+
 export function useTableEffects<T>({
   tableRows,
   headers,
@@ -21,6 +27,7 @@ export function useTableEffects<T>({
   onSearchInput,
   defaultOrder = 'asc',
   defaultSortBy = '',
+  backendSearch = false,
 }: TableProps<T>) {
   const [order, setOrder] = useState<Order>(defaultOrder);
   const [orderBy, setOrderBy] = useState(defaultSortBy);
@@ -135,6 +142,14 @@ export function useTableEffects<T>({
         page: pageIndex,
       };
 
+  const paginationText = (props: LabelRowProps) => {
+    if (backendSearch) {
+      return `Showing ${props.from} to ${props.to} of ${props.count} entries`;
+    }
+
+    return `Showing ${props.from} to ${(rows.length < props.to ? rows.length : props.to)} of ${rows.length} entries`
+  };
+
   return {
     getTableProps,
     prepareRow,
@@ -152,6 +167,7 @@ export function useTableEffects<T>({
     orderBy,
     getComparator,
     pagination,
-    handleSearchInput
+    handleSearchInput,
+    paginationText,
   };
 }

@@ -42,7 +42,10 @@ export const useStyles = makeStyles()((theme) => ({
   },
   secondaryButton: {
     '&.MuiButton-root': {
-      border: `1px solid ${alpha(theme.palette.secondary.main, 0.5)}`,
+      border: `1px solid ${theme.palette.secondary.main}`,
+      '&:hover': {
+        background: alpha(theme.palette.secondary.main, 0.04)
+      },
     },
   },
 }));

@@ -32,6 +32,9 @@
       "@ddhub-client-gateway-frontend/ui/core": [
         "libs/ddhub-client-gateway-frontend/ui/core/src/index.ts"
       ],
+      "@ddhub-client-gateway-frontend/ui/gateway-settings": [
+        "libs/ddhub-client-gateway-frontend/ui/gateway-settings/src/index.ts"
+      ],
       "@ddhub-client-gateway-frontend/ui/integration": [
         "libs/ddhub-client-gateway-frontend/ui/integration/src/index.ts"
       ],
@@ -59,8 +62,8 @@
       "@dsb-client-gateway/ddhub-client-gateway-enrolment": [
         "libs/ddhub-client-gateway-enrolment/src/index.ts"
       ],
-      "@ddhub-client-gateway-frontend/ui/gateway-settings": [
-        "libs/ddhub-client-gateway-frontend/ui/gateway-settings/src/index.ts"
+      "@dsb-client-gateway/ddhub-client-gateway-env": [
+        "libs/ddhub-client-gateway-env/src/index.ts"
       ],
       "@dsb-client-gateway/ddhub-client-gateway-identity": [
         "libs/ddhub-client-gateway-identity/src/index.ts"

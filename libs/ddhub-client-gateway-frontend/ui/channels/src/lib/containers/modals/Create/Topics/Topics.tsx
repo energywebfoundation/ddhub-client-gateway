@@ -29,6 +29,7 @@ export const Topics = ({
     addSelectedTopic,
     selectedTopics,
     removeSelectedTopic,
+    filterTopics,
   } = useTopicsEffects(channelValues);
 
   return (
@@ -64,6 +65,7 @@ export const Topics = ({
                 addSelectedTopic(newValue);
               }
             }}
+            filterOptions={filterTopics}
             placeholder="Add topic"
             label="Add topic"
             wrapperProps={{ mb: 1.2 }}

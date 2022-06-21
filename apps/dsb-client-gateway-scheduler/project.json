@@ -3,6 +3,23 @@
   "sourceRoot": "apps/dsb-client-gateway-scheduler/src",
   "projectType": "application",
   "targets": {
+    "generate-envs": {
+      "executor": "@nrwl/workspace:run-commands",
+      "options": {
+        "command": "node dist/apps/dsb-client-gateway-scheduler-envs/main.js"
+      }
+    },
+    "build-envs": {
+      "executor": "@nrwl/node:build",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/apps/dsb-client-gateway-scheduler-envs",
+        "main": "apps/dsb-client-gateway-scheduler/src/generate-envs.ts",
+        "tsConfig": "apps/dsb-client-gateway-scheduler/tsconfig.app.json",
+        "assets": ["apps/dsb-client-gateway-scheduler/src/assets"],
+        "generatePackageJson": true
+      }
+    },
     "build": {
       "executor": "@nrwl/node:build",
       "outputs": ["{options.outputPath}"],

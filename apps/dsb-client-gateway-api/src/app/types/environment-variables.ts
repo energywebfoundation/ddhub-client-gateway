@@ -1,251 +1,96 @@
-import {
-  IsBoolean,
-  IsEnum,
-  IsNumber,
-  IsOptional,
-  IsPositive,
-  IsString,
-  ValidateIf,
-} from 'class-validator';
-import { WebSocketImplementation } from '../modules/message/message.const';
-import { EventEmitMode } from '../modules/message/service/message.service';
-import { Transform } from 'class-transformer';
-import { SecretsEngine } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
+import * as Joi from 'joi';
 
-export enum NODE_ENV {
-  Production = 'production',
-  Development = 'development',
-  Test = 'test',
+export enum EventEmitMode {
+  SINGLE = 'SINGLE',
+  BULK = 'BULK',
 }
 
-export enum OpenTelemetryExporters {
-  ZIPKIN = 'ZIPKIN',
+export enum WebSocketImplementation {
+  NONE = 'NONE',
+  SERVER = 'SERVER',
+  CLIENT = 'CLIENT',
 }
 
-export class EnvironmentVariables {
-  @IsString()
-  @IsEnum(NODE_ENV)
-  NODE_ENV: NODE_ENV;
-
-  @IsNumber()
-  @Transform(EnvironmentVariables.transformNumber('PORT'))
-  PORT = 3333;
-
-  @IsString()
-  RPC_URL = 'https://volta-rpc.energyweb.org/';
-
-  @IsString()
-  DSB_BASE_URL = 'https://dsb-demo.energyweb.org';
-
-  @IsEnum(WebSocketImplementation)
-  WEBSOCKET = WebSocketImplementation.NONE;
-
-  @IsString()
-  CLIENT_ID = 'WS-CONSUMER';
-
-  @IsPositive()
-  EVENTS_MAX_PER_SECOND = 2;
-
-  @IsString()
-  PARENT_NAMESPACE = 'dsb.apps.energyweb.iam.ewc';
-
-  @IsString()
-  EVENT_SERVER_URL = 'identityevents-dev.energyweb.org';
-
-  @IsString()
-  NATS_ENV_NAME = 'ewf-dev';
-
-  @IsPositive()
-  @Transform(EnvironmentVariables.transformNumber('CHAIN_ID'))
-  CHAIN_ID = 73799;
-
-  @IsString()
-  CACHE_SERVER_URL = 'https://identitycache-dev.energyweb.org/v1';
-
-  @IsString()
-  CLAIM_MANAGER_ADDRESS = '0x5339adE9332A604A1c957B9bC1C6eee0Bcf7a031';
-
-  @IsEnum(EventEmitMode)
-  @ValidateIf(EnvironmentVariables.isWebsocketEnabled)
-  EVENTS_EMIT_MODE = EventEmitMode.BULK;
-
-  @IsPositive()
-  @Transform(EnvironmentVariables.transformNumber('DID_TTL'))
-  DID_TTL = 60; // seconds
-
-  @IsString()
-  @ValidateIf(EnvironmentVariables.isClientWebSocketEnabled)
-  WEBSOCKET_URL: string;
-
-  @IsString()
-  @ValidateIf(EnvironmentVariables.isClientWebSocketEnabled)
-  WEBSOCKET_PROTOCOL = 'dsb-protocol';
-
-  @IsPositive()
-  @ValidateIf(EnvironmentVariables.isClientWebSocketEnabled)
-  WEBSOCKET_RECONNECT_TIMEOUT = 5000;
-
-  @Transform(EnvironmentVariables.transformBoolean('WEBSOCKET_RECONNECT'))
-  @ValidateIf(EnvironmentVariables.isClientWebSocketEnabled)
-  WEBSOCKET_RECONNECT = true;
-
-  @IsPositive()
-  @ValidateIf(EnvironmentVariables.isClientWebSocketEnabled)
-  WEBSOCKET_RECONNECT_MAX_RETRIES = 10;
-
-  @IsNumber()
-  @Transform(EnvironmentVariables.transformNumber('WEBSOCKET_POOLING_TIMEOUT'))
-  WEBSOCKET_POOLING_TIMEOUT = 5000;
-
-  @IsEnum(SecretsEngine)
-  SECRETS_ENGINE = SecretsEngine.VAULT;
-
-  @IsString()
-  SECRET_PREFIX = 'ddhub/';
-
-  @IsString()
-  @ValidateIf(EnvironmentVariables.isVaultEnabled)
-  VAULT_ENDPOINT;
-
-  @IsString()
-  @ValidateIf(EnvironmentVariables.isVaultEnabled)
-  VAULT_TOKEN = 'root';
-
-  @IsString()
-  @ValidateIf(EnvironmentVariables.isAWSSecretsManagerEnabled)
-  AWS_REGION = 'ap-southeast-2';
-
-  @IsString()
-  @ValidateIf(EnvironmentVariables.isAWSSecretsManagerEnabled)
-  AWS_ACCESS_KEY_ID: string;
-
-  @IsString()
-  @ValidateIf(EnvironmentVariables.isAWSSecretsManagerEnabled)
-  AWS_SECRET_ACCESS_KEY: string;
-
-  @IsString()
-  @ValidateIf(EnvironmentVariables.isAzureKeyVaultEnabled)
-  AZURE_VAULT_URL: string;
-
-  @IsString()
-  @ValidateIf(EnvironmentVariables.isAzureKeyVaultEnabled)
-  AZURE_CLIENT_ID: string;
-
-  @IsString()
-  @ValidateIf(EnvironmentVariables.isAzureKeyVaultEnabled)
-  AZURE_CLIENT_SECRET: string;
-
-  @IsString()
-  @ValidateIf(EnvironmentVariables.isAzureKeyVaultEnabled)
-  AZURE_TENANT_ID: string;
-
-  @IsString()
-  @IsOptional()
-  USERNAME: string;
-
-  @IsString()
-  @IsOptional()
-  PASSWORD: string;
-
-  @IsPositive()
-  @IsOptional()
-  MAX_RETRIES = 3;
-
-  @IsPositive()
-  @IsOptional()
-  RETRY_FACTOR = 2;
-
-  @IsPositive()
-  @IsOptional()
-  TIMEOUT = 1000;
-
-  @IsBoolean()
-  @Transform(EnvironmentVariables.transformBoolean('SCHEDULED_JOBS'))
-  SCHEDULED_JOBS = false;
-
-  @IsString()
-  DID_CLAIM_NAMESPACE = 'message.broker.app.namespace';
-
-  @IsNumber()
-  @Transform(EnvironmentVariables.transformNumber('MAX_FILE_SIZE'))
-  MAX_FILE_SIZE = 100000000;
-
-  @IsString()
-  SYMMETRIC_KEY_CLIENT_ID = 'test';
-
-  @IsPositive()
-  @IsNumber()
-  @Transform(
-    EnvironmentVariables.transformNumber('AMOUNT_OF_SYMMETRIC_KEYS_FETCHED')
-  )
-  AMOUNT_OF_SYMMETRIC_KEYS_FETCHED = 100;
-
-  @IsBoolean()
-  @Transform(EnvironmentVariables.transformBoolean('OPENTELEMETRY_ENABLED'))
-  OPENTELEMETRY_ENABLED = false;
-
-  @IsString()
-  @ValidateIf(EnvironmentVariables.isOTELEnabled)
-  OTEL_IGNORED_ROUTES = 'health,api/v2/health';
-
-  @IsString()
-  @ValidateIf(EnvironmentVariables.isOTELEnabled)
-  OTEL_TRACING_URL = 'http://localhost:4318/v1/traces';
-
-  @IsString()
-  @ValidateIf(EnvironmentVariables.isOTELEnabled)
-  OTEL_SERVICE_NAME = 'ddhub-client-gateway';
-
-  @IsString()
-  @ValidateIf(EnvironmentVariables.isOTELEnabled)
-  OTEL_ENVIRONMENT = 'local';
-
-  @IsString()
-  APPLICATION_NAMESPACE_REGULAR_EXPRESSION = '\\w.apps.*\\w.iam.ewc';
-
-  @IsString()
-  DB_NAME = 'local.db';
-
-  @IsString()
-  REQUEST_BODY_SIZE = '50mb';
-
-  static isOTELEnabled(values: EnvironmentVariables): boolean {
-    return values.OPENTELEMETRY_ENABLED;
-  }
-
-  static isVaultEnabled(values: EnvironmentVariables): boolean {
-    return values.SECRETS_ENGINE === SecretsEngine.VAULT;
-  }
-
-  static isAWSSecretsManagerEnabled(values: EnvironmentVariables): boolean {
-    return values.SECRETS_ENGINE === SecretsEngine.AWS;
-  }
-
-  static isAzureKeyVaultEnabled(values: EnvironmentVariables): boolean {
-    return values.SECRETS_ENGINE === SecretsEngine.AZURE;
-  }
-
-  static isClientWebSocketEnabled(values: EnvironmentVariables): boolean {
-    return values.WEBSOCKET === WebSocketImplementation.CLIENT;
-  }
-
-  static isWebsocketEnabled(values: EnvironmentVariables): boolean {
-    return values.WEBSOCKET !== WebSocketImplementation.NONE;
-  }
-
-  static transformNumber(
-    paramKey: string
-  ): ({ obj }: { obj: EnvironmentVariables }) => number {
-    return ({ obj }) => {
-      return +obj[paramKey];
-    };
-  }
-
-  static transformBoolean(
-    paramKey: string
-  ): ({ obj }: { obj: EnvironmentVariables }) => boolean {
-    return ({ obj }) => {
-      return [true, 'true'].indexOf(obj[paramKey]) > -1;
-    };
-  }
-}
+export const API_ENVS = Joi.object({
+  PORT: Joi.number().port().default(3333).description('HTTP port'),
+  WEBSOCKET: Joi.string()
+    .valid(...Object.values(WebSocketImplementation))
+    .default(WebSocketImplementation.NONE)
+    .description('Websocket mode'),
+  EVENTS_MAX_PER_SECOND: Joi.number()
+    .positive()
+    .default(2)
+    .description('Amount of messages to pull for each WebSocket run'),
+  EVENTS_EMIT_MODE: Joi.string()
+    .valid(...Object.values(EventEmitMode))
+    .default(EventEmitMode.BULK)
+    .description('Should Websocket emit messages as array or single object'),
+  DID_TTL: Joi.number()
+    .positive()
+    .default(60)
+    .description('How long cached DID attributes should be valid'),
+  WEBSOCKET_URL: Joi.alternatives()
+    .conditional('WEBSOCKET', {
+      is: WebSocketImplementation.CLIENT,
+      then: Joi.string().uri().required(),
+      otherwise: Joi.optional(),
+    })
+    .description('WebSocket Client URL to connect'),
+  WEBSOCKET_PROTOCOL: Joi.alternatives()
+    .conditional('WEBSOCKET', {
+      is: WebSocketImplementation.CLIENT,
+      then: Joi.string().default('dsb-protocol').required(),
+      otherwise: Joi.optional(),
+    })
+    .description('WebSocket Client protocol'),
+  WEBSOCKET_RECONNECT_TIMEOUT: Joi.alternatives()
+    .conditional('WEBSOCKET', {
+      is: WebSocketImplementation.CLIENT,
+      then: Joi.number().positive().default(3000).required(),
+      otherwise: Joi.optional(),
+    })
+    .description('WebSocket Client reconnect timeout'),
+  WEBSOCKET_RECONNECT: Joi.alternatives()
+    .conditional('WEBSOCKET', {
+      is: WebSocketImplementation.CLIENT,
+      then: Joi.number().positive().default(3000).required(),
+      otherwise: Joi.optional(),
+    })
+    .description('Should attempt to reconnect'),
+  WEBSOCKET_RECONNECT_MAX_RETRIES: Joi.alternatives()
+    .conditional('WEBSOCKET', {
+      is: WebSocketImplementation.CLIENT,
+      then: Joi.number().positive().default(10).required(),
+      otherwise: Joi.optional(),
+    })
+    .description('How many times should attempt to reconnect'),
+  WEBSOCKET_POOLING_TIMEOUT: Joi.alternatives()
+    .conditional('WEBSOCKET', {
+      is: WebSocketImplementation.CLIENT,
+      then: Joi.number().positive().default(5000).required(),
+      otherwise: Joi.optional(),
+    })
+    .description('How often should poll messages'),
+  DID_CLAIM_NAMESPACE: Joi.string()
+    .default('message.broker.app.namespace')
+    .description('Namespace for fetching applications'),
+  MAX_FILE_SIZE: Joi.number()
+    .positive()
+    .default(100000000)
+    .description('Maximum file size for large data messaging (100 MB)'),
+  SYMMETRIC_KEY_CLIENT_ID: Joi.string()
+    .default('test')
+    .description('Client ID for fetching symmetric keys'),
+  AMOUNT_OF_SYMMETRIC_KEYS_FETCHED: Joi.number()
+    .positive()
+    .description('Amout of symmetric keys to fetch for each run'),
+  MULTER_UPLOADS_PATH: Joi.string()
+    .default('uploads')
+    .description('Multer temporary file storage path'),
+  APPLICATION_NAMESPACE_REGULAR_EXPRESSION: Joi.string()
+    .default('\\w.apps.*\\w.iam.ewc')
+    .description('Filter for application namespaces'),
+  REQUEST_BODY_SIZE: Joi.string()
+    .default('50mb')
+    .description('Maximum request size'),
+});

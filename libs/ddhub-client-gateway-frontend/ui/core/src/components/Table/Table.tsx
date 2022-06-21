@@ -35,6 +35,7 @@ export function GenericTable<T>({
   loadingRows,
   showSearch = true,
   showFooter = true,
+  backendSearch = false,
   paginationProps,
   onPageChange,
   customStyle,
@@ -61,6 +62,7 @@ export function GenericTable<T>({
     getComparator,
     pagination,
     handleSearchInput,
+    paginationText,
   } = useTableEffects({
     headers,
     tableRows,
@@ -70,13 +72,18 @@ export function GenericTable<T>({
     onSearchInput,
     defaultOrder,
     defaultSortBy,
+    backendSearch,
   });
 
   return (
     <>
       {showSearch ? (
         <Box display="flex">
-          <Search filter={globalFilter} onSearchInput={handleSearchInput} debounceTime={500} />
+          { backendSearch ? (
+            <Search filter={globalFilter} onSearchInput={handleSearchInput} debounceTime={500} />
+          ) : (
+            <Search filter={globalFilter} setFilter={setGlobalFilter} />
+          )}
           {children}
         </Box>
       ) : (
@@ -176,12 +183,10 @@ export function GenericTable<T>({
                 <TableRow>
                   <TablePagination
                     rowsPerPageOptions={[]}
-                    labelDisplayedRows={({ from, to, count }) =>
-                      `Showing ${from} to ${to} of ${count} entries`
-                    }
+                    labelDisplayedRows={paginationText}
                     count={pagination.count}
-                    rowsPerPage={pagination.limit}
-                    page={pagination.page}
+                    rowsPerPage={Number(pagination.limit)}
+                    page={Number(pagination.page)}
                     onPageChange={handleChangePage}
                     ActionsComponent={TablePaginationActions}
                     classes={{

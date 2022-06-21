@@ -9,6 +9,7 @@ import FormData from 'form-data';
 import { DdhubLoginService } from './ddhub-login.service';
 import 'multer';
 import { SendMessageResponseFile } from '../dto';
+import { IncomingMessage } from 'http';
 
 @Injectable()
 export class DdhubFilesService extends DdhubBaseService {
@@ -22,18 +23,19 @@ export class DdhubFilesService extends DdhubBaseService {
     super(
       new Logger(DdhubFilesService.name),
       retryConfigService,
-      ddhubLoginService
+      ddhubLoginService,
+      tlsAgentService
     );
   }
 
   @Span('ddhub_mb_uploadFile')
   public async uploadFile(
-    file: Express.Multer.File,
+    file,
+    originalname: string,
     fqcns: string[],
     topicId: string,
     topicVersion: string,
     signature: string,
-    encryptedMessage: string,
     clientGatewayMessageId: string,
     payloadEncryption: boolean,
     transactionId?: string
@@ -42,8 +44,8 @@ export class DdhubFilesService extends DdhubBaseService {
     try {
       const formData = new FormData();
 
-      formData.append('file', encryptedMessage);
-      formData.append('fileName', file.originalname);
+      formData.append('file', file);
+      formData.append('fileName', originalname);
       formData.append('fqcns', fqcns.join(','));
       formData.append('signature', signature);
       formData.append('topicId', topicId);
@@ -74,13 +76,11 @@ export class DdhubFilesService extends DdhubBaseService {
         }
       );
 
-      this.logger.log(
-        `upload file with file name: ${file.originalname} successful`
-      );
+      this.logger.log(`upload file with file name: ${originalname} successful`);
       return result.data;
     } catch (e) {
       this.logger.error(
-        `upload file with file name: ${file.originalname} failed`,
+        `upload file with file name: ${originalname} failed`,
         e
       );
       throw e;
@@ -90,7 +90,7 @@ export class DdhubFilesService extends DdhubBaseService {
   @Span('ddhub_mb_downloadFile')
   public async downloadFile(
     fileId: string
-  ): Promise<{ data: string; headers: any }> {
+  ): Promise<{ data: IncomingMessage; headers: any }> {
     try {
       const result = await this.request<null>(
         () =>
@@ -98,6 +98,7 @@ export class DdhubFilesService extends DdhubBaseService {
             params: {
               fileId,
             },
+            responseType: 'stream',
             httpsAgent: this.tlsAgentService.get(),
             headers: {
               Authorization: `Bearer ${this.didAuthService.getToken()}`,

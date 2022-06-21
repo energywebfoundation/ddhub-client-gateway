@@ -1,4 +1,4 @@
-export interface TopicEntity {
+export interface TopicEntityDto {
   id: string;
   name: string;
   schemaType: string;
@@ -14,5 +14,5 @@ export interface GetTopicResponse {
   count: number;
   limit: number;
   page: number;
-  records: TopicEntity[];
+  records: TopicEntityDto[];
 }
