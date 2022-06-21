@@ -124,6 +124,11 @@ ddhub-client-gateway-api:
           backend:
             serviceName: ddhub-gateway-api-dev
             servicePort: 80
+        - path: /
+          pathType: Prefix
+          backend:
+            serviceName: ddhub-gateway-api-dev-ui
+            servicePort: 80
     tls:
       - secretName: dsb-tls-secret
         hosts:
