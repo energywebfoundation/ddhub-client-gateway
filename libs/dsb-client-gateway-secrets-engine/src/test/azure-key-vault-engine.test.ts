@@ -218,6 +218,38 @@ describe('Azure Key Vault Engine', () => {
     }
   });
 
+  it('should rollback all Certificate Details secrets if one fails', async () => {
+    jest.spyOn(SecretClient.prototype, 'beginDeleteSecret').mockResolvedValue({
+      poll: jest.fn(),
+      onProgress: jest.fn(),
+      pollUntilDone: jest.fn().mockImplementation(() => Promise.resolve(true)),
+      isDone: jest.fn(),
+      stopPolling: jest.fn(),
+      isStopped: jest.fn(),
+      getResult: jest.fn(),
+      cancelOperation: jest.fn(),
+      getOperationState: jest.fn(),
+    });
+    jest
+      .spyOn(SecretClient.prototype, 'setSecret')
+      .mockResolvedValueOnce({
+        name: 'ddhub-certificate-private-key',
+        value: 'test_private_key',
+        properties: {
+          vaultUrl: '',
+          version: '',
+          name: '',
+        },
+      })
+      .mockRejectedValueOnce(new Error('Test error'));
+
+    const details = await service.setCertificateDetails({
+      privateKey: 'test_private_key',
+      certificate: 'test_certificate',
+    });
+    expect(details).toBeNull();
+  });
+
   it('should delete all Azure KV secrets', async () => {
     jest.spyOn(SecretClient.prototype, 'beginDeleteSecret').mockResolvedValue({
       poll: jest.fn(),

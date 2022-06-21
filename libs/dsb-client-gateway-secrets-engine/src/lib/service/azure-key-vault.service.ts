@@ -75,24 +75,25 @@ export class AzureKeyVaultService
     certificate,
     privateKey,
   }: CertificateDetails): Promise<KeyVaultSecret[]> {
-    const commands = [
-      this.client.setSecret(
-        this.encodeAzureKey(`${this.prefix}${PATHS.CERTIFICATE_KEY}`),
-        privateKey
-      ),
-      this.client.setSecret(
-        this.encodeAzureKey(`${this.prefix}${PATHS.CERTIFICATE}`),
-        certificate
-      ),
+    const paths = [
+      {
+        path: this.encodeAzureKey(`${this.prefix}${PATHS.CERTIFICATE_KEY}`),
+        key: privateKey,
+      },
+      {
+        path: this.encodeAzureKey(`${this.prefix}${PATHS.CERTIFICATE}`),
+        key: certificate,
+      },
     ];
+    const commands = paths.map(({ path, key }) =>
+      this.client.setSecret(path, key)
+    );
 
     if (caCertificate) {
-      commands.push(
-        this.client.setSecret(
-          this.encodeAzureKey(`${this.prefix}${PATHS.CA_CERTIFICATE}`),
-          caCertificate
-        )
-      );
+      const path = this.encodeAzureKey(`${this.prefix}${PATHS.CA_CERTIFICATE}`);
+      const key = caCertificate;
+      paths.push({ path, key });
+      commands.push(this.client.setSecret(path, key));
     }
 
     const responses = await Promise.allSettled(
@@ -113,8 +114,13 @@ export class AzureKeyVaultService
       ({ status }) => status === 'rejected'
     ) as PromiseRejectedResult[];
 
+    // Log errors and rollback
     if (errors.length > 0) {
       this.logger.error(errors.map(({ reason }) => reason.message).join(', '));
+      for (const { path } of paths) {
+        await this.deleteOne(path);
+      }
+      return null;
     }
 
     return responses
@@ -210,7 +216,6 @@ export class AzureKeyVaultService
     const responses = await Promise.allSettled(
       pollers.map((poller) => poller.pollUntilDone())
     );
-    this.logger.log(JSON.stringify(responses, null, 2));
     const errors = responses.filter(
       (response) => response.status === 'rejected'
     );
@@ -222,6 +227,15 @@ export class AzureKeyVaultService
           .join(', ')}`
       );
     }
+  }
+
+  @Span('azure_kv_deleteOne')
+  private async deleteOne(path: string): Promise<void> {
+    this.logger.log(`Deleting Azure KV secret: ${path}`);
+    const poller = await this.client.beginDeleteSecret(path);
+    await poller.pollUntilDone().catch((err) => {
+      this.logger.error(err);
+    });
   }
 
   /**
