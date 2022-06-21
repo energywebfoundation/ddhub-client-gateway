@@ -41,7 +41,7 @@ export class TopicsController {
   constructor(
     protected readonly ddhubTopicsService: DdhubTopicsService,
     protected readonly topicService: TopicService
-  ) {}
+  ) { }
 
   @Get('')
   @ApiResponse({
@@ -120,8 +120,8 @@ export class TopicsController {
   })
   public async getTopicsBySearch(
     @Query() { keyword, owner, limit, page }: GetTopicsSearchQueryDto
-  ): Promise<PaginatedTopicResponse | []> {
-    return this.ddhubTopicsService.getTopicsBySearch(
+  ) {
+    return this.topicService.getTopicsBySearch(
       keyword,
       owner,
       limit,
