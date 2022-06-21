@@ -1,4 +1,4 @@
-import { FileText, CreditCard, Check } from 'react-feather';
+import { FileText, Check, Slash, MessageCircle } from 'react-feather';
 import { TStep } from './types';
 
 export const CREATION_STEPS: TStep[] = [
@@ -10,12 +10,12 @@ export const CREATION_STEPS: TStep[] = [
   {
     title: 'Restrictions',
     subtitle: 'Add restrictions by searching',
-    icon: <CreditCard size={18} />,
+    icon: <Slash size={18} />,
   },
   {
     title: 'Topics',
     subtitle: 'Add topics by searching',
-    icon: <CreditCard size={18} />,
+    icon: <MessageCircle size={18} />,
   },
   {
     title: 'Review',
