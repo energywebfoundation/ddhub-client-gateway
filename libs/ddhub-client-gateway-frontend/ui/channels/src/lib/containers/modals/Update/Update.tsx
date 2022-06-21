@@ -38,6 +38,7 @@ export const Update = () => {
             actionButtonsProps={getActionButtonsProps({
               onClick: setRestrictions,
               text: 'Next',
+              showArrowIcon: true,
             })}
             restrictions={channelValues.conditions}
           />
