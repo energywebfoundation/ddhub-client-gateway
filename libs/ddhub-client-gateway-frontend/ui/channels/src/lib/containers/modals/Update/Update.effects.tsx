@@ -143,6 +143,12 @@ export const useUpdateChannelEffects = () => {
     onCancel: openCancelModal,
   });
 
+  const navigateToStep = (index: number) => {
+    if (index !== activeStep) {
+      setActiveStep(index);
+    }
+  };
+
   return {
     open,
     channel,
@@ -153,5 +159,6 @@ export const useUpdateChannelEffects = () => {
     channelUpdateHandler,
     isUpdating,
     getActionButtonsProps,
+    navigateToStep,
   };
 };

@@ -25,6 +25,7 @@ export const Update = () => {
     channelUpdateHandler,
     isUpdating,
     getActionButtonsProps,
+    navigateToStep,
   } = useUpdateChannelEffects();
   const { classes } = useStyles();
 
@@ -109,7 +110,7 @@ export const Update = () => {
             </Box>
           )}
           <Box className={classes.divider} />
-          <Steps steps={UPDATE_STEPS} activeStep={activeStep} />
+          <Steps steps={UPDATE_STEPS} activeStep={activeStep} setActiveStep={navigateToStep} />
         </Grid>
         <Grid item className={classes.formWrapper}>
           {formPart(activeStep)}
