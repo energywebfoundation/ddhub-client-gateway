@@ -178,8 +178,9 @@ ddhub-client-gateway-api:
 
   affinity: {}
 
-  pvc:
+  existingClaim:
     enabled: true
+    claimName: azurefile-ddhub-gw-demo
     mountPath: /usr/app/data
 
   probes:
