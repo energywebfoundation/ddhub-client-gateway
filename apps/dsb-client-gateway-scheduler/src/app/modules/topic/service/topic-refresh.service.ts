@@ -91,6 +91,9 @@ export class TopicRefreshService implements OnApplicationBootstrap {
             await this.ddhubTopicsService.getTopicVersions(topic.id);
 
           for (const topicVersion of topicVersions.records) {
+            const [major, minor, patch]: string[] =
+              topicVersion.version.split('.');
+
             await this.wrapper.topicRepository.save({
               id: topic.id,
               owner: topic.owner,
@@ -99,6 +102,9 @@ export class TopicRefreshService implements OnApplicationBootstrap {
               version: topicVersion.version,
               schema: topicVersion.schema,
               tags: topicVersion.tags,
+              majorVersion: major,
+              minorVersion: minor,
+              patchVersion: patch,
             });
 
             this.logger.log(

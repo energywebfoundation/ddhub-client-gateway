@@ -20,6 +20,7 @@ import { DdhubClientGatewayEnrolmentModule } from '@dsb-client-gateway/ddhub-cli
 import { MulterModule } from '@nestjs/platform-express';
 import multer from 'multer';
 import { ConfigService } from '@nestjs/config';
+import { CertificateModule } from '../certificate/certificate.module';
 
 @Module({
   imports: [
@@ -48,10 +49,9 @@ import { ConfigService } from '@nestjs/config';
       },
       inject: [ConfigService],
     }),
-    DdhubClientGatewayMessageBrokerModule.forRootAsync([
-      DdhubClientGatewayEnrolmentModule,
-    ]),
+    DdhubClientGatewayMessageBrokerModule,
     FileMetadataRepositoryModule,
+    CertificateModule,
   ],
   providers: [
     EventsGateway,

@@ -9,14 +9,16 @@ import {
   RetryOptions,
 } from '@dsb-client-gateway/ddhub-client-gateway-utils';
 import { DdhubLoginService } from './ddhub-login.service';
-import { MessageBrokerException } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
 import { DsbClientGatewayErrors } from '@dsb-client-gateway/dsb-client-gateway-errors';
+import { TlsAgentService } from './tls-agent.service';
+import { MessageBrokerException } from '../exceptions';
 
 export abstract class DdhubBaseService {
   protected constructor(
     protected readonly logger: Logger,
     protected readonly retryConfigService: RetryConfigService,
-    protected readonly ddhubLoginService: DdhubLoginService
+    protected readonly ddhubLoginService: DdhubLoginService,
+    protected readonly tlsAgentService: TlsAgentService
   ) {}
 
   protected async request<T>(
@@ -66,6 +68,23 @@ export abstract class DdhubBaseService {
 
     this.logger.error('Request failed', e.request.path);
     this.logger.error(e.response.data);
+
+    const invalidCertificateErrorCodes: number[] = [
+      495,
+      496,
+      525,
+      526, // 525 and 526 are CloudFlare errors
+    ];
+
+    if (invalidCertificateErrorCodes.includes(e.response.status)) {
+      this.logger.error(
+        `Invalid certificate with response code ${e.response.status}`
+      );
+
+      await this.tlsAgentService.create();
+
+      return retry();
+    }
 
     if (defaults.stopOnStatusCodes.includes(status)) {
       this.logger.error(

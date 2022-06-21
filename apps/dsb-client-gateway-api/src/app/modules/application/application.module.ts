@@ -6,12 +6,11 @@ import {
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
 import { ApplicationsService } from './service/applications.service';
 import { DdhubClientGatewayMessageBrokerModule } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
-import { EnrolmentModule } from '../enrolment/enrolment.module';
 
 @Module({
   imports: [
     DsbClientGatewayStorageModule,
-    DdhubClientGatewayMessageBrokerModule.forRootAsync([EnrolmentModule]),
+    DdhubClientGatewayMessageBrokerModule,
     ApplicationRepositoryModule,
   ],
   providers: [ApplicationsService],

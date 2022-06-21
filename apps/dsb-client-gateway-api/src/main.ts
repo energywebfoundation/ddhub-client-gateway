@@ -1,5 +1,5 @@
 import * as dotenv from 'dotenv';
-import { Logger } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { WsAdapter } from '@nestjs/platform-ws';
 import * as bodyParser from 'body-parser';
@@ -7,6 +7,8 @@ import { AppModule } from './app/app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 import { otelSDK } from '@dsb-client-gateway/ddhub-client-gateway-tracing';
+import { ValidationException } from '@dsb-client-gateway/dsb-client-gateway-errors';
+import { TopicRepositoryWrapper } from '@dsb-client-gateway/dsb-client-gateway-storage';
 
 dotenv.config({
   path: '.env',
@@ -22,6 +24,18 @@ async function bootstrap() {
 
   const app = await NestFactory.create(
     AppModule.register({ shouldValidate: true })
+  );
+
+  const wrapper = app.get(TopicRepositoryWrapper);
+
+  console.log(
+    await wrapper.topicRepository.getLatest(
+      5,
+      undefined,
+      'dsb.apps.szostak.iam.ewc',
+      1,
+      undefined
+    )
   );
 
   app.enableCors({
@@ -43,6 +57,22 @@ async function bootstrap() {
     bodyParser.urlencoded({
       limit: configService.get<string>('REQUEST_BODY_SIZE'),
       extended: true,
+    })
+  );
+
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+      transformOptions: {
+        enableImplicitConversion: true,
+      },
+      exceptionFactory: (errors) => {
+        const transformedErrors = errors
+          .map((error) => Object.values(error.constraints))
+          .flat();
+
+        return new ValidationException(transformedErrors);
+      },
     })
   );
 

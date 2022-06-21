@@ -9,12 +9,14 @@ export const useTopicsSearch = (
     page = 1,
     limit = 0,
     keyword = '',
+    owner,
   }: TopicsControllerGetTopicsBySearchParams) => {
 
   const { data, isSuccess, isError }  = useTopicsControllerGetTopicsBySearch({
     keyword,
     page,
-    limit
+    limit,
+    owner,
   }, {
     query: {
       enabled: !!keyword

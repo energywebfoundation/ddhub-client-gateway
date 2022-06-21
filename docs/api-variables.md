@@ -1,43 +1,49 @@
-# API environment variables
+# API env. variables
 
-| KEY                                      | TYPE    | DEFAULT VALUE                              | ALLOWED VALUES                                                     | DESCRIPTION                                                                                                                | DEPENDENCY KEY               |
-| ---------------------------------------- | ------- | ------------------------------------------ | ------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
-| NODE_ENV                                 | String  | null                                       | production, development, test                                      |                                                                                                                            |                              |
-| PORT                                     | Number  | 3333                                       | Any positive integer                                               | Port on which application should listen                                                                                    |                              |
-| RPC_URL                                  | String  | https://volta-rpc.energyweb.org/           | Any string (URL)                                                   | RPC network                                                                                                                |                              |
-| DSB_BASE_URL                             | String  | https://dsb-demo.energyweb.org             | Any string (URL)                                                   | Message broker URL. Note that this key will change to MB_URL                                                               |                              |
-| CLIENT_ID                                | String  | WS-CONSUMER                                | Any string                                                         | Client ID used for WebSocket messaging                                                                                     |                              |
-| EVENTS_MAX_PER_SECOND                    | Number  | 2                                          | Any positive integer                                               | Maximum amount of messages to receive                                                                                      |                              |
-| PARENT_NAMESPACE                         | String  | dsb.apps.energyweb.iam.ewc                 | Any string                                                         | Default namespace for enrolment configuration                                                                              |                              |
-| EVENT_SERVER_URL                         | String  | identityevents-dev.energyweb.org           | Any string (URL)                                                   | Events URL on which application should listen during enrolment                                                             |                              |
-| NATS_ENV_NAME                            | String  | ewf-dev                                    | Any string                                                         |                                                                                                                            |                              |
-| CHAIN_ID                                 | Number  | 73799                                      | 73799 - development network (VOLTA) 456 - production network (EWC) | RPC Network chain id                                                                                                       |                              |
-| CACHE_SERVER_URL                         | String  | https://identitycache-dev.energyweb.org/v1 | Any string (URL)                                                   | IAM Cache Server URL                                                                                                       |                              |
-| CLAIM_MANAGER_ADDRESS                    | String  | 0x5339adE9332A604A1c957B9bC1C6eee0Bcf7a031 | Any string (address)                                               | Overridden claim manager address                                                                                           |                              |
-| EVENTS_EMIT_MODE                         | String  | BULK                                       | Any string (BULK, SINGLE)                                          | Should emit websocket messages in bulk or single message                                                                   | WEBSOCKET != 'NONE'          |
-| DID_TTL                                  | Number  | 60                                         | Any positive integer                                               | How long DID should be cached for messaging purposes (seconds)                                                             |                              |
-| WEBSOCKET                                | String  | NONE                                       | Any string (NONE, SERVER, CLIENT)                                  | Determines if WebSocket is enabled (only for SERVER and CLIENT we enable WS) and how it should run (client or server mode) |                              |
-| WEBSOCKET_URL                            | String  | null                                       | Any string (URL)                                                   | Determines to which WS Server should application connect                                                                   | WEBSOCKET = 'CLIENT'         |
-| WEBSOCKET_PROTOCOL                       | String  | dsb-protocol                               | Any string                                                         | Which protocol should use when connecting to WS Server                                                                     | WEBSOCKET = 'CLIENT'         |
-| WEBSOCKET_RECONNECT_TIMEOUT              | Number  | 5000                                       | Any positive integer                                               | How long application should wait to reconnect                                                                              | WEBSOCKET = 'CLIENT'         |
-| WEBSOCKET_RECONNECT                      | Boolean | true                                       | Boolean                                                            | Should WS attempt to reconnect to server                                                                                   | WEBSOCKET = 'CLIENT'         |
-| WEBSOCKET_RECONNECT_MAX_RETRIES          | Number  | 10                                         | Any positive integer                                               | How many times WS should attempt reconnecting                                                                              | WEBSOCKET = 'CLIENT'         |
-| WEBSOCKET_POOLING_TIMEOUT                | Number  | 5000                                       | Any positive integer                                               | How often server should poll for messages                                                                                  |                              |
-| SECRETS_ENGINE                           | String  | vault                                      | Any string (vault)                                                 | Which secrets engine it should use to store secret data                                                                    |                              |
-| VAULT_ENDPOINT                           | String  | null                                       | Any string (URL)                                                   | Vault endpoint                                                                                                             | SECRETS_ENGINE = 'VAULT'     |
-| VAULT_TOKEN                              | String  | root                                       | Any string                                                         | Vault token                                                                                                                | SECRETS_ENGINE = 'VAULT'     |
-| USERNAME                                 | String  | null                                       | Any string                                                         | Username for API authentication. Not implemented YET.                                                                      |                              |
-| PASSWORD                                 | String  | null                                       | Any string                                                         | Password for API authentication. Not implemented YET.                                                                      |                              |
-| MAX_RETRIES                              | Number  | 3                                          | Any positive integer                                               | How many times application should attempt to make a request to message broker                                              |                              |
-| DID_CLAIM_NAMESPACE                      | String  | message.broker.app.namespace               | Any string                                                         | Namespace for fetching applications                                                                                        |                              |
-| MAX_FILE_SIZE                            | Number  | 100000000                                  | Any positive integer                                               | Maximum file size for large data messaging (100 MB)                                                                        |                              |
-| SYMMETRIC_KEY_CLIENT_ID                  | String  | test                                       | Any string                                                         | Client ID for fetching Symmetric Keys.                                                                                     |                              |
-| AMOUNT_OF_SYMMETRIC_KEYS_FETCHED         | Number  | 100                                        | Any positive integer                                               | How many symmetric keys should be fetched                                                                                  |                              |
-| OPENTELEMETRY_ENABLED                    | Boolean | false                                      | Boolean                                                            | Should enable OTEL                                                                                                         |                              |
-| OTEL_IGNORED_ROUTES                      | String  | health,api/v2/health                       | Any string separated by `,`                                        | Ignored routes for tracing                                                                                                 | OPENTELEMETRY_ENABLED = true |
-| OTEL_TRACING_URL                         | String  | http://localhost:4318/v1/traces            | Any string (URL)                                                   | OTEL Collector tracing URL                                                                                                 | OPENTELEMETRY_ENABLED = true |
-| OTEL_SERVICE_NAME                        | String  | ddhub-client-gateway                       | Any string                                                         | OTEL service name identifier                                                                                               | OPENTELEMETRY_ENABLED = true |
-| OTEL_ENVIRONMENT                         | String  | local                                      | Any string                                                         | OTEL environment                                                                                                           | OPENTELEMETRY_ENABLED = true |
-| APPLICATION_NAMESPACE_REGULAR_EXPRESSION | String  | `\\ w.apps.* \\ w.iam.ewc`                 | Any string (regular expression)                                    |                                                                                                                            |                              |
-| DB_NAME                                  | String  | local.db                                   | Any string (path)                                                  | Where database file should be created                                                                                      |                              |
-| REQUEST_BODY_SIZE                        | String  | `50mb`                                     | Any string (request request body size)                             |
+| KEY | TYPE | DEFAULT | DESCRIPTION | ALLOWED_VALUES | DEPENDENCY |
+| --- | ---- | ------- | ----------- | -------------- | ---------- |
+| PORT | number | 3333 | HTTP port |  |  |
+| WEBSOCKET | string | NONE | Websocket mode | NONE,SERVER,CLIENT |  |
+| EVENTS_MAX_PER_SECOND | number | 2 | Amount of messages to pull for each WebSocket run |  |  |
+| EVENTS_EMIT_MODE | string | BULK | Should Websocket emit messages as array or single object | SINGLE,BULK |  |
+| DID_TTL | number | 60 | How long cached DID attributes should be valid |  |  |
+| WEBSOCKET_URL | string |  | WebSocket Client URL to connect |  | WEBSOCKET == CLIENT |
+| WEBSOCKET_PROTOCOL | string | dsb-protocol | WebSocket Client protocol |  | WEBSOCKET == CLIENT |
+| WEBSOCKET_RECONNECT_TIMEOUT | number | 3000 | WebSocket Client reconnect timeout |  | WEBSOCKET == CLIENT |
+| WEBSOCKET_RECONNECT | number | 3000 | Should attempt to reconnect |  | WEBSOCKET == CLIENT |
+| WEBSOCKET_RECONNECT_MAX_RETRIES | number | 10 | How many times should attempt to reconnect |  | WEBSOCKET == CLIENT |
+| WEBSOCKET_POOLING_TIMEOUT | number | 5000 | How often should poll messages |  | WEBSOCKET == CLIENT |
+| DID_CLAIM_NAMESPACE | string | message.broker.app.namespace | Namespace for fetching applications |  |  |
+| MAX_FILE_SIZE | number | 100000000 | Maximum file size for large data messaging (100 MB) |  |  |
+| SYMMETRIC_KEY_CLIENT_ID | string | test | Client ID for fetching symmetric keys |  |  |
+| AMOUNT_OF_SYMMETRIC_KEYS_FETCHED | number |  | Amout of symmetric keys to fetch for each run |  |  |
+| MULTER_UPLOADS_PATH | string | uploads | Multer temporary file storage path |  |  |
+| APPLICATION_NAMESPACE_REGULAR_EXPRESSION | string | \w.apps.*\w.iam.ewc | Filter for application namespaces |  |  |
+| REQUEST_BODY_SIZE | string | 50mb | Maximum request size |  |  |
+| NODE_ENV | string |  | Node environment |  |  |
+| DSB_BASE_URL | string | https://dsb-demo.energyweb.org | Message broker URL |  |  |
+| UPLOAD_FILES_DIR | string | ./upload | Directory where we should store temporary files for upload |  |  |
+| DOWNLOAD_FILES_DIR | string | ./download | Directory where we should store downloaded files for limited time |  |  |
+| MTLS_ENABLED | boolean | true | Should enable mTLS |  |  |
+| DB_NAME | string | local.db | SQLite database file name |  |  |
+| CLIENT_ID | string | WS_CONSUMER | WS client id |  |  |
+| SECRETS_ENGINE | string | vault | Secrets engine to use | aws,vault |  |
+| VAULT_ENDPOINT | string | http://localhost:8200 | HashiCorp Vault endpoint |  |  |
+| VAULT_TOKEN | string | root | HashiCorp Vault token |  |  |
+| MAX_RETRIES | number | 3 | Specifies maximum amount of retries for vulnerable methods |  |  |
+| RETRY_FACTOR | number | 2 | Specifies retry factor (multiplier for timeout) for vulnerable methods |  |  |
+| TIMEOUT | number | 1000 | Specifies timeout (how much app should wait before retries) for vulnerable methods |  |  |
+| OPENTELEMETRY_ENABLED | boolean | false |  |  |  |
+| OTEL_IGNORED_ROUTES | string | health,api/v2/health | OTEL ignored routes |  | OPENTELEMETRY_ENABLED == true |
+| OTEL_TRACING_URL | string | http://localhost:4318/v1/traces | OTEL collector tracing URL |  | OPENTELEMETRY_ENABLED == true |
+| OTEL_SERVICE_NAME | string | ddhub-client-gateway | OTEL service name tag |  | OPENTELEMETRY_ENABLED == true |
+| OTEL_ENVIRONMENT | string | local | OTEL environment name tag |  | OPENTELEMETRY_ENABLED == true |
+| RPC_URL | string | https://volta-rpc.energyweb.org/ | EWF RPC URL |  |  |
+| PARENT_NAMESPACE | string | dsb.apps.energyweb.iam.ewc | Parent namespace for IAM lookup |  |  |
+| EVENT_SERVER_URL | string | identityevents-dev.energyweb.org | NATS URL for listening for DID roles updates |  |  |
+| NATS_ENV_NAME | string | ewf-dev |  |  |  |
+| CHAIN_ID | number | 73799 | Chain ID |  |  |
+| CACHE_SERVER_URL | string | https://identitycache-dev.energyweb.org/v1 | SSI HUB url |  |  |
+| CLAIM_MANAGER_ADDRESS | string | CLAIM_MANAGER_ADDRESS | Overrides default IAM Client Lib claim manager address |  |  |
+| CHAIN_NAME | string | VOLTA | Chain name |  |  |
+| ENS_URL | string | https://volta-rpc-vkn5r5zx4ke71f9hcu0c.energyweb.org | Will be deprecated - same as RPC_URL |  |  |

@@ -18,6 +18,8 @@ export class ResponseError<T> {
     description: 'Additional details',
   })
   additionalDetails: T;
+
+  exception?: any;
 }
 
 export class ResponseErrorDto<T = any> {
