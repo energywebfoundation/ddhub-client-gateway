@@ -1,2 +1,2 @@
-export * from './aws-secrets-manager.service';
-export * from './vault.service';
+export * from './service/';
+export * from './proxy';
