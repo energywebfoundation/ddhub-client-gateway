@@ -47,7 +47,6 @@ export const Details = ({ nextClick, channelValues }: DetailsProps) => {
             className={classes.switchLabel}
             control={
               <CheckSwitch
-                defaultChecked
                 id={fields.payloadEncryption.name}
                 name={fields.payloadEncryption.name}
                 color="primary"

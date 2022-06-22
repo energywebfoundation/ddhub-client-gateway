@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { Edit } from 'react-feather';
+import { Edit, Check, X } from 'react-feather';
 import {
   DialogContent,
   DialogActions,
@@ -62,6 +62,14 @@ export const Details: FC = () => {
               </Typography>
               <Typography className={classes.typeValue} variant="body2">
                 {ChannelConnectionType[channel.type]}
+              </Typography>
+            </Box>
+            <Box display="flex" className={classes.typeWrapper}>
+              <Typography className={classes.typeLabel} variant="body2">
+                Payload Encryption:
+              </Typography>
+              <Typography className={classes.encryptionValue} variant="body2">
+                {channel.payloadEncryption ? <Check className={classes.iconCheck} /> : <X className={classes.iconCross} />}
               </Typography>
             </Box>
             <Box mb={0.9}>
