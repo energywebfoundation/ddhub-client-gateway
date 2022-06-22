@@ -583,6 +583,9 @@ export class TopicsByIdAndVersionParamsDto {
     type: String,
     example: '1.0.9',
   })
+  @IsValidVersion({
+    message: 'malformed version',
+  })
   public versionNumber: string;
 }
 
@@ -600,6 +603,9 @@ export class DeleteTopicsVersionParamsDto {
     description: 'version of the topic',
     type: String,
     example: '1.0.9',
+  })
+  @IsValidVersion({
+    message: 'malformed version',
   })
   public versionNumber: string;
 }
@@ -678,7 +684,7 @@ export class PostTopicBodyDto {
   schema: string;
 
   @IsValidVersion({
-    message: 'Malformed version.',
+    message: 'malformed version',
   })
   @IsString()
   @IsNotEmpty()

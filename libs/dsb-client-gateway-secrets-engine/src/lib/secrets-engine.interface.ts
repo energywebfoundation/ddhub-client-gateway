@@ -2,6 +2,7 @@ import {
   CreateSecretResponse,
   PutSecretValueResponse,
 } from '@aws-sdk/client-secrets-manager';
+import { OnModuleInit } from '@nestjs/common';
 
 export enum PATHS {
   IDENTITY_PRIVATE_KEY = 'identity/private_key',
@@ -11,7 +12,8 @@ export enum PATHS {
   RSA_KEY = 'rsa_key',
 }
 
-export abstract class SecretsEngineService {
+export abstract class SecretsEngineService implements OnModuleInit {
+  abstract onModuleInit(): Promise<void>;
   abstract setPrivateKey(privateKey: string): Promise<SetPrivateKeyResponse>;
   abstract getPrivateKey(): Promise<string | null>;
   abstract setCertificateDetails(

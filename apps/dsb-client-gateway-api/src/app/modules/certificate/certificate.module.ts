@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { CertificateService } from './service/certificate.service';
 import { CertificateController } from './certificate.controller';
 import { SecretsEngineModule } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
@@ -6,7 +6,10 @@ import { DdhubClientGatewayMessageBrokerModule } from '@dsb-client-gateway/ddhub
 import { MtlsGuard } from './guards/mtls.guard';
 
 @Module({
-  imports: [SecretsEngineModule, DdhubClientGatewayMessageBrokerModule],
+  imports: [
+    SecretsEngineModule,
+    forwardRef(() => DdhubClientGatewayMessageBrokerModule),
+  ],
   providers: [CertificateService, MtlsGuard],
   exports: [MtlsGuard, CertificateService],
   controllers: [CertificateController],

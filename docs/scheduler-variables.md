@@ -26,12 +26,17 @@
 | MTLS_ENABLED | boolean | true | Should enable mTLS |  |  |
 | DB_NAME | string | local.db | SQLite database file name |  |  |
 | CLIENT_ID | string | WS_CONSUMER | WS client id |  |  |
-| SECRETS_ENGINE | string | vault | Secrets engine to use | aws,vault |  |
-| VAULT_ENDPOINT | string | http://localhost:8200 | HashiCorp Vault endpoint |  |  |
-| VAULT_TOKEN | string | root | HashiCorp Vault token |  |  |
 | MAX_RETRIES | number | 3 | Specifies maximum amount of retries for vulnerable methods |  |  |
 | RETRY_FACTOR | number | 2 | Specifies retry factor (multiplier for timeout) for vulnerable methods |  |  |
 | TIMEOUT | number | 1000 | Specifies timeout (how much app should wait before retries) for vulnerable methods |  |  |
+| INTERNAL_EVENTS_TIMEOUT | number | 5 | How often internal events interval should execute (seconds) |  |  |
+| USE_CACHE | boolean | true | Should use cache |  |  |
+| SECRETS_ENGINE | string |  | Secrets engine to use | aws,vault |  |
+| VAULT_SECRET_PREFIX | string | ddhub/ | Vault path prefix for secrets |  | SECRETS_ENGINE == vault |
+| VAULT_ENDPOINT | string |  | Vault path |  | SECRETS_ENGINE == vault |
+| VAULT_TOKEN | string | root | Vault auth token |  | SECRETS_ENGINE == vault |
+| AWS_SECRET_PREFIX | string | /ddhub/ | AWS Secret prefix |  | SECRETS_ENGINE == aws |
+| AWS_REGION | string | us-east-1 | AWS Secrets Manager region |  | SECRETS_ENGINE == aws |
 | OPENTELEMETRY_ENABLED | boolean | false |  |  |  |
 | OTEL_IGNORED_ROUTES | string | health,api/v2/health | OTEL ignored routes |  | OPENTELEMETRY_ENABLED == true |
 | OTEL_TRACING_URL | string | http://localhost:4318/v1/traces | OTEL collector tracing URL |  | OPENTELEMETRY_ENABLED == true |
@@ -43,6 +48,6 @@
 | NATS_ENV_NAME | string | ewf-dev |  |  |  |
 | CHAIN_ID | number | 73799 | Chain ID |  |  |
 | CACHE_SERVER_URL | string | https://identitycache-dev.energyweb.org/v1 | SSI HUB url |  |  |
-| CLAIM_MANAGER_ADDRESS | string | CLAIM_MANAGER_ADDRESS | Overrides default IAM Client Lib claim manager address |  |  |
+| CLAIM_MANAGER_ADDRESS | string | 0x5339adE9332A604A1c957B9bC1C6eee0Bcf7a031 | Overrides default IAM Client Lib claim manager address |  |  |
 | CHAIN_NAME | string | VOLTA | Chain name |  |  |
 | ENS_URL | string | https://volta-rpc-vkn5r5zx4ke71f9hcu0c.energyweb.org | Will be deprecated - same as RPC_URL |  |  |

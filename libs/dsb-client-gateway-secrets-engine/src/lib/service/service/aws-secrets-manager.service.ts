@@ -18,7 +18,7 @@ import {
   SetCertificateDetailsResponse,
   SetPrivateKeyResponse,
   SetRSAPrivateKeyResponse,
-} from '../secrets-engine.interface';
+} from '../../secrets-engine.interface';
 import { Span } from 'nestjs-otel';
 
 @Injectable()
