@@ -32,11 +32,11 @@
 | INTERNAL_EVENTS_TIMEOUT | number | 5 | How often internal events interval should execute (seconds) |  |  |
 | USE_CACHE | boolean | true | Should use cache |  |  |
 | SECRETS_ENGINE | string |  | Secrets engine to use | aws,vault,azure |  |
-| VAULT_SECRET_PREFIX | string | ddhub/ | Vault path prefix for secrets |  | SECRETS_ENGINE == vault |
 | VAULT_ENDPOINT | string |  | Vault path |  | SECRETS_ENGINE == vault |
 | VAULT_TOKEN | string | root | Vault auth token |  | SECRETS_ENGINE == vault |
-| AWS_SECRET_PREFIX | string | /ddhub/ | AWS Secret prefix |  | SECRETS_ENGINE == aws |
+| SECRET_PREFIX | string | dduhb/ |  |  |  |
 | AWS_REGION | string | us-east-1 | AWS Secrets Manager region |  | SECRETS_ENGINE == aws |
+| AZURE_VAULT_URL | string |  | Azure Vault URL |  | SECRETS_ENGINE == azure |
 | OPENTELEMETRY_ENABLED | boolean | false |  |  |  |
 | OTEL_IGNORED_ROUTES | string | health,api/v2/health | OTEL ignored routes |  | OPENTELEMETRY_ENABLED == true |
 | OTEL_TRACING_URL | string | http://localhost:4318/v1/traces | OTEL collector tracing URL |  | OPENTELEMETRY_ENABLED == true |

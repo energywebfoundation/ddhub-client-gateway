@@ -12,12 +12,10 @@ export class DidAuthHandler implements ICommandHandler<DidAuthCommand> {
     protected readonly commandBus: CommandBus
   ) {}
 
-  public async execute(): Promise<any> {
+  public async execute(): Promise<void> {
     const didAddress: string = this.iamService.getDIDAddress();
     const privateKey: string | null =
       await this.secretsEngineService.getPrivateKey();
-
-    console.log(didAddress);
 
     await this.commandBus.execute(new LoginCommand(privateKey, didAddress));
   }
