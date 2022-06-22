@@ -1,5 +1,5 @@
 import { makeStyles } from 'tss-react/mui';
-import { darken } from '@mui/material/styles';
+import { darken, alpha } from '@mui/material/styles';
 
 export const useStyles = makeStyles()((theme) => ({
   createTopicButton: {
@@ -9,6 +9,7 @@ export const useStyles = makeStyles()((theme) => ({
     borderRadius: 5,
     '&:hover': {
       backgroundColor: darken(theme.palette.primary.main, 0.2),
+      boxShadow: `0px 0px 10px ${alpha(theme.palette.primary.main, 0.65)}`,
     },
   },
   createTopicButtonText: {

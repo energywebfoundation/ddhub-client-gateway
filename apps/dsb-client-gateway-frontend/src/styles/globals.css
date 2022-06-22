@@ -96,6 +96,10 @@ a {
   letter-spacing: 0.4px;
 }
 
+.swal2-actions .swal2-styled.swal2-confirm:hover {
+  box-shadow: 0px 0px 10px #a466ffa6;
+}
+
 .swal2-confirm:active {
   background-color: var(--primary-dark-color) !important;
 }

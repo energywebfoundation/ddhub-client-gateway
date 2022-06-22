@@ -6,7 +6,7 @@ export const useStyles = makeStyles()((theme) => ({
     borderColor: '#384151',
     padding: '7px 5px 5px',
     height: 159,
-    width: 202,
+    width: 245,
   },
   label: {
     fontSize: 14,

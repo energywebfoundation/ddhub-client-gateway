@@ -5,6 +5,7 @@ import { AwsSecretsManagerService } from './service/aws-secrets-manager.service'
 import { SecretsEngineService } from './secrets-engine.interface';
 import { VaultService } from './service/vault.service';
 import { InvalidEngineException } from './exceptions/invalid-engine.exception';
+import { AzureKeyVaultService } from './service/azure-key-vault.service';
 
 @Module({
   providers: [
@@ -22,6 +23,8 @@ import { InvalidEngineException } from './exceptions/invalid-engine.exception';
             return new AwsSecretsManagerService(configService);
           case SecretsEngine.VAULT:
             return new VaultService(configService);
+          case SecretsEngine.AZURE:
+            return new AzureKeyVaultService(configService);
           default:
             throw new InvalidEngineException();
         }

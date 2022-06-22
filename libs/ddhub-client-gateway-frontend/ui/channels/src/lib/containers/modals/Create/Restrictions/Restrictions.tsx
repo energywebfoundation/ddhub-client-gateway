@@ -113,7 +113,6 @@ export const Restrictions = ({
     <Grid
       container
       direction="column"
-      justifyContent="space-between"
       className={'no-wrap'}
       sx={{ height: '100%', flexWrap: 'nowrap' }}
     >
@@ -180,7 +179,7 @@ export const Restrictions = ({
           />
         </Box>
       </Grid>
-      <Grid item alignSelf="flex-end" width="100%">
+      <Grid item alignSelf="flex-end" width="100%" sx={{ marginTop: '60px' }}>
         <ActionButtons
           {...actionButtonsProps}
           nextClickButtonProps={{
