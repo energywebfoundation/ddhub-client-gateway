@@ -8,6 +8,7 @@ import {
   InvalidRequestException,
   PutSecretValueCommand,
   PutSecretValueCommandOutput,
+  PutSecretValueResponse,
   ResourceNotFoundException,
   SecretsManagerClient,
 } from '@aws-sdk/client-secrets-manager';
@@ -15,9 +16,6 @@ import {
   CertificateDetails,
   PATHS,
   SecretsEngineService,
-  SetCertificateDetailsResponse,
-  SetPrivateKeyResponse,
-  SetRSAPrivateKeyResponse,
 } from '../secrets-engine.interface';
 import { Span } from 'nestjs-otel';
 
@@ -33,12 +31,12 @@ export class AwsSecretsManagerService
 
   constructor(protected readonly configService: ConfigService) {
     super();
-    this.prefix = this.configService.get('AWS_SECRET_PREFIX', '/ddhub/');
+    this.prefix = this.configService.get('SECRET_PREFIX', '/ddhub/');
   }
 
   @Span('aws_ssm_onModuleInit')
   public async onModuleInit(): Promise<void> {
-    const region = this.configService.get('AWS_REGION', 'us-east-1');
+    const region = this.configService.get('AWS_REGION', 'ap-southeast-2');
 
     this.client = new SecretsManagerClient({
       region,
@@ -50,7 +48,7 @@ export class AwsSecretsManagerService
   @Span('aws_ssm_setRSAKey')
   public async setRSAPrivateKey(
     privateKey: string
-  ): Promise<SetRSAPrivateKeyResponse> {
+  ): Promise<CreateSecretResponse | PutSecretValueResponse | null> {
     const name = `${this.prefix}${PATHS.RSA_KEY}`;
     const command = new PutSecretValueCommand({
       SecretId: name,
@@ -60,7 +58,7 @@ export class AwsSecretsManagerService
     return this.client
       .send(command)
       .then((response) => {
-        this.logger.log(response);
+        this.logger.log(`Successfully set RSA private key: ${name}`);
         return response;
       })
       .catch(async (err) => {
@@ -88,7 +86,9 @@ export class AwsSecretsManagerService
     caCertificate,
     certificate,
     privateKey,
-  }: CertificateDetails): Promise<SetCertificateDetailsResponse> {
+  }: CertificateDetails): Promise<
+    CreateSecretResponse[] | PutSecretValueResponse[]
+  > {
     const commands: PutSecretValueCommand[] = [
       new PutSecretValueCommand({
         SecretId: `${this.prefix}${PATHS.CERTIFICATE_KEY}`,
@@ -223,7 +223,9 @@ export class AwsSecretsManagerService
   }
 
   @Span('aws_ssm_setPrivateKey')
-  public async setPrivateKey(key: string): Promise<SetPrivateKeyResponse> {
+  public async setPrivateKey(
+    key: string
+  ): Promise<CreateSecretResponse | PutSecretValueResponse | null> {
     const name = `${this.prefix}${PATHS.IDENTITY_PRIVATE_KEY}`;
     const putCommand = new PutSecretValueCommand({
       SecretId: name,
@@ -233,7 +235,7 @@ export class AwsSecretsManagerService
     return this.client
       .send(putCommand)
       .then((response) => {
-        this.logger.log(response);
+        this.logger.log(`Successfully set private identity key: ${name}`);
         return response;
       })
       .catch(async (err) => {
@@ -279,7 +281,7 @@ export class AwsSecretsManagerService
         SecretString: value,
       });
       return this.client.send(createCommand).then((response) => {
-        this.logger.log('Created secret', response);
+        this.logger.log(`Successfully created secret: ${name}`);
         return response;
       });
     } else if (err instanceof InvalidRequestException) {

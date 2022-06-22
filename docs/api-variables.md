@@ -27,7 +27,7 @@
 | MTLS_ENABLED | boolean | true | Should enable mTLS |  |  |
 | DB_NAME | string | local.db | SQLite database file name |  |  |
 | CLIENT_ID | string | WS_CONSUMER | WS client id |  |  |
-| SECRETS_ENGINE | string | vault | Secrets engine to use | aws,vault |  |
+| SECRETS_ENGINE | string | vault | Secrets engine to use | aws,azure,vault |  |
 | VAULT_ENDPOINT | string | http://localhost:8200 | HashiCorp Vault endpoint |  |  |
 | VAULT_TOKEN | string | root | HashiCorp Vault token |  |  |
 | MAX_RETRIES | number | 3 | Specifies maximum amount of retries for vulnerable methods |  |  |
