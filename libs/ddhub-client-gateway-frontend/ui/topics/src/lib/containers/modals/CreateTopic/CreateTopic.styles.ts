@@ -12,11 +12,11 @@ export const useStyles = makeStyles()((theme) => ({
     borderRadius: 5,
   },
   cancelButton: {
-    border: `1px solid ${theme.palette.secondary.main}`,
+    border: `1px solid ${alpha(theme.palette.secondary.main, 0.5)}`,
     marginRight: 7,
     '&:hover': {
-      border: `1px solid ${theme.palette.secondary.main}`,
-      background: alpha(theme.palette.secondary.main, 0.04)
+      border: `1px solid ${alpha(theme.palette.secondary.main, 0.5)}`,
+      background: alpha(theme.palette.secondary.main, 0.04),
     }
   },
   confirmButton: {
@@ -26,6 +26,7 @@ export const useStyles = makeStyles()((theme) => ({
     },
     '&:hover': {
       backgroundColor: darken(theme.palette.primary.main, 0.2),
+      boxShadow: `0px 0px 10px ${alpha(theme.palette.primary.main, 0.65)}`,
     },
   },
   buttonProgress: {

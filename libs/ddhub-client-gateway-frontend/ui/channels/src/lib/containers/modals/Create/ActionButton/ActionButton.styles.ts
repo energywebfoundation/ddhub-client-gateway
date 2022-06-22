@@ -10,6 +10,7 @@ export const useStyles = makeStyles()((theme) => ({
     justifyContent: 'flex-start',
     '&:hover': {
       backgroundColor: darken(theme.palette.primary.main, 0.2),
+      boxShadow: `0px 0px 10px ${alpha(theme.palette.primary.main, 0.65)}`,
     },
     '&.Mui-disabled': {
       '& .MuiButton-endIcon svg': {

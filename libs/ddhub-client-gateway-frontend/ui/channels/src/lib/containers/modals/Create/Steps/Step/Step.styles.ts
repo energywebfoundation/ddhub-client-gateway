@@ -39,4 +39,7 @@ export const useStyles = makeStyles()((theme) => ({
     alignItems: 'center',
     paddingLeft: '12px',
   },
+  clickableAvatar: {
+    cursor: 'pointer'
+  }
 }));
