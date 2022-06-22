@@ -12,7 +12,7 @@ export const useTopicsSearch = (
     owner,
   }: TopicsControllerGetTopicsBySearchParams) => {
 
-  const { data, isSuccess, isError }  = useTopicsControllerGetTopicsBySearch({
+  const { data, isSuccess, isError, isLoading }  = useTopicsControllerGetTopicsBySearch({
     keyword,
     page,
     limit,
@@ -25,9 +25,11 @@ export const useTopicsSearch = (
 
   const topicsBySearch = data ?? {} as PaginatedResponse;
   const topicsBySearchLoaded = isSuccess && data !== undefined && !isError;
+  const topicsSearchLoading = isLoading;
 
   return {
     topicsBySearch,
-    topicsBySearchLoaded
+    topicsBySearchLoaded,
+    topicsSearchLoading,
   };
 };
