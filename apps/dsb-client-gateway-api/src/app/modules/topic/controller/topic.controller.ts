@@ -78,7 +78,7 @@ export class TopicsController {
   public async getTopicsHistoryById(
     @Param() { id }: GetTopicsParamsDto
   ): Promise<PaginatedTopicResponse> {
-    return this.ddhubTopicsService.getTopicHistoryById(id);
+    return this.topicService.getTopicHistoryById(id);
   }
 
   @Get('/:id/versions/:versionNumber')
@@ -94,7 +94,7 @@ export class TopicsController {
   public async getTopicHistoryByIdAndVersion(
     @Param() { id, versionNumber }: TopicsByIdAndVersionParamsDto
   ): Promise<PostTopicDto> {
-    return this.ddhubTopicsService.getTopicHistoryByIdAndVersion(
+    return this.topicService.getTopicHistoryByIdAndVersion(
       id,
       versionNumber
     );

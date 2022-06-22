@@ -17,7 +17,7 @@ import { ConfigService } from '@nestjs/config';
 import { IsValidVersion } from '../../utils/validator/decorators/isValidVersion';
 
 export class GetTopicDto {
-  constructor(protected readonly configService: ConfigService) {}
+  constructor(protected readonly configService: ConfigService) { }
 
   @IsString()
   @IsNotEmpty()
@@ -289,6 +289,15 @@ export class GetTopicSearchDto {
     example: 'torta.apps.eggplant.vege.iam.ewc',
   })
   owner: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({
+    description: 'owner of the topic',
+    type: String,
+    example: 'torta.apps.eggplant.vege.iam.ewc',
+  })
+  version: string;
 
   @IsArray()
   @IsNotEmpty()

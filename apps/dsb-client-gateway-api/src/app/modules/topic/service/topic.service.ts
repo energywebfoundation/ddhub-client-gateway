@@ -7,7 +7,8 @@ import {
 import { Span } from 'nestjs-otel';
 import { GetTopicResponse } from '../entity/topic.entity';
 
-import { PostTopicDto } from '../dto';
+import { GetTopicSearchDto, PaginatedTopicResponse, PostTopicDto } from '../dto';
+import { SchemaType } from '../topic.const';
 
 @Injectable()
 export class TopicService {
@@ -16,7 +17,7 @@ export class TopicService {
   constructor(
     protected readonly wrapper: TopicRepositoryWrapper,
     protected readonly applicationsWrapper: ApplicationWrapperRepository
-  ) {}
+  ) { }
 
   @Span('topics_getTopics')
   public async getTopics(
@@ -147,6 +148,48 @@ export class TopicService {
           topicsCount: () => 'topicsCount - 1',
         }
       );
+    }
+  }
+
+  public async getTopicHistoryByIdAndVersion(id: string, versionNumber: string): Promise<PostTopicDto> {
+
+    const topic: TopicEntity = await this.wrapper.topicRepository.findOne({
+      where: { id, version: versionNumber }
+    });
+
+    return {
+      id: topic.id,
+      name: topic.name,
+      schemaType: topic.schemaType as SchemaType,
+      schema: JSON.stringify(topic.schema),
+      version: topic.version,
+      owner: topic.owner,
+      tags: topic.tags
+    };
+  }
+
+  public async getTopicHistoryById(id: string): Promise<PaginatedTopicResponse> {
+    const [topics, allCount] = await this.wrapper.topicRepository.findAndCount({
+      where: { id }
+    });
+
+    const topicSearchDto: GetTopicSearchDto[] = topics.map(topic => {
+      const topicDto: GetTopicSearchDto = {
+        id: topic.id,
+        name: topic.name,
+        schemaType: topic.schemaType as SchemaType,
+        owner: topic.owner,
+        tags: topic.tags,
+        version: topic.version
+      };
+      return topicDto;
+    });
+
+    return {
+      count: allCount,
+      limit: 0,
+      page: 1,
+      records: topicSearchDto
     }
   }
 }
