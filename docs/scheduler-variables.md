@@ -31,7 +31,7 @@
 | TIMEOUT | number | 1000 | Specifies timeout (how much app should wait before retries) for vulnerable methods |  |  |
 | INTERNAL_EVENTS_TIMEOUT | number | 5 | How often internal events interval should execute (seconds) |  |  |
 | USE_CACHE | boolean | true | Should use cache |  |  |
-| SECRETS_ENGINE | string |  | Secrets engine to use | aws,vault |  |
+| SECRETS_ENGINE | string |  | Secrets engine to use | aws,vault,azure |  |
 | VAULT_SECRET_PREFIX | string | ddhub/ | Vault path prefix for secrets |  | SECRETS_ENGINE == vault |
 | VAULT_ENDPOINT | string |  | Vault path |  | SECRETS_ENGINE == vault |
 | VAULT_TOKEN | string | root | Vault auth token |  | SECRETS_ENGINE == vault |

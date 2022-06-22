@@ -3,6 +3,7 @@ import {
   PutSecretValueResponse,
 } from '@aws-sdk/client-secrets-manager';
 import { OnModuleInit } from '@nestjs/common';
+import { KeyVaultSecret } from '@azure/keyvault-secrets';
 
 export enum PATHS {
   IDENTITY_PRIVATE_KEY = 'identity/private_key',
@@ -36,12 +37,15 @@ export interface CertificateDetails {
 export type SetPrivateKeyResponse =
   | PutSecretValueResponse
   | CreateSecretResponse
+  | KeyVaultSecret
   | null;
 export type SetRSAPrivateKeyResponse =
   | PutSecretValueResponse
   | CreateSecretResponse
+  | KeyVaultSecret
   | null;
 export type SetCertificateDetailsResponse =
   | CreateSecretResponse[]
   | PutSecretValueResponse[]
+  | KeyVaultSecret[]
   | null;

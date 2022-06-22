@@ -15,7 +15,8 @@ export const useStyles = makeStyles()((theme) => ({
     color: theme.palette.text.primary,
     fontFamily: theme.typography.body2.fontFamily,
     '&:hover': {
-      backgroundColor: theme.palette.primary.dark,
+      backgroundColor: alpha(theme.palette.primary.main, 0.12),
+      color: `${theme.palette.primary.main}!important` as any,
     },
   },
   paper: {

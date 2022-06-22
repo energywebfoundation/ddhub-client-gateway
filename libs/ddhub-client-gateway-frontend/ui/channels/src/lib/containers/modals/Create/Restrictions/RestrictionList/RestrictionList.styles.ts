@@ -47,6 +47,6 @@ export const useStyles = makeStyles()((theme) => ({
     letterSpacing: '0.4px',
     color: theme.palette.grey[300],
     fontFamily: theme.typography.body2.fontFamily,
-    maxWidth: 150,
+    maxWidth: 160,
   },
 }));

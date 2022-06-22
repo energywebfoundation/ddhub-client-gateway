@@ -7,6 +7,7 @@ import { VaultService } from './service/service/vault.service';
 import { InvalidEngineException } from './exceptions/invalid-engine.exception';
 import { SecretsCacheProxyService } from './service';
 import { SecretChangeHandler } from './service/command/secret-change.handler';
+import { AzureKeyVaultService } from './service/azure-key-vault.service';
 
 @Module({
   providers: [
@@ -30,6 +31,9 @@ import { SecretChangeHandler } from './service/command/secret-change.handler';
             break;
           case SecretsEngine.VAULT:
             engineToUse = new VaultService(configService);
+            break;
+          case SecretsEngine.AZURE:
+            engineToUse = new AzureKeyVaultService(configService);
             break;
           default:
             throw new InvalidEngineException();

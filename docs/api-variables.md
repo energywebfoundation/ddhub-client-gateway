@@ -21,7 +21,7 @@
 | APPLICATION_NAMESPACE_REGULAR_EXPRESSION | string | \w.apps.*\w.iam.ewc | Filter for application namespaces |  |  |
 | REQUEST_BODY_SIZE | string | 50mb | Maximum request size |  |  |
 | USE_CACHE | boolean | true | Should use cache |  |  |
-| SECRETS_ENGINE | string |  | Secrets engine to use | aws,vault |  |
+| SECRETS_ENGINE | string |  | Secrets engine to use | aws,vault,azure |  |
 | VAULT_SECRET_PREFIX | string | ddhub/ | Vault path prefix for secrets |  | SECRETS_ENGINE == vault |
 | VAULT_ENDPOINT | string |  | Vault path |  | SECRETS_ENGINE == vault |
 | VAULT_TOKEN | string | root | Vault auth token |  | SECRETS_ENGINE == vault |

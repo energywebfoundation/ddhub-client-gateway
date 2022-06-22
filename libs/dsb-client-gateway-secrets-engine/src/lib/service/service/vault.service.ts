@@ -17,7 +17,7 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
 
   constructor(protected readonly configService: ConfigService) {
     super();
-    this.prefix = this.configService.get('VAULT_SECRET_PREFIX', 'ddhub/');
+    this.prefix = this.configService.get('SECRET_PREFIX', 'ddhub/');
   }
 
   public async deleteAll(): Promise<void> {

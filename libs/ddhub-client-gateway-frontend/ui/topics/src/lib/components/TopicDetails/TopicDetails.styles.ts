@@ -34,6 +34,7 @@ export const useStyles = makeStyles()((theme) => ({
     fontWeight: 400,
     color: theme.palette.grey[300],
     marginRight: 20,
+    fontFamily: theme.typography.body2.fontFamily,
   },
   tag: {
     fontSize: 12,
@@ -44,11 +45,13 @@ export const useStyles = makeStyles()((theme) => ({
     margin: '2px 3px',
     borderRadius: 4,
     background: alpha(theme.palette.primary.main, 0.12),
+    fontFamily: theme.typography.body2.fontFamily,
   },
   detailsInfoValue: {
     fontSize: 14,
     lineHeight: '21px',
     fontWeight: 400,
     color: theme.palette.common.white,
+    fontFamily: theme.typography.body2.fontFamily,
   },
 }));

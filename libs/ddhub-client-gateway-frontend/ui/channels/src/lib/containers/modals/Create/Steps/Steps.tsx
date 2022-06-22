@@ -19,6 +19,7 @@ export const Steps = ({ activeStep, setActiveStep, steps }: StepsProps) => {
             subtitle={step.subtitle}
             title={step.title}
             icon={step.icon}
+            showCursor={!!setActiveStep}
             clickHandler={() => {
               if (setActiveStep) {
                 setActiveStep(index);

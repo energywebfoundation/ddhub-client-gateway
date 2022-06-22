@@ -2,12 +2,15 @@ import { useStyles } from './RestrictionList.styles';
 import { X as Close } from 'react-feather';
 import { Grid, Typography, IconButton } from '@mui/material';
 import { CopyToClipboard } from '@ddhub-client-gateway-frontend/ui/core';
+import { RestrictionType } from '../models/restriction-type.enum';
+import { didFormatMinifier } from '@ddhub-client-gateway-frontend/ui/utils';
 
 export interface RestrictionListProps {
   list: string[];
   canRemove: boolean;
   canCopy: boolean;
   remove?: (value: string) => void;
+  type: RestrictionType;
 }
 
 export const RestrictionList = ({
@@ -15,6 +18,7 @@ export const RestrictionList = ({
   remove,
   canRemove,
   canCopy,
+  type,
 }: RestrictionListProps) => {
   const { classes } = useStyles();
   return (
@@ -28,7 +32,7 @@ export const RestrictionList = ({
         >
           <Grid item>
             <Typography noWrap variant="body2" className={classes.itemText}>
-              {el}
+              {type === RestrictionType.DID ? didFormatMinifier(el) : el}
             </Typography>
           </Grid>
           {canRemove && (
