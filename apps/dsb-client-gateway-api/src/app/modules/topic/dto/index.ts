@@ -291,13 +291,15 @@ export class GetTopicSearchDto {
   owner: string;
 
   @IsString()
-  @IsNotEmpty()
   @ApiProperty({
-    description: 'owner of the topic',
+    description: 'version of the topic',
     type: String,
-    example: 'torta.apps.eggplant.vege.iam.ewc',
+    example: '1.0.9',
   })
-  version: string;
+  @IsValidVersion({
+    message: 'malformed version',
+  })
+  public version: string;
 
   @IsArray()
   @IsNotEmpty()
