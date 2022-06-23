@@ -5,3 +5,4 @@ export * from './SymmetricKeys';
 export * from './TopicRefresh';
 export * from './ChannelRoles';
 export * from './ApplicationRefresh';
+export * from './FileCleaner';
