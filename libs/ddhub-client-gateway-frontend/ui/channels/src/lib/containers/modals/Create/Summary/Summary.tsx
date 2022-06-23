@@ -9,6 +9,7 @@ import { ActionButtons } from '../ActionButtons';
 import { TActionButtonsProps } from '../ActionButtons/ActionButtons';
 import { useSummaryEffects } from './Summary.effects';
 import { useStyles } from './Summary.styles';
+import { Check } from 'react-feather';
 
 export interface SummaryProps {
   channelValues: ICreateChannel;
@@ -53,6 +54,16 @@ export const Summary = ({
               text={channelValues?.fqcn}
               wrapperProps={{ marginLeft: '8px' }}
             />
+          </Box>
+        </Stack>
+        <Stack direction="row" mt={1}>
+          <Typography className={classes.detailsTitle} variant="body2">
+            Payload encryption:
+          </Typography>
+          <Box display="flex">
+            <Typography className={classes.encryptionValue} variant="body2">
+              {channelValues?.payloadEncryption ? <Check className={classes.iconCheck} /> : '-'}
+            </Typography>
           </Box>
         </Stack>
         <Divider className={classes.divider} />
