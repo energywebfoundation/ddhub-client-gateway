@@ -1,5 +1,4 @@
 import * as Joi from 'joi';
-import { SecretsEngine } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
 
 export const BASIC_ENVS = Joi.object({
   NODE_ENV: Joi.string().description('Node environment'),
@@ -20,18 +19,6 @@ export const BASIC_ENVS = Joi.object({
     .default('local.db')
     .description('SQLite database file name'),
   CLIENT_ID: Joi.string().default('WS_CONSUMER').description('WS client id'),
-  SECRETS_ENGINE: Joi.string()
-    .valid(...Object.values(SecretsEngine))
-    .default(SecretsEngine.VAULT)
-    .description('Secrets engine to use'),
-  VAULT_ENDPOINT: Joi.string()
-    .uri()
-    .default('http://localhost:8200')
-    .required()
-    .description('HashiCorp Vault endpoint'),
-  VAULT_TOKEN: Joi.string()
-    .default('root')
-    .description('HashiCorp Vault token'),
   MAX_RETRIES: Joi.number()
     .positive()
     .default(3)

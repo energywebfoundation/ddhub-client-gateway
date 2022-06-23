@@ -1,9 +1,9 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import {
   CertificateDetails,
-  SecretsEngineService,
   PATHS,
-} from '../secrets-engine.interface';
+  SecretsEngineService,
+} from '../../secrets-engine.interface';
 import { ConfigService } from '@nestjs/config';
 import nv from 'node-vault';
 import { Span } from 'nestjs-otel';

@@ -6,5 +6,6 @@ export const validationSchema = yup
     schemaType: yup.string().required(),
     tags: yup.array().optional(),
     version: yup.string().required(),
+    schema: yup.string().required(),
   })
   .required();

@@ -6,12 +6,13 @@ import {
   CronEntity,
   DidEntity,
   EnrolmentEntity,
+  EventsEntity,
+  FileMetadataEntity,
   IdentityEntity,
   SymmetricKeysEntity,
   TopicEntity,
 } from './module';
 import { ConfigService } from '@nestjs/config';
-import { FileMetadataEntity } from './module/file-metadata';
 
 const ENTITIES = [
   ChannelEntity,
@@ -23,6 +24,7 @@ const ENTITIES = [
   CronEntity,
   ApplicationEntity,
   FileMetadataEntity,
+  EventsEntity,
 ];
 
 @Module({
