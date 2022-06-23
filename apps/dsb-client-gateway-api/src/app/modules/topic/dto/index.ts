@@ -575,6 +575,28 @@ export class GetTopicsParamsDto {
     example: '62545547fe37f174d7715ff3',
   })
   public id: string;
+
+  @IsOptional()
+  @IsNumber()
+  @ApiProperty({
+    example: 1,
+    default: 0,
+    required: false,
+    type: Number,
+  })
+  public limit: number = 5;
+
+  @IsNumber()
+  @IsPositive()
+  @IsOptional()
+  @ApiProperty({
+    example: 1,
+    default: 0,
+    required: false,
+    type: Number,
+  })
+  public page: number = 1;
+
 }
 
 export class TopicsByIdAndVersionParamsDto {

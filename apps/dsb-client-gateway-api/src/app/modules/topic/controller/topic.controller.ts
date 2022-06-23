@@ -76,9 +76,9 @@ export class TopicsController {
     description: 'Unauthorized',
   })
   public async getTopicsHistoryById(
-    @Param() { id }: GetTopicsParamsDto
+    @Param() { id, limit, page }: GetTopicsParamsDto
   ): Promise<PaginatedTopicResponse> {
-    return this.topicService.getTopicHistoryById(id);
+    return this.topicService.getTopicHistoryById(id, limit, page);
   }
 
   @Get('/:id/versions/:versionNumber')

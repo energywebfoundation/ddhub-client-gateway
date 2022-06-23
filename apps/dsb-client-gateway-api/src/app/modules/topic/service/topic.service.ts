@@ -168,9 +168,11 @@ export class TopicService {
     };
   }
 
-  public async getTopicHistoryById(id: string): Promise<PaginatedTopicResponse> {
+  public async getTopicHistoryById(id: string, limit: number, page: number): Promise<PaginatedTopicResponse> {
     const [topics, allCount] = await this.wrapper.topicRepository.findAndCount({
-      where: { id }
+      where: { id },
+      skip: (page - 1) * limit,
+      take: limit,
     });
 
     const topicSearchDto: GetTopicSearchDto[] = topics.map(topic => {
@@ -187,8 +189,8 @@ export class TopicService {
 
     return {
       count: allCount,
-      limit: 0,
-      page: 1,
+      limit: limit,
+      page: page,
       records: topicSearchDto
     }
   }
