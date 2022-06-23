@@ -15,5 +15,10 @@ export const useStyles = makeStyles()((theme) => ({
     fontFamily: theme.typography.body2.fontFamily,
     letterSpacing: '0.4px',
     marginBottom: 22,
+  },
+  centerIcon: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
   }
 }));

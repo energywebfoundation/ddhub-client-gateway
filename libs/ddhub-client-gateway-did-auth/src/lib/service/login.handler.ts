@@ -11,7 +11,7 @@ export class LoginHandler implements ICommandHandler<LoginCommand> {
 
   public async execute({ did, privateKey }: LoginCommand): Promise<void> {
     if (!privateKey) {
-      this.logger.warn('IAM is not initialized, skipping login');
+      this.logger.warn('Private key is empty, skipping login');
 
       return;
     }

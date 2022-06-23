@@ -20,7 +20,7 @@ export const useTopics = ({
   const [params, setParams] = useState({ page, limit });
   const [searchParams, setSearchParams] = useState({ page, limit, keyword });
 
-  const { topicsBySearch, topicsBySearchLoaded } = useTopicsSearch({
+  const { topicsBySearch, topicsBySearchLoaded, topicsSearchLoading } = useTopicsSearch({
     limit: searchParams.limit,
     page: searchParams.page,
     keyword: searchParams.keyword,
@@ -90,10 +90,12 @@ export const useTopics = ({
     page: paginated?.page,
   };
 
+  const topicsLoading = topicsSearchLoading || isLoading;
+
   return {
     topics,
     topicsById,
-    isLoading,
+    topicsLoading,
     topicsFetched,
     getTopicsBySearch,
     getTopics,

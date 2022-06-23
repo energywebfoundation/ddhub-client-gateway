@@ -8,16 +8,14 @@ import { capitalizeFirstLetter } from '@ddhub-client-gateway-frontend/ui/utils';
 export interface SchedulerItemProps {
   name: string;
   date: string;
-  color: string;
   icon: Icon;
   status: string;
 }
 
 export const SchedulerItem: FC<SchedulerItemProps> = ({
-  icon: SchedulerIcon,
+  icon: Icon,
   name,
   date,
-  color,
   status,
 }) => {
   const { classes } = useStyles();
@@ -26,7 +24,7 @@ export const SchedulerItem: FC<SchedulerItemProps> = ({
       <Divider />
       <Box display="flex" mb={1.2} mt={1.2}>
         <Box className={classes.iconWrappper}>
-          <SchedulerIcon size={20} />
+          <Icon size={20} />
         </Box>
         <Box display="flex" justifyContent="space-between" flex={1}>
           <Box display="flex" flexDirection="column">

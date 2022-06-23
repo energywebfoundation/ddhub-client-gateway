@@ -23,6 +23,8 @@ import { LoginCommand } from '@dsb-client-gateway/ddhub-client-gateway-did-auth'
 import { EnrolmentService } from '@dsb-client-gateway/ddhub-client-gateway-enrolment';
 import { EthersService } from '@dsb-client-gateway/ddhub-client-gateway-utils';
 import { RefreshKeysCommand } from '@dsb-client-gateway/ddhub-client-gateway-encryption';
+import { TriggerEventCommand } from '../../../../ddhub-client-gateway-events/src/lib/command/trigger-event.command';
+import { Events } from '@dsb-client-gateway/ddhub-client-gateway-events';
 
 @Injectable()
 export class IdentityService {
@@ -138,12 +140,20 @@ export class IdentityService {
     if (balanceState === BalanceState.NONE) {
       this.logger.warn(`No balance for ${wallet.address}, not deriving keys`);
 
+      await this.commandBus.execute(
+        new TriggerEventCommand(Events.PRIVATE_KEY_CHANGED)
+      );
+
       return;
     }
 
     await this.commandBus.execute(new RefreshKeysCommand());
     await this.commandBus.execute(
       new LoginCommand(privateKey, this.iamService.getDIDAddress())
+    );
+
+    await this.commandBus.execute(
+      new TriggerEventCommand(Events.PRIVATE_KEY_CHANGED)
     );
   }
 }

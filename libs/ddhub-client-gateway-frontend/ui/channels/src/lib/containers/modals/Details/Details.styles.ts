@@ -86,8 +86,25 @@ export const useStyles = makeStyles()((theme) => ({
     color: theme.palette.common.white,
     marginLeft: 38,
   },
+  encryptionValue: {
+    fontSize: 14,
+    lineHeight: '21px',
+    fontWeight: 400,
+    color: theme.palette.common.white,
+    marginLeft: 25,
+  },
   divider: {
     marginTop: 22,
     borderBottom: `1px solid ${lighten(theme.palette.background.paper, 0.07)}`,
   },
+  iconCheck: {
+    stroke: theme.palette.success.main,
+    width: 21,
+    height: 21,
+  },
+  iconCross: {
+    stroke: theme.palette.error.main,
+    width: 21,
+    height: 21,
+  }
 }));
