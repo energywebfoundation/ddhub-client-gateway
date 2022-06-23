@@ -95,13 +95,22 @@ export class TopicService {
   public async updateTopic(data: PostTopicDto): Promise<void> {
     await this.wrapper.topicRepository.update(
       {
-        id: data.id,
+        id: data.id
       },
       {
         ...(data.tags ? { tags: data.tags } : null),
-        ...(data.schema ? { schema: data.schema as unknown as object } : null),
       }
     );
+
+    if (data.version)
+      await this.wrapper.topicRepository.update(
+        {
+          id: data.id, version: data.version
+        },
+        {
+          ...(data.schema ? { schema: data.schema as unknown as object } : null),
+        }
+      );
   }
 
   @Span('topics_updateTopicVersion')

@@ -16,7 +16,7 @@ export class DirectoryCreatedService implements OnModuleInit {
   }
 
   onModuleInit() {
-    fs.promises.mkdir(this.uploadPath, { recursive: true }).catch(error => { this.logger.debug('caught exception : ', error.message); });
-    fs.promises.mkdir(this.downloadPath, { recursive: true }).catch(error => { this.logger.debug('caught exception : ', error.message); });
+    fs.promises.mkdir(this.uploadPath, { recursive: true }).catch(error => { this.logger.error('caught exception : ', error.message); });
+    fs.promises.mkdir(this.downloadPath, { recursive: true }).catch(error => { this.logger.error('caught exception : ', error.message); });
   }
 }
