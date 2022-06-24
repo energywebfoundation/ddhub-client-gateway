@@ -17,7 +17,7 @@ import { ConfigService } from '@nestjs/config';
 import { IsValidVersion } from '../../utils/validator/decorators/isValidVersion';
 
 export class GetTopicDto {
-  constructor(protected readonly configService: ConfigService) {}
+  constructor(protected readonly configService: ConfigService) { }
 
   @IsString()
   @IsNotEmpty()
@@ -289,6 +289,17 @@ export class GetTopicSearchDto {
     example: 'torta.apps.eggplant.vege.iam.ewc',
   })
   owner: string;
+
+  @IsString()
+  @ApiProperty({
+    description: 'version of the topic',
+    type: String,
+    example: '1.0.9',
+  })
+  @IsValidVersion({
+    message: 'malformed version',
+  })
+  public version: string;
 
   @IsArray()
   @IsNotEmpty()
@@ -566,6 +577,28 @@ export class GetTopicsParamsDto {
     example: '62545547fe37f174d7715ff3',
   })
   public id: string;
+
+  @IsOptional()
+  @IsNumber()
+  @ApiProperty({
+    example: 1,
+    default: 0,
+    required: false,
+    type: Number,
+  })
+  public limit: number = 5;
+
+  @IsNumber()
+  @IsPositive()
+  @IsOptional()
+  @ApiProperty({
+    example: 1,
+    default: 0,
+    required: false,
+    type: Number,
+  })
+  public page: number = 1;
+
 }
 
 export class TopicsByIdAndVersionParamsDto {

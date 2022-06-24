@@ -41,7 +41,7 @@ export class TopicsController {
   constructor(
     protected readonly ddhubTopicsService: DdhubTopicsService,
     protected readonly topicService: TopicService
-  ) {}
+  ) { }
 
   @Get('')
   @ApiResponse({
@@ -76,9 +76,9 @@ export class TopicsController {
     description: 'Unauthorized',
   })
   public async getTopicsHistoryById(
-    @Param() { id }: GetTopicsParamsDto
+    @Param() { id, limit, page }: GetTopicsParamsDto
   ): Promise<PaginatedTopicResponse> {
-    return this.ddhubTopicsService.getTopicHistoryById(id);
+    return this.topicService.getTopicHistoryById(id, limit, page);
   }
 
   @Get('/:id/versions/:versionNumber')
@@ -94,7 +94,7 @@ export class TopicsController {
   public async getTopicHistoryByIdAndVersion(
     @Param() { id, versionNumber }: TopicsByIdAndVersionParamsDto
   ): Promise<PostTopicDto> {
-    return this.ddhubTopicsService.getTopicHistoryByIdAndVersion(
+    return this.topicService.getTopicHistoryByIdAndVersion(
       id,
       versionNumber
     );
@@ -120,8 +120,8 @@ export class TopicsController {
   })
   public async getTopicsBySearch(
     @Query() { keyword, owner, limit, page }: GetTopicsSearchQueryDto
-  ): Promise<PaginatedTopicResponse | []> {
-    return this.ddhubTopicsService.getTopicsBySearch(
+  ) {
+    return this.topicService.getTopicsBySearch(
       keyword,
       owner,
       limit,
