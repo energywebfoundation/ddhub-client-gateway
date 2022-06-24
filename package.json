@@ -1,6 +1,6 @@
 {
   "name": "dsb-client-gateway",
-  "version": "0.0.0-development",
+  "version": "0.0.1",
   "license": "MIT",
   "engines": {
     "node": ">=16 <=18",
@@ -138,6 +138,7 @@
     "@commitlint/config-nx-scopes": "^17.0.0",
     "@commitlint/cz-commitlint": "^17.0.0",
     "@emotion/sheet": "^1.1.0",
+    "@jscutlery/semver": "^2.25.2",
     "@mikro-orm/cli": "^5.1.2",
     "@nestjs/schematics": "^8.0.0",
     "@nestjs/testing": "^8.2.6",
@@ -202,6 +203,7 @@
     "prettier": "^2.5.1",
     "react-test-renderer": "17.0.2",
     "semantic-release": "^19.0.3",
+    "standard-version": "^9.5.0",
     "supertest": "^6.2.2",
     "ts-jest": "27.0.5",
     "ts-node": "^10.8.0",
@@ -209,6 +211,13 @@
     "typechain": "^8.0.0",
     "typescript": "~4.5.2",
     "wait-on": "^6.0.1"
+  },
+  "standard-version": {
+    "skip": {
+      "bump": true,
+      "commit": true,
+      "tag": true
+    }
   },
   "repository": {
     "type": "git",
