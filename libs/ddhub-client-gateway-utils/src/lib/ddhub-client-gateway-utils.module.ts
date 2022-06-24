@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { EthersService, RetryConfigService } from './services';
 import { ConfigService } from '@nestjs/config';
 import { providers } from 'ethers';
+import { DirectoryCreatedService } from './services/directory-created.service';
 
 @Module({
   controllers: [],
@@ -21,7 +22,8 @@ import { providers } from 'ethers';
       },
       inject: [ConfigService],
     },
+    DirectoryCreatedService
   ],
   exports: [RetryConfigService, EthersService],
 })
-export class DdhubClientGatewayUtilsModule {}
+export class DdhubClientGatewayUtilsModule { }
