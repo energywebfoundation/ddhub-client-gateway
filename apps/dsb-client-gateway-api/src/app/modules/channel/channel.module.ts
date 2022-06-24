@@ -14,6 +14,7 @@ import {
 import { DdhubClientGatewayMessageBrokerModule } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
 import { DdhubClientGatewayIdentityModule } from '@dsb-client-gateway/ddhub-client-gateway-identity';
 import { CertificateModule } from '../certificate/certificate.module';
+import { TopicModule } from '../topic/topic.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { CertificateModule } from '../certificate/certificate.module';
     TopicRepositoryModule,
     DdhubClientGatewayMessageBrokerModule,
     CertificateModule,
+    TopicModule,
   ],
   providers: [
     ChannelService,

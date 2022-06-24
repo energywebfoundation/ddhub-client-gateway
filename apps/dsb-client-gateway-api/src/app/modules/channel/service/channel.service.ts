@@ -13,12 +13,16 @@ import { Span } from 'nestjs-otel';
 import {
   ChannelEntity,
   ChannelWrapperRepository,
+  TopicEntity,
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
 import { TopicNotFoundException } from '../exceptions/topic-not-found.exception';
 import {
   DdhubTopicsService,
+  SchemaType,
   Topic,
 } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
+import { ChannelInvalidTopicException } from '../exceptions/channel-invalid-topic.exception';
+import { TopicService } from '../../topic/service/topic.service';
 
 @Injectable()
 export class ChannelService {
@@ -27,6 +31,7 @@ export class ChannelService {
   constructor(
     protected readonly wrapperRepository: ChannelWrapperRepository,
     protected readonly ddhubTopicsService: DdhubTopicsService,
+    protected readonly topicsService: TopicService,
     protected readonly commandBus: CommandBus
   ) {}
 
@@ -50,6 +55,8 @@ export class ChannelService {
     const topicsWithIds: ChannelTopic[] = await this.getTopicsWithIds(
       payload.conditions.topics
     );
+
+    await this.validateTopics(topicsWithIds, payload.type);
 
     if (payload.conditions.topics.length && !topicsWithIds.length) {
       throw new TopicNotFoundException();
@@ -155,6 +162,8 @@ export class ChannelService {
       dto.conditions.topics
     );
 
+    await this.validateTopics(topicsWithIds, channel.type);
+
     channel.payloadEncryption =
       dto.payloadEncryption ?? channel.payloadEncryption;
 
@@ -168,6 +177,34 @@ export class ChannelService {
     await this.wrapperRepository.channelRepository.save(channel);
 
     await this.commandBus.execute(new RefreshChannelCacheDataCommand(fqcn));
+  }
+
+  @Span('channels_validateTopic')
+  protected async validateTopics(
+    topics: ChannelTopic[],
+    channelType: ChannelType
+  ): Promise<void> {
+    const textSchemaTypes: SchemaType[] = [SchemaType.JSD7, SchemaType.XML];
+    for (const topic of topics) {
+      const topicEntity: TopicEntity | null = await this.topicsService.getOne(
+        topic.topicName,
+        topic.owner
+      );
+
+      if (!topicEntity) {
+        throw new TopicNotFoundException();
+      }
+
+      if ([ChannelType.PUB, ChannelType.SUB].includes(channelType)) {
+        if (!textSchemaTypes.includes(topicEntity.schemaType as SchemaType)) {
+          throw new ChannelInvalidTopicException(topicEntity.id);
+        }
+      } else {
+        if (textSchemaTypes.includes(topicEntity.schemaType as SchemaType)) {
+          throw new ChannelInvalidTopicException(topicEntity.id);
+        }
+      }
+    }
   }
 
   @Span('channels_getTopicsWithIds')
