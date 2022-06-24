@@ -13,6 +13,7 @@ import { Span } from 'nestjs-otel';
 import {
   ChannelEntity,
   ChannelWrapperRepository,
+  TopicEntity,
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
 import { TopicNotFoundException } from '../exceptions/topic-not-found.exception';
 import {
@@ -21,6 +22,7 @@ import {
   Topic,
 } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
 import { ChannelInvalidTopicException } from '../exceptions/channel-invalid-topic.exception';
+import { TopicService } from '../../topic/service/topic.service';
 
 @Injectable()
 export class ChannelService {
@@ -29,6 +31,7 @@ export class ChannelService {
   constructor(
     protected readonly wrapperRepository: ChannelWrapperRepository,
     protected readonly ddhubTopicsService: DdhubTopicsService,
+    protected readonly topicsService: TopicService,
     protected readonly commandBus: CommandBus
   ) {}
 
@@ -183,17 +186,22 @@ export class ChannelService {
   ): Promise<void> {
     const textSchemaTypes: SchemaType[] = [SchemaType.JSD7, SchemaType.XML];
     for (const topic of topics) {
-      const result = await this.ddhubTopicsService.getTopicById(topic.topicId);
+      const topicEntity: TopicEntity | null = await this.topicsService.getOne(
+        topic.topicName,
+        topic.owner
+      );
 
-      const topicDetails = result.records[0];
+      if (!topicEntity) {
+        throw new TopicNotFoundException();
+      }
 
       if ([ChannelType.PUB, ChannelType.SUB].includes(channelType)) {
-        if (!textSchemaTypes.includes(topicDetails.schemaType)) {
-          throw new ChannelInvalidTopicException(topicDetails.id);
+        if (!textSchemaTypes.includes(topicEntity.schemaType as SchemaType)) {
+          throw new ChannelInvalidTopicException(topicEntity.id);
         }
       } else {
-        if (textSchemaTypes.includes(topicDetails.schemaType)) {
-          throw new ChannelInvalidTopicException(topicDetails.id);
+        if (textSchemaTypes.includes(topicEntity.schemaType as SchemaType)) {
+          throw new ChannelInvalidTopicException(topicEntity.id);
         }
       }
     }

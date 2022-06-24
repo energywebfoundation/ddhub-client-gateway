@@ -8,7 +8,6 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 import { otelSDK } from '@dsb-client-gateway/ddhub-client-gateway-tracing';
 import { ValidationException } from '@dsb-client-gateway/dsb-client-gateway-errors';
-import { TopicRepositoryWrapper } from '@dsb-client-gateway/dsb-client-gateway-storage';
 
 dotenv.config({
   path: '.env',
@@ -24,18 +23,6 @@ async function bootstrap() {
 
   const app = await NestFactory.create(
     AppModule.register({ shouldValidate: true })
-  );
-
-  const wrapper = app.get(TopicRepositoryWrapper);
-
-  console.log(
-    await wrapper.topicRepository.getLatest(
-      5,
-      undefined,
-      'dsb.apps.szostak.iam.ewc',
-      1,
-      undefined
-    )
   );
 
   app.enableCors({
