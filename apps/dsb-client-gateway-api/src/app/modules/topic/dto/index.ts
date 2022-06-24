@@ -414,6 +414,7 @@ export class GetTopicsSearchQueryDto {
   public owner: string;
 
   @IsOptional()
+  @IsNumber()
   @ApiProperty({
     example: 1,
     default: 5,
@@ -422,6 +423,8 @@ export class GetTopicsSearchQueryDto {
   })
   public limit: number = 5;
 
+  @IsNumber()
+  @IsPositive()
   @IsOptional()
   @ApiProperty({
     example: 1,
@@ -429,7 +432,6 @@ export class GetTopicsSearchQueryDto {
     required: false,
     type: Number,
   })
-  @IsOptional()
   public page: number = 1;
 }
 
@@ -499,15 +501,27 @@ export class PaginatedResponse {
     type: Number,
     example: 1,
   })
+  @IsOptional()
   @IsNumber()
-  public limit: number;
   @ApiProperty({
     description: 'page number out of total pages',
-    type: Number,
     example: 1,
+    default: 5,
+    required: false,
+    type: Number,
   })
+  public limit: number = 5;
+
   @IsNumber()
-  public page: number;
+  @IsPositive()
+  @IsOptional()
+  @ApiProperty({
+    example: 1,
+    default: 1,
+    required: false,
+    type: Number,
+  })
+  public page: number = 1;
 
   @ApiProperty({
     description: 'Topics records',
@@ -532,15 +546,31 @@ export class PaginatedTopicResponse {
     type: Number,
     example: 1,
   })
+  @IsOptional()
   @IsNumber()
-  public limit: number;
+  @ApiProperty({
+    example: 1,
+    default: 5,
+    required: false,
+    type: Number,
+  })
+  public limit: number = 5;
+
   @ApiProperty({
     description: 'page number out of total pages',
     type: Number,
     example: 1,
   })
   @IsNumber()
-  public page: number;
+  @IsPositive()
+  @IsOptional()
+  @ApiProperty({
+    example: 1,
+    default: 1,
+    required: false,
+    type: Number,
+  })
+  public page: number = 1;
 
   @ApiProperty({
     description: 'Topics records',
