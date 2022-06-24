@@ -1,6 +1,6 @@
 {
   "name": "dsb-client-gateway",
-  "version": "0.0.0",
+  "version": "0.0.0-development",
   "license": "MIT",
   "engines": {
     "node": ">=16 <=18",
@@ -24,7 +24,8 @@
     "export": "npm run build:client && nx export dsb-client-gateway-frontend",
     "build:api": "nx build dsb-client-gateway-api",
     "test": "nx test",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "semantic-release": "semantic-release"
   },
   "private": true,
   "dependencies": {
@@ -151,6 +152,10 @@
     "@nrwl/tao": "13.7.3",
     "@nrwl/web": "13.7.3",
     "@nrwl/workspace": "13.7.3",
+    "@semantic-release/commit-analyzer": "^9.0.2",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^8.0.4",
+    "@semantic-release/release-notes-generator": "^10.0.3",
     "@swc/core": "^1.2.163",
     "@testing-library/react": "12.1.2",
     "@testing-library/react-hooks": "7.0.2",
@@ -196,6 +201,7 @@
     "orval": "^6.7.0",
     "prettier": "^2.5.1",
     "react-test-renderer": "17.0.2",
+    "semantic-release": "^19.0.3",
     "supertest": "^6.2.2",
     "ts-jest": "27.0.5",
     "ts-node": "^10.8.0",
@@ -203,5 +209,9 @@
     "typechain": "^8.0.0",
     "typescript": "~4.5.2",
     "wait-on": "^6.0.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/energywebfoundation/ddhub-client-gateway.git"
   }
 }
