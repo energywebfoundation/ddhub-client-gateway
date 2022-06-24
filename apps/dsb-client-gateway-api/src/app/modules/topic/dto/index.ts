@@ -414,6 +414,7 @@ export class GetTopicsSearchQueryDto {
   public owner: string;
 
   @IsOptional()
+  @IsNumber()
   @ApiProperty({
     example: 1,
     default: 5,
@@ -422,6 +423,8 @@ export class GetTopicsSearchQueryDto {
   })
   public limit: number = 5;
 
+  @IsNumber()
+  @IsPositive()
   @IsOptional()
   @ApiProperty({
     example: 1,
@@ -429,7 +432,6 @@ export class GetTopicsSearchQueryDto {
     required: false,
     type: Number,
   })
-  @IsOptional()
   public page: number = 1;
 }
 
