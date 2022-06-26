@@ -363,7 +363,7 @@ export class MessageService {
       await this.ddhubMessageService.messagesSearch(
         topicsIds,
         channel.conditions.qualifiedDids,
-        `${clientId}.${fqcn}`,
+        `${clientId}:${fqcn}`,
         from,
         amount
       );
@@ -448,6 +448,7 @@ export class MessageService {
         clientGatewayMessageId
       );
     } else {
+
       filePath = join(this.uploadPath, clientGatewayMessageId + this.ext);
 
       const stream = fs.createWriteStream(filePath);
@@ -564,7 +565,9 @@ export class MessageService {
       !topic.schemaType ||
       !topic.version
     ) {
-      throw new TopicNotFoundException(topic.id);
+      if (!topic) throw new TopicNotFoundException("");
+      else
+        throw new TopicNotFoundException(topic.id);
     }
 
     const isTopicNotRelatedToChannel: boolean = this.checkTopicForChannel(

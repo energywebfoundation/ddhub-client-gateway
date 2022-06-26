@@ -6,10 +6,10 @@ import {
   SecretsManagerClient,
 } from '@aws-sdk/client-secrets-manager';
 import { ConfigService } from '@nestjs/config';
-import { AwsSecretsManagerService } from '../lib/service/aws-secrets-manager.service';
+import { AwsSecretsManagerService } from '../lib/service/service/aws-secrets-manager.service';
 import { mockClient } from 'aws-sdk-client-mock';
 
-describe('Secrets Manager Engine', () => {
+describe('AWS Secrets Manager Engine', () => {
   const service = new AwsSecretsManagerService(new ConfigService());
 
   beforeAll(async () => {
@@ -229,11 +229,10 @@ describe('Secrets Manager Engine', () => {
       certificate: 'test_certificate',
       caCertificate: 'test_ca_certificate',
     });
-    console.log(details);
     expect(details).toBeDefined();
     if (details && details.length) {
       for (const cert of details) {
-        expect(cert.Name).toMatch(/^\/dsb-gw\/certificate\/?/);
+        expect(cert.Name).toMatch(/^\/ddhub\/certificate\/?/);
       }
     }
   });
@@ -261,7 +260,7 @@ describe('Secrets Manager Engine', () => {
     expect(details).toBeDefined();
     if (details && details.length) {
       for (const cert of details) {
-        expect(cert.Name).toMatch(/^\/dsb-gw\/certificate\/?/);
+        expect(cert.Name).toMatch(/^\/ddhub\/certificate\/?/);
       }
     }
   });

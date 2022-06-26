@@ -16,6 +16,7 @@ import { CronRepositoryModule } from '@dsb-client-gateway/dsb-client-gateway-sto
 import { ApplicationModule } from './modules/ application/application.module';
 import { HeartbeatModule } from './modules/heartbeat/heartbeat.module';
 import { FileMessagesModule } from './modules/files-messages/file-messages.module';
+import { DdhubClientGatewayEventsModule } from '@dsb-client-gateway/ddhub-client-gateway-events';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { FileMessagesModule } from './modules/files-messages/file-messages.modul
     ApplicationModule,
     HeartbeatModule,
     FileMessagesModule,
+    DdhubClientGatewayEventsModule,
   ],
   controllers: [],
   providers: [AppInitService, PrivateKeyWatcherService],

@@ -8,6 +8,7 @@ export interface StepProps {
   subtitle: string;
   icon: React.ReactNode;
   clickHandler?: () => void;
+  showCursor?: boolean;
 }
 
 export const Step = ({
@@ -16,6 +17,7 @@ export const Step = ({
   subtitle,
   title,
   clickHandler,
+  showCursor,
 }: StepProps) => {
   const { classes } = useStyles();
 
@@ -23,7 +25,7 @@ export const Step = ({
     <Stack direction="row" className={classes.root}>
       <Avatar
         variant="rounded"
-        className={clsx(classes.icon, { [classes.activeIcon]: active })}
+        className={clsx(classes.icon, { [classes.activeIcon]: active, [classes.clickableAvatar]: showCursor })}
         onClick={clickHandler}
       >
         {icon}

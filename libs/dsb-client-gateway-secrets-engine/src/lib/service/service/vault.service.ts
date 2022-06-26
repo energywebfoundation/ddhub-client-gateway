@@ -1,9 +1,9 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import {
   CertificateDetails,
-  SecretsEngineService,
   PATHS,
-} from '../secrets-engine.interface';
+  SecretsEngineService,
+} from '../../secrets-engine.interface';
 import { ConfigService } from '@nestjs/config';
 import nv from 'node-vault';
 import { Span } from 'nestjs-otel';
@@ -17,7 +17,7 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
 
   constructor(protected readonly configService: ConfigService) {
     super();
-    this.prefix = this.configService.get('VAULT_SECRET_PREFIX', 'ddhub/');
+    this.prefix = this.configService.get('SECRET_PREFIX', 'ddhub/');
   }
 
   public async deleteAll(): Promise<void> {

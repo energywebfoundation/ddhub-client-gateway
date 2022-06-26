@@ -17,7 +17,7 @@ import { ConfigService } from '@nestjs/config';
 import { IsValidVersion } from '../../utils/validator/decorators/isValidVersion';
 
 export class GetTopicDto {
-  constructor(protected readonly configService: ConfigService) {}
+  constructor(protected readonly configService: ConfigService) { }
 
   @IsString()
   @IsNotEmpty()
@@ -290,6 +290,17 @@ export class GetTopicSearchDto {
   })
   owner: string;
 
+  @IsString()
+  @ApiProperty({
+    description: 'version of the topic',
+    type: String,
+    example: '1.0.9',
+  })
+  @IsValidVersion({
+    message: 'malformed version',
+  })
+  public version: string;
+
   @IsArray()
   @IsNotEmpty()
   @ArrayUnique()
@@ -403,14 +414,17 @@ export class GetTopicsSearchQueryDto {
   public owner: string;
 
   @IsOptional()
+  @IsNumber()
   @ApiProperty({
     example: 1,
-    default: 0,
+    default: 5,
     required: false,
     type: Number,
   })
-  public limit: number;
+  public limit: number = 5;
 
+  @IsNumber()
+  @IsPositive()
   @IsOptional()
   @ApiProperty({
     example: 1,
@@ -418,8 +432,7 @@ export class GetTopicsSearchQueryDto {
     required: false,
     type: Number,
   })
-  @IsOptional()
-  public page: number;
+  public page: number = 1;
 }
 
 export class GetTopicsQueryDto {
@@ -488,15 +501,27 @@ export class PaginatedResponse {
     type: Number,
     example: 1,
   })
+  @IsOptional()
   @IsNumber()
-  public limit: number;
   @ApiProperty({
     description: 'page number out of total pages',
-    type: Number,
     example: 1,
+    default: 5,
+    required: false,
+    type: Number,
   })
+  public limit: number = 5;
+
   @IsNumber()
-  public page: number;
+  @IsPositive()
+  @IsOptional()
+  @ApiProperty({
+    example: 1,
+    default: 1,
+    required: false,
+    type: Number,
+  })
+  public page: number = 1;
 
   @ApiProperty({
     description: 'Topics records',
@@ -521,15 +546,31 @@ export class PaginatedTopicResponse {
     type: Number,
     example: 1,
   })
+  @IsOptional()
   @IsNumber()
-  public limit: number;
+  @ApiProperty({
+    example: 1,
+    default: 5,
+    required: false,
+    type: Number,
+  })
+  public limit: number = 5;
+
   @ApiProperty({
     description: 'page number out of total pages',
     type: Number,
     example: 1,
   })
   @IsNumber()
-  public page: number;
+  @IsPositive()
+  @IsOptional()
+  @ApiProperty({
+    example: 1,
+    default: 1,
+    required: false,
+    type: Number,
+  })
+  public page: number = 1;
 
   @ApiProperty({
     description: 'Topics records',
@@ -566,6 +607,28 @@ export class GetTopicsParamsDto {
     example: '62545547fe37f174d7715ff3',
   })
   public id: string;
+
+  @IsOptional()
+  @IsNumber()
+  @ApiProperty({
+    example: 1,
+    default: 0,
+    required: false,
+    type: Number,
+  })
+  public limit: number = 5;
+
+  @IsNumber()
+  @IsPositive()
+  @IsOptional()
+  @ApiProperty({
+    example: 1,
+    default: 0,
+    required: false,
+    type: Number,
+  })
+  public page: number = 1;
+
 }
 
 export class TopicsByIdAndVersionParamsDto {
@@ -582,6 +645,9 @@ export class TopicsByIdAndVersionParamsDto {
     description: 'version of the topic',
     type: String,
     example: '1.0.9',
+  })
+  @IsValidVersion({
+    message: 'malformed version',
   })
   public versionNumber: string;
 }
@@ -600,6 +666,9 @@ export class DeleteTopicsVersionParamsDto {
     description: 'version of the topic',
     type: String,
     example: '1.0.9',
+  })
+  @IsValidVersion({
+    message: 'malformed version',
   })
   public versionNumber: string;
 }
@@ -678,7 +747,7 @@ export class PostTopicBodyDto {
   schema: string;
 
   @IsValidVersion({
-    message: 'Malformed version.',
+    message: 'malformed version',
   })
   @IsString()
   @IsNotEmpty()

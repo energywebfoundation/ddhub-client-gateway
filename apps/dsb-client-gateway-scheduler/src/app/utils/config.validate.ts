@@ -1,7 +1,9 @@
 import {
   BASIC_ENVS,
+  EVENTS_ENV,
   IAM_ENVS,
   OPEN_TELEMETRY_ENVS,
+  SECRETS_ENGINE_ENV,
 } from '@dsb-client-gateway/ddhub-client-gateway-env';
 import * as Joi from 'joi';
 import { Logger } from '@nestjs/common';
@@ -11,6 +13,8 @@ export const getSchema = (): Joi.ObjectSchema => {
   return Joi.object()
     .concat(SCHEDULER_ENVS)
     .concat(BASIC_ENVS)
+    .concat(EVENTS_ENV)
+    .concat(SECRETS_ENGINE_ENV)
     .concat(OPEN_TELEMETRY_ENVS)
     .concat(IAM_ENVS);
 };

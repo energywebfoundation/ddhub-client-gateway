@@ -25,6 +25,7 @@ export const RestrictionBox = ({
     <Box component="div" className={classes.root} {...wrapperProps}>
       <Typography className={classes.label}>{type}</Typography>
       <RestrictionList
+        type={type}
         list={list}
         remove={remove}
         canRemove={canRemove}

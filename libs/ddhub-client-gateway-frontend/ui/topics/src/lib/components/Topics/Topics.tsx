@@ -22,7 +22,7 @@ export const Topics: FC<TopicsProps> = ({
     openCreateTopic,
     topics,
     actions,
-    isLoading,
+    topicsLoading,
     handleRowClick,
     pagination,
     handlePageChange,
@@ -40,7 +40,7 @@ export const Topics: FC<TopicsProps> = ({
         onPageChange={handlePageChange}
         onSearchInput={handleSearchInput}
         backendSearch={true}
-        loading={isLoading}
+        loading={topicsLoading}
         defaultSortBy='name'
         defaultOrder='asc'
       >

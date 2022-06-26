@@ -2,7 +2,7 @@ import { makeStyles } from 'tss-react/mui';
 
 export const useStyles = makeStyles()((theme) => ({
   wrapper: {
-    background: theme.palette.background.default,
+    background: '#1E1E1E',
     cursor: 'text',
     border: `1px solid ${theme.palette.grey[500]}`,
     boxSizing: 'border-box',

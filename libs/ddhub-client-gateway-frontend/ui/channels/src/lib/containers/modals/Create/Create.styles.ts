@@ -8,7 +8,7 @@ export const useStyles = makeStyles()((theme) => ({
     flexGrow: 1,
   },
   paper: {
-    maxWidth: 757,
+    maxWidth: 820,
     minHeight: 510,
     padding: '37px 27px 27px 39px',
     borderRadius: 0,
@@ -26,7 +26,7 @@ export const useStyles = makeStyles()((theme) => ({
     right: 18,
   },
   formWrapper: {
-    minWidth: '416px',
+    minWidth: '479px',
     marginLeft: 'auto',
     paddingTop: 16,
   },
