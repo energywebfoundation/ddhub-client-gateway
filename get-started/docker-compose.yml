@@ -15,12 +15,12 @@ services:
     entrypoint: "vault server -config=/vault/config/vault.json"
 
   ddhub-gateway-UI:
-    image: aemocontainerregistry.azurecr.io/ddhub-client-gateway-frontend:canary
+    image: aemocontainerregistry.azurecr.io/ddhub-client-gateway-frontend:latest
     ports:
       - "3000:80"
 
   ddhub-gateway-api:
-    image: aemocontainerregistry.azurecr.io/ddhub-client-gateway-backend:canary
+    image: aemocontainerregistry.azurecr.io/ddhub-client-gateway-backend:latest
     container_name: ddhub-gateway-api
     depends_on:
       - 'vault_demo'
@@ -32,7 +32,7 @@ services:
       NODE_ENV: test
       DSB_BASE_URL: https://ddhub-demo.energyweb.org
       CACHE_SERVER_URL: https://identitycache-staging.energyweb.org/v1
-      EVENT_SERVER_URL: https://identityevents-staging.energyweb.org
+      EVENT_SERVER_URL: https://identitycache-staging.energyweb.org
       SECRETS_ENGINE: $SECRETS_ENGINE
       VAULT_ENDPOINT: http://vault_demo:8200
       VAULT_TOKEN: $VAULT_TOKEN
@@ -41,33 +41,37 @@ services:
       AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
       AZURE_VAULT_URL: $AZURE_VAULT_URL
       AZURE_CLIENT_SECRET: $AZURE_CLIENT_SECRET
+      AZURE_CLIENT_ID: $AZURE_CLIENT_ID
       AZURE_TENANT_ID: $AZURE_TENANT_ID
       DB_NAME: ./data/local.db
+      PARENT_NAMESPACE: ddhub.apps.energyweb.iam.ewc
       
-  # ddhub-gateway-scheduler:
-  #   image: aemocontainerregistry.azurecr.io/ddhub-client-gateway-scheduler:canary
-  #   container_name: ddhub-gateway-scheduler
-  #   depends_on:
-  #     - 'vault_demo'
-  #   volumes:
-  #     - ./data:/usr/app/data
-  #   environment:
-  #     NODE_ENV: test
-  #     DSB_BASE_URL: https://ddhub-demo.energyweb.org
-  #     CACHE_SERVER_URL: https://identitycache-staging.energyweb.org/v1
-  #     EVENT_SERVER_URL: https://identityevents-staging.energyweb.org
-  #     SECRETS_ENGINE: $SECRETS_ENGINE
-  #     VAULT_ENDPOINT: http://vault_demo:8200
-  #     VAULT_TOKEN: $VAULT_TOKEN
-  #     AWS_REGION: $AWS_REGION
-  #     AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
-  #     AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
-  #     AZURE_VAULT_URL: $AZURE_VAULT_URL
-  #     AZURE_CLIENT_SECRET: $AZURE_CLIENT_SECRET
-  #     AZURE_TENANT_ID: $AZURE_TENANT_ID
-  #     DB_NAME: ./data/local.db
-  #     DID_AUTH_URL: https://ddhub-demo.energyweb.org
-  #     DID_REGISTRY_ADDRESS: "0xc15d5a57a8eb0e1dcbe5d88b8f9a82017e5cc4af"
+  ddhub-gateway-scheduler:
+    image: aemocontainerregistry.azurecr.io/ddhub-client-gateway-scheduler:latest
+    container_name: ddhub-gateway-scheduler
+    depends_on:
+      - 'vault_demo'
+    volumes:
+      - ./data:/usr/app/data
+    environment:
+      NODE_ENV: test
+      DSB_BASE_URL: https://ddhub-demo.energyweb.org
+      CACHE_SERVER_URL: https://identitycache-staging.energyweb.org/v1
+      EVENT_SERVER_URL: https://identitycache-staging.energyweb.org
+      SECRETS_ENGINE: $SECRETS_ENGINE
+      VAULT_ENDPOINT: http://vault_demo:8200
+      VAULT_TOKEN: $VAULT_TOKEN
+      AWS_REGION: $AWS_REGION
+      AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
+      AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
+      AZURE_VAULT_URL: $AZURE_VAULT_URL
+      AZURE_CLIENT_SECRET: $AZURE_CLIENT_SECRET
+      AZURE_CLIENT_ID: $AZURE_CLIENT_ID
+      AZURE_TENANT_ID: $AZURE_TENANT_ID
+      DB_NAME: ./data/local.db
+      DID_AUTH_URL: https://ddhub-demo.energyweb.org
+      DID_REGISTRY_ADDRESS: "0xc15d5a57a8eb0e1dcbe5d88b8f9a82017e5cc4af"
+      PARENT_NAMESPACE: ddhub.apps.energyweb.iam.ewc
 
   proxy-server:
     image: nginx:alpine
