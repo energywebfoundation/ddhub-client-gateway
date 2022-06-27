@@ -607,7 +607,9 @@ export class GetTopicsParamsDto {
     example: '62545547fe37f174d7715ff3',
   })
   public id: string;
+}
 
+export class GetTopicsWithLimitParamsDto {
   @IsOptional()
   @IsNumber()
   @ApiProperty({
