@@ -6,7 +6,7 @@ export const IAM_ENVS = Joi.object({
     .default('https://volta-rpc.energyweb.org/')
     .description('EWF RPC URL'),
   PARENT_NAMESPACE: Joi.string()
-    .default('dsb.apps.energyweb.iam.ewc')
+    .default('ddhub.apps.energyweb.iam.ewc')
     .description('Parent namespace for IAM lookup'),
   EVENT_SERVER_URL: Joi.string()
     .uri()
