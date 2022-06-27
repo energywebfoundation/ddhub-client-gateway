@@ -25,7 +25,7 @@ export class EnrolmentService {
     @Inject(forwardRef(() => RoleListenerService))
     protected readonly roleListenerService: RoleListenerService,
     protected readonly wrapper: EnrolmentWrapperRepository
-  ) {}
+  ) { }
 
   public async deleteEnrolment(): Promise<void> {
     await this.wrapper.enrolmentRepository.clear();
@@ -94,7 +94,7 @@ export class EnrolmentService {
   public getRequiredRoles(): string[] {
     const parentNamespace: string = this.configService.get<string>(
       'PARENT_NAMESPACE',
-      'dsb.apps.energyweb.iam.ewc'
+      'ddhub.apps.energyweb.iam.ewc'
     );
 
     return [`user.roles.${parentNamespace}`];

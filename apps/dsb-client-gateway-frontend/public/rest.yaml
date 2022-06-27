@@ -200,7 +200,7 @@ paths:
           name: fqcn
           required: true
           description: Fully Qualified Channel Name
-          example: test.channels.dsb.apps.energyweb.iam.ewc
+          example: test.channels.ddhub.apps.energyweb.iam.ewc
           schema:
             type: string
         - in: query
@@ -486,7 +486,7 @@ components:
       properties:
         fqcn:
           description: Fully Qualified Channel Name
-          example: test.channels.dsb.apps.energyweb.iam.ewc
+          example: test.channels.ddhub.apps.energyweb.iam.ewc
           type: string
         topic:
           description: Topic to send the message to
@@ -574,7 +574,7 @@ components:
       properties:
         fqcn:
           description: Fully-qualified channel name
-          example: test.channels.dsb.apps.energyweb.iam.ewc
+          example: test.channels.ddhub.apps.energyweb.iam.ewc
           type: string
         topics:
           type: array
@@ -597,13 +597,13 @@ components:
             type: string
         publishers:
           description: Array of DIDS and/or role authorized to pubish on the channel
-          example: ["did:ethr:0x3E8c2db768f876907C54F52B9e6Cc7F8E48d850F", "user.roles.dsb.apps.energyweb.iam.ewc"]
+          example: ["did:ethr:0x3E8c2db768f876907C54F52B9e6Cc7F8E48d850F", "user.roles.ddhub.apps.energyweb.iam.ewc"]
           type: array
           items:
             type: string
         subscribers:
           description: Array of DIDS and/or role authorized to subscribe to the channel
-          example: ["did:ethr:0x3E8c2db768f876907C54F52B9e6Cc7F8E48d850F", "user.roles.dsb.apps.energyweb.iam.ewc"]
+          example: ["did:ethr:0x3E8c2db768f876907C54F52B9e6Cc7F8E48d850F", "user.roles.ddhub.apps.energyweb.iam.ewc"]
           type: array
           items:
             type: string

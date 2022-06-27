@@ -20,6 +20,7 @@ import {
   GetTopicsParamsDto,
   GetTopicsQueryDto,
   GetTopicsSearchQueryDto,
+  GetTopicsWithLimitParamsDto,
   PaginatedResponse,
   PaginatedTopicResponse,
   PostTopicBodyDto,
@@ -76,7 +77,8 @@ export class TopicsController {
     description: 'Unauthorized',
   })
   public async getTopicsHistoryById(
-    @Param() { id, limit, page }: GetTopicsParamsDto
+    @Param() { id }: GetTopicsParamsDto,
+    @Query() { limit, page }: GetTopicsWithLimitParamsDto,
   ): Promise<PaginatedTopicResponse> {
     return this.topicService.getTopicHistoryById(id, limit, page);
   }
