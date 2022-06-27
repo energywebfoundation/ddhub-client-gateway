@@ -42,7 +42,7 @@ export const useDataMessagingUploadEffects = ({
     topicHistory,
     topicHistoryByVersion,
     isLoading: topicHistoryLoading,
-  } = useTopicVersionHistory(selectedTopic);
+  } = useTopicVersionHistory({ id: selectedTopic });
 
   const channelOptions = filteredChannels.map((channel) => ({
     label: channel.fqcn,
