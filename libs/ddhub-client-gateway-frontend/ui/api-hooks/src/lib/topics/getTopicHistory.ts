@@ -7,7 +7,7 @@ import { useCustomAlert } from '@ddhub-client-gateway-frontend/ui/core';
 
 export const useTopicVersionHistory = (id: string) => {
   const Swal = useCustomAlert();
-  const { data, isLoading, isSuccess, isError } = { "data": { "records": [] }, "isError": "", "isLoading": "", "isSuccess": "" };
+  const { data, isLoading, isSuccess, isError } = { "data": { "records": [] }, "isError": true, "isLoading": true, "isSuccess": true };
   // useTopicsControllerGetTopicsHistoryById(id, {
   //   query: {
   //     enabled: !!id,
