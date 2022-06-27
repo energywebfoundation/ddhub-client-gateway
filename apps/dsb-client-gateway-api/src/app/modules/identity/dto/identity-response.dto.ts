@@ -11,7 +11,7 @@ export class RoleDto implements Role {
   @ApiProperty({
     type: String,
     description: 'Namespace',
-    example: 'user.roles.dsb.apps.szostak.iam.ewc',
+    example: 'user.roles.ddhub.apps.szostak.iam.ewc',
   })
   namespace: string;
 
