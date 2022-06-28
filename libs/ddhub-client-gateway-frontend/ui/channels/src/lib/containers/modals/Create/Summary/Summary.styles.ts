@@ -34,4 +34,15 @@ export const useStyles = makeStyles()((theme) => ({
     color: theme.palette.common.white,
     fontFamily: theme.typography.body1.fontFamily,
   },
+  encryptionValue: {
+    fontSize: 14,
+    lineHeight: '21px',
+    fontWeight: 400,
+    color: theme.palette.common.white,
+  },
+  iconCheck: {
+    stroke: theme.palette.success.main,
+    width: 21,
+    height: 21,
+  },
 }));

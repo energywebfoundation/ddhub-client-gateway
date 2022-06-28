@@ -14,7 +14,7 @@ export const useStyles = makeStyles()((theme) => ({
   },
   owner: {
     color: theme.palette.grey[300],
-    fontSize: 14,
+    fontSize: 12,
     lineHeight: '21px',
     fontWeight: 400,
     fontFamily: theme.typography.body2.fontFamily,
