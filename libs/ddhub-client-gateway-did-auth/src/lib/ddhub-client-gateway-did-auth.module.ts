@@ -2,11 +2,18 @@ import { Module } from '@nestjs/common';
 import { HttpModule } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { SecretsEngineModule } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
-import { DidAuthApiService, DidAuthService, LoginHandler } from './service';
+import {
+  DidAuthApiService,
+  DidAuthHandler,
+  DidAuthService,
+  LoginHandler,
+} from './service';
 import { DdhubClientGatewayUtilsModule } from '@dsb-client-gateway/ddhub-client-gateway-utils';
+import { CqrsModule } from '@nestjs/cqrs';
 
 @Module({
   imports: [
+    CqrsModule,
     DdhubClientGatewayUtilsModule,
     HttpModule.registerAsync({
       useFactory: (configService: ConfigService) => {
@@ -21,7 +28,7 @@ import { DdhubClientGatewayUtilsModule } from '@dsb-client-gateway/ddhub-client-
     }),
     SecretsEngineModule,
   ],
-  providers: [DidAuthService, DidAuthApiService, LoginHandler],
+  providers: [DidAuthService, DidAuthApiService, LoginHandler, DidAuthHandler],
   exports: [DidAuthService],
 })
 export class DidAuthModule {}

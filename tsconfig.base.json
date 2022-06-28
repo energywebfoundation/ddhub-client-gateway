@@ -65,6 +65,9 @@
       "@dsb-client-gateway/ddhub-client-gateway-env": [
         "libs/ddhub-client-gateway-env/src/index.ts"
       ],
+      "@dsb-client-gateway/ddhub-client-gateway-events": [
+        "libs/ddhub-client-gateway-events/src/index.ts"
+      ],
       "@dsb-client-gateway/ddhub-client-gateway-identity": [
         "libs/ddhub-client-gateway-identity/src/index.ts"
       ],

@@ -42,13 +42,32 @@ export class TopicRepository extends Repository<TopicEntity> {
     return 0;
   }
 
+  public async getOne(
+    name: string,
+    owner: string
+  ): Promise<TopicEntity | null> {
+    const query: TopicEntity[] = await this.getLatest(
+      1,
+      name,
+      owner,
+      1,
+      undefined
+    );
+
+    if (!query.length) {
+      return null;
+    }
+
+    return query[0];
+  }
+
   public async getLatest(
     limit: number,
     name: string,
     owner: string,
     page: number,
     tags: string[]
-  ): Promise<any[]> {
+  ): Promise<TopicEntity[]> {
     // @TODO - type
     const query = this.getLatestVersionsQuery(owner, name, tags);
 

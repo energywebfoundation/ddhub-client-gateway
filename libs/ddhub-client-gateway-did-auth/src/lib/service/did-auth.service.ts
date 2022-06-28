@@ -21,6 +21,27 @@ export class DidAuthService {
   public async login(privateKey: string, did: string): Promise<void> {
     this.logger.log('Attempting to login');
 
+    if (this.refreshToken) {
+      this.logger.log('attempting to refresh token');
+
+      await this.didAuthApiService
+        .refreshToken(this.refreshToken)
+        .then((response) => {
+          this.accessToken = response.access_token;
+          this.refreshToken = response.refresh_token;
+        })
+        .catch((e) => {
+          this.logger.warn('refresh token failed', e);
+
+          this.accessToken = null;
+          this.refreshToken = null;
+
+          return this.login(privateKey, did);
+        });
+
+      return;
+    }
+
     const proof = await this.ethersService.createProof(privateKey, did);
 
     const response = await this.didAuthApiService.login(proof);

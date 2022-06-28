@@ -14,9 +14,7 @@ export function IsValidVersion(validationOptions?: ValidationOptions) {
       validator: {
         validate(value: any, args: ValidationArguments) {
           if (typeof value === 'string' && value.length > 0) {
-            return !!value.match(
-              /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(-(0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(\.(0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*)?(\+[0-9a-zA-Z-]+(\.[0-9a-zA-Z-]+)*)?$/
-            );
+            return !!value.match(/^(\d+\.)(\d+\.)(\d+)$/);
           }
           return false;
         },

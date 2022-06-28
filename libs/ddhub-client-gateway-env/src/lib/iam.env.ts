@@ -6,7 +6,7 @@ export const IAM_ENVS = Joi.object({
     .default('https://volta-rpc.energyweb.org/')
     .description('EWF RPC URL'),
   PARENT_NAMESPACE: Joi.string()
-    .default('dsb.apps.energyweb.iam.ewc')
+    .default('ddhub.apps.energyweb.iam.ewc')
     .description('Parent namespace for IAM lookup'),
   EVENT_SERVER_URL: Joi.string()
     .uri()
@@ -19,7 +19,7 @@ export const IAM_ENVS = Joi.object({
     .default('https://identitycache-dev.energyweb.org/v1')
     .description('SSI HUB url'),
   CLAIM_MANAGER_ADDRESS: Joi.string()
-    .default('CLAIM_MANAGER_ADDRESS')
+    .default('0x5339adE9332A604A1c957B9bC1C6eee0Bcf7a031')
     .description('Overrides default IAM Client Lib claim manager address'),
   CHAIN_NAME: Joi.string().default('VOLTA').description('Chain name'),
   ENS_URL: Joi.string()

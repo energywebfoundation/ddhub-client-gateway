@@ -91,6 +91,11 @@ export const useCreateTopicEffects = () => {
 
   const topicSubmitHandler: SubmitHandler<FieldValues> = (data) => {
     const values = data as PostTopicBodyDto;
+
+    if (!values.tags) {
+      values.tags = [];
+    }
+
     createTopicHandler(values, onCreateTopic);
   };
 

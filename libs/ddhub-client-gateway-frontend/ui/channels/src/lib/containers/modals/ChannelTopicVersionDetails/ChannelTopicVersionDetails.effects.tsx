@@ -11,7 +11,7 @@ export const useChannelTopicVersionDetailsEffects = () => {
     topicVersionDetails: {open, data},
   } = useModalStore();
   const dispatch = useModalDispatch();
-  const { topicHistory } = useTopicVersionHistory(data?.topic?.topicId);
+  const { topicHistory } = useTopicVersionHistory({id: data?.topic?.topicId});
 
   const closeModal = () => {
     dispatch({
