@@ -45,6 +45,7 @@ services:
       AZURE_TENANT_ID: $AZURE_TENANT_ID
       DB_NAME: ./data/local.db
       PARENT_NAMESPACE: ddhub.apps.energyweb.iam.ewc
+      MTLS_ENABLED: false
       
   ddhub-gateway-scheduler:
     image: aemocontainerregistry.azurecr.io/ddhub-client-gateway-scheduler:latest
@@ -72,6 +73,7 @@ services:
       DID_AUTH_URL: https://ddhub-demo.energyweb.org
       DID_REGISTRY_ADDRESS: "0xc15d5a57a8eb0e1dcbe5d88b8f9a82017e5cc4af"
       PARENT_NAMESPACE: ddhub.apps.energyweb.iam.ewc
+      MTLS_ENABLED: false
 
   proxy-server:
     image: nginx:alpine
