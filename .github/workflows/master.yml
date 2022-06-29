@@ -5,6 +5,7 @@ on:
     branches: [ master ]
     paths-ignore:
       - 'devops/**'
+      - 'get-started/**'
 env:
   SECRETS_ENGINE: vault
 
