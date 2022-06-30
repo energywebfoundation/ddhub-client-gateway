@@ -49,7 +49,7 @@ export const useCustomAlert = () => {
       type: 'error',
       confirmButtonText: 'Dismiss',
       html:
-        `${error?.response?.data?.err?.reason} <br /> ${error?.response?.data?.err?.additionalData ?? ''}`,
+        `${error?.response?.data?.err?.reason} <br /> ${error?.response?.data?.err?.additionalDetails?.errors[0] ?? ''}`,
     }).fire();
   };
   return {
