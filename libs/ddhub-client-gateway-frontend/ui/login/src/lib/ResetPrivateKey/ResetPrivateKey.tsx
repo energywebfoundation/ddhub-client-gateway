@@ -1,4 +1,4 @@
-import { Button } from '@mui/material';
+import { Button, Typography } from '@mui/material';
 import { useResetPrivateKeyEffects } from './ResetPrivateKey.effects';
 import { useStyles } from '../Login.styles';
 
@@ -11,11 +11,13 @@ export function ResetPrivateKey() {
       className={classes.submitBtn}
       variant="contained"
       color="primary"
-      sx={{ marginTop: '20px' }}
+      sx={{ marginTop: '20px', height: '37px' }}
       onClick={() => resetPrivateKeyHandler()}
       fullWidth
     >
-      Reset private key
+      <Typography variant="body2">
+        Reset private key
+      </Typography>
     </Button>
   );
 }
