@@ -52,7 +52,6 @@ export const useTopicsEffects = (channelValues: TopicsProps['channelValues']) =>
     setSelectedTopics([
       ...selectedTopics,
       {
-        ...selectedTopic,
         owner: selectedApplication,
         topicName: selectedTopic.name as string,
       },
