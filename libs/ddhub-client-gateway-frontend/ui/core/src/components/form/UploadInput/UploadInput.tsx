@@ -20,7 +20,7 @@ export interface UploadInputProps {
 export const UploadInput: FC<UploadInputProps> = (props) => {
   const { classes } = useStyles();
   const { open, getRootProps, getInputProps } = useUploadInputEffects(props);
-  
+
   return (
     <Box {...props?.wrapperProps} {...getRootProps()}>
       {props?.label && (
@@ -29,6 +29,7 @@ export const UploadInput: FC<UploadInputProps> = (props) => {
 
       <input {...getInputProps()} />
       <TextField
+        autoComplete='off'
         placeholder={props?.placeholder ?? 'Choose a file'}
         className={classes.input}
         value={props.value}
