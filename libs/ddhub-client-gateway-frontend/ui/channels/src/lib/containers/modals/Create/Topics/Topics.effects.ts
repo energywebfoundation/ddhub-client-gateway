@@ -24,6 +24,7 @@ const topicsFilters: Record<ChannelType, GetTopicDtoSchemaType[]> = {
 export interface Topic extends Partial<GetTopicDto> {
   owner: string;
   topicName: string;
+  topicId?: string;
 }
 
 export const useTopicsEffects = (channelValues: TopicsProps['channelValues']) => {
@@ -60,7 +61,15 @@ export const useTopicsEffects = (channelValues: TopicsProps['channelValues']) =>
   };
 
   const removeSelectedTopic = (data: Topic) => {
-    setSelectedTopics(selectedTopics.filter((topic) => topic.id !== data.id));
+    const filteredTopic = selectedTopics.filter((topic) => {
+      const topicId = topic.id || topic.topicId;
+
+      if (data.topicId) {
+        return data.topicId !== topicId;
+      }
+      return data.id !== topicId;
+    })
+    setSelectedTopics(filteredTopic);
   };
 
   const availableTopics: Topic[] = differenceBy(
