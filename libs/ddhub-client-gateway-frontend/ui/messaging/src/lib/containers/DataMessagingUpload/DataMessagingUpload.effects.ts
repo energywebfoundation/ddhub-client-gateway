@@ -50,8 +50,8 @@ export const useDataMessagingUploadEffects = ({
   }));
 
   const topicHistoryOptions = topicHistory.map((topic) => ({
-    label: '1.0.0', // @TODO - Frontend fix
-    value: '1.0.0',
+    label: topic.version,
+    value: topic.version,
   }));
 
   const topics = channelsByName[selectedChannel]?.conditions?.topics ?? [];

@@ -33,7 +33,7 @@ export class ChannelService {
     protected readonly ddhubTopicsService: DdhubTopicsService,
     protected readonly topicsService: TopicService,
     protected readonly commandBus: CommandBus
-  ) {}
+  ) { }
 
   @Span('channels_getChannels')
   public async getChannels(): Promise<ChannelEntity[]> {
@@ -186,22 +186,13 @@ export class ChannelService {
   ): Promise<void> {
     const textSchemaTypes: SchemaType[] = [SchemaType.JSD7, SchemaType.XML];
     for (const topic of topics) {
-      const topicEntity: TopicEntity | null = await this.topicsService.getOne(
-        topic.topicName,
-        topic.owner
-      );
-
-      if (!topicEntity) {
-        throw new TopicNotFoundException();
-      }
-
       if ([ChannelType.PUB, ChannelType.SUB].includes(channelType)) {
-        if (!textSchemaTypes.includes(topicEntity.schemaType as SchemaType)) {
-          throw new ChannelInvalidTopicException(topicEntity.id);
+        if (!textSchemaTypes.includes(topic.schemaType as SchemaType)) {
+          throw new ChannelInvalidTopicException(topic.topicId);
         }
       } else {
-        if (textSchemaTypes.includes(topicEntity.schemaType as SchemaType)) {
-          throw new ChannelInvalidTopicException(topicEntity.id);
+        if (textSchemaTypes.includes(topic.schemaType as SchemaType)) {
+          throw new ChannelInvalidTopicException(topic.topicId);
         }
       }
     }
@@ -230,12 +221,13 @@ export class ChannelService {
         return [];
       }
 
-      const { id }: Topic = receivedTopics.records[0];
+      const { id, schemaType }: Topic = receivedTopics.records[0];
 
       topicsToReturn.push({
         topicName,
         owner,
         topicId: id,
+        schemaType: schemaType
       });
     }
 
