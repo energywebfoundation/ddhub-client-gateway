@@ -3,8 +3,8 @@ import { lighten } from '@mui/material/styles';
 
 export const useStyles = makeStyles()((theme) => ({
   paper: {
-    maxWidth: 514,
-    minHeight: 641,
+    maxWidth: 600,
+    minHeight: 800,
     padding: '55px 43px 34px 50px',
     borderRadius: 0,
   },

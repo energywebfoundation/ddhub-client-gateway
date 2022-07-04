@@ -28,7 +28,7 @@ export const Summary = ({
       direction="column"
       justifyContent="space-between"
       className={'no-wrap'}
-      sx={{ height: '100%', flexWrap: 'nowrap', marginTop: '-20px' }}
+      sx={{ height: '100%', flexWrap: 'nowrap' }}
     >
       <Grid item>
         <Typography variant={'h4'} className={classes.mainLabel}>

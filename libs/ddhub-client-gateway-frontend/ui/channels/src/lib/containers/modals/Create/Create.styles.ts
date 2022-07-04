@@ -9,7 +9,7 @@ export const useStyles = makeStyles()((theme) => ({
   },
   paper: {
     maxWidth: 820,
-    minHeight: 541,
+    minHeight: 800,
     padding: '37px 27px 27px 39px',
     borderRadius: 0,
   },
@@ -26,8 +26,8 @@ export const useStyles = makeStyles()((theme) => ({
     right: 18,
   },
   formWrapper: {
-    minWidth: '479px',
-    marginLeft: 'auto',
+    minWidth: '502px',
+    marginLeft: 18,
     paddingTop: 16,
   },
   channelWrapper: {

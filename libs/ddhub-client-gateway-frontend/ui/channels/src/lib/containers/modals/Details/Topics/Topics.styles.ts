@@ -26,7 +26,7 @@ export const useStyles = makeStyles()((theme) => ({
     color: theme.palette.grey[300],
   },
   topicsList: {
-    maxHeight: 90,
+    maxHeight: 132,
     marginTop: 15,
     overflow: 'auto',
     '&::-webkit-scrollbar': {
