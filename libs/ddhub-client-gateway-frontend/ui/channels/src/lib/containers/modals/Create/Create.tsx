@@ -25,6 +25,7 @@ export const Create = () => {
     channelValues,
     isCreating,
     getActionButtonsProps,
+    validFqcn,
   } = useCreateChannelEffects();
   const { classes } = useStyles();
 
@@ -36,7 +37,7 @@ export const Create = () => {
   const formPart = (id: number) => {
     switch (id) {
       case 0:
-        return <Details nextClick={setDetails} channelValues={channelValues} />;
+        return <Details nextClick={setDetails} channelValues={channelValues} validFqcn={validFqcn} />;
       case 1:
         return (
           <Restrictions

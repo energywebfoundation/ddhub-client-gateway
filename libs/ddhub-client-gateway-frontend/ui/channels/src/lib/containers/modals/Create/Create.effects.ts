@@ -40,6 +40,7 @@ export const useCreateChannelEffects = () => {
   const dispatch = useModalDispatch();
   const Swal = useCustomAlert();
   const [activeStep, setActiveStep] = useState(0);
+  const [validFqcn, setValidFqcn] = useState(true);
 
   const [channelValues, setChannelValues] =
     useState<ICreateChannel>(initialState);
@@ -78,18 +79,31 @@ export const useCreateChannelEffects = () => {
     return CreateChannelDtoType.upload;
   };
 
+  const validateFqcn = (fqcn: string) => {
+    let isValid = false;
+
+    if (typeof fqcn === 'string' && fqcn.length > 0) {
+      isValid = !!fqcn.match(/^[a-z0-9.]{1,255}$/);
+    }
+
+    setValidFqcn(isValid);
+    return isValid;
+  }
+
   const setDetails = (data: {
     fqcn: string;
     connectionType: ConnectionType;
     channelType: ChannelType;
     payloadEncryption: boolean;
   }) => {
-    setActiveStep(activeStep + 1);
-    setChannelValues({
-      ...channelValues,
-      ...data,
-      type: getType(data),
-    });
+    if (validateFqcn(data.fqcn)) {
+      setActiveStep(activeStep + 1);
+      setChannelValues({
+        ...channelValues,
+        ...data,
+        type: getType(data),
+      });
+    }
   };
 
   const setTopics = (data: Topic[]) => {
@@ -203,5 +217,6 @@ export const useCreateChannelEffects = () => {
     setRestrictions,
     channelValues,
     getActionButtonsProps,
+    validFqcn,
   };
 };

@@ -8,9 +8,10 @@ import { useStyles, CheckSwitch } from "./Details.styles";
 export interface DetailsProps {
   nextClick: (data) => void;
   channelValues: ICreateChannel;
+  validFqcn: boolean;
 }
 
-export const Details = ({ nextClick, channelValues }: DetailsProps) => {
+export const Details = ({ nextClick, channelValues, validFqcn }: DetailsProps) => {
   const { classes } = useStyles();
   const { register, fields, handleSubmit, isValid, control } =
     useDetailsEffects(channelValues);
@@ -39,6 +40,8 @@ export const Details = ({ nextClick, channelValues }: DetailsProps) => {
             register={register}
             control={control}
             variant="outlined"
+            errorExists={!validFqcn}
+            errorText={!validFqcn && `Should contain only alphanumeric lowercase letters, use . as a separator.`}
           />
 
           <Divider className={classes.divider} />
