@@ -1,12 +1,19 @@
-import { AccountStatusEnum, checkAccountStatus } from "./check-account-status/check-account-status";
-import { getIdentityControllerGetQueryKey } from "@dsb-client-gateway/dsb-client-gateway-api-client";
-import { IdentityWithEnrolment, Role, RoleStatus } from "@ddhub-client-gateway/identity/models";
-import { routerConst } from "@ddhub-client-gateway-frontend/ui/utils";
-import { useRouter } from "next/router";
-import { useContext } from "react";
-import { UserDataContext } from "./UserDataContext";
-import { useQueryClient } from "react-query";
-import { RouteRestrictions } from "./config/route-restrictions.interface";
+import {
+  AccountStatusEnum,
+  checkAccountStatus,
+} from './check-account-status/CheckAccountStatus';
+import { getIdentityControllerGetQueryKey } from '@dsb-client-gateway/dsb-client-gateway-api-client';
+import {
+  IdentityWithEnrolment,
+  Role,
+  RoleStatus,
+} from '@ddhub-client-gateway/identity/models';
+import { routerConst } from '@ddhub-client-gateway-frontend/ui/utils';
+import { useRouter } from 'next/router';
+import { useContext } from 'react';
+import { UserDataContext } from './UserDataContext';
+import { useQueryClient } from 'react-query';
+import { RouteRestrictions } from './config/route-restrictions.interface';
 
 export const routeRestrictions = new Map()
   .set('topicManagement', routerConst.TopicManagement)
@@ -61,11 +68,10 @@ export const useSetUserDataEffect = () => {
     routeRestrictions: RouteRestrictions = userData.routeRestrictions
   ) => {
     const redirect = async (status: AccountStatusEnum | RoleStatus) => {
-      if (status === RoleStatus.SYNCED) {
-        return router.push(routerConst.IntegrationAPIs);
-      } else {
+      if (status !== RoleStatus.SYNCED) {
         return router.push(routerConst.InitialPage);
       }
+      return;
     };
 
     const accountStatus = checkAccountStatus(res);
@@ -78,6 +84,7 @@ export const useSetUserDataEffect = () => {
       setUserData({
         ...userData,
         accountStatus,
+        roles: res.enrolment.roles,
         isChecking: false,
         routeRestrictions,
         displayedRoutes,

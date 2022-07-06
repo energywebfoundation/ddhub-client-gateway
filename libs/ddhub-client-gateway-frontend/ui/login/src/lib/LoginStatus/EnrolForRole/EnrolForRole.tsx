@@ -11,12 +11,21 @@ export function EnrolForRole(props: EnrolForRoleProps) {
 
   return (
     <>
-      <Stack spacing={'11px'} alignItems="center" direction={'row'} paddingTop={'33px'}>
+      <Stack
+        spacing={'11px'}
+        alignItems="center"
+        direction={'row'}
+        paddingTop={'33px'}
+      >
         <ErrorOutline color={'warning'} />
-        <Typography variant={'body2'} fontSize={'18px'}>Unauthorized</Typography>
+        <Typography variant={'body2'} fontSize={'18px'}>
+          Unauthorized
+        </Typography>
       </Stack>
       <Container sx={{ marginLeft: '11px', paddingTop: '6px' }}>
-        <Typography variant={'body2'}>No Role to access DDHub Client GW.</Typography>
+        <Typography variant={'body2'}>
+          No role to access DDHub Client Gateway.
+        </Typography>
         <Button
           className={classes.submitBtn}
           variant="contained"

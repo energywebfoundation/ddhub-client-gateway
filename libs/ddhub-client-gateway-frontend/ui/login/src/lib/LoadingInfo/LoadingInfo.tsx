@@ -9,9 +9,9 @@ export function LoadingInfo(props: LoadingInfoProps) {
   const { classes } = useStyles();
 
   return (
-    <Stack spacing={1} alignItems="center" direction={'row'} mt={4}>
+    <Stack spacing={1} alignItems="top" direction={'row'} mt={4}>
       <CircularProgress color="primary" size={22} />
-      <Typography className={classes.label}>{props.children}</Typography>
+      {props.children}
     </Stack>
   );
 }
