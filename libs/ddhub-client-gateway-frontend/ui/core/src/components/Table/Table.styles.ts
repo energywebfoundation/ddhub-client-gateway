@@ -6,6 +6,13 @@ export const useStyles = makeStyles()((theme) => ({
     '& .MuiTableCell-root': {
       padding: '5px 12px',
     },
+    '& .MuiTableRow-root:last-child > .MuiTableCell-root': {
+      borderBottom: 'none',
+    },
+    '& .MuiTableCell-footer': {
+      borderBottom: 'none',
+      borderTop: '1px solid #384151'
+    }
   },
   head: {
     background: lighten(theme.palette.background.paper, 0.07),

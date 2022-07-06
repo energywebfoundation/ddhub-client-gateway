@@ -118,12 +118,12 @@ export const getTopicsControllerPostTopicsMock = () => ({
   version: faker.random.word(),
 });
 
-export const getTopicsControllerGetTopicsHistoryByIdMock = () => {
+export const getTopicsControllerGetTopicsHistoryByIdMock = (queryParams: any) => {
   return {
-    count: 1,
-    limit: 1,
-    page: 1,
-    records: [...Array(1)].map(() => ({
+    count: 8,
+    limit: Number(queryParams.limit),
+    page: Number(queryParams.page),
+    records: [...Array(6)].map(() => ({
       id: faker.datatype.uuid(),
       name: faker.word.adverb(),
       owner: 'ddhub.apps.energyweb.iam.ewc',

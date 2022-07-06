@@ -13,6 +13,8 @@
 | TOPICS_CRON_ENABLED | boolean | true | Should poll for topics data |  |  |
 | FILE_CLEANER_CRON_SCHEDULE | string | */1 * * * * | How often should check and delete expired downloaded files |  |  |
 | FILE_CLEANER_CRON_ENABLED | boolean | true | Should check for downloaded/expired files |  |  |
+| ROLES_REFRESH_CRON_SCHEDULE | string | */1 * * * * | How often should check for DID roles changes |  |  |
+| ROLES_REFRESH_CRON_ENABLED | boolean | true | Should check for DID roles changes |  |  |
 | PRIVATE_KEY_CRON_SCHEDULE | string | */11 * * * * | How often should check for private key changes in secrets engine |  |  |
 | PRIVATE_KEY_CRON_ENABLED | boolean | true | Should check for private key changes |  |  |
 | HEARTBEAT_CRON_SCHEDULE | string | 30 * * * * * | How often CRON JOB heartbeat should run |  |  |
@@ -43,7 +45,7 @@
 | OTEL_SERVICE_NAME | string | ddhub-client-gateway | OTEL service name tag |  | OPENTELEMETRY_ENABLED == true |
 | OTEL_ENVIRONMENT | string | local | OTEL environment name tag |  | OPENTELEMETRY_ENABLED == true |
 | RPC_URL | string | https://volta-rpc.energyweb.org/ | EWF RPC URL |  |  |
-| PARENT_NAMESPACE | string | dsb.apps.energyweb.iam.ewc | Parent namespace for IAM lookup |  |  |
+| PARENT_NAMESPACE | string | ddhub.apps.energyweb.iam.ewc | Parent namespace for IAM lookup |  |  |
 | EVENT_SERVER_URL | string | identityevents-dev.energyweb.org | NATS URL for listening for DID roles updates |  |  |
 | NATS_ENV_NAME | string | ewf-dev |  |  |  |
 | CHAIN_ID | number | 73799 | Chain ID |  |  |

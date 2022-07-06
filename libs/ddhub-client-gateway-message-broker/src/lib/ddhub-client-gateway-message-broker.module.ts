@@ -15,6 +15,7 @@ import { DdhubClientGatewayUtilsModule } from '@dsb-client-gateway/ddhub-client-
 import { DidAuthModule } from '@dsb-client-gateway/ddhub-client-gateway-did-auth';
 import { SecretsEngineModule } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
 import { DdhubClientGatewayEnrolmentModule } from '@dsb-client-gateway/ddhub-client-gateway-enrolment';
+import { ReloginHandler } from './handler/relogin.handler';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { DdhubClientGatewayEnrolmentModule } from '@dsb-client-gateway/ddhub-cli
     DdhubMessagesService,
     DdhubLoginService,
     DdhubDidService,
+    ReloginHandler,
   ],
   exports: [
     DdhubTopicsService,

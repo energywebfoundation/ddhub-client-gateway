@@ -6,7 +6,7 @@ export const useStyles = makeStyles()((theme) => ({
     border: `1px solid ${lighten(theme.palette.background.paper, 0.07)}`,
     borderRadius: 3,
     padding: '7px 4px 7px 10px',
-    width: 204,
+    width: 245,
     height: 159,
   },
   list: {

@@ -1,8 +1,5 @@
 import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
-import {
-  Role,
-  RoleStatus,
-} from '@ddhub-client-gateway/identity/models';
+import { Role, RoleStatus } from '@ddhub-client-gateway/identity/models';
 import {
   Claim,
   IamService,
@@ -31,13 +28,35 @@ export class EnrolmentService {
     await this.wrapper.enrolmentRepository.clear();
   }
 
+  public async stopListening(): Promise<void> {
+    await this.roleListenerService.stopListening();
+  }
+
   public async startListening(): Promise<void> {
     await this.roleListenerService.startListening();
   }
 
-  public async get(): Promise<EnrolmentEntity> {
+  public async getFromCache(): Promise<EnrolmentEntity | null> {
+    const didAddress: string = this.iamService.getDIDAddress();
+
     const currentEnrolment: EnrolmentEntity | null =
-      await this.wrapper.enrolmentRepository.findOne();
+      await this.wrapper.enrolmentRepository.findOne({
+        where: {
+          did: didAddress,
+        },
+      });
+
+    return currentEnrolment;
+  }
+
+  public async get(): Promise<EnrolmentEntity> {
+    const didAddress: string = this.iamService.getDIDAddress();
+    const currentEnrolment: EnrolmentEntity | null =
+      await this.wrapper.enrolmentRepository.findOne({
+        where: {
+          did: didAddress,
+        },
+      });
 
     if (!currentEnrolment) {
       const createdEnrolment: EnrolmentEntity = await this.generateEnrolment();
@@ -94,7 +113,7 @@ export class EnrolmentService {
   public getRequiredRoles(): string[] {
     const parentNamespace: string = this.configService.get<string>(
       'PARENT_NAMESPACE',
-      'dsb.apps.energyweb.iam.ewc'
+      'ddhub.apps.energyweb.iam.ewc'
     );
 
     return [`user.roles.${parentNamespace}`];

@@ -44,7 +44,7 @@
 | OTEL_SERVICE_NAME | string | ddhub-client-gateway | OTEL service name tag |  | OPENTELEMETRY_ENABLED == true |
 | OTEL_ENVIRONMENT | string | local | OTEL environment name tag |  | OPENTELEMETRY_ENABLED == true |
 | RPC_URL | string | https://volta-rpc.energyweb.org/ | EWF RPC URL |  |  |
-| PARENT_NAMESPACE | string | dsb.apps.energyweb.iam.ewc | Parent namespace for IAM lookup |  |  |
+| PARENT_NAMESPACE | string | ddhub.apps.energyweb.iam.ewc | Parent namespace for IAM lookup |  |  |
 | EVENT_SERVER_URL | string | identityevents-dev.energyweb.org | NATS URL for listening for DID roles updates |  |  |
 | NATS_ENV_NAME | string | ewf-dev |  |  |  |
 | CHAIN_ID | number | 73799 | Chain ID |  |  |
