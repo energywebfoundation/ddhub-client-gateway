@@ -28,9 +28,9 @@ export const Summary = ({
       direction="column"
       justifyContent="space-between"
       className={'no-wrap'}
-      sx={{ height: '100%', flexWrap: 'nowrap' }}
+      sx={{ height: '100%', flexWrap: 'nowrap', marginTop: '-10px' }}
     >
-      <Grid item>
+      <Grid item sx={{ paddingRight: '36px' }}>
         <Typography variant={'h4'} className={classes.mainLabel}>
           {channelValues.channelType}
         </Typography>

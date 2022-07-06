@@ -8,9 +8,10 @@ export const useStyles = makeStyles()((theme) => ({
     flexGrow: 1,
   },
   paper: {
-    maxWidth: 820,
-    minHeight: 800,
-    padding: '37px 27px 27px 39px',
+    maxWidth: 860,
+    minHeight: 600,
+    maxHeight: 800,
+    padding: '37px 20px 27px 39px',
     borderRadius: 0,
   },
   title: {
@@ -26,14 +27,16 @@ export const useStyles = makeStyles()((theme) => ({
     right: 18,
   },
   formWrapper: {
-    minWidth: '502px',
-    marginLeft: 18,
+    minWidth: '540px',
     paddingTop: 16,
   },
   channelWrapper: {
     display: 'flex',
     flexDirection: 'column',
     marginTop: -34,
+  },
+  leftPanel: {
+    width: 261,
   },
   type: {
     fontSize: 18,

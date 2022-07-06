@@ -9,7 +9,8 @@ export const useStyles = makeStyles()((theme) => ({
     background: '#21273B',
     fontSize: '12px',
     color: theme.palette.grey[300],
-    height: '125px',
+    minHeight: 167,
+    maxHeight: 413,
     overflow: 'auto',
     '&::-webkit-scrollbar': {
       width: 2,

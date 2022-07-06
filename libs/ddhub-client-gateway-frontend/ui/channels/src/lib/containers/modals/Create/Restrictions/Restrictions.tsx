@@ -120,7 +120,7 @@ export const Restrictions = ({
       sx={{ height: '100%', flexWrap: 'nowrap' }}
     >
       <Grid item>
-        <Grid container spacing={2}>
+        <Grid container spacing={2} sx={{ paddingRight: '20px' }}>
           <Grid item sx={{ marginBottom: '22px' }}>
             <InputLabel id="restriction-type" className={classes.label}>
               Restrictions
@@ -182,7 +182,7 @@ export const Restrictions = ({
           />
         </Box>
       </Grid>
-      <Grid item alignSelf="flex-end" width="100%">
+      <Grid item alignSelf="flex-end" width="100%" sx={{ paddingTop: '22px' }}>
         <ActionButtons
           {...actionButtonsProps}
           nextClickButtonProps={{

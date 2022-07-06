@@ -39,7 +39,7 @@ export const Topics = ({
       justifyContent="space-between"
       sx={{ height: '100%', flexWrap: 'nowrap' }}
     >
-      <Grid item>
+      <Grid item sx={{ paddingRight: '20px' }}>
         <Autocomplete
           loading={isLoadingApplications}
           options={applicationList}
