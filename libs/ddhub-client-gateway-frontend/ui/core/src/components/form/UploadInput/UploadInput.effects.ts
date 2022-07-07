@@ -11,7 +11,7 @@ export const useUploadInputEffects = ({
 }: Omit<UploadInputProps, 'value'>) => {
   const fileType = acceptedFileTypes[acceptedFileType];
 
-  const { open } = useDropzone({
+  const { open, getRootProps, getInputProps } = useDropzone({
     onDrop: onChange,
     noClick: true,
     noKeyboard: true,
@@ -23,5 +23,7 @@ export const useUploadInputEffects = ({
 
   return {
     open,
+    getRootProps,
+    getInputProps,
   };
 };

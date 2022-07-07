@@ -1,3 +1,4 @@
 export enum Events {
   PRIVATE_KEY_CHANGED = 'PRIVATE_KEY_CHANGED',
+  ROLES_CHANGE = 'ROLES_CHANGE',
 }

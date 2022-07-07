@@ -44,6 +44,7 @@ ddhub-client-gateway-api:
       node_env: test
       db_name: ./data/local.db
       opentelemetry_enabled: false
+      mtls_enabled: false
     scheduler:
       enabled: true
       image:

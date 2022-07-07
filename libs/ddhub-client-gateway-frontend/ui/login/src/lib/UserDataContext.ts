@@ -1,7 +1,6 @@
 import { createContext, useMemo, useState } from 'react';
 import { Role, RoleStatus } from '@ddhub-client-gateway/identity/models';
 import { AccountStatusEnum } from './check-account-status/CheckAccountStatus';
-import { DDHubFrontendConfig } from './config/DDHubFrontendConfig';
 import { RouteRestrictions } from './config/route-restrictions.interface';
 
 export interface UserDataContext {
@@ -21,6 +20,7 @@ const initialData = {
   displayedRoutes: new Set<string>(),
   routeRestrictions: new RouteRestrictions(),
 };
+
 export const UserDataContext = createContext<{
   userData: UserDataContext;
   setUserData: (data: UserDataContext) => void;
