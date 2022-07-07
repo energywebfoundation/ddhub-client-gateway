@@ -1,8 +1,7 @@
 import { createContext, useMemo, useState } from 'react';
 import { RoleStatus } from '@ddhub-client-gateway/identity/models';
 import { AccountStatusEnum } from './check-account-status/check-account-status';
-import { DDHubFrontendConfig } from './config/DDHubFrontendConfig';
-import { RouteRestrictions } from "./config/route-restrictions.interface";
+import { RouteRestrictions } from './config/route-restrictions.interface';
 
 export interface UserDataContext {
   accountStatus: AccountStatusEnum | RoleStatus;
@@ -17,8 +16,9 @@ const initialData = {
   isChecking: true,
   errorMessage: '',
   displayedRoutes: new Set<string>(),
-  routeRestrictions: new RouteRestrictions()
+  routeRestrictions: new RouteRestrictions(),
 };
+
 export const UserDataContext = createContext<{
   userData: UserDataContext;
   setUserData: (data: UserDataContext) => void;

@@ -11,8 +11,8 @@ import { CssBaseline } from '@mui/material';
 import createCache from '@emotion/cache';
 import { Layout } from '../components/Layout';
 import { queryClientOptions } from '../utils';
-import { BackdropContextProvider } from "@ddhub-client-gateway-frontend/ui/context";
-import { Backdrop } from '@ddhub-client-gateway-frontend/ui/core'
+import { BackdropContextProvider } from '@ddhub-client-gateway-frontend/ui/context';
+import { Backdrop } from '@ddhub-client-gateway-frontend/ui/core';
 import {
   useCheckAccountOnInitEffects,
   UserDataContext,

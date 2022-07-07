@@ -39,7 +39,7 @@ export class EventsService implements OnApplicationBootstrap {
       await this.execute();
     });
 
-    await this.schedulerRegistry.addCronJob(CronJobType.EVENTS, cronJob);
+    this.schedulerRegistry.addCronJob(CronJobType.EVENTS, cronJob);
 
     cronJob.start();
   }
@@ -92,7 +92,7 @@ export class EventsService implements OnApplicationBootstrap {
             event.updatedDate.getTime();
         }
       } catch (e) {
-        this.logger.error('events failed', e);
+        this.logger.error('Event failed to execute', e);
       }
     }
   }

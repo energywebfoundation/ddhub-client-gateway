@@ -28,8 +28,7 @@ export const useCheckAccountOnInitEffects = () => {
       );
       return { identityData, routeRestrictions };
     } catch (e: any) {
-      console.error(e);
-      setDataOnError(e);
+      setDataOnError(e, false);
       return e;
     }
   };
