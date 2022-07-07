@@ -87,7 +87,7 @@
     "form-data": "^4.0.0",
     "formidable": "^2.0.1",
     "hdkey": "^2.0.1",
-    "iam-client-lib": "^5.1.0-alpha.30",
+    "iam-client-lib": "^6.0.0-alpha.23",
     "jest-cucumber": "^3.0.1",
     "json2md": "^1.12.0",
     "lokijs": "^1.5.12",
