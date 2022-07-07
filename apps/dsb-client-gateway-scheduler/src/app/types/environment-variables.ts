@@ -34,6 +34,12 @@ export const SCHEDULER_ENVS = Joi.object({
   FILE_CLEANER_CRON_ENABLED: Joi.boolean()
     .default(true)
     .description('Should check for downloaded/expired files'),
+  ROLES_REFRESH_CRON_SCHEDULE: Joi.string()
+    .default('*/1 * * * *')
+    .description('How often should check for DID roles changes'),
+  ROLES_REFRESH_CRON_ENABLED: Joi.boolean()
+    .default(true)
+    .description('Should check for DID roles changes'),
   PRIVATE_KEY_CRON_SCHEDULE: Joi.string()
     .default('*/11 * * * *')
     .description(

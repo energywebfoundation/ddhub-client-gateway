@@ -27,7 +27,7 @@ export class DdhubLoginService {
   ) {}
 
   @Span('ddhub_mb_login')
-  public async login(): Promise<void> {
+  public async login(forceRelogin = true): Promise<void> {
     const enrolment = await this.enrolmentService.get();
 
     if (!enrolment) {
@@ -60,7 +60,7 @@ export class DdhubLoginService {
 
     await promiseRetry(async (retry) => {
       await this.didAuthService
-        .login(privateKey, this.iamService.getDIDAddress())
+        .login(privateKey, this.iamService.getDIDAddress(), forceRelogin)
         .catch((e) => retry(e));
     }, this.retryConfigService.config);
 

@@ -1,8 +1,5 @@
 import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
-import {
-  Role,
-  RoleStatus,
-} from '@ddhub-client-gateway/identity/models';
+import { Role, RoleStatus } from '@ddhub-client-gateway/identity/models';
 import {
   Claim,
   IamService,
@@ -25,19 +22,41 @@ export class EnrolmentService {
     @Inject(forwardRef(() => RoleListenerService))
     protected readonly roleListenerService: RoleListenerService,
     protected readonly wrapper: EnrolmentWrapperRepository
-  ) { }
+  ) {}
 
   public async deleteEnrolment(): Promise<void> {
     await this.wrapper.enrolmentRepository.clear();
+  }
+
+  public async stopListening(): Promise<void> {
+    await this.roleListenerService.stopListening();
   }
 
   public async startListening(): Promise<void> {
     await this.roleListenerService.startListening();
   }
 
-  public async get(): Promise<EnrolmentEntity> {
+  public async getFromCache(): Promise<EnrolmentEntity | null> {
+    const didAddress: string = this.iamService.getDIDAddress();
+
     const currentEnrolment: EnrolmentEntity | null =
-      await this.wrapper.enrolmentRepository.findOne();
+      await this.wrapper.enrolmentRepository.findOne({
+        where: {
+          did: didAddress,
+        },
+      });
+
+    return currentEnrolment;
+  }
+
+  public async get(): Promise<EnrolmentEntity> {
+    const didAddress: string = this.iamService.getDIDAddress();
+    const currentEnrolment: EnrolmentEntity | null =
+      await this.wrapper.enrolmentRepository.findOne({
+        where: {
+          did: didAddress,
+        },
+      });
 
     if (!currentEnrolment) {
       const createdEnrolment: EnrolmentEntity = await this.generateEnrolment();
