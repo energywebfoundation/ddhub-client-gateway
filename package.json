@@ -92,7 +92,7 @@
     "json2md": "^1.12.0",
     "lokijs": "^1.5.12",
     "match-sorter": "^6.3.1",
-    "moment": "^2.29.1",
+    "moment": "^2.29.4",
     "multer": "^1.4.4",
     "nats.ws": "^1.7.2",
     "nedb": "^1.8.0",
@@ -120,7 +120,7 @@
     "sweetalert2-react-content": "^4.2.0",
     "tslib": "^2.0.0",
     "tss-react": "3.6.0",
-    "typeorm": "^0.2.45",
+    "typeorm": "^0.3.0",
     "uuid": "^8.3.2",
     "websocket": "^1.0.34",
     "yup": "^0.32.11"
