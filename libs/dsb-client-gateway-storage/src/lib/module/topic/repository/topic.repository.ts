@@ -8,7 +8,7 @@ export class TopicRepository extends Repository<TopicEntity> {
     name: string,
     owner: string,
     page: number
-  ): Promise<[TopicEntity[], number]> {
+  ): Promise<TopicEntity[]> {
     const query = this.createQueryBuilder('t');
     query.where('t.name like :name', { name: `%${name}%` });
     query
@@ -18,7 +18,21 @@ export class TopicRepository extends Repository<TopicEntity> {
     if (owner) {
       query.andWhere('t.owner = :owner', { owner: owner });
     }
-    return query.getManyAndCount();
+    return query.getMany();
+  }
+
+  public async getTopicsCountSearch(
+    name: string,
+    owner: string,
+  ): Promise<number> {
+    const query = this.createQueryBuilder('t');
+    query.where('t.name like :name', { name: `%${name}%` });
+    query
+      .groupBy('t.id')
+    if (owner) {
+      query.andWhere('t.owner = :owner', { owner: owner });
+    }
+    return (await query.getRawMany()).length;
   }
 
   public async getCountOfLatest(

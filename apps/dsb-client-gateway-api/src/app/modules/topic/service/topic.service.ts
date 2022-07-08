@@ -21,7 +21,7 @@ export class TopicService {
   constructor(
     protected readonly wrapper: TopicRepositoryWrapper,
     protected readonly applicationsWrapper: ApplicationWrapperRepository
-  ) {}
+  ) { }
 
   public async getOne(
     name: string,
@@ -64,13 +64,15 @@ export class TopicService {
     limit: number,
     page: number
   ) {
-    const [topics, allCount] =
+    const topics =
       await this.wrapper.topicRepository.getTopicsAndCountSearch(
         limit,
         keyword,
         owner,
         page
       );
+
+    const allCount = await this.wrapper.topicRepository.getTopicsCountSearch(keyword, owner);
 
     return {
       limit,
