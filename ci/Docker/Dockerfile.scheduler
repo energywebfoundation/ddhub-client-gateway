@@ -16,5 +16,6 @@ WORKDIR /usr/app
 RUN npm ci --production
 
 USER node
+VOLUME ["/mnt"]
 
 CMD ["node", "main.js"]
