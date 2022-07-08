@@ -18,7 +18,7 @@ export class AppInitService implements OnModuleInit {
     if (!privateKey) {
       this.logger.error('No private key is set');
 
-      throw Error('No private key is set'); // @TODO - standardize this error in iam client package
+      return;
     }
 
     this.logger.log('Initializing IAM');

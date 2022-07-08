@@ -13,6 +13,8 @@
 | TOPICS_CRON_ENABLED | boolean | true | Should poll for topics data |  |  |
 | FILE_CLEANER_CRON_SCHEDULE | string | */1 * * * * | How often should check and delete expired downloaded files |  |  |
 | FILE_CLEANER_CRON_ENABLED | boolean | true | Should check for downloaded/expired files |  |  |
+| ROLES_REFRESH_CRON_SCHEDULE | string | */1 * * * * | How often should check for DID roles changes |  |  |
+| ROLES_REFRESH_CRON_ENABLED | boolean | true | Should check for DID roles changes |  |  |
 | PRIVATE_KEY_CRON_SCHEDULE | string | */11 * * * * | How often should check for private key changes in secrets engine |  |  |
 | PRIVATE_KEY_CRON_ENABLED | boolean | true | Should check for private key changes |  |  |
 | HEARTBEAT_CRON_SCHEDULE | string | 30 * * * * * | How often CRON JOB heartbeat should run |  |  |
