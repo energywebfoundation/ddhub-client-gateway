@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "outDir": "./migrations-build",
+    "removeComments": false,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "rootDir": "./migrations",
+    "skipLibCheck": true
+  },
+  "exclude": ["apps/*", "libs/*"],
+  "include": ["migrations/*.ts"]
+}
