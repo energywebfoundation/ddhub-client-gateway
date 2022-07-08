@@ -97,6 +97,7 @@ export class TopicRepository extends Repository<TopicEntity> {
         schemaType: rawEntity.schemaType,
         tags: JSON.parse(rawEntity.tags),
         owner: rawEntity.owner,
+        schema: JSON.parse(rawEntity.schema),
         id: rawEntity.id,
         version: rawEntity.version,
       };
