@@ -1,30 +1,26 @@
-import { Typography, Stack } from '@mui/material';
-import { makeStyles } from 'tss-react/mui';
+import { Typography, Stack, Box } from '@mui/material';
 import { Check } from 'react-feather';
+import RefreshAccountStatus from '../RefreshAccountStatus/RefreshAccountStatus';
+import ResetPrivateKey from '../../ResetPrivateKey/ResetPrivateKey';
 
 export const RequestApproved = () => {
-  const { classes } = useStyles();
   return (
-    <Stack spacing={1} alignItems="center" direction="row" mt={4}>
-      <Check className={classes.icon} size={22} />
-      <Typography className={classes.label}>
-        Enrolment request approved
-      </Typography>
+    <Stack spacing={4} mt={2}>
+      <Stack spacing={1} direction="row">
+        <Check color="success" size={22} />
+        <Stack>
+          <Typography variant="body1">Enrolment request approved</Typography>
+          <Typography variant="body2">
+            Please wait momentarily for your enrolment to sync.
+          </Typography>
+          <Box mt={2}>
+            <RefreshAccountStatus />
+          </Box>
+        </Stack>
+      </Stack>
+      <ResetPrivateKey />
     </Stack>
   );
 };
 
 export default RequestApproved;
-
-export const useStyles = makeStyles()((theme) => ({
-  label: {
-    fontFamily: theme.typography.body2.fontFamily,
-    fontWeight: 400,
-    fontSize: '18px',
-    lineHeight: '21px',
-    color: theme.palette.common.white,
-  },
-  icon: {
-    color: theme.palette.success.main,
-  },
-}));

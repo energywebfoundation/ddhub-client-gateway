@@ -1,4 +1,3 @@
-import { Queries } from '@ddhub-client-gateway-frontend/ui/utils';
 import { usePrivateKeyEffects } from '../Login.effects';
 import { AccountStatusEnum } from '../check-account-status/CheckAccountStatus';
 import LoginForm from '../LoginForm/LoginForm';
@@ -8,7 +7,6 @@ import EnrolForRoleContainer from './EnrolForRoleContainer/EnrolForRoleContainer
 import RequestingEnrolment from './RequestingEnrolment/RequestingEnrolment';
 import RequestApproved from './RequestApproved/RequestApproved';
 import IdentitySuccessful from './IdentitySuccessful/IdentitySuccessful';
-import AwaitingSyncing from './AwaitingSyncing/AwaitingSyncing';
 import ResetPrivateKey from '../ResetPrivateKey/ResetPrivateKey';
 import LoadingInfo from '../LoadingInfo/LoadingInfo';
 import { Stack, Typography } from '@mui/material';
@@ -54,8 +52,7 @@ export const useLoginStatusEffects = () => {
       case RoleStatus.AWAITING_APPROVAL:
         return <RequestingEnrolment />;
       case RoleStatus.APPROVED:
-        return <AwaitingSyncing />;
-      // TODO: add status case for RequestApproved component
+        return <RequestApproved />;
       case RoleStatus.SYNCED:
         if (isLoading) {
           return checkingIdentity();
