@@ -13,6 +13,7 @@ import {
   PostTopicDto,
 } from '../dto';
 import { SchemaType } from '../topic.const';
+import { TopicOrVersionNotFoundException } from '../exceptions/topic-or-version-not-found.exception';
 
 @Injectable()
 export class TopicService {
@@ -183,6 +184,10 @@ export class TopicService {
     const topic: TopicEntity = await this.wrapper.topicRepository.findOne({
       where: { id, version: versionNumber },
     });
+
+    if (!topic) {
+      throw new TopicOrVersionNotFoundException(id, versionNumber);
+    }
 
     return {
       id: topic.id,
