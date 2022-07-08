@@ -103,6 +103,23 @@ export abstract class DdhubBaseService {
     }
 
     if (
+      e.response.data.returnCode && status === HttpStatus.UNAUTHORIZED
+    ) {
+      this.logger.error(
+        'Request stopped because of stopOnResponseCodes rule',
+        e.response.data.returnCode,
+        defaults.stopOnResponseCodes
+      );
+
+      throw new MessageBrokerUnauthrizedException(
+        e.message,
+        DsbClientGatewayErrors.MB_ERROR,
+        e.response.data.returnCode,
+        e.request.path
+      );
+    }
+
+    if (
       e.response.data.returnCode &&
       defaults.stopOnResponseCodes.includes(e.response.data.returnCode)
     ) {
@@ -112,7 +129,7 @@ export abstract class DdhubBaseService {
         defaults.stopOnResponseCodes
       );
 
-      throw new MessageBrokerUnauthrizedException(
+      throw new MessageBrokerException(
         e.message,
         DsbClientGatewayErrors.MB_ERROR,
         e.response.data.returnCode,
