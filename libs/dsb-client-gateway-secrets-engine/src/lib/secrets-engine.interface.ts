@@ -28,6 +28,12 @@ export abstract class SecretsEngineService implements OnModuleInit {
   abstract deleteAll(): Promise<void>;
 }
 
+export interface Key {
+  privateKey: string;
+  publicKey: string;
+  exp: number;
+}
+
 export interface CertificateDetails {
   privateKey: string;
   certificate: string;

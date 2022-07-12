@@ -29,6 +29,21 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
       })
     );
   }
+  //
+  // @Span('vault_addKey')
+  // addKey(keyId: string): Promise<void> {
+  //   return Promise.resolve(undefined);
+  // }
+  //
+  // @Span('vault_removeKey')
+  // removeKey(keyId: string): Promise<void> {
+  //   return Promise.resolve(undefined);
+  // }
+  //
+  // @Span('vault_storeMasterSeed')
+  // storeMasterSeed(seed: string): Promise<void> {
+  //   return Promise.resolve(undefined);
+  // }
 
   @Span('vault_onModuleInit')
   public async onModuleInit(): Promise<void> {

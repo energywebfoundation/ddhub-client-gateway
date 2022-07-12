@@ -19,7 +19,6 @@ import {
 } from '../dto/request/send-message.dto';
 import { GetMessagesDto } from '../dto/request/get-messages.dto';
 import { DownloadMessagesDto } from '../dto/request/download-file.dto';
-import { MessageService } from '../service/message.service';
 import { DigestGuard } from '../../utils/guards/digest.guard';
 import { SendMessagelResponseDto } from '../dto/response/send-message.dto';
 import { GetMessagesResponseDto } from '../dto/response/get-message-response.dto';
@@ -27,13 +26,14 @@ import { DownloadMessageResponse } from '../entity/message.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Readable } from 'stream';
 import { MtlsGuard } from '../../certificate/guards/mtls.guard';
+import { AService } from '../service/a.service';
 
 @Controller('messages')
 @UseGuards(DigestGuard, MtlsGuard)
 @ApiTags('Messaging')
-export class MessageControlller {
-  private readonly logger = new Logger();
-  constructor(protected readonly messageService: MessageService) {}
+export class MessageController {
+  private readonly logger = new Logger(MessageController.name);
+  constructor(protected readonly messageService: AService) {}
 
   @Get('/')
   @ApiResponse({
@@ -80,7 +80,7 @@ export class MessageControlller {
   ): Promise<Readable> {
     try {
       const file: DownloadMessageResponse =
-        await this.messageService.downloadMessages(fileId);
+        await this.messageService.downloadMessage(fileId);
 
       res.set({
         'Content-Type': 'multipart/form-data',

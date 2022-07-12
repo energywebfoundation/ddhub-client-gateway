@@ -5,6 +5,7 @@ import {
   ClaimsService,
   DIDAttribute,
   DidRegistry,
+  PubKeyType,
   RegistrationTypes,
   SignerService,
 } from 'iam-client-lib';
@@ -15,7 +16,7 @@ import { ApplicationDTO, Claim } from '../iam.interface';
 import { RoleStatus } from '@ddhub-client-gateway/identity/models';
 import { Span } from 'nestjs-otel';
 import promiseRetry from 'promise-retry';
-import { Encoding, PubKeyType } from '@ew-did-registry/did-resolver-interface';
+import { Encoding } from '@ew-did-registry/did-resolver-interface';
 import { KeyType } from '@ew-did-registry/keys';
 import { RetryConfigService } from '@dsb-client-gateway/ddhub-client-gateway-utils';
 
@@ -88,7 +89,10 @@ export class IamService {
   @Span('iam_setVerificationMethod')
   public async setVerificationMethod(
     publicKey: string,
-    tag = 'dsb'
+    tag = 'dsb',
+    type: PubKeyType = PubKeyType.VerificationKey2018,
+    algo: KeyType = KeyType.RSA,
+    encoding: Encoding = Encoding.HEX
   ): Promise<void> {
     await promiseRetry(
       async (retryFn, attempt) => {
@@ -101,11 +105,11 @@ export class IamService {
             did: this.getDIDAddress(),
             didAttribute: DIDAttribute.PublicKey,
             data: {
-              type: PubKeyType.VerificationKey2018,
-              encoding: Encoding.HEX,
-              algo: KeyType.RSA,
+              type,
+              encoding,
+              algo,
               value: {
-                type: KeyType.RSA,
+                type: algo,
                 tag,
                 publicKey,
               },

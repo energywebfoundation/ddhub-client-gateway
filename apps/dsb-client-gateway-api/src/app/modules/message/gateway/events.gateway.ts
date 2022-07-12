@@ -13,13 +13,13 @@ import { ConfigService } from '@nestjs/config';
 import { WebSocketImplementation } from '../message.const';
 import { AuthService } from '../../utils/service/auth.service';
 import { ChannelService } from '../../channel/service/channel.service';
-import { MessageService } from '../service/message.service';
+import { AService } from '../service/a.service';
 
 @WebSocketGateway({
   cors: {
     origin: '*',
   },
-  path: '/events'
+  path: '/events',
 })
 @Injectable()
 export class EventsGateway implements OnGatewayConnection, OnGatewayInit {
@@ -33,9 +33,9 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayInit {
     protected readonly configService: ConfigService,
     protected readonly authService: AuthService,
     protected readonly channelService: ChannelService,
-    @Inject(forwardRef(() => MessageService))
-    protected readonly messageService: MessageService,
-  ) { }
+    @Inject(forwardRef(() => AService))
+    protected readonly messageService: AService
+  ) {}
 
   public async afterInit(server: Server) {
     const websocketMode = this.configService.get(
@@ -72,17 +72,27 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayInit {
       return;
     }
 
-    const _clientId = new URLSearchParams(client.request.url.split("?")[1]).get("clientId");
-    const _size = new URLSearchParams(client.request.url.split("?")[1]).get("size");
+    const _clientId = new URLSearchParams(client.request.url.split('?')[1]).get(
+      'clientId'
+    );
+    const _size = new URLSearchParams(client.request.url.split('?')[1]).get(
+      'size'
+    );
 
     if (_clientId === null) {
-      client.close(1003, 'Required paramater \'clientId\' ex. ws://localhost:3333/events?clientId=id_name');
+      client.close(
+        1003,
+        "Required paramater 'clientId' ex. ws://localhost:3333/events?clientId=id_name"
+      );
       return;
     }
 
     const clientIdRegex = new RegExp(/^[a-zA-Z0-9\-:]+$/);
     if (!clientIdRegex.test(_clientId)) {
-      client.close(1003, 'Required paramater \'clientId\' with format Alphanumeric string');
+      client.close(
+        1003,
+        "Required paramater 'clientId' with format Alphanumeric string"
+      );
       return;
     }
 
@@ -111,13 +121,27 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayInit {
   }
 
   @SubscribeMessage('message')
-  public async handleMessage(@ConnectedSocket() client: any, @MessageBody() data): Promise<void> {
-    this.logger.log(`${client.request.connection.remoteAddress}:${client.request.connection.remotePort}${client.request.url} ${JSON.stringify(data)}`);
-    this.messageService.sendMessage(JSON.parse(data)).then((response) => {
-      client.send(JSON.stringify(response));
-    }).catch((ex) => {
-      this.logger.error(`${client.request.connection.remoteAddress}:${client.request.connection.remotePort}${client.request.url} ${JSON.stringify(ex.response)}`);
-      client.send(JSON.stringify(ex.response));
-    });
+  public async handleMessage(
+    @ConnectedSocket() client: any,
+    @MessageBody() data
+  ): Promise<void> {
+    this.logger.log(
+      `${client.request.connection.remoteAddress}:${
+        client.request.connection.remotePort
+      }${client.request.url} ${JSON.stringify(data)}`
+    );
+    this.messageService
+      .sendMessage(JSON.parse(data))
+      .then((response) => {
+        client.send(JSON.stringify(response));
+      })
+      .catch((ex) => {
+        this.logger.error(
+          `${client.request.connection.remoteAddress}:${
+            client.request.connection.remotePort
+          }${client.request.url} ${JSON.stringify(ex.response)}`
+        );
+        client.send(JSON.stringify(ex.response));
+      });
   }
 }

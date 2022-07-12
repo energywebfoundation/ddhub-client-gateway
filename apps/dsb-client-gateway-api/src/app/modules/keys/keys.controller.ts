@@ -1,5 +1,4 @@
 import { Controller, Post, UseGuards } from '@nestjs/common';
-import { KeysService } from './service/keys.service';
 import { DigestGuard } from '../utils/guards/digest.guard';
 import { ApiTags } from '@nestjs/swagger';
 
@@ -7,7 +6,7 @@ import { ApiTags } from '@nestjs/swagger';
 @UseGuards(DigestGuard)
 @ApiTags('Gateway Configuration')
 export class KeysController {
-  constructor(protected readonly keysService: KeysService) {}
+  constructor(e) {}
 
   @Post('')
   public async derive(): Promise<void> {

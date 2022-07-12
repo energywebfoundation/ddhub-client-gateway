@@ -1,9 +1,15 @@
-import { forwardRef, Inject, Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import {
+  forwardRef,
+  Inject,
+  Injectable,
+  Logger,
+  OnModuleInit,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import ReconnectingWebSocket from 'reconnecting-websocket';
 import WebSocket from 'ws';
 import { WebSocketImplementation } from '../message.const';
-import { MessageService } from './message.service';
+import { AService } from './a.service';
 
 @Injectable()
 export class WsClientService implements OnModuleInit {
@@ -12,9 +18,9 @@ export class WsClientService implements OnModuleInit {
 
   constructor(
     protected readonly configService: ConfigService,
-    @Inject(forwardRef(() => MessageService))
-    protected readonly messageService: MessageService
-  ) { }
+    @Inject(forwardRef(() => AService))
+    protected readonly messageService: AService
+  ) {}
 
   public async onModuleInit(): Promise<void> {
     const websocketMode = this.configService.get(
@@ -48,7 +54,9 @@ export class WsClientService implements OnModuleInit {
         if (this.rws === undefined) {
           const options = {
             WebSocket: WebSocket, // custom WebSocket constructor
-            connectionTimeout: this.configService.get<number>('WEBSOCKET_RECONNECT_TIMEOUT'),
+            connectionTimeout: this.configService.get<number>(
+              'WEBSOCKET_RECONNECT_TIMEOUT'
+            ),
           };
           const _ws = new ReconnectingWebSocket(wsUrl, [], options);
           _ws.addEventListener('open', () => {
@@ -61,12 +69,15 @@ export class WsClientService implements OnModuleInit {
 
             _ws.addEventListener('message', (event) => {
               this.logger.log(`${wsUrl} ${JSON.stringify(event.data)}`);
-              this.messageService.sendMessage(JSON.parse(event.data)).then((response) => {
-                _ws.send(JSON.stringify(response));
-              }).catch((ex) => {
-                this.logger.error(`${wsUrl} ${JSON.stringify(ex.response)}`);
-                _ws.send(JSON.stringify(ex.response));
-              });
+              this.messageService
+                .sendMessage(JSON.parse(event.data))
+                .then((response) => {
+                  _ws.send(JSON.stringify(response));
+                })
+                .catch((ex) => {
+                  this.logger.error(`${wsUrl} ${JSON.stringify(ex.response)}`);
+                  _ws.send(JSON.stringify(ex.response));
+                });
             });
 
             resolve();
@@ -77,7 +88,6 @@ export class WsClientService implements OnModuleInit {
         } else {
           resolve();
         }
-
       } catch (err) {
         reject(err);
       }

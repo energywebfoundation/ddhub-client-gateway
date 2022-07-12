@@ -1,8 +1,7 @@
 import { Module } from '@nestjs/common';
 import { EventsGateway } from './gateway/events.gateway';
-import { MessageService } from './service/message.service';
 import { UtilsModule } from '../utils/utils.module';
-import { MessageControlller } from './controller/message.controller';
+import { MessageController } from './controller/message.controller';
 import { ChannelModule } from '../channel/channel.module';
 import { CqrsModule } from '@nestjs/cqrs';
 import { KeysModule } from '../keys/keys.module';
@@ -21,6 +20,7 @@ import { MulterModule } from '@nestjs/platform-express';
 import multer from 'multer';
 import { ConfigService } from '@nestjs/config';
 import { CertificateModule } from '../certificate/certificate.module';
+import { AService } from './service/a.service';
 
 @Module({
   imports: [
@@ -55,11 +55,11 @@ import { CertificateModule } from '../certificate/certificate.module';
   ],
   providers: [
     EventsGateway,
-    MessageService,
     WsClientService,
+    AService,
     DsbMessagePoolingService,
   ],
-  exports: [MessageService],
-  controllers: [MessageControlller],
+  exports: [AService],
+  controllers: [MessageController],
 })
 export class MessageModule {}

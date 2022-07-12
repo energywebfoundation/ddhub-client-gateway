@@ -36,6 +36,9 @@ const ENTITIES = [
           database: configService.get<string>('DB_NAME', 'local.db'),
           synchronize: true,
           entities: ENTITIES,
+          prepareDatabase: (db) => {
+            console.log(db);
+          },
         };
       },
       inject: [ConfigService],

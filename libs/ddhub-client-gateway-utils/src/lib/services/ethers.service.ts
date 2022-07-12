@@ -3,6 +3,8 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { BigNumber, providers, utils, Wallet } from 'ethers';
 import { parseEther } from 'ethers/lib/utils';
 import { Span } from 'nestjs-otel';
+import { generateMnemonic, mnemonicToSeedSync } from 'bip39';
+import HDKEY from 'hdkey';
 
 @Injectable()
 export class EthersService {
@@ -10,6 +12,14 @@ export class EthersService {
 
   public createPrivateKey(): string {
     return Wallet.createRandom().privateKey;
+  }
+
+  public generateHDKey(): HDKEY {
+    const mnemonic = generateMnemonic();
+
+    const seed = mnemonicToSeedSync(mnemonic);
+
+    return HDKEY.fromMasterSeed(seed);
   }
 
   @Span('ethers_createProof')
