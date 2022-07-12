@@ -24,14 +24,6 @@ Retrieves and caches data for performance purposes
 
 After configuring environment variables (in `.env` file) run following commands
 
-### Running migrations
-Set environment variable `DB_NAME` as described in **Environment Variables** section
-
-```shell
-npm run migrations:build
-npm run migrations:run
-```
-
 ### Development mode
 
 ```shell
