@@ -41,22 +41,22 @@ export const useCustomAlert = () => {
     }).fire();
   };
 
-  const httpError = async (
-    error: any
-  ): Promise<SweetAlertResult> => {
+  const httpError = async (error: any): Promise<SweetAlertResult> => {
     return await CustomSwal({
       title: 'Error',
       type: 'error',
       confirmButtonText: 'Dismiss',
-      html:
-        `${error?.response?.data?.err?.reason} <br /> ${error?.response?.data?.err?.additionalDetails?.errors[0] ?? ''}`,
+      html: `${error?.response?.data?.err?.reason} <br /> ${
+        error?.response?.data?.err?.additionalDetails?.errors?.[0] ?? ''
+      }`,
     }).fire();
   };
+
   return {
     fire,
     error,
     warning,
     success,
-    httpError
+    httpError,
   };
 };
