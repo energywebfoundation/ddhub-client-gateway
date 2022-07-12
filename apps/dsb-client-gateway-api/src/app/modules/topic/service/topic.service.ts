@@ -13,6 +13,7 @@ import {
   PostTopicDto,
 } from '../dto';
 import { SchemaType } from '../topic.const';
+import { TopicOrVersionNotFoundException } from '../exceptions/topic-or-version-not-found.exception';
 
 @Injectable()
 export class TopicService {
@@ -21,7 +22,7 @@ export class TopicService {
   constructor(
     protected readonly wrapper: TopicRepositoryWrapper,
     protected readonly applicationsWrapper: ApplicationWrapperRepository
-  ) {}
+  ) { }
 
   public async getOne(
     name: string,
@@ -64,13 +65,15 @@ export class TopicService {
     limit: number,
     page: number
   ) {
-    const [topics, allCount] =
+    const topics =
       await this.wrapper.topicRepository.getTopicsAndCountSearch(
         limit,
         keyword,
         owner,
         page
       );
+
+    const allCount = await this.wrapper.topicRepository.getTopicsCountSearch(keyword, owner);
 
     return {
       limit,
@@ -181,6 +184,10 @@ export class TopicService {
     const topic: TopicEntity = await this.wrapper.topicRepository.findOne({
       where: { id, version: versionNumber },
     });
+
+    if (!topic) {
+      throw new TopicOrVersionNotFoundException(id, versionNumber);
+    }
 
     return {
       id: topic.id,
