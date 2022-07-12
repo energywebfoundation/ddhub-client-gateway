@@ -6,6 +6,7 @@ import {
   PostTopicDto,
   getTopicsControllerGetTopicsQueryKey,
   getTopicsControllerGetTopicsHistoryByIdQueryKey,
+  topicsControllerGetTopicHistoryByIdAndVersion,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import {
   useUpdateTopics,
@@ -121,17 +122,39 @@ export const useUpdateTopicEffects = () => {
     });
   };
 
-  const topicSubmitHandler: SubmitHandler<FieldValues> = (data) => {
-    const values = data as PostTopicDto;
-    const fomattedValues = {
+  const postTopicUpdate = (values: PostTopicDto) => {
+    const formattedValues = {
       ...values,
       id: topic.id,
       schema: parseJson(values.schema),
     };
+
     updateTopicHandler(
-      fomattedValues as PostTopicDto,
+      formattedValues as PostTopicDto,
       onUpdateTopics
     );
+  };
+
+  const topicSubmitHandler: SubmitHandler<FieldValues> = (data) => {
+    const values = data as PostTopicDto;
+
+    if (values.version !== topicWithSchema.version) {
+      topicsControllerGetTopicHistoryByIdAndVersion(values.id, values.version).then((data) => {
+        if (data) {
+          openWarnModal(values);
+        } else {
+          postTopicUpdate(values);
+        }
+      }).catch((err) => {
+        if (err.response && err.response.status === 400 && err.response.data.err.code === 'TOPIC::NOT_FOUND') {
+          postTopicUpdate(values);
+        } else {
+          Swal.httpError(err);
+        }
+      });
+    } else {
+      postTopicUpdate(values);
+    }
   };
 
   const onSubmit = handleSubmit(topicSubmitHandler);
@@ -146,6 +169,23 @@ export const useUpdateTopicEffects = () => {
     });
 
     if (result.isConfirmed) {
+      closeModal();
+    } else {
+      showModal();
+    }
+  };
+
+  const openWarnModal = async (values: PostTopicDto) => {
+    hideModal();
+    const result = await Swal.fire({
+      title: 'Update Topic',
+      text: 'You are about to overwrite an existing version of this topic.',
+      type: 'warning',
+      showCancelButton: true,
+    });
+
+    if (result.isConfirmed) {
+      postTopicUpdate(values);
       closeModal();
     } else {
       showModal();
