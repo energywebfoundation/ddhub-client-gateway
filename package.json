@@ -7,9 +7,6 @@
     "npm": ">=8.5.0"
   },
   "scripts": {
-    "migrations:build": "rimraf migrations-build && tsc -p tsconfig.migrations.json",
-    "migrations:run": "npm run typeorm -- migration:run",
-    "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/.bin/typeorm",
     "generate:envs": "npm run generate:api:envs && npm run generate:scheduler:envs",
     "generate:api:envs": "npm run build:api:envs && node dist/apps/dsb-client-gateway-api-envs/main.js",
     "generate:scheduler:envs": "npm run build:scheduler:envs && node dist/apps/dsb-client-gateway-scheduler-envs/main.js",
