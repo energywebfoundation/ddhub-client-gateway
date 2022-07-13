@@ -19,12 +19,13 @@ FROM $IMAGE
 ENV NODE_ENV=$NODE_ENV
 
 COPY --chown=node:node dist/apps/dsb-client-gateway-api/* /usr/app/
+COPY --chown=node:node ormconfig.js /usr/app/
 COPY --chown=node:node migrations-build/* /usr/app/migrations-build
 COPY --chown=node:node package-lock.json /usr/app/
 COPY --chown=node:node package.json /usr/app
 
 WORKDIR /usr/app
-RUN npm ci --production
+RUN npm install -g nx npm@8.5.0 && npm ci --production
 
 USER node
 
