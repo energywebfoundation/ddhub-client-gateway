@@ -49,6 +49,7 @@ export const Restrictions = ({
 
   const selectRoleRestriction = type === RestrictionType.Role && (
     <TextField
+      autoComplete='off'
       fullWidth
       variant={'outlined'}
       value={roleInput}
@@ -80,6 +81,7 @@ export const Restrictions = ({
 
   const setDIDRestriction = type === RestrictionType.DID && (
     <TextField
+      autoComplete='off'
       fullWidth
       variant={'outlined'}
       value={didInput}

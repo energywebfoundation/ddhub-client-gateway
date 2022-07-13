@@ -65,7 +65,7 @@ function validateJSONSchema(schema: object, payload: string) {
     return true;
   } else if (validate) {
     throw new SchemaNotValidException(
-      JSON.stringify(ajv.errorsText(validate.errors))
+      validate.errors[0]
     );
   }
 }

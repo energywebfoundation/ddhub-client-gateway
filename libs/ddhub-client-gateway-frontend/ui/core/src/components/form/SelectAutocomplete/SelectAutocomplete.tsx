@@ -50,6 +50,7 @@ export const SelectAutocomplete: FC<SelectAutocompleteProps> = ({
         value={value !== undefined ? value : []}
         renderInput={(params) => (
           <TextField
+            autoComplete='off'
             {...params}
             required={field.required && !(value?.length > 0)}
             placeholder={field.placeholder}

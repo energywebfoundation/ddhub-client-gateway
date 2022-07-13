@@ -12,6 +12,8 @@ export function TopicVersionHistory() {
     topicId,
     loading,
     openTopicDetails,
+    pagination,
+    handlePageChange,
   } = useTopicVersionHistoryEffects();
 
   return (
@@ -29,6 +31,8 @@ export function TopicVersionHistory() {
           loading={loading}
           defaultSortBy='name'
           defaultOrder='asc'
+          onPageChange={handlePageChange}
+          paginationProps={pagination}
         />
       </div>
     </Stack>

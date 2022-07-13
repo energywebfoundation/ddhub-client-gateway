@@ -24,14 +24,6 @@ Retrieves and caches data for performance purposes
 
 After configuring environment variables (in `.env` file) run following commands
 
-### Running migrations
-Set environment variable `DB_NAME` as described in **Environment Variables** section
-
-```shell
-npm run migrations:build
-npm run migrations:run
-```
-
 ### Development mode
 
 ```shell
@@ -55,7 +47,9 @@ $ node dist/apps/dsb-client-gateway-scheduler/main.js
 ```
 
 Running pure `node` in production is not recommended. Use any process manager (pm2, docker etc.) for stability.  
-You can find docker images in `ci` directory.
+You can find docker images in `ci` directory.  
+
+For more details please refer to [Deployment Guide](https://energyweb.atlassian.net/wiki/spaces/AEMO/pages/3178627074/DDHub+Client+Deployment+Guide)
 
 ## Swagger
 Swagger is available on route `{{API_HOST}}/docs`.    

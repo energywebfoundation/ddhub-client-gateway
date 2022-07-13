@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { Icon } from 'react-feather';
-import { Typography, Box, alpha, Divider } from '@mui/material';
+import { Typography, Box, Divider } from '@mui/material';
 import { useStyles } from './SchedulerItem.styles';
 import Status, { StatusTypeEnum } from '../../Status/Status';
 import { capitalizeFirstLetter } from '@ddhub-client-gateway-frontend/ui/utils';

@@ -15,7 +15,11 @@ export const useTopicVersionHistoryEffects = () => {
   // TODO: add useApplication
   const { applicationsByNamespace, applicationsFetched } =
     useApplications('user');
-  const { topicHistory, topicHistoryLoaded } = useTopicVersionHistory(topicId);
+  const { topicHistory, topicHistoryLoaded, getTopicHistory, pagination } = useTopicVersionHistory({
+    id: topicId,
+    page: 1,
+    limit: 6,
+  });
 
   const application = applicationsByNamespace[applicationNamespace];
 
@@ -34,6 +38,10 @@ export const useTopicVersionHistoryEffects = () => {
     });
   };
 
+  const handlePageChange = (newPage: number) => {
+    getTopicHistory({ page: newPage });
+  };
+
   return {
     applicationNamespace,
     topicId,
@@ -41,5 +49,7 @@ export const useTopicVersionHistoryEffects = () => {
     topicHistoryLoaded,
     loading,
     openTopicDetails,
+    handlePageChange,
+    pagination,
   };
 };

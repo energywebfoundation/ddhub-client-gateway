@@ -13,12 +13,16 @@ import { Span } from 'nestjs-otel';
 import {
   ChannelEntity,
   ChannelWrapperRepository,
+  TopicEntity,
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
 import { TopicNotFoundException } from '../exceptions/topic-not-found.exception';
 import {
   DdhubTopicsService,
+  SchemaType,
   Topic,
 } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
+import { ChannelInvalidTopicException } from '../exceptions/channel-invalid-topic.exception';
+import { TopicService } from '../../topic/service/topic.service';
 
 @Injectable()
 export class ChannelService {
@@ -27,8 +31,9 @@ export class ChannelService {
   constructor(
     protected readonly wrapperRepository: ChannelWrapperRepository,
     protected readonly ddhubTopicsService: DdhubTopicsService,
+    protected readonly topicsService: TopicService,
     protected readonly commandBus: CommandBus
-  ) {}
+  ) { }
 
   @Span('channels_getChannels')
   public async getChannels(): Promise<ChannelEntity[]> {
@@ -50,6 +55,8 @@ export class ChannelService {
     const topicsWithIds: ChannelTopic[] = await this.getTopicsWithIds(
       payload.conditions.topics
     );
+
+    await this.validateTopics(topicsWithIds, payload.type);
 
     if (payload.conditions.topics.length && !topicsWithIds.length) {
       throw new TopicNotFoundException();
@@ -155,6 +162,8 @@ export class ChannelService {
       dto.conditions.topics
     );
 
+    await this.validateTopics(topicsWithIds, channel.type);
+
     channel.payloadEncryption =
       dto.payloadEncryption ?? channel.payloadEncryption;
 
@@ -168,6 +177,25 @@ export class ChannelService {
     await this.wrapperRepository.channelRepository.save(channel);
 
     await this.commandBus.execute(new RefreshChannelCacheDataCommand(fqcn));
+  }
+
+  @Span('channels_validateTopic')
+  protected async validateTopics(
+    topics: ChannelTopic[],
+    channelType: ChannelType
+  ): Promise<void> {
+    const textSchemaTypes: SchemaType[] = [SchemaType.JSD7, SchemaType.XML];
+    for (const topic of topics) {
+      if ([ChannelType.PUB, ChannelType.SUB].includes(channelType)) {
+        if (!textSchemaTypes.includes(topic.schemaType as SchemaType)) {
+          throw new ChannelInvalidTopicException(topic.topicId);
+        }
+      } else {
+        if (textSchemaTypes.includes(topic.schemaType as SchemaType)) {
+          throw new ChannelInvalidTopicException(topic.topicId);
+        }
+      }
+    }
   }
 
   @Span('channels_getTopicsWithIds')
@@ -193,12 +221,13 @@ export class ChannelService {
         return [];
       }
 
-      const { id }: Topic = receivedTopics.records[0];
+      const { id, schemaType }: Topic = receivedTopics.records[0];
 
       topicsToReturn.push({
         topicName,
         owner,
         topicId: id,
+        schemaType: schemaType
       });
     }
 
