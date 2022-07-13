@@ -4,7 +4,8 @@ import { alpha } from '@mui/material/styles';
 export const useStyles = makeStyles()((theme) => ({
   card: {
     padding: '32px 21px 24px 21px',
-    boxShadow: 'none'
+    boxShadow: 'none',
+    height: 'auto'
   },
   mailIcon: {
     stroke: theme.palette.secondary.main,

@@ -17,4 +17,14 @@ export class ApplicationsService {
         applications.filter(({ roles }) => roles.includes(roleName))
       );
   }
+
+  public async getApplicationsByNamespace(
+    namespace: string
+  ): Promise<ApplicationEntity[]> {
+    return this.applicationsWrapper.repository.find({
+      where: {
+        namespace,
+      },
+    });
+  }
 }

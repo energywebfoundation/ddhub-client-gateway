@@ -30,6 +30,7 @@ export const Search = memo((props: SearchProps) => {
         </Typography>
       </InputLabel>
       <TextField
+        autoComplete='off'
         fullWidth
         type="text"
         margin="normal"

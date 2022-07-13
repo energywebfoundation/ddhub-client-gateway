@@ -9,7 +9,7 @@ export const useStyles = makeStyles()((theme) => ({
   },
   paper: {
     maxWidth: 820,
-    minHeight: 510,
+    minHeight: 541,
     padding: '37px 27px 27px 39px',
     borderRadius: 0,
   },
@@ -58,9 +58,23 @@ export const useStyles = makeStyles()((theme) => ({
     color: theme.palette.grey[400],
     fontFamily: theme.typography.body2.fontFamily,
     maxWidth: 224,
+    alignSelf: 'center',
   },
   divider: {
     marginBottom: 27,
     borderBottom: `1px solid ${lighten(theme.palette.background.paper, 0.07)}`,
+  },
+  encryptionValue: {
+    fontSize: 14,
+    lineHeight: '21px',
+    fontWeight: 400,
+    color: theme.palette.common.white,
+    marginLeft: 25,
+  },
+  iconCheck: {
+    stroke: theme.palette.success.main,
+    width: 21,
+    height: 21,
+    marginTop: 3,
   },
 }));

@@ -38,6 +38,7 @@ export const SelectRegular: FC<SelectRegularProps> = ({
     <Box {...field.formInputsWrapperProps} flexShrink={0}>
       <InputLabel className={classes.label}>{field.label ?? ''}</InputLabel>
       <TextField
+        autoComplete='off'
         select
         fullWidth
         name={`${field.name}`}

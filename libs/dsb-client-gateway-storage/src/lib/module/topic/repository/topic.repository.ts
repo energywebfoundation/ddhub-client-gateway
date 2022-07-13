@@ -8,7 +8,7 @@ export class TopicRepository extends Repository<TopicEntity> {
     name: string,
     owner: string,
     page: number
-  ): Promise<[TopicEntity[], number]> {
+  ): Promise<TopicEntity[]> {
     const query = this.createQueryBuilder('t');
     query.where('t.name like :name', { name: `%${name}%` });
     query
@@ -18,7 +18,21 @@ export class TopicRepository extends Repository<TopicEntity> {
     if (owner) {
       query.andWhere('t.owner = :owner', { owner: owner });
     }
-    return query.getManyAndCount();
+    return query.getMany();
+  }
+
+  public async getTopicsCountSearch(
+    name: string,
+    owner: string,
+  ): Promise<number> {
+    const query = this.createQueryBuilder('t');
+    query.where('t.name like :name', { name: `%${name}%` });
+    query
+      .groupBy('t.id')
+    if (owner) {
+      query.andWhere('t.owner = :owner', { owner: owner });
+    }
+    return (await query.getRawMany()).length;
   }
 
   public async getCountOfLatest(
@@ -42,13 +56,32 @@ export class TopicRepository extends Repository<TopicEntity> {
     return 0;
   }
 
+  public async getOne(
+    name: string,
+    owner: string
+  ): Promise<TopicEntity | null> {
+    const query: TopicEntity[] = await this.getLatest(
+      1,
+      name,
+      owner,
+      1,
+      undefined
+    );
+
+    if (!query.length) {
+      return null;
+    }
+
+    return query[0];
+  }
+
   public async getLatest(
     limit: number,
     name: string,
     owner: string,
     page: number,
     tags: string[]
-  ): Promise<any[]> {
+  ): Promise<TopicEntity[]> {
     // @TODO - type
     const query = this.getLatestVersionsQuery(owner, name, tags);
 
@@ -64,6 +97,7 @@ export class TopicRepository extends Repository<TopicEntity> {
         schemaType: rawEntity.schemaType,
         tags: JSON.parse(rawEntity.tags),
         owner: rawEntity.owner,
+        schema: JSON.parse(rawEntity.schema),
         id: rawEntity.id,
         version: rawEntity.version,
       };

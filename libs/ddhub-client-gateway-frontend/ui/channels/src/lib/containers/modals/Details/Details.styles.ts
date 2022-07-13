@@ -102,9 +102,4 @@ export const useStyles = makeStyles()((theme) => ({
     width: 21,
     height: 21,
   },
-  iconCross: {
-    stroke: theme.palette.error.main,
-    width: 21,
-    height: 21,
-  }
 }));

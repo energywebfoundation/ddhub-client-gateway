@@ -67,8 +67,8 @@ export function makeServer({ environment = 'development' }) {
         return getTopicsControllerGetTopicsSearchMock(request.queryParams);
       });
 
-      this.get('/topics/:id/versions', () => {
-        return getTopicsControllerGetTopicsHistoryByIdMock();
+      this.get('/topics/:id/versions', (_schema, request) => {
+        return getTopicsControllerGetTopicsHistoryByIdMock(request.queryParams);
       });
 
       this.put('/topics/:id', (_schema, request) => {
