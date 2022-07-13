@@ -14,6 +14,7 @@ import { TActionButtonsProps } from "./ActionButtons/ActionButtons";
 import { ICreateChannel } from "../models/create-channel.interface";
 import { ChannelType } from "../../../models/channel-type.enum";
 import { ConnectionType } from "./Details/models/connection-type.enum";
+import { pick } from 'lodash';
 
 type TGetActionButtonsProps = TActionButtonsProps['nextClickButtonProps'] & {
   canGoBack: boolean;
@@ -93,12 +94,14 @@ export const useCreateChannelEffects = () => {
   };
 
   const setTopics = (data: Topic[]) => {
+    const topicsData = data.map(topic => pick(topic, ['owner', 'topicName']));
+
     setActiveStep(activeStep + 1);
     setChannelValues({
       ...channelValues,
       conditions: {
         ...channelValues.conditions,
-        topics: data,
+        topics: topicsData,
       },
     });
   };
