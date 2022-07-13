@@ -10,8 +10,8 @@ import {
 } from '@dsb-client-gateway/ddhub-client-gateway-utils';
 import { DdhubLoginService } from './ddhub-login.service';
 import { DsbClientGatewayErrors } from '@dsb-client-gateway/dsb-client-gateway-errors';
-import { TlsAgentService } from './tls-agent.service';
 import { MessageBrokerException } from '../exceptions';
+import { TlsAgentService } from '@dsb-client-gateway/ddhub-client-gateway-tls-agent';
 
 export abstract class DdhubBaseService {
   protected constructor(
