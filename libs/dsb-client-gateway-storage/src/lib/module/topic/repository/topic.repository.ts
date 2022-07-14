@@ -10,9 +10,10 @@ export class TopicRepository extends Repository<TopicEntity> {
     page: number
   ): Promise<TopicEntity[]> {
     const query = this.createQueryBuilder('t');
+    query.select('t.*');
+    query.distinctOn(['t.id']);
     query.where('t.name like :name', { name: `%${name}%` });
     query
-      .groupBy('t.id')
       .limit(limit)
       .offset(limit * (page - 1));
     if (owner) {
@@ -26,9 +27,9 @@ export class TopicRepository extends Repository<TopicEntity> {
     owner: string,
   ): Promise<number> {
     const query = this.createQueryBuilder('t');
+    query.select('t.*');
+    query.distinctOn(['t.id']);
     query.where('t.name like :name', { name: `%${name}%` });
-    query
-      .groupBy('t.id')
     if (owner) {
       query.andWhere('t.owner = :owner', { owner: owner });
     }
@@ -109,42 +110,33 @@ export class TopicRepository extends Repository<TopicEntity> {
     name: string,
     tags: string[]
   ): SelectQueryBuilder<TopicEntity> {
-    const query = this.createQueryBuilder();
+    const qb = this.createQueryBuilder("t");
 
-    query.select('e.*');
+    qb.select('t.*')
+    qb.distinctOn(['id'])
+    if (owner) {
+      qb.where('owner = :owner', { owner });
+    }
 
-    query.from((qb) => {
-      qb.from(TopicEntity, 't');
+    if (name) {
+      qb.andWhere('name = :name', { name });
+    }
 
-      if (owner) {
-        qb.where('owner = :owner', { owner });
-      }
+    if (tags && tags.length) {
+      let tagQueryString = '(';
 
-      if (name) {
-        qb.andWhere('name = :name', { name });
-      }
+      tags.forEach((tag, index) => {
+        if (index === 0) {
+          tagQueryString += ` '"' || tags || '"' LIKE '%${tag}%' `;
 
-      if (tags && tags.length) {
-        let tagQueryString = '(';
+          return;
+        }
 
-        tags.forEach((tag, index) => {
-          if (index === 0) {
-            tagQueryString += ` '"' || tags || '"' LIKE '%${tag}%' `;
+        tagQueryString += ` OR '"' || tags || '"' LIKE '%${tag}%' `;
+      });
 
-            return;
-          }
-
-          tagQueryString += ` OR '"' || tags || '"' LIKE '%${tag}%' `;
-        });
-
-        qb.andWhere(tagQueryString + ')');
-      }
-
-      return qb;
-    }, 'e');
-
-    query.groupBy('e.name').addGroupBy('e.owner');
-
-    return query;
+      qb.andWhere(tagQueryString + ')');
+    }
+    return qb;
   }
 }
