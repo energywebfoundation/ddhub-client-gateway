@@ -1,6 +1,6 @@
 module.exports = {
     type: 'postgres',
-    database: process.env.DB_NAME,
+    url: process.env.DB_NAME,
     migrationsDir: 'migrations-build',
     migrations: ['migrations-build/*.js'],
   };
