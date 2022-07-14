@@ -21,7 +21,7 @@ export class MessageBrokerUnauthrizedException extends BaseException {
         errorCode,
         path,
       },
-      HttpStatus.UNAUTHORIZED
+      HttpStatus.FORBIDDEN
     );
   }
 }

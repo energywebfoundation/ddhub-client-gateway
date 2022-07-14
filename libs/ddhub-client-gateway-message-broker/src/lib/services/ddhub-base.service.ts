@@ -103,7 +103,7 @@ export abstract class DdhubBaseService {
     }
 
     if (
-      e.response.data.returnCode && status === HttpStatus.UNAUTHORIZED
+      e.response.data.returnCode && status === HttpStatus.FORBIDDEN
     ) {
       this.logger.error(
         'Request stopped because of stopOnResponseCodes rule',
