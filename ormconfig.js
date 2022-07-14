@@ -1,7 +1,6 @@
 module.exports = {
-    type: 'better-sqlite3',
+    type: 'postgres',
     database: process.env.DB_NAME,
     migrationsDir: 'migrations-build',
     migrations: ['migrations-build/*.js'],
   };
-  
