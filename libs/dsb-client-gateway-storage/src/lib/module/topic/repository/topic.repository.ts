@@ -19,6 +19,7 @@ export class TopicRepository extends Repository<TopicEntity> {
     if (owner) {
       query.andWhere('t.owner = :owner', { owner: owner });
     }
+    query.orderBy("t.id,t.version", "DESC");
     return query.getMany();
   }
 
@@ -33,6 +34,7 @@ export class TopicRepository extends Repository<TopicEntity> {
     if (owner) {
       query.andWhere('t.owner = :owner', { owner: owner });
     }
+    query.orderBy("t.id,t.version", "DESC");
     return (await query.getRawMany()).length;
   }
 
@@ -137,6 +139,7 @@ export class TopicRepository extends Repository<TopicEntity> {
 
       qb.andWhere(tagQueryString + ')');
     }
+    qb.orderBy("id,version", "DESC");
     return qb;
   }
 }
