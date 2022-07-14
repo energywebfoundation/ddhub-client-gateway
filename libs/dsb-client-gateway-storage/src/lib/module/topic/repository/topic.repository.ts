@@ -19,21 +19,33 @@ export class TopicRepository extends Repository<TopicEntity> {
     if (owner) {
       query.andWhere('t.owner = :owner', { owner: owner });
     }
-    return query.getMany();
+    return query.getRawMany();
   }
 
   public async getTopicsCountSearch(
     name: string,
     owner: string,
   ): Promise<number> {
-    const query = this.createQueryBuilder('t');
-    query.select('t.*');
-    query.distinctOn(['t.id']);
-    query.where('t.name like :name', { name: `%${name}%` });
+    const subQuery = this.createQueryBuilder('t');
+    subQuery.select('t.*');
+    subQuery.distinctOn(['t.id']);
+    subQuery.where('t.name like :name', { name: `%${name}%` });
     if (owner) {
-      query.andWhere('t.owner = :owner', { owner: owner });
+      subQuery.andWhere('t.owner = :owner', { owner: owner });
     }
-    return (await query.getRawMany()).length;
+
+    const [query, params] = subQuery.getQueryAndParameters();
+
+    const result = await this.query(
+      `SELECT COUNT(*) as count FROM (${query}) t`,
+      params
+    );
+
+    if (Array.isArray(result) && result.length) {
+      return +result[0].count;
+    }
+
+    return 0;
   }
 
   public async getCountOfLatest(
@@ -51,7 +63,7 @@ export class TopicRepository extends Repository<TopicEntity> {
     );
 
     if (Array.isArray(result) && result.length) {
-      return result[0].count;
+      return +result[0].count;
     }
 
     return 0;
