@@ -102,11 +102,9 @@ export abstract class DdhubBaseService {
       );
     }
 
-    if (
-      e.response.data.returnCode && status === HttpStatus.FORBIDDEN
-    ) {
+    if (e.response.data.returnCode && status === HttpStatus.FORBIDDEN) {
       this.logger.error(
-        'Request stopped because of stopOnResponseCodes rule',
+        'Request stopped because resource forbidden',
         e.response.data.returnCode,
         defaults.stopOnResponseCodes
       );
