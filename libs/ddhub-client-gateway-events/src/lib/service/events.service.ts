@@ -15,12 +15,14 @@ import { CronJob } from 'cron';
 import { SchedulerRegistry } from '@nestjs/schedule';
 import { ReloginCommand } from '../../../../ddhub-client-gateway-message-broker/src/lib/command/relogin.command';
 import { EnrolmentIdentityChangedCommand } from '../command/enrolment-identity-changed.command';
+import { CertificateChangedCommand } from '@dsb-client-gateway/ddhub-client-gateway-tls-agent';
 
 @Injectable()
 export class EventsService implements OnApplicationBootstrap {
   protected readonly acknowledgedEvents: Record<Events, number> = {
     [Events.PRIVATE_KEY_CHANGED]: undefined,
     [Events.ROLES_CHANGE]: undefined,
+    [Events.CERTIFICATE_CHANGED]: undefined,
   };
   protected readonly logger = new Logger(EventsService.name);
   protected readonly workerId = uuidv4();
@@ -97,7 +99,7 @@ export class EventsService implements OnApplicationBootstrap {
     }
   }
 
-  protected async emitEvent(eventType: Events): Promise<void> {
+  public async emitEvent(eventType: Events): Promise<void> {
     switch (eventType) {
       case Events.PRIVATE_KEY_CHANGED:
         await this.commandBus.execute(
@@ -110,6 +112,12 @@ export class EventsService implements OnApplicationBootstrap {
         return;
       case Events.ROLES_CHANGE:
         await this.commandBus.execute(new ReloginCommand());
+        return;
+      case Events.CERTIFICATE_CHANGED:
+        await this.commandBus.execute(new CertificateChangedCommand());
+        await this.commandBus.execute(
+          new SecretChangeCommand(SecretType.CERTIFICATE)
+        );
         return;
       default:
         this.logger.error(`unknown event ${eventType}`);

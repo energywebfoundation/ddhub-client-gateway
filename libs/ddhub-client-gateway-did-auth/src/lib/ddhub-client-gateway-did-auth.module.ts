@@ -5,6 +5,7 @@ import { SecretsEngineModule } from '@dsb-client-gateway/dsb-client-gateway-secr
 import { DidAuthApiService, DidAuthService } from './service';
 import { DdhubClientGatewayUtilsModule } from '@dsb-client-gateway/ddhub-client-gateway-utils';
 import { CqrsModule } from '@nestjs/cqrs';
+import { DdhubClientGatewayTlsAgentModule } from '@dsb-client-gateway/ddhub-client-gateway-tls-agent';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { CqrsModule } from '@nestjs/cqrs';
       inject: [ConfigService],
     }),
     SecretsEngineModule,
+    DdhubClientGatewayTlsAgentModule,
   ],
   providers: [DidAuthService, DidAuthApiService],
   exports: [DidAuthService],
