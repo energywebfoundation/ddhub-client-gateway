@@ -132,17 +132,37 @@ export class IamService {
 
   @Span('iam_setup')
   public async setup(privateKey: string) {
-    this.logger.log('Initializing IAM connection');
+    await promiseRetry(
+      async (retryFn, attempt) => {
+        try {
+          this.logger.log(
+            `attempting to initialize IAM connection, attempt ${attempt}`
+          );
 
-    const { cacheClient, didRegistry, signerService, claimsService } =
-      await this.iamFactoryService.initialize(privateKey, this.configService);
+          this.logger.log('Initializing IAM connection');
 
-    this.cacheClient = cacheClient;
-    this.didRegistry = didRegistry;
-    this.signerService = signerService;
-    this.claimsService = claimsService;
+          const { cacheClient, didRegistry, signerService, claimsService } =
+            await this.iamFactoryService.initialize(
+              privateKey,
+              this.configService
+            );
 
-    this.initialized = true;
+          this.cacheClient = cacheClient;
+          this.didRegistry = didRegistry;
+          this.signerService = signerService;
+          this.claimsService = claimsService;
+
+          this.initialized = true;
+        } catch (e) {
+          this.logger.error('IAM init failed', e);
+
+          await retryFn(e);
+        }
+      },
+      {
+        retries: 20,
+      }
+    );
   }
 
   public isInitialized(): boolean {

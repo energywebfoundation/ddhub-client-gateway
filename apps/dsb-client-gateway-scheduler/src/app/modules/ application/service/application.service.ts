@@ -8,16 +8,17 @@ import {
 import {
   ApplicationDTO,
   IamService,
+  InitIamCommand,
 } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
 import { CronJob } from 'cron';
 import { Span } from 'nestjs-otel';
 import { SchedulerRegistry } from '@nestjs/schedule';
 import {
   DdhubTopicsService,
-  Topic,
   TopicCountDto,
 } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
 import { ConfigService } from '@nestjs/config';
+import { CommandBus } from '@nestjs/cqrs';
 
 @Injectable()
 export class ApplicationService implements OnApplicationBootstrap {
@@ -29,7 +30,8 @@ export class ApplicationService implements OnApplicationBootstrap {
     protected readonly applicationWrapper: ApplicationWrapperRepository,
     protected readonly schedulerRegistry: SchedulerRegistry,
     protected readonly ddhubTopicService: DdhubTopicsService,
-    protected readonly configService: ConfigService
+    protected readonly configService: ConfigService,
+    protected readonly commandBus: CommandBus
   ) {}
 
   public async onApplicationBootstrap(): Promise<void> {
@@ -67,7 +69,9 @@ export class ApplicationService implements OnApplicationBootstrap {
       const isInitialized: boolean = this.iamService.isInitialized();
 
       if (!isInitialized) {
-        this.logger.error(`IAM is not initialized. Please setup private key`);
+        this.logger.error(`IAM is not initialized. Attempting to init IAM`);
+
+        await this.commandBus.execute(new InitIamCommand());
 
         return;
       }
