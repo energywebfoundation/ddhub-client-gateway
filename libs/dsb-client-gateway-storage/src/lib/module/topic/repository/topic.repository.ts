@@ -20,7 +20,18 @@ export class TopicRepository extends Repository<TopicEntity> {
       query.andWhere('t.owner = :owner', { owner: owner });
     }
     query.orderBy("t.id,t.version", "DESC");
-    return query.getMany();
+    const result = await query.execute();
+    return result.map((rawEntity) => {
+      return {
+        name: rawEntity.name,
+        schemaType: rawEntity.schemaType,
+        tags: JSON.parse(rawEntity.tags),
+        owner: rawEntity.owner,
+        schema: JSON.parse(rawEntity.schema),
+        id: rawEntity.id,
+        version: rawEntity.version,
+      };
+    });
   }
 
   public async getTopicsCountSearch(
