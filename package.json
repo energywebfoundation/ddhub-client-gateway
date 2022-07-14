@@ -7,9 +7,6 @@
     "npm": ">=8.5.0"
   },
   "scripts": {
-    "migrations:build": "rimraf migrations-build && tsc -p tsconfig.migrations.json",
-    "migrations:run": "npm run typeorm -- migration:run",
-    "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/.bin/typeorm",
     "generate:envs": "npm run generate:api:envs && npm run generate:scheduler:envs",
     "generate:api:envs": "npm run build:api:envs && node dist/apps/dsb-client-gateway-api-envs/main.js",
     "generate:scheduler:envs": "npm run build:scheduler:envs && node dist/apps/dsb-client-gateway-scheduler-envs/main.js",
@@ -76,6 +73,7 @@
     "@opentelemetry/sdk-trace-base": "^1.0.1",
     "@opentelemetry/tracing": "^0.24.0",
     "@sentry/nextjs": "^6.17.9",
+    "@types/luxon": "^2.3.2",
     "ajv": "^8.11.0",
     "ajv-formats": "^2.1.1",
     "babel-plugin-styled-components": "^2.0.2",
@@ -94,6 +92,7 @@
     "jest-cucumber": "^3.0.1",
     "json2md": "^1.12.0",
     "lokijs": "^1.5.12",
+    "luxon": "^2.4.0",
     "match-sorter": "^6.3.1",
     "moment": "^2.29.1",
     "multer": "^1.4.4",
@@ -103,6 +102,7 @@
     "next": "12.0.7",
     "node-vault": "^0.9.22",
     "nprogress": "^0.2.0",
+    "pg": "^8.7.3",
     "promise-retry": "^2.0.1",
     "react": "17.0.2",
     "react-copy-to-clipboard": "^5.1.0",

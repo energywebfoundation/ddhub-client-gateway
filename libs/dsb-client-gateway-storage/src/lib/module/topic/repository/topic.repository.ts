@@ -8,17 +8,32 @@ export class TopicRepository extends Repository<TopicEntity> {
     name: string,
     owner: string,
     page: number
-  ): Promise<[TopicEntity[], number]> {
+  ): Promise<TopicEntity[]> {
     const query = this.createQueryBuilder('t');
+    query.select('t.*');
+    query.distinctOn(['t.id']);
     query.where('t.name like :name', { name: `%${name}%` });
     query
-      .groupBy('t.id')
       .limit(limit)
       .offset(limit * (page - 1));
     if (owner) {
       query.andWhere('t.owner = :owner', { owner: owner });
     }
-    return query.getManyAndCount();
+    return query.getMany();
+  }
+
+  public async getTopicsCountSearch(
+    name: string,
+    owner: string,
+  ): Promise<number> {
+    const query = this.createQueryBuilder('t');
+    query.select('t.*');
+    query.distinctOn(['t.id']);
+    query.where('t.name like :name', { name: `%${name}%` });
+    if (owner) {
+      query.andWhere('t.owner = :owner', { owner: owner });
+    }
+    return (await query.getRawMany()).length;
   }
 
   public async getCountOfLatest(
@@ -83,6 +98,7 @@ export class TopicRepository extends Repository<TopicEntity> {
         schemaType: rawEntity.schemaType,
         tags: JSON.parse(rawEntity.tags),
         owner: rawEntity.owner,
+        schema: JSON.parse(rawEntity.schema),
         id: rawEntity.id,
         version: rawEntity.version,
       };
@@ -94,42 +110,33 @@ export class TopicRepository extends Repository<TopicEntity> {
     name: string,
     tags: string[]
   ): SelectQueryBuilder<TopicEntity> {
-    const query = this.createQueryBuilder();
+    const qb = this.createQueryBuilder("t");
 
-    query.select('e.*');
+    qb.select('t.*')
+    qb.distinctOn(['id'])
+    if (owner) {
+      qb.where('owner = :owner', { owner });
+    }
 
-    query.from((qb) => {
-      qb.from(TopicEntity, 't');
+    if (name) {
+      qb.andWhere('name = :name', { name });
+    }
 
-      if (owner) {
-        qb.where('owner = :owner', { owner });
-      }
+    if (tags && tags.length) {
+      let tagQueryString = '(';
 
-      if (name) {
-        qb.andWhere('name = :name', { name });
-      }
+      tags.forEach((tag, index) => {
+        if (index === 0) {
+          tagQueryString += ` '"' || tags || '"' LIKE '%${tag}%' `;
 
-      if (tags && tags.length) {
-        let tagQueryString = '(';
+          return;
+        }
 
-        tags.forEach((tag, index) => {
-          if (index === 0) {
-            tagQueryString += ` '"' || tags || '"' LIKE '%${tag}%' `;
+        tagQueryString += ` OR '"' || tags || '"' LIKE '%${tag}%' `;
+      });
 
-            return;
-          }
-
-          tagQueryString += ` OR '"' || tags || '"' LIKE '%${tag}%' `;
-        });
-
-        qb.andWhere(tagQueryString + ')');
-      }
-
-      return qb;
-    }, 'e');
-
-    query.groupBy('e.name').addGroupBy('e.owner');
-
-    return query;
+      qb.andWhere(tagQueryString + ')');
+    }
+    return qb;
   }
 }
