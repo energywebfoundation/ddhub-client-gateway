@@ -90,7 +90,7 @@ export class TopicService {
         namespace: data.owner,
       },
       {
-        topicsCount: () => 'topicsCount + 1',
+        topicsCount: () => '"topicsCount" + 1',
       }
     );
 
@@ -171,7 +171,7 @@ export class TopicService {
           namespace: data.owner,
         },
         {
-          topicsCount: () => 'topicsCount - 1',
+          topicsCount: () => '"topicsCount" - 1',
         }
       );
     }
