@@ -1,5 +1,15 @@
 version: '3'
 services:
+  db:
+    image: postgres:14.1-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=ddhub
+      - POSTGRES_PASSWORD=ddhub
+    ports:
+      - '5432:5432'
+    volumes:
+      - db:/var/lib/postgresql/data
   vault_dev:
     image: hashicorp/vault:latest
     restart: always
@@ -43,3 +53,7 @@ services:
     depends_on:
       - jaeger
       - zipkin
+
+volumes:
+  db:
+    driver: local

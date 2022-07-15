@@ -3,7 +3,7 @@ import { DdhubBaseService } from './ddhub-base.service';
 import { HttpService } from '@nestjs/axios';
 import { RetryConfigService } from '@dsb-client-gateway/ddhub-client-gateway-utils';
 import { DidAuthService } from '@dsb-client-gateway/ddhub-client-gateway-did-auth';
-import { TlsAgentService } from './tls-agent.service';
+import { TlsAgentService } from '@dsb-client-gateway/ddhub-client-gateway-tls-agent';
 import { Span } from 'nestjs-otel';
 import { DdhubLoginService } from './ddhub-login.service';
 import { OperationOptions } from 'retry';

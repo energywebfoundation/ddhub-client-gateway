@@ -1,0 +1,22 @@
+{
+  "root": "libs/ddhub-client-gateway-tls-agent",
+  "sourceRoot": "libs/ddhub-client-gateway-tls-agent/src",
+  "targets": {
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/ddhub-client-gateway-tls-agent/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/libs/ddhub-client-gateway-tls-agent"],
+      "options": {
+        "jestConfig": "libs/ddhub-client-gateway-tls-agent/jest.config.js",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": []
+}

@@ -16,8 +16,12 @@ export const BASIC_ENVS = Joi.object({
     ),
   MTLS_ENABLED: Joi.boolean().default(true).description('Should enable mTLS'),
   DB_NAME: Joi.string()
-    .default('local.db')
-    .description('SQLite database file name'),
+    .default('postgresql://ddhub:ddhub@localhost:5432/ddhub')
+    .description('Database connection string'),
+  DB_DRIVER: Joi.string()
+    .valid('postgres', 'better-sqlite3')
+    .default('postgres')
+    .description('Database driver'),
   CLIENT_ID: Joi.string().default('WS_CONSUMER').description('WS client id'),
   MAX_RETRIES: Joi.number()
     .positive()

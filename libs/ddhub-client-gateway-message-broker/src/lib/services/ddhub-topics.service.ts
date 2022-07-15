@@ -4,7 +4,6 @@ import { DdhubBaseService } from './ddhub-base.service';
 import { RetryConfigService } from '@dsb-client-gateway/ddhub-client-gateway-utils';
 import { Span } from 'nestjs-otel';
 import { DidAuthService } from '@dsb-client-gateway/ddhub-client-gateway-did-auth';
-import { TlsAgentService } from './tls-agent.service';
 import {
   DeleteTopicResponseDto,
   PaginatedData,
@@ -21,6 +20,7 @@ import {
 import * as qs from 'qs';
 import { DdhubLoginService } from './ddhub-login.service';
 import { MessageBrokerErrors } from '../ddhub-client-gateway-message-broker.const';
+import { TlsAgentService } from '@dsb-client-gateway/ddhub-client-gateway-tls-agent';
 
 @Injectable()
 export class DdhubTopicsService extends DdhubBaseService {

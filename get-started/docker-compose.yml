@@ -14,6 +14,44 @@ services:
     container_name: vault_demo
     entrypoint: "vault server -config=/vault/config/vault.json"
 
+  postgres:
+    image: postgres:14.1-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=ddhub
+      - POSTGRES_PASSWORD=password123
+      - POSTGRES_DB=ddhub
+    ports:
+      - '5432:5432'
+    volumes:
+      - ./data:/var/lib/postgresql/data
+
+  ddhub-gateway-migrationer:
+    image: aemocontainerregistry.azurecr.io/ddhub-client-gateway-backend:latest
+    container_name: ddhub-gateway-migrationer
+    depends_on:
+      - 'vault_demo'
+      - 'postgres'
+    command: "./node_modules/.bin/typeorm migrations:run"
+    environment:
+      NODE_ENV: test
+      DSB_BASE_URL: https://ddhub-demo.energyweb.org
+      CACHE_SERVER_URL: https://identitycache-staging.energyweb.org/v1
+      EVENT_SERVER_URL: https://identitycache-staging.energyweb.org
+      SECRETS_ENGINE: $SECRETS_ENGINE
+      VAULT_ENDPOINT: http://vault_demo:8200
+      VAULT_TOKEN: $VAULT_TOKEN
+      AWS_REGION: $AWS_REGION
+      AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
+      AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
+      AZURE_VAULT_URL: $AZURE_VAULT_URL
+      AZURE_CLIENT_SECRET: $AZURE_CLIENT_SECRET
+      AZURE_CLIENT_ID: $AZURE_CLIENT_ID
+      AZURE_TENANT_ID: $AZURE_TENANT_ID
+      DB_NAME: postgresql://ddhub:password123@postgres:5432/ddhub
+      PARENT_NAMESPACE: ddhub.apps.energyweb.iam.ewc
+      MTLS_ENABLED: false
+
   ddhub-gateway-UI:
     image: aemocontainerregistry.azurecr.io/ddhub-client-gateway-frontend:latest
     ports:
@@ -24,10 +62,10 @@ services:
     container_name: ddhub-gateway-api
     depends_on:
       - 'vault_demo'
+      - 'postgres'
+      - 'ddhub-gateway-migrationer'
     ports:
       - 3333:3333
-    volumes:
-      - ./data:/usr/app/data
     environment:
       NODE_ENV: test
       DSB_BASE_URL: https://ddhub-demo.energyweb.org
@@ -43,7 +81,7 @@ services:
       AZURE_CLIENT_SECRET: $AZURE_CLIENT_SECRET
       AZURE_CLIENT_ID: $AZURE_CLIENT_ID
       AZURE_TENANT_ID: $AZURE_TENANT_ID
-      DB_NAME: ./data/local.db
+      DB_NAME: postgresql://ddhub:password123@postgres:5432/ddhub 
       PARENT_NAMESPACE: ddhub.apps.energyweb.iam.ewc
       MTLS_ENABLED: false
       
@@ -52,8 +90,8 @@ services:
     container_name: ddhub-gateway-scheduler
     depends_on:
       - 'vault_demo'
-    volumes:
-      - ./data:/usr/app/data
+      - 'postgres'
+      - 'ddhub-gateway-migrationer'
     environment:
       NODE_ENV: test
       DSB_BASE_URL: https://ddhub-demo.energyweb.org
@@ -69,7 +107,7 @@ services:
       AZURE_CLIENT_SECRET: $AZURE_CLIENT_SECRET
       AZURE_CLIENT_ID: $AZURE_CLIENT_ID
       AZURE_TENANT_ID: $AZURE_TENANT_ID
-      DB_NAME: ./data/local.db
+      DB_NAME: postgresql://ddhub:password123@postgres:5432/ddhub 
       DID_AUTH_URL: https://ddhub-demo.energyweb.org
       DID_REGISTRY_ADDRESS: "0xc15d5a57a8eb0e1dcbe5d88b8f9a82017e5cc4af"
       PARENT_NAMESPACE: ddhub.apps.energyweb.iam.ewc

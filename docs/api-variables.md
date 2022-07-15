@@ -32,7 +32,8 @@
 | UPLOAD_FILES_DIR | string | ./upload | Directory where we should store temporary files for upload |  |  |
 | DOWNLOAD_FILES_DIR | string | ./download | Directory where we should store downloaded files for limited time |  |  |
 | MTLS_ENABLED | boolean | true | Should enable mTLS |  |  |
-| DB_NAME | string | local.db | SQLite database file name |  |  |
+| DB_NAME | string | postgresql://ddhub:ddhub@localhost:5432/ddhub | Database connection string |  |  |
+| DB_DRIVER | string | postgres | Database driver | postgres,better-sqlite3 |  |
 | CLIENT_ID | string | WS_CONSUMER | WS client id |  |  |
 | MAX_RETRIES | number | 3 | Specifies maximum amount of retries for vulnerable methods |  |  |
 | RETRY_FACTOR | number | 2 | Specifies retry factor (multiplier for timeout) for vulnerable methods |  |  |

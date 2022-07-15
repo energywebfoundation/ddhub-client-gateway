@@ -1,14 +1,25 @@
-import { AccountStatusEnum, checkAccountStatus } from "./check-account-status/check-account-status";
-import { getIdentityControllerGetQueryKey } from "@dsb-client-gateway/dsb-client-gateway-api-client";
-import { IdentityWithEnrolment, Role, RoleStatus } from "@ddhub-client-gateway/identity/models";
-import { routerConst } from "@ddhub-client-gateway-frontend/ui/utils";
-import { useRouter } from "next/router";
-import { useContext } from "react";
-import { UserDataContext } from "./UserDataContext";
-import { useQueryClient } from "react-query";
-import { RouteRestrictions } from "./config/route-restrictions.interface";
+import {
+  AccountStatusEnum,
+  checkAccountStatus,
+} from './check-account-status/CheckAccountStatus';
+import { getIdentityControllerGetQueryKey } from '@dsb-client-gateway/dsb-client-gateway-api-client';
+import {
+  IdentityWithEnrolment,
+  Role,
+  RoleStatus,
+} from '@ddhub-client-gateway/identity/models';
+import { routerConst } from '@ddhub-client-gateway-frontend/ui/utils';
+import { useRouter } from 'next/router';
+import { useContext } from 'react';
+import { UserDataContext } from './UserDataContext';
+import { useQueryClient } from 'react-query';
+import {
+  RouteRestrictions,
+  IndexableRouteRestrictions,
+} from './config/route-restrictions.interface';
+import { useCustomAlert } from '@ddhub-client-gateway-frontend/ui/core';
 
-export const routeRestrictions = new Map()
+export const routeRestrictions = new Map<string, string>()
   .set('topicManagement', routerConst.TopicManagement)
   .set('myAppsAndTopics', routerConst.ChannelApps)
   .set('channelManagement', routerConst.ChannelsManagement)
@@ -19,7 +30,7 @@ export const routeRestrictions = new Map()
 
 export const getRoutesToDisplay = (
   accountRoles: Role[],
-  restrictions: RouteRestrictions
+  restrictions: IndexableRouteRestrictions
 ): Set<string> => {
   if (!accountRoles) {
     return new Set();
@@ -45,13 +56,16 @@ export const getRoutesToDisplay = (
       )
     ) {
       return routeRestrictions.get(key);
+    } else {
+      return '';
     }
   });
 
-  return new Set(allowedRoutes);
+  return new Set(allowedRoutes.filter((value) => value !== '') as string[]);
 };
 
 export const useSetUserDataEffect = () => {
+  const Swal = useCustomAlert();
   const router = useRouter();
   const { userData, setUserData } = useContext(UserDataContext);
   const queryClient = useQueryClient();
@@ -61,23 +75,23 @@ export const useSetUserDataEffect = () => {
     routeRestrictions: RouteRestrictions = userData.routeRestrictions
   ) => {
     const redirect = async (status: AccountStatusEnum | RoleStatus) => {
-      if (status === RoleStatus.SYNCED) {
-        return router.push(routerConst.IntegrationAPIs);
-      } else {
+      if (status !== RoleStatus.SYNCED) {
         return router.push(routerConst.InitialPage);
       }
+      return;
     };
 
     const accountStatus = checkAccountStatus(res);
     if (res?.enrolment?.roles) {
       const displayedRoutes = getRoutesToDisplay(
         res.enrolment.roles,
-        routeRestrictions
+        routeRestrictions as unknown as IndexableRouteRestrictions
       );
 
       setUserData({
         ...userData,
         accountStatus,
+        roles: res.enrolment.roles,
         isChecking: false,
         routeRestrictions,
         displayedRoutes,
@@ -96,7 +110,7 @@ export const useSetUserDataEffect = () => {
     redirect(accountStatus).catch(console.error);
   };
 
-  const setDataOnError = (error: any) => {
+  const setDataOnError = (error: any, displayError = true) => {
     setUserData({
       ...userData,
       accountStatus: AccountStatusEnum.ErrorOccur,
@@ -104,6 +118,9 @@ export const useSetUserDataEffect = () => {
       errorMessage: error.message,
     });
     router.push(routerConst.InitialPage);
+    if (displayError) {
+      Swal.httpError(error);
+    }
   };
 
   const setIsChecking = (value: boolean) => {

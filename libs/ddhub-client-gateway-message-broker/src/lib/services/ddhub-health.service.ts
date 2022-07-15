@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { RetryConfigService } from '@dsb-client-gateway/ddhub-client-gateway-utils';
-import { TlsAgentService } from './tls-agent.service';
+import { TlsAgentService } from '@dsb-client-gateway/ddhub-client-gateway-tls-agent';
 import { DdhubBaseService } from './ddhub-base.service';
 import { DdhubLoginService } from './ddhub-login.service';
 

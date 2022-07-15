@@ -5,13 +5,13 @@ import { DdhubLoginService } from '../services';
 
 @CommandHandler(ReloginCommand)
 export class ReloginHandler implements ICommandHandler<ReloginCommand> {
-  protected readonly logger = new Logger();
+  protected readonly logger = new Logger(ReloginHandler.name);
 
   constructor(protected readonly ddhubLoginService: DdhubLoginService) {}
 
   public async execute(): Promise<void> {
     await this.ddhubLoginService.login().catch((e) => {
-      this.logger.error('failed during relogin', e);
+      this.logger.error('Failed to relogin', e);
     });
   }
 }

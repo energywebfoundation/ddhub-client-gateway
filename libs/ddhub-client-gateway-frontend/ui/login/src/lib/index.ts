@@ -1,4 +1,4 @@
 export * from './Login';
 export * from './UserDataContext';
-export * from './CheckAccountOnInit.effects';
+export * from './check-account-status/CheckAccountStatus.effects';
 export * from './SetUserData.effects';

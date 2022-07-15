@@ -13,7 +13,7 @@ export function LoginForm(props: LoginFormProps) {
   const { classes } = useStyles();
 
   return (
-    <form style={{ minWidth: 342 }}>
+    <form style={{ minWidth: 342 }} onSubmit={onSubmit}>
       <Box className={classes.inputWrapper}>
         <FormInput
           variant="outlined"

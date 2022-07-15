@@ -16,7 +16,7 @@ export const checkAccountStatus = (
   if (!res) {
     return AccountStatusEnum.NotSetPrivateKey;
   }
-  if (isBalanceToLow(res.balance)) {
+  if (isBalanceTooLow(res.balance)) {
     return AccountStatusEnum.InsufficientFund;
   }
 
@@ -51,6 +51,6 @@ export const checkAccountStatus = (
   return AccountStatusEnum.NotSetPrivateKey;
 };
 
-const isBalanceToLow = (balanceStatus: string): boolean => {
+const isBalanceTooLow = (balanceStatus: string): boolean => {
   return balanceStatus !== BalanceState.OK;
 };
