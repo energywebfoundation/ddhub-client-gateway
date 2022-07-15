@@ -54,5 +54,4 @@ local.db
 .next
 uploads
 certificate
-
 migrations-build

@@ -10,8 +10,9 @@ import {
 } from '@dsb-client-gateway/ddhub-client-gateway-utils';
 import { DdhubLoginService } from './ddhub-login.service';
 import { DsbClientGatewayErrors } from '@dsb-client-gateway/dsb-client-gateway-errors';
-import { TlsAgentService } from './tls-agent.service';
 import { MessageBrokerException } from '../exceptions';
+import { MessageBrokerUnauthrizedException } from '../exceptions/message-broker-unauthrized.exception';
+import { TlsAgentService } from '@dsb-client-gateway/ddhub-client-gateway-tls-agent';
 
 export abstract class DdhubBaseService {
   protected constructor(
@@ -19,7 +20,7 @@ export abstract class DdhubBaseService {
     protected readonly retryConfigService: RetryConfigService,
     protected readonly ddhubLoginService: DdhubLoginService,
     protected readonly tlsAgentService: TlsAgentService
-  ) {}
+  ) { }
 
   protected async request<T>(
     requestFn: () => Observable<AxiosResponse<T>>,
@@ -94,6 +95,21 @@ export abstract class DdhubBaseService {
       );
 
       throw new MessageBrokerException(
+        e.message,
+        DsbClientGatewayErrors.MB_ERROR,
+        e.response.data.returnCode,
+        e.request.path
+      );
+    }
+
+    if (e.response.data.returnCode && status === HttpStatus.FORBIDDEN) {
+      this.logger.error(
+        'Request stopped because resource forbidden',
+        e.response.data.returnCode,
+        defaults.stopOnResponseCodes
+      );
+
+      throw new MessageBrokerUnauthrizedException(
         e.message,
         DsbClientGatewayErrors.MB_ERROR,
         e.response.data.returnCode,
