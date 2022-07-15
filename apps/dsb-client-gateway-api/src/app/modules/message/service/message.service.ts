@@ -386,7 +386,7 @@ export class MessageService {
         messageLoggerContext.debug(`processing message ${message.messageId}`);
 
         const processedMessage: GetMessageResponse = await this.processMessage(
-          channel.payloadEncryption,
+          message.payloadEncryption,
           topic,
           message
         );
@@ -395,7 +395,10 @@ export class MessageService {
       })
     );
 
-    return getMessagesResponse;
+    return getMessagesResponse.sort((a, b) => {
+      if (a.timestampNanos < b.timestampNanos) return -1
+      return a.timestampNanos > b.timestampNanos ? 1 : 0
+    });
   }
 
   public async uploadMessage(
