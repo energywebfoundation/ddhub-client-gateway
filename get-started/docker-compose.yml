@@ -27,7 +27,7 @@ services:
       - ./data:/var/lib/postgresql/data
 
   ddhub-gateway-migrationer:
-    image: aemocontainerregistry.azurecr.io/ddhub-client-gateway-backend:latest
+    image: dupa6:latest
     container_name: ddhub-gateway-migrationer
     depends_on:
       - 'vault_demo'
@@ -50,7 +50,7 @@ services:
       AZURE_TENANT_ID: $AZURE_TENANT_ID
       DB_NAME: postgresql://ddhub:password123@postgres:5432/ddhub
       PARENT_NAMESPACE: ddhub.apps.energyweb.iam.ewc
-      MTLS_ENABLED: false
+      MTLS_ENABLED: "false"
 
   ddhub-gateway-UI:
     image: aemocontainerregistry.azurecr.io/ddhub-client-gateway-frontend:latest
@@ -81,10 +81,10 @@ services:
       AZURE_CLIENT_SECRET: $AZURE_CLIENT_SECRET
       AZURE_CLIENT_ID: $AZURE_CLIENT_ID
       AZURE_TENANT_ID: $AZURE_TENANT_ID
-      DB_NAME: postgresql://ddhub:password123@postgres:5432/ddhub 
+      DB_NAME: postgresql://ddhub:password123@postgres:5432/ddhub
       PARENT_NAMESPACE: ddhub.apps.energyweb.iam.ewc
-      MTLS_ENABLED: false
-      
+      MTLS_ENABLED: "false"
+
   ddhub-gateway-scheduler:
     image: aemocontainerregistry.azurecr.io/ddhub-client-gateway-scheduler:latest
     container_name: ddhub-gateway-scheduler
@@ -107,11 +107,11 @@ services:
       AZURE_CLIENT_SECRET: $AZURE_CLIENT_SECRET
       AZURE_CLIENT_ID: $AZURE_CLIENT_ID
       AZURE_TENANT_ID: $AZURE_TENANT_ID
-      DB_NAME: postgresql://ddhub:password123@postgres:5432/ddhub 
+      DB_NAME: postgresql://ddhub:password123@postgres:5432/ddhub
       DID_AUTH_URL: https://ddhub-demo.energyweb.org
       DID_REGISTRY_ADDRESS: "0xc15d5a57a8eb0e1dcbe5d88b8f9a82017e5cc4af"
       PARENT_NAMESPACE: ddhub.apps.energyweb.iam.ewc
-      MTLS_ENABLED: false
+      MTLS_ENABLED: "false"
 
   proxy-server:
     image: nginx:alpine
