@@ -19,7 +19,19 @@ export class TopicRepository extends Repository<TopicEntity> {
     if (owner) {
       query.andWhere('t.owner = :owner', { owner: owner });
     }
-    return query.getRawMany();
+    query.orderBy("t.id,t.version", "DESC");
+    const result = await query.execute();
+    return result.map((rawEntity) => {
+      return {
+        name: rawEntity.name,
+        schemaType: rawEntity.schemaType,
+        tags: JSON.parse(rawEntity.tags),
+        owner: rawEntity.owner,
+        schema: JSON.parse(rawEntity.schema),
+        id: rawEntity.id,
+        version: rawEntity.version,
+      };
+    });
   }
 
   public async getTopicsCountSearch(
@@ -149,6 +161,7 @@ export class TopicRepository extends Repository<TopicEntity> {
 
       qb.andWhere(tagQueryString + ')');
     }
+    qb.orderBy("id,version", "DESC");
     return qb;
   }
 }
