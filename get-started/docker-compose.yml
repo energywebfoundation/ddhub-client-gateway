@@ -25,13 +25,19 @@ services:
       - '5432:5432'
     volumes:
       - ./data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ddhub"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
   ddhub-gateway-migrationer:
-    image: dupa6:latest
+    image: aemocontainerregistry.azurecr.io/ddhub-client-gateway-backend:latest
     container_name: ddhub-gateway-migrationer
     depends_on:
-      - 'vault_demo'
-      - 'postgres'
+      postgres:
+        condition: service_healthy
     command: "./node_modules/.bin/typeorm migrations:run"
     environment:
       NODE_ENV: test
