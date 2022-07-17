@@ -115,15 +115,15 @@ export class MessageService {
 
     messageLoggerContext.debug(
       'attempting to encrypt payload, encryption enabled: ' +
-      channel.payloadEncryption
+        channel.payloadEncryption
     );
 
     const message = channel.payloadEncryption
       ? this.keyService.encryptMessage(
-        dto.payload,
-        randomKey,
-        EncryptedMessageType['UTF-8']
-      )
+          dto.payload,
+          randomKey,
+          EncryptedMessageType['UTF-8']
+        )
       : dto.payload;
 
     messageLoggerContext.debug('fetching private key');
@@ -451,7 +451,6 @@ export class MessageService {
         clientGatewayMessageId
       );
     } else {
-
       filePath = join(this.uploadPath, clientGatewayMessageId + this.ext);
 
       const stream = fs.createWriteStream(filePath);
@@ -524,7 +523,6 @@ export class MessageService {
         fileId,
         fileMetadata.signature
       );
-
     }
 
     if (!fileMetadata.encrypted) {
@@ -568,9 +566,8 @@ export class MessageService {
       !topic.schemaType ||
       !topic.version
     ) {
-      if (!topic) throw new TopicNotFoundException("");
-      else
-        throw new TopicNotFoundException(topic.id);
+      if (!topic) throw new TopicNotFoundException('');
+      else throw new TopicNotFoundException(topic.id);
     }
 
     const isTopicNotRelatedToChannel: boolean = this.checkTopicForChannel(
