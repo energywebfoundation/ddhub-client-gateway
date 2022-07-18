@@ -20,7 +20,7 @@ export const useTopicsEffects = (
 ) => {
   const { theme } = useStyles();
   const router = useRouter();
-  const [isSearch, setIsSearcb] = useState(false);
+  const [isSearch, setIsSearch] = useState(false);
 
   const { topics, topicsFetched, getTopics, pagination, topicsLoading, getTopicsBySearch } = useTopics({
     limit: 6,
@@ -113,7 +113,7 @@ export const useTopicsEffects = (
   };
 
   const handleSearchInput = (searchInput: string) => {
-    setIsSearcb(!!searchInput);
+    setIsSearch(!!searchInput);
     getTopicsBySearch({ keyword: searchInput });
   };
 
