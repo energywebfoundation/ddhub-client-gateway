@@ -4,22 +4,6 @@ export class init1655893804425 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
       '--\n' +
-        '-- PostgreSQL database dump\n' +
-        '--\n' +
-        '\n' +
-        '-- Dumped from database version 14.1\n' +
-        '-- Dumped by pg_dump version 14.4 (Ubuntu 14.4-1.pgdg20.04+1)\n' +
-        '\n' +
-        'SET statement_timeout = 0;\n' +
-        'SET lock_timeout = 0;\n' +
-        'SET idle_in_transaction_session_timeout = 0;\n' +
-        "SET client_encoding = 'UTF8';\n" +
-        'SET standard_conforming_strings = on;\n' +
-        "SELECT pg_catalog.set_config('search_path', '', false);\n" +
-        'SET check_function_bodies = false;\n' +
-        'SET xmloption = content;\n' +
-        'SET client_min_messages = warning;\n' +
-        'SET row_security = off;\n' +
         '\n' +
         '--\n' +
         '-- Name: uuid-ossp; Type: EXTENSION; Schema: -; Owner: -\n' +
@@ -33,12 +17,6 @@ export class init1655893804425 implements MigrationInterface {
         '--\n' +
         '\n' +
         'COMMENT ON EXTENSION "uuid-ossp" IS \'generate universally unique identifiers (UUIDs)\';\n' +
-        '\n' +
-        '\n' +
-        "SET default_tablespace = '';\n" +
-        '\n' +
-        'SET default_table_access_method = heap;\n' +
-        '\n' +
         '--\n' +
         '-- Name: applications; Type: TABLE; Schema: public; Owner: -\n' +
         '--\n' +

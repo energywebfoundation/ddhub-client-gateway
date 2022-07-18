@@ -73,8 +73,9 @@ export class ChannelEntity {
 
   @Column({
     default: true,
+    nullable: true,
   })
-  payloadEncryption: boolean;
+  payloadEncryption: boolean | null;
 
   @CreateDateColumn()
   createdDate!: Date;
