@@ -1,3 +1,7 @@
+export interface IndexableRouteRestrictions {
+  [key: string]: RouteRestriction;
+}
+
 export class RouteRestriction {
   allowedRoles: string[] = [];
 }
