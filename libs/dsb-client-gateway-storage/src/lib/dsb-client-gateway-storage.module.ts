@@ -31,12 +31,21 @@ const ENTITIES = [
   imports: [
     TypeOrmModule.forRootAsync({
       useFactory: async (configService: ConfigService) => {
-        return {
-          type: 'better-sqlite3',
-          database: configService.get<string>('DB_NAME', 'local.db'),
-          synchronize: true,
-          entities: ENTITIES,
-        };
+        if (configService.get('DB_DRIVER') === 'postgres') {
+          return {
+            type: 'postgres',
+            url: configService.get<string>('DB_NAME', 'local.db'),
+            synchronize: true,
+            entities: ENTITIES,
+          };
+        } else {
+          return {
+            type: 'better-sqlite3',
+            database: configService.get<string>('DB_NAME', 'local.db'),
+            synchronize: false,
+            entities: ENTITIES,
+          };
+        }
       },
       inject: [ConfigService],
     }),
