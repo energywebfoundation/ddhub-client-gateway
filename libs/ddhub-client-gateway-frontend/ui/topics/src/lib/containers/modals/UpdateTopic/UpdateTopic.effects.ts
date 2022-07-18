@@ -6,6 +6,7 @@ import {
   PostTopicDto,
   getTopicsControllerGetTopicsQueryKey,
   getTopicsControllerGetTopicsHistoryByIdQueryKey,
+  getTopicsControllerGetTopicsBySearchQueryKey,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import {
   useUpdateTopics,
@@ -32,7 +33,7 @@ const initialValues = {
 export const useUpdateTopicEffects = () => {
   const queryClient = useQueryClient();
   const {
-    updateTopic: { open, application, topic, canUpdateSchema },
+    updateTopic: { open, application, topic, canUpdateSchema, isSearch },
   } = useTopicsModalsStore();
   const dispatch = useTopicsModalsDispatch();
 
@@ -108,6 +109,8 @@ export const useUpdateTopicEffects = () => {
       queryClient.invalidateQueries(
         getTopicsControllerGetTopicsHistoryByIdQueryKey(topic.id)
       );
+    } else if (isSearch) {
+      queryClient.invalidateQueries(getTopicsControllerGetTopicsBySearchQueryKey());
     } else {
       queryClient.invalidateQueries(getTopicsControllerGetTopicsQueryKey());
     }
