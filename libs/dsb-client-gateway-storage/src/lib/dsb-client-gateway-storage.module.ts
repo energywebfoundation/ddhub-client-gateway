@@ -35,7 +35,7 @@ const ENTITIES = [
           return {
             type: 'postgres',
             url: configService.get<string>('DB_NAME', 'local.db'),
-            synchronize: false,
+            synchronize: true,
             entities: ENTITIES,
           };
         } else {

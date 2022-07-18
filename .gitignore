@@ -55,3 +55,4 @@ local.db
 uploads
 certificate
 migrations-build
+get-started/data

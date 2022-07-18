@@ -138,6 +138,8 @@ jobs:
         run: npm ci
       - name: Build
         run: nx build dsb-client-gateway-api --prod
+      - name: Build migrations
+        run: npm run migrations:build
 
       - name: 'Login via Azure CLI'
         uses: azure/login@v1

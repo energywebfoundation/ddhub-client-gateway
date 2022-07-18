@@ -73,7 +73,7 @@ export const getTopicsControllerGetTopicsMock = (queryParams: any) => ({
       count: 24,
       limit: Number(queryParams.limit),
       page: Number(queryParams.page),
-      records: [...Array(Number(queryParams.limit))].map(() => ({
+      records: [...Array(6)].map(() => ({
         id: faker.datatype.uuid(),
         name: faker.word.noun(),
         owner: faker.random.arrayElement([
