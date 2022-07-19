@@ -42,7 +42,6 @@ ddhub-client-gateway-api:
       # -- Enable basic auth. (Once enabled, associated secret is required, eg: "ddhub-client-gateway-api-secret")
       basic_auth_enabled: true
       node_env: test
-      db_name: ./data/local.db
       opentelemetry_enabled: false
       mtls_enabled: false
     scheduler:
