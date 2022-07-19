@@ -76,7 +76,7 @@ export class DdhubLoginService {
     try {
       await promiseRetry(async (retry) => {
         this.logger.debug('https agent');
-        this.logger.debug(this.tlsAgentService.get());
+        console.log(this.tlsAgentService.get());
 
         await this.tlsAgentService.create();
 
@@ -98,6 +98,7 @@ export class DdhubLoginService {
       this.logger.log('Init ext channel successful');
     } catch (e) {
       this.logger.error('Init ext channel failed', e);
+      console.error(e);
     }
   }
 }
