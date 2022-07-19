@@ -14,7 +14,6 @@ ddhub-client-gateway-api:
       # -- Sets the secret prefix in the secret engine.
       secret_prefix: "ddhubqa/"
       node_env: test
-      db_name: ./data/local.db
       opentelemetry_enabled: false
     scheduler:
       enabled: true
