@@ -5,5 +5,6 @@ module.exports = {
   migrations: ['migrations-build/*.js'],
   schema: 'public',
   synchronize: false,
-  migrationsRun: false,
+  migrationsRun: true,
+  migrationsTransactionMode: 'each',
 };

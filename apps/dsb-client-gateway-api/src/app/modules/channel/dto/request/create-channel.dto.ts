@@ -89,9 +89,11 @@ export class CreateChannelDto {
     description: 'Channel encryption',
     type: Boolean,
     example: true,
+    required: false,
   })
   @IsBoolean()
-  payloadEncryption: boolean;
+  @IsOptional()
+  payloadEncryption: boolean = null;
 
   @IsEnum(ChannelType)
   @ApiProperty({

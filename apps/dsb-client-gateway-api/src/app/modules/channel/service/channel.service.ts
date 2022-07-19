@@ -13,7 +13,6 @@ import { Span } from 'nestjs-otel';
 import {
   ChannelEntity,
   ChannelWrapperRepository,
-  TopicEntity,
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
 import { TopicNotFoundException } from '../exceptions/topic-not-found.exception';
 import {
@@ -23,6 +22,8 @@ import {
 } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
 import { ChannelInvalidTopicException } from '../exceptions/channel-invalid-topic.exception';
 import { TopicService } from '../../topic/service/topic.service';
+import { ChannelInvalidPayloadEncryptionException } from '../exceptions/channel-invalid-payload-encryption.exception';
+import { ChannelMissingPayloadEncryptionException } from '../exceptions/channel-missing-payload-encryption.exception';
 
 @Injectable()
 export class ChannelService {
@@ -33,7 +34,7 @@ export class ChannelService {
     protected readonly ddhubTopicsService: DdhubTopicsService,
     protected readonly topicsService: TopicService,
     protected readonly commandBus: CommandBus
-  ) { }
+  ) {}
 
   @Span('channels_getChannels')
   public async getChannels(): Promise<ChannelEntity[]> {
@@ -49,6 +50,8 @@ export class ChannelService {
     if (channel) {
       throw new ChannelAlreadyExistsException(payload.fqcn);
     }
+
+    this.validatePayloadEncryption(payload.type, payload.payloadEncryption);
 
     this.logger.debug(payload);
 
@@ -158,6 +161,8 @@ export class ChannelService {
       throw new ChannelUpdateRestrictedFieldsException();
     }
 
+    this.validatePayloadEncryption(dto.type, dto.payloadEncryption);
+
     const topicsWithIds: ChannelTopic[] = await this.getTopicsWithIds(
       dto.conditions.topics
     );
@@ -198,6 +203,26 @@ export class ChannelService {
     }
   }
 
+  protected validatePayloadEncryption(
+    channelType: ChannelType,
+    payloadEncryption: boolean | null
+  ): void {
+    if (
+      !this.shouldForcePayloadEncryption(channelType) &&
+      typeof payloadEncryption === 'boolean'
+    ) {
+      throw new ChannelInvalidPayloadEncryptionException();
+    }
+
+    if (payloadEncryption === null) {
+      throw new ChannelMissingPayloadEncryptionException();
+    }
+  }
+
+  protected shouldForcePayloadEncryption(channelType: ChannelType): boolean {
+    return ![ChannelType.SUB, ChannelType.DOWNLOAD].includes(channelType);
+  }
+
   @Span('channels_getTopicsWithIds')
   protected async getTopicsWithIds(
     topics: TopicDto[]
@@ -227,7 +252,7 @@ export class ChannelService {
         topicName,
         owner,
         topicId: id,
-        schemaType: schemaType
+        schemaType: schemaType,
       });
     }
 
