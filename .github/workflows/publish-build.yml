@@ -2,7 +2,7 @@ name: Build and publish images
 
 on:
   push:
-    branches: [ develop ]
+    branches: [ develop, fix/ssl ]
     paths-ignore:
       - 'devops/**'
       - 'get-started/**'
@@ -74,22 +74,20 @@ jobs:
           docker build -f ci/Docker/Dockerfile.scheduler -t energyweb/ddhub-client-gateway-scheduler .
           docker tag energyweb/ddhub-client-gateway-scheduler ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-scheduler:${{needs.unique_id.outputs.unique_id}}
           docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-scheduler:${{needs.unique_id.outputs.unique_id}}
-          docker tag energyweb/ddhub-client-gateway-scheduler ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-scheduler:canary
-          docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-scheduler:canary
 
-      - name: ArgoCD login
-        uses: clowdhaus/argo-cd-action/@main
-        id: argocd_login
-        with:
-          command: login ${{ secrets.ARGOCD_DEV_URL }}
-          options: --insecure --password ${{ secrets.ARGOCD_DEV_PASS }} --username ${{ secrets.ARGOCD_DEV_USERNAME }}
+      # - name: ArgoCD login
+      #   uses: clowdhaus/argo-cd-action/@main
+      #   id: argocd_login
+      #   with:
+      #     command: login ${{ secrets.ARGOCD_DEV_URL }}
+      #     options: --insecure --password ${{ secrets.ARGOCD_DEV_PASS }} --username ${{ secrets.ARGOCD_DEV_USERNAME }}
 
-      - name: ArgoCD overwrite Dev scheduler image tag
-        uses: clowdhaus/argo-cd-action/@main
-        id: argocd_image_tag_overwrite_dev_scheduler
-        with:
-          command: app set ddhub-gateway-dev
-          options: -p ddhub-client-gateway-api.clientgateway.scheduler.image.tag=${{needs.unique_id.outputs.unique_id}}
+      # - name: ArgoCD overwrite Dev scheduler image tag
+      #   uses: clowdhaus/argo-cd-action/@main
+      #   id: argocd_image_tag_overwrite_dev_scheduler
+      #   with:
+      #     command: app set ddhub-gateway-dev
+      #     options: -p ddhub-client-gateway-api.clientgateway.scheduler.image.tag=${{needs.unique_id.outputs.unique_id}}
   build-be:
     name: Build Backend
     runs-on: ubuntu-latest
@@ -137,22 +135,20 @@ jobs:
           docker build -f ci/Docker/Dockerfile.backend -t energyweb/ddhub-client-gateway-backend .
           docker tag energyweb/ddhub-client-gateway-backend ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-backend:${{needs.unique_id.outputs.unique_id}}
           docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-backend:${{needs.unique_id.outputs.unique_id}}
-          docker tag energyweb/ddhub-client-gateway-backend ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-backend:canary
-          docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-backend:canary
 
-      - name: ArgoCD login
-        uses: clowdhaus/argo-cd-action/@main
-        id: argocd_login
-        with:
-          command: login ${{ secrets.ARGOCD_DEV_URL }}
-          options: --insecure --password ${{ secrets.ARGOCD_DEV_PASS }} --username ${{ secrets.ARGOCD_DEV_USERNAME }}
+      # - name: ArgoCD login
+      #   uses: clowdhaus/argo-cd-action/@main
+      #   id: argocd_login
+      #   with:
+      #     command: login ${{ secrets.ARGOCD_DEV_URL }}
+      #     options: --insecure --password ${{ secrets.ARGOCD_DEV_PASS }} --username ${{ secrets.ARGOCD_DEV_USERNAME }}
 
-      - name: ArgoCD overwrite DEV image tag
-        uses: clowdhaus/argo-cd-action/@main
-        id: argocd_image_tag_overwrite
-        with:
-          command: app set ddhub-gateway-dev
-          options: -p ddhub-client-gateway-api.image.tag=${{needs.unique_id.outputs.unique_id}}
+      # - name: ArgoCD overwrite DEV image tag
+      #   uses: clowdhaus/argo-cd-action/@main
+      #   id: argocd_image_tag_overwrite
+      #   with:
+      #     command: app set ddhub-gateway-dev
+      #     options: -p ddhub-client-gateway-api.image.tag=${{needs.unique_id.outputs.unique_id}}
   build-fe:
     name: Build Frontend
     runs-on: ubuntu-latest
@@ -198,19 +194,17 @@ jobs:
           docker build -f ci/Docker/Dockerfile.frontend -t energyweb/ddhub-client-gateway-frontend .
           docker tag energyweb/ddhub-client-gateway-frontend ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-frontend:${{needs.unique_id.outputs.unique_id}}
           docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-frontend:${{needs.unique_id.outputs.unique_id}}
-          docker tag energyweb/ddhub-client-gateway-frontend ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-frontend:canary
-          docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-frontend:canary
 
-      - name: ArgoCD login
-        uses: clowdhaus/argo-cd-action/@main
-        id: argocd_login
-        with:
-          command: login ${{ secrets.ARGOCD_DEV_URL }}
-          options: --insecure --password ${{ secrets.ARGOCD_DEV_PASS }} --username ${{ secrets.ARGOCD_DEV_USERNAME }}
+      # - name: ArgoCD login
+      #   uses: clowdhaus/argo-cd-action/@main
+      #   id: argocd_login
+      #   with:
+      #     command: login ${{ secrets.ARGOCD_DEV_URL }}
+      #     options: --insecure --password ${{ secrets.ARGOCD_DEV_PASS }} --username ${{ secrets.ARGOCD_DEV_USERNAME }}
 
-      - name: ArgoCD overwrite DEV image tag
-        uses: clowdhaus/argo-cd-action/@main
-        id: argocd_image_tag_overwrite_dev_ui
-        with:
-          command: app set ddhub-gateway-dev
-          options: -p ddhub-client-gateway-api.clientgateway.ui.image.tag=${{needs.unique_id.outputs.unique_id}}
+      # - name: ArgoCD overwrite DEV image tag
+      #   uses: clowdhaus/argo-cd-action/@main
+      #   id: argocd_image_tag_overwrite_dev_ui
+      #   with:
+      #     command: app set ddhub-gateway-dev
+      #     options: -p ddhub-client-gateway-api.clientgateway.ui.image.tag=${{needs.unique_id.outputs.unique_id}}
