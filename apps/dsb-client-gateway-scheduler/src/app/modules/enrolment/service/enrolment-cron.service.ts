@@ -114,6 +114,7 @@ export class EnrolmentCronService implements OnApplicationBootstrap {
       });
 
       this.logger.error('refresh roles failed', e);
+      console.error(e);
     }
   }
 
