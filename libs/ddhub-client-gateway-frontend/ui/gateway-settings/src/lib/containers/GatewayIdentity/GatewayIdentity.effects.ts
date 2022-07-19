@@ -1,14 +1,10 @@
-import { useRouter } from 'next/router';
-import { IMPORT_PRIVATE_KEY } from '@ddhub-client-gateway/identity/models';
 import { useCustomAlert } from '@ddhub-client-gateway-frontend/ui/core';
 import { useIdentity } from '@ddhub-client-gateway-frontend/ui/api-hooks';
-import { routerConst } from '@ddhub-client-gateway-frontend/ui/utils';
-import { useQueryClient } from 'react-query';
+import { useSetUserDataEffect } from '@ddhub-client-gateway-frontend/ui/login';
 
 export const useGatewayIdentityEffects = () => {
-  const router = useRouter();
   const { identity } = useIdentity();
-  const queryClient = useQueryClient();
+  const { setUserData } = useSetUserDataEffect();
   const Swal = useCustomAlert();
 
   const namespace =
@@ -17,16 +13,12 @@ export const useGatewayIdentityEffects = () => {
 
   const update = async () => {
     const result = await Swal.warning({
-      text: 'you will be logged out if you wish to proceed',
+      text: 'You will be logged out if you wish to proceed',
     });
 
     if (result.isConfirmed) {
-      router
-        .push({
-          pathname: routerConst.InitialPage,
-          query: { privateKey: IMPORT_PRIVATE_KEY },
-        })
-        .then(() => queryClient.clear());
+      // Setting to null will force the user to be logged out and redirected to private key form
+      setUserData(null);
     }
   };
 

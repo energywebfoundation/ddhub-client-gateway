@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 import {
   PostTopicBodyDto,
   getTopicsControllerGetTopicsQueryKey,
+  getTopicsControllerGetTopicsBySearchQueryKey,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { useCreateTopic } from '@ddhub-client-gateway-frontend/ui/api-hooks';
 import { useCustomAlert } from '@ddhub-client-gateway-frontend/ui/core';
@@ -21,7 +22,7 @@ export const useCreateTopicEffects = () => {
   const queryClient = useQueryClient();
   const router = useRouter();
   const {
-    createTopic: { open, application },
+    createTopic: { open, application, isSearch },
   } = useTopicsModalsStore();
   const dispatch = useTopicsModalsDispatch();
   const Swal = useCustomAlert();
@@ -82,7 +83,12 @@ export const useCreateTopicEffects = () => {
   };
 
   const onCreateTopic = () => {
-    queryClient.invalidateQueries(getTopicsControllerGetTopicsQueryKey());
+    if (isSearch) {
+      queryClient.invalidateQueries(getTopicsControllerGetTopicsBySearchQueryKey());
+    } else {
+      queryClient.invalidateQueries(getTopicsControllerGetTopicsQueryKey());
+    }
+
     closeModal();
     Swal.success({
       text: 'You have successfully created the topic',

@@ -9,7 +9,7 @@ ddhub-client-gateway-api:
       # -- Define the port the gateway will run on.
       port: 3333
       # -- Select WebSocket mode depending on architecture (i.e. preference for inbound or outbound connections). By default, the gateway will run a WebSocket server on /events. However, it can also operate as a client with additional configuration (see below). Alternatively, this functionality can be turned off. Options: SERVER, CLIENT, NONE
-      websocket: NONE
+      websocket: SERVER
       # -- Sets the URL of the WebSocket server the client should try to connect to. Required if WEBSOCKET is set to CLIENT.
       websocket_url: ""
       # -- Sets the protocol the WebSocket client should request access to. Acceptable protocols are defined by the WebSocket server, however, this can also be left undefined. Note that if WEBSOCKET is set to SERVER this variable is ignored. The server will only accept connection requests on the dsb-messages protocol.
@@ -39,7 +39,6 @@ ddhub-client-gateway-api:
       secret_engine: vault
       secret_engine_endpoint: http://vault.ddhub-dev.svc:8200
       node_env: development
-      db_name: ./data/local.db
       opentelemetry_enabled: false
     scheduler:
       enabled: true
@@ -50,7 +49,7 @@ ddhub-client-gateway-api:
         tag: canary
       podAnnotations: {}
       resources: {}
-      probes: 
+      probes:
         liveness: true
         readiness: true
       appConfig:

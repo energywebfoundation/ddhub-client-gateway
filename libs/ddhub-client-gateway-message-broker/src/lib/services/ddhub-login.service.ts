@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { RetryConfigService } from '@dsb-client-gateway/ddhub-client-gateway-utils';
 import { DidAuthService } from '@dsb-client-gateway/ddhub-client-gateway-did-auth';
-import { TlsAgentService } from './tls-agent.service';
+import { TlsAgentService } from '@dsb-client-gateway/ddhub-client-gateway-tls-agent';
 import { Span } from 'nestjs-otel';
 import { RoleStatus } from '@ddhub-client-gateway/identity/models';
 import promiseRetry from 'promise-retry';
@@ -27,7 +27,18 @@ export class DdhubLoginService {
   ) {}
 
   @Span('ddhub_mb_login')
-  public async login(): Promise<void> {
+  public async login(forceRelogin = true): Promise<void> {
+    this.logger.log('Attempting to login...');
+
+    const privateKey: string | null =
+      await this.secretsEngineService.getPrivateKey();
+
+    if (!privateKey) {
+      this.logger.error('Private key is missing');
+
+      throw new UnableToLoginException();
+    }
+
     const enrolment = await this.enrolmentService.get();
 
     if (!enrolment) {
@@ -49,18 +60,9 @@ export class DdhubLoginService {
 
     this.logger.log('Attempting to login to DID Auth Server');
 
-    const privateKey: string | null =
-      await this.secretsEngineService.getPrivateKey();
-
-    if (!privateKey) {
-      this.logger.error('Private key is missing');
-
-      return;
-    }
-
     await promiseRetry(async (retry) => {
       await this.didAuthService
-        .login(privateKey, this.iamService.getDIDAddress())
+        .login(privateKey, this.iamService.getDIDAddress(), forceRelogin)
         .catch((e) => retry(e));
     }, this.retryConfigService.config);
 

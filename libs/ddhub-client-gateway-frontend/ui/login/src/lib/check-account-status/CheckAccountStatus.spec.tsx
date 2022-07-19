@@ -1,4 +1,4 @@
-import { AccountStatusEnum, checkAccountStatus } from './check-account-status';
+import { AccountStatusEnum, checkAccountStatus } from './CheckAccountStatus';
 import {
   BalanceState,
   IdentityWithEnrolment,

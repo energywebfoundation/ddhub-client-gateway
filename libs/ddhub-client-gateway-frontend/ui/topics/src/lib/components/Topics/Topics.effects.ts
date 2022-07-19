@@ -12,6 +12,7 @@ import { TTableComponentAction } from '@ddhub-client-gateway-frontend/ui/core';
 import { GetTopicDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { Queries } from '@ddhub-client-gateway-frontend/ui/utils';
 import { useStyles } from './Topics.styles';
+import { useState } from 'react';
 
 export const useTopicsEffects = (
   versionHistoryUrl: string,
@@ -19,6 +20,7 @@ export const useTopicsEffects = (
 ) => {
   const { theme } = useStyles();
   const router = useRouter();
+  const [isSearch, setIsSearch] = useState(false);
 
   const { topics, topicsFetched, getTopics, pagination, topicsLoading, getTopicsBySearch } = useTopics({
     limit: 6,
@@ -27,7 +29,7 @@ export const useTopicsEffects = (
   });
 
   const { applicationsByNamespace } = useCachedApplications();
-  const { removeTopicHandler } = useRemoveTopic();
+  const { removeTopicHandler } = useRemoveTopic(isSearch);
 
   const application =
     applicationsByNamespace[router.query[Queries.Namespace] as string];
@@ -51,6 +53,7 @@ export const useTopicsEffects = (
       payload: {
         open: true,
         application: application,
+        isSearch,
       },
     });
   };
@@ -62,6 +65,7 @@ export const useTopicsEffects = (
         open: true,
         application: application,
         topic,
+        isSearch,
       },
     });
   };
@@ -109,6 +113,7 @@ export const useTopicsEffects = (
   };
 
   const handleSearchInput = (searchInput: string) => {
+    setIsSearch(!!searchInput);
     getTopicsBySearch({ keyword: searchInput });
   };
 
