@@ -12,7 +12,7 @@ export interface DetailsProps {
 
 export const Details = ({ nextClick, channelValues }: DetailsProps) => {
   const { classes } = useStyles();
-  const { register, fields, handleSubmit, isValid, control } =
+  const { register, fields, handleSubmit, isValid, control, connectionOnChange, showEncryption, encryptionOnChange, isEncrypt } =
     useDetailsEffects(channelValues);
 
   return (
@@ -31,6 +31,7 @@ export const Details = ({ nextClick, channelValues }: DetailsProps) => {
             field={fields.connectionType}
             formControlLabelProps={{
               style: { marginRight: 36 },
+              onChange: connectionOnChange
             }}
           />
 
@@ -43,21 +44,25 @@ export const Details = ({ nextClick, channelValues }: DetailsProps) => {
 
           <Divider className={classes.divider} />
 
-          <FormControlLabel
-            className={classes.switchLabel}
-            control={
-              <CheckSwitch
-                id={fields.payloadEncryption.name}
-                name={fields.payloadEncryption.name}
-                color="primary"
-              />
-            }
-            labelPlacement="start"
-            id={fields.payloadEncryption.name}
-            name={fields.payloadEncryption.name}
-            label={fields.payloadEncryption.label}
-            {...register(fields.payloadEncryption.name)}
-          />
+          { showEncryption &&
+            <FormControlLabel
+              className={classes.switchLabel}
+              control={
+                <CheckSwitch
+                  checked={isEncrypt}
+                  id={fields.payloadEncryption.name}
+                  onChange={encryptionOnChange}
+                  name={fields.payloadEncryption.name}
+                  color="primary"
+                />
+              }
+              labelPlacement="start"
+              id={fields.payloadEncryption.name}
+              name={fields.payloadEncryption.name}
+              label={fields.payloadEncryption.label}
+              {...register(fields.payloadEncryption.name)}
+            />
+          }
         </Grid>
         <Grid item alignSelf="flex-end">
           <ActionButton
