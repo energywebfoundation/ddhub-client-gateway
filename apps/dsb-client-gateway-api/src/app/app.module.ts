@@ -21,6 +21,7 @@ import { DdhubClientGatewayTracingModule } from '@dsb-client-gateway/ddhub-clien
 import { CronModule } from './modules/cron/cron.module';
 import { StorageModule } from './modules/storage/storage.module';
 import { DdhubClientGatewayEventsModule } from '@dsb-client-gateway/ddhub-client-gateway-events';
+import { GatewayModule } from './modules/gateway/gateway.module';
 
 @Module({})
 export class AppModule {
@@ -54,6 +55,7 @@ export class AppModule {
       TopicModule,
       CronModule,
       DdhubClientGatewayEventsModule,
+      GatewayModule,
     ];
 
     const providers = [
