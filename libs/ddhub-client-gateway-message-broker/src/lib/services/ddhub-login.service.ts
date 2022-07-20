@@ -75,13 +75,14 @@ export class DdhubLoginService {
   protected async initExtChannel(): Promise<void> {
     try {
       await promiseRetry(async (retry) => {
+        await this.tlsAgentService.create();
+
         await lastValueFrom(
           this.httpService.post(
             '/channel/initExtChannel',
+            {},
             {
               httpsAgent: this.tlsAgentService.get(),
-            },
-            {
               headers: {
                 Authorization: `Bearer ${this.didAuthService.getToken()}`,
               },

@@ -161,13 +161,20 @@ export class IamService {
   ): Promise<ApplicationDTO[]> {
     this.logger.debug('start: ApplicationsByOwnerAndRole');
 
-    const didClaims = await this.cacheClient.getClaimsByRequester(ownerDid, {
-      isAccepted: true,
-    });
+    const didClaims = await this.cacheClient
+      .getClaimsByRequester(ownerDid, {
+        isAccepted: true,
+      })
+      .catch((e) => {
+        this.logger.log('fetching claims by requester failed', e);
+
+        throw e;
+      });
+
     const namespaceList = [];
     const applications: IAppDefinition[] = [];
 
-    this.logger.debug('did claims fetched.');
+    this.logger.debug('did claims fetched');
 
     didClaims.forEach((didClaim) => {
       if (
@@ -186,9 +193,16 @@ export class IamService {
 
     await Promise.all(
       namespaceList.map(async (namespace: string) => {
-        const application = (await this.cacheClient.getAppDefinition(
-          namespace
-        )) as ApplicationDTO;
+        const application = (await this.cacheClient
+          .getAppDefinition(namespace)
+          .catch((e) => {
+            this.logger.error(
+              'getting app definition for ' + namespace + ' failed'
+            );
+            this.logger.error(e);
+
+            throw e;
+          })) as ApplicationDTO;
         application.namespace = namespace;
         applications.push(application);
       })

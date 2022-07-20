@@ -3,6 +3,7 @@ import { HttpService } from '@nestjs/axios';
 import { DidAuthResponse } from '../did-auth.interface';
 import { lastValueFrom } from 'rxjs';
 import { TlsAgentService } from '@dsb-client-gateway/ddhub-client-gateway-tls-agent';
+import { useErrorHandler } from '@dsb-client-gateway/ddhub-client-gateway-utils';
 
 @Injectable()
 export class DidAuthApiService {
@@ -11,7 +12,9 @@ export class DidAuthApiService {
   constructor(
     protected readonly httpService: HttpService,
     protected readonly tlsAgentService: TlsAgentService
-  ) {}
+  ) {
+    useErrorHandler(this.httpService, this.logger);
+  }
 
   public async login(identityToken: string): Promise<DidAuthResponse> {
     const { data } = await lastValueFrom(
