@@ -5,7 +5,7 @@ export const useStyles = makeStyles()((theme) => ({
     fontSize: 12,
     lineHeight: '14px',
     fontWeight: 400,
-    color: theme.palette.grey[300],
+    color: theme.palette.common.white,
   },
   topic: {
     display: 'flex',

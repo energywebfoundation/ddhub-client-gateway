@@ -3,15 +3,18 @@ import { lighten } from '@mui/material/styles';
 
 export const useStyles = makeStyles()((theme) => ({
   paper: {
-    maxWidth: 600,
-    minHeight: 800,
-    padding: '55px 43px 34px 50px',
+    maxWidth: 860,
+    minHeight: 600,
+    padding: '48px 41px 34px 46px',
     borderRadius: 0,
+  },
+  content: {
+    height: '100%',
+    flexGrow: 1,
   },
   channelWrapper: {
     display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
+    placeItems: 'start',
     flexDirection: 'column',
   },
   type: {
@@ -29,6 +32,15 @@ export const useStyles = makeStyles()((theme) => ({
     textAlign: 'center',
     color: theme.palette.grey[400],
     fontFamily: theme.typography.body2.fontFamily,
+  },
+  value: {
+    fontSize: 12,
+    lineHeight: '14px',
+    fontWeight: 400,
+    color: theme.palette.grey[400],
+    fontFamily: theme.typography.body2.fontFamily,
+    maxWidth: 224,
+    alignSelf: 'center',
   },
   title: {
     fontSize: 18,
@@ -54,19 +66,20 @@ export const useStyles = makeStyles()((theme) => ({
   },
   icon: {
     stroke: theme.palette.primary.main,
-    width: 18,
-    height: 18,
+    width: 16,
+    height: 16,
   },
   editIconButton: {
     position: 'absolute',
-    top: -10,
-    right: 0,
+    right: -20,
   },
   label: {
     fontSize: 12,
-    lineHeight: '14px',
+    lineHeight: '24px',
     fontWeight: 400,
-    color: theme.palette.grey[300],
+    color: theme.palette.common.white,
+    fontFamily: theme.typography.body2.fontFamily,
+    marginBottom: 1,
   },
   typeWrapper: {
     margin: '17px 0 16px',
@@ -94,12 +107,19 @@ export const useStyles = makeStyles()((theme) => ({
     marginLeft: 25,
   },
   divider: {
-    marginTop: 22,
+    marginBottom: 27,
     borderBottom: `1px solid ${lighten(theme.palette.background.paper, 0.07)}`,
   },
   iconCheck: {
     stroke: theme.palette.success.main,
     width: 21,
     height: 21,
+    strokeWidth: 1,
   },
+  contentWrapper: {
+    minWidth: '540px',
+    paddingTop: 48,
+    flexGrow: 1,
+    paddingLeft: 63,
+  }
 }));

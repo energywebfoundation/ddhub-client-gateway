@@ -29,7 +29,7 @@ export const Topics: FC<TopicsProps> = ({ topics }) => {
               <Typography className={classes.topicLabel} variant="body2">
                 {topic.topicName}
               </Typography>
-              <Box display="flex">
+              <Box display="flex" justifyContent="space-between">
                 <Typography className={classes.topicValue} variant="body2">
                   {topic.owner}
                 </Typography>
