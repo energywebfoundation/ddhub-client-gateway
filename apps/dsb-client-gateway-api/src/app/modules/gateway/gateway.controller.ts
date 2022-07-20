@@ -20,7 +20,7 @@ export class GatewayController {
     status: HttpStatus.UNAUTHORIZED,
     description: 'Unauthorized',
   })
-  public async get(): Promise<GatewayResponseDto> {
+  public get(): GatewayResponseDto {
     return {
       namespace: this.configService.get<string>('PARENT_NAMESPACE'),
     };
