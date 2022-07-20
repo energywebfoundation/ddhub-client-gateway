@@ -80,10 +80,9 @@ export class DdhubLoginService {
         await lastValueFrom(
           this.httpService.post(
             '/channel/initExtChannel',
+            {},
             {
               httpsAgent: this.tlsAgentService.get(),
-            },
-            {
               headers: {
                 Authorization: `Bearer ${this.didAuthService.getToken()}`,
               },
@@ -95,7 +94,6 @@ export class DdhubLoginService {
       this.logger.log('Init ext channel successful');
     } catch (e) {
       this.logger.error('Init ext channel failed', e);
-      console.error(e);
     }
   }
 }
