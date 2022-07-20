@@ -137,7 +137,7 @@ export class MessageService {
 
     const signature = this.keyService.createSignature(
       message,
-      '0x' + privateKey
+      privateKey.length === 66 ? privateKey : '0x' + privateKey
     );
 
     if (channel.payloadEncryption) {
@@ -396,8 +396,8 @@ export class MessageService {
     );
 
     return getMessagesResponse.sort((a, b) => {
-      if (a.timestampNanos < b.timestampNanos) return -1
-      return a.timestampNanos > b.timestampNanos ? 1 : 0
+      if (a.timestampNanos < b.timestampNanos) return -1;
+      return a.timestampNanos > b.timestampNanos ? 1 : 0;
     });
   }
 
@@ -470,7 +470,7 @@ export class MessageService {
 
     const signature = this.keyService.createSignature(
       checksum,
-      '0x' + privateKey
+      privateKey.length === 66 ? privateKey : '0x' + privateKey
     );
 
     await this.sendSymmetricKeys(
