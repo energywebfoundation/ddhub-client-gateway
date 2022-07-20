@@ -123,7 +123,7 @@ export const Update = () => {
           <Box className={classes.divider} />
           <Steps steps={UPDATE_STEPS} activeStep={activeStep} setActiveStep={navigateToStep} />
         </Grid>
-        <Grid item className={classes.formWrapper}>
+        <Grid item className={classes.updateFormWrapper}>
           {formPart(activeStep)}
         </Grid>
       </Grid>

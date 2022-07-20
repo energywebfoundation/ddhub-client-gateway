@@ -39,7 +39,7 @@ export const Topics = ({
       justifyContent="space-between"
       sx={{ height: '100%', flexWrap: 'nowrap' }}
     >
-      <Grid item sx={{ paddingRight: '20px' }}>
+      <Grid item sx={{ paddingRight: '27px' }}>
         <Autocomplete
           loading={isLoadingApplications}
           options={applicationList}
@@ -80,7 +80,7 @@ export const Topics = ({
           remove={removeSelectedTopic}
         />
       </Grid>
-      <Grid item alignSelf="flex-end" width="100%">
+      <Grid item alignSelf="flex-end" width="100%" sx={{paddingRight: '7px'}}>
         <ActionButtons
           {...actionButtonsProps}
           nextClickButtonProps={{

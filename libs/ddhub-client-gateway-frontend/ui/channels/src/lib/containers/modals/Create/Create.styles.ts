@@ -11,7 +11,7 @@ export const useStyles = makeStyles()((theme) => ({
     maxWidth: 860,
     minHeight: 600,
     maxHeight: 800,
-    padding: '37px 20px 27px 39px',
+    padding: '39px 20px 27px 39px',
     borderRadius: 0,
   },
   title: {
@@ -29,6 +29,7 @@ export const useStyles = makeStyles()((theme) => ({
   formWrapper: {
     minWidth: '540px',
     paddingTop: 16,
+    flexGrow: 1,
   },
   channelWrapper: {
     display: 'flex',
@@ -79,5 +80,11 @@ export const useStyles = makeStyles()((theme) => ({
     width: 21,
     height: 21,
     marginTop: 3,
+  },
+  updateFormWrapper: {
+    minWidth: '540px',
+    paddingTop: 16,
+    flexGrow: 1,
+    paddingLeft: 63,
   },
 }));
