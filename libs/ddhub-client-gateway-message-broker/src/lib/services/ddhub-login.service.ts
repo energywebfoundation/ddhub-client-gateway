@@ -75,9 +75,6 @@ export class DdhubLoginService {
   protected async initExtChannel(): Promise<void> {
     try {
       await promiseRetry(async (retry) => {
-        this.logger.debug('https agent');
-        console.log(this.tlsAgentService.get());
-
         await this.tlsAgentService.create();
 
         await lastValueFrom(
