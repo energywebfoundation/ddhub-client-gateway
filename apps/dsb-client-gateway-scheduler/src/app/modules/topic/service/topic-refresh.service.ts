@@ -76,9 +76,6 @@ export class TopicRefreshService implements OnApplicationBootstrap {
 
       this.logger.log(`fetched ${applications.length} applications`);
 
-      this.logger.log('clearing topics');
-      await this.applicationsWrapper.repository.clear();
-
       for (const application of applications) {
         const topicsForApplication: TopicDataResponse =
           await this.ddhubTopicsService.getTopics(
