@@ -11,8 +11,6 @@ export const useGatewayIdentityEffects = () => {
   const { setUserData } = useSetUserDataEffect();
   const Swal = useCustomAlert();
 
-  console.log(config);
-
   const namespace = config?.namespace ?? 'ddhub.apps.energyweb.iam.ewc';
 
   const update = async () => {
