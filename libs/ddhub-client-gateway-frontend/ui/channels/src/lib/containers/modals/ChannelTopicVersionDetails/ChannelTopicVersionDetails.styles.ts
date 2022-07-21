@@ -2,9 +2,9 @@ import { makeStyles } from 'tss-react/mui';
 
 export const useStyles = makeStyles()((theme) => ({
   paper: {
-    maxWidth: 514,
-    minHeight: 620,
-    padding: '37px 50px 52px 50px',
+    maxWidth: 860,
+    minHeight: 600,
+    padding: '48px 46px',
     borderRadius: 0,
   },
   closeButtonWrapper: {

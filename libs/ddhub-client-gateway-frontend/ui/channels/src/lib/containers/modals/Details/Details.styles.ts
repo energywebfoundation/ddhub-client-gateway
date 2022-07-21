@@ -121,5 +121,5 @@ export const useStyles = makeStyles()((theme) => ({
     paddingTop: 48,
     flexGrow: 1,
     paddingLeft: 63,
-  }
+  },
 }));
