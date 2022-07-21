@@ -115,15 +115,15 @@ export class MessageService {
 
     messageLoggerContext.debug(
       'attempting to encrypt payload, encryption enabled: ' +
-        channel.payloadEncryption
+      channel.payloadEncryption
     );
 
     const message = channel.payloadEncryption
       ? this.keyService.encryptMessage(
-          dto.payload,
-          randomKey,
-          EncryptedMessageType['UTF-8']
-        )
+        dto.payload,
+        randomKey,
+        EncryptedMessageType['UTF-8']
+      )
       : dto.payload;
 
     messageLoggerContext.debug('fetching private key');
@@ -137,7 +137,7 @@ export class MessageService {
 
     const signature = this.keyService.createSignature(
       message,
-      '0x' + privateKey
+      privateKey.length === 66 ? privateKey : '0x' + privateKey
     );
 
     if (channel.payloadEncryption) {
@@ -396,9 +396,11 @@ export class MessageService {
     );
 
     return getMessagesResponse.sort((a, b) => {
-      if (a.timestampNanos < b.timestampNanos) return -1
-      return a.timestampNanos > b.timestampNanos ? 1 : 0
+      if (a.timestampNanos < b.timestampNanos) return -1;
+      return a.timestampNanos > b.timestampNanos ? 1 : 0;
     });
+
+
   }
 
   public async uploadMessage(
@@ -470,7 +472,7 @@ export class MessageService {
 
     const signature = this.keyService.createSignature(
       checksum,
-      '0x' + privateKey
+      privateKey.length === 66 ? privateKey : '0x' + privateKey
     );
 
     await this.sendSymmetricKeys(
@@ -671,3 +673,5 @@ export class MessageService {
     return null;
   }
 }
+
+

@@ -85,17 +85,11 @@ export const useCreateChannelEffects = () => {
     channelType: ChannelType;
     payloadEncryption: boolean;
   }) => {
-    const detailsData = data;
-
-    if (detailsData.connectionType !== ConnectionType.Publish) {
-      detailsData.payloadEncryption = false;
-    }
-
     setActiveStep(activeStep + 1);
     setChannelValues({
       ...channelValues,
-      ...detailsData,
-      type: getType(detailsData),
+      ...data,
+      type: getType(data),
     });
   };
 
