@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { Typography, Box } from '@mui/material';
+import { Typography, Box, Grid, Stack } from '@mui/material';
 import {
   ApplicationDTO,
   ChannelTopic,
@@ -36,18 +36,23 @@ export const TopicVersionDetails: FC<TopicVersionDetailsProps> = (
   }
 
   return (
-    <Box sx={{ padding: 0 }}>
-      {application && <ApplicationInfoModal application={application} /> }
-
-      <Box className={classes.details}>
-        <Typography className={classes.title}>Details</Typography>
-
-        {fields.map((field) => (
-          <Box className={classes.detailsInfo} display="flex" mb={1.2} key={field.value}>
-            <Typography className={classes.detailsInfoLabel}>{field.label}</Typography>
-            <Typography className={classes.detailsInfoValue}>{getValue(field.value)}</Typography>
-          </Box>
-        ))}
+    <Grid container className={classes.content}>
+      <Grid item>
+        {application && <ApplicationInfoModal application={application} /> }
+      </Grid>
+      <Grid item className={classes.contentWrapper}>
+        <Grid container spacing={2}>
+          {fields.map((field) => (
+            <Grid item xs={6}>
+              <Stack direction="column" key={field.value}>
+                <Typography className={classes.detailsInfoLabel}>{field.label}</Typography>
+                <Box display="flex">
+                  <Typography className={classes.detailsInfoValue}>{getValue(field.value)}</Typography>
+                </Box>
+              </Stack>
+            </Grid>
+          ))}
+        </Grid>
 
         <Typography className={classes.subtitle}>Version history</Typography>
 
@@ -59,7 +64,7 @@ export const TopicVersionDetails: FC<TopicVersionDetailsProps> = (
           onRowClick={handleRowClick}
           customStyle={{ tableMinWidth: 'auto' }}
         />
-      </Box>
-    </Box>
+      </Grid>
+    </Grid>
   );
 };
