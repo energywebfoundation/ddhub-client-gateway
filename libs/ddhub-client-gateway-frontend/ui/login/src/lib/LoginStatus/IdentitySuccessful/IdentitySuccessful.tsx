@@ -12,7 +12,7 @@ export interface IdentitySuccessfulProps {
 export const IdentitySuccessful = (props: IdentitySuccessfulProps) => {
   const router = useRouter();
   const { classes } = useStyles();
-  const { totalSeconds } = useCountdown(10 * 1000, () => {
+  const { totalSeconds } = useCountdown(60 * 10 * 1000, () => {
     navigate();
   });
 
@@ -23,7 +23,7 @@ export const IdentitySuccessful = (props: IdentitySuccessfulProps) => {
   return (
     <Stack spacing={4} mt={2}>
       <Stack spacing={1} alignItems="top" direction="row">
-        <Check color="success" size={22} />
+        <Check className={classes.icon} size={22} />
         <Stack spacing={1}>
           <Typography variant="body1">Identity check is successful</Typography>
           <Typography variant="body2" className={classes.role}>
@@ -53,6 +53,9 @@ export default IdentitySuccessful;
 export const useStyles = makeStyles()((theme) => ({
   role: {
     color: theme.palette.primary.main,
+  },
+  icon: {
+    color: theme.palette.success.main,
   },
   submitBtn: {
     textTransform: 'none',
