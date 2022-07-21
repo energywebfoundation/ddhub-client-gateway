@@ -68,7 +68,10 @@ export class EventsService implements OnApplicationBootstrap {
 
           this.logger.log(`initialized ${event.eventType} event`);
 
-          if (this.workerId === event.workerId) {
+          if (
+            this.workerId === event.workerId &&
+            event.updatedDate.getTime() < new Date().getTime()
+          ) {
             return;
           }
 
