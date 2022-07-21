@@ -137,7 +137,7 @@ export class MessageService {
 
     const signature = this.keyService.createSignature(
       message,
-      '0x' + privateKey
+      privateKey.length === 66 ? privateKey : '0x' + privateKey
     );
 
     if (channel.payloadEncryption) {
@@ -386,7 +386,7 @@ export class MessageService {
         messageLoggerContext.debug(`processing message ${message.messageId}`);
 
         const processedMessage: GetMessageResponse = await this.processMessage(
-          channel.payloadEncryption,
+          message.payloadEncryption,
           topic,
           message
         );
@@ -395,7 +395,12 @@ export class MessageService {
       })
     );
 
-    return getMessagesResponse;
+    return getMessagesResponse.sort((a, b) => {
+      if (a.timestampNanos < b.timestampNanos) return -1;
+      return a.timestampNanos > b.timestampNanos ? 1 : 0;
+    });
+
+
   }
 
   public async uploadMessage(
@@ -448,7 +453,6 @@ export class MessageService {
         clientGatewayMessageId
       );
     } else {
-
       filePath = join(this.uploadPath, clientGatewayMessageId + this.ext);
 
       const stream = fs.createWriteStream(filePath);
@@ -468,7 +472,7 @@ export class MessageService {
 
     const signature = this.keyService.createSignature(
       checksum,
-      '0x' + privateKey
+      privateKey.length === 66 ? privateKey : '0x' + privateKey
     );
 
     await this.sendSymmetricKeys(
@@ -521,7 +525,6 @@ export class MessageService {
         fileId,
         fileMetadata.signature
       );
-
     }
 
     if (!fileMetadata.encrypted) {
@@ -565,9 +568,8 @@ export class MessageService {
       !topic.schemaType ||
       !topic.version
     ) {
-      if (!topic) throw new TopicNotFoundException("");
-      else
-        throw new TopicNotFoundException(topic.id);
+      if (!topic) throw new TopicNotFoundException('');
+      else throw new TopicNotFoundException(topic.id);
     }
 
     const isTopicNotRelatedToChannel: boolean = this.checkTopicForChannel(
@@ -671,3 +673,5 @@ export class MessageService {
     return null;
   }
 }
+
+

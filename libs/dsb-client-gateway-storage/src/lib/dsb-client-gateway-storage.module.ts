@@ -42,7 +42,7 @@ const ENTITIES = [
           return {
             type: 'better-sqlite3',
             database: configService.get<string>('DB_NAME', 'local.db'),
-            synchronize: true,
+            synchronize: false,
             entities: ENTITIES,
           };
         }

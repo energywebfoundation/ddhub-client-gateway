@@ -76,17 +76,36 @@ export class ApplicationService implements OnApplicationBootstrap {
         return;
       }
 
-      const userApplications =
-        await this.iamService.getApplicationsByOwnerAndRole(
-          'user',
-          this.iamService.getDIDAddress()
-        );
+      const userApplications = await this.iamService
+        .getApplicationsByOwnerAndRole('user', this.iamService.getDIDAddress())
+        .catch((e) => {
+          this.logger.error(
+            'fetching applications for role user ' +
+              this.iamService.getDIDAddress() +
+              ' failed'
+          );
+          this.logger.error(e);
 
-      const topicCreatorApplications =
-        await this.iamService.getApplicationsByOwnerAndRole(
+          throw e;
+        });
+
+      this.logger.log('userApplications', userApplications);
+
+      const topicCreatorApplications = await this.iamService
+        .getApplicationsByOwnerAndRole(
           'topiccreator',
           this.iamService.getDIDAddress()
-        );
+        )
+        .catch((e) => {
+          this.logger.error(
+            'fetching applications for role topiccreator ' +
+              this.iamService.getDIDAddress() +
+              ' failed'
+          );
+          this.logger.error(e);
+
+          throw e;
+        });
 
       const userApplicationRoles = this.getRoles(userApplications, 'user');
       const allApplicationsRoles = this.getRoles(
@@ -99,6 +118,9 @@ export class ApplicationService implements OnApplicationBootstrap {
         ...userApplications,
         ...topicCreatorApplications,
       ];
+
+      this.logger.log('combined applications');
+      this.logger.log(combinedApplications);
 
       const namespaces: string[] = combinedApplications
         .map(({ namespace }) => namespace)

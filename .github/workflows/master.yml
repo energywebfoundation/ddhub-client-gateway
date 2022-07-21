@@ -51,10 +51,6 @@ jobs:
       - uses: actions/setup-node@v2-beta
         with:
           node-version: '16.14.2'
-      - name: Setup app dependencies
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
       - name: Cache node modules
         uses: actions/cache@v2
         env:
@@ -116,10 +112,6 @@ jobs:
       - uses: actions/setup-node@v2-beta
         with:
           node-version: '16.14.2'
-      - name: Setup app dependencies
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
       - name: Cache node modules
         uses: actions/cache@v2
         env:
@@ -138,6 +130,8 @@ jobs:
         run: npm ci
       - name: Build
         run: nx build dsb-client-gateway-api --prod
+      - name: Build migrations
+        run: npm run migrations:build
 
       - name: 'Login via Azure CLI'
         uses: azure/login@v1
@@ -188,10 +182,6 @@ jobs:
       - uses: actions/setup-node@v2-beta
         with:
           node-version: '16.14.2'
-      - name: Setup app dependencies
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
       - name: Cache node modules
         uses: actions/cache@v2
         env:

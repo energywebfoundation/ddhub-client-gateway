@@ -49,7 +49,7 @@ export class KeysService implements OnModuleInit {
     protected readonly iamInitService: IamInitService,
     protected readonly didWrapper: DidWrapperRepository,
     protected readonly configService: ConfigService
-  ) {}
+  ) { }
 
   @Span('keys_storeKeysForMessage')
   public async storeKeysForMessage(): Promise<void> {
@@ -433,8 +433,7 @@ export class KeysService implements OnModuleInit {
     const existingKeyInDid = did.publicKey.filter(
       (c) =>
         c.id ===
-        `${this.iamService.getDIDAddress()}#${
-          DIDPublicKeyTags.DSB_SYMMETRIC_ENCRYPTION
+        `${this.iamService.getDIDAddress()}#${DIDPublicKeyTags.DSB_SYMMETRIC_ENCRYPTION
         }`
     );
 
@@ -501,8 +500,7 @@ export class KeysService implements OnModuleInit {
     const existingKeyInDid = did.publicKey.filter(
       (c) =>
         c.id ===
-        `${this.iamService.getDIDAddress()}#${
-          DIDPublicKeyTags.DSB_SIGNATURE_KEY
+        `${this.iamService.getDIDAddress()}#${DIDPublicKeyTags.DSB_SIGNATURE_KEY
         }`
     );
 
@@ -605,9 +603,17 @@ export class KeysService implements OnModuleInit {
     didEntity.publicSignatureKey = signatureKey.publicKeyHex;
     didEntity.publicRSAKey = rsaKey.publicKeyHex;
 
-    this.logger.log(`Saving didEntity to cache ${did}`);
 
-    await this.didWrapper.didRepository.save(didEntity);
+
+    try {
+      await this.didWrapper.didRepository.save(didEntity);
+      this.logger.log(`Saving didEntity to cache ${did}`);
+    } catch (e) {
+      await this.didWrapper.didRepository.update({
+        did: didEntity.did,
+      }, didEntity);
+      this.logger.log(`Update didEntity to cache ${did}`);
+    }
 
     return didEntity;
   }

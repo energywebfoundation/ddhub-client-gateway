@@ -20,7 +20,7 @@ export const useLoginStatusEffects = () => {
   };
 
   const checkingIdentity = () => (
-    <LoadingInfo>
+    <LoadingInfo mt={2}>
       <Stack spacing={1}>
         <Typography variant="body1">Checking identity</Typography>
         <Typography variant="body2">This might take a while.</Typography>
