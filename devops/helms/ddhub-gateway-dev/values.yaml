@@ -164,4 +164,7 @@ ddhub-client-gateway-api:
 
   probes:
     liveness: true
+    livenessInitialDelay: 120
+    livenessPeriodSeconds: 10
     readiness: true
+    readinessInitialDelay: 120
