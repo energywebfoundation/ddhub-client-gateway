@@ -1,10 +1,10 @@
 import { FC } from 'react';
-import { CircularProgress, Typography, Box, IconButton } from '@mui/material';
+import { CircularProgress, Typography, Box, IconButton, Grid } from '@mui/material';
 import {
   ApplicationDTO,
   PostTopicDto,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
-import { Image, EditorView } from '@ddhub-client-gateway-frontend/ui/core';
+import { EditorView } from '@ddhub-client-gateway-frontend/ui/core';
 import { useStyles } from './TopicDetails.styles';
 import { TopicDetail } from './TopicDetail';
 import { ApplicationInfoModal } from '../ApplicationInfoModal';
@@ -41,37 +41,42 @@ export const TopicDetails: FC<TopicDetailsProps> = ({
           <CircularProgress />
         </Box>
       ) : (
-        <Box sx={{ padding: 0 }}>
-          {application && <ApplicationInfoModal application={application} />}
-          <Box className={classes.details}>
-            <Typography className={classes.title}>Details</Typography>
-            {buttons.map((button) => {
-              return (
-                <IconButton
-                  key={button.name}
-                  className={button.wrapperClassName}
-                  onClick={button.onClick}
-                >
-                  {button.icon}
-                </IconButton>
-              );
-            })}
-            <Box className={classes.detailsInfo}>
-              {fields.map((field) => (
-                <TopicDetail key={field.value} topic={topic} field={field} />
-              ))}
-              <Box>
-                <Typography
-                  style={{ marginBottom: 7 }}
-                  className={classes.detailsInfoLabel}
-                >
-                  Schema Definition
-                </Typography>
-                <EditorView value={topic.schema} />
-              </Box>
+        <Grid container className={classes.content} flexDirection={"row"}>
+          <Grid item className={classes.leftPanel}>
+            <Box className={classes.details}>
+              {buttons.map((button) => {
+                return (
+                  <IconButton
+                    key={button.name}
+                    className={button.wrapperClassName}
+                    onClick={button.onClick}
+                  >
+                    {button.icon}
+                  </IconButton>
+                );
+              })}
             </Box>
-          </Box>
-        </Box>
+            {application && <ApplicationInfoModal application={application} />}
+          </Grid>
+          <Grid item className={classes.contentWrapper}>
+            <Grid container spacing={2}>
+              {fields.map((field) => (
+                <Grid item xs={6} className={classes.gridItem}>
+                  <TopicDetail key={field.value} topic={topic} field={field} />
+                </Grid>
+              ))}
+            </Grid>
+            <Box>
+              <Typography
+                style={{ marginBottom: 7, marginTop: 12 }}
+                className={classes.detailsInfoLabel}
+              >
+                Schema Definition
+              </Typography>
+              <EditorView value={topic.schema} height={360} />
+            </Box>
+          </Grid>
+        </Grid>
       )}
     </Box>
   );
