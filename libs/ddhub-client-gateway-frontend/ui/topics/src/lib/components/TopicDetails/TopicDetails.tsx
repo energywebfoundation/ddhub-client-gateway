@@ -11,6 +11,7 @@ import { ApplicationInfoModal } from '../ApplicationInfoModal';
 
 interface TopicDetailsProps {
   isLoading: boolean;
+  showActionButtons?: boolean;
   details: {
     topic: PostTopicDto;
     application: ApplicationDTO;
@@ -29,6 +30,7 @@ interface TopicDetailsProps {
 
 export const TopicDetails: FC<TopicDetailsProps> = ({
   isLoading,
+  showActionButtons = true,
   details: { application, topic },
   fields,
   buttons,
@@ -43,19 +45,21 @@ export const TopicDetails: FC<TopicDetailsProps> = ({
       ) : (
         <Grid container className={classes.content} flexDirection={"row"}>
           <Grid item className={classes.leftPanel}>
-            <Box className={classes.details}>
-              {buttons.map((button) => {
-                return (
-                  <IconButton
-                    key={button.name}
-                    className={button.wrapperClassName}
-                    onClick={button.onClick}
-                  >
-                    {button.icon}
-                  </IconButton>
-                );
-              })}
-            </Box>
+            { showActionButtons &&
+              <Box className={classes.details}>
+                {buttons.map((button) => {
+                  return (
+                    <IconButton
+                      key={button.name}
+                      className={button.wrapperClassName}
+                      onClick={button.onClick}
+                    >
+                      {button.icon}
+                    </IconButton>
+                  );
+                })}
+              </Box>
+            }
             {application && <ApplicationInfoModal application={application} />}
           </Grid>
           <Grid item className={classes.contentWrapper}>

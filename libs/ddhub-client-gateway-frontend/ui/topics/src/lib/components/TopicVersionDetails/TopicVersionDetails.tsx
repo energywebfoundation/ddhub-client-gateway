@@ -43,8 +43,8 @@ export const TopicVersionDetails: FC<TopicVersionDetailsProps> = (
       <Grid item className={classes.contentWrapper}>
         <Grid container spacing={2}>
           {fields.map((field) => (
-            <Grid item xs={6}>
-              <Stack direction="column" key={field.value}>
+            <Grid item xs={6} key={field.value}>
+              <Stack direction="column">
                 <Typography className={classes.detailsInfoLabel}>{field.label}</Typography>
                 <Box display="flex">
                   <Typography className={classes.detailsInfoValue}>{getValue(field.value)}</Typography>

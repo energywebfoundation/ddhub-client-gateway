@@ -7,7 +7,7 @@ import { useStyles } from './ViewTopicDetails.styles';
 
 export const ViewTopicDetails: FC = () => {
   const { classes } = useStyles();
-  const { open, closeModal, isLoading, fields, details, buttons } =
+  const { open, closeModal, isLoading, fields, details, buttons, showActionButtons } =
     useViewTopicDetailsEffects();
   return (
     <Dialog open={open} onClose={closeModal} paperClassName={classes.paper}>
@@ -17,6 +17,7 @@ export const ViewTopicDetails: FC = () => {
           details={details}
           fields={fields}
           buttons={buttons}
+          showActionButtons={showActionButtons}
         />
       </DialogContent>
       <DialogActions className={classes.actions}>
