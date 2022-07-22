@@ -11,6 +11,7 @@ export const useStyles = makeStyles()((theme) => ({
   content: {
     height: '100%',
     flexGrow: 1,
+    flexWrap: 'nowrap',
   },
   channelWrapper: {
     display: 'flex',

@@ -69,7 +69,7 @@ export const Details: FC = () => {
   return (
     <Dialog open={open} onClose={closeModal} paperClassName={classes.paper}>
       <Grid container className={classes.content}>
-        <Grid item>
+        <Grid item xs={4}>
           {channel && (
             <>
               <Box className={classes.details}>
@@ -131,7 +131,7 @@ export const Details: FC = () => {
             </>
             )}
         </Grid>
-        <Grid item className={classes.contentWrapper}>
+        <Grid item className={classes.contentWrapper} xs={8}>
           {channel && formPart(activeStep)}
         </Grid>
       </Grid>
