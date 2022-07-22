@@ -60,16 +60,11 @@ export const useStyles = makeStyles()((theme) => ({
     flexWrap: 'nowrap',
   },
   contentWrapper: {
-    minWidth: '474px',
     paddingTop: 48,
     flexGrow: 1,
-    marginLeft: 44,
   },
   gridItem: {
     flexGrow: 1,
     paddingTop: '10px !important',
   },
-  leftPanel: {
-    width: 300,
-  }
 }));

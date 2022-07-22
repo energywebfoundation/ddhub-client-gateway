@@ -44,7 +44,7 @@ export const TopicDetails: FC<TopicDetailsProps> = ({
         </Box>
       ) : (
         <Grid container className={classes.content} flexDirection={"row"}>
-          <Grid item className={classes.leftPanel}>
+          <Grid item xs={4} paddingRight={4}>
             { showActionButtons &&
               <Box className={classes.details}>
                 {buttons.map((button) => {
@@ -62,7 +62,7 @@ export const TopicDetails: FC<TopicDetailsProps> = ({
             }
             {application && <ApplicationInfoModal application={application} />}
           </Grid>
-          <Grid item className={classes.contentWrapper}>
+          <Grid item className={classes.contentWrapper} xs={8}>
             <Grid container spacing={2}>
               {fields.map((field) => (
                 <Grid item xs={6} className={classes.gridItem}>
