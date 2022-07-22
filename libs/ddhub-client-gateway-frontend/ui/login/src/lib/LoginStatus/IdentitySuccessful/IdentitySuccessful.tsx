@@ -4,21 +4,32 @@ import { Check } from 'react-feather';
 import { useRouter } from 'next/router';
 import { routerConst } from '@ddhub-client-gateway-frontend/ui/utils';
 import { useCountdown } from '../Countdown.effects';
+import LoadingInfo from '../../LoadingInfo/LoadingInfo';
 
 export interface IdentitySuccessfulProps {
   children?: React.ReactNode;
+  isFirstLogin?: boolean;
 }
 
 export const IdentitySuccessful = (props: IdentitySuccessfulProps) => {
   const router = useRouter();
   const { classes } = useStyles();
-  const { totalSeconds } = useCountdown(60 * 10 * 1000, () => {
+  const { totalSeconds } = useCountdown(10 * 1000, () => {
     navigate();
   });
 
   const navigate = () => {
-    return router.push(routerConst.IntegrationAPIs);
+    return router.push(routerConst.Dashboard);
   };
+
+  if (!props.isFirstLogin) {
+    navigate();
+    return (
+      <LoadingInfo mt={2}>
+        <Typography>Redirecting...</Typography>
+      </LoadingInfo>
+    );
+  }
 
   return (
     <Stack spacing={4} mt={2}>
