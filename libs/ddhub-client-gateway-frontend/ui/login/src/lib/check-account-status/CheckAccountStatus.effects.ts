@@ -15,7 +15,7 @@ export const useCheckAccountStatusEffects = (
   withBackdrop = true
 ) => {
   const queryClient = useQueryClient();
-  const { setUserData, setIsChecking, setDataOnError } = useSetUserDataEffect();
+  const { setUserData, setIsChecking } = useSetUserDataEffect();
   const { setIsLoading } = useBackdropContext();
   const [checking, setChecking] = useState(triggerQuery);
 
@@ -35,7 +35,6 @@ export const useCheckAccountStatusEffects = (
       );
       return { identityData, routeRestrictions };
     } catch (e: any) {
-      setDataOnError(e, false);
       return e;
     }
   };
