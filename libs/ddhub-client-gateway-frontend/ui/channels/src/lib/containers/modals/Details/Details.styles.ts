@@ -4,7 +4,7 @@ import { lighten } from '@mui/material/styles';
 export const useStyles = makeStyles()((theme) => ({
   paper: {
     maxWidth: 860,
-    minHeight: 600,
+    minHeight: 693,
     padding: '48px 41px 34px 46px',
     borderRadius: 0,
   },
@@ -62,7 +62,6 @@ export const useStyles = makeStyles()((theme) => ({
     marginTop: 10,
   },
   details: {
-    marginTop: 36,
     position: 'relative',
   },
   icon: {
@@ -73,6 +72,7 @@ export const useStyles = makeStyles()((theme) => ({
   editIconButton: {
     position: 'absolute',
     right: -20,
+    top: 10,
   },
   label: {
     fontSize: 12,

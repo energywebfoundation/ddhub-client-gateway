@@ -23,7 +23,7 @@ export const useStyles = makeStyles()((theme) => ({
   },
   downloadIconButton: {
     position: 'absolute',
-    top: -10,
+    top: 10,
     right: 0,
   },
 }));

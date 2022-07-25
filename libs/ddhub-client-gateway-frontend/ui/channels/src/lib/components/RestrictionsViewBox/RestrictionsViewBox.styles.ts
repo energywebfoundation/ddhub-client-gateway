@@ -7,11 +7,10 @@ export const useStyles = makeStyles()((theme) => ({
     borderRadius: 3,
     padding: '7px 4px 7px 10px',
     width: 245,
-    height: 159,
+    minHeight: 159,
   },
   list: {
     overflow: 'auto',
-    maxHeight: 118,
     '&::-webkit-scrollbar': {
       width: 2,
     },

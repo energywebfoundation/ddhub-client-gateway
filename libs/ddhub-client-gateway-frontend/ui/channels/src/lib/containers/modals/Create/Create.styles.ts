@@ -9,7 +9,7 @@ export const useStyles = makeStyles()((theme) => ({
   },
   paper: {
     maxWidth: 860,
-    minHeight: 600,
+    minHeight: 693,
     maxHeight: 800,
     padding: '39px 20px 27px 39px',
     borderRadius: 0,

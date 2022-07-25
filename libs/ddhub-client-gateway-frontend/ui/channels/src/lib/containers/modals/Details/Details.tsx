@@ -46,11 +46,15 @@ export const Details: FC = () => {
                 list={channel.conditions?.dids}
                 formatter={(value: string) => didFormatMinifier(value, 5, 3)}
                 wrapperProps={{ mr: 0.8 }}
+                wrapperMaxHeight={650}
+                listMaxHeight={550}
               />
               <RestrictionsViewBox
                 label="Role"
                 list={channel.conditions?.roles}
                 wrapperProps={{ ml: 0.8 }}
+                wrapperMaxHeight={650}
+                listMaxHeight={550}
               />
             </Box>
           </>
