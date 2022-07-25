@@ -22,7 +22,6 @@ export const useStyles = makeStyles()((theme) => ({
     position: 'absolute',
   },
   details: {
-    marginTop: 36,
     position: 'relative',
   },
   detailsInfo: {

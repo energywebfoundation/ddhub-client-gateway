@@ -2,6 +2,12 @@ import { makeStyles } from 'tss-react/mui';
 import { alpha, darken } from '@mui/material/styles';
 
 export const useStyles = makeStyles()((theme) => ({
+  paper: {
+    maxWidth: 860,
+    minHeight: 693,
+    padding: '48px 40px 40px 48px',
+    borderRadius: 0,
+  },
   closeButtonWrapper: {
     position: 'absolute',
     top: 17,
@@ -48,7 +54,7 @@ export const useStyles = makeStyles()((theme) => ({
   },
   actions: {
     padding: 0,
-    marginTop: 10,
+    marginTop: 2,
   },
   appImage: {
     width: 49,

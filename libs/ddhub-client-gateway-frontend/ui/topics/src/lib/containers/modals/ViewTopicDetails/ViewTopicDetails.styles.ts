@@ -23,12 +23,12 @@ export const useStyles = makeStyles()((theme) => ({
   },
   editIconButton: {
     position: 'absolute',
-    top: -10,
+    top: 10,
     right: 0,
   },
   downloadIconButton: {
     position: 'absolute',
-    top: -10,
+    top: 10,
     right: 30,
   },
 }));
