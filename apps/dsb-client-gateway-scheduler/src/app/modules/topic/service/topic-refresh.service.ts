@@ -5,6 +5,7 @@ import {
   CronJobType,
   CronStatus,
   CronWrapperRepository,
+  TopicEntity,
   TopicRepositoryWrapper,
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
 import { IamService } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
@@ -76,42 +77,51 @@ export class TopicRefreshService implements OnApplicationBootstrap {
 
       this.logger.log(`fetched ${applications.length} applications`);
 
+      await this.checkForDeletedTopics();
+
+      if (applications.length === 0) {
+        this.logger.log('no applications to refresh topics');
+
+        await this.cronWrapper.cronRepository.save({
+          jobName: CronJobType.TOPIC_REFRESH,
+          latestStatus: CronStatus.SUCCESS,
+          executedAt: new Date(),
+        });
+
+        return;
+      }
+
+      let failed = false;
+
+      const createdTopics: TopicEntity[] = [];
+
       for (const application of applications) {
-        const topicsForApplication: TopicDataResponse =
-          await this.ddhubTopicsService.getTopics(
-            100,
-            undefined,
-            application.namespace,
-            1,
-            []
+        const topics: TopicEntity[] = await this.refreshTopicsForApplication(
+          application
+        ).catch((e) => {
+          this.logger.error(
+            'failed refreshing topics for application ' + application.namespace
           );
+          this.logger.error(e);
 
-        for (const topic of topicsForApplication.records) {
-          const topicVersions: TopicVersionResponse =
-            await this.ddhubTopicsService.getTopicVersions(topic.id);
+          failed = true;
 
-          for (const topicVersion of topicVersions.records) {
-            const [major, minor, patch]: string[] =
-              topicVersion.version.split('.');
+          return [];
+        });
 
-            await this.wrapper.topicRepository.save({
-              id: topic.id,
-              owner: topic.owner,
-              name: topic.name,
-              schemaType: topic.schemaType,
-              version: topicVersion.version,
-              schema: topicVersion.schema,
-              tags: topicVersion.tags,
-              majorVersion: major,
-              minorVersion: minor,
-              patchVersion: patch,
-            });
+        createdTopics.push(...topics);
+      }
 
-            this.logger.log(
-              `stored topic with name ${topicVersion.name} and owner ${topicVersion.owner} with version ${topicVersion.version}`
-            );
-          }
-        }
+      if (failed) {
+        await this.cronWrapper.cronRepository.save({
+          jobName: CronJobType.TOPIC_REFRESH,
+          latestStatus: CronStatus.FAILED,
+          executedAt: new Date(),
+        });
+
+        this.logger.error('refresh topics failed');
+
+        return;
       }
 
       await this.cronWrapper.cronRepository.save({
@@ -127,6 +137,84 @@ export class TopicRefreshService implements OnApplicationBootstrap {
       });
 
       this.logger.error('refresh topics failed', e);
+    }
+  }
+
+  @Span('topic_refresh_aplication')
+  public async refreshTopicsForApplication(
+    application: ApplicationEntity
+  ): Promise<TopicEntity[]> {
+    const topicsForApplication: TopicDataResponse =
+      await this.ddhubTopicsService
+        .getTopics(100, undefined, application.namespace, 1, [])
+        .catch((e) => {
+          this.logger.log(
+            'failed when pulling topics for application ' +
+              application.namespace
+          );
+
+          throw e;
+        });
+
+    const topicsToReturn: TopicEntity[] = [];
+
+    for (const topic of topicsForApplication.records) {
+      const topicVersions: TopicVersionResponse = await this.ddhubTopicsService
+        .getTopicVersions(topic.id)
+        .catch((e) => {
+          this.logger.error(
+            'failed when fetching topic versions for ' + topic.id
+          );
+
+          throw e;
+        });
+
+      for (const topicVersion of topicVersions.records) {
+        const [major, minor, patch]: string[] = topicVersion.version.split('.');
+
+        const topicEntity: TopicEntity = await this.wrapper.topicRepository
+          .save({
+            id: topic.id,
+            owner: topic.owner,
+            name: topic.name,
+            schemaType: topic.schemaType,
+            version: topicVersion.version,
+            schema: topicVersion.schema,
+            tags: topicVersion.tags,
+            majorVersion: major,
+            minorVersion: minor,
+            patchVersion: patch,
+          })
+          .catch((e) => {
+            this.logger.error(
+              `failed when saving topic version to database ${topic.owner} ${topic.name} ${topic.version}`
+            );
+
+            throw e;
+          });
+
+        topicsToReturn.push(topicEntity);
+
+        this.logger.log(
+          `stored topic with name ${topicVersion.name} and owner ${topicVersion.owner} with version ${topicVersion.version}`
+        );
+      }
+    }
+
+    return topicsToReturn;
+  }
+
+  private async checkForDeletedTopics(): Promise<void> {
+    const existingTopics: TopicEntity[] =
+      await this.wrapper.topicRepository.find({});
+
+    for (const topic of existingTopics) {
+      try {
+      } catch (e) {
+        this.logger.error(
+          `attempt at deleting topic ${topic.name} ${topic.owner} ${topic.version} failed`
+        );
+      }
     }
   }
 }
