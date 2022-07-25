@@ -65,8 +65,8 @@ export const TopicDetails: FC<TopicDetailsProps> = ({
           <Grid item className={classes.contentWrapper} xs={8}>
             <Grid container spacing={2}>
               {fields.map((field) => (
-                <Grid item xs={6} className={classes.gridItem}>
-                  <TopicDetail key={field.value} topic={topic} field={field} />
+                <Grid item xs={6} className={classes.gridItem} key={field.value}>
+                  <TopicDetail topic={topic} field={field} />
                 </Grid>
               ))}
             </Grid>

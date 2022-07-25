@@ -10,7 +10,7 @@ import {
 } from '@ddhub-client-gateway-frontend/ui/api-hooks';
 import { TTableComponentAction } from '@ddhub-client-gateway-frontend/ui/core';
 import { GetTopicDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
-import { Queries } from '@ddhub-client-gateway-frontend/ui/utils';
+import { Queries, routerConst } from '@ddhub-client-gateway-frontend/ui/utils';
 import { useStyles } from './Topics.styles';
 import { useState } from 'react';
 
@@ -28,7 +28,13 @@ export const useTopicsEffects = (
     owner: router.query[Queries.Namespace] as string,
   });
 
-  const { applicationsByNamespace } = useCachedApplications();
+  const getUsedRoleForApplication = router.pathname.includes(
+    routerConst.Channels
+  )
+    ? 'user'
+    : undefined;
+
+  const { applicationsByNamespace } = useCachedApplications(getUsedRoleForApplication);
   const { removeTopicHandler } = useRemoveTopic(isSearch);
 
   const application =
@@ -43,6 +49,7 @@ export const useTopicsEffects = (
         open: true,
         application: application,
         topic,
+        showActionButtons: true,
       },
     });
   };
