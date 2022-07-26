@@ -4,6 +4,7 @@ import {
 } from './check-account-status/CheckAccountStatus';
 import { getIdentityControllerGetQueryKey } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import {
+  GatewayConfig,
   IdentityWithEnrolment,
   Role,
   RoleStatus,
@@ -18,6 +19,7 @@ import {
   IndexableRouteRestrictions,
 } from './config/route-restrictions.interface';
 import { useCustomAlert } from '@ddhub-client-gateway-frontend/ui/core';
+import { useGatewayConfig } from '@ddhub-client-gateway-frontend/ui/api-hooks';
 
 export const routeRestrictions = new Map<string, string>()
   .set('topicManagement', routerConst.TopicManagement)
@@ -30,7 +32,8 @@ export const routeRestrictions = new Map<string, string>()
 
 export const getRoutesToDisplay = (
   accountRoles: Role[],
-  restrictions: IndexableRouteRestrictions
+  restrictions: IndexableRouteRestrictions,
+  config: GatewayConfig
 ): Set<string> => {
   if (!accountRoles) {
     return new Set();
@@ -40,8 +43,7 @@ export const getRoutesToDisplay = (
       (role) =>
         role.status === RoleStatus.SYNCED &&
         role.namespace.includes(
-          process.env['NEXT_PUBLIC_PARENT_NAMESPACE'] ??
-            'ddhub.apps.energyweb.iam.ewc'
+          config?.namespace ?? 'ddhub.apps.energyweb.iam.ewc'
         )
     )
     .map((role) => role.namespace);
@@ -67,6 +69,7 @@ export const getRoutesToDisplay = (
 export const useSetUserDataEffect = () => {
   const Swal = useCustomAlert();
   const router = useRouter();
+  const { config } = useGatewayConfig();
   const { userData, setUserData } = useContext(UserDataContext);
   const queryClient = useQueryClient();
 
@@ -85,7 +88,8 @@ export const useSetUserDataEffect = () => {
     if (res?.enrolment?.roles) {
       const displayedRoutes = getRoutesToDisplay(
         res.enrolment.roles,
-        routeRestrictions as unknown as IndexableRouteRestrictions
+        routeRestrictions as unknown as IndexableRouteRestrictions,
+        config
       );
 
       setUserData({
@@ -95,6 +99,7 @@ export const useSetUserDataEffect = () => {
         isChecking: false,
         routeRestrictions,
         displayedRoutes,
+        did: res.enrolment.did,
       });
     } else {
       setUserData({

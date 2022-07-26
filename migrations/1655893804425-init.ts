@@ -37,8 +37,6 @@ export class init1655893804425 implements MigrationInterface {
         '\n' +
         "SET default_tablespace = '';\n" +
         '\n' +
-        'SET default_table_access_method = heap;\n' +
-        '\n' +
         '--\n' +
         '-- Name: applications; Type: TABLE; Schema: public; Owner: -\n' +
         '--\n' +
