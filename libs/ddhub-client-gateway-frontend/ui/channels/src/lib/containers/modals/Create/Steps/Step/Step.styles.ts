@@ -39,7 +39,15 @@ export const useStyles = makeStyles()((theme) => ({
     alignItems: 'center',
     paddingLeft: '12px',
   },
-  clickableAvatar: {
-    cursor: 'pointer'
+  clickableDiv: {
+    cursor: 'pointer',
+    '&:hover': {
+      '& .MuiAvatar-rounded:not([class*="activeIcon"])': {
+        backgroundColor: alpha(theme.palette.primary.main, 0.12),
+      },
+      '& .MuiTypography-h6': {
+        color: theme.palette.primary.main,
+      },
+    },
   }
 }));
