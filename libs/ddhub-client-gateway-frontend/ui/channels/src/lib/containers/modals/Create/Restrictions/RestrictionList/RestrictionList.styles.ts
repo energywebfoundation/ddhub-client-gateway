@@ -37,7 +37,7 @@ export const useStyles = makeStyles()((theme) => ({
     },
   },
   container: {
-    height: 24,
+    height: 37,
     padding: '0 3px 0 6px',
     alignItems: 'center',
   },

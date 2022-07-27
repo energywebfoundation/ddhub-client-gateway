@@ -62,7 +62,7 @@ export const Details = ({ nextClick, channelValues, validFqcn }: DetailsProps) =
             {...register(fields.payloadEncryption.name)}
           />
         </Grid>
-        <Grid item alignSelf="flex-end">
+        <Grid item alignSelf="flex-end" sx={{ paddingRight: '7px' }}>
           <ActionButton
             disabled={!isValid}
             showArrowIcon

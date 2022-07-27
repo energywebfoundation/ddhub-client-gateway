@@ -84,10 +84,10 @@ export const Create = () => {
       <DialogTitle className={classes.title}>Create Channel</DialogTitle>
       <DialogSubTitle>{subTitle}</DialogSubTitle>
       <Grid container className={classes.content}>
-        <Grid item pt={2} className={classes.leftPanel}>
+        <Grid item pt={2} xs={4}>
           <Steps steps={CREATION_STEPS} activeStep={activeStep} />
         </Grid>
-        <Grid item className={classes.formWrapper}>
+        <Grid item className={classes.formWrapper} xs={8}>
           {formPart(activeStep)}
         </Grid>
       </Grid>

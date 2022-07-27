@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { Typography, Box } from '@mui/material';
+import { Typography, Box, Stack } from '@mui/material';
 import { ChannelTopic } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { CopyToClipboard } from '@ddhub-client-gateway-frontend/ui/core';
 import { useTopicsEffects } from './Topics.effects';
@@ -24,20 +24,21 @@ export const Topics: FC<TopicsProps> = ({ topics }) => {
             <Box
               key={topic.topicId}
               className={classes.topic}
-              onClick={() => openTopicDetails(topic)}
-            >
-              <Typography className={classes.topicLabel} variant="body2">
-                {topic.topicName}
-              </Typography>
-              <Box display="flex" justifyContent="space-between">
-                <Typography className={classes.topicValue} variant="body2">
-                  {topic.owner}
-                </Typography>
-                <CopyToClipboard
-                  text={topic.owner}
-                  wrapperProps={{ display: 'flex', marginLeft: '10px' }}
-                />
+              onClick={() => openTopicDetails(topic)}>
+              <Box>
+                <Stack>
+                  <Typography className={classes.topicLabel} variant="body2">
+                    {topic.topicName}
+                  </Typography>
+                  <Typography className={classes.topicValue} variant="body2">
+                    {topic.owner}
+                  </Typography>
+                </Stack>
               </Box>
+              <CopyToClipboard
+                text={topic.owner}
+                wrapperProps={{ display: 'flex', marginLeft: '10px' }}
+              />
             </Box>
           );
         })}

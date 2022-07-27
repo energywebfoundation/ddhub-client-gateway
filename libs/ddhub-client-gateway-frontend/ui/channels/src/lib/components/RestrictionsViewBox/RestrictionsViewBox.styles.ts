@@ -5,7 +5,7 @@ export const useStyles = makeStyles()((theme) => ({
   wrapper: {
     border: `1px solid ${lighten(theme.palette.background.paper, 0.07)}`,
     borderRadius: 3,
-    padding: '7px 4px 7px 10px',
+    padding: '12px 0 12px 0',
     width: 245,
     minHeight: 159,
   },
@@ -23,12 +23,16 @@ export const useStyles = makeStyles()((theme) => ({
       backgroundColor: theme.palette.primary.main,
       borderRadius: 3,
     },
+    '& .MuiBox-root:nth-of-type(even)': {
+      background: lighten('#21273B', 0.1),
+    },
   },
   label: {
     fontSize: 14,
     lineHeight: '17px',
     fontWeight: 400,
     color: theme.palette.common.white,
+    padding: '0 14px 0 14px',
   },
   text: {
     fontSize: 12,
@@ -36,5 +40,6 @@ export const useStyles = makeStyles()((theme) => ({
     fontWeight: 400,
     color: theme.palette.grey[300],
     maxWidth: 150,
+    alignSelf: 'center',
   },
 }));

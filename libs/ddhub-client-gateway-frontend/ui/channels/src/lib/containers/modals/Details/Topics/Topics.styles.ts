@@ -1,4 +1,5 @@
 import { makeStyles } from 'tss-react/mui';
+import { lighten } from '@mui/material/styles';
 
 export const useStyles = makeStyles()((theme) => ({
   label: {
@@ -9,9 +10,13 @@ export const useStyles = makeStyles()((theme) => ({
   },
   topic: {
     display: 'flex',
-    flexDirection: 'column',
     cursor: 'pointer',
     marginBottom: 3,
+    padding: '4px 16px 7px 12px',
+    justifyContent: 'space-between',
+    '&:nth-of-type(even)': {
+      background: lighten('#21273B', 0.1),
+    },
   },
   topicLabel: {
     fontSize: 14,

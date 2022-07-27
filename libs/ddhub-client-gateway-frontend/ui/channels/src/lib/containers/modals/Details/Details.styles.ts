@@ -24,7 +24,7 @@ export const useStyles = makeStyles()((theme) => ({
     fontWeight: 500,
     color: theme.palette.common.white,
     fontFamily: theme.typography.body1.fontFamily,
-    marginBottom: 6,
+    marginBottom: 13,
   },
   namespace: {
     fontSize: 12,
@@ -71,7 +71,7 @@ export const useStyles = makeStyles()((theme) => ({
   },
   editIconButton: {
     position: 'absolute',
-    right: -20,
+    right: -10,
     top: 10,
   },
   label: {
@@ -100,6 +100,14 @@ export const useStyles = makeStyles()((theme) => ({
     color: theme.palette.common.white,
     marginLeft: 38,
   },
+  encryptionLabel: {
+    fontSize: 12,
+    lineHeight: '21px',
+    fontWeight: 405,
+    color: theme.palette.grey[400],
+    fontFamily: theme.typography.body2.fontFamily,
+    marginBottom: 12,
+  },
   encryptionValue: {
     fontSize: 14,
     lineHeight: '21px',
@@ -118,9 +126,9 @@ export const useStyles = makeStyles()((theme) => ({
     strokeWidth: 1,
   },
   contentWrapper: {
-    minWidth: '540px',
+    minWidth: '450px',
     paddingTop: 48,
     flexGrow: 1,
-    paddingLeft: 63,
+    paddingLeft: 60,
   },
 }));

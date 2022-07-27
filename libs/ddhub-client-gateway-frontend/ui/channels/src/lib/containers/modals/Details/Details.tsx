@@ -119,7 +119,7 @@ export const Details: FC = () => {
                   </Box>
                 </Stack>
                 <Stack direction="row" mt={1.5} mb={2.3}>
-                  <Typography className={classes.value} variant="body2">
+                  <Typography className={classes.encryptionLabel} variant="body2">
                     Payload encryption:
                   </Typography>
                   <Box display="flex">

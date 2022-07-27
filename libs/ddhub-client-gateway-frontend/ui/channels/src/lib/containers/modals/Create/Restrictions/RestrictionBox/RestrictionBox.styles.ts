@@ -7,8 +7,7 @@ export const useStyles = makeStyles()((theme) => ({
     padding: '7px 5px 5px',
     minHeight: 204,
     maxHeight: 451,
-    minWidth: 232,
-    flexGrow: 1,
+    minWidth: 215,
   },
   label: {
     fontSize: 14,

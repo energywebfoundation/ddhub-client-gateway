@@ -93,7 +93,7 @@ export const Summary = ({
           canCopy={true}
         />
       </Grid>
-      <Grid item alignSelf="flex-end" width="100%">
+      <Grid item alignSelf="flex-end" width="100%" sx={{ paddingTop: '33px', paddingRight: '7px' }}>
         <ActionButtons {...actionButtonsProps} />
       </Grid>
     </Grid>

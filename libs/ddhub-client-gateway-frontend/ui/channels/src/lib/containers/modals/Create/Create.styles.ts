@@ -20,6 +20,7 @@ export const useStyles = makeStyles()((theme) => ({
     fontWeight: 500,
     fontFamily: theme.typography.body1.fontFamily,
     color: theme.palette.common.white,
+    marginBottom: 13,
   },
   closeButtonWrapper: {
     position: 'absolute',
@@ -27,17 +28,14 @@ export const useStyles = makeStyles()((theme) => ({
     right: 18,
   },
   formWrapper: {
-    minWidth: '540px',
     paddingTop: 16,
     flexGrow: 1,
+    paddingLeft: 63,
   },
   channelWrapper: {
     display: 'flex',
     flexDirection: 'column',
     marginTop: -34,
-  },
-  leftPanel: {
-    width: 261,
   },
   type: {
     fontSize: 18,
@@ -82,9 +80,16 @@ export const useStyles = makeStyles()((theme) => ({
     marginTop: 3,
   },
   updateFormWrapper: {
-    minWidth: '540px',
     paddingTop: 16,
     flexGrow: 1,
     paddingLeft: 63,
+  },
+  encryptionLabel: {
+    fontSize: 12,
+    lineHeight: '21px',
+    fontWeight: 405,
+    color: theme.palette.grey[400],
+    fontFamily: theme.typography.body2.fontFamily,
+    marginBottom: 12,
   },
 }));

@@ -26,7 +26,7 @@ export const RestrictionsViewBox: FC<RestrictionsViewBoxProps> = memo(
         <Box className={classes.list} style={{maxHeight: listMaxHeight}}>
           {list?.map((item) => {
             return (
-              <Box key={item} mb={0.4} display="flex">
+              <Box key={item} display="flex" justifyContent="space-between" pl={2} pr={2} height={37}>
                 <Typography noWrap variant="body2" className={classes.text}>
                   {formatter ? formatter(item) : item}
                 </Typography>
