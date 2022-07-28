@@ -41,4 +41,5 @@ export interface TableProps<T> {
   defaultOrder?: 'asc' | 'desc';
   customStyle?: TableCustomStyle;
   backendSearch?: boolean;
+  stripedTable?: boolean;
 }

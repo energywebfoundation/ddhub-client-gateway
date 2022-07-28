@@ -46,4 +46,12 @@ export const useStyles = makeStyles()((theme) => ({
   toolbar: {
     paddingLeft: 0,
   },
+  stripedRow: {
+    '&:nth-of-type(even)': {
+      background: '#31374B',
+    },
+  },
+  stripedCol: {
+    borderBottom: 'none'
+  },
 }));

@@ -23,6 +23,7 @@ import { useTableEffects } from './Table.effects';
 import { useStyles } from './Table.styles';
 import { TableProps } from './Table.types';
 import { visuallyHidden } from '@mui/utils';
+import clsx from 'clsx';
 
 export function GenericTable<T>({
   headers,
@@ -36,6 +37,7 @@ export function GenericTable<T>({
   showSearch = true,
   showFooter = true,
   backendSearch = false,
+  stripedTable = false,
   paginationProps,
   onPageChange,
   customStyle,
@@ -151,6 +153,9 @@ export function GenericTable<T>({
                 prepareRow(row);
                 return (
                   <TableRow
+                    className={clsx({
+                      [classes.stripedRow]: stripedTable,
+                    })}
                     {...row.getRowProps()}
                     onClick={() => handleRowClick(data)}
                   >
@@ -160,7 +165,7 @@ export function GenericTable<T>({
                       };
                       return (
                         <TableCell
-                          style={{ cursor: onRowClick ? 'pointer' : 'default' }}
+                          style={{ cursor: onRowClick ? 'pointer' : 'default', border: stripedTable ? 'none' : '' }}
                           classes={{ body: classes.body }}
                           color={column.color}
                           {...cell.getCellProps()}
