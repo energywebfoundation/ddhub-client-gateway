@@ -8,8 +8,12 @@
     "target": "es2015"
   },
   "exclude": ["**/*.spec.ts", "**/*.test.ts"],
-  "include": ["**/*.ts", "../../libs/hello-tsc/response-type.ts", "../../libs/hello-tsc/orval.config.ts"],
+  "include": [
+    "**/*.ts",
+    "../../libs/hello-tsc/response-type.ts",
+    "../../libs/hello-tsc/orval.config.ts"
+  ],
   "ts-node": {
     "require": ["tsconfig-paths/register"]
-  },
+  }
 }

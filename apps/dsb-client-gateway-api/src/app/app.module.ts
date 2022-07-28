@@ -9,7 +9,6 @@ import { SecretsEngineModule } from '@dsb-client-gateway/dsb-client-gateway-secr
 import { APP_FILTER } from '@nestjs/core';
 import { AllExceptionsFilter } from './modules/utils/filter/all-exceptions.filter';
 import { TerminusModule } from '@nestjs/terminus';
-import { HealthController } from './modules/health/health.controller';
 import { ScheduleModule } from '@nestjs/schedule';
 import { UtilsModule } from './modules/utils/utils.module';
 import { configValidate } from './modules/utils/config.validate';
@@ -22,6 +21,7 @@ import { CronModule } from './modules/cron/cron.module';
 import { StorageModule } from './modules/storage/storage.module';
 import { DdhubClientGatewayEventsModule } from '@dsb-client-gateway/ddhub-client-gateway-events';
 import { GatewayModule } from './modules/gateway/gateway.module';
+import { HealthModule } from './modules/health/health.module';
 
 @Module({})
 export class AppModule {
@@ -56,6 +56,7 @@ export class AppModule {
       CronModule,
       DdhubClientGatewayEventsModule,
       GatewayModule,
+      HealthModule,
     ];
 
     const providers = [
@@ -64,13 +65,12 @@ export class AppModule {
         useClass: AllExceptionsFilter,
       },
     ];
-    const controllers = [HealthController];
 
     return {
       module: AppModule,
       imports,
       providers,
-      controllers,
+      controllers: [],
     };
   }
 }

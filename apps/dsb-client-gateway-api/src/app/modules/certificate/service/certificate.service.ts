@@ -34,13 +34,15 @@ export class CertificateService {
 
       return true;
     }
+    return false;
+  }
 
+  public async configureMTLS(): Promise<boolean> {
     this.logger.debug('attempting to configure mTLS Agent');
 
     await this.tlsAgentService.create();
 
-    const agentAfterCreation: Agent | undefined =
-      await this.tlsAgentService.get();
+    const agentAfterCreation: Agent | undefined = this.tlsAgentService.get();
 
     return !!agentAfterCreation;
   }
