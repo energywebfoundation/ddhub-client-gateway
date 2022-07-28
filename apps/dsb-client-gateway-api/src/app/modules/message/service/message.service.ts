@@ -122,15 +122,15 @@ export class MessageService {
 
     messageLoggerContext.debug(
       'attempting to encrypt payload, encryption enabled: ' +
-        channel.payloadEncryption
+      channel.payloadEncryption
     );
 
     const message = channel.payloadEncryption
       ? this.keyService.encryptMessage(
-          dto.payload,
-          randomKey,
-          EncryptedMessageType['UTF-8']
-        )
+        dto.payload,
+        randomKey,
+        EncryptedMessageType['UTF-8']
+      )
       : dto.payload;
 
     messageLoggerContext.debug('fetching private key');
@@ -704,13 +704,14 @@ export class MessageService {
     payloadEncryption: boolean,
     transactionId?: string
   ): Promise<SendMessageResponseFile> {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       const readStream = fs.createReadStream(filePath, {
         highWaterMark: this.chunkSize
       });
       let result: SendMessageResponseFile = null;
+      const fileStats = fs.statSync(filePath);
       let i = 0;
-      const chunks = Math.ceil(file.size / this.chunkSize);
+      const chunks = Math.ceil(fileStats.size / this.chunkSize);
       readStream.on('data', async (chunk) => {
         try {
           if (i < chunks) {
@@ -719,7 +720,7 @@ export class MessageService {
           result =
             await this.ddhubFilesService.uploadFileChunk(
               chunk,
-              file.size,
+              fileStats.size,
               this.chunkSize,
               i++,
               checksum,
