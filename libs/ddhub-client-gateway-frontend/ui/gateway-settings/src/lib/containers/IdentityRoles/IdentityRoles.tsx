@@ -23,8 +23,8 @@ export const IdentityRoles: FC = () => {
       icon={RolesRefresh()}
       content={
         <Stack spacing={1}>
-          {loadingRoles.map((role) => (
-            <Stack spacing={1} key={role.namespace}>
+          {loadingRoles.map((role, index) => (
+            <Stack spacing={1} key={index}>
               <Stack direction="row" spacing={1}>
                 <Typography variant="body2">ROLE</Typography>
                 <Typography
