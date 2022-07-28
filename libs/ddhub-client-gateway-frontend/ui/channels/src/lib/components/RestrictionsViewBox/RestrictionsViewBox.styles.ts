@@ -24,7 +24,7 @@ export const useStyles = makeStyles()((theme) => ({
       borderRadius: 3,
     },
     '& .MuiBox-root:nth-of-type(even)': {
-      background: lighten('#21273B', 0.1),
+      background: '#32394F',
     },
   },
   label: {

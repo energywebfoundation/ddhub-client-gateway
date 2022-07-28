@@ -12,6 +12,7 @@ export const useStyles = makeStyles()((theme) => ({
     minHeight: 167,
     maxHeight: 413,
     overflow: 'auto',
+    flexGrow: 1,
     '&::-webkit-scrollbar': {
       width: 2,
     },
@@ -25,7 +26,7 @@ export const useStyles = makeStyles()((theme) => ({
       borderRadius: 3,
     },
     '& .MuiGrid-root:nth-of-type(even)': {
-      background: lighten('#21273B', 0.1),
+      background: '#2A3044',
     },
   },
   close: {

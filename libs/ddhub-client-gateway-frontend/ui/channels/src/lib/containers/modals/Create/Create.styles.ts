@@ -17,10 +17,10 @@ export const useStyles = makeStyles()((theme) => ({
   title: {
     fontSize: 28,
     lineHeight: '34px',
-    fontWeight: 500,
-    fontFamily: theme.typography.body1.fontFamily,
+    fontWeight: 400,
+    fontFamily: theme.typography.h2.fontFamily,
     color: theme.palette.common.white,
-    marginBottom: 13,
+    marginBottom: 8,
   },
   closeButtonWrapper: {
     position: 'absolute',

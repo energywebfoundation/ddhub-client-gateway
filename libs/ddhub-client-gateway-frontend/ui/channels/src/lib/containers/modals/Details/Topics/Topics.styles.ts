@@ -1,5 +1,5 @@
 import { makeStyles } from 'tss-react/mui';
-import { lighten } from '@mui/material/styles';
+import { lighten, alpha } from '@mui/material/styles';
 
 export const useStyles = makeStyles()((theme) => ({
   label: {
@@ -11,11 +11,13 @@ export const useStyles = makeStyles()((theme) => ({
   topic: {
     display: 'flex',
     cursor: 'pointer',
-    marginBottom: 3,
     padding: '4px 16px 7px 12px',
     justifyContent: 'space-between',
     '&:nth-of-type(even)': {
       background: lighten('#21273B', 0.1),
+    },
+    '&:hover': {
+      backgroundColor: alpha(theme.palette.primary.main, 0.12),
     },
   },
   topicLabel: {
