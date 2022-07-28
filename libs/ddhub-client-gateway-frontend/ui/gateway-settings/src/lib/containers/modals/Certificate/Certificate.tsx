@@ -32,7 +32,7 @@ export const Certificate: FC = () => {
       paperClassName={classes.paper}
     >
       <DialogTitle className={classes.title}>Outbound Certificate</DialogTitle>
-      <DialogSubTitle>Add or update certificates, private key</DialogSubTitle>
+      <DialogSubTitle>Upload your mTLS certificates</DialogSubTitle>
       <Box mt={5.7}>
         <UploadInput
           label="Certificate"
@@ -66,7 +66,6 @@ export const Certificate: FC = () => {
       >
         <Button
           variant="outlined"
-          secondary
           style={{ marginRight: 20 }}
           onClick={openCancelModal}
         >

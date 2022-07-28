@@ -59,13 +59,13 @@ const dsbTheme: ThemeOptions = {
       fontWeight: 400,
     },
     body1: {
-      fontFamily: 'Sequel Sans',
+      fontFamily: 'Bw Gradual',
       fontSize: 18,
       lineHeight: '21px',
       fontWeight: 400,
     },
     body2: {
-      fontFamily: 'Sequel Sans',
+      fontFamily: 'Bw Gradual',
       fontSize: 14,
       lineHeight: '21px',
       fontWeight: 400,

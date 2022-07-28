@@ -8,21 +8,25 @@ export const useStyles = makeStyles()((theme) => ({
     borderRadius: 6,
     backgroundColor: theme.palette.background.paper,
     display: 'flex',
-    flexDirection: 'column'
+    flexDirection: 'column',
   },
   iconWrapper: {
-    width: 46,
-    height: 46,
+    width: 48,
+    height: 48,
     margin: '7px 23px 0 0',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
+    '& > svg': {
+      height: '100%',
+      width: '100%',
+    },
   },
   title: {
     fontSize: 18,
     lineHeight: '21px',
     fontWeight: 400,
-    color: theme.palette.text.primary
+    color: theme.palette.text.primary,
   },
   label: {
     fontSize: 12,
@@ -37,19 +41,19 @@ export const useStyles = makeStyles()((theme) => ({
     fontSize: 12,
     lineHeight: '18px',
     fontWeight: 400,
-    color: theme.palette.grey[300]
+    color: theme.palette.grey[300],
   },
   subtitle: {
     fontSize: 10,
     lineHeight: '18px',
     fontWeight: 400,
     color: theme.palette.text.primary,
-    margin: '7px 0 0 10px'
+    margin: '7px 0 0 10px',
   },
   footer: {
     flexGrow: 1,
     display: 'flex',
-    alignItems: 'flex-end'
+    alignItems: 'flex-end',
   },
   button: {
     height: 37,
@@ -71,5 +75,5 @@ export const useStyles = makeStyles()((theme) => ({
     transition: theme.transitions.create('color', {
       duration: theme.transitions.duration.short,
     }),
-  }
+  },
 }));

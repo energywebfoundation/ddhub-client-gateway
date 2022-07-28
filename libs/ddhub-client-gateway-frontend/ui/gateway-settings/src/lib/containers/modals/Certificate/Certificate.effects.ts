@@ -70,7 +70,7 @@ export const useCertificateEffects = () => {
   const openCancelModal = async () => {
     closeModal();
     const result = await Swal.warning({
-      text: 'you will close configure certificate form',
+      text: 'The certificate configuration form will be closed.',
     });
 
     if (result.isConfirmed) {
@@ -85,9 +85,7 @@ export const useCertificateEffects = () => {
     clear();
     closeModal();
     Swal.success({
-      html:
-        'You have successfully configured the certificates. <br />' +
-        'Please restart the Client GW Backend to reflect these changes',
+      text: 'Certificates have been successfully configured.',
     });
   };
 
