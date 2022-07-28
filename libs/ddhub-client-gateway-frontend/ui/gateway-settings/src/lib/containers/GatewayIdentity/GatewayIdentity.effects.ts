@@ -1,12 +1,9 @@
 import { useCustomAlert } from '@ddhub-client-gateway-frontend/ui/core';
-import {
-  useIdentity,
-  useGatewayConfig,
-} from '@ddhub-client-gateway-frontend/ui/api-hooks';
+import { useGatewayConfig } from '@ddhub-client-gateway-frontend/ui/api-hooks';
 import { useSetUserDataEffect } from '@ddhub-client-gateway-frontend/ui/login';
 
 export const useGatewayIdentityEffects = () => {
-  const { config } = useGatewayConfig();
+  const { config, isLoading } = useGatewayConfig();
   const { userData, setUserData } = useSetUserDataEffect();
   const Swal = useCustomAlert();
 
@@ -25,7 +22,10 @@ export const useGatewayIdentityEffects = () => {
 
   return {
     update,
-    identity: { enrolment: { did: userData.did } },
+    ...config,
     namespace,
+    isLoading: isLoading || userData.isChecking,
+    roles: userData.roles.filter((role) => role.required),
+    accountStatus: userData.accountStatus,
   };
 };
