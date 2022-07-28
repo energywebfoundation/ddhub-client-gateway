@@ -62,6 +62,8 @@ export const TopicVersionDetails: FC<TopicVersionDetailsProps> = (
           showFooter={false}
           showSearch={false}
           onRowClick={handleRowClick}
+          containerProps={{ style: { boxShadow: 'none' }}}
+          stripedTable={true}
           customStyle={{ tableMinWidth: 'auto' }}
         />
       </Grid>
