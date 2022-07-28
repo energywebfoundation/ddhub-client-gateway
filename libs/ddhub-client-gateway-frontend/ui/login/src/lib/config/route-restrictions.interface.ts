@@ -3,15 +3,34 @@ export interface IndexableRouteRestrictions {
 }
 
 export class RouteRestriction {
-  allowedRoles: string[] = [];
+  protected allowedRoles: string[] = [];
+  protected mtlsRequired = false;
+
+  constructor(allowedRoles: string[], mtlsRequired?: boolean) {
+    this.allowedRoles = allowedRoles;
+    if (mtlsRequired !== undefined) {
+      this.mtlsRequired = mtlsRequired;
+    }
+  }
+
+  public getAllowedRoles(): string[] {
+    return this.allowedRoles;
+  }
+
+  public getMtlsRequired(): boolean {
+    return this.mtlsRequired;
+  }
 }
 
 export class RouteRestrictions {
-  topicManagement: RouteRestriction = new RouteRestriction();
-  myAppsAndTopics: RouteRestriction = new RouteRestriction();
-  channelManagement: RouteRestriction = new RouteRestriction();
-  largeFileUpload: RouteRestriction = new RouteRestriction();
-  largeFileDownload: RouteRestriction = new RouteRestriction();
-  fileUpload: RouteRestriction = new RouteRestriction();
-  fileDownload: RouteRestriction = new RouteRestriction();
+  topicManagement: RouteRestriction = new RouteRestriction(
+    ['topiccreator'],
+    true
+  );
+  myAppsAndTopics: RouteRestriction = new RouteRestriction(['user']);
+  channelManagement: RouteRestriction = new RouteRestriction(['user'], true);
+  largeFileUpload: RouteRestriction = new RouteRestriction(['user'], true);
+  largeFileDownload: RouteRestriction = new RouteRestriction(['user'], true);
+  fileUpload: RouteRestriction = new RouteRestriction(['user'], true);
+  fileDownload: RouteRestriction = new RouteRestriction(['user'], true);
 }

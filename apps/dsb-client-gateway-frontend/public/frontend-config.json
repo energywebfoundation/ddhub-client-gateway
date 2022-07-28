@@ -1,23 +1,29 @@
 {
   "topicManagement": {
-    "allowedRoles": ["topiccreator"]
+    "allowedRoles": ["topiccreator"],
+    "mtlsRequired": true
   },
   "myAppsAndTopics": {
     "allowedRoles": ["user"]
   },
   "channelManagement": {
-    "allowedRoles": ["user"]
+    "allowedRoles": ["user"],
+    "mtlsRequired": true
   },
   "largeFileUpload": {
-    "allowedRoles": ["user"]
+    "allowedRoles": ["user"],
+    "mtlsRequired": true
   },
   "largeFileDownload": {
-    "allowedRoles": ["user"]
+    "allowedRoles": ["user"],
+    "mtlsRequired": true
   },
   "fileUpload": {
-    "allowedRoles": ["user"]
+    "allowedRoles": ["user"],
+    "mtlsRequired": true
   },
   "fileDownload": {
-    "allowedRoles": ["user"]
+    "allowedRoles": ["user"],
+    "mtlsRequired": true
   }
 }

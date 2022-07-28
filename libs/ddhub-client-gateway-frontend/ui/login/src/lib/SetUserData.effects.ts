@@ -19,9 +19,8 @@ import {
   IndexableRouteRestrictions,
 } from './config/route-restrictions.interface';
 import { useCustomAlert } from '@ddhub-client-gateway-frontend/ui/core';
-import { useGatewayConfig } from '@ddhub-client-gateway-frontend/ui/api-hooks';
 
-export const routeRestrictions = new Map<string, string>()
+export const routes = new Map<string, string>()
   .set('topicManagement', routerConst.TopicManagement)
   .set('myAppsAndTopics', routerConst.ChannelApps)
   .set('channelManagement', routerConst.ChannelsManagement)
@@ -33,7 +32,7 @@ export const routeRestrictions = new Map<string, string>()
 export const getRoutesToDisplay = (
   accountRoles: Role[],
   restrictions: IndexableRouteRestrictions,
-  config: GatewayConfig
+  config?: GatewayConfig
 ): Set<string> => {
   if (!accountRoles) {
     return new Set();
@@ -51,31 +50,37 @@ export const getRoutesToDisplay = (
     return new Set();
   }
   const allowedRoutes = Object.keys(restrictions).map((key: string) => {
+    const routeRestriction = restrictions[key];
+    const route = routes.get(key);
     if (
-      restrictions[key].allowedRoles.some(
-        (allowedRole: string) =>
-          roles.filter((role) => role.includes(allowedRole)).length > 0
-      )
+      routeRestriction
+        .getAllowedRoles()
+        .some(
+          (allowedRole: string) =>
+            roles.filter((role) => role.includes(allowedRole)).length > 0
+        ) &&
+      (!routeRestriction.getMtlsRequired() ||
+        (routeRestriction.getMtlsRequired() &&
+          // If mtlsIsValid is undefined, it means that it is not enabled
+          (config?.mtlsIsValid === undefined || config?.mtlsIsValid === true)))
     ) {
-      return routeRestrictions.get(key);
-    } else {
-      return '';
+      return route;
     }
   });
 
-  return new Set(allowedRoutes.filter((value) => value !== '') as string[]);
+  return new Set(allowedRoutes.filter((value) => !!value) as string[]);
 };
 
 export const useSetUserDataEffect = () => {
   const Swal = useCustomAlert();
   const router = useRouter();
-  const { config } = useGatewayConfig();
   const { userData, setUserData } = useContext(UserDataContext);
   const queryClient = useQueryClient();
 
   const setData = (
     res: IdentityWithEnrolment,
-    routeRestrictions: RouteRestrictions = userData.routeRestrictions
+    routeRestrictions: RouteRestrictions = userData.routeRestrictions,
+    config?: GatewayConfig
   ) => {
     const redirect = async (status: AccountStatusEnum | RoleStatus) => {
       if (status !== RoleStatus.SYNCED) {
