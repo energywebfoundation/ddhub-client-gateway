@@ -78,6 +78,7 @@ export const Topics = ({
         <SelectedTopicList
           topics={selectedTopics}
           remove={removeSelectedTopic}
+          canCopy={true}
         />
       </Grid>
       <Grid item alignSelf="flex-end" width="100%" sx={{paddingRight: '7px'}}>
