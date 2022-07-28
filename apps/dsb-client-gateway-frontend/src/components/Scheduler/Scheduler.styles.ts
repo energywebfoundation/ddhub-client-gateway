@@ -4,7 +4,6 @@ export const useStyles = makeStyles()((theme) => ({
   card: {
     boxShadow: 'none',
     minHeight: 206,
-    padding: '22px 29px 43px',
   },
   cardHeader: {
     padding: 0,
@@ -20,5 +19,5 @@ export const useStyles = makeStyles()((theme) => ({
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-  }
+  },
 }));

@@ -23,7 +23,11 @@
       "executor": "@nrwl/next:server",
       "options": {
         "buildTarget": "dsb-client-gateway-frontend:build",
-        "dev": true
+        "dev": true,
+        "assets": [
+          "apps/dsb-client-gateway-frontend/public/frontend-config.json",
+          "apps/dsb-client-gateway-frontend/public/ws.yaml"
+        ]
       },
       "configurations": {
         "production": {

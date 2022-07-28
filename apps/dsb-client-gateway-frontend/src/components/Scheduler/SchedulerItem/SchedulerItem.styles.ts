@@ -1,9 +1,6 @@
 import { makeStyles } from 'tss-react/mui';
 
 export const useStyles = makeStyles()((theme) => ({
-  iconWrappper: {
-    marginRight: 19,
-  },
   label: {
     fontSize: 12,
     lineHeight: '18px',
@@ -25,6 +22,8 @@ export const useStyles = makeStyles()((theme) => ({
     color: theme.palette.text.primary,
   },
   iconWrapper: {
+    marginLeft: 18.4,
+    marginRight: 28,
     width: 48,
     height: 48,
     borderRadius: '50%',

@@ -1,15 +1,20 @@
 import { FC } from 'react';
 import { Icon } from 'react-feather';
-import { Typography, Box, Divider } from '@mui/material';
+import { Typography, Box, Divider, Skeleton } from '@mui/material';
 import { useStyles } from './SchedulerItem.styles';
-import Status, { StatusTypeEnum } from '../../Status/Status';
 import { capitalizeFirstLetter } from '@ddhub-client-gateway-frontend/ui/utils';
+import {
+  Badge,
+  BadgeText,
+  BadgeTextType,
+} from '@ddhub-client-gateway-frontend/ui/core';
 
 export interface SchedulerItemProps {
   name: string;
   date: string;
   icon: Icon;
-  status: string;
+  status: BadgeTextType;
+  isLoading: boolean;
 }
 
 export const SchedulerItem: FC<SchedulerItemProps> = ({
@@ -17,13 +22,15 @@ export const SchedulerItem: FC<SchedulerItemProps> = ({
   name,
   date,
   status,
+  isLoading,
 }) => {
   const { classes } = useStyles();
+
   return (
     <>
       <Divider />
-      <Box display="flex" mb={1.2} mt={1.2}>
-        <Box className={classes.iconWrappper}>
+      <Box display="flex" p={1.2}>
+        <Box className={classes.iconWrapper}>
           <Icon size={20} />
         </Box>
         <Box display="flex" justifyContent="space-between" flex={1}>
@@ -36,7 +43,13 @@ export const SchedulerItem: FC<SchedulerItemProps> = ({
             </Typography>
           </Box>
           <Box display="flex" flexDirection="column" alignSelf="center">
-            <Status text={status} type={status as StatusTypeEnum}></Status>
+            {isLoading ? (
+              <Box mt={'7px'}>
+                <Skeleton variant="text" width={100} height={20} />
+              </Box>
+            ) : (
+              <Badge text={BadgeText[status]} />
+            )}
           </Box>
         </Box>
       </Box>

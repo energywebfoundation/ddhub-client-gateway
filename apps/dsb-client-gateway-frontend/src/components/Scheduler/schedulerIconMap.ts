@@ -1,6 +1,7 @@
 import {
   ApplicationRefresh,
-  ChannelRoles, FileCleaner,
+  ChannelRoles,
+  FileCleaner,
   SymmetricKeys,
   TopicRefresh,
   RolesRefresh,
