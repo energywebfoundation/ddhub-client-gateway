@@ -38,6 +38,6 @@ export interface Role {
 }
 
 export interface Enrolment {
-  did: string | null;
+  did?: string;
   roles: Role[];
 }
