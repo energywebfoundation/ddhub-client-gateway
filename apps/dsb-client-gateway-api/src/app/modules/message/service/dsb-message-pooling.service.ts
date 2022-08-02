@@ -133,38 +133,52 @@ export class DsbMessagePoolingService implements OnModuleInit {
 
     let msgCount = 0;
     for (const subscription of subscriptions) {
-      const messages: GetMessageResponse[] = await this.messageService.getMessages(
-        {
-          fqcn: subscription.fqcn,
-          from: undefined,
-          amount: messagesAmount,
-          topicName: undefined,
-          topicOwner: undefined,
-          clientId: _clientId ? _clientId : clientId,
+      try {
+        const messages: GetMessageResponse[] = await this.messageService.getMessages(
+          {
+            fqcn: subscription.fqcn,
+            from: undefined,
+            amount: messagesAmount,
+            topicName: undefined,
+            topicOwner: undefined,
+            clientId: _clientId ? _clientId : clientId,
+          }
+        );
+
+        this.logger.log(`Found ${messages.length} in ${subscription.fqcn} for ${_clientId ? _clientId : clientId}`);
+
+        if (messages && messages.length > 0) {
+          msgCount += messages.length;
+          await this.sendMessagesToSubscribers(messages, subscription.fqcn, client);
         }
-      );
+      } catch (e) {
 
-      this.logger.log(`Found ${messages.length} in ${subscription.fqcn} for ${_clientId ? _clientId : clientId}`);
-
-      if (messages && messages.length > 0) {
-        msgCount += messages.length;
-        await this.sendMessagesToSubscribers(messages, subscription.fqcn, client);
+        this.logger.error(`[WS][pullMessages] ${e}`);
       }
+
     }
 
     return msgCount;
   }
 
   public async sendMessagesToSubscribers(messages: GetMessageResponse[], fqcn: string, client: any): Promise<void> {
-    const emitMode: EventEmitMode = this.configService.get('EVENTS_EMIT_MODE', EventEmitMode.BULK);
+    try {
+      const emitMode: EventEmitMode = this.configService.get('EVENTS_EMIT_MODE', EventEmitMode.BULK);
 
-    if (emitMode === EventEmitMode.BULK) {
-      client.send(JSON.stringify(messages.map((message) => ({ ...message, fqcn }))));
-      return;
+      if (emitMode === EventEmitMode.BULK) {
+        const msg = JSON.stringify(messages.map((message) => ({ ...message, fqcn })));
+        this.logger.log(`[WS][sendMessagesToSubscribers][BULK]${msg}`);
+        client.send(msg);
+        return;
+      }
+
+      messages.forEach((message: GetMessageResponse) => {
+        this.logger.log(`[WS][sendMessagesToSubscribers][SINGLE]${message}`);
+        client.send(JSON.stringify({ ...message, fqcn }));
+      });
+
+    } catch (e) {
+      this.logger.error(`[WS][sendMessagesToSubscribers] ${e}`);
     }
-
-    messages.forEach((message: GetMessageResponse) => {
-      client.send(JSON.stringify({ ...message, fqcn }));
-    });
   }
 }

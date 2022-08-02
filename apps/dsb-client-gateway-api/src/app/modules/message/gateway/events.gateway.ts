@@ -107,7 +107,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayInit {
       return;
     }
 
-    this.logger.log(`New client connected, total client connected ${this.server.clients.size}`);
+    this.logger.log(`New client connected ${_clientId}, total client connected ${this.server.clients.size}`);
   }
 
   @SubscribeMessage('message')
