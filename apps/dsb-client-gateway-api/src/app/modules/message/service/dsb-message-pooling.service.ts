@@ -133,23 +133,28 @@ export class DsbMessagePoolingService implements OnModuleInit {
 
     let msgCount = 0;
     for (const subscription of subscriptions) {
-      const messages: GetMessageResponse[] = await this.messageService.getMessages(
-        {
-          fqcn: subscription.fqcn,
-          from: undefined,
-          amount: messagesAmount,
-          topicName: undefined,
-          topicOwner: undefined,
-          clientId: _clientId ? _clientId : clientId,
+      try {
+        const messages: GetMessageResponse[] = await this.messageService.getMessages(
+          {
+            fqcn: subscription.fqcn,
+            from: undefined,
+            amount: messagesAmount,
+            topicName: undefined,
+            topicOwner: undefined,
+            clientId: _clientId ? _clientId : clientId,
+          }
+        );
+
+        this.logger.log(`Found ${messages.length} in ${subscription.fqcn} for ${_clientId ? _clientId : clientId}`);
+
+        if (messages && messages.length > 0) {
+          msgCount += messages.length;
+          await this.sendMessagesToSubscribers(messages, subscription.fqcn, client);
         }
-      );
-
-      this.logger.log(`Found ${messages.length} in ${subscription.fqcn} for ${_clientId ? _clientId : clientId}`);
-
-      if (messages && messages.length > 0) {
-        msgCount += messages.length;
-        await this.sendMessagesToSubscribers(messages, subscription.fqcn, client);
+      } catch (e) {
+        this.logger.log(e);
       }
+
     }
 
     return msgCount;
