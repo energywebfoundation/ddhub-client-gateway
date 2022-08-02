@@ -59,6 +59,7 @@ ddhub-client-gateway-api:
       appConfig:
         DID_AUTH_URL: "https://ddhub-demo.energyweb.org"
         DID_REGISTRY_ADDRESS: "0xc15d5a57a8eb0e1dcbe5d88b8f9a82017e5cc4af"
+        NO_COLOR: "true"
     ui:
       enabled: true
       replicaCount: 1

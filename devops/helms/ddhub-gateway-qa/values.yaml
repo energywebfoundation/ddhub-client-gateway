@@ -22,6 +22,8 @@ ddhub-client-gateway-api:
         pullPolicy: IfNotPresent
         # Overrides the image tag whose default is the chart appVersion.
         tag: latest
+      appConfig:
+        NO_COLOR: "true"
     ui:
       enabled: true
       replicaCount: 1
