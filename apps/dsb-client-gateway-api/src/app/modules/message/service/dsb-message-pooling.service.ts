@@ -152,7 +152,7 @@ export class DsbMessagePoolingService implements OnModuleInit {
           await this.sendMessagesToSubscribers(messages, subscription.fqcn, client);
         }
       } catch (e) {
-        this.logger.log(e);
+        this.logger.error(`[WS][pullMessages] ${e}`);
       }
 
     }
@@ -161,15 +161,23 @@ export class DsbMessagePoolingService implements OnModuleInit {
   }
 
   public async sendMessagesToSubscribers(messages: GetMessageResponse[], fqcn: string, client: any): Promise<void> {
-    const emitMode: EventEmitMode = this.configService.get('EVENTS_EMIT_MODE', EventEmitMode.BULK);
+    try {
+      const emitMode: EventEmitMode = this.configService.get('EVENTS_EMIT_MODE', EventEmitMode.BULK);
 
-    if (emitMode === EventEmitMode.BULK) {
-      client.send(JSON.stringify(messages.map((message) => ({ ...message, fqcn }))));
-      return;
+      if (emitMode === EventEmitMode.BULK) {
+        const msg = JSON.stringify(messages.map((message) => ({ ...message, fqcn })));
+        this.logger.log(`[WS][sendMessagesToSubscribers][BULK]${msg}`);
+        client.send(msg);
+        return;
+      }
+
+      messages.forEach((message: GetMessageResponse) => {
+        this.logger.log(`[WS][sendMessagesToSubscribers][SINGLE]${message}`);
+        client.send(JSON.stringify({ ...message, fqcn }));
+      });
+
+    } catch (e) {
+      this.logger.error(`[WS][sendMessagesToSubscribers] ${e}`);
     }
-
-    messages.forEach((message: GetMessageResponse) => {
-      client.send(JSON.stringify({ ...message, fqcn }));
-    });
   }
 }
