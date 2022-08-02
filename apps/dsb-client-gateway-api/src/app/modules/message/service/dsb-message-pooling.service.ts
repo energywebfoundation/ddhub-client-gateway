@@ -60,6 +60,7 @@ export class DsbMessagePoolingService implements OnModuleInit {
       if (this.websocketMode === WebSocketImplementation.SERVER && this.gateway.server.clients.size === 0) {
         const timeout = setTimeout(callback, this.configService.get<number>('WEBSOCKET_POOLING_TIMEOUT', 5000));
         this.schedulerRegistry.addTimeout(SCHEDULER_HANDLERS.MESSAGES, timeout);
+        this.logger.log(`${this.gateway.server.clients.size} client connected. Skip pooling trigger. waiting ${this.configService.get<number>('WEBSOCKET_POOLING_TIMEOUT')}`);
         return;
       }
 
@@ -69,6 +70,7 @@ export class DsbMessagePoolingService implements OnModuleInit {
         }
         const timeout = setTimeout(callback, this.configService.get<number>('WEBSOCKET_POOLING_TIMEOUT', 5000));
         this.schedulerRegistry.addTimeout(SCHEDULER_HANDLERS.MESSAGES, timeout);
+        this.logger.log(`Skip pooling trigger. waiting ${this.configService.get<number>('WEBSOCKET_POOLING_TIMEOUT')}`);
         return;
       }
 
@@ -79,23 +81,24 @@ export class DsbMessagePoolingService implements OnModuleInit {
           'No subscriptions found. Push messages are enabled when the DID is added to a channel'
         );
 
-        const timeout = setTimeout(callback, this.configService.get<number>('WEBSOCKET_POOLING_TIMEOUT', 5000) * 12);
+        const timeout = setTimeout(callback, this.configService.get<number>('WEBSOCKET_POOLING_TIMEOUT', 5000));
         this.schedulerRegistry.addTimeout(SCHEDULER_HANDLERS.MESSAGES, timeout);
-
+        this.logger.log(`Waiting ${this.configService.get<number>('WEBSOCKET_POOLING_TIMEOUT')}`);
         return;
       }
 
       const msdCount = await this.pullMessagesAndEmit(subscriptions);
       if (msdCount == 0) {
-        throw new Error(`empty msg, increase waiting to ` + this.configService.get<number>('WEBSOCKET_POOLING_TIMEOUT', 5000) * 12);
+        throw new Error(`empty msg, waiting to ` + this.configService.get<number>('WEBSOCKET_POOLING_TIMEOUT', 5000));
       }
 
-      const timeout = setTimeout(callback, this.configService.get<number>('WEBSOCKET_POOLING_TIMEOUT', 5000) / 5);
+      const timeout = setTimeout(callback, 1000); //immediate get msg available
       this.schedulerRegistry.addTimeout(SCHEDULER_HANDLERS.MESSAGES, timeout);
     } catch (e) {
       this.logger.error(e);
-      const timeout = setTimeout(callback, this.configService.get<number>('WEBSOCKET_POOLING_TIMEOUT', 5000) * 12);
+      const timeout = setTimeout(callback, this.configService.get<number>('WEBSOCKET_POOLING_TIMEOUT', 5000));
       this.schedulerRegistry.addTimeout(SCHEDULER_HANDLERS.MESSAGES, timeout);
+      this.logger.log(`Waiting ${this.configService.get<number>('WEBSOCKET_POOLING_TIMEOUT')}`);
     }
   }
 

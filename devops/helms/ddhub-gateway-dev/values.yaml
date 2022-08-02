@@ -55,7 +55,7 @@ ddhub-client-gateway-api:
       appConfig:
         DID_AUTH_URL: "http://ddhub-messagebroker-proxy-dev.ddhub-dev.svc"
         DID_REGISTRY_ADDRESS: "0xc15d5a57a8eb0e1dcbe5d88b8f9a82017e5cc4af"
-        WEBSOCKET_POOLING_TIMEOUT: "834000"
+        WEBSOCKET_POOLING_TIMEOUT: "10000" #10s
         NO_COLOR: "true"
   image:
     # repository: 098061033856.dkr.ecr.us-east-1.amazonaws.com/ew-dos-dsb-ecr
@@ -164,4 +164,7 @@ ddhub-client-gateway-api:
 
   probes:
     liveness: true
+    livenessInitialDelay: 120
+    livenessPeriodSeconds: 10
     readiness: true
+    readinessInitialDelay: 120

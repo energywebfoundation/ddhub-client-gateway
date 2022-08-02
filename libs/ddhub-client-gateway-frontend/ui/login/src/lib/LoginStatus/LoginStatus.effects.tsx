@@ -10,8 +10,10 @@ import IdentitySuccessful from './IdentitySuccessful/IdentitySuccessful';
 import ResetPrivateKey from '../ResetPrivateKey/ResetPrivateKey';
 import LoadingInfo from '../LoadingInfo/LoadingInfo';
 import { Stack, Typography } from '@mui/material';
+import { useEffect, useState } from 'react';
 
 export const useLoginStatusEffects = () => {
+  const [isFirstLogin, setIsFirstLogin] = useState(false);
   const { isLoading, submit, status, errorMessage, userData } =
     usePrivateKeyEffects();
 
@@ -28,14 +30,26 @@ export const useLoginStatusEffects = () => {
     </LoadingInfo>
   );
 
+  const showLoginForm = () => {
+    if (isLoading) {
+      return checkingIdentity();
+    } else {
+      return <LoginForm onPrivateKeySubmit={privateKeyHandler} />;
+    }
+  };
+
+  useEffect(() => {
+    if (status === AccountStatusEnum.FirstLogin) {
+      setIsFirstLogin(true);
+    }
+  }, [status]);
+
   const statusFactory = () => {
     switch (status) {
+      case AccountStatusEnum.FirstLogin:
+        return showLoginForm();
       case AccountStatusEnum.NotSetPrivateKey:
-        if (isLoading) {
-          return checkingIdentity();
-        } else {
-          return <LoginForm onPrivateKeySubmit={privateKeyHandler} />;
-        }
+        return showLoginForm();
       case AccountStatusEnum.ErrorOccur:
         return (
           <>
@@ -58,7 +72,7 @@ export const useLoginStatusEffects = () => {
           return checkingIdentity();
         } else {
           return (
-            <IdentitySuccessful>
+            <IdentitySuccessful isFirstLogin={isFirstLogin}>
               {
                 userData.roles
                   .filter((role) => role.required)

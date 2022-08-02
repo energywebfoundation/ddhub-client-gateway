@@ -10,6 +10,7 @@ export interface UserDataContext {
   routeRestrictions: RouteRestrictions;
   displayedRoutes: Set<string>;
   roles: Role[];
+  did?: string;
 }
 
 const initialData = {

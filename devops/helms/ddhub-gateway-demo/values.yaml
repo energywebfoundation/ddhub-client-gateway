@@ -20,7 +20,7 @@ ddhub-client-gateway-api:
       websocket_reconnect_timeout: 10000
       # -- Define how many times the WebSocket client should attempt reconnection with the server upon receving connection error/close.
       websocket_reconnect_max_retries: 10
-      websocket_pooling_timeout: 834000
+      websocket_pooling_timeout: 10000
       # -- Defines the format for messages pushed over a real-time communication channel. If bulk mode is chosen, messages will be sent as an array. At every 1 second interval, the gateway will emit an array of the latest messages received. If single mode is chosen, messages will be sent individually. Options: BULK, SINGLE
       events_emit_mode: BULK
       # -- Defines how many events should be pushed per second, regardless of mode chosen (see above).
@@ -53,7 +53,7 @@ ddhub-client-gateway-api:
         tag: canary
       podAnnotations: {}
       resources: {}
-      probes: 
+      probes:
         liveness: true
         readiness: true
       appConfig:
@@ -69,7 +69,7 @@ ddhub-client-gateway-api:
         tag: canary
       podAnnotations: {}
       resources: {}
-      probes: 
+      probes:
         liveness: true
         readiness: true
       port: 80
@@ -184,4 +184,7 @@ ddhub-client-gateway-api:
 
   probes:
     liveness: true
+    livenessInitialDelay: 120
+    livenessPeriodSeconds: 10
     readiness: true
+    readinessInitialDelay: 120

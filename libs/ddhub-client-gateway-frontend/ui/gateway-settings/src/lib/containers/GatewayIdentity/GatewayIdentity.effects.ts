@@ -6,9 +6,8 @@ import {
 import { useSetUserDataEffect } from '@ddhub-client-gateway-frontend/ui/login';
 
 export const useGatewayIdentityEffects = () => {
-  const { identity } = useIdentity();
   const { config } = useGatewayConfig();
-  const { setUserData } = useSetUserDataEffect();
+  const { userData, setUserData } = useSetUserDataEffect();
   const Swal = useCustomAlert();
 
   const namespace = config?.namespace ?? 'ddhub.apps.energyweb.iam.ewc';
@@ -26,7 +25,7 @@ export const useGatewayIdentityEffects = () => {
 
   return {
     update,
-    identity,
+    identity: { enrolment: { did: userData.did } },
     namespace,
   };
 };

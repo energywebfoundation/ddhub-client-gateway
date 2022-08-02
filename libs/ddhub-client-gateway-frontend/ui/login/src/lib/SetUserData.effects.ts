@@ -99,6 +99,7 @@ export const useSetUserDataEffect = () => {
         isChecking: false,
         routeRestrictions,
         displayedRoutes,
+        did: res.enrolment.did,
       });
     } else {
       setUserData({
