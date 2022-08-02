@@ -60,7 +60,7 @@ export class DsbMessagePoolingService implements OnModuleInit {
       if (this.websocketMode === WebSocketImplementation.SERVER && this.gateway.server.clients.size === 0) {
         const timeout = setTimeout(callback, this.configService.get<number>('WEBSOCKET_POOLING_TIMEOUT', 5000));
         this.schedulerRegistry.addTimeout(SCHEDULER_HANDLERS.MESSAGES, timeout);
-        this.logger.log(`${this.gateway.server.clients.size} client connected. Skip pooling trigger.`);
+        this.logger.log(`${this.gateway.server.clients.size} client connected. Skip pooling trigger. waiting ${this.configService.get<number>('WEBSOCKET_POOLING_TIMEOUT')}`);
         return;
       }
 
@@ -70,6 +70,7 @@ export class DsbMessagePoolingService implements OnModuleInit {
         }
         const timeout = setTimeout(callback, this.configService.get<number>('WEBSOCKET_POOLING_TIMEOUT', 5000));
         this.schedulerRegistry.addTimeout(SCHEDULER_HANDLERS.MESSAGES, timeout);
+        this.logger.log(`Skip pooling trigger. waiting ${this.configService.get<number>('WEBSOCKET_POOLING_TIMEOUT')}`);
         return;
       }
 
@@ -82,7 +83,7 @@ export class DsbMessagePoolingService implements OnModuleInit {
 
         const timeout = setTimeout(callback, this.configService.get<number>('WEBSOCKET_POOLING_TIMEOUT', 5000));
         this.schedulerRegistry.addTimeout(SCHEDULER_HANDLERS.MESSAGES, timeout);
-
+        this.logger.log(`Waiting ${this.configService.get<number>('WEBSOCKET_POOLING_TIMEOUT')}`);
         return;
       }
 
@@ -97,6 +98,7 @@ export class DsbMessagePoolingService implements OnModuleInit {
       this.logger.error(e);
       const timeout = setTimeout(callback, this.configService.get<number>('WEBSOCKET_POOLING_TIMEOUT', 5000));
       this.schedulerRegistry.addTimeout(SCHEDULER_HANDLERS.MESSAGES, timeout);
+      this.logger.log(`Waiting ${this.configService.get<number>('WEBSOCKET_POOLING_TIMEOUT')}`);
     }
   }
 
