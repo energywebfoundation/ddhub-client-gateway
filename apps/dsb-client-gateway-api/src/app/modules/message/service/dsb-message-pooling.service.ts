@@ -152,6 +152,7 @@ export class DsbMessagePoolingService implements OnModuleInit {
           await this.sendMessagesToSubscribers(messages, subscription.fqcn, client);
         }
       } catch (e) {
+
         this.logger.error(`[WS][pullMessages] ${e}`);
       }
 
