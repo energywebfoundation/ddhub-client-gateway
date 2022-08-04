@@ -97,9 +97,8 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const responseBody: ResponseErrorDto = {
       err: {
         code: DsbClientGatewayErrors.UNKNOWN,
-        reason: exception.message,
-        additionalDetails: exception.additionalDetails,
-        exception: JSON.stringify(exception),
+        reason: exception?.message,
+        additionalDetails: exception?.additionalDetails,
       },
       timestamp: new Date().toISOString(),
       statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
