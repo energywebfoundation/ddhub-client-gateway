@@ -20,10 +20,12 @@ ddhub-client-gateway-api:
       websocket_reconnect_timeout: 10000
       # -- Define how many times the WebSocket client should attempt reconnection with the server upon receving connection error/close.
       websocket_reconnect_max_retries: 10
+       # -- Define the websocket message pooling timeout.
+      websocket_pooling_timeout: 2000
       # -- Defines the format for messages pushed over a real-time communication channel. If bulk mode is chosen, messages will be sent as an array. At every 1 second interval, the gateway will emit an array of the latest messages received. If single mode is chosen, messages will be sent individually. Options: BULK, SINGLE
       events_emit_mode: BULK
       # -- Defines how many events should be pushed per second, regardless of mode chosen (see above).
-      events_max_per_second: 2
+      events_max_per_second: 50
       # -- The URL of the DSB Message Broker you want to connect to. Trailing / allowed.
       dsb_base_url: http://ddhub-messagebroker-proxy-dev.ddhub-dev.svc
       # -- Sets the chain ID of the blockchain network. Options: 73799 (Volta), 246 (EWC)
@@ -55,7 +57,7 @@ ddhub-client-gateway-api:
       appConfig:
         DID_AUTH_URL: "http://ddhub-messagebroker-proxy-dev.ddhub-dev.svc"
         DID_REGISTRY_ADDRESS: "0xc15d5a57a8eb0e1dcbe5d88b8f9a82017e5cc4af"
-        WEBSOCKET_POOLING_TIMEOUT: "10000" #10s
+        EVENTS_MAX_PER_SECOND: "50"
         NO_COLOR: "true"
   image:
     # repository: 098061033856.dkr.ecr.us-east-1.amazonaws.com/ew-dos-dsb-ecr
