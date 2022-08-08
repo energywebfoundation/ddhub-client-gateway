@@ -151,6 +151,13 @@ jobs:
           docker tag energyweb/ddhub-client-gateway-backend ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-backend:latest
           docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-backend:latest
 
+      - name: Create a GitHub release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ needs.semantic-version.outputs.new_version }}
+          name: Release ${{ needs.semantic-version.outputs.new_version }}
+          body: ${{ needs.semantic-version.outputs.changelog }}
+
       - name: ArgoCD login
         uses: clowdhaus/argo-cd-action/@v1.12.1
         id: argocd_login
@@ -165,12 +172,6 @@ jobs:
           command: app set ddhub-gateway-demo
           options: -p ddhub-client-gateway-api.image.tag=${{needs.semantic-version.outputs.new_version}}
 
-      - name: Create a GitHub release
-        uses: ncipollo/release-action@v1
-        with:
-          tag: ${{ needs.semantic-version.outputs.new_version }}
-          name: Release ${{ needs.semantic-version.outputs.new_version }}
-          body: ${{ needs.semantic-version.outputs.changelog }}
   build-fe:
     name: Build Frontend
     runs-on: ubuntu-latest
