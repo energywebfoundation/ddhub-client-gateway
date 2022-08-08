@@ -6,6 +6,7 @@ import {
 import { SecretsEngineService } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
 import {
   ChannelEntity,
+  ChannelTopic,
   FileMetadataEntity,
   FileMetadataWrapperRepository,
   TopicEntity,
@@ -115,15 +116,15 @@ export class MessageService {
 
     messageLoggerContext.debug(
       'attempting to encrypt payload, encryption enabled: ' +
-      channel.payloadEncryption
+        channel.payloadEncryption
     );
 
     const message = channel.payloadEncryption
       ? this.keyService.encryptMessage(
-        dto.payload,
-        randomKey,
-        EncryptedMessageType['UTF-8']
-      )
+          dto.payload,
+          randomKey,
+          EncryptedMessageType['UTF-8']
+        )
       : dto.payload;
 
     messageLoggerContext.debug('fetching private key');
@@ -217,6 +218,17 @@ export class MessageService {
         topicName,
         topicOwner
       );
+
+      const hasNonBoundTopics: ChannelTopic | undefined =
+        channel.conditions.topics.find(
+          (channelTopic: ChannelTopic) =>
+            topicName === channelTopic.topicName &&
+            channelTopic.owner === topicOwner
+        );
+
+      if (!hasNonBoundTopics) {
+        throw new TopicNotRelatedToChannelException();
+      }
 
       if (!topic) {
         this.logger.error(
@@ -399,8 +411,6 @@ export class MessageService {
       if (a.timestampNanos < b.timestampNanos) return -1;
       return a.timestampNanos > b.timestampNanos ? 1 : 0;
     });
-
-
   }
 
   public async uploadMessage(
@@ -673,5 +683,3 @@ export class MessageService {
     return null;
   }
 }
-
-
