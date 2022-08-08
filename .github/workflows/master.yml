@@ -89,14 +89,14 @@ jobs:
           docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-scheduler:latest
 
       - name: ArgoCD login
-        uses: clowdhaus/argo-cd-action/@main
+        uses: clowdhaus/argo-cd-action/@v1.12.1
         id: argocd_login
         with:
           command: login ${{ secrets.ARGOCD_STAGING_URL }}
           options: --insecure --password ${{ secrets.ARGOCD_STAGING_PASS }} --username ${{ secrets.ARGOCD_STAGING_USERNAME }}
 
       - name: ArgoCD overwrite DEMO scheduler image tag
-        uses: clowdhaus/argo-cd-action/@main
+        uses: clowdhaus/argo-cd-action/@v1.12.1
         id: argocd_image_tag_overwrite_demo_scheduler
         with:
           command: app set ddhub-gateway-demo
@@ -152,14 +152,14 @@ jobs:
           docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-backend:latest
 
       - name: ArgoCD login
-        uses: clowdhaus/argo-cd-action/@main
+        uses: clowdhaus/argo-cd-action/@v1.12.1
         id: argocd_login
         with:
           command: login ${{ secrets.ARGOCD_STAGING_URL }}
           options: --insecure --password ${{ secrets.ARGOCD_STAGING_PASS }} --username ${{ secrets.ARGOCD_STAGING_USERNAME }}
 
       - name: ArgoCD overwrite DEMO image tag
-        uses: clowdhaus/argo-cd-action/@main
+        uses: clowdhaus/argo-cd-action/@v1.12.1
         id: argocd_image_tag_overwrite_demo_api
         with:
           command: app set ddhub-gateway-demo
@@ -220,14 +220,14 @@ jobs:
           docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-frontend:latest
 
       - name: ArgoCD login
-        uses: clowdhaus/argo-cd-action/@main
+        uses: clowdhaus/argo-cd-action/@v1.12.1
         id: argocd_login
         with:
           command: login ${{ secrets.ARGOCD_STAGING_URL }}
           options: --insecure --password ${{ secrets.ARGOCD_STAGING_PASS }} --username ${{ secrets.ARGOCD_STAGING_USERNAME }}
 
       - name: ArgoCD overwrite DEMO image tag
-        uses: clowdhaus/argo-cd-action/@main
+        uses: clowdhaus/argo-cd-action/@v1.12.1
         id: argocd_image_tag_overwrite_demo_ui
         with:
           command: app set ddhub-gateway-demo
