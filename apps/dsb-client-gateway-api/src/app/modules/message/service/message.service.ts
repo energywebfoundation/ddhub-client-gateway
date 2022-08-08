@@ -6,6 +6,7 @@ import {
 import { SecretsEngineService } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
 import {
   ChannelEntity,
+  ChannelTopic,
   FileMetadataEntity,
   FileMetadataWrapperRepository,
   TopicEntity,
@@ -217,6 +218,17 @@ export class MessageService {
         topicName,
         topicOwner
       );
+
+      const hasNonBoundTopics: ChannelTopic | undefined =
+        channel.conditions.topics.find(
+          (channelTopic: ChannelTopic) =>
+            topicName === channelTopic.topicName &&
+            channelTopic.owner === topicOwner
+        );
+
+      if (!hasNonBoundTopics) {
+        throw new TopicNotRelatedToChannelException();
+      }
 
       if (!topic) {
         this.logger.error(

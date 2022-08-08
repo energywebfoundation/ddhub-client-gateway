@@ -25,6 +25,18 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const { httpAdapter } = this.httpAdapterHost;
 
     const ctx = host.switchToHttp();
+    const request = ctx.getRequest();
+
+    const log = {
+      body: request.body,
+      url: request.originalUrl,
+      headers: request.headers,
+      params: request.params,
+      query: request.query,
+      statusCode: request.res.statusCode,
+    };
+
+    this.logger.debug('Catched error', JSON.stringify(log));
 
     if (exception instanceof ForbiddenException) {
       const responseBody: ResponseErrorDto = {
@@ -38,6 +50,8 @@ export class AllExceptionsFilter implements ExceptionFilter {
         timestamp: new Date().toISOString(),
         statusCode: HttpStatus.FORBIDDEN,
       };
+
+      this.logger.error(JSON.stringify(responseBody));
 
       this.emitError(ctx, httpAdapter, responseBody, responseBody.statusCode);
 
@@ -55,6 +69,8 @@ export class AllExceptionsFilter implements ExceptionFilter {
         statusCode: exception.httpCode,
       };
 
+      this.logger.error(JSON.stringify(responseBody));
+
       this.emitError(ctx, httpAdapter, responseBody, exception.httpCode);
 
       return;
@@ -71,6 +87,8 @@ export class AllExceptionsFilter implements ExceptionFilter {
         statusCode: exception.httpCode,
       };
 
+      this.logger.error(JSON.stringify(responseBody));
+
       this.emitError(ctx, httpAdapter, responseBody, exception.httpCode);
 
       return;
@@ -86,6 +104,8 @@ export class AllExceptionsFilter implements ExceptionFilter {
       timestamp: new Date().toISOString(),
       statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
     };
+
+    this.logger.error(JSON.stringify(responseBody));
 
     this.emitError(
       ctx,

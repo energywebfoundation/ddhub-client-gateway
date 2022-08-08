@@ -46,7 +46,7 @@ export class EnrolmentCronService implements OnApplicationBootstrap {
     const cronJob = new CronJob(
       this.configService.get<string>('ROLES_REFRESH_CRON_SCHEDULE'),
       async () => {
-        this.logger.log(`Executing applications refresh`);
+        this.logger.log(`Executing roles refresh`);
 
         await this.execute();
       }
@@ -94,6 +94,20 @@ export class EnrolmentCronService implements OnApplicationBootstrap {
       );
 
       if (!hasEnrolmentChanged) {
+        this.logger.debug(
+          `no enrolment change`,
+          'cached enrolment',
+          JSON.stringify(cachedEnrolment),
+          'new enrolment',
+          JSON.stringify(newEnrolment)
+        );
+
+        await this.cronWrapper.cronRepository.save({
+          jobName: CronJobType.ROLES_REFRESH,
+          latestStatus: CronStatus.SUCCESS,
+          executedAt: new Date(),
+        });
+
         return;
       }
 
