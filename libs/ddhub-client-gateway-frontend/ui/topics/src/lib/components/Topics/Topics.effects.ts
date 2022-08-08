@@ -10,7 +10,7 @@ import {
 } from '@ddhub-client-gateway-frontend/ui/api-hooks';
 import { TTableComponentAction } from '@ddhub-client-gateway-frontend/ui/core';
 import { GetTopicDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
-import { Queries, routerConst } from '@ddhub-client-gateway-frontend/ui/utils';
+import { downloadJson, Queries, routerConst } from '@ddhub-client-gateway-frontend/ui/utils';
 import { useStyles } from './Topics.styles';
 import { useState } from 'react';
 
@@ -84,6 +84,13 @@ export const useTopicsEffects = (
     });
   };
 
+  const exportSchema = (data: any) => {
+    downloadJson(
+      data.schema,
+      `Schema_${data.name}_${data.version}.json`
+    );
+  };
+
   const actions: TTableComponentAction<GetTopicDto>[] = [
     {
       label: 'View details',
@@ -99,6 +106,11 @@ export const useTopicsEffects = (
       label: 'View version history',
       readonly: true,
       onClick: (topic: GetTopicDto) => navigateToVersionHistory(topic),
+    },
+    {
+      label: 'Export schema',
+      readonly: true,
+      onClick: (topic: GetTopicDto) => exportSchema(topic),
     },
     {
       label: 'Remove',

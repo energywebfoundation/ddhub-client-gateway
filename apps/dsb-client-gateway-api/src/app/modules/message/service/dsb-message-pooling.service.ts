@@ -60,6 +60,7 @@ export class DsbMessagePoolingService implements OnModuleInit {
       if (this.websocketMode === WebSocketImplementation.SERVER && this.gateway.server.clients.size === 0) {
         const timeout = setTimeout(callback, this.configService.get<number>('WEBSOCKET_POOLING_TIMEOUT', 5000));
         this.schedulerRegistry.addTimeout(SCHEDULER_HANDLERS.MESSAGES, timeout);
+        this.logger.log(`${this.gateway.server.clients.size} client connected. Skip pooling trigger. waiting ${this.configService.get<number>('WEBSOCKET_POOLING_TIMEOUT', 5000)}`);
         return;
       }
 
@@ -69,6 +70,7 @@ export class DsbMessagePoolingService implements OnModuleInit {
         }
         const timeout = setTimeout(callback, this.configService.get<number>('WEBSOCKET_POOLING_TIMEOUT', 5000));
         this.schedulerRegistry.addTimeout(SCHEDULER_HANDLERS.MESSAGES, timeout);
+        this.logger.log(`Skip pooling trigger. waiting ${this.configService.get<number>('WEBSOCKET_POOLING_TIMEOUT', 5000)}`);
         return;
       }
 
@@ -79,23 +81,24 @@ export class DsbMessagePoolingService implements OnModuleInit {
           'No subscriptions found. Push messages are enabled when the DID is added to a channel'
         );
 
-        const timeout = setTimeout(callback, this.configService.get<number>('WEBSOCKET_POOLING_TIMEOUT', 5000) * 12);
+        const timeout = setTimeout(callback, this.configService.get<number>('WEBSOCKET_POOLING_TIMEOUT', 5000));
         this.schedulerRegistry.addTimeout(SCHEDULER_HANDLERS.MESSAGES, timeout);
-
+        this.logger.log(`Waiting ${this.configService.get<number>('WEBSOCKET_POOLING_TIMEOUT', 5000)}`);
         return;
       }
 
       const msdCount = await this.pullMessagesAndEmit(subscriptions);
       if (msdCount == 0) {
-        throw new Error(`empty msg, increase waiting to ` + this.configService.get<number>('WEBSOCKET_POOLING_TIMEOUT', 5000) * 12);
+        throw new Error(`empty msg, waiting to ` + this.configService.get<number>('WEBSOCKET_POOLING_TIMEOUT', 5000));
       }
 
-      const timeout = setTimeout(callback, this.configService.get<number>('WEBSOCKET_POOLING_TIMEOUT', 5000) / 5);
+      const timeout = setTimeout(callback, 1000); //immediate get msg available
       this.schedulerRegistry.addTimeout(SCHEDULER_HANDLERS.MESSAGES, timeout);
     } catch (e) {
       this.logger.error(e);
-      const timeout = setTimeout(callback, this.configService.get<number>('WEBSOCKET_POOLING_TIMEOUT', 5000) * 12);
+      const timeout = setTimeout(callback, this.configService.get<number>('WEBSOCKET_POOLING_TIMEOUT', 5000));
       this.schedulerRegistry.addTimeout(SCHEDULER_HANDLERS.MESSAGES, timeout);
+      this.logger.log(`Waiting ${this.configService.get<number>('WEBSOCKET_POOLING_TIMEOUT', 5000)}`);
     }
   }
 
@@ -130,38 +133,46 @@ export class DsbMessagePoolingService implements OnModuleInit {
 
     let msgCount = 0;
     for (const subscription of subscriptions) {
-      const messages: GetMessageResponse[] = await this.messageService.getMessages(
-        {
-          fqcn: subscription.fqcn,
-          from: undefined,
-          amount: messagesAmount,
-          topicName: undefined,
-          topicOwner: undefined,
-          clientId: _clientId ? _clientId : clientId,
+      try {
+        const messages: GetMessageResponse[] = await this.messageService.getMessages(
+          {
+            fqcn: subscription.fqcn,
+            from: undefined,
+            amount: messagesAmount,
+            topicName: undefined,
+            topicOwner: undefined,
+            clientId: _clientId ? _clientId : clientId,
+          }
+        );
+
+        this.logger.log(`Found ${messages.length} in ${subscription.fqcn} for ${_clientId ? _clientId : clientId}`);
+
+        if (messages && messages.length > 0) {
+          msgCount += messages.length;
+          await this.sendMessagesToSubscribers(messages, subscription.fqcn, client);
         }
-      );
+      } catch (e) {
 
-      this.logger.log(`Found ${messages.length} in ${subscription.fqcn} for ${_clientId ? _clientId : clientId}`);
-
-      if (messages && messages.length > 0) {
-        msgCount += messages.length;
-        await this.sendMessagesToSubscribers(messages, subscription.fqcn, client);
+        this.logger.error(`[WS][pullMessages] ${e}`);
       }
+
     }
 
     return msgCount;
   }
 
   public async sendMessagesToSubscribers(messages: GetMessageResponse[], fqcn: string, client: any): Promise<void> {
-    const emitMode: EventEmitMode = this.configService.get('EVENTS_EMIT_MODE', EventEmitMode.BULK);
+    try {
 
-    if (emitMode === EventEmitMode.BULK) {
-      client.send(JSON.stringify(messages.map((message) => ({ ...message, fqcn }))));
-      return;
+      messages.forEach((message: GetMessageResponse) => {
+        if (client.readyState === WebSocket.OPEN) {
+          client.send(JSON.stringify({ ...message, fqcn }));
+          this.logger.log(`[WS][sendMessagesToSubscribers][SINGLE] ${JSON.stringify({ ...message, fqcn })}`);
+        }
+      });
+
+    } catch (e) {
+      this.logger.error(`[WS][sendMessagesToSubscribers] ${e}`);
     }
-
-    messages.forEach((message: GetMessageResponse) => {
-      client.send(JSON.stringify({ ...message, fqcn }));
-    });
   }
 }
