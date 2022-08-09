@@ -23,7 +23,7 @@ export const useTopicsEffects = (
   const [isSearch, setIsSearch] = useState(false);
 
   const { topics, topicsFetched, getTopics, pagination, topicsLoading, getTopicsBySearch } = useTopics({
-    limit: 6,
+    limit: 10,
     page: 1,
     owner: router.query[Queries.Namespace] as string,
   });

@@ -14,6 +14,7 @@ import { WsClientService } from './ws-client.service';
 
 enum SCHEDULER_HANDLERS {
   MESSAGES = 'ws-messages',
+  MESSAGES_HEARTBEAT = 'ws-messages-heartbeat',
 }
 
 @Injectable()
@@ -44,8 +45,37 @@ export class DsbMessagePoolingService implements OnModuleInit {
     const timeout = setTimeout(callback, this.configService.get<number>('WEBSOCKET_POOLING_TIMEOUT', 5000));
     this.schedulerRegistry.addTimeout(SCHEDULER_HANDLERS.MESSAGES, timeout);
 
+
+    const callbackHeartbeat = async () => {
+      await this.handleIntervalHeartbeat();
+    };
+    const timeoutHeartbeat = setTimeout(callbackHeartbeat, this.configService.get<number>('WEBSOCKET_HEARTBEAT_TIMEOUT', 30000));
+    this.schedulerRegistry.addTimeout(SCHEDULER_HANDLERS.MESSAGES_HEARTBEAT, timeoutHeartbeat);
+
     this.logger.log('Enabling websockets');
 
+  }
+
+  @Span('ws_pool_messages_heartbeat')
+  public async handleIntervalHeartbeat(): Promise<void> {
+    const callbackHeartbeat = async () => {
+      await this.handleIntervalHeartbeat();
+    };
+
+    this.schedulerRegistry.deleteTimeout(SCHEDULER_HANDLERS.MESSAGES_HEARTBEAT);
+
+    if (this.websocketMode === WebSocketImplementation.SERVER && this.gateway.server.clients.size > 0) {
+      await Promise.allSettled(
+        Array.from(this.gateway.server.clients.values()).map((client: any) => {
+          const _clientId = new URLSearchParams(client.request?.url.split("?")[1]).get("clientId");
+          client.send(JSON.stringify({ clientId: `${_clientId}`, type: 'Heartbeat', messages: `Heartbeat trigger. Every ${this.configService.get<number>('WEBSOCKET_HEARTBEAT_TIMEOUT', 30000) / 1000} seconds` }));
+        })
+      );
+      const timeoutHeartbeat = setTimeout(callbackHeartbeat, this.configService.get<number>('WEBSOCKET_HEARTBEAT_TIMEOUT', 30000));
+      this.schedulerRegistry.addTimeout(SCHEDULER_HANDLERS.MESSAGES_HEARTBEAT, timeoutHeartbeat);
+      this.logger.log(`${this.gateway.server.clients.size} client connected. Heartbeat trigger. Every ${this.configService.get<number>('WEBSOCKET_HEARTBEAT_TIMEOUT', 30000)}`);
+      return;
+    }
   }
 
   @Span('ws_pool_messages')
@@ -74,7 +104,7 @@ export class DsbMessagePoolingService implements OnModuleInit {
         return;
       }
 
-      const subscriptions: ChannelEntity[] = (await this.channelService.getChannels()).filter((entity) => entity.type == ChannelType.SUB);
+      const subscriptions: ChannelEntity[] = (await this.channelService.getChannels()).filter((entity) => entity.type == ChannelType.SUB || entity.type == ChannelType.DOWNLOAD);
 
       if (subscriptions.length === 0) {
         this.logger.log(
@@ -163,14 +193,22 @@ export class DsbMessagePoolingService implements OnModuleInit {
 
   public async sendMessagesToSubscribers(messages: GetMessageResponse[], fqcn: string, client: any): Promise<void> {
     try {
+      const emitMode: EventEmitMode = this.configService.get('EVENTS_EMIT_MODE', EventEmitMode.BULK);
 
-      messages.forEach((message: GetMessageResponse) => {
+      if (emitMode === EventEmitMode.BULK) {
         if (client.readyState === WebSocket.OPEN) {
-          client.send(JSON.stringify({ ...message, fqcn }));
-          this.logger.log(`[WS][sendMessagesToSubscribers][SINGLE] ${JSON.stringify({ ...message, fqcn })}`);
+          const msg = JSON.stringify(messages.map((message) => ({ ...message, fqcn })));
+          client.send(msg);
+          this.logger.log(`[WS][sendMessagesToSubscribers][BULK] ${msg}`);
         }
-      });
-
+      } else {
+        messages.forEach((message: GetMessageResponse) => {
+          if (client.readyState === WebSocket.OPEN) {
+            client.send(JSON.stringify({ ...message, fqcn }));
+            this.logger.log(`[WS][sendMessagesToSubscribers][SINGLE] ${JSON.stringify({ ...message, fqcn })}`);
+          }
+        });
+      }
     } catch (e) {
       this.logger.error(`[WS][sendMessagesToSubscribers] ${e}`);
     }
