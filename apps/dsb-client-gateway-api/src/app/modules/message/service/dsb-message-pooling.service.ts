@@ -50,6 +50,7 @@ export class DsbMessagePoolingService implements OnModuleInit {
       await this.handleIntervalHeartbeat();
     };
     const timeoutHeartbeat = setTimeout(callbackHeartbeat, this.configService.get<number>('WEBSOCKET_HEARTBEAT_TIMEOUT', 20000));
+
     this.schedulerRegistry.addTimeout(SCHEDULER_HANDLERS.MESSAGES_HEARTBEAT, timeoutHeartbeat);
 
     this.logger.log('Enabling websockets');
@@ -74,6 +75,7 @@ export class DsbMessagePoolingService implements OnModuleInit {
       const timeoutHeartbeat = setTimeout(callbackHeartbeat, this.configService.get<number>('WEBSOCKET_HEARTBEAT_TIMEOUT', 20000));
       this.schedulerRegistry.addTimeout(SCHEDULER_HANDLERS.MESSAGES_HEARTBEAT, timeoutHeartbeat);
       this.logger.log(`${this.gateway.server.clients.size} client connected. Heartbeat trigger. Every ${this.configService.get<number>('WEBSOCKET_HEARTBEAT_TIMEOUT', 20000)}`);
+
       return;
     }
   }
