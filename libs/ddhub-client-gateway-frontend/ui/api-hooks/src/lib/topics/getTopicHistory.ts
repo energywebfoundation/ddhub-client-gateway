@@ -39,7 +39,7 @@ export const useTopicVersionHistory = (
 
   const getTopicHistory = async ({
                              page = 1,
-                             limit = 6,
+                             limit = 10,
                            }: TopicsControllerGetTopicsHistoryByIdParams) => {
     setParams({ page, limit });
   };
