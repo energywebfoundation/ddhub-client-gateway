@@ -74,7 +74,7 @@ export class DsbMessagePoolingService implements OnModuleInit {
         return;
       }
 
-      const subscriptions: ChannelEntity[] = (await this.channelService.getChannels()).filter((entity) => entity.type == ChannelType.SUB);
+      const subscriptions: ChannelEntity[] = (await this.channelService.getChannels()).filter((entity) => entity.type == ChannelType.SUB || entity.type == ChannelType.DOWNLOAD);
 
       if (subscriptions.length === 0) {
         this.logger.log(
