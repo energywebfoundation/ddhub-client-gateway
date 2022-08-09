@@ -163,14 +163,22 @@ export class DsbMessagePoolingService implements OnModuleInit {
 
   public async sendMessagesToSubscribers(messages: GetMessageResponse[], fqcn: string, client: any): Promise<void> {
     try {
+      const emitMode: EventEmitMode = this.configService.get('EVENTS_EMIT_MODE', EventEmitMode.BULK);
 
-      messages.forEach((message: GetMessageResponse) => {
+      if (emitMode === EventEmitMode.BULK) {
         if (client.readyState === WebSocket.OPEN) {
-          client.send(JSON.stringify({ ...message, fqcn }));
-          this.logger.log(`[WS][sendMessagesToSubscribers][SINGLE] ${JSON.stringify({ ...message, fqcn })}`);
+          const msg = JSON.stringify(messages.map((message) => ({ ...message, fqcn })));
+          client.send(msg);
+          this.logger.log(`[WS][sendMessagesToSubscribers][BULK] ${msg}`);
         }
-      });
-
+      } else {
+        messages.forEach((message: GetMessageResponse) => {
+          if (client.readyState === WebSocket.OPEN) {
+            client.send(JSON.stringify({ ...message, fqcn }));
+            this.logger.log(`[WS][sendMessagesToSubscribers][SINGLE] ${JSON.stringify({ ...message, fqcn })}`);
+          }
+        });
+      }
     } catch (e) {
       this.logger.error(`[WS][sendMessagesToSubscribers] ${e}`);
     }
