@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import { ChannelTopic, GetTopicSearchDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { ModalActionsEnum, useModalDispatch } from '../../../../context';
 import { useApplications } from '@ddhub-client-gateway-frontend/ui/api-hooks';
@@ -5,6 +6,8 @@ import { useApplications } from '@ddhub-client-gateway-frontend/ui/api-hooks';
 export const useTopicsEffects = () => {
   const dispatch = useModalDispatch();
   const { applicationsByNamespace } = useApplications('user');
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(50);
 
   const hideModal = () => {
     dispatch({
@@ -31,7 +34,25 @@ export const useTopicsEffects = () => {
     });
   };
 
+  const handleChangePage = (
+    event: React.MouseEvent<HTMLButtonElement> | null,
+    newPage: number,
+  ) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
   return {
-    openTopicDetails
+    openTopicDetails,
+    rowsPerPage,
+    page,
+    handleChangePage,
+    handleChangeRowsPerPage,
   };
 };

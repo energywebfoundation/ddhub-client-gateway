@@ -49,4 +49,16 @@ export const useStyles = makeStyles()((theme) => ({
       borderRadius: 3,
     },
   },
+  spacer: {
+    flex: 0,
+  },
+  displayedRows: {
+    marginRight: 'auto',
+  },
+  toolbar: {
+    paddingLeft: 0,
+  },
+  paginationRoot: {
+    borderBottom: 'none',
+  }
 }));
