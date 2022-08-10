@@ -101,8 +101,8 @@ export class GetMessagesResponseDto {
   @IsBoolean()
   @ApiProperty({
     description: 'transactionId sent to message for idempotency',
-    type: Boolean,
+    type: String,
     example: true,
   })
-  signatureValid: boolean;
+  signatureValid: string;
 }
