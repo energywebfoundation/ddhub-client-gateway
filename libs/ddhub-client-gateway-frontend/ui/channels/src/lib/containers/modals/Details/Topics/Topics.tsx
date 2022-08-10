@@ -13,12 +13,10 @@ export const Topics: FC<TopicsProps> = ({ topics }) => {
   const { classes } = useStyles();
   const {
     openTopicDetails,
-    rowsPerPage,
     page,
     handleChangePage,
-    handleChangeRowsPerPage,
   } = useTopicsEffects();
-
+  const rowsPerPage = 50;
   const rows = [];
   const startIdx = page !== 0 ? rowsPerPage * page : 0;
   const endIdx = startIdx + rowsPerPage;
@@ -60,13 +58,13 @@ export const Topics: FC<TopicsProps> = ({ topics }) => {
           <Box display="flex">
             <TablePagination
               style={{width: '100%'}}
-              rowsPerPageOptions={[50, 100]}
+              rowsPerPageOptions={[]}
+              labelDisplayedRows={() => ''}
               count={topics.length}
               rowsPerPage={rowsPerPage}
               page={page}
               onPageChange={handleChangePage}
               ActionsComponent={TablePaginationActions}
-              onRowsPerPageChange={handleChangeRowsPerPage}
               classes={{
                 spacer: classes.spacer,
                 displayedRows: classes.displayedRows,

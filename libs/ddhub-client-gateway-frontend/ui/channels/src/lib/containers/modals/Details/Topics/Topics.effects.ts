@@ -7,7 +7,6 @@ export const useTopicsEffects = () => {
   const dispatch = useModalDispatch();
   const { applicationsByNamespace } = useApplications('user');
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(50);
 
   const hideModal = () => {
     dispatch({
@@ -41,18 +40,9 @@ export const useTopicsEffects = () => {
     setPage(newPage);
   };
 
-  const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
-
   return {
     openTopicDetails,
-    rowsPerPage,
     page,
     handleChangePage,
-    handleChangeRowsPerPage,
   };
 };
