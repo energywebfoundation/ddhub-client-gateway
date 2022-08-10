@@ -20,7 +20,7 @@ ddhub-client-gateway-api:
       websocket_reconnect_timeout: 10000
       # -- Define how many times the WebSocket client should attempt reconnection with the server upon receving connection error/close.
       websocket_reconnect_max_retries: 10
-      websocket_pooling_timeout: 10000
+      websocket_pooling_timeout: 2000
       # -- Defines the format for messages pushed over a real-time communication channel. If bulk mode is chosen, messages will be sent as an array. At every 1 second interval, the gateway will emit an array of the latest messages received. If single mode is chosen, messages will be sent individually. Options: BULK, SINGLE
       events_emit_mode: BULK
       # -- Defines how many events should be pushed per second, regardless of mode chosen (see above).
@@ -59,6 +59,7 @@ ddhub-client-gateway-api:
       appConfig:
         DID_AUTH_URL: "https://ddhub-demo.energyweb.org"
         DID_REGISTRY_ADDRESS: "0xc15d5a57a8eb0e1dcbe5d88b8f9a82017e5cc4af"
+        EVENTS_MAX_PER_SECOND: "50"
         NO_COLOR: "true"
     ui:
       enabled: true
@@ -143,6 +144,11 @@ ddhub-client-gateway-api:
           pathType: Prefix
           backend:
             serviceName: ddhub-client-gateway-api-demo
+            servicePort: 80
+        - path: /events
+          pathType: Prefix
+          backend:
+            serviceName: ddhub-gateway-api-dev
             servicePort: 80
         - path: /
           pathType: Prefix
