@@ -148,7 +148,7 @@ ddhub-client-gateway-api:
         - path: /events
           pathType: Prefix
           backend:
-            serviceName: ddhub-gateway-api-dev
+            serviceName: ddhub-client-gateway-api-demo
             servicePort: 80
         - path: /
           pathType: Prefix
