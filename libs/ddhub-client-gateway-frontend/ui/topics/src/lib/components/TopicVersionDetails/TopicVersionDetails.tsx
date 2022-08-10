@@ -59,7 +59,7 @@ export const TopicVersionDetails: FC<TopicVersionDetailsProps> = (
         <GenericTable<GetTopicSearchDto>
           headers={TOPIC_VERSIONS_HEADERS}
           tableRows={versions}
-          showFooter={false}
+          showFooter={true}
           showSearch={false}
           onRowClick={handleRowClick}
           containerProps={{ style: { boxShadow: 'none' }}}
