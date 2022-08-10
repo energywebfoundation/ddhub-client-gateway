@@ -13,7 +13,6 @@ export function Applications({ role, topicUrl }: ApplicationsProps) {
     role,
     topicUrl
   );
-
   return (
     <section style={{ marginTop: 16 }}>
       <GenericTable<ApplicationDTO>
@@ -21,7 +20,7 @@ export function Applications({ role, topicUrl }: ApplicationsProps) {
         tableRows={applications}
         onRowClick={handleRowClick}
         loading={isLoading}
-        showFooter={false}
+        showFooter={true}
         defaultSortBy='namespace'
         defaultOrder='asc'
       />

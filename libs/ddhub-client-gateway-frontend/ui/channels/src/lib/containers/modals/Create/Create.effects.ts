@@ -114,14 +114,12 @@ export const useCreateChannelEffects = () => {
   };
 
   const setTopics = (data: Topic[]) => {
-    const topicsData = data.map(topic => pick(topic, ['owner', 'topicName']));
-
     setActiveStep(activeStep + 1);
     setChannelValues({
       ...channelValues,
       conditions: {
         ...channelValues.conditions,
-        topics: topicsData,
+        topics: data,
       },
     });
   };
@@ -173,12 +171,18 @@ export const useCreateChannelEffects = () => {
 
   const channelSubmitHandler = () => {
     const values = channelValues;
+    const topicsData = values.conditions.topics.map(topic => pick(topic, ['owner', 'topicName']));
+
     const channelCreateValues: CreateChannelDto = {
       fqcn: values.fqcn,
       type: values.type,
-      conditions: values.conditions,
+      conditions: {
+        ...values.conditions,
+        topics: topicsData,
+      },
       payloadEncryption: values.payloadEncryption,
     };
+
     createChannelHandler(channelCreateValues, onCreate);
   };
 
