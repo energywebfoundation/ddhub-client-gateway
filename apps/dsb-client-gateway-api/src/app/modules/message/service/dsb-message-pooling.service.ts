@@ -49,7 +49,8 @@ export class DsbMessagePoolingService implements OnModuleInit {
     const callbackHeartbeat = async () => {
       await this.handleIntervalHeartbeat();
     };
-    const timeoutHeartbeat = setTimeout(callbackHeartbeat, this.configService.get<number>('WEBSOCKET_HEARTBEAT_TIMEOUT', 30000));
+    const timeoutHeartbeat = setTimeout(callbackHeartbeat, this.configService.get<number>('WEBSOCKET_HEARTBEAT_TIMEOUT', 20000));
+
     this.schedulerRegistry.addTimeout(SCHEDULER_HANDLERS.MESSAGES_HEARTBEAT, timeoutHeartbeat);
 
     this.logger.log('Enabling websockets');
@@ -68,12 +69,13 @@ export class DsbMessagePoolingService implements OnModuleInit {
       await Promise.allSettled(
         Array.from(this.gateway.server.clients.values()).map((client: any) => {
           const _clientId = new URLSearchParams(client.request?.url.split("?")[1]).get("clientId");
-          client.send(JSON.stringify({ clientId: `${_clientId}`, type: 'Heartbeat', messages: `Heartbeat trigger. Every ${this.configService.get<number>('WEBSOCKET_HEARTBEAT_TIMEOUT', 30000) / 1000} seconds` }));
+          client.send(JSON.stringify({ clientId: `${_clientId}`, type: 'Heartbeat', messages: `Heartbeat trigger. Every ${this.configService.get<number>('WEBSOCKET_HEARTBEAT_TIMEOUT', 20000) / 1000} seconds` }));
         })
       );
-      const timeoutHeartbeat = setTimeout(callbackHeartbeat, this.configService.get<number>('WEBSOCKET_HEARTBEAT_TIMEOUT', 30000));
+      const timeoutHeartbeat = setTimeout(callbackHeartbeat, this.configService.get<number>('WEBSOCKET_HEARTBEAT_TIMEOUT', 20000));
       this.schedulerRegistry.addTimeout(SCHEDULER_HANDLERS.MESSAGES_HEARTBEAT, timeoutHeartbeat);
-      this.logger.log(`${this.gateway.server.clients.size} client connected. Heartbeat trigger. Every ${this.configService.get<number>('WEBSOCKET_HEARTBEAT_TIMEOUT', 30000)}`);
+      this.logger.log(`${this.gateway.server.clients.size} client connected. Heartbeat trigger. Every ${this.configService.get<number>('WEBSOCKET_HEARTBEAT_TIMEOUT', 20000)}`);
+
       return;
     }
   }
