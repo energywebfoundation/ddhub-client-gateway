@@ -63,6 +63,7 @@ export function GenericTable<T>({
     pagination,
     handleSearchInput,
     paginationText,
+    handleChangeRowsPerPage,
   } = useTableEffects({
     headers,
     tableRows,
@@ -182,7 +183,7 @@ export function GenericTable<T>({
               <TableFooter>
                 <TableRow>
                   <TablePagination
-                    rowsPerPageOptions={[]}
+                    rowsPerPageOptions={[10, 20, 50, 100]}
                     labelDisplayedRows={paginationText}
                     count={pagination.count}
                     rowsPerPage={Number(pagination.limit)}
@@ -191,9 +192,11 @@ export function GenericTable<T>({
                     ActionsComponent={TablePaginationActions}
                     classes={{
                       spacer: classes.spacer,
-                      displayedRows: classes.displayedRows,
                       toolbar: classes.toolbar,
+                      selectIcon: classes.selectIcon,
+                      menuItem: classes.menuItem,
                     }}
+                    onRowsPerPageChange={handleChangeRowsPerPage}
                   />
                 </TableRow>
               </TableFooter>

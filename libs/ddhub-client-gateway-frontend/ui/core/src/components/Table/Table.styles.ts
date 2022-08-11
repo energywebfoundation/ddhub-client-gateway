@@ -1,5 +1,6 @@
 import { makeStyles } from 'tss-react/mui';
 import { lighten } from '@mui/material/styles';
+import { alpha } from '@mui/material';
 
 export const useStyles = makeStyles()((theme) => ({
   root: {
@@ -36,14 +37,32 @@ export const useStyles = makeStyles()((theme) => ({
   spacer: {
     flex: 0,
   },
-  displayedRows: {
-    marginRight: 'auto',
-  },
   action: {
     width: 30,
     color: 'transparent',
   },
   toolbar: {
     paddingLeft: 0,
+    justifyContent: 'flex-end',
+  },
+  selectIcon: {
+    color: theme.palette.common.white,
+  },
+  menuItem: {
+    fontSize: 12,
+    lineHeight: '21px',
+    fontWeight: 400,
+    color: theme.palette.common.white,
+    minHeight: 22,
+    padding: '9px 16px 10px',
+    fontFamily: theme.typography.body2.fontFamily,
+    '&.Mui-selected': {
+      backgroundColor: theme.palette.primary.main,
+      color: theme.palette.common.white,
+    },
+    '&:hover': {
+      backgroundColor: alpha(theme.palette.primary.main, 0.12),
+      color: theme.palette.primary.main,
+    },
   },
 }));
