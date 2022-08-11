@@ -35,8 +35,8 @@ export interface TableProps<T> {
   containerProps?: TableContainerProps;
   loadingRows?: number;
   paginationProps?: TablePagination;
-  onPageChange?: (newPage: number, newLimit: number) => void;
-  onSearchInput?: (filterValue: FilterValue, newLimit: number) => void;
+  onPageChange?: (newPage: number, limit: number) => void;
+  onSearchInput?: (filterValue: FilterValue, limit: number) => void;
   defaultSortBy?: string;
   defaultOrder?: 'asc' | 'desc';
   customStyle?: TableCustomStyle;

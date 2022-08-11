@@ -69,10 +69,10 @@ export function useTableEffects<T>({
   const emptyRows: number =
     pageIndex > 0 ? Math.max(0, (1 + pageIndex) * pageSize - rows.length) : 0;
 
-  const changePage = (newPage: number, newLimit: number) => {
+  const changePage = (newPage: number, limit: number) => {
     if (paginationProps && onPageChange) {
       // page starts at 0 index
-      onPageChange(newPage + 1, newLimit);
+      onPageChange(newPage + 1, limit);
     } else {
       gotoPage(newPage);
     }
