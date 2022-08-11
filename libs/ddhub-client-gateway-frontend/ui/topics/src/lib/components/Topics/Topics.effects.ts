@@ -120,13 +120,13 @@ export const useTopicsEffects = (
 
   const handleRowClick = (topic: GetTopicDto) => openTopicDetails(topic);
 
-  const handlePageChange = (newPage: number) => {
-    getTopics({ page: newPage });
+  const handlePageChange = (newPage: number, newLimit: number) => {
+    getTopics({ page: newPage, limit: newLimit });
   };
 
-  const handleSearchInput = (searchInput: string) => {
+  const handleSearchInput = (searchInput: string, limit: number) => {
     setIsSearch(!!searchInput);
-    getTopicsBySearch({ keyword: searchInput });
+    getTopicsBySearch({ keyword: searchInput, limit });
   };
 
   return {
