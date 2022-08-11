@@ -11,7 +11,6 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { DigestGuard } from '../../utils/guards/digest.guard';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import {
   DeleteTopic,
@@ -36,13 +35,13 @@ import { TopicService } from '../service/topic.service';
 import { MtlsGuard } from '../../certificate/guards/mtls.guard';
 
 @Controller('topics')
-@UseGuards(DigestGuard, MtlsGuard)
+@UseGuards(MtlsGuard)
 @ApiTags('Topics')
 export class TopicsController {
   constructor(
     protected readonly ddhubTopicsService: DdhubTopicsService,
     protected readonly topicService: TopicService
-  ) { }
+  ) {}
 
   @Get('')
   @ApiResponse({
@@ -78,7 +77,7 @@ export class TopicsController {
   })
   public async getTopicsHistoryById(
     @Param() { id }: GetTopicsParamsDto,
-    @Query() { limit, page }: GetTopicsWithLimitParamsDto,
+    @Query() { limit, page }: GetTopicsWithLimitParamsDto
   ): Promise<PaginatedTopicResponse> {
     return this.topicService.getTopicHistoryById(id, limit, page);
   }
@@ -96,10 +95,7 @@ export class TopicsController {
   public async getTopicHistoryByIdAndVersion(
     @Param() { id, versionNumber }: TopicsByIdAndVersionParamsDto
   ): Promise<PostTopicDto> {
-    return this.topicService.getTopicHistoryByIdAndVersion(
-      id,
-      versionNumber
-    );
+    return this.topicService.getTopicHistoryByIdAndVersion(id, versionNumber);
   }
 
   @Get('/count')
@@ -123,12 +119,7 @@ export class TopicsController {
   public async getTopicsBySearch(
     @Query() { keyword, owner, limit, page }: GetTopicsSearchQueryDto
   ) {
-    return this.topicService.getTopicsBySearch(
-      keyword,
-      owner,
-      limit,
-      page
-    );
+    return this.topicService.getTopicsBySearch(keyword, owner, limit, page);
   }
 
   @Post('')
@@ -150,10 +141,12 @@ export class TopicsController {
   public async postTopics(
     @Body() data: PostTopicBodyDto
   ): Promise<PostTopicDto> {
-    return this.ddhubTopicsService.postTopics(data).then((topic: PostTopicDto) => {
-      this.topicService.saveTopic(topic);
-      return topic;
-    });
+    return this.ddhubTopicsService
+      .postTopics(data)
+      .then((topic: PostTopicDto) => {
+        this.topicService.saveTopic(topic);
+        return topic;
+      });
   }
 
   @Put('/:id/versions/:versionNumber')
@@ -180,14 +173,12 @@ export class TopicsController {
     @Param() { id, versionNumber }: TopicsByIdAndVersionParamsDto,
     @Body() data: UpdateTopicHistoryBodyDto
   ): Promise<PostTopicDto> {
-    return this.ddhubTopicsService.updateTopicByIdAndVersion(
-      data,
-      id,
-      versionNumber
-    ).then((topic: PostTopicDto) => {
-      this.topicService.updateTopicVersion(topic);
-      return topic;
-    });
+    return this.ddhubTopicsService
+      .updateTopicByIdAndVersion(data, id, versionNumber)
+      .then((topic: PostTopicDto) => {
+        this.topicService.updateTopicVersion(topic);
+        return topic;
+      });
   }
 
   @Put('/:id')
@@ -214,10 +205,12 @@ export class TopicsController {
     @Param() { id }: GetTopicsParamsDto,
     @Body() data: UpdateTopicBodyDto
   ): Promise<PutTopicDto> {
-    return this.ddhubTopicsService.updateTopic(data, id).then((topic: PostTopicDto) => {
-      this.topicService.updateTopic(topic);
-      return topic;
-    });
+    return this.ddhubTopicsService
+      .updateTopic(data, id)
+      .then((topic: PostTopicDto) => {
+        this.topicService.updateTopic(topic);
+        return topic;
+      });
   }
 
   @Delete('/:id')
@@ -243,10 +236,12 @@ export class TopicsController {
   public async deleteTopics(
     @Param() { id }: GetTopicsParamsDto
   ): Promise<DeleteTopic> {
-    return this.ddhubTopicsService.deleteTopic(id).then((topic: DeleteTopic) => {
-      this.topicService.deleteTopic(id, undefined);
-      return topic;
-    });
+    return this.ddhubTopicsService
+      .deleteTopic(id)
+      .then((topic: DeleteTopic) => {
+        this.topicService.deleteTopic(id, undefined);
+        return topic;
+      });
   }
 
   @Delete('/:id/versions/:versionNumber')
@@ -272,9 +267,11 @@ export class TopicsController {
   public async deleteTopicsByVersion(
     @Param() { id, versionNumber }: DeleteTopicsVersionParamsDto
   ): Promise<DeleteTopic> {
-    return this.ddhubTopicsService.deleteTopicByVersion(id, versionNumber).then((topic: DeleteTopic) => {
-      this.topicService.deleteTopic(id, versionNumber);
-      return topic;
-    });
+    return this.ddhubTopicsService
+      .deleteTopicByVersion(id, versionNumber)
+      .then((topic: DeleteTopic) => {
+        this.topicService.deleteTopic(id, versionNumber);
+        return topic;
+      });
   }
 }

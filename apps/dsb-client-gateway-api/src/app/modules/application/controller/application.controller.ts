@@ -1,12 +1,4 @@
-import {
-  Controller,
-  Get,
-  HttpStatus,
-  Param,
-  Query,
-  UseGuards,
-} from '@nestjs/common';
-import { DigestGuard } from '../../utils/guards/digest.guard';
+import { Controller, Get, HttpStatus, Param, Query } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { ApplicationDTO, GetApplicationsQueryDto } from '../dto';
@@ -15,7 +7,6 @@ import { GetApplicationsByNamespaceDto } from '../dto/get-by-namespace.dto';
 
 @Controller('applications')
 @ApiTags('Applications')
-@UseGuards(DigestGuard)
 export class ApplicationsController {
   constructor(protected readonly applicationsService: ApplicationsService) {}
 

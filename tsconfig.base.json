@@ -68,6 +68,9 @@
       "@dsb-client-gateway/ddhub-client-gateway-events": [
         "libs/ddhub-client-gateway-events/src/index.ts"
       ],
+      "@dsb-client-gateway/ddhub-client-gateway-guard": [
+        "libs/ddhub-client-gateway-guard/src/index.ts"
+      ],
       "@dsb-client-gateway/ddhub-client-gateway-identity": [
         "libs/ddhub-client-gateway-identity/src/index.ts"
       ],

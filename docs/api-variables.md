@@ -2,6 +2,9 @@
 
 | KEY | TYPE | DEFAULT | DESCRIPTION | ALLOWED_VALUES | DEPENDENCY |
 | --- | ---- | ------- | ----------- | -------------- | ---------- |
+| API_KEY | string |  | API Key to protect API |  |  |
+| API_USERNAME | string |  | USERNAME for authentication |  |  |
+| API_PASSWORD | string |  | PASSWORD for authentication |  |  |
 | PORT | number | 3333 | HTTP port |  |  |
 | WEBSOCKET | string | NONE | Websocket mode | NONE,SERVER,CLIENT |  |
 | EVENTS_MAX_PER_SECOND | number | 2 | Amount of messages to pull for each WebSocket run |  |  |

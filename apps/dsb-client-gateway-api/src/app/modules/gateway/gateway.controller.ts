@@ -1,11 +1,9 @@
-import { Controller, Get, HttpStatus, UseGuards } from '@nestjs/common';
-import { DigestGuard } from '../utils/guards/digest.guard';
+import { Controller, Get, HttpStatus } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { GatewayResponseDto } from './dto/gateway-response.dto';
 import { ConfigService } from '@nestjs/config';
 
 @Controller('gateway')
-@UseGuards(DigestGuard)
 @ApiTags('Gateway')
 export class GatewayController {
   constructor(protected readonly configService: ConfigService) {}

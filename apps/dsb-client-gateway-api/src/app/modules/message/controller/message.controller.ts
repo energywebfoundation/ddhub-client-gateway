@@ -20,7 +20,6 @@ import {
 import { GetMessagesDto } from '../dto/request/get-messages.dto';
 import { DownloadMessagesDto } from '../dto/request/download-file.dto';
 import { MessageService } from '../service/message.service';
-import { DigestGuard } from '../../utils/guards/digest.guard';
 import { SendMessagelResponseDto } from '../dto/response/send-message.dto';
 import { GetMessagesResponseDto } from '../dto/response/get-message-response.dto';
 import { DownloadMessageResponse } from '../entity/message.entity';
@@ -29,7 +28,7 @@ import { Readable } from 'stream';
 import { MtlsGuard } from '../../certificate/guards/mtls.guard';
 
 @Controller('messages')
-@UseGuards(DigestGuard, MtlsGuard)
+@UseGuards(MtlsGuard)
 @ApiTags('Messaging')
 export class MessageControlller {
   private readonly logger = new Logger();
@@ -62,7 +61,7 @@ export class MessageControlller {
   @Get('/download')
   @ApiResponse({
     status: HttpStatus.OK,
-    description: 'Message Dwonloaded successfully',
+    description: 'Message download successfully',
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
