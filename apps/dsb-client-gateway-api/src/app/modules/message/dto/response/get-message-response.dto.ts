@@ -7,6 +7,7 @@ import {
   IsBoolean
 } from 'class-validator';
 import { SchemaType } from '../../../topic/topic.const';
+import { EncryptionStatus } from '../../message.const';
 
 export class GetMessagesResponseDto {
   @IsString()
@@ -98,11 +99,19 @@ export class GetMessagesResponseDto {
   })
   transactionId: string;
 
-  @IsBoolean()
+  @IsString()
+  @IsEnum(EncryptionStatus)
   @ApiProperty({
     description: 'transactionId sent to message for idempotency',
     type: String,
-    example: true,
+    enum: [
+      EncryptionStatus.FAILED,
+      EncryptionStatus.NOT_PERFORMED,
+      EncryptionStatus.NOT_REQUIRED,
+      EncryptionStatus.REQUIRED_NOT_PERFORMED,
+      EncryptionStatus.SUCCESS
+    ],
+    example: 'SUCCESS',
   })
-  signatureValid: string;
+  signatureValid: EncryptionStatus;
 }
