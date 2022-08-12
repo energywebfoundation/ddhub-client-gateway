@@ -39,6 +39,7 @@ export class DdhubDidService extends DdhubBaseService {
     const { data } = await this.request<{ dids: string[] }>(
       () =>
         this.httpService.get('/roles/list', {
+          httpsAgent: this.tlsAgentService.get(),
           params: {
             roles,
             searchType,
