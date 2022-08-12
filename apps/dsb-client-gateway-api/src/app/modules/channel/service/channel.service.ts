@@ -13,7 +13,6 @@ import { Span } from 'nestjs-otel';
 import {
   ChannelEntity,
   ChannelWrapperRepository,
-  TopicEntity,
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
 import { TopicNotFoundException } from '../exceptions/topic-not-found.exception';
 import {
@@ -33,7 +32,7 @@ export class ChannelService {
     protected readonly ddhubTopicsService: DdhubTopicsService,
     protected readonly topicsService: TopicService,
     protected readonly commandBus: CommandBus
-  ) { }
+  ) {}
 
   @Span('channels_getChannels')
   public async getChannels(): Promise<ChannelEntity[]> {
@@ -207,7 +206,11 @@ export class ChannelService {
     for (const { topicName, owner } of topics) {
       const receivedTopics = await this.ddhubTopicsService
         .getTopicsByOwnerAndName(topicName, owner)
-        .catch(() => {
+        .catch((e) => {
+          if (e?.response?.status !== 404) {
+            throw e;
+          }
+
           return {
             records: [],
           };
@@ -227,7 +230,7 @@ export class ChannelService {
         topicName,
         owner,
         topicId: id,
-        schemaType: schemaType
+        schemaType: schemaType,
       });
     }
 
