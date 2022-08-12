@@ -41,7 +41,7 @@ export const Details = ({ nextClick, channelValues, validFqcn }: DetailsProps) =
             control={control}
             variant="outlined"
             errorExists={!validFqcn}
-            errorText={!validFqcn && `Should contain only alphanumeric lowercase letters, use . as a separator.`}
+            errorText={!validFqcn && `Should contain only alphanumeric lowercase characters, use . as a separator.`}
           />
 
           <Divider className={classes.divider} />
