@@ -57,7 +57,7 @@ export function useTableEffects<T>({
       filterTypes,
       columns,
       data,
-      initialState: { pageIndex: 0, pageSize: 6 },
+      initialState: { pageIndex: 0, pageSize: 10 },
     },
     useFilters,
     useGlobalFilter,

@@ -9,14 +9,14 @@ export const useErrorHandler = (httpService: HttpService, logger: Logger) => {
     },
     (err) => {
       const errorObject = {
-        method: err.config.method,
-        status: err.response.status,
-        url: err.config.url,
+        method: err.config?.method,
+        status: err.response?.status,
+        url: err.config?.url,
         message: err.message,
-        params: err.config.params,
-        body: err.config.data,
-        responseBody: err.response.data,
-        httpsAgent: !!err.config.httpsAgent,
+        params: err.config?.params,
+        body: err.config?.data,
+        responseBody: err.response?.data,
+        httpsAgent: !!err.config?.httpsAgent,
       };
 
       logger.debug(JSON.stringify(errorObject));

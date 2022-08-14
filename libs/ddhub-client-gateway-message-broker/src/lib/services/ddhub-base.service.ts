@@ -20,7 +20,7 @@ export abstract class DdhubBaseService {
     protected readonly retryConfigService: RetryConfigService,
     protected readonly ddhubLoginService: DdhubLoginService,
     protected readonly tlsAgentService: TlsAgentService
-  ) { }
+  ) {}
 
   protected async request<T>(
     requestFn: () => Observable<AxiosResponse<T>>,
@@ -53,6 +53,13 @@ export abstract class DdhubBaseService {
       retryWithAuth: true,
       ...options,
     };
+
+    if (e.errno === -3001) {
+      this.logger.error('incorrect network activity');
+      this.logger.error(e);
+
+      return retry(e);
+    }
 
     if (!isAxiosError(e)) {
       this.logger.error('Request failed due to unknown error', e);

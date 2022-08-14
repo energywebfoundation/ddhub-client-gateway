@@ -21,7 +21,7 @@ export class TlsAgentService implements OnApplicationBootstrap {
     return this.agent;
   }
 
-  public async create(): Promise<void> {
+  public async create(): Promise<Agent | undefined> {
     const certificateDetails =
       await this.secretsEngineService.getCertificateDetails();
 
@@ -38,5 +38,7 @@ export class TlsAgentService implements OnApplicationBootstrap {
       key: certificateDetails.privateKey,
       ca: certificateDetails.caCertificate,
     });
+
+    return this.agent;
   }
 }

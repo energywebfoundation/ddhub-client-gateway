@@ -9,7 +9,7 @@ export const useVersionHistoryEffects = () => {
   const applicationNamespace = router.query[Queries.Namespace] as string;
   const { topicHistory, topicHistoryLoaded, isLoading, getTopicHistory, pagination } = useTopicVersionHistory({
     id: topicId,
-    limit: 6,
+    limit: 10,
     page: 1,
   });
   const { actions } = useVersionActionsEffects(applicationNamespace, topicId);
