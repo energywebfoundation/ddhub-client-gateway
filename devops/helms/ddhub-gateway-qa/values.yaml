@@ -9,7 +9,7 @@ ddhub-client-gateway-api:
       # -- The URL of the DSB Message Broker you want to connect to. Trailing / allowed.
       dsb_base_url: https://qa.der.aemo.com.au/ddhub
       parent_namespace: ddhub.apps.aemo.iam.ewc
-      secret_engine: vault
+      secret_engine: azure
       secret_engine_endpoint: http://demo-vault.ddhub-demo.svc:8200
       # -- Sets the secret prefix in the secret engine.
       secret_prefix: "ddhubqa/"
@@ -94,10 +94,6 @@ ddhub-client-gateway-api:
     maxReplicas: 100
     targetCPUUtilizationPercentage: 80
     # targetMemoryUtilizationPercentage: 80
-
-  pvc:
-    enabled: true
-    mountPath: /usr/app/data
 
   probes:
     liveness: true
