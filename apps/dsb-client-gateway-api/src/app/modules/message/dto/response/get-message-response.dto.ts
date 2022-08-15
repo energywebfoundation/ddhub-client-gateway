@@ -77,7 +77,7 @@ export class GetMessagesResponseDto {
 
   @IsString()
   @ApiProperty({
-    description: 'signature sent to message',
+    description: 'message sender',
     type: String,
     example: 'did:ethr:volta:0x03830466Ce257f9B798B0f27359D7639dFB6457D',
   })
@@ -85,7 +85,7 @@ export class GetMessagesResponseDto {
 
   @IsNumber()
   @ApiProperty({
-    description: 'signature sent to message',
+    description: 'timestamp in nano seconds',
     type: Number,
     example: 1649147198388,
   })
@@ -99,11 +99,9 @@ export class GetMessagesResponseDto {
   })
   transactionId: string;
 
-  @IsString()
   @IsEnum(EncryptionStatus)
   @ApiProperty({
-    description: 'transactionId sent to message for idempotency',
-    type: String,
+    description: 'Encryption status for a message',
     enum: [
       EncryptionStatus.FAILED,
       EncryptionStatus.NOT_PERFORMED,
