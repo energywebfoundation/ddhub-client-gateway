@@ -112,7 +112,6 @@ export class DsbMessagePoolingService implements OnModuleInit {
     const websocketMode = this.configService.get('WEBSOCKET', WebSocketImplementation.NONE);
     let msgCount = 0;
     if (websocketMode === WebSocketImplementation.SERVER && this.gateway.server.clients.size > 0) {
-      await this.ddhubLoginService.login();
       this.logger.log("[pullMessagesAndEmit] Start Promise.allSettled");
       await Promise.allSettled(
         Array.from(this.gateway.server.clients.values()).map(async (client) => {
@@ -123,7 +122,6 @@ export class DsbMessagePoolingService implements OnModuleInit {
       );
       this.logger.log("[pullMessagesAndEmit] End Promise.allSettled");
     } else if (this.wsClient.rws) {
-      await this.ddhubLoginService.login();
       this.logger.log("[pullMessagesAndEmit] Start pullMessagesAndEmit");
       await this.pullMessages(subscriptions, this.wsClient.rws).then((totalMsg) => {
         msgCount += totalMsg;
