@@ -1,4 +1,7 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { 
+  ApiProperty,
+  ApiPropertyOptional 
+} from '@nestjs/swagger';
 
 export class Error {
   @ApiProperty({
@@ -33,7 +36,7 @@ export class Error {
 }
 
 export class SendMessageSuccessResponse {
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'did for which message is sent',
     type: String,
     example: 'did:ethr:volta:0x09Df5d33f1242E1b8aA5E0E0F6BfA687E6846993',
