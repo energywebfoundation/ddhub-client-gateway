@@ -43,9 +43,7 @@ export const getRoutesToDisplay = (
     .filter(
       (role) =>
         role.status === RoleStatus.SYNCED &&
-        role.namespace.includes(
-          config?.namespace ?? 'ddhub.apps.energyweb.iam.ewc'
-        )
+        role.namespace.includes(config?.namespace)
     )
     .map((role) => role.namespace);
   if (roles.length === 0) {
