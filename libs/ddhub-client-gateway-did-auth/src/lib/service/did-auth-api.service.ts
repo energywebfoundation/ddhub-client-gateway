@@ -1,9 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { DidAuthResponse } from '../did-auth.interface';
-import { lastValueFrom } from 'rxjs';
+import { lastValueFrom, timeout } from 'rxjs';
 import { TlsAgentService } from '@dsb-client-gateway/ddhub-client-gateway-tls-agent';
 import { useErrorHandler } from '@dsb-client-gateway/ddhub-client-gateway-utils';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class DidAuthApiService {
@@ -11,7 +12,8 @@ export class DidAuthApiService {
 
   constructor(
     protected readonly httpService: HttpService,
-    protected readonly tlsAgentService: TlsAgentService
+    protected readonly tlsAgentService: TlsAgentService,
+    protected readonly configService: ConfigService
   ) {
     useErrorHandler(this.httpService, this.logger);
   }
@@ -26,12 +28,10 @@ export class DidAuthApiService {
         {
           httpsAgent: this.tlsAgentService.get(),
         }
-      )
+      ).pipe(timeout(+this.configService.get<number>('MAX_TIMEOUT', 60000)))
     ).catch((e) => {
-      this.logger.error('Login failed');
-
-      this.logger.error(e.message);
-      this.logger.error(e.response.data);
+      this.logger.error(`[Login Failed][msg] ${e.message}`);
+      this.logger.error(`[Login Failed][data] ${JSON.stringify((e.response?.data))}`);
 
       throw e;
     });
