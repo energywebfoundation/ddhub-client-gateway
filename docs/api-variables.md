@@ -32,7 +32,8 @@
 | UPLOAD_FILES_DIR | string | ./upload | Directory where we should store temporary files for upload |  |  |
 | DOWNLOAD_FILES_DIR | string | ./download | Directory where we should store downloaded files for limited time |  |  |
 | MTLS_ENABLED | boolean | true | Should enable mTLS |  |  |
-| DB_NAME | string | local.db | SQLite database file name |  |  |
+| DB_NAME | string | postgresql://ddhub:ddhub@localhost:5432/ddhub | Database connection string |  |  |
+| DB_DRIVER | string | postgres | Database driver | postgres,better-sqlite3 |  |
 | CLIENT_ID | string | WS_CONSUMER | WS client id |  |  |
 | MAX_RETRIES | number | 3 | Specifies maximum amount of retries for vulnerable methods |  |  |
 | RETRY_FACTOR | number | 2 | Specifies retry factor (multiplier for timeout) for vulnerable methods |  |  |
@@ -44,7 +45,7 @@
 | OTEL_SERVICE_NAME | string | ddhub-client-gateway | OTEL service name tag |  | OPENTELEMETRY_ENABLED == true |
 | OTEL_ENVIRONMENT | string | local | OTEL environment name tag |  | OPENTELEMETRY_ENABLED == true |
 | RPC_URL | string | https://volta-rpc.energyweb.org/ | EWF RPC URL |  |  |
-| PARENT_NAMESPACE | string | dsb.apps.energyweb.iam.ewc | Parent namespace for IAM lookup |  |  |
+| PARENT_NAMESPACE | string | ddhub.apps.energyweb.iam.ewc | Parent namespace for IAM lookup |  |  |
 | EVENT_SERVER_URL | string | identityevents-dev.energyweb.org | NATS URL for listening for DID roles updates |  |  |
 | NATS_ENV_NAME | string | ewf-dev |  |  |  |
 | CHAIN_ID | number | 73799 | Chain ID |  |  |

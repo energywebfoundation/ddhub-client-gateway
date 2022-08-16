@@ -4,10 +4,25 @@ import {
   SendMessage,
   UploadMessage,
 } from '../message.interface';
+import {
+  DownloadMessageResponse,
+  GetMessagesResponse,
+  SendMessageResponse,
+  SendMessageResponseFile,
+} from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
+import { SignatureService } from './signature.service';
 
 export abstract class MessageService {
-  abstract sendMessage(message: SendMessage): Promise<any>;
-  abstract getMessages(query: GetMessages): Promise<any>;
-  abstract uploadMessage(payload: UploadMessage): Promise<any>;
-  abstract downloadMessages(query: DownloadMessage): Promise<any>;
+  protected constructor(
+    protected readonly signatureService: SignatureService
+  ) {}
+
+  abstract sendMessage(message: SendMessage): Promise<SendMessageResponse>;
+  abstract getMessages(query: GetMessages): Promise<GetMessagesResponse>;
+  abstract uploadMessage(
+    payload: UploadMessage
+  ): Promise<SendMessageResponseFile>;
+  abstract downloadMessages(
+    query: DownloadMessage
+  ): Promise<DownloadMessageResponse>;
 }

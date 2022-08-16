@@ -27,6 +27,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { Readable } from 'stream';
 import { MtlsGuard } from '../../certificate/guards/mtls.guard';
 import { AService } from '../service/a.service';
+import { SendMessageResponseFile } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
 
 @Controller('messages')
 @UseGuards(DigestGuard, MtlsGuard)
@@ -150,6 +151,14 @@ export class MessageController {
     @UploadedFile('file') file: Express.Multer.File,
     @Body() dto: uploadMessageBodyDto
   ): Promise<SendMessagelResponseDto> {
-    return this.messageService.uploadMessage(file, dto);
+    const result: SendMessageResponseFile =
+      await this.messageService.uploadMessage(file, dto);
+
+    return {
+      did: result.did,
+      clientGatewayMessageId: result.clientGatewayMessageId,
+      status: result.status,
+      recipients: result.recipients,
+    };
   }
 }

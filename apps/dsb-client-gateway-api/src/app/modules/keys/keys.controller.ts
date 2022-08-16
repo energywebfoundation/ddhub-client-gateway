@@ -6,8 +6,6 @@ import { ApiTags } from '@nestjs/swagger';
 @UseGuards(DigestGuard)
 @ApiTags('Gateway Configuration')
 export class KeysController {
-  constructor(e) {}
-
   @Post('')
   public async derive(): Promise<void> {
     // await this.keysService.deriveKeys();

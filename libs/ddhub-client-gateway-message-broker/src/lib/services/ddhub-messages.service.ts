@@ -9,8 +9,8 @@ import { Span } from 'nestjs-otel';
 import { OperationOptions } from 'retry';
 import {
   GetInternalMessageResponse,
+  GetMessagesResponse,
   Message,
-  SearchMessageResponseDto,
   SendInternalMessageRequestDTO,
   SendInternalMessageResponse,
   SendMessageData,
@@ -35,6 +35,11 @@ export class DdhubMessagesService extends DdhubBaseService {
     );
   }
 
+  @Span('ddhub_mb_retention')
+  public async getMessageRetention(): Promise<number> {
+    return 24;
+  }
+
   @Span('ddhub_mb_messagesSearch')
   public async messagesSearch(
     topicId: string[],
@@ -42,7 +47,7 @@ export class DdhubMessagesService extends DdhubBaseService {
     clientId?: string,
     from?: string,
     amount?: number
-  ): Promise<SearchMessageResponseDto[]> {
+  ): Promise<GetMessagesResponse[]> {
     const requestBody = {
       topicId,
       clientId,
@@ -52,7 +57,7 @@ export class DdhubMessagesService extends DdhubBaseService {
     };
 
     try {
-      const result = await this.request<SearchMessageResponseDto[]>(
+      const result = await this.request<GetMessagesResponse[]>(
         () =>
           this.httpService.post('/messages/search', requestBody, {
             httpsAgent: this.tlsAgentService.get(),
@@ -65,7 +70,7 @@ export class DdhubMessagesService extends DdhubBaseService {
         }
       );
 
-      this.logger.log('messages search successful', result);
+      this.logger.log('messages search successful');
 
       return result.data;
     } catch (e) {

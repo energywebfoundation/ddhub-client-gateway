@@ -29,21 +29,42 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
       })
     );
   }
-  //
-  // @Span('vault_addKey')
-  // addKey(keyId: string): Promise<void> {
-  //   return Promise.resolve(undefined);
-  // }
-  //
-  // @Span('vault_removeKey')
-  // removeKey(keyId: string): Promise<void> {
-  //   return Promise.resolve(undefined);
-  // }
-  //
-  // @Span('vault_storeMasterSeed')
-  // storeMasterSeed(seed: string): Promise<void> {
-  //   return Promise.resolve(undefined);
-  // }
+
+  public async setKey(tag: string, value: string): Promise<void> {
+    await this.client.write(`${this.prefix}${PATHS.ECDH}_${tag}`, { value });
+  }
+
+  public async getKey(tag: string): Promise<string | null> {
+    return this.client
+      .read(`${this.prefix}${PATHS.ECDH}_${tag}`)
+      .then(({ data }) => data.value)
+      .catch((err) => {
+        this.logger.error(err.message);
+
+        this.logger.error(err);
+
+        return null;
+      });
+  }
+
+  public async getMasterSeed(): Promise<string | null> {
+    return this.client
+      .read(`${this.prefix}${PATHS.MASTER_SEED}`)
+      .then(({ data }) => data)
+      .catch((err) => {
+        this.logger.error(err.message);
+
+        return null;
+      });
+  }
+
+  public async setMasterSeed(seed: string): Promise<void> {
+    this.logger.log('Attempting to write private RSA key');
+
+    await this.client.write(`${this.prefix}${PATHS.MASTER_SEED}`, { seed });
+
+    this.logger.log('Writing private RSA key');
+  }
 
   @Span('vault_onModuleInit')
   public async onModuleInit(): Promise<void> {

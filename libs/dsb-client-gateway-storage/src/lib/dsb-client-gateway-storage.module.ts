@@ -9,6 +9,8 @@ import {
   EventsEntity,
   FileMetadataEntity,
   IdentityEntity,
+  IterationEntity,
+  KeyEntity,
   SymmetricKeysEntity,
   TopicEntity,
 } from './module';
@@ -25,21 +27,29 @@ const ENTITIES = [
   ApplicationEntity,
   FileMetadataEntity,
   EventsEntity,
+  KeyEntity,
+  IterationEntity,
 ];
 
 @Module({
   imports: [
     TypeOrmModule.forRootAsync({
       useFactory: async (configService: ConfigService) => {
-        return {
-          type: 'better-sqlite3',
-          database: configService.get<string>('DB_NAME', 'local.db'),
-          synchronize: true,
-          entities: ENTITIES,
-          prepareDatabase: (db) => {
-            console.log(db);
-          },
-        };
+        if (configService.get('DB_DRIVER') === 'postgres') {
+          return {
+            type: 'postgres',
+            url: configService.get<string>('DB_NAME', 'local.db'),
+            synchronize: true,
+            entities: ENTITIES,
+          };
+        } else {
+          return {
+            type: 'better-sqlite3',
+            database: configService.get<string>('DB_NAME', 'local.db'),
+            synchronize: true,
+            entities: ENTITIES,
+          };
+        }
       },
       inject: [ConfigService],
     }),

@@ -7,6 +7,7 @@ import { DidAuthService } from '@dsb-client-gateway/ddhub-client-gateway-did-aut
 import { TlsAgentService } from './tls-agent.service';
 import {
   DeleteTopicResponseDto,
+  PaginatedData,
   PostTopicBodyDto,
   Topic,
   TopicCountDto,
@@ -39,9 +40,11 @@ export class DdhubTopicsService extends DdhubBaseService {
   }
 
   @Span('ddhub_mb_getTopicById')
-  async getTopicById(topicId: string): Promise<TopicVersion | null> {
+  async getTopicById(
+    topicId: string
+  ): Promise<PaginatedData<TopicVersion> | null> {
     try {
-      const { data } = await this.request<TopicVersion | null>(
+      const { data } = await this.request<PaginatedData<TopicVersion> | null>(
         () =>
           this.httpService.get('/topics/' + topicId + '/versions', {
             httpsAgent: this.tlsAgentService.get(),

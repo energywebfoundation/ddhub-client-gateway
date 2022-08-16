@@ -16,9 +16,6 @@ import {
   CertificateDetails,
   PATHS,
   SecretsEngineService,
-  SetCertificateDetailsResponse,
-  SetPrivateKeyResponse,
-  SetRSAPrivateKeyResponse,
 } from '../../secrets-engine.interface';
 import { Span } from 'nestjs-otel';
 
@@ -35,6 +32,22 @@ export class AwsSecretsManagerService
   constructor(protected readonly configService: ConfigService) {
     super();
     this.prefix = this.configService.get('SECRET_PREFIX', '/ddhub/');
+  }
+
+  public async setKey(tag: string, value: string): Promise<void> {
+    return Promise.resolve(undefined);
+  }
+
+  public async getKey(tag: string): Promise<string | null> {
+    return Promise.resolve(undefined);
+  }
+
+  getMasterSeed(): Promise<string | null> {
+    return Promise.resolve(undefined);
+  }
+
+  setMasterSeed(seed: string): Promise<void> {
+    return Promise.resolve(undefined);
   }
 
   @Span('aws_ssm_onModuleInit')

@@ -21,6 +21,7 @@ import multer from 'multer';
 import { ConfigService } from '@nestjs/config';
 import { CertificateModule } from '../certificate/certificate.module';
 import { AService } from './service/a.service';
+import { DdhubClientGatewayMessagingModule } from '@dsb-client-gateway/ddhub-client-gateway-messaging';
 
 @Module({
   imports: [
@@ -52,6 +53,7 @@ import { AService } from './service/a.service';
     DdhubClientGatewayMessageBrokerModule,
     FileMetadataRepositoryModule,
     CertificateModule,
+    DdhubClientGatewayMessagingModule,
   ],
   providers: [
     EventsGateway,

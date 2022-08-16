@@ -11,6 +11,8 @@ import { Span } from 'nestjs-otel';
 import {
   DdhubFilesService,
   DdhubMessagesService,
+  DownloadMessageResponse,
+  SendMessageResponse,
   SendMessageResponseFile,
 } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
 import Crypto from 'crypto';
@@ -20,7 +22,6 @@ import {
 } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
 import {
   FileMetadataEntity,
-  FileMetadataWrapperRepository,
   TopicEntity,
   TopicRepositoryWrapper,
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
@@ -29,17 +30,14 @@ import {
   SearchMessageResponseDto,
 } from '../../../../../apps/dsb-client-gateway-api/src/app/modules/message/message.interface';
 import { EncryptionStatus } from '../../../../../apps/dsb-client-gateway-api/src/app/modules/message/message.const';
-import { join } from 'path';
 import fs from 'fs';
 import { ConfigService } from '@nestjs/config';
-import { MessageSignatureNotValidException } from '../../../../../apps/dsb-client-gateway-api/src/app/modules/message/exceptions/messages-signature-not-valid.exception';
+import { FileHelperService } from './file-helper.service';
+import { SignatureService } from './signature.service';
+import { SymmetricKeysService } from './symmetric-keys.service';
 
 @Injectable()
 export class RsaService extends MessageService {
-  protected readonly uploadPath: string;
-  protected readonly downloadPath: string;
-  protected readonly ext: string = '.enc';
-
   constructor(
     protected readonly rsaEncryptionService: RsaEncryptionService,
     protected readonly ddhubMessageService: DdhubMessagesService,
@@ -47,32 +45,20 @@ export class RsaService extends MessageService {
     protected readonly topicWrapper: TopicRepositoryWrapper,
     protected readonly configService: ConfigService,
     protected readonly ddhubFilesService: DdhubFilesService,
-    protected readonly fileMetadataWrapper: FileMetadataWrapperRepository
+    protected readonly fileHelperService: FileHelperService,
+    protected readonly signatureService: SignatureService,
+    protected readonly symmetricKeysService: SymmetricKeysService
   ) {
-    super();
-
-    this.uploadPath = configService.get<string>('UPLOAD_FILES_DIR');
-    this.downloadPath = configService.get<string>('DOWNLOAD_FILES_DIR');
+    super(signatureService);
   }
 
-  public async downloadMessages({ fileId }: DownloadMessage): Promise<any> {
-    const fileMetadata: FileMetadataEntity = await this.createMetadata(fileId);
+  public async downloadMessages({
+    fileId,
+  }: DownloadMessage): Promise<DownloadMessageResponse> {
+    const fileMetadata: FileMetadataEntity =
+      await this.fileHelperService.createMetadata(fileId);
 
-    const fullPath: string = join(this.downloadPath, fileId + this.ext);
-
-    const isSignatureValid: boolean =
-      await this.rsaEncryptionService.verifySignature(
-        fileMetadata.did,
-        fileMetadata.signature,
-        await this.rsaEncryptionService.checksumFile(fullPath)
-      );
-
-    if (!isSignatureValid) {
-      throw new MessageSignatureNotValidException(
-        fileId,
-        fileMetadata.signature
-      );
-    }
+    await this.fileHelperService.validateFileSignature(fileMetadata);
 
     if (!fileMetadata.encrypted) {
       return {
@@ -80,13 +66,13 @@ export class RsaService extends MessageService {
         sender: fileMetadata.did,
         signature: fileMetadata.signature,
         clientGatewayMessageId: fileMetadata.clientGatewayMessageId,
-        data: fs.createReadStream(fullPath),
+        data: fs.createReadStream(fileMetadata.path),
       };
     }
 
     const decryptionStream = await this.rsaEncryptionService
       .decryptMessageStream(
-        fullPath,
+        fileMetadata.path,
         fileMetadata.clientGatewayMessageId,
         fileMetadata.did
       )
@@ -138,7 +124,7 @@ export class RsaService extends MessageService {
     payload,
     channel,
     clientGatewayMessageId,
-  }: SendMessage): Promise<any> {
+  }: SendMessage): Promise<SendMessageResponse> {
     const logger = new Logger(RsaService.name + '_' + clientGatewayMessageId);
 
     const randomKey: string = Crypto.randomBytes(32).toString('hex');
@@ -157,11 +143,11 @@ export class RsaService extends MessageService {
       channel.conditions.qualifiedDids
     );
 
-    await this.sendSymmetricKeys(
-      logger,
+    await this.symmetricKeysService.send(
       channel.conditions.qualifiedDids,
       randomKey,
-      clientGatewayMessageId
+      clientGatewayMessageId,
+      logger
     );
 
     logger.log('preparing message');
@@ -172,7 +158,7 @@ export class RsaService extends MessageService {
 
     logger.log('creating signature');
 
-    const signature: string = this.rsaEncryptionService.createSignature(
+    const signature: string = this.signatureService.createSignature(
       message,
       '0x' + privateKey
     );
@@ -195,7 +181,7 @@ export class RsaService extends MessageService {
     transactionId,
     channel,
     clientGatewayMessageId,
-  }: UploadMessage): Promise<any> {
+  }: UploadMessage): Promise<SendMessageResponseFile> {
     const logger = new Logger(RsaService.name + '_' + clientGatewayMessageId);
 
     const randomKey: string = Crypto.randomBytes(32).toString('hex');
@@ -208,18 +194,18 @@ export class RsaService extends MessageService {
     );
 
     const privateKey = await this.secretsEngineService.getPrivateKey();
-    const checksum = await this.rsaEncryptionService.checksumFile(filePath);
+    const checksum = await this.signatureService.checksumFile(filePath);
 
-    const signature = this.rsaEncryptionService.createSignature(
+    const signature = this.signatureService.createSignature(
       checksum,
       '0x' + privateKey
     );
 
-    await this.sendSymmetricKeys(
-      logger,
+    await this.symmetricKeysService.send(
       channel.conditions.qualifiedDids,
       randomKey,
-      clientGatewayMessageId
+      clientGatewayMessageId,
+      logger
     );
 
     const result: SendMessageResponseFile =
@@ -243,139 +229,6 @@ export class RsaService extends MessageService {
     }
 
     return result;
-  }
-
-  private async createMetadata(fileId: string): Promise<FileMetadataEntity> {
-    const fileMetadata: FileMetadataEntity | null = await this.getFileMetadata(
-      fileId
-    );
-
-    const path: string = join(this.downloadPath, fileId + this.ext);
-
-    if (fileMetadata) {
-      return fileMetadata;
-    }
-
-    const { headers, data } = await this.ddhubFilesService.downloadFile(fileId);
-
-    const writeStream: fs.WriteStream = fs.createWriteStream(path);
-
-    const writeFilePromise = () => {
-      data.pipe(writeStream);
-
-      return new Promise((resolve, reject) => {
-        writeStream.on('finish', () => {
-          resolve(null);
-        });
-
-        writeStream.on('error', reject);
-      });
-    };
-
-    await writeFilePromise();
-
-    const encryptionEnabled: boolean = headers.payloadencryption === 'true';
-
-    return this.fileMetadataWrapper.repository.save({
-      clientGatewayMessageId: headers.clientgatewaymessageid,
-      signature: headers.signature,
-      did: headers.ownerdid,
-      fileId,
-      encrypted: encryptionEnabled,
-    });
-  }
-
-  private async getFileMetadata(
-    fileId: string
-  ): Promise<FileMetadataEntity | null> {
-    const fileMetadata: FileMetadataEntity | null =
-      await this.fileMetadataWrapper.repository.findOne({
-        where: {
-          fileId,
-        },
-      });
-
-    if (fileMetadata) {
-      const fullPath = join(this.downloadPath, fileId + this.ext);
-
-      const existsInStorage: boolean = fs.existsSync(fullPath);
-
-      if (!existsInStorage) {
-        await this.fileMetadataWrapper.repository.delete({
-          fileId,
-        });
-
-        return null;
-      }
-
-      return fileMetadata;
-    }
-
-    return null;
-  }
-
-  protected async prepareFile(
-    payloadEncryption: boolean,
-    file: Express.Multer.File,
-    randomKey: string,
-    clientGatewayMessageId: string
-  ): Promise<string> {
-    let filePath: string;
-
-    if (payloadEncryption) {
-      filePath = await this.rsaEncryptionService.encryptMessageStream(
-        file.stream,
-        randomKey,
-        clientGatewayMessageId
-      );
-    } else {
-      filePath = join(this.uploadPath, clientGatewayMessageId + this.ext);
-
-      const stream = fs.createWriteStream(filePath);
-
-      const writeStream = file.stream.pipe(stream);
-
-      const promise = () =>
-        new Promise((resolve) => {
-          writeStream.on('finish', () => resolve(null));
-        });
-
-      await promise();
-    }
-
-    return filePath;
-  }
-
-  @Span('message_sendSymmetricKeys')
-  protected async sendSymmetricKeys(
-    contextLogger: Logger,
-    qualifiedDids: string[],
-    decryptionKey: string,
-    clientGatewayMessageId: string
-  ): Promise<void> {
-    await Promise.allSettled(
-      qualifiedDids.map(async (recipientDid: string) => {
-        const encryptedSymmetricKey =
-          await this.rsaEncryptionService.encryptSymmetricKey(
-            decryptionKey,
-            recipientDid
-          );
-        await this.ddhubMessageService.sendMessageInternal(
-          recipientDid,
-          clientGatewayMessageId,
-          encryptedSymmetricKey
-        );
-
-        contextLogger.debug(`send symmetric key to ${recipientDid}`);
-      })
-    ).catch((e) => {
-      contextLogger.error(
-        'Error while Sending CipherText as Internal Message to recipients',
-        e
-      );
-
-      throw new Error(e);
-    });
   }
 
   @Span('message_processMessage')
@@ -411,7 +264,7 @@ export class RsaService extends MessageService {
     }
 
     const isSignatureValid: boolean =
-      await this.rsaEncryptionService.verifySignature(
+      await this.signatureService.verifySignature(
         message.senderDid,
         message.signature,
         message.payload
@@ -477,5 +330,29 @@ export class RsaService extends MessageService {
       },
       payload: decryptedMessage,
     };
+  }
+
+  protected async prepareFile(
+    payloadEncryption: boolean,
+    file: Express.Multer.File,
+    randomKey: string,
+    clientGatewayMessageId: string
+  ): Promise<string> {
+    let filePath: string;
+
+    if (payloadEncryption) {
+      filePath = await this.rsaEncryptionService.encryptMessageStream(
+        file.stream,
+        randomKey,
+        clientGatewayMessageId
+      );
+    } else {
+      filePath = await this.fileHelperService.storeNotEncryptedFileForUpload(
+        clientGatewayMessageId,
+        file
+      );
+    }
+
+    return filePath;
   }
 }

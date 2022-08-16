@@ -1,6 +1,6 @@
 import { Recipients, Status } from './files.interface';
 
-export interface SearchMessageResponseDto {
+export interface GetMessagesResponse {
   messageId: string;
   topicId: string;
   topicVersion: string;

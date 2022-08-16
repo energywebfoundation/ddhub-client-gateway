@@ -34,8 +34,8 @@ ddhub-client-gateway-api:
       # -- Sets the Energy Web IAM cache server URL, used to cache identities (as it can be expensive to rely only on querying smart contract data).
       cache_server_url: https://identitycache-staging.energyweb.org/v1
       # -- Sets the Energy Web IAM events server URL, used to receive notification of approved DSB role claims.
-      event_server_url: https://identityevents-staging.energyweb.org
-      # -- Sets the Energy Web IAM application namespace. DSB related roles, such as user and messagebroker should fall under this namespace.
+      event_server_url: https://identitycache-staging.energyweb.org
+      # -- Sets the Energy Web IAM application namespace. DDHub related roles, such as user and messagebroker should fall under this namespace.
       parent_namespace: ddhub.apps.energyweb.iam.ewc
       secret_engine: vault
       secret_engine_endpoint: http://demo-vault.ddhub-demo.svc:8200
@@ -44,6 +44,7 @@ ddhub-client-gateway-api:
       node_env: test
       db_name: ./data/local.db
       opentelemetry_enabled: false
+      mtls_enabled: false
     scheduler:
       enabled: true
       image:
@@ -53,7 +54,7 @@ ddhub-client-gateway-api:
         tag: canary
       podAnnotations: {}
       resources: {}
-      probes: 
+      probes:
         liveness: true
         readiness: true
       appConfig:
@@ -69,7 +70,7 @@ ddhub-client-gateway-api:
         tag: canary
       podAnnotations: {}
       resources: {}
-      probes: 
+      probes:
         liveness: true
         readiness: true
       port: 80

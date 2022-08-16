@@ -41,6 +41,10 @@ export class RoleListenerService {
     }
   }
 
+  public async stopListening(): Promise<void> {
+    await this.claimListenerService.stop();
+  }
+
   public async startListening(): Promise<Enrolment> {
     const identity: Identity | null = await this.identityService.getIdentity(
       true

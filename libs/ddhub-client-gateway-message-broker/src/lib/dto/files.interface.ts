@@ -1,3 +1,5 @@
+import { Readable } from 'stream';
+
 export interface Recipients {
   total: number;
   sent: number;
@@ -20,4 +22,12 @@ export interface SendMessageResponseFile {
   did: string;
   recipients: Recipients;
   status: Status[];
+}
+
+export interface DownloadMessageResponse {
+  fileName: string;
+  sender: string;
+  signature: string;
+  clientGatewayMessageId: string;
+  data: Readable;
 }

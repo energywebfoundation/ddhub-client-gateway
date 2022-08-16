@@ -12,6 +12,7 @@ import { DdhubClientGatewayIdentityModule } from '@dsb-client-gateway/ddhub-clie
 import { DdhubClientGatewayEnrolmentModule } from '@dsb-client-gateway/ddhub-client-gateway-enrolment';
 import { DdhubClientGatewayEncryptionModule } from '@dsb-client-gateway/ddhub-client-gateway-encryption';
 import { DdhubClientGatewayUtilsModule } from '@dsb-client-gateway/ddhub-client-gateway-utils';
+import { EcdhController } from './controller/ecdh.controller';
 
 @Module({
   imports: [
@@ -27,7 +28,7 @@ import { DdhubClientGatewayUtilsModule } from '@dsb-client-gateway/ddhub-client-
     DdhubClientGatewayEncryptionModule,
   ],
   providers: [],
-  controllers: [KeysController],
+  controllers: [KeysController, EcdhController],
   exports: [],
 })
 export class KeysModule {}

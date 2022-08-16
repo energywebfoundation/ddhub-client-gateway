@@ -20,7 +20,11 @@ import { TopicNotRelatedToChannelException } from '../exceptions/topic-not-relat
 import { v4 as uuidv4 } from 'uuid';
 import { GetMessagesDto } from '../dto/request/get-messages.dto';
 import { TopicOwnerTopicNameRequiredException } from '../exceptions/topic-owner-and-topic-name-required.exception';
-import { DdhubMessagesService } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
+import {
+  DdhubMessagesService,
+  SendMessageResponse,
+  SendMessageResponseFile,
+} from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
 import {
   DownloadMessageResponse,
   SearchMessageResponseDto,
@@ -55,7 +59,7 @@ export class AService {
   public async uploadMessage(
     file: Express.Multer.File,
     dto: uploadMessageBodyDto
-  ): Promise<any> {
+  ): Promise<SendMessageResponseFile> {
     file.stream = fs.createReadStream(file.path);
 
     if (file.mimetype !== 'text/csv') {
@@ -122,7 +126,7 @@ export class AService {
       );
 
     if (messages.length === 0) {
-      return;
+      return [];
     }
 
     const messageService: RsaService =
@@ -134,7 +138,7 @@ export class AService {
     });
   }
 
-  public async sendMessage(dto: SendMessageDto): Promise<any> {
+  public async sendMessage(dto: SendMessageDto): Promise<SendMessageResponse> {
     const channel: ChannelEntity = await this.channelService.getChannelOrThrow(
       dto.fqcn
     );

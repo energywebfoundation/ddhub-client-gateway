@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import {
   CertificateDetails,
   SecretsEngineService,
@@ -8,24 +8,64 @@ import {
 } from '../../secrets-engine.interface';
 
 @Injectable()
-export class SecretsCacheProxyService extends SecretsEngineService {
+export class SecretsCacheProxyService
+  extends SecretsEngineService
+  implements OnModuleInit
+{
   protected readonly logger = new Logger(SecretsCacheProxyService.name);
 
   protected readonly cachedObjects: {
     certificate: CertificateDetails | null;
     privateKey: string | null;
     rsaPrivateKey: string | null;
+    masterSeed: string | null;
+    keys: { [key: string]: string };
   } = {
     certificate: null,
     rsaPrivateKey: null,
     privateKey: null,
+    masterSeed: null,
+    keys: {},
   };
 
   constructor(protected readonly secretsEngineService: SecretsEngineService) {
     super();
   }
 
-  public async onModuleInit(): Promise<void> {}
+  public async onModuleInit(): Promise<void> {
+    await this.init();
+  }
+
+  public async setKey(tag: string, value: string): Promise<void> {
+    await this.secretsEngineService.setKey(tag, value);
+
+    this.cachedObjects.keys[tag] = value;
+  }
+
+  public async getKey(tag: string): Promise<string | null> {
+    return this.secretsEngineService.getKey(tag);
+  }
+
+  public async getMasterSeed(): Promise<string | null> {
+    this.logger.debug('getting master seed');
+
+    return this.cachedObjects.masterSeed;
+  }
+
+  public async setMasterSeed(seed: string): Promise<void> {
+    this.logger.debug('setting master seed');
+
+    await this.secretsEngineService.setMasterSeed(seed);
+
+    this.cachedObjects.masterSeed = seed;
+  }
+
+  public async refreshMasterSeed(): Promise<void> {
+    this.logger.log('refreshing master seed');
+
+    this.cachedObjects.masterSeed =
+      await this.secretsEngineService.getMasterSeed();
+  }
 
   public async refreshPrivateKey(): Promise<void> {
     this.logger.log('refreshing private key');
@@ -53,6 +93,7 @@ export class SecretsCacheProxyService extends SecretsEngineService {
       this.refreshCertificate(),
       this.refreshPrivateKey(),
       this.refreshRsaPrivateKey(),
+      this.refreshMasterSeed(),
     ]);
   }
 

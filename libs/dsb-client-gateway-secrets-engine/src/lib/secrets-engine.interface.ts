@@ -2,8 +2,8 @@ import {
   CreateSecretResponse,
   PutSecretValueResponse,
 } from '@aws-sdk/client-secrets-manager';
-import { OnModuleInit } from '@nestjs/common';
 import { KeyVaultSecret } from '@azure/keyvault-secrets';
+import { OnModuleInit } from '@nestjs/common';
 
 export enum PATHS {
   IDENTITY_PRIVATE_KEY = 'identity/private_key',
@@ -11,6 +11,8 @@ export enum PATHS {
   CERTIFICATE_KEY = 'certificate/private_key',
   CA_CERTIFICATE = 'certificate/ca_certificate',
   RSA_KEY = 'rsa_key',
+  MASTER_SEED = 'master_seed',
+  ECDH = 'ecdh',
 }
 
 export abstract class SecretsEngineService implements OnModuleInit {
@@ -26,6 +28,10 @@ export abstract class SecretsEngineService implements OnModuleInit {
   ): Promise<SetRSAPrivateKeyResponse>;
   abstract getRSAPrivateKey(): Promise<string | null>;
   abstract deleteAll(): Promise<void>;
+  abstract getMasterSeed(): Promise<string | null>;
+  abstract setMasterSeed(seed: string): Promise<void>;
+  abstract setKey(tag: string, value: string): Promise<void>;
+  abstract getKey(tag: string): Promise<string | null>;
 }
 
 export interface Key {

@@ -1,4 +1,4 @@
-import { RsaEncryptionService } from '../lib/service/rsa-encryption.service';
+import { RsaEncryptionService } from '../lib/service/rsa/rsa-encryption.service';
 
 const symmetricKeysWrapperMock = {};
 

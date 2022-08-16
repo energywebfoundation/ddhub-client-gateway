@@ -23,6 +23,9 @@ export class FileMetadataEntity {
   @Column()
   public encrypted: boolean;
 
+  @Column()
+  public path: string;
+
   @CreateDateColumn()
   createdDate!: Date;
 

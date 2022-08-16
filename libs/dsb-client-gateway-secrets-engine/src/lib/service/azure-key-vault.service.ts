@@ -9,6 +9,7 @@ import { Span } from 'nestjs-otel';
 import { DefaultAzureCredential } from '@azure/identity';
 import { KeyVaultSecret, SecretClient } from '@azure/keyvault-secrets';
 import { setLogLevel } from '@azure/logger';
+
 setLogLevel('info');
 
 @Injectable()
@@ -24,6 +25,22 @@ export class AzureKeyVaultService
   constructor(protected readonly configService: ConfigService) {
     super();
     this.prefix = this.configService.get('SECRET_PREFIX', 'ddhub/');
+  }
+
+  getMasterSeed(): Promise<string | null> {
+    return Promise.resolve(undefined);
+  }
+
+  setMasterSeed(seed: string): Promise<void> {
+    return Promise.resolve(undefined);
+  }
+
+  public async setKey(tag: string, value: string): Promise<void> {
+    return Promise.resolve(undefined);
+  }
+
+  public async getKey(tag: string): Promise<string | null> {
+    return Promise.resolve(undefined);
   }
 
   @Span('azure_kv_onModuleInit')

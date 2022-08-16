@@ -27,3 +27,5 @@ export interface UploadMessage {
 export interface DownloadMessage {
   fileId: string;
 }
+
+export interface UploadMessageResult {}

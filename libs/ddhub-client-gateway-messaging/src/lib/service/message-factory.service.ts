@@ -8,10 +8,10 @@ import {
 } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
 import { SecretsEngineService } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
 import { ConfigService } from '@nestjs/config';
-import {
-  FileMetadataWrapperRepository,
-  TopicRepositoryWrapper,
-} from '@dsb-client-gateway/dsb-client-gateway-storage';
+import { TopicRepositoryWrapper } from '@dsb-client-gateway/dsb-client-gateway-storage';
+import { SymmetricKeysService } from './symmetric-keys.service';
+import { SignatureService } from './signature.service';
+import { FileHelperService } from './file-helper.service';
 
 @Injectable()
 export class MessageFactoryService {
@@ -22,7 +22,9 @@ export class MessageFactoryService {
     protected readonly configService: ConfigService,
     protected readonly topicWrapper: TopicRepositoryWrapper,
     protected readonly ddhubFilesService: DdhubFilesService,
-    protected readonly fileMetadataWrapper: FileMetadataWrapperRepository
+    protected readonly fileHelperService: FileHelperService,
+    protected readonly symmetricKeysService: SymmetricKeysService,
+    protected readonly signatureService: SignatureService
   ) {}
 
   public create<T extends RsaService>(t: MessagingType): T {
@@ -35,7 +37,9 @@ export class MessageFactoryService {
           this.topicWrapper,
           this.configService,
           this.ddhubFilesService,
-          this.fileMetadataWrapper
+          this.fileHelperService,
+          this.signatureService,
+          this.symmetricKeysService
         ) as T;
       default:
         throw new Error(`Invalid messaging type ${t}`);

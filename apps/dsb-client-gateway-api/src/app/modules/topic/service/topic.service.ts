@@ -7,8 +7,13 @@ import {
 import { Span } from 'nestjs-otel';
 import { GetTopicResponse } from '../entity/topic.entity';
 
-import { GetTopicSearchDto, PaginatedTopicResponse, PostTopicDto } from '../dto';
+import {
+  GetTopicSearchDto,
+  PaginatedTopicResponse,
+  PostTopicDto,
+} from '../dto';
 import { SchemaType } from '../topic.const';
+import { TopicOrVersionNotFoundException } from '../exceptions/topic-or-version-not-found.exception';
 
 @Injectable()
 export class TopicService {
@@ -17,7 +22,14 @@ export class TopicService {
   constructor(
     protected readonly wrapper: TopicRepositoryWrapper,
     protected readonly applicationsWrapper: ApplicationWrapperRepository
-  ) { }
+  ) {}
+
+  public async getOne(
+    name: string,
+    owner: string
+  ): Promise<TopicEntity | null> {
+    return this.wrapper.topicRepository.getOne(name, owner);
+  }
 
   @Span('topics_getTopics')
   public async getTopics(
@@ -53,13 +65,17 @@ export class TopicService {
     limit: number,
     page: number
   ) {
-    const [topics, allCount] =
-      await this.wrapper.topicRepository.getTopicsAndCountSearch(
-        limit,
-        keyword,
-        owner,
-        page
-      );
+    const topics = await this.wrapper.topicRepository.getTopicsAndCountSearch(
+      limit,
+      keyword,
+      owner,
+      page
+    );
+
+    const allCount = await this.wrapper.topicRepository.getTopicsCountSearch(
+      keyword,
+      owner
+    );
 
     return {
       limit,
@@ -95,7 +111,7 @@ export class TopicService {
   public async updateTopic(data: PostTopicDto): Promise<void> {
     await this.wrapper.topicRepository.update(
       {
-        id: data.id
+        id: data.id,
       },
       {
         ...(data.tags ? { tags: data.tags } : null),
@@ -105,10 +121,13 @@ export class TopicService {
     if (data.version)
       await this.wrapper.topicRepository.update(
         {
-          id: data.id, version: data.version
+          id: data.id,
+          version: data.version,
         },
         {
-          ...(data.schema ? { schema: data.schema as unknown as object } : null),
+          ...(data.schema
+            ? { schema: data.schema as unknown as object }
+            : null),
         }
       );
   }
@@ -160,11 +179,17 @@ export class TopicService {
     }
   }
 
-  public async getTopicHistoryByIdAndVersion(id: string, versionNumber: string): Promise<PostTopicDto> {
-
+  public async getTopicHistoryByIdAndVersion(
+    id: string,
+    versionNumber: string
+  ): Promise<PostTopicDto> {
     const topic: TopicEntity = await this.wrapper.topicRepository.findOne({
-      where: { id, version: versionNumber }
+      where: { id, version: versionNumber },
     });
+
+    if (!topic) {
+      throw new TopicOrVersionNotFoundException(id, versionNumber);
+    }
 
     return {
       id: topic.id,
@@ -173,25 +198,29 @@ export class TopicService {
       schema: JSON.stringify(topic.schema),
       version: topic.version,
       owner: topic.owner,
-      tags: topic.tags
+      tags: topic.tags,
     };
   }
 
-  public async getTopicHistoryById(id: string, limit: number, page: number): Promise<PaginatedTopicResponse> {
+  public async getTopicHistoryById(
+    id: string,
+    limit: number,
+    page: number
+  ): Promise<PaginatedTopicResponse> {
     const [topics, allCount] = await this.wrapper.topicRepository.findAndCount({
       where: { id },
       skip: (page - 1) * limit,
       take: limit,
     });
 
-    const topicSearchDto: GetTopicSearchDto[] = topics.map(topic => {
+    const topicSearchDto: GetTopicSearchDto[] = topics.map((topic) => {
       const topicDto: GetTopicSearchDto = {
         id: topic.id,
         name: topic.name,
         schemaType: topic.schemaType as SchemaType,
         owner: topic.owner,
         tags: topic.tags,
-        version: topic.version
+        version: topic.version,
       };
       return topicDto;
     });
@@ -200,7 +229,7 @@ export class TopicService {
       count: allCount,
       limit: limit,
       page: page,
-      records: topicSearchDto
-    }
+      records: topicSearchDto,
+    };
   }
 }
