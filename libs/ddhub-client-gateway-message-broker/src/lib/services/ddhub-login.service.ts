@@ -64,11 +64,7 @@ export class DdhubLoginService {
       this.logger.log(`[ddhub_mb_login] Attempting to login to DID Auth Server #${number}`);
       await this.didAuthService
         .login(privateKey, this.iamService.getDIDAddress(), forceRelogin)
-        .catch((e) => {
-          this.logger.error(`[ddhub_mb_login][exception]  ${JSON.stringify((e))}`);
-          retry(e)
-        }
-        );
+        .catch((e) => retry(e));
     }, this.retryConfigService.loginConfig);
 
     this.logger.log('Login successful, attempting to init ext channel');

@@ -28,7 +28,7 @@ export class DidAuthApiService {
         {
           httpsAgent: this.tlsAgentService.get(),
         }
-      ).pipe(timeout(this.configService.get<number>('MAX_TIMEOUT', 60000)))
+      ).pipe(timeout(+this.configService.get<number>('MAX_TIMEOUT', 60000)))
     ).catch((e) => {
       this.logger.error(`[Login Failed][msg] ${e.message}`);
       this.logger.error(`[Login Failed][data] ${JSON.stringify((e.response?.data))}`);
