@@ -2,9 +2,9 @@ import { makeStyles } from 'tss-react/mui';
 
 export const useStyles = makeStyles()((theme) => ({
   paper: {
-    maxWidth: 514,
-    minHeight: 620,
-    padding: '37px 50px 52px 50px',
+    maxWidth: 860,
+    minHeight: 693,
+    padding: '48px 40px 40px 48px',
     borderRadius: 0,
   },
   closeButtonWrapper: {
@@ -18,17 +18,17 @@ export const useStyles = makeStyles()((theme) => ({
   },
   icon: {
     stroke: theme.palette.primary.main,
-    width: 18,
-    height: 18,
+    width: 14,
+    height: 14,
   },
   editIconButton: {
     position: 'absolute',
-    top: -10,
+    top: 10,
     right: 0,
   },
   downloadIconButton: {
     position: 'absolute',
-    top: -10,
+    top: 10,
     right: 30,
   },
 }));

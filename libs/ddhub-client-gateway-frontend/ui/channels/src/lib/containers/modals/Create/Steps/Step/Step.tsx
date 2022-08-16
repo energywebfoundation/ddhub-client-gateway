@@ -22,11 +22,10 @@ export const Step = ({
   const { classes } = useStyles();
 
   return (
-    <Stack direction="row" className={classes.root}>
+    <Stack direction="row" className={clsx(classes.root, {[classes.clickableDiv]: showCursor})} onClick={clickHandler}>
       <Avatar
         variant="rounded"
-        className={clsx(classes.icon, { [classes.activeIcon]: active, [classes.clickableAvatar]: showCursor })}
-        onClick={clickHandler}
+        className={clsx(classes.icon, { [classes.activeIcon]: active })}
       >
         {icon}
       </Avatar>

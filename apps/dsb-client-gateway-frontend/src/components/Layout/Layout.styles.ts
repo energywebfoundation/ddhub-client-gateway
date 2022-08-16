@@ -8,4 +8,9 @@ export const useStyles = makeStyles()({
   content: {
     flexGrow: 1
   },
+  childContent: {
+    maxWidth: 1440,
+    marginLeft: 'auto',
+    marginRight: 'auto',
+  },
 });

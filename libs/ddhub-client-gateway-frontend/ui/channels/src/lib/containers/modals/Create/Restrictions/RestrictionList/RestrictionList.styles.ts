@@ -9,8 +9,10 @@ export const useStyles = makeStyles()((theme) => ({
     background: '#21273B',
     fontSize: '12px',
     color: theme.palette.grey[300],
-    height: '125px',
+    minHeight: 167,
+    maxHeight: 413,
     overflow: 'auto',
+    flexGrow: 1,
     '&::-webkit-scrollbar': {
       width: 2,
     },
@@ -24,7 +26,7 @@ export const useStyles = makeStyles()((theme) => ({
       borderRadius: 3,
     },
     '& .MuiGrid-root:nth-of-type(even)': {
-      background: lighten('#21273B', 0.1),
+      background: '#2A3044',
     },
   },
   close: {
@@ -36,7 +38,7 @@ export const useStyles = makeStyles()((theme) => ({
     },
   },
   container: {
-    height: 24,
+    height: 37,
     padding: '0 3px 0 6px',
     alignItems: 'center',
   },

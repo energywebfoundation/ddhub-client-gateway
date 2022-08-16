@@ -28,9 +28,9 @@ export const Summary = ({
       direction="column"
       justifyContent="space-between"
       className={'no-wrap'}
-      sx={{ height: '100%', flexWrap: 'nowrap', marginTop: '-20px' }}
+      sx={{ height: '100%', flexWrap: 'nowrap', marginTop: '-10px' }}
     >
-      <Grid item>
+      <Grid item sx={{ paddingRight: '36px' }}>
         <Typography variant={'h4'} className={classes.mainLabel}>
           {channelValues.channelType}
         </Typography>
@@ -93,7 +93,7 @@ export const Summary = ({
           canCopy={true}
         />
       </Grid>
-      <Grid item alignSelf="flex-end" width="100%">
+      <Grid item alignSelf="flex-end" width="100%" sx={{ paddingRight: '7px' }}>
         <ActionButtons {...actionButtonsProps} />
       </Grid>
     </Grid>
