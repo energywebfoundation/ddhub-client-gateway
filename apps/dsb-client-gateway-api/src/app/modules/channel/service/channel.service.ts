@@ -207,7 +207,11 @@ export class ChannelService {
     for (const { topicName, owner } of topics) {
       const receivedTopics = await this.ddhubTopicsService
         .getTopicsByOwnerAndName(topicName, owner)
-        .catch(() => {
+        .catch((e) => {
+          if (e?.response?.status !== 404) {
+            throw e;
+          }
+
           return {
             records: [],
           };
@@ -227,7 +231,7 @@ export class ChannelService {
         topicName,
         owner,
         topicId: id,
-        schemaType: schemaType
+        schemaType: schemaType,
       });
     }
 

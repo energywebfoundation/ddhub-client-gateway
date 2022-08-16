@@ -4,20 +4,23 @@ import {
 } from './check-account-status/CheckAccountStatus';
 import { getIdentityControllerGetQueryKey } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import {
+  GatewayConfig,
   IdentityWithEnrolment,
   Role,
   RoleStatus,
 } from '@ddhub-client-gateway/identity/models';
 import { routerConst } from '@ddhub-client-gateway-frontend/ui/utils';
 import { useRouter } from 'next/router';
-import { useContext } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { UserDataContext } from './UserDataContext';
 import { useQueryClient } from 'react-query';
+import { isEmpty } from 'lodash';
 import {
   RouteRestrictions,
   IndexableRouteRestrictions,
 } from './config/route-restrictions.interface';
 import { useCustomAlert } from '@ddhub-client-gateway-frontend/ui/core';
+import { useGatewayConfig } from '@ddhub-client-gateway-frontend/ui/api-hooks';
 
 export const routeRestrictions = new Map<string, string>()
   .set('topicManagement', routerConst.TopicManagement)
@@ -30,7 +33,8 @@ export const routeRestrictions = new Map<string, string>()
 
 export const getRoutesToDisplay = (
   accountRoles: Role[],
-  restrictions: IndexableRouteRestrictions
+  restrictions: IndexableRouteRestrictions,
+  config: GatewayConfig
 ): Set<string> => {
   if (!accountRoles) {
     return new Set();
@@ -39,10 +43,7 @@ export const getRoutesToDisplay = (
     .filter(
       (role) =>
         role.status === RoleStatus.SYNCED &&
-        role.namespace.includes(
-          process.env['NEXT_PUBLIC_PARENT_NAMESPACE'] ??
-            'ddhub.apps.energyweb.iam.ewc'
-        )
+        role.namespace.includes(config?.namespace)
     )
     .map((role) => role.namespace);
   if (roles.length === 0) {
@@ -67,8 +68,33 @@ export const getRoutesToDisplay = (
 export const useSetUserDataEffect = () => {
   const Swal = useCustomAlert();
   const router = useRouter();
+  const { config } = useGatewayConfig();
   const { userData, setUserData } = useContext(UserDataContext);
   const queryClient = useQueryClient();
+  const [routeRestrictionList, setRouteRestrictionList] = useState({} as RouteRestrictions);
+  const [result, setResult] = useState({} as IdentityWithEnrolment);
+
+  useEffect(() => {
+    if (!isEmpty(config) && result?.enrolment?.roles) {
+      const accountStatus = checkAccountStatus(result);
+
+      const displayedRoutes = getRoutesToDisplay(
+        result.enrolment.roles,
+        routeRestrictionList as unknown as IndexableRouteRestrictions,
+        config,
+      );
+
+      setUserData({
+        ...userData,
+        accountStatus,
+        roles: result.enrolment.roles,
+        isChecking: false,
+        routeRestrictions: routeRestrictionList,
+        displayedRoutes,
+        did: result.enrolment.did,
+      });
+    }
+  }, [config, result, routeRestrictionList]);
 
   const setData = (
     res: IdentityWithEnrolment,
@@ -82,21 +108,10 @@ export const useSetUserDataEffect = () => {
     };
 
     const accountStatus = checkAccountStatus(res);
-    if (res?.enrolment?.roles) {
-      const displayedRoutes = getRoutesToDisplay(
-        res.enrolment.roles,
-        routeRestrictions as unknown as IndexableRouteRestrictions
-      );
+    setResult(res);
+    setRouteRestrictionList(routeRestrictions);
 
-      setUserData({
-        ...userData,
-        accountStatus,
-        roles: res.enrolment.roles,
-        isChecking: false,
-        routeRestrictions,
-        displayedRoutes,
-      });
-    } else {
+    if (!res?.enrolment?.roles) {
       setUserData({
         ...userData,
         accountStatus,

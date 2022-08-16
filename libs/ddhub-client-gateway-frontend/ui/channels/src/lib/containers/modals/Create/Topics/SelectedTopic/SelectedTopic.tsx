@@ -20,7 +20,7 @@ export const SelectedTopic = ({
 }: SelectedTopicProps) => {
   const { classes, theme } = useStyles();
   return (
-    <Grid container justifyContent="space-between" alignItems="center">
+    <Grid container justifyContent="space-between" alignItems="center" className={classes.wrapper}>
       <Grid item>
         <Typography
           variant="body2"

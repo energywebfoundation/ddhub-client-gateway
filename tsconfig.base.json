@@ -74,6 +74,9 @@
       "@dsb-client-gateway/ddhub-client-gateway-message-broker": [
         "libs/ddhub-client-gateway-message-broker/src/index.ts"
       ],
+      "@dsb-client-gateway/ddhub-client-gateway-tls-agent": [
+        "libs/ddhub-client-gateway-tls-agent/src/index.ts"
+      ],
       "@dsb-client-gateway/ddhub-client-gateway-messaging": [
         "libs/ddhub-client-gateway-messaging/src/index.ts"
       ],

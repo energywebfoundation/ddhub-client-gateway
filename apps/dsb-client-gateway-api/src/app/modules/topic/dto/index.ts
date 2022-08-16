@@ -61,6 +61,22 @@ export class GetTopicDto {
   @IsString()
   @IsNotEmpty()
   @ApiProperty({
+    description: 'schema of the topic',
+    type: String,
+    example: JSON.stringify({
+      type: 'object',
+      properties: {
+        data: {
+          type: 'number',
+        },
+      },
+    }),
+  })
+  schema: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({
     description: 'version of the topic',
     type: String,
     example: '1.0.9',

@@ -7,6 +7,9 @@
     "npm": ">=8.5.0"
   },
   "scripts": {
+    "migrations:build": "rimraf migrations-build && tsc -p tsconfig.migrations.json",
+    "migrations:run": "npm run typeorm -- migration:run",
+    "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/.bin/typeorm",
     "generate:envs": "npm run generate:api:envs && npm run generate:scheduler:envs",
     "generate:api:envs": "npm run build:api:envs && node dist/apps/dsb-client-gateway-api-envs/main.js",
     "generate:scheduler:envs": "npm run build:scheduler:envs && node dist/apps/dsb-client-gateway-scheduler-envs/main.js",
@@ -88,7 +91,7 @@
     "form-data": "^4.0.0",
     "formidable": "^2.0.1",
     "hdkey": "^2.0.1",
-    "iam-client-lib": "^6.0.0-alpha.23",
+    "iam-client-lib": "^6.0.0-alpha.34",
     "jest-cucumber": "^3.0.1",
     "json2md": "^1.12.0",
     "lokijs": "^1.5.12",

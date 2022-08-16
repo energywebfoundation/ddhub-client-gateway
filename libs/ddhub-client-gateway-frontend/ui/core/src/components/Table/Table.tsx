@@ -23,6 +23,7 @@ import { useTableEffects } from './Table.effects';
 import { useStyles } from './Table.styles';
 import { TableProps } from './Table.types';
 import { visuallyHidden } from '@mui/utils';
+import clsx from 'clsx';
 
 export function GenericTable<T>({
   headers,
@@ -36,6 +37,7 @@ export function GenericTable<T>({
   showSearch = true,
   showFooter = true,
   backendSearch = false,
+  stripedTable = false,
   paginationProps,
   onPageChange,
   customStyle,
@@ -63,6 +65,7 @@ export function GenericTable<T>({
     pagination,
     handleSearchInput,
     paginationText,
+    handleChangeRowsPerPage,
   } = useTableEffects({
     headers,
     tableRows,
@@ -151,6 +154,9 @@ export function GenericTable<T>({
                 prepareRow(row);
                 return (
                   <TableRow
+                    className={clsx({
+                      [classes.stripedRow]: stripedTable,
+                    })}
                     {...row.getRowProps()}
                     onClick={() => handleRowClick(data)}
                   >
@@ -160,7 +166,7 @@ export function GenericTable<T>({
                       };
                       return (
                         <TableCell
-                          style={{ cursor: onRowClick ? 'pointer' : 'default' }}
+                          style={{ cursor: onRowClick ? 'pointer' : 'default', border: stripedTable ? 'none' : '' }}
                           classes={{ body: classes.body }}
                           color={column.color}
                           {...cell.getCellProps()}
@@ -182,7 +188,7 @@ export function GenericTable<T>({
               <TableFooter>
                 <TableRow>
                   <TablePagination
-                    rowsPerPageOptions={[]}
+                    rowsPerPageOptions={[10, 20, 50, 100]}
                     labelDisplayedRows={paginationText}
                     count={pagination.count}
                     rowsPerPage={Number(pagination.limit)}
@@ -191,9 +197,11 @@ export function GenericTable<T>({
                     ActionsComponent={TablePaginationActions}
                     classes={{
                       spacer: classes.spacer,
-                      displayedRows: classes.displayedRows,
                       toolbar: classes.toolbar,
+                      selectIcon: classes.selectIcon,
+                      menuItem: classes.menuItem,
                     }}
+                    onRowsPerPageChange={handleChangeRowsPerPage}
                   />
                 </TableRow>
               </TableFooter>

@@ -12,6 +12,7 @@ import {
   getFrontendConfigMock,
   getTopicsControllerGetTopicsSearchMock,
   getCronMock,
+  getGatewayMock,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 
 export function makeServer({ environment = 'development' }) {
@@ -26,6 +27,10 @@ export function makeServer({ environment = 'development' }) {
 
       this.namespace = 'api/v2';
       this.urlPrefix = 'http://localhost:3333';
+
+      this.get('/gateway', () => {
+        return getGatewayMock();
+      });
 
       this.get('/applications', () => {
         return getApplicationsControllerGetApplicationsMock();

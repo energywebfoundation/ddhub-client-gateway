@@ -8,14 +8,16 @@ export enum AccountStatusEnum {
   InsufficientFund = 'Insufficient fund',
   NotSetPrivateKey = 'Not Set Private Key',
   ErrorOccur = 'Error Occur',
+  FirstLogin = 'First Login',
 }
 
 export const checkAccountStatus = (
   res: IdentityWithEnrolment
 ): AccountStatusEnum | RoleStatus => {
   if (!res) {
-    return AccountStatusEnum.NotSetPrivateKey;
+    return AccountStatusEnum.FirstLogin;
   }
+
   if (isBalanceTooLow(res.balance)) {
     return AccountStatusEnum.InsufficientFund;
   }

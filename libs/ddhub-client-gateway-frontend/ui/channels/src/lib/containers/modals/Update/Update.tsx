@@ -13,6 +13,7 @@ import { ChannelConnectionType } from '../../../models/channel-connection-type.e
 import { ChannelImage } from '../../../components';
 import { useUpdateChannelEffects } from './Update.effects';
 import { useStyles } from '../Create/Create.styles';
+import { Check } from 'react-feather';
 
 export const Update = () => {
   const {
@@ -71,7 +72,7 @@ export const Update = () => {
       <DialogTitle className={classes.title}>Update Channel</DialogTitle>
       <DialogSubTitle>{subTitle}</DialogSubTitle>
       <Grid container className={classes.content}>
-        <Grid item pt={2}>
+        <Grid item pt={2} xs={4}>
           {channel && (
             <Box className={classes.channelWrapper}>
               <ChannelImage
@@ -97,13 +98,23 @@ export const Update = () => {
                   </Typography>
                 </Box>
               </Stack>
-              <Stack direction="column" mt={1} mb={2.3}>
+              <Stack direction="column" mt={1}>
                 <Typography className={classes.label} variant="body2">
-                  Type:
+                  Type
                 </Typography>
                 <Box display="flex">
                   <Typography className={classes.value} variant="body2">
                     {ChannelConnectionType[channel.type]}
+                  </Typography>
+                </Box>
+              </Stack>
+              <Stack direction="row" mt={1.5} mb={2.3}>
+                <Typography className={classes.encryptionLabel} variant="body2">
+                  Payload encryption:
+                </Typography>
+                <Box display="flex">
+                  <Typography className={classes.encryptionValue} variant="body2">
+                    {channelValues?.payloadEncryption ? <Check className={classes.iconCheck} /> : '-'}
                   </Typography>
                 </Box>
               </Stack>
@@ -112,7 +123,7 @@ export const Update = () => {
           <Box className={classes.divider} />
           <Steps steps={UPDATE_STEPS} activeStep={activeStep} setActiveStep={navigateToStep} />
         </Grid>
-        <Grid item className={classes.formWrapper}>
+        <Grid item className={classes.updateFormWrapper} xs={8}>
           {formPart(activeStep)}
         </Grid>
       </Grid>

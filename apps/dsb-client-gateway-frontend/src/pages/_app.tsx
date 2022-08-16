@@ -22,6 +22,7 @@ import { makeServer } from '../services/mock.service';
 import '@asyncapi/react-component/styles/default.min.css';
 import 'nprogress/nprogress.css';
 import '../styles/globals.css';
+import { useGatewayIdentityEffects } from 'libs/ddhub-client-gateway-frontend/ui/gateway-settings/src/lib/containers/GatewayIdentity/GatewayIdentity.effects';
 
 if (
   process.env.NODE_ENV !== 'production' &&
@@ -41,6 +42,7 @@ export interface MyAppProps extends AppProps {
 }
 
 function InitializeAccountStatus(props) {
+  useGatewayIdentityEffects();
   useCheckAccountStatusEffects();
   return <>{props.children}</>;
 }

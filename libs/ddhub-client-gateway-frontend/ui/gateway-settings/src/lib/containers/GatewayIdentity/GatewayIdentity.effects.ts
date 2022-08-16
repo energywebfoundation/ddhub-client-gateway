@@ -1,15 +1,16 @@
 import { useCustomAlert } from '@ddhub-client-gateway-frontend/ui/core';
-import { useIdentity } from '@ddhub-client-gateway-frontend/ui/api-hooks';
+import {
+  useIdentity,
+  useGatewayConfig,
+} from '@ddhub-client-gateway-frontend/ui/api-hooks';
 import { useSetUserDataEffect } from '@ddhub-client-gateway-frontend/ui/login';
 
 export const useGatewayIdentityEffects = () => {
-  const { identity } = useIdentity();
-  const { setUserData } = useSetUserDataEffect();
+  const { config } = useGatewayConfig();
+  const { userData, setUserData } = useSetUserDataEffect();
   const Swal = useCustomAlert();
 
-  const namespace =
-    process.env['NEXT_PUBLIC_PARENT_NAMESPACE'] ??
-    'ddhub.apps.energyweb.iam.ewc';
+  const namespace = config?.namespace ?? 'ddhub.apps.energyweb.iam.ewc';
 
   const update = async () => {
     const result = await Swal.warning({
@@ -24,7 +25,7 @@ export const useGatewayIdentityEffects = () => {
 
   return {
     update,
-    identity,
+    identity: { enrolment: { did: userData.did } },
     namespace,
   };
 };

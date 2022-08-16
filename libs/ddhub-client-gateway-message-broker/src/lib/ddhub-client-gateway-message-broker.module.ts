@@ -7,7 +7,6 @@ import {
   DdhubLoginService,
   DdhubMessagesService,
   DdhubTopicsService,
-  TlsAgentService,
 } from './services';
 import { DdhubHealthService } from './services/ddhub-health.service';
 import { CqrsModule } from '@nestjs/cqrs';
@@ -16,6 +15,8 @@ import { DidAuthModule } from '@dsb-client-gateway/ddhub-client-gateway-did-auth
 import { SecretsEngineModule } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
 import { DdhubClientGatewayEnrolmentModule } from '@dsb-client-gateway/ddhub-client-gateway-enrolment';
 import { ReloginHandler } from './handler/relogin.handler';
+import { DdhubClientGatewayTlsAgentModule } from '@dsb-client-gateway/ddhub-client-gateway-tls-agent';
+import { DdhubLogService } from './services/ddhub-log.service';
 
 @Module({
   imports: [
@@ -39,9 +40,9 @@ import { ReloginHandler } from './handler/relogin.handler';
     SecretsEngineModule,
     DdhubClientGatewayUtilsModule,
     CqrsModule,
+    DdhubClientGatewayTlsAgentModule,
   ],
   providers: [
-    TlsAgentService,
     DdhubTopicsService,
     DdhubFilesService,
     DdhubHealthService,
@@ -49,6 +50,7 @@ import { ReloginHandler } from './handler/relogin.handler';
     DdhubLoginService,
     DdhubDidService,
     ReloginHandler,
+    DdhubLogService,
   ],
   exports: [
     DdhubTopicsService,
@@ -57,7 +59,6 @@ import { ReloginHandler } from './handler/relogin.handler';
     DdhubMessagesService,
     DdhubLoginService,
     DdhubDidService,
-    TlsAgentService,
   ],
 })
 export class DdhubClientGatewayMessageBrokerModule {}

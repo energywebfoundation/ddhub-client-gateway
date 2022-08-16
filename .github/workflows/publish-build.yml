@@ -40,10 +40,6 @@ jobs:
       - uses: actions/setup-node@v2-beta
         with:
           node-version: '16.14.2'
-      - name: Setup app dependencies
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
       - name: Cache node modules
         uses: actions/cache@v2
         env:
@@ -82,14 +78,14 @@ jobs:
           docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-scheduler:canary
 
       - name: ArgoCD login
-        uses: clowdhaus/argo-cd-action/@main
+        uses: clowdhaus/argo-cd-action/@v1.12.1
         id: argocd_login
         with:
           command: login ${{ secrets.ARGOCD_DEV_URL }}
           options: --insecure --password ${{ secrets.ARGOCD_DEV_PASS }} --username ${{ secrets.ARGOCD_DEV_USERNAME }}
 
       - name: ArgoCD overwrite Dev scheduler image tag
-        uses: clowdhaus/argo-cd-action/@main
+        uses: clowdhaus/argo-cd-action/@v1.12.1
         id: argocd_image_tag_overwrite_dev_scheduler
         with:
           command: app set ddhub-gateway-dev
@@ -105,10 +101,6 @@ jobs:
       - uses: actions/setup-node@v2-beta
         with:
           node-version: '16.14.2'
-      - name: Setup app dependencies
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
       - name: Cache node modules
         uses: actions/cache@v2
         env:
@@ -127,6 +119,8 @@ jobs:
         run: npm ci
       - name: Build
         run: nx build dsb-client-gateway-api --prod
+      - name: Build migrations
+        run: npm run migrations:build
 
       - name: 'Login via Azure CLI'
         uses: azure/login@v1
@@ -147,14 +141,14 @@ jobs:
           docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-backend:canary
 
       - name: ArgoCD login
-        uses: clowdhaus/argo-cd-action/@main
+        uses: clowdhaus/argo-cd-action/@v1.12.1
         id: argocd_login
         with:
           command: login ${{ secrets.ARGOCD_DEV_URL }}
           options: --insecure --password ${{ secrets.ARGOCD_DEV_PASS }} --username ${{ secrets.ARGOCD_DEV_USERNAME }}
 
       - name: ArgoCD overwrite DEV image tag
-        uses: clowdhaus/argo-cd-action/@main
+        uses: clowdhaus/argo-cd-action/@v1.12.1
         id: argocd_image_tag_overwrite
         with:
           command: app set ddhub-gateway-dev
@@ -170,10 +164,6 @@ jobs:
       - uses: actions/setup-node@v2-beta
         with:
           node-version: '16.14.2'
-      - name: Setup app dependencies
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
       - name: Cache node modules
         uses: actions/cache@v2
         env:
@@ -212,14 +202,14 @@ jobs:
           docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-frontend:canary
 
       - name: ArgoCD login
-        uses: clowdhaus/argo-cd-action/@main
+        uses: clowdhaus/argo-cd-action/@v1.12.1
         id: argocd_login
         with:
           command: login ${{ secrets.ARGOCD_DEV_URL }}
           options: --insecure --password ${{ secrets.ARGOCD_DEV_PASS }} --username ${{ secrets.ARGOCD_DEV_USERNAME }}
 
       - name: ArgoCD overwrite DEV image tag
-        uses: clowdhaus/argo-cd-action/@main
+        uses: clowdhaus/argo-cd-action/@v1.12.1
         id: argocd_image_tag_overwrite_dev_ui
         with:
           command: app set ddhub-gateway-dev

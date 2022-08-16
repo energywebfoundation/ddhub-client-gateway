@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { RetryConfigService } from '@dsb-client-gateway/ddhub-client-gateway-utils';
 import { DidAuthService } from '@dsb-client-gateway/ddhub-client-gateway-did-auth';
-import { TlsAgentService } from './tls-agent.service';
+import { TlsAgentService } from '@dsb-client-gateway/ddhub-client-gateway-tls-agent';
 import { Span } from 'nestjs-otel';
 import { RoleStatus } from '@ddhub-client-gateway/identity/models';
 import promiseRetry from 'promise-retry';
@@ -75,13 +75,14 @@ export class DdhubLoginService {
   protected async initExtChannel(): Promise<void> {
     try {
       await promiseRetry(async (retry) => {
+        await this.tlsAgentService.create();
+
         await lastValueFrom(
           this.httpService.post(
             '/channel/initExtChannel',
+            {},
             {
               httpsAgent: this.tlsAgentService.get(),
-            },
-            {
               headers: {
                 Authorization: `Bearer ${this.didAuthService.getToken()}`,
               },

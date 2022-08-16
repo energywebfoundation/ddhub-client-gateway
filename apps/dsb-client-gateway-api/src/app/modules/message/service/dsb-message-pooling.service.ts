@@ -15,6 +15,7 @@ import { AService } from './a.service';
 
 enum SCHEDULER_HANDLERS {
   MESSAGES = 'ws-messages',
+  MESSAGES_HEARTBEAT = 'ws-messages-heartbeat',
 }
 
 @Injectable()
@@ -56,11 +57,15 @@ export class DsbMessagePoolingService implements OnModuleInit {
   @Span('ws_pool_messages')
   public async handleInterval(): Promise<void> {
     const callback = async () => {
+      // handling callback polling msg
+      this.logger.log('[handleInterval] handling callback polling msg');
       await this.handleInterval();
     };
 
     try {
+      this.logger.log('[deleteTimeout] Start deleteTimeout');
       this.schedulerRegistry.deleteTimeout(SCHEDULER_HANDLERS.MESSAGES);
+      this.logger.log('[deleteTimeout] End deleteTimeout');
 
       if (
         this.websocketMode === WebSocketImplementation.SERVER &&
@@ -71,6 +76,14 @@ export class DsbMessagePoolingService implements OnModuleInit {
           this.configService.get<number>('WEBSOCKET_POOLING_TIMEOUT', 5000)
         );
         this.schedulerRegistry.addTimeout(SCHEDULER_HANDLERS.MESSAGES, timeout);
+        this.logger.log(
+          `${
+            this.gateway.server.clients.size
+          } client connected. Skip pooling trigger. waiting ${this.configService.get<number>(
+            'WEBSOCKET_POOLING_TIMEOUT',
+            5000
+          )}`
+        );
         return;
       }
 
@@ -88,12 +101,21 @@ export class DsbMessagePoolingService implements OnModuleInit {
           this.configService.get<number>('WEBSOCKET_POOLING_TIMEOUT', 5000)
         );
         this.schedulerRegistry.addTimeout(SCHEDULER_HANDLERS.MESSAGES, timeout);
+        this.logger.log(
+          `Skip pooling trigger. waiting ${this.configService.get<number>(
+            'WEBSOCKET_POOLING_TIMEOUT',
+            5000
+          )}`
+        );
         return;
       }
 
       const subscriptions: ChannelEntity[] = (
         await this.channelService.getChannels()
-      ).filter((entity) => entity.type == ChannelType.SUB);
+      ).filter(
+        (entity) =>
+          entity.type == ChannelType.SUB || entity.type == ChannelType.DOWNLOAD
+      );
 
       if (subscriptions.length === 0) {
         this.logger.log(
@@ -102,34 +124,41 @@ export class DsbMessagePoolingService implements OnModuleInit {
 
         const timeout = setTimeout(
           callback,
-          this.configService.get<number>('WEBSOCKET_POOLING_TIMEOUT', 5000) * 12
+          this.configService.get<number>('WEBSOCKET_POOLING_TIMEOUT', 5000)
         );
         this.schedulerRegistry.addTimeout(SCHEDULER_HANDLERS.MESSAGES, timeout);
-
+        this.logger.log(
+          `[no subscriptions] Waiting ${this.configService.get<number>(
+            'WEBSOCKET_POOLING_TIMEOUT',
+            5000
+          )}`
+        );
         return;
       }
 
       const msdCount = await this.pullMessagesAndEmit(subscriptions);
       if (msdCount == 0) {
         throw new Error(
-          `empty msg, increase waiting to ` +
-            this.configService.get<number>('WEBSOCKET_POOLING_TIMEOUT', 5000) *
-              12
+          `empty msg, waiting to ` +
+            this.configService.get<number>('WEBSOCKET_POOLING_TIMEOUT', 5000)
         );
       }
 
-      const timeout = setTimeout(
-        callback,
-        this.configService.get<number>('WEBSOCKET_POOLING_TIMEOUT', 5000) / 5
-      );
+      const timeout = setTimeout(callback, 1000); //immediate get msg available
       this.schedulerRegistry.addTimeout(SCHEDULER_HANDLERS.MESSAGES, timeout);
     } catch (e) {
       this.logger.error(e);
       const timeout = setTimeout(
         callback,
-        this.configService.get<number>('WEBSOCKET_POOLING_TIMEOUT', 5000) * 12
+        this.configService.get<number>('WEBSOCKET_POOLING_TIMEOUT', 5000)
       );
       this.schedulerRegistry.addTimeout(SCHEDULER_HANDLERS.MESSAGES, timeout);
+      this.logger.log(
+        `[exception caught] Waiting ${this.configService.get<number>(
+          'WEBSOCKET_POOLING_TIMEOUT',
+          5000
+        )}`
+      );
     }
   }
 
@@ -145,7 +174,7 @@ export class DsbMessagePoolingService implements OnModuleInit {
       websocketMode === WebSocketImplementation.SERVER &&
       this.gateway.server.clients.size > 0
     ) {
-      await this.ddhubLoginService.login();
+      this.logger.log('[pullMessagesAndEmit] Start Promise.allSettled');
       await Promise.allSettled(
         Array.from(this.gateway.server.clients.values()).map(async (client) => {
           await this.pullMessages(subscriptions, client)
@@ -155,13 +184,15 @@ export class DsbMessagePoolingService implements OnModuleInit {
             .catch();
         })
       );
+      this.logger.log('[pullMessagesAndEmit] End Promise.allSettled');
     } else if (this.wsClient.rws) {
-      await this.ddhubLoginService.login();
+      this.logger.log('[pullMessagesAndEmit] Start pullMessagesAndEmit');
       await this.pullMessages(subscriptions, this.wsClient.rws)
         .then((totalMsg) => {
           msgCount += totalMsg;
         })
         .catch();
+      this.logger.log('[pullMessagesAndEmit] End pullMessagesAndEmit');
     }
 
     return msgCount;
@@ -186,29 +217,33 @@ export class DsbMessagePoolingService implements OnModuleInit {
 
     let msgCount = 0;
     for (const subscription of subscriptions) {
-      const messages: GetMessageResponse[] =
-        await this.messageService.getMessages({
-          fqcn: subscription.fqcn,
-          from: undefined,
-          amount: messagesAmount,
-          topicName: undefined,
-          topicOwner: undefined,
-          clientId: _clientId ? _clientId : clientId,
-        });
+      try {
+        const messages: GetMessageResponse[] =
+          await this.messageService.getMessages({
+            fqcn: subscription.fqcn,
+            from: undefined,
+            amount: messagesAmount,
+            topicName: undefined,
+            topicOwner: undefined,
+            clientId: _clientId ? _clientId : clientId,
+          });
 
-      this.logger.log(
-        `Found ${messages.length} in ${subscription.fqcn} for ${
-          _clientId ? _clientId : clientId
-        }`
-      );
-
-      if (messages && messages.length > 0) {
-        msgCount += messages.length;
-        await this.sendMessagesToSubscribers(
-          messages,
-          subscription.fqcn,
-          client
+        this.logger.log(
+          `Found ${messages.length} in ${subscription.fqcn} for ${
+            _clientId ? _clientId : clientId
+          }`
         );
+
+        if (messages && messages.length > 0) {
+          msgCount += messages.length;
+          await this.sendMessagesToSubscribers(
+            messages,
+            subscription.fqcn,
+            client
+          );
+        }
+      } catch (e) {
+        this.logger.error(`[WS][pullMessages] ${e}`);
       }
     }
 
@@ -220,20 +255,35 @@ export class DsbMessagePoolingService implements OnModuleInit {
     fqcn: string,
     client: any
   ): Promise<void> {
-    const emitMode: EventEmitMode = this.configService.get(
-      'EVENTS_EMIT_MODE',
-      EventEmitMode.BULK
-    );
-
-    if (emitMode === EventEmitMode.BULK) {
-      client.send(
-        JSON.stringify(messages.map((message) => ({ ...message, fqcn })))
+    try {
+      const emitMode: EventEmitMode = this.configService.get(
+        'EVENTS_EMIT_MODE',
+        EventEmitMode.BULK
       );
-      return;
-    }
 
-    messages.forEach((message: GetMessageResponse) => {
-      client.send(JSON.stringify({ ...message, fqcn }));
-    });
+      if (emitMode === EventEmitMode.BULK) {
+        if (client.readyState === WebSocket.OPEN) {
+          const msg = JSON.stringify(
+            messages.map((message) => ({ ...message, fqcn }))
+          );
+          client.send(msg);
+          this.logger.log(`[WS][sendMessagesToSubscribers][BULK] ${msg}`);
+        }
+      } else {
+        messages.forEach((message: GetMessageResponse) => {
+          if (client.readyState === WebSocket.OPEN) {
+            client.send(JSON.stringify({ ...message, fqcn }));
+            this.logger.log(
+              `[WS][sendMessagesToSubscribers][SINGLE] ${JSON.stringify({
+                ...message,
+                fqcn,
+              })}`
+            );
+          }
+        });
+      }
+    } catch (e) {
+      this.logger.error(`[WS][sendMessagesToSubscribers] ${e}`);
+    }
   }
 }

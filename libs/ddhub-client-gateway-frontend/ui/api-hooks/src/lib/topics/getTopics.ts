@@ -66,7 +66,7 @@ export const useTopics = ({
 
   const getTopicsBySearch = async ({
     page = 1,
-    limit = 6,
+    limit = 10,
     keyword = ''
   }: TopicsControllerGetTopicsBySearchParams) => {
     setKeyword(keyword);
@@ -75,7 +75,7 @@ export const useTopics = ({
 
   const getTopics = async ({
     page = 1,
-    limit = 6,
+    limit = 10,
   }: Omit<TopicsControllerGetTopicsParams, 'owner'>) => {
     if (keyword) {
       await getTopicsBySearch({ page, limit, keyword });

@@ -1,7 +1,7 @@
 import { FC } from 'react';
 import { useStyles } from './ApplicationInfoModal.styles';
 import { ApplicationDTO } from '@dsb-client-gateway/dsb-client-gateway-api-client';
-import { Box, Typography } from '@mui/material';
+import { Box, Stack, Typography } from '@mui/material';
 import { Image } from '@ddhub-client-gateway-frontend/ui/core';
 
 interface ApplicationInfoModalProps {
@@ -19,9 +19,16 @@ export const ApplicationInfoModal: FC<ApplicationInfoModalProps> = ({
       <Typography className={classes.appName}>
         {application.appName}
       </Typography>
-      <Typography className={classes.namespace}>
-        {application.namespace}
-      </Typography>
+      <Stack direction="column">
+        <Typography className={classes.label} variant="body2">
+          Namespace
+        </Typography>
+        <Box display="flex">
+          <Typography className={classes.namespace} variant="body2" noWrap>
+            {application.namespace}
+          </Typography>
+        </Box>
+      </Stack>
     </Box>
   );
 }

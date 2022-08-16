@@ -51,10 +51,6 @@ jobs:
       - uses: actions/setup-node@v2-beta
         with:
           node-version: '16.14.2'
-      - name: Setup app dependencies
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
       - name: Cache node modules
         uses: actions/cache@v2
         env:
@@ -93,14 +89,14 @@ jobs:
           docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-scheduler:latest
 
       - name: ArgoCD login
-        uses: clowdhaus/argo-cd-action/@main
+        uses: clowdhaus/argo-cd-action/@v1.12.1
         id: argocd_login
         with:
           command: login ${{ secrets.ARGOCD_STAGING_URL }}
           options: --insecure --password ${{ secrets.ARGOCD_STAGING_PASS }} --username ${{ secrets.ARGOCD_STAGING_USERNAME }}
 
       - name: ArgoCD overwrite DEMO scheduler image tag
-        uses: clowdhaus/argo-cd-action/@main
+        uses: clowdhaus/argo-cd-action/@v1.12.1
         id: argocd_image_tag_overwrite_demo_scheduler
         with:
           command: app set ddhub-gateway-demo
@@ -116,10 +112,6 @@ jobs:
       - uses: actions/setup-node@v2-beta
         with:
           node-version: '16.14.2'
-      - name: Setup app dependencies
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
       - name: Cache node modules
         uses: actions/cache@v2
         env:
@@ -138,6 +130,8 @@ jobs:
         run: npm ci
       - name: Build
         run: nx build dsb-client-gateway-api --prod
+      - name: Build migrations
+        run: npm run migrations:build
 
       - name: 'Login via Azure CLI'
         uses: azure/login@v1
@@ -157,26 +151,27 @@ jobs:
           docker tag energyweb/ddhub-client-gateway-backend ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-backend:latest
           docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-backend:latest
 
-      - name: ArgoCD login
-        uses: clowdhaus/argo-cd-action/@main
-        id: argocd_login
-        with:
-          command: login ${{ secrets.ARGOCD_STAGING_URL }}
-          options: --insecure --password ${{ secrets.ARGOCD_STAGING_PASS }} --username ${{ secrets.ARGOCD_STAGING_USERNAME }}
-
-      - name: ArgoCD overwrite DEMO image tag
-        uses: clowdhaus/argo-cd-action/@main
-        id: argocd_image_tag_overwrite_demo_api
-        with:
-          command: app set ddhub-gateway-demo
-          options: -p ddhub-client-gateway-api.image.tag=${{needs.semantic-version.outputs.new_version}}
-
       - name: Create a GitHub release
         uses: ncipollo/release-action@v1
         with:
           tag: ${{ needs.semantic-version.outputs.new_version }}
           name: Release ${{ needs.semantic-version.outputs.new_version }}
           body: ${{ needs.semantic-version.outputs.changelog }}
+
+      - name: ArgoCD login
+        uses: clowdhaus/argo-cd-action/@v1.12.1
+        id: argocd_login
+        with:
+          command: login ${{ secrets.ARGOCD_STAGING_URL }}
+          options: --insecure --password ${{ secrets.ARGOCD_STAGING_PASS }} --username ${{ secrets.ARGOCD_STAGING_USERNAME }}
+
+      - name: ArgoCD overwrite DEMO image tag
+        uses: clowdhaus/argo-cd-action/@v1.12.1
+        id: argocd_image_tag_overwrite_demo_api
+        with:
+          command: app set ddhub-gateway-demo
+          options: -p ddhub-client-gateway-api.image.tag=${{needs.semantic-version.outputs.new_version}}
+
   build-fe:
     name: Build Frontend
     runs-on: ubuntu-latest
@@ -188,10 +183,6 @@ jobs:
       - uses: actions/setup-node@v2-beta
         with:
           node-version: '16.14.2'
-      - name: Setup app dependencies
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
       - name: Cache node modules
         uses: actions/cache@v2
         env:
@@ -230,14 +221,14 @@ jobs:
           docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-frontend:latest
 
       - name: ArgoCD login
-        uses: clowdhaus/argo-cd-action/@main
+        uses: clowdhaus/argo-cd-action/@v1.12.1
         id: argocd_login
         with:
           command: login ${{ secrets.ARGOCD_STAGING_URL }}
           options: --insecure --password ${{ secrets.ARGOCD_STAGING_PASS }} --username ${{ secrets.ARGOCD_STAGING_USERNAME }}
 
       - name: ArgoCD overwrite DEMO image tag
-        uses: clowdhaus/argo-cd-action/@main
+        uses: clowdhaus/argo-cd-action/@v1.12.1
         id: argocd_image_tag_overwrite_demo_ui
         with:
           command: app set ddhub-gateway-demo

@@ -3,16 +3,15 @@ import { makeStyles } from 'tss-react/mui';
 export const useStyles = makeStyles()((theme) => ({
   appWrapper: {
     display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
     flexDirection: 'column',
+    placeItems: 'start',
   },
   appName: {
     fontSize: 18,
     lineHeight: '24px',
     fontWeight: 400,
     color: theme.palette.common.white,
-    fontFamily: theme.typography.body1.fontFamily,
+    fontFamily: theme.typography.h2.fontFamily,
     margin: '15px 0 6px 0',
   },
   namespace: {
@@ -24,7 +23,15 @@ export const useStyles = makeStyles()((theme) => ({
     fontFamily: theme.typography.body2.fontFamily,
   },
   appImage: {
-    width: 66,
-    height: 66,
+    width: 48,
+    height: 48,
+  },
+  label: {
+    fontSize: 12,
+    lineHeight: '24px',
+    fontWeight: 400,
+    color: theme.palette.common.white,
+    fontFamily: theme.typography.body2.fontFamily,
+    marginBottom: 1,
   },
 }));

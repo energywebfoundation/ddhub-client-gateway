@@ -10,6 +10,7 @@
     "ddhub-client-gateway-message-broker": "libs/ddhub-client-gateway-message-broker",
     "ddhub-client-gateway-messaging": "libs/ddhub-client-gateway-messaging",
     "ddhub-client-gateway-storage": "libs/dsb-client-gateway-storage",
+    "ddhub-client-gateway-tls-agent": "libs/ddhub-client-gateway-tls-agent",
     "ddhub-client-gateway-tracing": "libs/ddhub-client-gateway-tracing",
     "ddhub-client-gateway-ui-api-hooks": "libs/ddhub-client-gateway-frontend/ui/api-hooks",
     "ddhub-client-gateway-ui-applications": "libs/ddhub-client-gateway-frontend/ui/applications",

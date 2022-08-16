@@ -10,29 +10,54 @@ export class TopicRepository extends Repository<TopicEntity> {
     page: number
   ): Promise<TopicEntity[]> {
     const query = this.createQueryBuilder('t');
+    query.select('t.*');
+    query.distinctOn(['t.id']);
     query.where('t.name like :name', { name: `%${name}%` });
     query
-      .groupBy('t.id')
       .limit(limit)
       .offset(limit * (page - 1));
     if (owner) {
       query.andWhere('t.owner = :owner', { owner: owner });
     }
-    return query.getMany();
+    query.orderBy("t.id,t.version", "DESC");
+    const result = await query.execute();
+    return result.map((rawEntity) => {
+      return {
+        name: rawEntity.name,
+        schemaType: rawEntity.schemaType,
+        tags: JSON.parse(rawEntity.tags),
+        owner: rawEntity.owner,
+        schema: JSON.parse(rawEntity.schema),
+        id: rawEntity.id,
+        version: rawEntity.version,
+      };
+    });
   }
 
   public async getTopicsCountSearch(
     name: string,
     owner: string,
   ): Promise<number> {
-    const query = this.createQueryBuilder('t');
-    query.where('t.name like :name', { name: `%${name}%` });
-    query
-      .groupBy('t.id')
+    const subQuery = this.createQueryBuilder('t');
+    subQuery.select('t.*');
+    subQuery.distinctOn(['t.id']);
+    subQuery.where('t.name like :name', { name: `%${name}%` });
     if (owner) {
-      query.andWhere('t.owner = :owner', { owner: owner });
+      subQuery.andWhere('t.owner = :owner', { owner: owner });
     }
-    return (await query.getRawMany()).length;
+
+    const [query, params] = subQuery.getQueryAndParameters();
+
+    const result = await this.query(
+      `SELECT COUNT(*) as count FROM (${query}) t`,
+      params
+    );
+
+    if (Array.isArray(result) && result.length) {
+      return +result[0].count;
+    }
+
+    return 0;
   }
 
   public async getCountOfLatest(
@@ -50,7 +75,7 @@ export class TopicRepository extends Repository<TopicEntity> {
     );
 
     if (Array.isArray(result) && result.length) {
-      return result[0].count;
+      return +result[0].count;
     }
 
     return 0;
@@ -109,42 +134,34 @@ export class TopicRepository extends Repository<TopicEntity> {
     name: string,
     tags: string[]
   ): SelectQueryBuilder<TopicEntity> {
-    const query = this.createQueryBuilder();
+    const qb = this.createQueryBuilder("t");
 
-    query.select('e.*');
+    qb.select('t.*')
+    qb.distinctOn(['id'])
+    if (owner) {
+      qb.where('owner = :owner', { owner });
+    }
 
-    query.from((qb) => {
-      qb.from(TopicEntity, 't');
+    if (name) {
+      qb.andWhere('name = :name', { name });
+    }
 
-      if (owner) {
-        qb.where('owner = :owner', { owner });
-      }
+    if (tags && tags.length) {
+      let tagQueryString = '(';
 
-      if (name) {
-        qb.andWhere('name = :name', { name });
-      }
+      tags.forEach((tag, index) => {
+        if (index === 0) {
+          tagQueryString += ` '"' || tags || '"' LIKE '%${tag}%' `;
 
-      if (tags && tags.length) {
-        let tagQueryString = '(';
+          return;
+        }
 
-        tags.forEach((tag, index) => {
-          if (index === 0) {
-            tagQueryString += ` '"' || tags || '"' LIKE '%${tag}%' `;
+        tagQueryString += ` OR '"' || tags || '"' LIKE '%${tag}%' `;
+      });
 
-            return;
-          }
-
-          tagQueryString += ` OR '"' || tags || '"' LIKE '%${tag}%' `;
-        });
-
-        qb.andWhere(tagQueryString + ')');
-      }
-
-      return qb;
-    }, 'e');
-
-    query.groupBy('e.name').addGroupBy('e.owner');
-
-    return query;
+      qb.andWhere(tagQueryString + ')');
+    }
+    qb.orderBy("id,version", "DESC");
+    return qb;
   }
 }

@@ -65,17 +65,15 @@ export class TopicService {
     limit: number,
     page: number
   ) {
-    const topics = await this.wrapper.topicRepository.getTopicsAndCountSearch(
-      limit,
-      keyword,
-      owner,
-      page
-    );
+    const topics =
+      await this.wrapper.topicRepository.getTopicsAndCountSearch(
+        limit,
+        keyword,
+        owner,
+        page
+      );
 
-    const allCount = await this.wrapper.topicRepository.getTopicsCountSearch(
-      keyword,
-      owner
-    );
+    const allCount = await this.wrapper.topicRepository.getTopicsCountSearch(keyword, owner);
 
     return {
       limit,
@@ -92,7 +90,7 @@ export class TopicService {
         namespace: data.owner,
       },
       {
-        topicsCount: () => 'topicsCount + 1',
+        topicsCount: () => '"topicsCount" + 1',
       }
     );
 
@@ -173,7 +171,7 @@ export class TopicService {
           namespace: data.owner,
         },
         {
-          topicsCount: () => 'topicsCount - 1',
+          topicsCount: () => '"topicsCount" - 1',
         }
       );
     }

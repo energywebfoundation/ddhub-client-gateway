@@ -2,10 +2,10 @@ import { useQueryClient } from 'react-query';
 import {
   useTopicsControllerDeleteTopics,
   getTopicsControllerGetTopicsQueryKey,
+  getTopicsControllerGetTopicsBySearchQueryKey,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { useCustomAlert } from '@ddhub-client-gateway-frontend/ui/core';
-
-export const useRemoveTopic = () => {
+export const useRemoveTopic = (isSearch: boolean) => {
   const queryClient = useQueryClient();
   const Swal = useCustomAlert();
   const { mutate, isLoading } = useTopicsControllerDeleteTopics();
@@ -14,7 +14,12 @@ export const useRemoveTopic = () => {
     await Swal.success({
       text: 'You have successfully deleted the topic',
     });
-    queryClient.invalidateQueries(getTopicsControllerGetTopicsQueryKey());
+
+    if (isSearch) {
+      queryClient.invalidateQueries(getTopicsControllerGetTopicsBySearchQueryKey());
+    } else {
+      queryClient.invalidateQueries(getTopicsControllerGetTopicsQueryKey());
+    }
   };
 
   const removeTopicError = async (err: any) => {

@@ -138,6 +138,7 @@ export class IdentityService {
     await this.enrolmentService.generateEnrolment();
 
     await this.commandBus.execute(new ReloginCommand());
+
     await this.commandBus.execute(
       new GenerateMasterSeedCommand(wallet.address)
     );

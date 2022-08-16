@@ -23,6 +23,7 @@ export const topicsModalsInitialState: ITopicsModalsStore = {
     open: false,
     topic: null,
     application: null,
+    showActionButtons: true,
   },
 };
 

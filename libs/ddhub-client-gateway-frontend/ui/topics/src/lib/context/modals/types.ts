@@ -7,6 +7,7 @@ import { TopicsModalsActionsEnum } from './reducer';
 type TCreateTopic = {
   open: boolean;
   application: ApplicationDTO;
+  isSearch?: boolean;
 };
 
 type TUpdateTopic = {
@@ -14,12 +15,14 @@ type TUpdateTopic = {
   topic: GetTopicDto;
   application: ApplicationDTO;
   canUpdateSchema?: boolean;
+  isSearch?: boolean;
 };
 
 type TTopicDetails = {
   open: boolean;
   topic: GetTopicDto;
   application: ApplicationDTO;
+  showActionButtons: boolean;
 };
 
 export interface ITopicsModalsStore {

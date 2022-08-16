@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { Typography, Box } from '@mui/material';
+import { Typography, Box, Grid, Stack } from '@mui/material';
 import {
   ApplicationDTO,
   ChannelTopic,
@@ -36,30 +36,37 @@ export const TopicVersionDetails: FC<TopicVersionDetailsProps> = (
   }
 
   return (
-    <Box sx={{ padding: 0 }}>
-      {application && <ApplicationInfoModal application={application} /> }
-
-      <Box className={classes.details}>
-        <Typography className={classes.title}>Details</Typography>
-
-        {fields.map((field) => (
-          <Box className={classes.detailsInfo} display="flex" mb={1.2} key={field.value}>
-            <Typography className={classes.detailsInfoLabel}>{field.label}</Typography>
-            <Typography className={classes.detailsInfoValue}>{getValue(field.value)}</Typography>
-          </Box>
-        ))}
+    <Grid container className={classes.content}>
+      <Grid item>
+        {application && <ApplicationInfoModal application={application} /> }
+      </Grid>
+      <Grid item className={classes.contentWrapper}>
+        <Grid container spacing={2}>
+          {fields.map((field) => (
+            <Grid item xs={6} key={field.value}>
+              <Stack direction="column">
+                <Typography className={classes.detailsInfoLabel}>{field.label}</Typography>
+                <Box display="flex">
+                  <Typography className={classes.detailsInfoValue}>{getValue(field.value)}</Typography>
+                </Box>
+              </Stack>
+            </Grid>
+          ))}
+        </Grid>
 
         <Typography className={classes.subtitle}>Version history</Typography>
 
         <GenericTable<GetTopicSearchDto>
           headers={TOPIC_VERSIONS_HEADERS}
           tableRows={versions}
-          showFooter={false}
+          showFooter={true}
           showSearch={false}
           onRowClick={handleRowClick}
+          containerProps={{ style: { boxShadow: 'none' }}}
+          stripedTable={true}
           customStyle={{ tableMinWidth: 'auto' }}
         />
-      </Box>
-    </Box>
+      </Grid>
+    </Grid>
   );
 };
