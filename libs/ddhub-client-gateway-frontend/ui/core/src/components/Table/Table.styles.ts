@@ -65,4 +65,12 @@ export const useStyles = makeStyles()((theme) => ({
       color: theme.palette.primary.main,
     },
   },
+  stripedRow: {
+    '&:nth-of-type(even)': {
+      background: '#31374B',
+    },
+  },
+  stripedCol: {
+    borderBottom: 'none'
+  },
 }));

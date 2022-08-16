@@ -16,6 +16,7 @@ export const useTopicVersionEffects = () => {
         open: true,
         application: applicationsByNamespace[topic.owner],
         topic,
+        showActionButtons: false,
       },
     });
   };

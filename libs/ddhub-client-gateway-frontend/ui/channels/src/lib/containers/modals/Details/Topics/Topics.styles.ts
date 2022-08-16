@@ -1,17 +1,24 @@
 import { makeStyles } from 'tss-react/mui';
+import { lighten, alpha } from '@mui/material/styles';
 
 export const useStyles = makeStyles()((theme) => ({
   label: {
     fontSize: 12,
     lineHeight: '14px',
     fontWeight: 400,
-    color: theme.palette.grey[300],
+    color: theme.palette.common.white,
   },
   topic: {
     display: 'flex',
-    flexDirection: 'column',
     cursor: 'pointer',
-    marginBottom: 3,
+    padding: '4px 16px 7px 12px',
+    justifyContent: 'space-between',
+    '&:nth-of-type(even)': {
+      background: lighten('#21273B', 0.1),
+    },
+    '&:hover': {
+      backgroundColor: alpha(theme.palette.primary.main, 0.12),
+    },
   },
   topicLabel: {
     fontSize: 14,
@@ -26,7 +33,7 @@ export const useStyles = makeStyles()((theme) => ({
     color: theme.palette.grey[300],
   },
   topicsList: {
-    maxHeight: 90,
+    maxHeight: 500,
     marginTop: 15,
     overflow: 'auto',
     '&::-webkit-scrollbar': {
@@ -42,4 +49,16 @@ export const useStyles = makeStyles()((theme) => ({
       borderRadius: 3,
     },
   },
+  spacer: {
+    flex: 0,
+  },
+  displayedRows: {
+    marginRight: 'auto',
+  },
+  toolbar: {
+    paddingLeft: 0,
+  },
+  paginationRoot: {
+    borderBottom: 'none',
+  }
 }));
