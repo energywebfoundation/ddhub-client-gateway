@@ -61,11 +61,11 @@ export class DdhubLoginService {
 
 
     await promiseRetry(async (retry, number) => {
-      this.logger.log(`Attempting to login to DID Auth Server #${number}`);
+      this.logger.log(`[ddhub_mb_login] Attempting to login to DID Auth Server #${number}`);
       await this.didAuthService
         .login(privateKey, this.iamService.getDIDAddress(), forceRelogin)
         .catch((e) => {
-          this.logger.error("[ddhub_mb_login][exception] ", e);
+          this.logger.error(`[ddhub_mb_login][exception]  ${JSON.stringify((e))}`);
           retry(e)
         }
         );

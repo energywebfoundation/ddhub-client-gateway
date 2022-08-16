@@ -30,10 +30,8 @@ export class DidAuthApiService {
         }
       ).pipe(timeout(this.configService.get<number>('MAX_TIMEOUT', 60000)))
     ).catch((e) => {
-      this.logger.error('Login failed');
-
-      this.logger.error(e.message);
-      this.logger.error(e.response?.data);
+      this.logger.error(`[Login Failed][msg] ${e.message}`);
+      this.logger.error(`[Login Failed][data] ${JSON.stringify((e.response?.data))}`);
 
       throw e;
     });
