@@ -115,11 +115,12 @@ export const Restrictions = ({
     <Grid
       container
       direction="column"
+      justifyContent="space-between"
       className={'no-wrap'}
       sx={{ height: '100%', flexWrap: 'nowrap' }}
     >
       <Grid item>
-        <Grid container spacing={2}>
+        <Grid container spacing={2} sx={{ paddingRight: '27px' }}>
           <Grid item sx={{ marginBottom: '22px' }}>
             <InputLabel id="restriction-type" className={classes.label}>
               Restrictions
@@ -166,7 +167,7 @@ export const Restrictions = ({
             {restrictionsCount} Restrictions
           </Typography>
         </Box>
-        <Box display="flex">
+        <Box display="flex" paddingRight="26px">
           <RestrictionBox
             type={RestrictionType.DID}
             list={dids}
@@ -181,7 +182,7 @@ export const Restrictions = ({
           />
         </Box>
       </Grid>
-      <Grid item alignSelf="flex-end" width="100%" sx={{ marginTop: '60px' }}>
+      <Grid item alignSelf="flex-end" width="100%" sx={{ paddingTop: '22px', paddingRight: '7px' }}>
         <ActionButtons
           {...actionButtonsProps}
           nextClickButtonProps={{

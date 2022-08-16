@@ -12,8 +12,8 @@ export const fields = {
     name: 'name',
     label: 'Topic name',
     formInputsWrapperProps: {
-      width: 254,
       marginRight: '15px',
+      flexGrow: 1,
     },
     inputProps: {
       placeholder: 'Topic name',
@@ -23,7 +23,7 @@ export const fields = {
     name: 'version',
     label: 'Version',
     formInputsWrapperProps: {
-      width: 145,
+      width: '40%',
     },
     inputProps: {
       placeholder: 'Version',

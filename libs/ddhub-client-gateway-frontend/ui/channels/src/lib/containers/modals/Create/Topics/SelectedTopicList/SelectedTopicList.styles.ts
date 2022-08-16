@@ -2,7 +2,6 @@ import { makeStyles } from 'tss-react/mui';
 
 export const useStyles = makeStyles()((theme) => ({
   root: {
-    maxHeight: 92,
     overflow: 'auto',
     margin: '0 -2px 30px 0',
     paddingRight: 2,
@@ -19,4 +18,10 @@ export const useStyles = makeStyles()((theme) => ({
       borderRadius: 3,
     },
   },
+  create: {
+    maxHeight: 372,
+  },
+  summary: {
+    maxHeight: 134,
+  }
 }));

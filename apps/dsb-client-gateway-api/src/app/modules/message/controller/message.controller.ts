@@ -126,7 +126,7 @@ export class MessageControlller {
 
   @Post('upload')
   @ApiResponse({
-    status: HttpStatus.OK,
+    status: HttpStatus.CREATED,
     description: 'File Upload Successfully',
     type: () => SendMessagelResponseDto,
   })
