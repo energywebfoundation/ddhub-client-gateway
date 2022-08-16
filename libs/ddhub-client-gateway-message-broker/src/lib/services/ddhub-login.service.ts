@@ -24,7 +24,7 @@ export class DdhubLoginService {
     protected readonly enrolmentService: EnrolmentService,
     protected readonly secretsEngineService: SecretsEngineService,
     protected readonly iamService: IamService
-  ) {}
+  ) { }
 
   @Span('ddhub_mb_login')
   public async login(forceRelogin = true): Promise<void> {
@@ -58,13 +58,18 @@ export class DdhubLoginService {
       throw new UnableToLoginException();
     }
 
-    this.logger.log('Attempting to login to DID Auth Server');
 
-    await promiseRetry(async (retry) => {
+
+    await promiseRetry(async (retry, number) => {
+      this.logger.log(`Attempting to login to DID Auth Server #${number}`);
       await this.didAuthService
         .login(privateKey, this.iamService.getDIDAddress(), forceRelogin)
-        .catch((e) => retry(e));
-    }, this.retryConfigService.config);
+        .catch((e) => {
+          this.logger.error("[ddhub_mb_login][exception] ", e);
+          retry(e)
+        }
+        );
+    }, this.retryConfigService.loginConfig);
 
     this.logger.log('Login successful, attempting to init ext channel');
 
