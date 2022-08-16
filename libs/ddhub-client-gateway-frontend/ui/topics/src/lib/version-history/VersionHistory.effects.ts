@@ -14,8 +14,8 @@ export const useVersionHistoryEffects = () => {
   });
   const { actions } = useVersionActionsEffects(applicationNamespace, topicId);
 
-  const handlePageChange = (newPage: number) => {
-    getTopicHistory({ page: newPage });
+  const handlePageChange = (newPage: number, limit: number) => {
+    getTopicHistory({ page: newPage, limit });
   };
 
   return {

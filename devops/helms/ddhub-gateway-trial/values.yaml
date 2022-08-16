@@ -7,13 +7,12 @@ ddhub-client-gateway-api:
   clientgateway:
     config:
       # -- The URL of the DSB Message Broker you want to connect to. Trailing / allowed.
-      dsb_base_url: https://qa.der.aemo.com.au/ddhub
-      parent_namespace: ddhub.apps.aemo.iam.ewc
+      dsb_base_url: https://trial.der.aemo.com.au/ddhub
+      parent_namespace: ddhubtrial.apps.aemo.iam.ewc
       secret_engine: azure
-      secret_engine_endpoint: http://demo-vault.ddhub-demo.svc:8200
       # -- Sets the secret prefix in the secret engine.
-      secret_prefix: "ddhubqa/"
-      node_env: test
+      secret_prefix: "ddhubtrial/"
+      node_env: production
       opentelemetry_enabled: false
     scheduler:
       enabled: true
@@ -40,10 +39,10 @@ ddhub-client-gateway-api:
     tag: latest
 
   imagePullSecrets: []
-  nameOverride: "ddhub-client-gateway-qa"
-  fullnameOverride: "ddhub-client-gateway-qa"
+  nameOverride: "ddhub-client-gateway-trial"
+  fullnameOverride: "ddhub-client-gateway-trial"
 
-  podSecurityContext: 
+  podSecurityContext:
     fsGroup: 2000
 
   securityContext: {}
@@ -61,39 +60,32 @@ ddhub-client-gateway-api:
         appgw.ingress.kubernetes.io/ssl-redirect: "true"
       # kubernetes.io/tls-acme: "true"
     hosts:
-      - host: ddhub-gateway-qa.energyweb.org
+      - host: ddhub-gateway-trial.energyweb.org
         paths:
         - path: /docs
           pathType: Prefix
           backend:
-            serviceName: ddhub-client-gateway-qa
+            serviceName: ddhub-client-gateway-trial
             servicePort: 80
         - path: /api
           pathType: Prefix
           backend:
-            serviceName: ddhub-client-gateway-qa
+            serviceName: ddhub-client-gateway-trial
             servicePort: 80
         - path: /docs-json
           pathType: Prefix
           backend:
-            serviceName: ddhub-client-gateway-qa
+            serviceName: ddhub-client-gateway-trial
             servicePort: 80
         - path: /
           pathType: Prefix
           backend:
-            serviceName: ddhub-client-gateway-qa-ui
+            serviceName: ddhub-client-gateway-trial-ui
             servicePort: 80
     tls:
       - secretName: dsb-tls-secret
         hosts:
-          - ddhub-gateway-qa.energyweb.org
-
-  autoscaling:
-    enabled: false
-    minReplicas: 1
-    maxReplicas: 100
-    targetCPUUtilizationPercentage: 80
-    # targetMemoryUtilizationPercentage: 80
+          - ddhub-gateway-trial.energyweb.org
 
   probes:
     liveness: true

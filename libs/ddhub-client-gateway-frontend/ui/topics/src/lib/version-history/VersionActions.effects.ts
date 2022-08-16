@@ -45,6 +45,7 @@ export const useVersionActionsEffects = (
         open: true,
         application: applicationsByNamespace[namespace],
         topic,
+        showActionButtons: true,
       },
     });
   };

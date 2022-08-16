@@ -18,7 +18,7 @@ export const SelectedTopicList = ({
 }: SelectedTopicListProps) => {
   const { classes } = useStyles();
   return (
-    <Box className={classes.root}>
+    <Box className={classes.root + ` ${ canRemove ? classes.create : classes.summary}`}>
       {topics.map((topic) => (
         <SelectedTopic
           key={topic.topicName}

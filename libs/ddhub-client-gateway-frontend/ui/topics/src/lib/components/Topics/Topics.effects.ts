@@ -10,7 +10,7 @@ import {
 } from '@ddhub-client-gateway-frontend/ui/api-hooks';
 import { TTableComponentAction } from '@ddhub-client-gateway-frontend/ui/core';
 import { GetTopicDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
-import { downloadJson, Queries } from '@ddhub-client-gateway-frontend/ui/utils';
+import { downloadJson, Queries, routerConst } from '@ddhub-client-gateway-frontend/ui/utils';
 import { useStyles } from './Topics.styles';
 import { useState } from 'react';
 
@@ -28,7 +28,13 @@ export const useTopicsEffects = (
     owner: router.query[Queries.Namespace] as string,
   });
 
-  const { applicationsByNamespace } = useCachedApplications();
+  const getUsedRoleForApplication = router.pathname.includes(
+    routerConst.Channels
+  )
+    ? 'user'
+    : undefined;
+
+  const { applicationsByNamespace } = useCachedApplications(getUsedRoleForApplication);
   const { removeTopicHandler } = useRemoveTopic(isSearch);
 
   const application =
@@ -43,6 +49,7 @@ export const useTopicsEffects = (
         open: true,
         application: application,
         topic,
+        showActionButtons: true,
       },
     });
   };
@@ -120,13 +127,13 @@ export const useTopicsEffects = (
 
   const handleRowClick = (topic: GetTopicDto) => openTopicDetails(topic);
 
-  const handlePageChange = (newPage: number) => {
-    getTopics({ page: newPage });
+  const handlePageChange = (newPage: number, limit: number) => {
+    getTopics({ page: newPage, limit });
   };
 
-  const handleSearchInput = (searchInput: string) => {
+  const handleSearchInput = (searchInput: string, limit: number) => {
     setIsSearch(!!searchInput);
-    getTopicsBySearch({ keyword: searchInput });
+    getTopicsBySearch({ keyword: searchInput, limit });
   };
 
   return {
