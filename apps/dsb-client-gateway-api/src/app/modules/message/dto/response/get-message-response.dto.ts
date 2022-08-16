@@ -101,7 +101,7 @@ export class GetMessagesResponseDto {
 
   @IsEnum(EncryptionStatus)
   @ApiProperty({
-    description: 'Encryption status for a message',
+    description: 'Signature validation status for a message',
     enum: [
       EncryptionStatus.FAILED,
       EncryptionStatus.NOT_PERFORMED,
