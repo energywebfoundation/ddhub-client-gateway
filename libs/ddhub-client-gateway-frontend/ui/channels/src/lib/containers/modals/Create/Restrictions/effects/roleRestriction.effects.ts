@@ -1,8 +1,7 @@
 import { useState } from 'react';
 
-// TODO: create regex
 const roleRegex = new RegExp(
-  /^[a-z0-9]+\.roles\.((\w+).)*(ewc)$/gm
+  /^[a-z0-9]+\.roles\.((\w+).)*(ewc)$/
 );
 
 export const useRolesRestrictionEffects = (currentRoles: string[]) => {
@@ -17,7 +16,14 @@ export const useRolesRestrictionEffects = (currentRoles: string[]) => {
 
   const rolesInputChangeHandler = (value: string) => {
     setRoleInput(value);
-    setIsValid(roleRegex.test(value));
+  };
+
+  const rolesInputCheckValidity = () => {
+    if (roleInput) {
+      setIsValid(roleRegex.test(roleInput));
+    } else {
+      setIsValid(true);
+    }
   };
 
   const addRole = (role: string) => {
@@ -40,5 +46,6 @@ export const useRolesRestrictionEffects = (currentRoles: string[]) => {
     addRole,
     isValid,
     rolesInputChangeHandler,
+    rolesInputCheckValidity,
   };
 };

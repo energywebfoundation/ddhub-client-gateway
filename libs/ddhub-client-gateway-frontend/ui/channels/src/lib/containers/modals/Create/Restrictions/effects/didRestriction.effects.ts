@@ -14,7 +14,14 @@ export const useDIDRestrictionEffects = (currentDids: string[]) => {
 
   const didInputChangeHandler = (value: string) => {
     setDIDInput(value);
-    setIsValid(didRegex.test(value));
+  };
+
+  const didInputCheckValidity = () => {
+    if (didInput) {
+      setIsValid(didRegex.test(didInput));
+    } else {
+      setIsValid(true);
+    }
   };
 
   const addDID = (did: string) => {
@@ -39,5 +46,6 @@ export const useDIDRestrictionEffects = (currentDids: string[]) => {
     addDID,
     removeDID,
     didInputChangeHandler,
+    didInputCheckValidity,
   };
 };

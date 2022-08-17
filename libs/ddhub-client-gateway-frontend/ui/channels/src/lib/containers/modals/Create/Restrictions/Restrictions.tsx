@@ -44,6 +44,8 @@ export const Restrictions = ({
     rolesInputChangeHandler,
     didInputChangeHandler,
     restrictionsCount,
+    didInputCheckValidity,
+    rolesInputCheckValidity,
   } = useRestrictionsEffects(restrictions);
   const { classes, theme } = useStyles();
 
@@ -53,6 +55,7 @@ export const Restrictions = ({
       fullWidth
       variant={'outlined'}
       value={roleInput}
+      placeholder='user.roles.namespace.ewc'
       onChange={(event) => {
         rolesInputChangeHandler(event.target.value);
       }}
@@ -68,6 +71,9 @@ export const Restrictions = ({
             </IconButton>
           </InputAdornment>
         ),
+        onBlur: () => {
+          rolesInputCheckValidity();
+        }
       }}
       error={!isRoleValid}
       helperText={!isRoleValid ? 'Role format is invalid' : ''}
@@ -85,6 +91,7 @@ export const Restrictions = ({
       fullWidth
       variant={'outlined'}
       value={didInput}
+      placeholder='did:ethr:volta:0x09Df...46993'
       onChange={(event) => {
         didInputChangeHandler(event.target.value);
       }}
@@ -100,6 +107,9 @@ export const Restrictions = ({
             </IconButton>
           </InputAdornment>
         ),
+        onBlur: () => {
+          didInputCheckValidity();
+        }
       }}
       error={!isDIDValid}
       helperText={!isDIDValid ? 'DID format is invalid' : ''}
