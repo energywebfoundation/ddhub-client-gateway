@@ -24,11 +24,11 @@ export class DdhubLoginService {
     protected readonly enrolmentService: EnrolmentService,
     protected readonly secretsEngineService: SecretsEngineService,
     protected readonly iamService: IamService
-  ) { }
+  ) {}
 
   @Span('ddhub_mb_login')
-  public async login(forceRelogin = true): Promise<void> {
-    this.logger.log('Attempting to login...');
+  public async login(forceRelogin = true, source: string): Promise<void> {
+    this.logger.log('Attempting to login... with source ' + source);
 
     const privateKey: string | null =
       await this.secretsEngineService.getPrivateKey();
@@ -58,10 +58,10 @@ export class DdhubLoginService {
       throw new UnableToLoginException();
     }
 
-
-
     await promiseRetry(async (retry, number) => {
-      this.logger.log(`[ddhub_mb_login] Attempting to login to DID Auth Server #${number}`);
+      this.logger.log(
+        `[ddhub_mb_login] Attempting to login to DID Auth Server #${number}`
+      );
       await this.didAuthService
         .login(privateKey, this.iamService.getDIDAddress(), forceRelogin)
         .catch((e) => retry(e));
