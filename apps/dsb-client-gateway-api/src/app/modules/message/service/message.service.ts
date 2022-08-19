@@ -247,101 +247,126 @@ export class MessageService {
   @Span('message_processMessage')
   private async processMessage(
     payloadEncryption: boolean,
-    topic: TopicEntity,
     message: SearchMessageResponseDto
   ): Promise<GetMessageResponse> {
-    const baseMessage: Omit<
-      GetMessageResponse,
-      'signatureValid' | 'decryption'
-    > = {
-      id: message.messageId,
-      topicName: topic.name,
-      topicOwner: topic.owner,
-      topicVersion: message.topicVersion,
-      topicSchemaType: topic.schemaType,
-      payload: message.payload,
-      signature: message.signature,
-      sender: message.senderDid,
-      timestampNanos: message.timestampNanos,
-      transactionId: message.transactionId,
-    };
-
-    if (message.isFile) {
-      return {
-        ...baseMessage,
-        signatureValid: EncryptionStatus.NOT_REQUIRED,
-        decryption: {
-          status: EncryptionStatus.NOT_REQUIRED,
-        },
+    let baseMessage: Omit<GetMessageResponse, 'signatureValid' | 'decryption'> =
+      {
+        id: message.messageId,
+        topicVersion: message.topicVersion,
+        topicName: '',
+        topicOwner: '',
+        topicSchemaType: '',
+        payload: message.payload,
+        signature: message.signature,
+        sender: message.senderDid,
+        timestampNanos: message.timestampNanos,
+        transactionId: message.transactionId,
       };
-    }
 
-    const isSignatureValid: boolean = await this.keyService.verifySignature(
-      message.senderDid,
-      message.signature,
-      message.payload
-    );
+    try {
+      const topic: TopicEntity = await this.topicService.getTopicById(
+        message.topicId
+      );
 
-    if (!payloadEncryption && message.payloadEncryption) {
-      return {
+      baseMessage = {
         ...baseMessage,
-        signatureValid: isSignatureValid
-          ? EncryptionStatus.SUCCESS
-          : EncryptionStatus.FAILED,
-        decryption: {
-          status: EncryptionStatus.REQUIRED_NOT_PERFORMED,
-        },
+        topicName: topic.name,
+        topicOwner: topic.owner,
+        topicSchemaType: topic.schemaType,
       };
-    }
 
-    if (!payloadEncryption) {
-      return {
-        ...baseMessage,
-        signatureValid: isSignatureValid
-          ? EncryptionStatus.SUCCESS
-          : EncryptionStatus.FAILED,
-        decryption: {
-          status: EncryptionStatus.NOT_REQUIRED,
-        },
-      };
-    }
+      if (message.isFile) {
+        return {
+          ...baseMessage,
+          signatureValid: EncryptionStatus.NOT_REQUIRED,
+          decryption: {
+            status: EncryptionStatus.NOT_REQUIRED,
+          },
+        };
+      }
 
-    if (!isSignatureValid) {
-      return {
-        ...baseMessage,
-        signatureValid: EncryptionStatus.FAILED,
-        decryption: {
-          status: EncryptionStatus.NOT_PERFORMED,
-        },
-      };
-    }
+      const isSignatureValid: boolean = await this.keyService.verifySignature(
+        message.senderDid,
+        message.signature,
+        message.payload
+      );
 
-    const decryptedMessage: string | null =
-      await this.keyService.decryptMessage(
+      /* TODO: fix predicate, this won't run currently.
+      Reads as: !message.payloadEncryption && message.payloadEncryption
+      if (!payloadEncryption && message.payloadEncryption) {
+        return {
+          ...baseMessage,
+          signatureValid: isSignatureValid
+            ? EncryptionStatus.SUCCESS
+            : EncryptionStatus.FAILED,
+          decryption: {
+            status: EncryptionStatus.REQUIRED_NOT_PERFORMED,
+          },
+        };
+      } */
+
+      if (!payloadEncryption) {
+        return {
+          ...baseMessage,
+          signatureValid: isSignatureValid
+            ? EncryptionStatus.SUCCESS
+            : EncryptionStatus.FAILED,
+          decryption: {
+            status: EncryptionStatus.NOT_REQUIRED,
+          },
+        };
+      }
+
+      if (!isSignatureValid) {
+        return {
+          ...baseMessage,
+          signatureValid: EncryptionStatus.FAILED,
+          decryption: {
+            status: EncryptionStatus.NOT_PERFORMED,
+          },
+        };
+      }
+
+      const { decrypted, error } = await this.keyService.decryptMessage(
         message.payload,
         message.clientGatewayMessageId,
         message.senderDid
       );
 
-    if (!decryptedMessage) {
+      if (error) {
+        return {
+          ...baseMessage,
+          signatureValid: EncryptionStatus.SUCCESS,
+          decryption: {
+            status: EncryptionStatus.ERROR,
+            errorMessage: error,
+          },
+        };
+      }
+
       return {
         ...baseMessage,
         signatureValid: EncryptionStatus.SUCCESS,
         decryption: {
-          status: EncryptionStatus.FAILED,
-          errorMessage: '',
+          status: EncryptionStatus.SUCCESS,
+        },
+        payload: decrypted,
+      };
+    } catch (e) {
+      this.logger.error(
+        `Error while processing message - messageId: ${message.messageId}`,
+        e
+      );
+
+      return {
+        ...baseMessage,
+        signatureValid: EncryptionStatus.ERROR,
+        decryption: {
+          status: EncryptionStatus.ERROR,
+          errorMessage: e.message,
         },
       };
     }
-
-    return {
-      ...baseMessage,
-      signatureValid: EncryptionStatus.SUCCESS,
-      decryption: {
-        status: EncryptionStatus.SUCCESS,
-      },
-      payload: decryptedMessage,
-    };
   }
 
   @Span('message_getMessages')
@@ -387,27 +412,53 @@ export class MessageService {
       return [];
     }
 
-    const getMessagesResponse: GetMessageResponse[] = [];
-
-    await Promise.allSettled(
-      messages.map(async (message: SearchMessageResponseDto) => {
-        const topic: TopicEntity = await this.topicService.getTopicById(
-          message.topicId
-        );
-
+    const messageResponses = await Promise.allSettled(
+      messages.map(async (message): Promise<GetMessageResponse> => {
         messageLoggerContext.debug(`processing message ${message.messageId}`);
 
         const processedMessage: GetMessageResponse = await this.processMessage(
           message.payloadEncryption,
-          topic,
           message
         );
 
-        getMessagesResponse.push(processedMessage);
+        return processedMessage;
       })
     );
 
-    return getMessagesResponse.sort((a, b) => {
+    const rejected = messageResponses.filter(
+      (value) => value.status === 'rejected'
+    );
+    if (rejected.length > 0) {
+      this.logger.error(
+        '[getMessages] Error while processing messages',
+        rejected.map((value) =>
+          value.status === 'rejected' ? value.reason : value
+        )
+      );
+    }
+
+    this.logger.log(
+      `[getMessages] Total message broker messages ${messages.length}`
+    );
+    this.logger.log(
+      `[getMessages] Total returned (fulfilled/rejected) messages ${messageResponses.length}`
+    );
+    this.logger.log(
+      '[getMessages] Returned processed messages',
+      messageResponses
+    );
+
+    const fulfilledMessages = messageResponses
+      .map((message) => (message.status === 'fulfilled' ? message.value : null))
+      .filter(
+        (message: GetMessageResponse | null) => !!message
+      ) as GetMessageResponse[];
+
+    this.logger.log(
+      `[getMessages] Total fulfilled messages ${messageResponses.length}`
+    );
+
+    return fulfilledMessages.sort((a, b) => {
       if (a.timestampNanos < b.timestampNanos) return -1;
       return a.timestampNanos > b.timestampNanos ? 1 : 0;
     });
