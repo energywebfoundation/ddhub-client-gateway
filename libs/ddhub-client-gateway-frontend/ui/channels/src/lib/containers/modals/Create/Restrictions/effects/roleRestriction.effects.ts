@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import { debounce } from 'lodash';
 
 const roleRegex = new RegExp(
   /^[a-z0-9]+\.roles\.((\w+).)*(ewc)$/
@@ -9,6 +10,22 @@ export const useRolesRestrictionEffects = (currentRoles: string[]) => {
   const [roleInput, setRoleInput] = useState<string>('');
   const [isValid, setIsValid] = useState<boolean>(true);
 
+  const debouncedInput = useRef(
+    debounce( (value) => {
+      if (value) {
+        setIsValid(roleRegex.test(value));
+      } else {
+        setIsValid(true);
+      }
+    }, 300)
+  ).current;
+
+  useEffect(() => {
+    return () => {
+      debouncedInput.cancel();
+    };
+  }, [debouncedInput]);
+
   const clearRolesInput = () => {
     setRoleInput('');
     setIsValid(true);
@@ -16,14 +33,7 @@ export const useRolesRestrictionEffects = (currentRoles: string[]) => {
 
   const rolesInputChangeHandler = (value: string) => {
     setRoleInput(value);
-  };
-
-  const rolesInputCheckValidity = () => {
-    if (roleInput) {
-      setIsValid(roleRegex.test(roleInput));
-    } else {
-      setIsValid(true);
-    }
+    debouncedInput(value);
   };
 
   const addRole = (role: string) => {
@@ -46,6 +56,5 @@ export const useRolesRestrictionEffects = (currentRoles: string[]) => {
     addRole,
     isValid,
     rolesInputChangeHandler,
-    rolesInputCheckValidity,
   };
 };

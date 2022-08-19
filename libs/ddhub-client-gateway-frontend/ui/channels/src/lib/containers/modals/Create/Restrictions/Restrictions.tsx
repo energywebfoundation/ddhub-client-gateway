@@ -44,8 +44,6 @@ export const Restrictions = ({
     rolesInputChangeHandler,
     didInputChangeHandler,
     restrictionsCount,
-    didInputCheckValidity,
-    rolesInputCheckValidity,
   } = useRestrictionsEffects(restrictions);
   const { classes, theme } = useStyles();
 
@@ -70,10 +68,7 @@ export const Restrictions = ({
               <Plus color={theme.palette.common.white} size={15} />
             </IconButton>
           </InputAdornment>
-        ),
-        onBlur: () => {
-          rolesInputCheckValidity();
-        }
+        )
       }}
       error={!isRoleValid}
       helperText={!isRoleValid ? 'Role format is invalid' : ''}
@@ -106,10 +101,7 @@ export const Restrictions = ({
               <Plus color={theme.palette.common.white} size={15} />
             </IconButton>
           </InputAdornment>
-        ),
-        onBlur: () => {
-          didInputCheckValidity();
-        }
+        )
       }}
       error={!isDIDValid}
       helperText={!isDIDValid ? 'DID format is invalid' : ''}
