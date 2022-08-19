@@ -354,7 +354,7 @@ export class MessageService {
       };
     } catch (e) {
       this.logger.error(
-        `Error while processing message - messageId: ${message.messageId}`,
+        `Error while processing message - messageId: ${message.messageId} topicId: ${message.topicId}`,
         e
       );
 
