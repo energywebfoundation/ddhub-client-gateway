@@ -429,7 +429,7 @@ export class MessageService {
       (value) => value.status === 'rejected'
     );
     if (rejected.length > 0) {
-      this.logger.error(
+      messageLoggerContext.error(
         '[getMessages] Error while processing messages',
         rejected.map((value) =>
           value.status === 'rejected' ? value.reason : value
@@ -437,13 +437,13 @@ export class MessageService {
       );
     }
 
-    this.logger.log(
+    messageLoggerContext.log(
       `[getMessages] Total message broker messages ${messages.length}`
     );
-    this.logger.log(
+    messageLoggerContext.log(
       `[getMessages] Total returned (fulfilled/rejected) messages ${messageResponses.length}`
     );
-    this.logger.log(
+    messageLoggerContext.log(
       '[getMessages] Returned processed messages',
       messageResponses
     );
@@ -454,7 +454,7 @@ export class MessageService {
         (message: GetMessageResponse | null) => !!message
       ) as GetMessageResponse[];
 
-    this.logger.log(
+    messageLoggerContext.log(
       `[getMessages] Total fulfilled messages ${messageResponses.length}`
     );
 
