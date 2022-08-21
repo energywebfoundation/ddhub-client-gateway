@@ -134,7 +134,7 @@ export class EnrolmentCronService implements OnApplicationBootstrap {
 
   private async triggerRoleChange(): Promise<void> {
     await this.eventsService.triggerEvent(Events.ROLES_CHANGE);
-    await this.commandBus.execute(new ReloginCommand());
+    await this.commandBus.execute(new ReloginCommand('ROLES_CHANGE'));
   }
 
   private hasEnrolmentChanged(
