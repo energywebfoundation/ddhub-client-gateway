@@ -11,6 +11,7 @@ import {
   Topic,
   TopicCountDto,
   TopicDataResponse,
+  TopicMonitorUpdates,
   TopicVersion,
   TopicVersionResponse,
   UpdateTopicBodyDTO,
@@ -349,6 +350,38 @@ export class DdhubTopicsService extends DdhubBaseService {
       return result.data;
     } catch (e) {
       this.logger.error(`get topics count with owners: ${owners} failed`, e);
+      throw e;
+    }
+  }
+
+  @Span('ddhub_mb_refreshTopicsMonitor')
+  public async topicUpdatesMonitor(
+    owners: string[]
+  ): Promise<TopicMonitorUpdates[]> {
+    try {
+      // const result = await this.request<null>(
+      //   () =>
+      //     this.httpService.get(`/topicUpdatesMonitor/`, {
+      //       httpsAgent: this.tlsAgentService.get(),
+      //       headers: {
+      //         Authorization: `Bearer ${this.didAuthService.getToken()}`,
+      //       },
+      //     }),
+      //   {
+      //     stopOnResponseCodes: [MessageBrokerErrors.UNAUTHORIZED_ACCESS],
+      //   }
+      // );
+
+      return [
+        {
+          id: 'test',
+          lastTopicUpdate: 'any',
+          owner: 'any',
+          lastTopicVersionUpdate: 'any',
+        },
+      ];
+    } catch (e) {
+      this.logger.error(`get topics monitor failed`, e);
       throw e;
     }
   }

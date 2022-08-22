@@ -72,3 +72,10 @@ export interface UpdateTopicHistoryDTO {
 
 export type TopicVersionResponse = PaginatedData<TopicVersion>;
 export type TopicDataResponse = PaginatedData<Topic>;
+
+export interface TopicMonitorUpdates {
+  id: string;
+  owner: string;
+  lastTopicUpdate: string;
+  lastTopicVersionUpdate: string;
+}

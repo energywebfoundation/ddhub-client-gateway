@@ -8,3 +8,4 @@ export * from './cron';
 export * from './applications';
 export * from './file-metadata';
 export * from './events';
+export * from './topic-monitor';

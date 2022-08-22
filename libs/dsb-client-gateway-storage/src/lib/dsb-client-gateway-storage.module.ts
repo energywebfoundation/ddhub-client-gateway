@@ -13,6 +13,7 @@ import {
   TopicEntity,
 } from './module';
 import { ConfigService } from '@nestjs/config';
+import { TopicMonitorEntity } from './module/topic-monitor';
 
 const ENTITIES = [
   ChannelEntity,
@@ -25,6 +26,7 @@ const ENTITIES = [
   ApplicationEntity,
   FileMetadataEntity,
   EventsEntity,
+  TopicMonitorEntity,
 ];
 
 @Module({
