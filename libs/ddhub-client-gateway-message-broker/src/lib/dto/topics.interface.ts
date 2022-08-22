@@ -28,6 +28,7 @@ export interface Topic {
   name: string;
   schemaType: SchemaType;
   schema: string;
+  deleted: boolean;
   version: string;
   owner: string;
   tags: string[];

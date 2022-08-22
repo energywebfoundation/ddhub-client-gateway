@@ -87,6 +87,16 @@ export class TopicRefreshService implements OnApplicationBootstrap {
           );
 
         for (const topic of topicsForApplication.records) {
+          if (topic.deleted) {
+            this.logger.log(`${topic.id} got deleted`);
+
+            await this.wrapper.topicRepository.delete({
+              name: topic.name,
+            });
+
+            continue;
+          }
+
           const topicVersions: TopicVersionResponse =
             await this.ddhubTopicsService.getTopicVersions(topic.id);
 
