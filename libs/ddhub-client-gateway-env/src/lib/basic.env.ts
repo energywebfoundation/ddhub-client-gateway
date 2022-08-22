@@ -45,4 +45,10 @@ export const BASIC_ENVS = Joi.object({
     .description(
       'Specifies maximum timeout (how much app should wait before retries) for vulnerable methods'
     ),
+  MESSAGING_MAX_TIMEOUT: Joi.number()
+    .positive()
+    .default(60000)
+    .description(
+      'Specifies messaging maximum timeout (how much app should wait before retries) for vulnerable methods'
+    ),
 });

@@ -571,8 +571,10 @@ export class KeysService implements OnModuleInit {
         },
       });
 
-    if (cacheDid) {
-      const didTtl: number = this.configService.get<number>('DID_TTL');
+    if (!cacheDid) {
+      this.logger.log(`DID ${did} not found in cache`);
+    } else {
+      const didTtl: number = this.configService.get<number>('DID_TTL', 3600);
 
       if (
         moment(cacheDid.updatedDate).add(didTtl, 'seconds').isSameOrBefore()
@@ -616,16 +618,18 @@ export class KeysService implements OnModuleInit {
     didEntity.publicRSAKey = rsaKey.publicKeyHex;
 
     try {
-      await this.didWrapper.didRepository.save(didEntity);
       this.logger.log(`Saving didEntity to cache ${did}`);
+      await this.didWrapper.didRepository.save(didEntity);
     } catch (e) {
-      await this.didWrapper.didRepository.update(
-        {
-          did: didEntity.did,
-        },
-        didEntity
-      );
-      this.logger.log(`Update didEntity to cache ${did}`);
+      if (e.code === '23505') { // Duplicate key
+        this.logger.log(`Updating didEntity to cache ${did}`);
+        await this.didWrapper.didRepository.update(
+          {
+            did: didEntity.did,
+          },
+          didEntity
+        );
+      }
     }
 
     return didEntity;
