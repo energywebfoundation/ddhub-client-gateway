@@ -9,6 +9,7 @@ import {
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
 import { ChannelDidService } from './service/channel-did.service';
 import { DdhubClientGatewayMessageBrokerModule } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
+import { KeysModule } from '../keys/keys.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { DdhubClientGatewayMessageBrokerModule } from '@dsb-client-gateway/ddhub
     ChannelRepositoryModule,
     CronRepositoryModule,
     DdhubClientGatewayMessageBrokerModule,
+    KeysModule,
   ],
   providers: [
     DidAttributeChangedHandler,

@@ -6,7 +6,7 @@
 | WEBSOCKET | string | NONE | Websocket mode | NONE,SERVER,CLIENT |  |
 | EVENTS_MAX_PER_SECOND | number | 2 | Amount of messages to pull for each WebSocket run |  |  |
 | EVENTS_EMIT_MODE | string | BULK | Should Websocket emit messages as array or single object | SINGLE,BULK |  |
-| DID_TTL | number | 60 | How long cached DID attributes should be valid |  |  |
+| DID_TTL | number | 3600 | How long cached DID attributes should be valid in seconds |  |  |
 | WEBSOCKET_URL | string |  | WebSocket Client URL to connect |  | WEBSOCKET == CLIENT |
 | WEBSOCKET_PROTOCOL | string | dsb-protocol | WebSocket Client protocol |  | WEBSOCKET == CLIENT |
 | WEBSOCKET_RECONNECT_TIMEOUT | number | 3000 | WebSocket Client reconnect timeout |  | WEBSOCKET == CLIENT |
