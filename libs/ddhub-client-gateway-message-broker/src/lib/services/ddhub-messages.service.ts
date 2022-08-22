@@ -62,7 +62,7 @@ export class DdhubMessagesService extends DdhubBaseService {
             headers: {
               Authorization: `Bearer ${this.didAuthService.getToken()}`,
             },
-          }).pipe(timeout(+this.configService.get<number>('MB_MAX_TIMEOUT', 30000))),
+          }).pipe(timeout(+this.configService.get<number>('MESSAGING_MAX_TIMEOUT', 60000))),
         {
           stopOnResponseCodes: ['10'],
         }
@@ -99,7 +99,7 @@ export class DdhubMessagesService extends DdhubBaseService {
             headers: {
               Authorization: `Bearer ${this.didAuthService.getToken()}`,
             },
-          }).pipe(timeout(+this.configService.get<number>('MB_MAX_TIMEOUT', 30000))),
+          }).pipe(timeout(+this.configService.get<number>('MESSAGING_MAX_TIMEOUT', 60000))),
         {
           stopOnResponseCodes: ['10'],
         }
@@ -150,7 +150,7 @@ export class DdhubMessagesService extends DdhubBaseService {
             headers: {
               Authorization: `Bearer ${this.didAuthService.getToken()}`,
             },
-          }).pipe(timeout(+this.configService.get<number>('MB_MAX_TIMEOUT', 30000))),
+          }).pipe(timeout(+this.configService.get<number>('MESSAGING_MAX_TIMEOUT', 60000))),
         {
           stopOnResponseCodes: ['10'],
         }
@@ -186,7 +186,7 @@ export class DdhubMessagesService extends DdhubBaseService {
             headers: {
               Authorization: `Bearer ${this.didAuthService.getToken()}`,
             },
-          }).pipe(timeout(+this.configService.get<number>('MB_MAX_TIMEOUT', 30000))),
+          }).pipe(timeout(+this.configService.get<number>('MESSAGING_MAX_TIMEOUT', 60000))),
         {
           stopOnResponseCodes: ['10'],
         }
@@ -220,7 +220,7 @@ export class DdhubMessagesService extends DdhubBaseService {
             headers: {
               Authorization: `Bearer ${this.didAuthService.getToken()}`,
             },
-          }).pipe(timeout(+this.configService.get<number>('MB_MAX_TIMEOUT', 30000))),
+          }).pipe(timeout(+this.configService.get<number>('MESSAGING_MAX_TIMEOUT', 60000))),
         {
           stopOnResponseCodes: ['10'],
         },
