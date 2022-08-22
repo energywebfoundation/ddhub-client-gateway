@@ -12,6 +12,7 @@ import { SchedulerRegistry } from '@nestjs/schedule';
 import { CronJob } from 'cron';
 import { Span } from 'nestjs-otel';
 import { ConfigService } from '@nestjs/config';
+import { KeysService } from '../../keys/service/keys.service';
 
 @Injectable()
 export class ChannelDidService implements OnApplicationBootstrap {
@@ -20,6 +21,7 @@ export class ChannelDidService implements OnApplicationBootstrap {
   constructor(
     protected readonly wrapper: ChannelWrapperRepository,
     protected readonly iamService: IamService,
+    protected readonly keyService: KeysService,
     protected readonly ddhubDidService: DdhubDidService,
     protected readonly schedulerRegistry: SchedulerRegistry,
     protected readonly cronWrapper: CronWrapperRepository,
@@ -60,6 +62,7 @@ export class ChannelDidService implements OnApplicationBootstrap {
     this.logger.log(`found ${channels.length} channels`);
 
     try {
+      let allUniqueChannelDids: string[] = [];
       for (const channel of channels) {
         if (!channel.conditions.roles || !channel.conditions.roles.length) {
           this.logger.log(
@@ -80,18 +83,22 @@ export class ChannelDidService implements OnApplicationBootstrap {
 
         this.logger.log(`Updating DIDs for ${channel.fqcn}`);
 
-        const uniqueDids: string[] = [
+        const uniqueDidsForChannel: string[] = [
           ...new Set([...rolesForDIDs, ...(channel.conditions.dids ?? [])]),
         ];
+        allUniqueChannelDids = [...new Set([...allUniqueChannelDids, ...uniqueDidsForChannel])];
 
         this.logger.log(
-          `found ${uniqueDids.length} DIDS for channel ${channel.fqcn}`
+          `found ${uniqueDidsForChannel.length} DIDS for channel ${channel.fqcn}`
         );
 
-        channel.conditions.qualifiedDids = uniqueDids;
+        channel.conditions.qualifiedDids = uniqueDidsForChannel;
 
         await this.wrapper.channelRepository.save(channel);
       }
+      this.logger.debug(`Updating DID cache for qualifiedDids`, allUniqueChannelDids);
+      const updatedDids = await Promise.allSettled(allUniqueChannelDids.map(async (did) => this.keyService.getDid(did)))
+      this.logger.debug(`Updated did cache`, JSON.stringify(updatedDids));
 
       await this.cronWrapper.cronRepository.save({
         jobName: CronJobType.CHANNEL_ROLES,
