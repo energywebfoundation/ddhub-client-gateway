@@ -5,6 +5,7 @@ import { RetryConfigService } from '@dsb-client-gateway/ddhub-client-gateway-uti
 import { DidAuthService } from '@dsb-client-gateway/ddhub-client-gateway-did-auth';
 import { TlsAgentService } from '@dsb-client-gateway/ddhub-client-gateway-tls-agent';
 import { Span } from 'nestjs-otel';
+import { timeout } from 'rxjs';
 
 import { OperationOptions } from 'retry';
 import {
@@ -17,6 +18,7 @@ import {
 } from '../dto/message.interface';
 import { SendMessageResponse } from '../dto';
 import { DdhubLoginService } from './ddhub-login.service';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class DdhubMessagesService extends DdhubBaseService {
@@ -25,7 +27,8 @@ export class DdhubMessagesService extends DdhubBaseService {
     protected readonly retryConfigService: RetryConfigService,
     protected readonly didAuthService: DidAuthService,
     protected readonly tlsAgentService: TlsAgentService,
-    protected readonly ddhubLoginService: DdhubLoginService
+    protected readonly ddhubLoginService: DdhubLoginService,
+    protected readonly configService: ConfigService
   ) {
     super(
       new Logger(DdhubMessagesService.name),
@@ -59,7 +62,7 @@ export class DdhubMessagesService extends DdhubBaseService {
             headers: {
               Authorization: `Bearer ${this.didAuthService.getToken()}`,
             },
-          }),
+          }).pipe(timeout(+this.configService.get<number>('MB_MAX_TIMEOUT', 30000))),
         {
           stopOnResponseCodes: ['10'],
         }
@@ -70,6 +73,7 @@ export class DdhubMessagesService extends DdhubBaseService {
       return result.data;
     } catch (e) {
       this.logger.error('messages search failed', e);
+      this.logger.error(`['/messages/search'][post]${JSON.stringify(requestBody)}`);
       throw e;
     }
   }
@@ -95,7 +99,7 @@ export class DdhubMessagesService extends DdhubBaseService {
             headers: {
               Authorization: `Bearer ${this.didAuthService.getToken()}`,
             },
-          }),
+          }).pipe(timeout(+this.configService.get<number>('MB_MAX_TIMEOUT', 30000))),
         {
           stopOnResponseCodes: ['10'],
         }
@@ -106,6 +110,12 @@ export class DdhubMessagesService extends DdhubBaseService {
       return result.data;
     } catch (e) {
       this.logger.error(`get messages failed for fqcn: ${fqcn}`, e);
+      this.logger.error(`['/messages'][get]${JSON.stringify({
+        fqcn,
+        from,
+        clientId,
+        amount,
+      })}`);
       throw e;
     }
   }
@@ -140,7 +150,7 @@ export class DdhubMessagesService extends DdhubBaseService {
             headers: {
               Authorization: `Bearer ${this.didAuthService.getToken()}`,
             },
-          }),
+          }).pipe(timeout(+this.configService.get<number>('MB_MAX_TIMEOUT', 30000))),
         {
           stopOnResponseCodes: ['10'],
         }
@@ -151,6 +161,7 @@ export class DdhubMessagesService extends DdhubBaseService {
       return result.data;
     } catch (e) {
       this.logger.error('send message failed', e);
+      this.logger.error(`['/messages'][post]${JSON.stringify(messageData)}`);
       throw e;
     }
   }
@@ -175,7 +186,7 @@ export class DdhubMessagesService extends DdhubBaseService {
             headers: {
               Authorization: `Bearer ${this.didAuthService.getToken()}`,
             },
-          }),
+          }).pipe(timeout(+this.configService.get<number>('MB_MAX_TIMEOUT', 30000))),
         {
           stopOnResponseCodes: ['10'],
         }
@@ -191,6 +202,7 @@ export class DdhubMessagesService extends DdhubBaseService {
         `send message internal failed with clientGatewayMessageId: ${clientGatewayMessageId}`,
         e
       );
+      this.logger.error(`['/messages/internal'][post]${JSON.stringify(requestData)}`);
       throw e;
     }
   }
@@ -208,7 +220,7 @@ export class DdhubMessagesService extends DdhubBaseService {
             headers: {
               Authorization: `Bearer ${this.didAuthService.getToken()}`,
             },
-          }),
+          }).pipe(timeout(+this.configService.get<number>('MB_MAX_TIMEOUT', 30000))),
         {
           stopOnResponseCodes: ['10'],
         },
@@ -220,6 +232,7 @@ export class DdhubMessagesService extends DdhubBaseService {
       return data;
     } catch (e) {
       this.logger.error(`get symmetric keys failed with dto:`, dto, e);
+      this.logger.error(`['/messages/internal/search'][get]${JSON.stringify(dto)}`);
       throw e;
     }
   }
