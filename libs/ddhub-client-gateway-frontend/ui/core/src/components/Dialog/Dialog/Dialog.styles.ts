@@ -12,6 +12,10 @@ export const useStyles = makeStyles()((theme) => ({
     padding: '37px 43px 32px 32px',
     borderRadius: 6,
   },
+  defaultPaper: {
+    alignSelf: 'start',
+    marginTop: 48,
+  },
   container: {
     transition: 'none !important',
   },

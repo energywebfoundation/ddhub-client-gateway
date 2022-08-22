@@ -18,7 +18,7 @@ export const useTopicVersionHistoryEffects = () => {
   const { topicHistory, topicHistoryLoaded, getTopicHistory, pagination } = useTopicVersionHistory({
     id: topicId,
     page: 1,
-    limit: 6,
+    limit: 10,
   });
 
   const application = applicationsByNamespace[applicationNamespace];
@@ -38,8 +38,8 @@ export const useTopicVersionHistoryEffects = () => {
     });
   };
 
-  const handlePageChange = (newPage: number) => {
-    getTopicHistory({ page: newPage });
+  const handlePageChange = (newPage: number, limit: number) => {
+    getTopicHistory({ page: newPage, limit });
   };
 
   return {

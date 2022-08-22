@@ -73,7 +73,7 @@ export const getTopicsControllerGetTopicsMock = (queryParams: any) => ({
       count: 24,
       limit: Number(queryParams.limit),
       page: Number(queryParams.page),
-      records: [...Array(6)].map(() => ({
+      records: [...Array(10)].map(() => ({
         id: faker.datatype.uuid(),
         name: faker.word.noun(),
         owner: faker.random.arrayElement([
@@ -92,7 +92,7 @@ export const getTopicsControllerGetTopicsSearchMock = (queryParams: any) => ({
   count: 12,
   limit: Number(queryParams.limit),
   page: Number(queryParams.page),
-  records: [...Array(6)].map(() => ({
+  records: [...Array(10)].map(() => ({
     id: faker.datatype.uuid(),
     name: faker.word.noun(),
     owner: faker.random.arrayElement([
@@ -120,10 +120,10 @@ export const getTopicsControllerPostTopicsMock = () => ({
 
 export const getTopicsControllerGetTopicsHistoryByIdMock = (queryParams: any) => {
   return {
-    count: 8,
+    count: 12,
     limit: Number(queryParams.limit),
     page: Number(queryParams.page),
-    records: [...Array(6)].map(() => ({
+    records: [...Array(10)].map(() => ({
       id: faker.datatype.uuid(),
       name: faker.word.adverb(),
       owner: 'ddhub.apps.energyweb.iam.ewc',
@@ -293,6 +293,19 @@ export const getCronMock = () => {
       "executedAt": "2022-06-02T09:06:03.339Z",
       "createdDate": "2022-05-25T22:36:07.000Z",
       "updatedDate": "2022-06-02T09:06:03.000Z"
+    },
+    {
+      "jobName": "ROLES_REFRESH",
+      "latestStatus": "SUCCESS",
+      "executedAt": "2022-06-02T09:06:03.339Z",
+      "createdDate": "2022-05-25T22:36:07.000Z",
+      "updatedDate": "2022-06-02T09:06:03.000Z"
     }
   ]
-}
+};
+
+export const getGatewayMock = () => {
+  return {
+    "namespace": "ddhub.apps.energyweb.iam.ewc"
+  };
+};

@@ -14,8 +14,10 @@ export function Layout(props: LayoutProps) {
       <Sidebar/>
       <div className={classes.content}>
         <Header />
-        <Breadcrumbs />
-        {props.children}
+        <div className={classes.childContent}>
+          <Breadcrumbs />
+          {props.children}
+        </div>
       </div>
     </div>
   );

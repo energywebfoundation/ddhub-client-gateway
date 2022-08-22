@@ -31,7 +31,9 @@
 | CLIENT_ID | string | WS_CONSUMER | WS client id |  |  |
 | MAX_RETRIES | number | 3 | Specifies maximum amount of retries for vulnerable methods |  |  |
 | RETRY_FACTOR | number | 2 | Specifies retry factor (multiplier for timeout) for vulnerable methods |  |  |
-| TIMEOUT | number | 1000 | Specifies timeout (how much app should wait before retries) for vulnerable methods |  |  |
+| TIMEOUT | number | 1000 | Specifies mininum timeout (how much app should wait before retries) for vulnerable methods |  |  |
+| MAX_TIMEOUT | number | 60000 | Specifies maximum timeout (how much app should wait before retries) for vulnerable methods |  |  |
+| MESSAGING_MAX_TIMEOUT | number | 60000 | Specifies messaging maximum timeout (how much app should wait before retries) for vulnerable methods |  |  |
 | INTERNAL_EVENTS_TIMEOUT | number | 5 | How often internal events interval should execute (seconds) |  |  |
 | USE_CACHE | boolean | true | Should use cache |  |  |
 | SECRETS_ENGINE | string |  | Secrets engine to use | aws,vault,azure |  |

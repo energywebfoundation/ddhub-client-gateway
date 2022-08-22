@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import {
   ModalActionsEnum,
   useModalDispatch,
@@ -9,8 +10,10 @@ export const useDetailsEffects = () => {
     details: { open, data },
   } = useModalStore();
   const dispatch = useModalDispatch();
+  const [activeStep, setActiveStep] = useState(0);
 
   const closeModal = () => {
+    setActiveStep(0);
     dispatch({
       type: ModalActionsEnum.SHOW_DETAILS,
       payload: {
@@ -31,10 +34,18 @@ export const useDetailsEffects = () => {
     });
   };
 
+  const navigateToStep = (index: number) => {
+    if (index !== activeStep) {
+      setActiveStep(index);
+    }
+  };
+
   return {
     open,
     data,
     closeModal,
     openUpdateChannel,
+    activeStep,
+    navigateToStep,
   };
 };

@@ -11,9 +11,10 @@ import {
 } from '@ddhub-client-gateway/identity/models';
 import { routerConst } from '@ddhub-client-gateway-frontend/ui/utils';
 import { useRouter } from 'next/router';
-import { useContext } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { UserDataContext } from './UserDataContext';
 import { useQueryClient } from 'react-query';
+import { isEmpty } from 'lodash';
 import {
   RouteRestrictions,
   IndexableRouteRestrictions,
@@ -42,9 +43,7 @@ export const getRoutesToDisplay = (
     .filter(
       (role) =>
         role.status === RoleStatus.SYNCED &&
-        role.namespace.includes(
-          config?.namespace ?? 'ddhub.apps.energyweb.iam.ewc'
-        )
+        role.namespace.includes(config?.namespace)
     )
     .map((role) => role.namespace);
   if (roles.length === 0) {
@@ -72,6 +71,30 @@ export const useSetUserDataEffect = () => {
   const { config } = useGatewayConfig();
   const { userData, setUserData } = useContext(UserDataContext);
   const queryClient = useQueryClient();
+  const [routeRestrictionList, setRouteRestrictionList] = useState({} as RouteRestrictions);
+  const [result, setResult] = useState({} as IdentityWithEnrolment);
+
+  useEffect(() => {
+    if (!isEmpty(config) && result?.enrolment?.roles) {
+      const accountStatus = checkAccountStatus(result);
+
+      const displayedRoutes = getRoutesToDisplay(
+        result.enrolment.roles,
+        routeRestrictionList as unknown as IndexableRouteRestrictions,
+        config,
+      );
+
+      setUserData({
+        ...userData,
+        accountStatus,
+        roles: result.enrolment.roles,
+        isChecking: false,
+        routeRestrictions: routeRestrictionList,
+        displayedRoutes,
+        did: result.enrolment.did,
+      });
+    }
+  }, [config, result, routeRestrictionList]);
 
   const setData = (
     res: IdentityWithEnrolment,
@@ -85,23 +108,10 @@ export const useSetUserDataEffect = () => {
     };
 
     const accountStatus = checkAccountStatus(res);
-    if (res?.enrolment?.roles) {
-      const displayedRoutes = getRoutesToDisplay(
-        res.enrolment.roles,
-        routeRestrictions as unknown as IndexableRouteRestrictions,
-        config
-      );
+    setResult(res);
+    setRouteRestrictionList(routeRestrictions);
 
-      setUserData({
-        ...userData,
-        accountStatus,
-        roles: res.enrolment.roles,
-        isChecking: false,
-        routeRestrictions,
-        displayedRoutes,
-        did: res.enrolment.did,
-      });
-    } else {
+    if (!res?.enrolment?.roles) {
       setUserData({
         ...userData,
         accountStatus,

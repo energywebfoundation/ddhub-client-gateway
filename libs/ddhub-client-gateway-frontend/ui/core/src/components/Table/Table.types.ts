@@ -35,10 +35,11 @@ export interface TableProps<T> {
   containerProps?: TableContainerProps;
   loadingRows?: number;
   paginationProps?: TablePagination;
-  onPageChange?: (newPage: number) => void;
-  onSearchInput?: (filterValue: FilterValue) => void;
+  onPageChange?: (newPage: number, limit: number) => void;
+  onSearchInput?: (filterValue: FilterValue, limit: number) => void;
   defaultSortBy?: string;
   defaultOrder?: 'asc' | 'desc';
   customStyle?: TableCustomStyle;
   backendSearch?: boolean;
+  stripedTable?: boolean;
 }

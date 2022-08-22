@@ -2,11 +2,14 @@ import { makeStyles } from 'tss-react/mui';
 
 export const useStyles = makeStyles()((theme) => ({
   root: {
+    display: 'flex',
+    flexDirection: 'column',
     border: '1px solid',
     borderColor: '#384151',
     padding: '7px 5px 5px',
-    height: 159,
-    width: 245,
+    minHeight: 204,
+    maxHeight: 451,
+    minWidth: 215,
   },
   label: {
     fontSize: 14,

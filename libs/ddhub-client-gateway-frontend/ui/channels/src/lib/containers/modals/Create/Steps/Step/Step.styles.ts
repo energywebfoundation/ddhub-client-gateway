@@ -3,7 +3,9 @@ import { alpha, darken } from '@mui/material/styles';
 
 export const useStyles = makeStyles()((theme) => ({
   root: {
+    padding: 4,
     marginBottom: 29,
+    borderRadius: 5,
   },
   title: {
     fontSize: 14,
@@ -39,7 +41,13 @@ export const useStyles = makeStyles()((theme) => ({
     alignItems: 'center',
     paddingLeft: '12px',
   },
-  clickableAvatar: {
-    cursor: 'pointer'
+  clickableDiv: {
+    cursor: 'pointer',
+    '&:hover': {
+      backgroundColor: alpha(theme.palette.primary.main, 0.12),
+      '& .MuiTypography-h6': {
+        color: theme.palette.primary.main,
+      },
+    },
   }
 }));

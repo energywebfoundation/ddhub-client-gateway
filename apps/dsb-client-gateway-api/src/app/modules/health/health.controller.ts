@@ -1,17 +1,22 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Controller, Get, Logger, UseGuards } from '@nestjs/common';
 import { HealthCheck } from '@nestjs/terminus';
 import { DigestGuard } from '../utils/guards/digest.guard';
 import { ApiTags } from '@nestjs/swagger';
+import { DdhubHealthService } from 'libs/ddhub-client-gateway-message-broker/src/lib/services/ddhub-health.service';
 
 @Controller('health')
 @UseGuards(DigestGuard)
 @ApiTags('Health')
 export class HealthController {
+  constructor(protected readonly healthService: DdhubHealthService) {}
+
   @Get()
   @HealthCheck()
-  public check(): { status: 'healthy' } {
+  public async check(): Promise<{
+    messageBroker: { statusCode: number; message?: string };
+  }> {
     return {
-      status: 'healthy',
+      messageBroker: await this.healthService.health(),
     };
   }
 }

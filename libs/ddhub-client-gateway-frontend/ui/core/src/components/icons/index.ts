@@ -6,3 +6,5 @@ export * from './TopicRefresh';
 export * from './ChannelRoles';
 export * from './ApplicationRefresh';
 export * from './FileCleaner';
+export * from './RolesRefresh';
+export * from './DefaultScheduler';
