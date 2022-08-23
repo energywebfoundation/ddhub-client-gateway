@@ -27,8 +27,8 @@ export const API_ENVS = Joi.object({
     .description('Should Websocket emit messages as array or single object'),
   DID_TTL: Joi.number()
     .positive()
-    .default(60)
-    .description('How long cached DID attributes should be valid'),
+    .default(3600) // 1 hour
+    .description('How long cached DID attributes should be valid in seconds'),
   WEBSOCKET_URL: Joi.alternatives()
     .conditional('WEBSOCKET', {
       is: WebSocketImplementation.CLIENT,
