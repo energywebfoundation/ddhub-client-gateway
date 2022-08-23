@@ -52,7 +52,7 @@ export const useEditorEffects = ({ showPlaceholder }: TUseEditorEffects) => {
     formatOnPaste: true,
     formatOnType: true,
     scrollBeyondLastLine: true,
-    fontSize: 10,
+    fontSize: 12,
     lineNumbersMinChars: 3,
     lineDecorationsWidth: 3,
     suggestOnTriggerCharacters: false,

@@ -117,4 +117,13 @@ export const useStyles = makeStyles()((theme) => ({
     fontFamily: theme.typography.body2.fontFamily,
     marginBottom: 8,
   },
+  noOptions: {
+    fontSize: 14,
+    lineHeight: '21px',
+    fontWeight: 400,
+    color: theme.palette.text.primary,
+    minHeight: 22,
+    fontFamily: theme.typography.body2.fontFamily,
+    padding: '10px 16px 9px',
+  },
 }));

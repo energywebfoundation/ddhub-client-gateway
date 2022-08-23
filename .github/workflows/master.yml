@@ -101,6 +101,20 @@ jobs:
         with:
           command: app set ddhub-gateway-demo
           options: -p ddhub-client-gateway-api.clientgateway.scheduler.image.tag=${{needs.semantic-version.outputs.new_version}}
+
+      - name: ArgoCD overwrite QA image tag
+        uses: clowdhaus/argo-cd-action/@v1.12.1
+        id: argocd_image_tag_overwrite_qa_scheduler
+        with:
+          command: app set ddhub-gateway-qa
+          options: -p ddhub-client-gateway-api.clientgateway.scheduler.image.tag=${{needs.semantic-version.outputs.new_version}}
+
+      - name: ArgoCD overwrite TRIAL image tag
+        uses: clowdhaus/argo-cd-action/@v1.12.1
+        id: argocd_image_tag_overwrite_trial_scheduler
+        with:
+          command: app set ddhub-gateway-trial
+          options: -p ddhub-client-gateway-api.clientgateway.scheduler.image.tag=${{needs.semantic-version.outputs.new_version}}
   build-be:
     name: Build Backend & Release
     runs-on: ubuntu-latest
@@ -171,6 +185,20 @@ jobs:
         with:
           command: app set ddhub-gateway-demo
           options: -p ddhub-client-gateway-api.image.tag=${{needs.semantic-version.outputs.new_version}}
+          
+      - name: ArgoCD overwrite QA image tag
+        uses: clowdhaus/argo-cd-action/@v1.12.1
+        id: argocd_image_tag_overwrite_qa_api
+        with:
+          command: app set ddhub-gateway-qa
+          options: -p ddhub-client-gateway-api.image.tag=${{needs.semantic-version.outputs.new_version}}
+
+      - name: ArgoCD overwrite TRIAL image tag
+        uses: clowdhaus/argo-cd-action/@v1.12.1
+        id: argocd_image_tag_overwrite_trial_api
+        with:
+          command: app set ddhub-gateway-trial
+          options: -p ddhub-client-gateway-api.image.tag=${{needs.semantic-version.outputs.new_version}}
 
   build-fe:
     name: Build Frontend
@@ -232,4 +260,18 @@ jobs:
         id: argocd_image_tag_overwrite_demo_ui
         with:
           command: app set ddhub-gateway-demo
+          options: -p ddhub-client-gateway-api.clientgateway.ui.image.tag=${{needs.semantic-version.outputs.new_version}}
+
+      - name: ArgoCD overwrite QA image tag
+        uses: clowdhaus/argo-cd-action/@v1.12.1
+        id: argocd_image_tag_overwrite_qa_ui
+        with:
+          command: app set ddhub-gateway-qa
+          options: -p ddhub-client-gateway-api.clientgateway.ui.image.tag=${{needs.semantic-version.outputs.new_version}}
+
+      - name: ArgoCD overwrite TRIAL image tag
+        uses: clowdhaus/argo-cd-action/@v1.12.1
+        id: argocd_image_tag_overwrite_trial_ui
+        with:
+          command: app set ddhub-gateway-trial
           options: -p ddhub-client-gateway-api.clientgateway.ui.image.tag=${{needs.semantic-version.outputs.new_version}}
