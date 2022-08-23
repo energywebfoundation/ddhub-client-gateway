@@ -39,6 +39,7 @@
 | RETRY_FACTOR | number | 2 | Specifies retry factor (multiplier for timeout) for vulnerable methods |  |  |
 | TIMEOUT | number | 1000 | Specifies mininum timeout (how much app should wait before retries) for vulnerable methods |  |  |
 | MAX_TIMEOUT | number | 60000 | Specifies maximum timeout (how much app should wait before retries) for vulnerable methods |  |  |
+| MESSAGING_MAX_TIMEOUT | number | 60000 | Specifies messaging maximum timeout (how much app should wait before retries) for vulnerable methods |  |  |
 | INTERNAL_EVENTS_TIMEOUT | number | 5 | How often internal events interval should execute (seconds) |  |  |
 | OPENTELEMETRY_ENABLED | boolean | false |  |  |  |
 | OTEL_IGNORED_ROUTES | string | health,api/v2/health | OTEL ignored routes |  | OPENTELEMETRY_ENABLED == true |
