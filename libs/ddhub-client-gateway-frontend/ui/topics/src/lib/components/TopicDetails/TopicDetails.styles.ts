@@ -22,7 +22,6 @@ export const useStyles = makeStyles()((theme) => ({
     position: 'absolute',
   },
   details: {
-    marginTop: 36,
     position: 'relative',
   },
   detailsInfo: {
@@ -32,7 +31,7 @@ export const useStyles = makeStyles()((theme) => ({
     fontSize: 12,
     lineHeight: '21px',
     fontWeight: 400,
-    color: theme.palette.grey[300],
+    color: theme.palette.common.white,
     marginRight: 20,
     fontFamily: theme.typography.body2.fontFamily,
   },
@@ -51,7 +50,20 @@ export const useStyles = makeStyles()((theme) => ({
     fontSize: 14,
     lineHeight: '21px',
     fontWeight: 400,
-    color: theme.palette.common.white,
     fontFamily: theme.typography.body2.fontFamily,
+    color: theme.palette.grey[300],
+  },
+  content: {
+    height: '100%',
+    flexGrow: 1,
+    flexWrap: 'nowrap',
+  },
+  contentWrapper: {
+    paddingTop: 48,
+    flexGrow: 1,
+  },
+  gridItem: {
+    flexGrow: 1,
+    paddingTop: '10px !important',
   },
 }));

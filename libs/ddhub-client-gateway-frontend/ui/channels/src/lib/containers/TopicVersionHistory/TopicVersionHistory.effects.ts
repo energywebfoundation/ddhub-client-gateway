@@ -38,8 +38,8 @@ export const useTopicVersionHistoryEffects = () => {
     });
   };
 
-  const handlePageChange = (newPage: number) => {
-    getTopicHistory({ page: newPage });
+  const handlePageChange = (newPage: number, limit: number) => {
+    getTopicHistory({ page: newPage, limit });
   };
 
   return {

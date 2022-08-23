@@ -22,6 +22,7 @@ type TTopicDetails = {
   open: boolean;
   topic: GetTopicDto;
   application: ApplicationDTO;
+  showActionButtons: boolean;
 };
 
 export interface ITopicsModalsStore {
