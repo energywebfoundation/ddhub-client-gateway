@@ -137,7 +137,7 @@ export class IdentityService {
     await this.enrolmentService.deleteEnrolment();
     await this.enrolmentService.generateEnrolment();
 
-    await this.commandBus.execute(new ReloginCommand());
+    await this.commandBus.execute(new ReloginCommand('IDENTITY_CHANGE'));
 
     if (balanceState === BalanceState.NONE) {
       this.logger.warn(`No balance for ${wallet.address}, not deriving keys`);
