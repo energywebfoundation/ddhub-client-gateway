@@ -108,27 +108,27 @@ ddhub-client-gateway-api:
         - path: /docs
           pathType: Prefix
           backend:
-            serviceName: ddhub-gateway-api-dev
+            serviceName: ddhub-gateway-api-dev-1
             servicePort: 80
         - path: /api
           pathType: Prefix
           backend:
-            serviceName: ddhub-gateway-api-dev
+            serviceName: ddhub-gateway-api-dev-1
             servicePort: 80
         - path: /docs-json
           pathType: Prefix
           backend:
-            serviceName: ddhub-gateway-api-dev
+            serviceName: ddhub-gateway-api-dev-1
             servicePort: 80
         - path: /events
           pathType: Prefix
           backend:
-            serviceName: ddhub-gateway-api-dev
+            serviceName: ddhub-gateway-api-dev-1
             servicePort: 80
         - path: /
           pathType: Prefix
           backend:
-            serviceName: ddhub-gateway-api-dev-ui
+            serviceName: ddhub-gateway-api-dev-1-ui
             servicePort: 80
     tls:
       - secretName: ddhub-gateway-dev-tls-secret
