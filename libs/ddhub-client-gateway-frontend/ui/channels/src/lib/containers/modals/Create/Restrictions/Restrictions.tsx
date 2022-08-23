@@ -53,6 +53,7 @@ export const Restrictions = ({
       fullWidth
       variant={'outlined'}
       value={roleInput}
+      placeholder='user.roles.namespace.ewc'
       onChange={(event) => {
         rolesInputChangeHandler(event.target.value);
       }}
@@ -67,7 +68,7 @@ export const Restrictions = ({
               <Plus color={theme.palette.common.white} size={15} />
             </IconButton>
           </InputAdornment>
-        ),
+        )
       }}
       error={!isRoleValid}
       helperText={!isRoleValid ? 'Role format is invalid' : ''}
@@ -85,6 +86,7 @@ export const Restrictions = ({
       fullWidth
       variant={'outlined'}
       value={didInput}
+      placeholder='did:ethr:volta:0x09Df...46993'
       onChange={(event) => {
         didInputChangeHandler(event.target.value);
       }}
@@ -99,7 +101,7 @@ export const Restrictions = ({
               <Plus color={theme.palette.common.white} size={15} />
             </IconButton>
           </InputAdornment>
-        ),
+        )
       }}
       error={!isDIDValid}
       helperText={!isDIDValid ? 'DID format is invalid' : ''}

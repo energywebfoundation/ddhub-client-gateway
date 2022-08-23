@@ -64,38 +64,39 @@ export class ChannelDidService implements OnApplicationBootstrap {
     try {
       let allUniqueChannelDids: string[] = [];
       for (const channel of channels) {
-        if (!channel.conditions.roles || !channel.conditions.roles.length) {
-          this.logger.log(
-            `channel ${channel.fqcn} does not have any roles assigned to it, skipping cron`
-          );
+        this.logger.log(`Updating DIDs for ${channel.fqcn}`);
 
-          continue;
-        }
-
-        const rolesForDIDs: string[] =
-          await this.ddhubDidService.getDIDsFromRoles(
+        let channelRoleUniqueDids: string[] = [];
+        if (channel.conditions.roles && channel.conditions.roles.length > 0) {
+          channelRoleUniqueDids = await this.ddhubDidService.getDIDsFromRoles(
             channel.conditions.roles,
             'ANY',
             {
               retries: 1,
             }
           );
+        }
 
-        this.logger.log(`Updating DIDs for ${channel.fqcn}`);
+        let channelUniqueDids: string[] = [];
+        if (channel.conditions.dids && channel.conditions.dids.length > 0) {
+          channelUniqueDids = channel.conditions.dids;
+        }
 
         const uniqueDidsForChannel: string[] = [
-          ...new Set([...rolesForDIDs, ...(channel.conditions.dids ?? [])]),
+          ...new Set([...channelRoleUniqueDids, ...channelUniqueDids]),
         ];
         allUniqueChannelDids = [...new Set([...allUniqueChannelDids, ...uniqueDidsForChannel])];
 
         this.logger.log(
-          `found ${uniqueDidsForChannel.length} DIDS for channel ${channel.fqcn}`
+          `found ${uniqueDidsForChannel.length} DIDS for channel ${channel.fqcn}`,
+          uniqueDidsForChannel
         );
 
         channel.conditions.qualifiedDids = uniqueDidsForChannel;
 
         await this.wrapper.channelRepository.save(channel);
       }
+
       this.logger.debug(`Updating DID cache for qualifiedDids`, allUniqueChannelDids);
       const updatedDids = await Promise.allSettled(allUniqueChannelDids.map(async (did) => this.keyService.getDid(did)))
       this.logger.debug(`Updated did cache`, JSON.stringify(updatedDids));
