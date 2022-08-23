@@ -19,6 +19,7 @@ export interface TopicVersion {
   version: string;
   owner: string;
   name: string;
+  deleted: boolean;
   schemaType: SchemaType;
   tags: string[];
 }
@@ -27,6 +28,7 @@ export interface Topic {
   id: string;
   name: string;
   schemaType: SchemaType;
+  deleted: boolean;
   schema: string;
   version: string;
   owner: string;

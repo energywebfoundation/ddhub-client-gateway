@@ -17,9 +17,6 @@ export class TopicMonitorEntity {
   @Column()
   lastTopicUpdate: string;
 
-  @PrimaryColumn()
-  version: string;
-
   @CreateDateColumn()
   createdDate?: Date;
 

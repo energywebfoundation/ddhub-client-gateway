@@ -20,6 +20,8 @@ import { SchedulerRegistry } from '@nestjs/schedule';
 import { CronJob } from 'cron';
 import { Span } from 'nestjs-otel';
 import { ConfigService } from '@nestjs/config';
+import { CommandBus } from '@nestjs/cqrs';
+import { TopicDeletedCommand } from '../../channel/command/topic-deleted.command';
 
 @Injectable()
 export class TopicRefreshService implements OnApplicationBootstrap {
@@ -33,6 +35,7 @@ export class TopicRefreshService implements OnApplicationBootstrap {
     protected readonly schedulerRegistry: SchedulerRegistry,
     protected readonly cronWrapper: CronWrapperRepository,
     protected readonly configService: ConfigService,
+    protected readonly commandBus: CommandBus,
     protected readonly topicMonitorWrapper: TopicMonitorRepositoryWrapper
   ) {}
 
@@ -114,14 +117,39 @@ export class TopicRefreshService implements OnApplicationBootstrap {
             undefined,
             application.namespace,
             1,
-            []
+            [],
+            true
           );
 
         for (const topic of topicsForApplication.records) {
+          if (topic.deleted) {
+            this.logger.log(`${topic.id} got deleted`);
+
+            await this.commandBus.execute(
+              new TopicDeletedCommand(topic.name, topic.owner)
+            );
+
+            continue;
+          }
+
           const topicVersions: TopicVersionResponse =
             await this.ddhubTopicsService.getTopicVersions(topic.id);
 
           for (const topicVersion of topicVersions.records) {
+            if (topicVersion.deleted) {
+              await this.wrapper.topicRepository.delete({
+                version: topicVersion.version,
+                name: topicVersion.name,
+                owner: topicVersion.owner,
+              });
+
+              this.logger.log(
+                `deleted topic ${topicVersion.version} ${topicVersion.name} ${topicVersion.owner}`
+              );
+
+              continue;
+            }
+
             const [major, minor, patch]: string[] =
               topicVersion.version.split('.');
 

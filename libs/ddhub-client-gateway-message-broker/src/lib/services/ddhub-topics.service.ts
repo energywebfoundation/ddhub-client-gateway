@@ -417,7 +417,8 @@ export class DdhubTopicsService extends DdhubBaseService {
     name: string,
     applicationNameSpace: string,
     page: number,
-    tags: string[]
+    tags: string[],
+    includeDeleted = true
   ): Promise<TopicDataResponse> {
     //replacing double quotes in order to pass correct input to MB
     const owner = applicationNameSpace.replace(/"/g, '');
@@ -432,6 +433,7 @@ export class DdhubTopicsService extends DdhubBaseService {
               owner,
               page,
               tags,
+              includeDeleted: includeDeleted ? 'true' : 'false',
             },
             httpsAgent: this.tlsAgentService.get(),
             headers: {
