@@ -145,7 +145,7 @@ export abstract class DdhubBaseService {
     if (status === HttpStatus.UNAUTHORIZED) {
       this.logger.log('Unauthorized, attempting to login');
 
-      await this.ddhubLoginService.login(false);
+      await this.ddhubLoginService.login(false, 'UNAUTHORIZED');
 
       return retry();
     }
