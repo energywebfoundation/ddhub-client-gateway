@@ -35,10 +35,12 @@ export class AppModule {
     envFilePath?: string;
   }) {
     const imports = [
-      LoggerModule.forRoot({
-        pinoHttp: {
-          genReqId: (req) => req.headers['x-request-id'] || uuidv4(),
-        },
+      LoggerModule.forRootAsync({
+        useFactory: () => ({
+          pinoHttp: {
+            genReqId: (req) => req.headers['x-request-id'] || uuidv4(),
+          },
+        }),
       }),
       ConfigModule.forRoot({
         isGlobal: true,

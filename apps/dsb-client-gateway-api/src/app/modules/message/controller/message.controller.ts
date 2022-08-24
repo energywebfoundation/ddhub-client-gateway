@@ -27,13 +27,17 @@ import { DownloadMessageResponse } from '../entity/message.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Readable } from 'stream';
 import { MtlsGuard } from '../../certificate/guards/mtls.guard';
+import { PinoLogger } from 'nestjs-pino';
 
 @Controller('messages')
 @UseGuards(DigestGuard, MtlsGuard)
 @ApiTags('Messaging')
 export class MessageControlller {
   private readonly logger = new Logger();
-  constructor(protected readonly messageService: MessageService) {}
+  constructor(
+    protected readonly messageService: MessageService,
+    protected readonly pinoLogger: PinoLogger
+  ) {}
 
   @Get('/')
   @ApiResponse({
@@ -56,6 +60,12 @@ export class MessageControlller {
   })
   @HttpCode(HttpStatus.OK)
   public async getMessage(@Query() dto: GetMessagesDto): Promise<Array<any>> {
+    this.pinoLogger.assign({
+      fqcn: dto.fqcn,
+      topicName: dto.topicName,
+      topicOwner: dto.topicOwner,
+    });
+
     return this.messageService.getMessages(dto);
   }
 
@@ -78,6 +88,10 @@ export class MessageControlller {
     @Query() { fileId }: DownloadMessagesDto,
     @Response() res
   ): Promise<Readable> {
+    this.pinoLogger.assign({
+      fileId,
+    });
+
     try {
       const file: DownloadMessageResponse =
         await this.messageService.downloadMessages(fileId);
@@ -121,6 +135,12 @@ export class MessageControlller {
   public async create(
     @Body() dto: SendMessageDto
   ): Promise<SendMessagelResponseDto> {
+    this.pinoLogger.assign({
+      fqcn: dto.fqcn,
+      topicName: dto.topicName,
+      topicOwner: dto.topicOwner,
+    });
+
     return this.messageService.sendMessage(dto);
   }
 
@@ -150,6 +170,12 @@ export class MessageControlller {
     @UploadedFile('file') file: Express.Multer.File,
     @Body() dto: uploadMessageBodyDto
   ): Promise<SendMessagelResponseDto> {
+    this.pinoLogger.assign({
+      fqcn: dto.fqcn,
+      topicName: dto.topicName,
+      topicOwner: dto.topicOwner,
+    });
+
     return this.messageService.uploadMessage(file, dto);
   }
 }

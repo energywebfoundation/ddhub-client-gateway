@@ -156,16 +156,27 @@ export class MessageService {
       `sending messages to ${qualifiedDids.length} DIDs`
     );
 
-    return this.ddhubMessageService.sendMessage(
-      qualifiedDids,
-      message,
-      topic.id,
-      topic.version,
-      signature,
-      clientGatewayMessageId,
-      channel.payloadEncryption,
-      dto.transactionId
-    );
+    const result: SendMessageResponse =
+      await this.ddhubMessageService.sendMessage(
+        qualifiedDids,
+        message,
+        topic.id,
+        topic.version,
+        signature,
+        clientGatewayMessageId,
+        channel.payloadEncryption,
+        dto.transactionId
+      );
+
+    for (const res of result.status) {
+      for (const detail of res.details) {
+        this.logger.log(
+          `message sent with id ${detail.messageId} to ${detail.did} with status code ${detail.statusCode}`
+        );
+      }
+    }
+
+    return result;
   }
 
   @Span('message_sendSymmetricKeys')

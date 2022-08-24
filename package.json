@@ -107,6 +107,7 @@
     "node-vault": "^0.9.22",
     "nprogress": "^0.2.0",
     "pg": "^8.7.3",
+    "pino-pretty": "^9.1.0",
     "promise-retry": "^2.0.1",
     "react": "17.0.2",
     "react-copy-to-clipboard": "^5.1.0",
