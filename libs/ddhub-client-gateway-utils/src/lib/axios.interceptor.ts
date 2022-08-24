@@ -1,8 +1,20 @@
-import { AxiosResponse } from '@nestjs/terminus/dist/health-indicator/http/axios.interfaces';
+import {
+  AxiosRequestConfig,
+  AxiosResponse,
+} from '@nestjs/terminus/dist/health-indicator/http/axios.interfaces';
 import { HttpService } from '@nestjs/axios';
 import { Logger } from '@nestjs/common';
+import { reqIdAccess } from './req-id-access';
 
 export const useErrorHandler = (httpService: HttpService, logger: Logger) => {
+  httpService.axiosRef.interceptors.request.use(
+    (config: AxiosRequestConfig) => {
+      config.headers['X-Request-Id'] = reqIdAccess();
+
+      return config;
+    }
+  );
+
   httpService.axiosRef.interceptors.response.use(
     (res: AxiosResponse) => {
       return res;
