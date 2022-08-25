@@ -22,6 +22,8 @@ import { StorageModule } from './modules/storage/storage.module';
 import { DdhubClientGatewayEventsModule } from '@dsb-client-gateway/ddhub-client-gateway-events';
 import { GatewayModule } from './modules/gateway/gateway.module';
 import { HealthModule } from './modules/health/health.module';
+import { LoggerModule } from 'nestjs-pino';
+import { v4 as uuidv4 } from 'uuid';
 
 @Module({})
 export class AppModule {
@@ -33,6 +35,13 @@ export class AppModule {
     envFilePath?: string;
   }) {
     const imports = [
+      LoggerModule.forRootAsync({
+        useFactory: () => ({
+          pinoHttp: {
+            genReqId: (req) => req.headers['x-request-id'] || uuidv4(),
+          },
+        }),
+      }),
       ConfigModule.forRoot({
         isGlobal: true,
         envFilePath: envFilePath,
