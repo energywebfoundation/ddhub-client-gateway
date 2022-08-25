@@ -3,7 +3,7 @@ import { HttpService } from '@nestjs/axios';
 import { DidAuthResponse } from '../did-auth.interface';
 import { lastValueFrom, timeout } from 'rxjs';
 import { TlsAgentService } from '@dsb-client-gateway/ddhub-client-gateway-tls-agent';
-import { useErrorHandler } from '@dsb-client-gateway/ddhub-client-gateway-utils';
+import { useInterceptors } from '@dsb-client-gateway/ddhub-client-gateway-utils';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
@@ -15,23 +15,27 @@ export class DidAuthApiService {
     protected readonly tlsAgentService: TlsAgentService,
     protected readonly configService: ConfigService
   ) {
-    useErrorHandler(this.httpService, this.logger);
+    useInterceptors(this.httpService, this.logger);
   }
 
   public async login(identityToken: string): Promise<DidAuthResponse> {
     const { data } = await lastValueFrom(
-      this.httpService.post<DidAuthResponse>(
-        '/auth/login',
-        {
-          identityToken,
-        },
-        {
-          httpsAgent: this.tlsAgentService.get(),
-        }
-      ).pipe(timeout(+this.configService.get<number>('MAX_TIMEOUT', 60000)))
+      this.httpService
+        .post<DidAuthResponse>(
+          '/auth/login',
+          {
+            identityToken,
+          },
+          {
+            httpsAgent: this.tlsAgentService.get(),
+          }
+        )
+        .pipe(timeout(+this.configService.get<number>('MAX_TIMEOUT', 60000)))
     ).catch((e) => {
       this.logger.error(`[Login Failed][msg] ${e.message}`);
-      this.logger.error(`[Login Failed][data] ${JSON.stringify((e.response?.data))}`);
+      this.logger.error(
+        `[Login Failed][data] ${JSON.stringify(e.response?.data)}`
+      );
 
       throw e;
     });
@@ -49,20 +53,24 @@ export class DidAuthApiService {
     }
 
     const { data } = await lastValueFrom(
-      this.httpService.post<DidAuthResponse>(
-        '/auth/refresh-token',
-        {
-          refreshToken,
-        },
-        {
-          httpsAgent: this.tlsAgentService.get(),
-        }
-      ).pipe(timeout(+this.configService.get<number>('MAX_TIMEOUT', 60000)))
+      this.httpService
+        .post<DidAuthResponse>(
+          '/auth/refresh-token',
+          {
+            refreshToken,
+          },
+          {
+            httpsAgent: this.tlsAgentService.get(),
+          }
+        )
+        .pipe(timeout(+this.configService.get<number>('MAX_TIMEOUT', 60000)))
     ).catch((e) => {
       this.logger.error('Refresh token failed');
 
       this.logger.error(e.message);
-      this.logger.error(`[Refresh token Failed][data] ${JSON.stringify((e.response?.data))}`);
+      this.logger.error(
+        `[Refresh token Failed][data] ${JSON.stringify(e.response?.data)}`
+      );
 
       throw e;
     });
