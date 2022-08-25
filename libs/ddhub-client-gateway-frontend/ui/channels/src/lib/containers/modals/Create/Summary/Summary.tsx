@@ -87,6 +87,11 @@ export const Summary = ({
         <Typography variant={'body2'} className={classes.label}>
           Topics
         </Typography>
+        {!channelValues.conditions.topics.length && (
+          <Typography variant={'body2'} className={classes.description}>
+            No topics added
+          </Typography>
+        )}
         <SelectedTopicList
           topics={channelValues.conditions.topics}
           canRemove={false}

@@ -147,20 +147,6 @@ export const useCreateChannelEffects = () => {
     resetToInitialState();
   };
 
-  const hideModal = () => {
-    dispatch({
-      type: ModalActionsEnum.HIDE_CREATE,
-      payload: true,
-    });
-  };
-
-  const showModal = () => {
-    dispatch({
-      type: ModalActionsEnum.HIDE_CREATE,
-      payload: false,
-    });
-  };
-
   const onCreate = () => {
     queryClient.invalidateQueries(getChannelControllerGetByTypeQueryKey());
     closeModal();
@@ -187,15 +173,12 @@ export const useCreateChannelEffects = () => {
   };
 
   const openCancelModal = async () => {
-    hideModal();
     const result = await Swal.warning({
-      text: 'you will close create channel form',
+      text: 'You will lose your data if you close the form.',
     });
 
     if (result.isConfirmed) {
       closeModal();
-    } else {
-      showModal();
     }
   };
 
