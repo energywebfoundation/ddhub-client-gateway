@@ -6,7 +6,7 @@ import { HttpService } from '@nestjs/axios';
 import { Logger } from '@nestjs/common';
 import { reqIdAccess } from './req-id-access';
 
-export const useErrorHandler = (httpService: HttpService, logger: Logger) => {
+export const useInterceptors = (httpService: HttpService, logger: Logger) => {
   httpService.axiosRef.interceptors.request.use(
     (config: AxiosRequestConfig) => {
       config.headers['X-Request-Id'] = reqIdAccess();
