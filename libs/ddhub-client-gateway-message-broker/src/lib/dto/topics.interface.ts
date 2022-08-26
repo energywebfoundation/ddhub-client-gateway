@@ -78,6 +78,6 @@ export type TopicDataResponse = PaginatedData<Topic>;
 export interface TopicMonitorUpdates {
   id: string;
   owner: string;
-  lastTopicUpdate: string;
-  lastTopicVersionUpdate: string;
+  lastTopicUpdate: number;
+  lastTopicVersionUpdate: number;
 }

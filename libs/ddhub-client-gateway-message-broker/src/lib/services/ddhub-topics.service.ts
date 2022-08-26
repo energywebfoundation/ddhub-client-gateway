@@ -361,27 +361,26 @@ export class DdhubTopicsService extends DdhubBaseService {
     owners: string[]
   ): Promise<TopicMonitorUpdates[]> {
     try {
-      // const result = await this.request<null>(
-      //   () =>
-      //     this.httpService.get(`/topicUpdatesMonitor/`, {
-      //       httpsAgent: this.tlsAgentService.get(),
-      //       headers: {
-      //         Authorization: `Bearer ${this.didAuthService.getToken()}`,
-      //       },
-      //     }),
-      //   {
-      //     stopOnResponseCodes: [MessageBrokerErrors.UNAUTHORIZED_ACCESS],
-      //   }
-      // );
-
-      return [
+      const result = await this.request<null>(
+        () =>
+          this.httpService.get(`/topics/topicUpdatesMonitor`, {
+            params: {
+              namespaceList: owners,
+            },
+            paramsSerializer: function (params) {
+              return qs.stringify(params, { arrayFormat: 'repeat' });
+            },
+            httpsAgent: this.tlsAgentService.get(),
+            headers: {
+              Authorization: `Bearer ${this.didAuthService.getToken()}`,
+            },
+          }),
         {
-          id: 'test',
-          lastTopicUpdate: 'any',
-          owner: 'any',
-          lastTopicVersionUpdate: 'any',
-        },
-      ];
+          stopOnResponseCodes: [MessageBrokerErrors.UNAUTHORIZED_ACCESS],
+        }
+      );
+
+      return result.data;
     } catch (e) {
       this.logger.error(`get topics monitor failed`, e);
       throw e;

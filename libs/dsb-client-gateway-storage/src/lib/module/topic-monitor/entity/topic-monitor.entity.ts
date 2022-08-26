@@ -11,11 +11,15 @@ export class TopicMonitorEntity {
   @PrimaryColumn()
   owner: string;
 
-  @Column()
-  lastTopicVersionUpdate: string;
+  @Column({
+    type: 'timestamptz',
+  })
+  lastTopicVersionUpdate: Date;
 
-  @Column()
-  lastTopicUpdate: string;
+  @Column({
+    type: 'timestamptz',
+  })
+  lastTopicUpdate: Date;
 
   @CreateDateColumn()
   createdDate?: Date;

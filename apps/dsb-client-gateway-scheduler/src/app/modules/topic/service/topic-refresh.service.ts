@@ -22,6 +22,7 @@ import { Span } from 'nestjs-otel';
 import { ConfigService } from '@nestjs/config';
 import { CommandBus } from '@nestjs/cqrs';
 import { TopicDeletedCommand } from '../../channel/command/topic-deleted.command';
+import moment from 'moment';
 
 @Injectable()
 export class TopicRefreshService implements OnApplicationBootstrap {
@@ -111,6 +112,8 @@ export class TopicRefreshService implements OnApplicationBootstrap {
       );
 
       for (const application of applicationsToRun) {
+        this.logger.log(`running application ${application.namespace}`);
+
         const topicsForApplication: TopicDataResponse =
           await this.ddhubTopicsService.getTopics(
             100,
@@ -238,8 +241,8 @@ export class TopicRefreshService implements OnApplicationBootstrap {
     for (const topicMonitor of topicUpdatesMonitor) {
       const matchingElement: TopicMonitorEntity | undefined =
         existingTopicsMonitors.find(
-          (topicMonitor: TopicMonitorEntity) =>
-            topicMonitor.owner === topicMonitor.owner
+          (topicMonitorEntity: TopicMonitorEntity) =>
+            topicMonitor.owner === topicMonitorEntity.owner
         );
 
       if (!matchingElement) {
@@ -252,11 +255,21 @@ export class TopicRefreshService implements OnApplicationBootstrap {
         await this.saveMonitor(topicMonitor);
       }
 
-      if (
-        matchingElement.lastTopicVersionUpdate >
-          topicMonitor.lastTopicVersionUpdate ||
-        matchingElement.lastTopicUpdate > topicMonitor.lastTopicUpdate
-      ) {
+      const hasTopicUpdated: boolean = moment(matchingElement.lastTopicUpdate)
+        .utc()
+        .isBefore(moment(topicMonitor.lastTopicUpdate).utc());
+
+      const hasTopicVersionUpdated: boolean = moment(
+        matchingElement.lastTopicVersionUpdate
+      )
+        .utc()
+        .isBefore(moment(topicMonitor.lastTopicVersionUpdate).utc());
+
+      this.logger.log(
+        `${topicMonitor.owner} topic updated: ${hasTopicUpdated}, topic version updated: ${hasTopicVersionUpdated}`
+      );
+
+      if (hasTopicUpdated || hasTopicVersionUpdated) {
         ownersToReturn.push(topicMonitor.owner);
 
         this.logger.log(`${topicMonitor.owner} monitor updated`);
@@ -271,8 +284,8 @@ export class TopicRefreshService implements OnApplicationBootstrap {
   protected async saveMonitor(mb: TopicMonitorUpdates): Promise<void> {
     await this.topicMonitorWrapper.topicRepository.save({
       owner: mb.owner,
-      lastTopicUpdate: mb.lastTopicUpdate,
-      lastTopicVersionUpdate: mb.lastTopicVersionUpdate,
+      lastTopicUpdate: moment(mb.lastTopicUpdate).utc().toDate(),
+      lastTopicVersionUpdate: moment(mb.lastTopicVersionUpdate).utc().toDate(),
     });
   }
 }

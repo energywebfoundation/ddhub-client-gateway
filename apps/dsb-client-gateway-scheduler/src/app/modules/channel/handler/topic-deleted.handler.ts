@@ -41,7 +41,7 @@ export class TopicDeletedHandler
           );
         });
 
-        // await this.channelWrapper.channelRepository.save(channel);
+        await this.channelWrapper.channelRepository.save(channel);
 
         this.logger.log(
           `removed ${command.topicName}-${command.topicOwner} from ${channel.fqcn}`
