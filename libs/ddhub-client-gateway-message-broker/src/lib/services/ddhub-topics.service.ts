@@ -200,6 +200,8 @@ export class DdhubTopicsService extends DdhubBaseService {
   @Span('ddhub_mb_postTopics')
   public async postTopics(topicData: PostTopicBodyDto): Promise<Topic> {
     try {
+      this.logger.log('attempting to create topic ' + topicData.name);
+
       const { data } = await this.request<null>(
         () =>
           this.httpService.post('/topics', topicData, {

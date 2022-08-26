@@ -78,23 +78,21 @@ export class IamFactoryService {
   }
 
   protected getLogger(): ILogger {
-    const logger = new Logger('IAM-Client-Lib');
-
     return {
       log: (message) => {
-        console.log(message);
+        this.logger.log(message);
       },
       error: (message) => {
-        console.error(message);
+        this.logger.error(message);
       },
       info: (message) => {
-        console.log(message);
+        this.logger.log(message);
       },
       warn: (message) => {
-        console.warn(message);
+        this.logger.warn(message);
       },
       debug: (message) => {
-        console.debug(message);
+        this.logger.debug(message);
       },
       _logLevel: LogLevel.debug,
     } as unknown as ILogger;
