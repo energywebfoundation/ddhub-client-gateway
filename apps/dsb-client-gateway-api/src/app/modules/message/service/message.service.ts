@@ -116,15 +116,15 @@ export class MessageService {
 
     messageLoggerContext.debug(
       'attempting to encrypt payload, encryption enabled: ' +
-        channel.payloadEncryption
+      channel.payloadEncryption
     );
 
     const message = channel.payloadEncryption
       ? this.keyService.encryptMessage(
-          dto.payload,
-          randomKey,
-          EncryptedMessageType['UTF-8']
-        )
+        dto.payload,
+        randomKey,
+        EncryptedMessageType['UTF-8']
+      )
       : dto.payload;
 
     messageLoggerContext.debug('fetching private key');
@@ -261,18 +261,18 @@ export class MessageService {
     message: SearchMessageResponseDto
   ): Promise<GetMessageResponse> {
     let baseMessage: Omit<GetMessageResponse, 'signatureValid' | 'decryption'> =
-      {
-        id: message.messageId,
-        topicVersion: message.topicVersion,
-        topicName: '',
-        topicOwner: '',
-        topicSchemaType: '',
-        payload: message.payload,
-        signature: message.signature,
-        sender: message.senderDid,
-        timestampNanos: message.timestampNanos,
-        transactionId: message.transactionId,
-      };
+    {
+      id: message.messageId,
+      topicVersion: message.topicVersion,
+      topicName: '',
+      topicOwner: '',
+      topicSchemaType: '',
+      payload: message.payload,
+      signature: message.signature,
+      sender: message.senderDid,
+      timestampNanos: message.timestampNanos,
+      transactionId: message.transactionId,
+    };
 
     try {
       const topic: TopicEntity = await this.topicService.getTopicById(
@@ -380,6 +380,13 @@ export class MessageService {
     }
   }
 
+  @Span('message_sendAckBy')
+  public async sendAckBy(messageIds: string[], clientId: string): Promise<string[]> {
+    this.logger.log(messageIds);
+    const successAckMessageIds: string[] = await this.ddhubMessageService.messagesAckBy(messageIds, clientId);
+    return successAckMessageIds;
+  }
+
   @Span('message_getMessages')
   public async getMessages({
     fqcn,
@@ -388,7 +395,7 @@ export class MessageService {
     topicName,
     topicOwner,
     clientId,
-  }: GetMessagesDto): Promise<GetMessageResponse[]> {
+  }: GetMessagesDto, ack: boolean | undefined = true): Promise<GetMessageResponse[]> {
     const loggerContextKey: string = `${MessageService.name}_${fqcn}_${topicName}_${topicOwner}_${clientId};`;
 
     const messageLoggerContext = new Logger(loggerContextKey);
@@ -457,9 +464,7 @@ export class MessageService {
     messageLoggerContext.log(
       '[getMessages] Returned processed messages',
       messageResponses
-    );
-
-    const fulfilledMessages = messageResponses
+    ); let fulfilledMessages = messageResponses
       .map((message) => (message.status === 'fulfilled' ? message.value : null))
       .filter(
         (message: GetMessageResponse | null) => !!message
@@ -468,6 +473,11 @@ export class MessageService {
     messageLoggerContext.log(
       `[getMessages] Total fulfilled messages ${messageResponses.length}`
     );
+
+    if (ack) {
+      const successAckMessageIds: string[] = await this.sendAckBy(fulfilledMessages.map((message) => message.id), `${clientId}:${fqcn}`);
+      fulfilledMessages = fulfilledMessages.filter(msg => successAckMessageIds.includes(msg.id));
+    }
 
     return fulfilledMessages.sort((a, b) => {
       if (a.timestampNanos < b.timestampNanos) return -1;
