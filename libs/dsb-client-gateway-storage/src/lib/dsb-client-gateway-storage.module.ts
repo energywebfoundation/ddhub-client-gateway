@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import {
+  AcksEntity,
   ApplicationEntity,
   ChannelEntity,
   CronEntity,
@@ -11,7 +12,6 @@ import {
   IdentityEntity,
   SymmetricKeysEntity,
   TopicEntity,
-  AcksEntity
 } from './module';
 import { ConfigService } from '@nestjs/config';
 import { TopicMonitorEntity } from './module/topic-monitor';
@@ -27,7 +27,7 @@ const ENTITIES = [
   ApplicationEntity,
   FileMetadataEntity,
   EventsEntity,
-  AcksEntity
+  AcksEntity,
   TopicMonitorEntity,
 ];
 
@@ -35,21 +35,12 @@ const ENTITIES = [
   imports: [
     TypeOrmModule.forRootAsync({
       useFactory: async (configService: ConfigService) => {
-        if (configService.get('DB_DRIVER') === 'postgres') {
-          return {
-            type: 'postgres',
-            url: configService.get<string>('DB_NAME', 'local.db'),
-            synchronize: true,
-            entities: ENTITIES,
-          };
-        } else {
-          return {
-            type: 'better-sqlite3',
-            database: configService.get<string>('DB_NAME', 'local.db'),
-            synchronize: false,
-            entities: ENTITIES,
-          };
-        }
+        return {
+          type: 'postgres',
+          url: configService.get<string>('DB_NAME', 'local.db'),
+          synchronize: configService.get<boolean>('DB_SYNC', false),
+          entities: ENTITIES,
+        };
       },
       inject: [ConfigService],
     }),
