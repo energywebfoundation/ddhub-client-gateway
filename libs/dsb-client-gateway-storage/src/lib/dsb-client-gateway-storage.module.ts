@@ -11,6 +11,7 @@ import {
   IdentityEntity,
   SymmetricKeysEntity,
   TopicEntity,
+  AcksEntity
 } from './module';
 import { ConfigService } from '@nestjs/config';
 import { TopicMonitorEntity } from './module/topic-monitor';
@@ -26,6 +27,7 @@ const ENTITIES = [
   ApplicationEntity,
   FileMetadataEntity,
   EventsEntity,
+  AcksEntity
   TopicMonitorEntity,
 ];
 
