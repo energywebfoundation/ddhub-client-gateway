@@ -102,11 +102,25 @@ jobs:
           command: app set ddhub-gateway-demo
           options: -p ddhub-client-gateway-api.clientgateway.scheduler.image.tag=${{needs.semantic-version.outputs.new_version}}
 
+      - name: ArgoCD overwrite DEMO-1 scheduler image tag
+        uses: clowdhaus/argo-cd-action/@v1.12.1
+        id: argocd_image_tag_overwrite_demo1_scheduler
+        with:
+          command: app set ddhub-gateway-demo-1
+          options: -p ddhub-client-gateway-api.clientgateway.scheduler.image.tag=${{needs.semantic-version.outputs.new_version}}
+
       - name: ArgoCD overwrite QA image tag
         uses: clowdhaus/argo-cd-action/@v1.12.1
         id: argocd_image_tag_overwrite_qa_scheduler
         with:
           command: app set ddhub-gateway-qa
+          options: -p ddhub-client-gateway-api.clientgateway.scheduler.image.tag=${{needs.semantic-version.outputs.new_version}}
+
+      - name: ArgoCD overwrite QA-1 image tag
+        uses: clowdhaus/argo-cd-action/@v1.12.1
+        id: argocd_image_tag_overwrite_qa1_scheduler
+        with:
+          command: app set ddhub-gateway-qa-1
           options: -p ddhub-client-gateway-api.clientgateway.scheduler.image.tag=${{needs.semantic-version.outputs.new_version}}
 
       - name: ArgoCD overwrite TRIAL image tag
@@ -185,12 +199,26 @@ jobs:
         with:
           command: app set ddhub-gateway-demo
           options: -p ddhub-client-gateway-api.image.tag=${{needs.semantic-version.outputs.new_version}}
+
+      - name: ArgoCD overwrite DEMO-1 image tag
+        uses: clowdhaus/argo-cd-action/@v1.12.1
+        id: argocd_image_tag_overwrite_demo1_api
+        with:
+          command: app set ddhub-gateway-demo-1
+          options: -p ddhub-client-gateway-api.image.tag=${{needs.semantic-version.outputs.new_version}}
           
       - name: ArgoCD overwrite QA image tag
         uses: clowdhaus/argo-cd-action/@v1.12.1
         id: argocd_image_tag_overwrite_qa_api
         with:
           command: app set ddhub-gateway-qa
+          options: -p ddhub-client-gateway-api.image.tag=${{needs.semantic-version.outputs.new_version}}
+
+      - name: ArgoCD overwrite QA-1 image tag
+        uses: clowdhaus/argo-cd-action/@v1.12.1
+        id: argocd_image_tag_overwrite_qa1_api
+        with:
+          command: app set ddhub-gateway-qa-1
           options: -p ddhub-client-gateway-api.image.tag=${{needs.semantic-version.outputs.new_version}}
 
       - name: ArgoCD overwrite TRIAL image tag
@@ -262,11 +290,25 @@ jobs:
           command: app set ddhub-gateway-demo
           options: -p ddhub-client-gateway-api.clientgateway.ui.image.tag=${{needs.semantic-version.outputs.new_version}}
 
+      - name: ArgoCD overwrite DEMO-1 image tag
+        uses: clowdhaus/argo-cd-action/@v1.12.1
+        id: argocd_image_tag_overwrite_demo1_ui
+        with:
+          command: app set ddhub-gateway-demo-1
+          options: -p ddhub-client-gateway-api.clientgateway.ui.image.tag=${{needs.semantic-version.outputs.new_version}}
+
       - name: ArgoCD overwrite QA image tag
         uses: clowdhaus/argo-cd-action/@v1.12.1
         id: argocd_image_tag_overwrite_qa_ui
         with:
           command: app set ddhub-gateway-qa
+          options: -p ddhub-client-gateway-api.clientgateway.ui.image.tag=${{needs.semantic-version.outputs.new_version}}
+
+      - name: ArgoCD overwrite QA-1 image tag
+        uses: clowdhaus/argo-cd-action/@v1.12.1
+        id: argocd_image_tag_overwrite_qa1_ui
+        with:
+          command: app set ddhub-gateway-qa-1
           options: -p ddhub-client-gateway-api.clientgateway.ui.image.tag=${{needs.semantic-version.outputs.new_version}}
 
       - name: ArgoCD overwrite TRIAL image tag
