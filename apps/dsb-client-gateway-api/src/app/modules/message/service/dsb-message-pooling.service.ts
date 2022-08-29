@@ -4,6 +4,7 @@ import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { SchedulerRegistry } from '@nestjs/schedule';
 import { Span } from 'nestjs-otel';
+import { In } from 'typeorm';
 import { ChannelType } from '../../channel/channel.const';
 import { ChannelService } from '../../channel/service/channel.service';
 import { EventsGateway } from '../gateway/events.gateway';
@@ -181,7 +182,7 @@ export class DsbMessagePoolingService implements OnModuleInit {
       const idsNotAckVerify: string[] = data.map(e => e.messageId);
       const _messages = messages.filter(e => !idsNotAckVerify.includes(e.id));
       if (emitMode === EventEmitMode.BULK) {
-        if (client.readyState === WebSocket.OPEN) {
+        if (client.readyState === WebSocket.OPEN && _messages.length > 0) {
           if (_messages.length > 0) {
             const msg = JSON.stringify(_messages.map((message) => ({ ...message, fqcn })));
             client.send(msg);
@@ -198,19 +199,27 @@ export class DsbMessagePoolingService implements OnModuleInit {
       }
       const successAckMessageIds: string[] = await this.messageService.sendAckBy(_messages.map((message) => message.id).concat(idsNotAckVerify), clientId);
       const idsNotAck: string[] = messages.filter(e => !successAckMessageIds.includes(e.id)).map(e => e.id);
+
+      let saveAcks: AcksEntity[] = [];
       idsNotAck.forEach(messageId => {
-        this.acksWrapperRepository.acksRepository.save({
-          messageId,
-          clientId
-        })
+        const ack = new AcksEntity();
+        ack.clientId = clientId;
+        ack.messageId = messageId;
+        saveAcks.push(ack);
       });
+
+      if (idsNotAck.length > 0) {
+        this.acksWrapperRepository.acksRepository.save(saveAcks);
+      }
+
       const deleteAckMessageIds = idsNotAckVerify.filter(e => successAckMessageIds.includes(e));
-      deleteAckMessageIds.forEach(messageId => {
+      if (deleteAckMessageIds.length > 0) {
         this.acksWrapperRepository.acksRepository.delete({
-          messageId,
+          messageId: In(deleteAckMessageIds),
           clientId
         })
-      });
+      }
+
     } catch (e) {
       this.logger.error(`[WS][sendMessagesToSubscribers] ${e}`);
     }

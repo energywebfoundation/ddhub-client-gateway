@@ -63,10 +63,10 @@ export class DdhubMessagesService extends DdhubBaseService {
       );
 
       const idsNotAck: string[] = messageIds.filter(id => !result.data.includes(id));
-      if (idsNotAck.length == 0) {
-        this.logger.log('messages ack successful', result);
+      if (idsNotAck.length === 0) {
+        this.logger.log('messages ack successful', result.data);
       } else {
-        this.logger.log('messages not ack', result);
+        this.logger.log('messages not ack', result.data);
         this.logger.error(`['/messages/ack'][post]${JSON.stringify(requestBody)}`);
       }
 
