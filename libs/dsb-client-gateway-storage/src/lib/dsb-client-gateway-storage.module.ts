@@ -11,6 +11,7 @@ import {
   IdentityEntity,
   SymmetricKeysEntity,
   TopicEntity,
+  AcksEntity
 } from './module';
 import { ConfigService } from '@nestjs/config';
 
@@ -25,6 +26,7 @@ const ENTITIES = [
   ApplicationEntity,
   FileMetadataEntity,
   EventsEntity,
+  AcksEntity
 ];
 
 @Module({
@@ -51,4 +53,4 @@ const ENTITIES = [
     }),
   ],
 })
-export class DsbClientGatewayStorageModule {}
+export class DsbClientGatewayStorageModule { }
