@@ -1,9 +1,10 @@
 import { FC } from 'react';
-import { Box, BoxProps, Grid, Typography } from '@mui/material';
+import { Box, BoxProps, Typography } from '@mui/material';
 import { UploadInput } from '@ddhub-client-gateway-frontend/ui/core';
 import { TFileType } from './UploadForm.types';
 import { useUploadFormEffects } from './UploadForm.effects';
 import { useStyles } from './UploadForm.styles';
+import clsx from 'clsx';
 
 export interface UploadFormProps {
   acceptedFiles: File[];
@@ -29,37 +30,40 @@ export const UploadForm: FC<UploadFormProps> = ({
 
   return (
     <Box className={classes.wrapper} {...wrapperProps}>
-      <Grid container>
-        <Grid item sx={{ minWidth: 183 }}>
-          <Typography className={classes.label} variant="body1">
-            Upload file
+      <Box
+        display="flex"
+        flexDirection="column"
+        mb={2.5}
+        sx={{ minHeight: '44px' }}
+      >
+        <Box display="flex" flexDirection="column" alignItems="center">
+          <Typography className={clsx(classes.title, {
+            [classes.titleDisabled]: !acceptedFileType,
+          })} variant="body1">
+            Upload {acceptedFileType ? acceptedFileType.toUpperCase() : 'file'}
           </Typography>
-        </Grid>
-        <Grid item>
-          <Box>
-            <Box
-              display="flex"
-              flexDirection="column"
-              mt={3.8}
-              mb={4.1}
-              sx={{ minHeight: '44px' }}
-            >
-              {acceptedFileType && (
-                <Box display="flex" flexDirection="column">
-                  <Typography variant="body1">File:</Typography>
-                  <Typography variant="body2">{fileSizeInfo}</Typography>
-                </Box>
-              )}
-            </Box>
-            <UploadInput
-              acceptedFileType={acceptedFileType}
-              value={fileTextValue}
-              onChange={onFileChange}
-              maxSize={maxFileSize}
-            />
-          </Box>
-        </Grid>
-      </Grid>
+          {acceptedFileType && (
+            <Typography className={classes.label} variant="body2">{fileSizeInfo}</Typography>
+          )}
+        </Box>
+      </Box>
+      <Box>
+        <UploadInput
+          uploadBox={true}
+          acceptedFileType={acceptedFileType}
+          value={fileTextValue}
+          onChange={onFileChange}
+          maxSize={maxFileSize}
+          isUploadDisabled={!acceptedFileType}
+          wrapperProps={{
+            className: clsx(classes.uploadWrapper, {
+            [classes.uploadWrapperDisabled]: !acceptedFileType,
+            [classes.uploadWrapperHover]: acceptedFileType && !fileTextValue,
+            [classes.uploadedWrapperHover]: acceptedFileType && fileTextValue,
+            }),
+          }}
+        />
+      </Box>
     </Box>
   );
 };
