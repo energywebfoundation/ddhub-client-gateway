@@ -44,13 +44,23 @@ export const Topics: FC<TopicsProps> = ({ topics }) => {
     />
   </Box>);
 
+  const noTopic = (
+    <Box>
+      <Stack>
+        <Typography className={classes.label} variant="body2">
+          -
+        </Typography>
+      </Stack>
+    </Box>
+  );
+
   return (
     <>
       <Typography className={classes.label} variant="body2">
         Topics
       </Typography>
       <Box className={classes.topicsList}>
-        {rows}
+        {topics.length ? rows : noTopic}
       </Box>
       { topics.length > 50 &&
         <Box display="flex">

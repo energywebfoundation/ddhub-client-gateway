@@ -165,7 +165,7 @@ export const useUpdateTopicEffects = () => {
   const openCancelModal = async () => {
     hideModal();
     const result = await Swal.fire({
-      title: 'Are you sure?',
+      title: 'Are you sure you want to proceed?',
       text: 'you will close update topic form',
       type: 'warning',
       showCancelButton: true,

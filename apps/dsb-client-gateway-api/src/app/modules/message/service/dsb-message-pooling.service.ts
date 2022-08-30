@@ -1,9 +1,10 @@
 import { DdhubLoginService } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
-import { ChannelEntity } from '@dsb-client-gateway/dsb-client-gateway-storage';
+import { AcksEntity, AcksWrapperRepository, ChannelEntity } from '@dsb-client-gateway/dsb-client-gateway-storage';
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { SchedulerRegistry } from '@nestjs/schedule';
 import { Span } from 'nestjs-otel';
+import { In } from 'typeorm';
 import { ChannelType } from '../../channel/channel.const';
 import { ChannelService } from '../../channel/service/channel.service';
 import { EventsGateway } from '../gateway/events.gateway';
@@ -29,6 +30,7 @@ export class DsbMessagePoolingService implements OnModuleInit {
     protected readonly channelService: ChannelService,
     protected readonly gateway: EventsGateway,
     protected readonly wsClient: WsClientService,
+    protected readonly acksWrapperRepository: AcksWrapperRepository,
   ) { }
 
   public async onModuleInit(): Promise<void> {
@@ -149,14 +151,15 @@ export class DsbMessagePoolingService implements OnModuleInit {
             topicName: undefined,
             topicOwner: undefined,
             clientId: _clientId ? _clientId : clientId,
-          }
+          },
+          false
         );
 
         this.logger.log(`Found ${messages.length} in ${subscription.fqcn} for ${_clientId ? _clientId : clientId}`);
 
         if (messages && messages.length > 0) {
           msgCount += messages.length;
-          await this.sendMessagesToSubscribers(messages, subscription.fqcn, client);
+          await this.sendMessagesToSubscribers(messages, subscription.fqcn, client, `${_clientId ? _clientId : clientId}:${subscription.fqcn}`);
         }
       } catch (e) {
 
@@ -168,24 +171,55 @@ export class DsbMessagePoolingService implements OnModuleInit {
     return msgCount;
   }
 
-  public async sendMessagesToSubscribers(messages: GetMessageResponse[], fqcn: string, client: any): Promise<void> {
+  public async sendMessagesToSubscribers(messages: GetMessageResponse[], fqcn: string, client: any, clientId: string): Promise<void> {
     try {
       const emitMode: EventEmitMode = this.configService.get('EVENTS_EMIT_MODE', EventEmitMode.BULK);
-
+      const data: AcksEntity[] = await this.acksWrapperRepository.acksRepository.find({
+        where: {
+          clientId
+        },
+      });
+      const idsNotAckVerify: string[] = data.map(e => e.messageId);
+      const _messages = messages.filter(e => !idsNotAckVerify.includes(e.id));
       if (emitMode === EventEmitMode.BULK) {
-        if (client.readyState === WebSocket.OPEN) {
-          const msg = JSON.stringify(messages.map((message) => ({ ...message, fqcn })));
-          client.send(msg);
-          this.logger.log(`[WS][sendMessagesToSubscribers][BULK] ${msg}`);
+        if (client.readyState === WebSocket.OPEN && _messages.length > 0) {
+          if (_messages.length > 0) {
+            const msg = JSON.stringify(_messages.map((message) => ({ ...message, fqcn })));
+            client.send(msg);
+            this.logger.log(`[WS][sendMessagesToSubscribers][BULK] ${msg}`);
+          }
         }
       } else {
-        messages.forEach((message: GetMessageResponse) => {
+        _messages.forEach((message: GetMessageResponse) => {
           if (client.readyState === WebSocket.OPEN) {
             client.send(JSON.stringify({ ...message, fqcn }));
             this.logger.log(`[WS][sendMessagesToSubscribers][SINGLE] ${JSON.stringify({ ...message, fqcn })}`);
           }
         });
       }
+      const successAckMessageIds: string[] = await this.messageService.sendAckBy(_messages.map((message) => message.id).concat(idsNotAckVerify), clientId);
+      const idsNotAck: string[] = messages.filter(e => !successAckMessageIds.includes(e.id)).map(e => e.id);
+
+      let saveAcks: AcksEntity[] = [];
+      idsNotAck.forEach(messageId => {
+        const ack = new AcksEntity();
+        ack.clientId = clientId;
+        ack.messageId = messageId;
+        saveAcks.push(ack);
+      });
+
+      if (idsNotAck.length > 0) {
+        this.acksWrapperRepository.acksRepository.save(saveAcks);
+      }
+
+      const deleteAckMessageIds = idsNotAckVerify.filter(e => successAckMessageIds.includes(e));
+      if (deleteAckMessageIds.length > 0) {
+        this.acksWrapperRepository.acksRepository.delete({
+          messageId: In(deleteAckMessageIds),
+          clientId
+        })
+      }
+
     } catch (e) {
       this.logger.error(`[WS][sendMessagesToSubscribers] ${e}`);
     }

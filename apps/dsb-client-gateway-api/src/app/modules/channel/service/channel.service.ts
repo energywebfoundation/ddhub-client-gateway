@@ -22,6 +22,7 @@ import {
 } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
 import { ChannelInvalidTopicException } from '../exceptions/channel-invalid-topic.exception';
 import { TopicService } from '../../topic/service/topic.service';
+import { differenceBy } from 'lodash';
 
 @Injectable()
 export class ChannelService {
@@ -221,7 +222,7 @@ export class ChannelService {
           `Topic ${topicName} with owner ${owner} does not exists`
         );
 
-        return [];
+        continue;
       }
 
       const { id, schemaType }: Topic = receivedTopics.records[0];
@@ -230,8 +231,17 @@ export class ChannelService {
         topicName,
         owner,
         topicId: id,
-        schemaType: schemaType,
+        schemaType,
       });
+    }
+
+    const invalidTopics = differenceBy(topics, topicsToReturn, 'topicName');
+    if (invalidTopics.length > 0) {
+      throw new TopicNotFoundException(
+        `Topics not found: ${invalidTopics
+          .map(({ owner, topicName }) => `${topicName} (owner: ${owner})`)
+          .join(', ')}.`
+      );
     }
 
     return topicsToReturn;
