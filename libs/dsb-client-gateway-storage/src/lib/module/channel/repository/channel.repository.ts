@@ -1,9 +1,39 @@
 import { ChannelEntity } from '../entity/channel.entity';
-import { EntityRepository, Repository } from 'typeorm';
+import { EntityRepository, In, Repository } from 'typeorm';
 import { ChannelType } from '@dsb-client-gateway/dsb-client-gateway-storage';
+
+export interface ChannelsHavingTopic {
+  c: {
+    topicName: string;
+    owner: string;
+    topicId: string;
+    schemaType: string;
+  };
+  fqcn: string;
+}
 
 @EntityRepository(ChannelEntity)
 export class ChannelRepository extends Repository<ChannelEntity> {
+  public async getChannelsHavingTopics(
+    topicName: string,
+    topicOwner: string
+  ): Promise<ChannelsHavingTopic[]> {
+    return this.query(
+      `
+      select * from (select json_array_elements(conditions::json->'topics') as c, fqcn from channels) t where t.c->>'topicName' = $1 AND t.c->>'owner' = $2
+    `,
+      [topicName, topicOwner]
+    );
+  }
+
+  public async getManyByFQCN(fqcn: string[]): Promise<ChannelEntity[]> {
+    return this.find({
+      where: {
+        fqcn: In(fqcn),
+      },
+    });
+  }
+
   public async getChannelsByType(type?: ChannelType): Promise<ChannelEntity[]> {
     return this.find({
       where: {
