@@ -16,7 +16,7 @@ export const BASIC_ENVS = Joi.object({
     ),
   MTLS_ENABLED: Joi.boolean().default(true).description('Should enable mTLS'),
   DB_SYNC: Joi.boolean()
-    .default(true)
+    .default(false)
     .description('Should generate migrations (dev use only)'),
   DB_NAME: Joi.string()
     .default('postgresql://ddhub:ddhub@localhost:5432/ddhub')
