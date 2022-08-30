@@ -24,7 +24,7 @@ type TDetails = {
 type TTopicDetails = {
   open: boolean;
   data: {
-    topic: GetTopicDto;
+    topic: GetTopicSearchDto;
     application: ApplicationDTO;
   };
 };

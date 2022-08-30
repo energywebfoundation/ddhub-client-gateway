@@ -26,7 +26,6 @@ export const Update = () => {
     channelUpdateHandler,
     isUpdating,
     getActionButtonsProps,
-    navigateToStep,
   } = useUpdateChannelEffects();
   const { classes } = useStyles();
 
@@ -41,6 +40,7 @@ export const Update = () => {
               onClick: setRestrictions,
               text: 'Next',
               showArrowIcon: true,
+              canGoBack: false,
             })}
             restrictions={channelValues.conditions}
           />
@@ -51,6 +51,7 @@ export const Update = () => {
             actionButtonsProps={getActionButtonsProps({
               onClick: channelUpdateHandler,
               loading: isUpdating,
+              canGoBack: true,
             })}
             channelValues={{
               topics: channelValues.conditions?.topics || [],
@@ -121,7 +122,7 @@ export const Update = () => {
             </Box>
           )}
           <Box className={classes.divider} />
-          <Steps steps={UPDATE_STEPS} activeStep={activeStep} setActiveStep={navigateToStep} />
+          <Steps steps={UPDATE_STEPS} activeStep={activeStep} />
         </Grid>
         <Grid item className={classes.updateFormWrapper} xs={8}>
           {formPart(activeStep)}

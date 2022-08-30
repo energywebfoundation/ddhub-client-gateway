@@ -22,7 +22,7 @@ export const useCustomAlert = () => {
     props: Partial<SwalProps>
   ): Promise<SweetAlertResult> => {
     return await CustomSwal({
-      title: 'Are you sure?',
+      title: 'Are you sure you want to proceed?',
       type: 'warning',
       showCancelButton: true,
       confirmButtonText: 'Confirm',
