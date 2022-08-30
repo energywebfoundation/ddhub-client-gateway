@@ -32,7 +32,7 @@
 | UPLOAD_FILES_DIR | string | ./upload | Directory where we should store temporary files for upload |  |  |
 | DOWNLOAD_FILES_DIR | string | ./download | Directory where we should store downloaded files for limited time |  |  |
 | MTLS_ENABLED | boolean | true | Should enable mTLS |  |  |
-| DB_SYNC | boolean | false | Should generate migrations (dev use only) |  |  |
+| DB_SYNC | boolean | true | Should generate migrations (dev use only) |  |  |
 | DB_NAME | string | postgresql://ddhub:ddhub@localhost:5432/ddhub | Database connection string |  |  |
 | DB_DRIVER | string | postgres | Database driver | postgres,better-sqlite3 |  |
 | CLIENT_ID | string | WS_CONSUMER | WS client id |  |  |
