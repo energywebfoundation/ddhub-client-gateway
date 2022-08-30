@@ -31,6 +31,7 @@ import { CommandBus } from '@nestjs/cqrs';
 import { RefreshAllChannelsCacheDataCommand } from '../command/refresh-all-channels-cache-data.command';
 import { ChannelEntity } from '@dsb-client-gateway/dsb-client-gateway-storage';
 import { MtlsGuard } from '../../certificate/guards/mtls.guard';
+import { PinoLogger } from 'nestjs-pino';
 
 @Controller('channels')
 @ApiTags('Channels')
@@ -39,7 +40,8 @@ import { MtlsGuard } from '../../certificate/guards/mtls.guard';
 export class ChannelController {
   constructor(
     protected readonly channelService: ChannelService,
-    protected readonly commandbus: CommandBus
+    protected readonly commandbus: CommandBus,
+    protected readonly logger: PinoLogger
   ) {}
 
   @Post()
@@ -61,6 +63,10 @@ export class ChannelController {
   public async create(
     @Body(ChannelValidationPipe) dto: CreateChannelDto
   ): Promise<ChannelEntity> {
+    this.logger.assign({
+      fqcn: dto.fqcn,
+    });
+
     await this.channelService.createChannel(dto);
 
     return this.channelService.getChannelOrThrow(dto.fqcn);
@@ -83,6 +89,10 @@ export class ChannelController {
   public async get(
     @Param() { fqcn }: GetChannelParamsDto
   ): Promise<GetChannelResponseDto> {
+    this.logger.assign({
+      fqcn,
+    });
+
     return this.channelService.getChannelOrThrow(fqcn);
   }
 
@@ -103,6 +113,10 @@ export class ChannelController {
   public async getQualifiedDids(
     @Param() { fqcn }: GetChannelQualifiedDidsParamsDto
   ): Promise<GetChannelQualifiedDidsDto> {
+    this.logger.assign({
+      fqcn,
+    });
+
     return this.channelService.getChannelQualifiedDids(fqcn);
   }
 
@@ -119,6 +133,10 @@ export class ChannelController {
   public async getByType(
     @Query() query: GetChannelByTypeQueryDto
   ): Promise<GetChannelResponseDto[]> {
+    this.logger.assign({
+      type: query.type,
+    });
+
     return this.channelService.getChannelsByType(query.type);
   }
 
@@ -136,6 +154,10 @@ export class ChannelController {
     description: 'Channel not found',
   })
   public async delete(@Param() { fqcn }: GetChannelParamsDto): Promise<void> {
+    this.logger.assign({
+      type: fqcn,
+    });
+
     await this.channelService.deleteChannelOrThrow(fqcn);
   }
 
@@ -159,6 +181,10 @@ export class ChannelController {
     @Body() dto: UpdateChannelDto,
     @Param() { fqcn }: GetChannelParamsDto
   ): Promise<ChannelEntity> {
+    this.logger.assign({
+      type: fqcn,
+    });
+
     await this.channelService.updateChannel(dto, fqcn);
 
     return this.channelService.getChannelOrThrow(fqcn);

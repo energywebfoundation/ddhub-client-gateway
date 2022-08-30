@@ -1,6 +1,6 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
-import { useErrorHandler } from '@dsb-client-gateway/ddhub-client-gateway-utils';
+import { useInterceptors } from '@dsb-client-gateway/ddhub-client-gateway-utils';
 
 @Injectable()
 export class DdhubLogService implements OnModuleInit {
@@ -9,6 +9,6 @@ export class DdhubLogService implements OnModuleInit {
   constructor(protected readonly httpService: HttpService) {}
 
   onModuleInit(): void {
-    useErrorHandler(this.httpService, this.logger);
+    useInterceptors(this.httpService, this.logger);
   }
 }
