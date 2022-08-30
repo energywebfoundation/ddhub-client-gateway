@@ -24,7 +24,7 @@ export const RestrictionsViewBox: FC<RestrictionsViewBoxProps> = memo(
           </Typography>
         </Box>
         <Box className={classes.list} style={{maxHeight: listMaxHeight}}>
-          {!list.length && (
+          {!list?.length && (
             <Box display="flex" justifyContent="space-between" pl={2} pr={2} height={37}>
               <Typography noWrap variant="body2" className={classes.text}>
                 -

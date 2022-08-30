@@ -69,6 +69,13 @@ export const ChannelInfo: FC<ChannelInfoProps> = ({ channel, topicName }) => {
             <Typography className={classes.subTitle} variant="body2">
               Roles
             </Typography>
+            {
+              !channel.conditions?.roles?.length && (
+                <Typography className={classes.subTitle} variant="body2">
+                  -
+                </Typography>
+              )
+            }
             {channel.conditions?.roles?.map((role) => (
               <Typography
                 key={role}
@@ -84,6 +91,13 @@ export const ChannelInfo: FC<ChannelInfoProps> = ({ channel, topicName }) => {
             <Typography className={classes.subTitle} variant="body2">
               DIDs
             </Typography>
+            {
+              !channel.conditions?.dids?.length && (
+                <Typography className={classes.subTitle} variant="body2">
+                  -
+                </Typography>
+              )
+            }
             {channel.conditions?.dids?.map((did) => (
               <Typography
                 key={did}
