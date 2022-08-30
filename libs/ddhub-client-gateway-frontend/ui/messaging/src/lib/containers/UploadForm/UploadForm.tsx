@@ -58,7 +58,7 @@ export const UploadForm: FC<UploadFormProps> = ({
           wrapperProps={{
             className: clsx(classes.uploadWrapper, {
             [classes.uploadWrapperDisabled]: !acceptedFileType,
-            [classes.uploadWrapperHover]: acceptedFileType && !fileTextValue,
+            [classes.uploadWrapperHover]: acceptedFileType,
             [classes.uploadedWrapperHover]: acceptedFileType && fileTextValue,
             }),
           }}

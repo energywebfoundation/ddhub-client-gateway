@@ -12,6 +12,7 @@ export const useStyles = makeStyles()((theme) => ({
     flexDirection: 'column',
   },
   uploadWrapper: {
+    height: 209,
     border: '1px dashed #848484',
     padding: '65px 10px 55px 10px',
     background: '#20273D',
@@ -31,8 +32,6 @@ export const useStyles = makeStyles()((theme) => ({
   },
   uploadedWrapperHover: {
     '&:hover': {
-      background: '#262D43',
-      cursor: 'pointer',
       '#replace-message': {
         display: 'block',
       },
