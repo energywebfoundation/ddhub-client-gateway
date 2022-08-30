@@ -14,6 +14,7 @@ export function VersionHistory() {
     isLoading,
     pagination,
     handlePageChange,
+    openTopicDetails,
   } = useVersionHistoryEffects();
 
   return (
@@ -31,6 +32,7 @@ export function VersionHistory() {
           loading={isLoading}
           onPageChange={handlePageChange}
           paginationProps={pagination}
+          onRowClick={openTopicDetails}
         />
       </div>
     </Stack>

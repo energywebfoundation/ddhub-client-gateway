@@ -35,7 +35,7 @@ export const useTopicsEffects = (channelValues: TopicsProps['channelValues']) =>
   const { applications, isLoading: isLoadingApplications } =
     useApplications('user');
 
-  const { topics } = useTopics({ owner: selectedApplication });
+  const { topics, topicsLoading } = useTopics({ owner: selectedApplication });
 
   const channelType = getChannelType(channelValues.channelType);
   const filters = topicsFilters[channelType as ChannelType];
@@ -119,5 +119,6 @@ export const useTopicsEffects = (channelValues: TopicsProps['channelValues']) =>
     topics: availableTopics,
     selectedTopics,
     filterTopics,
+    topicsLoading,
   };
 };

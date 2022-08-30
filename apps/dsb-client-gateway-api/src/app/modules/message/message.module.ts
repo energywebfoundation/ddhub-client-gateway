@@ -9,6 +9,7 @@ import { KeysModule } from '../keys/keys.module';
 import { SecretsEngineModule } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
 import { StorageModule } from '../storage/storage.module';
 import {
+  AcksRepositoryModule,
   FileMetadataRepositoryModule,
   SymmetricKeysRepositoryModule,
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
@@ -52,6 +53,7 @@ import { CertificateModule } from '../certificate/certificate.module';
     DdhubClientGatewayMessageBrokerModule,
     FileMetadataRepositoryModule,
     CertificateModule,
+    AcksRepositoryModule,
   ],
   providers: [
     EventsGateway,
@@ -62,4 +64,4 @@ import { CertificateModule } from '../certificate/certificate.module';
   exports: [MessageService],
   controllers: [MessageControlller],
 })
-export class MessageModule {}
+export class MessageModule { }
