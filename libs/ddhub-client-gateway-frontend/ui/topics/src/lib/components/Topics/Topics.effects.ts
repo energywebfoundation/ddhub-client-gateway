@@ -50,6 +50,7 @@ export const useTopicsEffects = (
         application: application,
         topic,
         showActionButtons: true,
+        isSearch,
       },
     });
   };

@@ -110,7 +110,7 @@ export const useCreateTopicEffects = () => {
   const openCancelModal = async () => {
     hideModal();
     const result = await Swal.fire({
-      title: 'Are you sure?',
+      title: 'Are you sure you want to proceed?',
       text: 'you will close create topic form',
       type: 'warning',
       showCancelButton: true,
