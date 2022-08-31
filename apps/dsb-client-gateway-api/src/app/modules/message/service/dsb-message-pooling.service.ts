@@ -197,7 +197,10 @@ export class DsbMessagePoolingService implements OnModuleInit {
           }
         });
       }
-      const successAckMessageIds: string[] = await this.messageService.sendAckBy(_messages.map((message) => message.id).concat(idsNotAckVerify), clientId);
+      const successAckMessageIds: string[] = await this.messageService.sendAckBy(_messages.map((message) => message.id).concat(idsNotAckVerify), clientId).catch((e) => {
+        this.logger.warn(`[WS][sendMessagesToSubscribers][sendAckBy] ${e}`);
+        return [];
+      });
       const idsNotAck: string[] = messages.filter(e => !successAckMessageIds.includes(e.id)).map(e => e.id);
 
       let saveAcks: AcksEntity[] = [];
@@ -209,7 +212,7 @@ export class DsbMessagePoolingService implements OnModuleInit {
       });
 
       if (idsNotAck.length > 0) {
-        this.acksWrapperRepository.acksRepository.save(saveAcks);
+        this.acksWrapperRepository.acksRepository.save(saveAcks).then();
       }
 
       const deleteAckMessageIds = idsNotAckVerify.filter(e => successAckMessageIds.includes(e));
@@ -217,7 +220,7 @@ export class DsbMessagePoolingService implements OnModuleInit {
         this.acksWrapperRepository.acksRepository.delete({
           messageId: In(deleteAckMessageIds),
           clientId
-        })
+        }).then();
       }
 
     } catch (e) {
