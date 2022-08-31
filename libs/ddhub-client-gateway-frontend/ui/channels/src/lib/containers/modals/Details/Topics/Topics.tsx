@@ -47,8 +47,8 @@ export const Topics: FC<TopicsProps> = ({ topics }) => {
   const noTopic = (
     <Box>
       <Stack>
-        <Typography className={classes.topicLabel} variant="body2">
-          No topic
+        <Typography className={classes.label} variant="body2">
+          -
         </Typography>
       </Stack>
     </Box>

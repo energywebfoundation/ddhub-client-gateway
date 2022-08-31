@@ -18,6 +18,7 @@ import { HeartbeatModule } from './modules/heartbeat/heartbeat.module';
 import { FileMessagesModule } from './modules/files-messages/file-messages.module';
 import { DdhubClientGatewayEventsModule } from '@dsb-client-gateway/ddhub-client-gateway-events';
 import { EnrolmentModule } from './modules/enrolment/enrolment.module';
+import { ChannelModule } from './modules/channel/channel.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { EnrolmentModule } from './modules/enrolment/enrolment.module';
     FileMessagesModule,
     DdhubClientGatewayEventsModule,
     EnrolmentModule,
+    ChannelModule,
   ],
   controllers: [],
   providers: [AppInitService, PrivateKeyWatcherService],

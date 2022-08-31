@@ -15,6 +15,9 @@ export const BASIC_ENVS = Joi.object({
       'Directory where we should store downloaded files for limited time'
     ),
   MTLS_ENABLED: Joi.boolean().default(true).description('Should enable mTLS'),
+  DB_SYNC: Joi.boolean()
+    .default(false)
+    .description('Should generate migrations (dev use only)'),
   DB_NAME: Joi.string()
     .default('postgresql://ddhub:ddhub@localhost:5432/ddhub')
     .description('Database connection string'),

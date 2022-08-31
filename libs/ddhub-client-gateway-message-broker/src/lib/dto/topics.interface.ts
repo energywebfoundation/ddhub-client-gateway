@@ -19,6 +19,7 @@ export interface TopicVersion {
   version: string;
   owner: string;
   name: string;
+  deleted: boolean;
   schemaType: SchemaType;
   tags: string[];
 }
@@ -27,6 +28,7 @@ export interface Topic {
   id: string;
   name: string;
   schemaType: SchemaType;
+  deleted: boolean;
   schema: string;
   version: string;
   owner: string;
@@ -72,3 +74,10 @@ export interface UpdateTopicHistoryDTO {
 
 export type TopicVersionResponse = PaginatedData<TopicVersion>;
 export type TopicDataResponse = PaginatedData<Topic>;
+
+export interface TopicMonitorUpdates {
+  id: string;
+  owner: string;
+  lastTopicUpdate: number;
+  lastTopicVersionUpdate: number;
+}
