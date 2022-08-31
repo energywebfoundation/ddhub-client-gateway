@@ -11,6 +11,7 @@ import {
   Topic,
   TopicCountDto,
   TopicDataResponse,
+  TopicMonitorUpdates,
   TopicVersion,
   TopicVersionResponse,
   UpdateTopicBodyDTO,
@@ -355,6 +356,37 @@ export class DdhubTopicsService extends DdhubBaseService {
     }
   }
 
+  @Span('ddhub_mb_refreshTopicsMonitor')
+  public async topicUpdatesMonitor(
+    owners: string[]
+  ): Promise<TopicMonitorUpdates[]> {
+    try {
+      const result = await this.request<null>(
+        () =>
+          this.httpService.get(`/topics/topicUpdatesMonitor`, {
+            params: {
+              namespaceList: owners,
+            },
+            paramsSerializer: function (params) {
+              return qs.stringify(params, { arrayFormat: 'repeat' });
+            },
+            httpsAgent: this.tlsAgentService.get(),
+            headers: {
+              Authorization: `Bearer ${this.didAuthService.getToken()}`,
+            },
+          }),
+        {
+          stopOnResponseCodes: [MessageBrokerErrors.UNAUTHORIZED_ACCESS],
+        }
+      );
+
+      return result.data;
+    } catch (e) {
+      this.logger.error(`get topics monitor failed`, e);
+      throw e;
+    }
+  }
+
   @Span('ddhub_mb_getTopicVersions')
   public async getTopicVersions(
     topicId: string
@@ -386,7 +418,8 @@ export class DdhubTopicsService extends DdhubBaseService {
     name: string,
     applicationNameSpace: string,
     page: number,
-    tags: string[]
+    tags: string[],
+    includeDeleted = true
   ): Promise<TopicDataResponse> {
     //replacing double quotes in order to pass correct input to MB
     const owner = applicationNameSpace.replace(/"/g, '');
@@ -401,6 +434,7 @@ export class DdhubTopicsService extends DdhubBaseService {
               owner,
               page,
               tags,
+              includeDeleted: includeDeleted ? 'true' : 'false',
             },
             httpsAgent: this.tlsAgentService.get(),
             headers: {

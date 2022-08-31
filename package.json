@@ -18,6 +18,7 @@
     "test:e2e:api": "./test-prepare.sh && nx test dsb-client-gateway-api-e2e",
     "commit": "git-cz",
     "start": "nx serve",
+    "start:prod": "npm run migrations:run && node dist/apps/dsb-client-gateway-api/main.js",
     "start:ui": "wait-on tcp:3333 && nx serve",
     "start:api": "nx serve dsb-client-gateway-api",
     "build:scheduler": "nx build dsb-client-gateway-scheduler",
