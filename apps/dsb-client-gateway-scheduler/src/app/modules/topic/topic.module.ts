@@ -3,9 +3,11 @@ import { TopicRefreshService } from './service/topic-refresh.service';
 import {
   ApplicationRepositoryModule,
   CronRepositoryModule,
+  TopicMonitorRepositoryModule,
   TopicRepositoryModule,
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
 import { DdhubClientGatewayMessageBrokerModule } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
+import { CqrsModule } from '@nestjs/cqrs';
 
 @Module({
   imports: [
@@ -13,6 +15,8 @@ import { DdhubClientGatewayMessageBrokerModule } from '@dsb-client-gateway/ddhub
     CronRepositoryModule,
     ApplicationRepositoryModule,
     DdhubClientGatewayMessageBrokerModule,
+    CqrsModule,
+    TopicMonitorRepositoryModule,
   ],
   providers: [TopicRefreshService],
 })
