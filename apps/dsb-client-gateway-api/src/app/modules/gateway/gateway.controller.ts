@@ -9,6 +9,7 @@ import { ConfigService } from '@nestjs/config';
 import { CertificateService } from '../certificate/service/certificate.service';
 import { HealthController } from '../health/health.controller';
 import { IamService } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
+import { DdhubHealthService } from 'libs/ddhub-client-gateway-message-broker/src/lib/services/ddhub-health.service';
 
 @Controller('gateway')
 @UseGuards(DigestGuard)
@@ -16,7 +17,7 @@ import { IamService } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
 export class GatewayController {
   constructor(
     protected readonly configService: ConfigService,
-    protected readonly healthService: HealthController,
+    protected readonly healthService: DdhubHealthService,
     protected readonly certificateService: CertificateService,
     protected readonly iamService: IamService
   ) {}
@@ -32,12 +33,12 @@ export class GatewayController {
     description: 'Unauthorized',
   })
   public async get(): Promise<GatewayResponseDto> {
-    const health = await this.healthService.check();
+    const health = await this.healthService.health();
 
     return {
       did: this.iamService.getDIDAddress(),
       messageBrokerStatus:
-        health.messageBroker.statusCode === 200
+        health.statusCode === 200
           ? MessageBrokerStatus.OK
           : MessageBrokerStatus.ERROR,
       mtlsIsValid: this.configService.get<boolean>('MTLS_ENABLED')

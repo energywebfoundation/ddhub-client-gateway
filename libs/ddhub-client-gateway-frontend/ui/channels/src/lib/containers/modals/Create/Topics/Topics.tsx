@@ -30,6 +30,8 @@ export const Topics = ({
     selectedTopics,
     removeSelectedTopic,
     filterTopics,
+    selectedApplication,
+    topicsLoading,
   } = useTopicsEffects(channelValues);
 
   return (
@@ -70,6 +72,18 @@ export const Topics = ({
             label="Add topic"
             wrapperProps={{ mb: 1.2 }}
           />
+        )}
+
+        {topicsLoading && (
+          <Typography className={classes.label}>
+            Loading topics
+          </Typography>
+        )}
+
+        {(!topics.length && selectedApplication && !topicsLoading) && (
+          <Typography className={classes.label}>
+            No topics found
+          </Typography>
         )}
 
         <Typography className={classes.label}>

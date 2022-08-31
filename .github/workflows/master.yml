@@ -206,7 +206,7 @@ jobs:
         with:
           command: app set ddhub-gateway-demo-1
           options: -p ddhub-client-gateway-api.image.tag=${{needs.semantic-version.outputs.new_version}}
-          
+
       - name: ArgoCD overwrite QA image tag
         uses: clowdhaus/argo-cd-action/@v1.12.1
         id: argocd_image_tag_overwrite_qa_api
@@ -232,6 +232,19 @@ jobs:
     name: Build Frontend
     runs-on: ubuntu-latest
     needs: [cancel-previous, semantic-version]
+    services:
+      postgres:
+        image: postgres
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_PASSWORD: ddhub
+          POSTGRES_USER: ddhub
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - uses: actions/checkout@v2
         with:
@@ -257,6 +270,8 @@ jobs:
         run: npm ci
       - name: Build
         run: npm run export
+        env:
+          DB_NAME: postgresql://ddhub:ddhub@localhost:5432/ddhub
 
       - name: 'Login via Azure CLI'
         uses: azure/login@v1
