@@ -8,15 +8,15 @@ import { DdhubHealthService } from 'libs/ddhub-client-gateway-message-broker/src
 @UseGuards(DigestGuard)
 @ApiTags('Health')
 export class HealthController {
-  constructor(protected readonly healthService: DdhubHealthService) {}
+  constructor() {}
 
   @Get()
   @HealthCheck()
   public async check(): Promise<{
-    messageBroker: { statusCode: number; message?: string };
+    message: boolean;
   }> {
     return {
-      messageBroker: await this.healthService.health(),
+      message: true,
     };
   }
 }
