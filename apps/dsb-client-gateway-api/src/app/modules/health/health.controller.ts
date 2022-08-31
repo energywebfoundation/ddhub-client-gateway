@@ -2,7 +2,6 @@ import { Controller, Get, Logger, UseGuards } from '@nestjs/common';
 import { HealthCheck } from '@nestjs/terminus';
 import { DigestGuard } from '../utils/guards/digest.guard';
 import { ApiTags } from '@nestjs/swagger';
-import { DdhubHealthService } from 'libs/ddhub-client-gateway-message-broker/src/lib/services/ddhub-health.service';
 
 @Controller('health')
 @UseGuards(DigestGuard)
@@ -13,10 +12,10 @@ export class HealthController {
   @Get()
   @HealthCheck()
   public async check(): Promise<{
-    message: boolean;
+    message: string;
   }> {
     return {
-      message: true,
+      message: 'OK',
     };
   }
 }
