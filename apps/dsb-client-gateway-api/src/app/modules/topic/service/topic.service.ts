@@ -22,7 +22,7 @@ export class TopicService {
   constructor(
     protected readonly wrapper: TopicRepositoryWrapper,
     protected readonly applicationsWrapper: ApplicationWrapperRepository
-  ) { }
+  ) {}
 
   public async getOne(
     name: string,
@@ -65,15 +65,17 @@ export class TopicService {
     limit: number,
     page: number
   ) {
-    const topics =
-      await this.wrapper.topicRepository.getTopicsAndCountSearch(
-        limit,
-        keyword,
-        owner,
-        page
-      );
+    const topics = await this.wrapper.topicRepository.getTopicsAndCountSearch(
+      limit,
+      keyword,
+      owner,
+      page
+    );
 
-    const allCount = await this.wrapper.topicRepository.getTopicsCountSearch(keyword, owner);
+    const allCount = await this.wrapper.topicRepository.getTopicsCountSearch(
+      keyword,
+      owner
+    );
 
     return {
       limit,
@@ -85,15 +87,6 @@ export class TopicService {
 
   @Span('topics_saveTopic')
   public async saveTopic(data: PostTopicDto): Promise<void> {
-    await this.applicationsWrapper.repository.update(
-      {
-        namespace: data.owner,
-      },
-      {
-        topicsCount: () => '"topicsCount" + 1',
-      }
-    );
-
     await this.wrapper.topicRepository.save({
       id: data.id,
       owner: data.owner,
@@ -165,15 +158,6 @@ export class TopicService {
         ...{ id },
         ...(versionNumber ? { version: versionNumber } : null),
       });
-
-      await this.applicationsWrapper.repository.update(
-        {
-          namespace: data.owner,
-        },
-        {
-          topicsCount: () => '"topicsCount" - 1',
-        }
-      );
     }
   }
 
