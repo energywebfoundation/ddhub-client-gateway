@@ -132,6 +132,11 @@ export class TopicRefreshService implements OnApplicationBootstrap {
               new TopicDeletedCommand(topic.name, topic.owner)
             );
 
+            await this.wrapper.topicRepository.delete({
+              owner: topic.owner,
+              name: topic.name,
+            });
+
             continue;
           }
 
