@@ -8,7 +8,7 @@ import { TMessage } from './Messages.type';
 export interface MessageProps {
   headers: TableHeader[];
   actions?: TTableComponentAction<TMessage>[];
-  openDetailsModal: (message: TMessage) => void;
+  openDetailsModal?: (message: TMessage) => void;
 }
 
 export const Messages: FC<MessageProps> = ({ actions, headers, openDetailsModal }) => {
