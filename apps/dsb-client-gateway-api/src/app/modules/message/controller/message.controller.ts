@@ -28,6 +28,9 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { Readable } from 'stream';
 import { MtlsGuard } from '../../certificate/guards/mtls.guard';
 import { PinoLogger } from 'nestjs-pino';
+import { ReqLockService } from '../service/req-lock.service';
+import { ReqLockExistsException } from '../exceptions/req-lock-exists.exception';
+import { GetMessageResponse } from '../message.interface';
 
 @Controller('messages')
 @UseGuards(DigestGuard, MtlsGuard)
@@ -36,6 +39,7 @@ export class MessageControlller {
   private readonly logger = new Logger();
   constructor(
     protected readonly messageService: MessageService,
+    protected readonly reqLockService: ReqLockService,
     protected readonly pinoLogger: PinoLogger
   ) {}
 
@@ -66,7 +70,28 @@ export class MessageControlller {
       topicOwner: dto.topicOwner,
     });
 
-    return this.messageService.getMessages(dto);
+    try {
+      await this.reqLockService.attemptLock(dto.fqcn, dto.clientId);
+
+      const messages: GetMessageResponse[] =
+        await this.messageService.getMessages(dto);
+
+      await this.reqLockService.clearLock(dto.fqcn, dto.clientId);
+
+      return messages;
+    } catch (e) {
+      if (e instanceof ReqLockExistsException) {
+        return [];
+      }
+
+      await this.reqLockService.clearLock(dto.fqcn, dto.clientId);
+
+      this.logger.error(`something went wrong when fetching messages`);
+
+      this.logger.error(e);
+
+      throw e;
+    }
   }
 
   @Get('/download')
