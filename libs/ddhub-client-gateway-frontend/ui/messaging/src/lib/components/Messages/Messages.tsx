@@ -8,9 +8,10 @@ import { TMessage } from './Messages.type';
 export interface MessageProps {
   headers: TableHeader[];
   actions?: TTableComponentAction<TMessage>[];
+  openDetailsModal: (message: TMessage) => void;
 }
 
-export const Messages: FC<MessageProps> = ({ actions, headers }) => {
+export const Messages: FC<MessageProps> = ({ actions, headers, openDetailsModal }) => {
   const { channel, topic, messages, loading } = useMessagesEffects();
 
   return (
@@ -24,6 +25,7 @@ export const Messages: FC<MessageProps> = ({ actions, headers }) => {
           actions={actions}
           showSearch={false}
           loadingRows={2}
+          onRowClick={openDetailsModal}
         />
       </Box>
     </Stack>
