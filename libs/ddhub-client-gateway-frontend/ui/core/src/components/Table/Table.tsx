@@ -85,7 +85,7 @@ export function GenericTable<T>({
           { backendSearch ? (
             <Search filter={globalFilter} onSearchInput={handleSearchInput} debounceTime={500} />
           ) : (
-            <Search filter={globalFilter} setFilter={setGlobalFilter} />
+            <Search filter={globalFilter} setFilter={setGlobalFilter} tableRows={tableRows}/>
           )}
           {children}
         </Box>
