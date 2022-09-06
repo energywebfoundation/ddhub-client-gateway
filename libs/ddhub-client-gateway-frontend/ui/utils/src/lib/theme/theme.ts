@@ -71,6 +71,15 @@ const dsbTheme: ThemeOptions = {
       fontWeight: 400,
     },
   },
+  breakpoints: {
+    values: {
+      xs: 0,
+      sm: 600,
+      md: 1024, // only this and above is supported
+      lg: 1200,
+      xl: 1536,
+    },
+  },
   components: {
     // Name of the component
     MuiCssBaseline: {

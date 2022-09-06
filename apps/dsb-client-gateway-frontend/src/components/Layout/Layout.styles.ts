@@ -1,9 +1,12 @@
 import { makeStyles } from 'tss-react/mui';
 
-export const useStyles = makeStyles()({
+export const useStyles = makeStyles()((theme) => ({
   root: {
     display: 'flex',
-    padding: '15px 28px 28px'
+    padding: '15px 28px 28px',
+    [theme.breakpoints.down('md')]: {
+      display: 'none',
+    },
   },
   content: {
     flexGrow: 1
@@ -13,4 +16,4 @@ export const useStyles = makeStyles()({
     marginLeft: 'auto',
     marginRight: 'auto',
   },
-});
+}));
