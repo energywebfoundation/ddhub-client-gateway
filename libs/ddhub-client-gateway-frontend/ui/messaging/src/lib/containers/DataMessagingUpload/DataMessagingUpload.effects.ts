@@ -64,9 +64,7 @@ export const useDataMessagingUploadEffects = ({
     ? FileType[selectedTopicWithSchema?.schemaType]
     : ('json' as TFileType);
   const maxFileSize = isLarge ? MAX_FILE_SIZE : MIN_FILE_SIZE;
-  const fileSizeInfo = isLarge
-    ? `${uploadFileType} size ${bytesToMegaBytes(MAX_FILE_SIZE)}mb.`
-    : `${uploadFileType} size ${bytesToMegaBytes(MIN_FILE_SIZE)}mb.`;
+  const fileSizeInfo = `Max file size: ${isLarge ? bytesToMegaBytes(MAX_FILE_SIZE) : bytesToMegaBytes(MIN_FILE_SIZE)}mb`;
 
   const topicsOptions =
     topics.map((topic) => ({
