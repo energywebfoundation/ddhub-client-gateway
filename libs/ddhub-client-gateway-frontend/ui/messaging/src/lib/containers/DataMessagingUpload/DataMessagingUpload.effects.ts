@@ -83,11 +83,12 @@ export const useDataMessagingUploadEffects = ({
   ) => {
     if (newInputValue === null) {
       setSelectedChannel('');
-      setSelectedTopic('');
-      setSelectedTopicVersion('');
     } else {
       setSelectedChannel(newInputValue?.value);
     }
+
+    setSelectedTopic('');
+    setSelectedTopicVersion('');
   };
 
   const onTopicChange = (
