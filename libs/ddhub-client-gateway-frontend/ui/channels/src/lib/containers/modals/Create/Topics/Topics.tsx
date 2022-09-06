@@ -57,7 +57,7 @@ export const Topics = ({
             options={topics}
             renderOption={(props, option) => (
               <TopicItem
-                key={option.topicName}
+                key={option.id}
                 option={option}
                 listProps={props}
               />

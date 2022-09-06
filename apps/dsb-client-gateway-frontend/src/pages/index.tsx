@@ -2,61 +2,66 @@ import { makeStyles } from 'tss-react/mui';
 import { Grid, Stack, Typography } from '@mui/material';
 import React from 'react';
 import { Login } from '@ddhub-client-gateway-frontend/ui/login';
+import { MobileUnsupported } from '../components/MobileUnsupported/MobileUnsupported';
 
 export default function Index() {
   const { classes } = useStyles();
 
   return (
-    <Grid
-      container
-      alignItems="stretch"
-      style={{ height: '100%', flexWrap: 'nowrap' }}
-    >
-      <Grid item className={classes.leftSide}>
-        <img src="/dots.png" alt="dots" className={classes.dots} />
-        <Stack
-          style={{ height: '100%' }}
-          direction="column"
-          justifyContent="space-between"
-          alignItems="flex-start"
-          spacing={2}
-        >
-          <div>
-            <img src="ew-flex-logo.png" alt="logo" className={classes.logo} />
-          </div>
-          <Grid
-            container
-            style={{
-              marginBottom: '70px',
-              paddingLeft: '27px',
-              paddingRight: '50%',
-            }}
-          >
-            <Grid item>
-              <Typography className={classes.mainLabel}>
-                Powering the <br />
-                <span className={classes.underline}>Zero Carbon</span> Economy
-              </Typography>
-              <Typography className={classes.subLabel}>
-                We deploy digital operating systems for energy grids with our
-                global community of more than 100 energy market participants.
-                These systems make it simple, secure, and efficient for clean
-                energy assets to support the grid of the future.
-              </Typography>
-            </Grid>
-          </Grid>
-        </Stack>
-      </Grid>
+    <>
       <Grid
-        item
-        justifyContent="center"
-        alignItems="center"
-        className={classes.loginDiv}
-        maxWidth={518}
+        className={classes.root}
+        container
+        alignItems="stretch"
+        style={{ height: '100%', flexWrap: 'nowrap' }}
       >
-        <Login />
+        <Grid item className={classes.leftSide}>
+          <img src="/dots.png" alt="dots" className={classes.dots} />
+          <Stack
+            style={{ height: '100%' }}
+            direction="column"
+            justifyContent="space-between"
+            alignItems="flex-start"
+            spacing={2}
+          >
+            <div>
+              <img src="ew-flex-logo.png" alt="logo" className={classes.logo} />
+            </div>
+            <Grid
+              container
+              style={{
+                marginBottom: '70px',
+                paddingLeft: '27px',
+                paddingRight: '50%',
+              }}
+            >
+              <Grid item>
+                <Typography className={classes.mainLabel}>
+                  Powering the <br />
+                  <span className={classes.underline}>Zero Carbon</span> Economy
+                </Typography>
+                <Typography className={classes.subLabel}>
+                  We deploy digital operating systems for energy grids with our
+                  global community of more than 100 energy market participants.
+                  These systems make it simple, secure, and efficient for clean
+                  energy assets to support the grid of the future.
+                </Typography>
+              </Grid>
+            </Grid>
+          </Stack>
+        </Grid>
+        <Grid
+          item
+          justifyContent="center"
+          alignItems="center"
+          className={classes.loginDiv}
+          maxWidth={518}
+        >
+          <Login />
+        </Grid>
       </Grid>
-    </Grid>
+      <MobileUnsupported />
+    </>
   );
 }
 
@@ -64,6 +69,11 @@ Index.getLayout = function getLayout(page) {
   return page;
 };
 const useStyles = makeStyles()((theme) => ({
+  root: {
+    [theme.breakpoints.down('md')]: {
+      display: 'none',
+    },
+  },
   leftSide: {
     backgroundImage: 'url(../initial-background.png)',
     backgroundRepeat: 'no-repeat',
