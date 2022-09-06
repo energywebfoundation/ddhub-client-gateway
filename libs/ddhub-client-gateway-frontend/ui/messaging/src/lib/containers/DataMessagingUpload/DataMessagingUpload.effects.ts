@@ -97,10 +97,11 @@ export const useDataMessagingUploadEffects = ({
   ) => {
     if (newInputValue === null) {
       setSelectedTopic('');
-      setSelectedTopicVersion('');
     } else {
       setSelectedTopic(newInputValue?.value);
     }
+
+    setSelectedTopicVersion('');
   };
 
   const onTopicVersionChange = (
