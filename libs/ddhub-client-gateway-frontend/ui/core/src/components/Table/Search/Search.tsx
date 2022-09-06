@@ -15,6 +15,7 @@ export interface SearchProps {
   setFilter?: (value: string) => void;
   onSearchInput?: (value: string) => void;
   debounceTime?: number;
+  tableRows?: any[];
 }
 
 export const Search = memo((props: SearchProps) => {
