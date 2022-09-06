@@ -117,7 +117,7 @@ export const useStyles = makeStyles()((theme) => ({
     fontFamily: theme.typography.body2.fontFamily,
     marginBottom: 8,
   },
-  noOptions: {
+  altOption: {
     fontSize: 14,
     lineHeight: '21px',
     fontWeight: 400,

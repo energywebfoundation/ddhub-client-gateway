@@ -76,7 +76,8 @@ export const Autocomplete: FC<AutocompleteProps> = ({
           option: classes.menuItem,
           listbox: classes.listBox,
           paper: classes.paper,
-          noOptions: classes.noOptions,
+          noOptions: classes.altOption,
+          loading: classes.altOption,
         }}
         renderInput={(params) => (
           <TextField
