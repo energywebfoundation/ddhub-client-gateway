@@ -10,6 +10,7 @@ import {
   EventsEntity,
   FileMetadataEntity,
   IdentityEntity,
+  ReqLockEntity,
   SymmetricKeysEntity,
   TopicEntity,
 } from './module';
@@ -29,6 +30,7 @@ const ENTITIES = [
   EventsEntity,
   AcksEntity,
   TopicMonitorEntity,
+  ReqLockEntity,
 ];
 
 @Module({

@@ -28,5 +28,6 @@ export const useMessagesContainerEffects = () => {
 
   return {
     actions,
+    openDetailsModal,
   };
 };
