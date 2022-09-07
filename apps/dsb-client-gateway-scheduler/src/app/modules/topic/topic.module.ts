@@ -8,6 +8,7 @@ import {
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
 import { DdhubClientGatewayMessageBrokerModule } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
 import { CqrsModule } from '@nestjs/cqrs';
+import { DeleteOldTopicsService } from './service/delete-old-topics.service';
 
 @Module({
   imports: [
@@ -18,6 +19,6 @@ import { CqrsModule } from '@nestjs/cqrs';
     CqrsModule,
     TopicMonitorRepositoryModule,
   ],
-  providers: [TopicRefreshService],
+  providers: [TopicRefreshService, DeleteOldTopicsService],
 })
 export class TopicModule {}
