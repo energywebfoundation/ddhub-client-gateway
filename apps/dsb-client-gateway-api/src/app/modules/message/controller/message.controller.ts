@@ -28,7 +28,6 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { Readable } from 'stream';
 import { MtlsGuard } from '../../certificate/guards/mtls.guard';
 import { PinoLogger } from 'nestjs-pino';
-
 @Controller('messages')
 @UseGuards(DigestGuard, MtlsGuard)
 @ApiTags('Messaging')
@@ -37,7 +36,7 @@ export class MessageControlller {
   constructor(
     protected readonly messageService: MessageService,
     protected readonly pinoLogger: PinoLogger
-  ) {}
+  ) { }
 
   @Get('/')
   @ApiResponse({
@@ -66,7 +65,7 @@ export class MessageControlller {
       topicOwner: dto.topicOwner,
     });
 
-    return this.messageService.getMessages(dto);
+    return this.messageService.getMessagesWithReqLock(dto);
   }
 
   @Get('/download')

@@ -46,7 +46,7 @@ export class PrivateKeyWatcherService implements OnApplicationBootstrap {
       }
     );
 
-    await this.schedulerRegistry.addCronJob(CronJobType.PRIVATE_KEY, cronJob);
+    this.schedulerRegistry.addCronJob(CronJobType.PRIVATE_KEY, cronJob);
 
     cronJob.start();
   }
@@ -55,7 +55,7 @@ export class PrivateKeyWatcherService implements OnApplicationBootstrap {
     try {
       const privateKey: string = await this.secretsEngine.getPrivateKey();
 
-      const wallet: Wallet = await this.ethersService.getWalletFromPrivateKey(
+      const wallet: Wallet = this.ethersService.getWalletFromPrivateKey(
         privateKey
       );
 

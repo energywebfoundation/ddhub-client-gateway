@@ -48,6 +48,8 @@ import { FileSizeException } from '../exceptions/file-size.exception';
 import { join } from 'path';
 import { FileTypeNotSupportedException } from '../exceptions/file-type-not-supported.exception';
 import { MessageSignatureNotValidException } from '../exceptions/messages-signature-not-valid.exception';
+import { ReqLockExistsException } from '../exceptions/req-lock-exists.exception';
+import { ReqLockService } from './req-lock.service';
 
 export enum EventEmitMode {
   SINGLE = 'SINGLE',
@@ -72,7 +74,8 @@ export class MessageService {
     protected readonly keyService: KeysService,
     protected readonly ddhubMessageService: DdhubMessagesService,
     protected readonly ddhubFilesService: DdhubFilesService,
-    protected readonly fileMetadataWrapper: FileMetadataWrapperRepository
+    protected readonly fileMetadataWrapper: FileMetadataWrapperRepository,
+    protected readonly reqLockService: ReqLockService,
   ) {
     this.uploadPath = configService.get<string>('UPLOAD_FILES_DIR');
     this.downloadPath = configService.get<string>('DOWNLOAD_FILES_DIR');
@@ -381,21 +384,50 @@ export class MessageService {
   }
 
   @Span('message_sendAckBy')
-  public async sendAckBy(messageIds: string[], clientId: string): Promise<string[]> {
+  public async sendAckBy(
+    messageIds: string[],
+    clientId: string
+  ): Promise<string[]> {
     this.logger.log(messageIds);
-    const successAckMessageIds: string[] = await this.ddhubMessageService.messagesAckBy(messageIds, clientId);
+    const successAckMessageIds: string[] =
+      await this.ddhubMessageService.messagesAckBy(messageIds, clientId);
     return successAckMessageIds;
   }
 
+  @Span('message_getMessages_reqLock')
+  public async getMessagesWithReqLock(
+    { fqcn, from, amount, topicName, topicOwner, clientId }: GetMessagesDto,
+    ack: boolean | undefined = true
+  ): Promise<GetMessageResponse[]> {
+    try {
+      await this.reqLockService.attemptLock(clientId, fqcn);
+
+      const messages: GetMessageResponse[] =
+        await this.getMessages({ fqcn, from, amount, topicName, topicOwner, clientId }, ack);
+
+      await this.reqLockService.clearLock(clientId, fqcn);
+
+      return messages;
+    } catch (e) {
+      if (e instanceof ReqLockExistsException) {
+        return [];
+      }
+
+      await this.reqLockService.clearLock(clientId, fqcn);
+
+      this.logger.error(`something went wrong when fetching messages`);
+
+      this.logger.error(e);
+
+      throw e;
+    }
+  }
+
   @Span('message_getMessages')
-  public async getMessages({
-    fqcn,
-    from,
-    amount,
-    topicName,
-    topicOwner,
-    clientId,
-  }: GetMessagesDto, ack: boolean | undefined = true): Promise<GetMessageResponse[]> {
+  public async getMessages(
+    { fqcn, from, amount, topicName, topicOwner, clientId }: GetMessagesDto,
+    ack: boolean | undefined = true
+  ): Promise<GetMessageResponse[]> {
     const loggerContextKey: string = `${MessageService.name}_${fqcn}_${topicName}_${topicOwner}_${clientId};`;
 
     const messageLoggerContext = new Logger(loggerContextKey);
@@ -464,7 +496,8 @@ export class MessageService {
     messageLoggerContext.log(
       '[getMessages] Returned processed messages',
       messageResponses
-    ); let fulfilledMessages = messageResponses
+    );
+    let fulfilledMessages = messageResponses
       .map((message) => (message.status === 'fulfilled' ? message.value : null))
       .filter(
         (message: GetMessageResponse | null) => !!message
@@ -475,8 +508,13 @@ export class MessageService {
     );
 
     if (ack) {
-      const successAckMessageIds: string[] = await this.sendAckBy(fulfilledMessages.map((message) => message.id), `${clientId}:${fqcn}`);
-      fulfilledMessages = fulfilledMessages.filter(msg => successAckMessageIds.includes(msg.id));
+      const successAckMessageIds: string[] = await this.sendAckBy(
+        fulfilledMessages.map((message) => message.id),
+        `${clientId}:${fqcn}`
+      );
+      fulfilledMessages = fulfilledMessages.filter((msg) =>
+        successAckMessageIds.includes(msg.id)
+      );
     }
 
     return fulfilledMessages.sort((a, b) => {
