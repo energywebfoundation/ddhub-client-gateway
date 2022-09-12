@@ -143,7 +143,7 @@ export class DsbMessagePoolingService implements OnModuleInit {
     let msgCount = 0;
     for (const subscription of subscriptions) {
       try {
-        const messages: GetMessageResponse[] = await this.messageService.getMessages(
+        const messages: GetMessageResponse[] = await this.messageService.getMessagesWithReqLock(
           {
             fqcn: subscription.fqcn,
             from: undefined,
