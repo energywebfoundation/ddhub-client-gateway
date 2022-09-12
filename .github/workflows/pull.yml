@@ -1,0 +1,8 @@
+name: Pull Request
+
+on:
+  pull_request:
+
+jobs:
+  BuildAPI:
+    uses: ./.github/workflows/build_api.yml

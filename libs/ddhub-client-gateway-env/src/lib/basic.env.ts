@@ -14,6 +14,9 @@ export const BASIC_ENVS = Joi.object({
     .description(
       'Directory where we should store downloaded files for limited time'
     ),
+  LOG_PRETTY: Joi.boolean()
+    .default(false)
+    .description('Should colorize logs, only use in dev mode'),
   MTLS_ENABLED: Joi.boolean().default(true).description('Should enable mTLS'),
   DB_SYNC: Joi.boolean()
     .default(false)
