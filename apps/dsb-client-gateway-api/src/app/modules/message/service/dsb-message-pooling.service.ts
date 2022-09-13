@@ -3,6 +3,7 @@ import { AcksEntity, AcksWrapperRepository, ChannelEntity } from '@dsb-client-ga
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { SchedulerRegistry } from '@nestjs/schedule';
+import moment from 'moment';
 import { Span } from 'nestjs-otel';
 import { In } from 'typeorm';
 import { ChannelType } from '../../channel/channel.const';
@@ -201,18 +202,16 @@ export class DsbMessagePoolingService implements OnModuleInit {
         this.logger.warn(`[WS][sendMessagesToSubscribers][sendAckBy] ${e}`);
         return [];
       });
-      const idsNotAck: string[] = messages.filter(e => !successAckMessageIds.includes(e.id)).map(e => e.id);
-
-      let saveAcks: AcksEntity[] = [];
-      idsNotAck.forEach(messageId => {
-        const ack = new AcksEntity();
-        ack.clientId = clientId;
-        ack.messageId = messageId;
-        saveAcks.push(ack);
+      const idsNotAck: AcksEntity[] = messages.filter(e => !successAckMessageIds.includes(e.id)).map(e => {
+        return {
+          clientId: clientId,
+          messageId: e.id,
+          mbTimestamp: moment(e.timestampNanos / (1000 * 1000)).utc().toDate()
+        }
       });
 
       if (idsNotAck.length > 0) {
-        this.acksWrapperRepository.acksRepository.save(saveAcks).then();
+        this.acksWrapperRepository.acksRepository.save(idsNotAck).then();
       }
 
       const deleteAckMessageIds = idsNotAckVerify.filter(e => successAckMessageIds.includes(e));
