@@ -16,6 +16,12 @@ export const SCHEDULER_ENVS = Joi.object({
   CHANNEL_DID_CRON_ENABLED: Joi.boolean()
     .default(true)
     .description('Should poll for channel DIDs'),
+  MESSAGE_CLEANER_CRON_ENABLED: Joi.boolean()
+    .default(true)
+    .description('Should clean symmetric keys'),
+  MESSAGE_CLEANER_CRON_SCHEDULE: Joi.string()
+    .default('*/1 * * * *')
+    .description('How often should clean messages data'),
   SYMMETRIC_KEYS_CRON_SCHEDULE: Joi.string()
     .default('*/1 * * * *')
     .description('How often should poll for symmetric keys'),
