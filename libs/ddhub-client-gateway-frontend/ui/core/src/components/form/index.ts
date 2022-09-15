@@ -6,3 +6,4 @@ export * from './FormRadio/FormRadio';
 export * from './Autocomplete';
 export * from './TextField';
 export * from './UploadInput';
+export * from './FormRadioBox/FormRadioBox';
