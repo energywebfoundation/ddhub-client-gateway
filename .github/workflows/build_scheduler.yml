@@ -1,8 +1,9 @@
-name: Lint Commit Messages
+name: Bulild Scheduler
 on: [workflow_call]
 
 jobs:
-  commitlint:
+  build-scheduler:
+    name: Build Scheduler
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -23,9 +24,9 @@ jobs:
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
             ${{ runner.os }}-
-      - name: Install NPM
-        run: npm install -g npm@8.5.0
-      - run: npm install
-      - uses: wagoid/commitlint-github-action@v4
-        env:
-          NODE_PATH: ${{ github.workspace }}/node_modules
+      - name: Install NX, NPM
+        run: npm install -g nx npm@8.5.0
+      - name: Install dependencies
+        run: npm ci
+      - name: Build
+        run: nx build dsb-client-gateway-scheduler

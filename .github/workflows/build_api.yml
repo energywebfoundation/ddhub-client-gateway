@@ -1,6 +1,15 @@
 on:
   workflow_call:
-
+    secrets:
+      ONEPASSWORD_VAULT_ID:
+        required: true
+        description: 1Password Vault ID
+      ONEPASSWORD_HOST:
+        required: true
+        description: 1Password Host
+      ONEPASSWORD_TOKEN:
+        required: true
+        description: 1Password JWT
 
 jobs:
   build-api:
@@ -29,7 +38,49 @@ jobs:
         run: npm install -g nx npm@8.5.0
       - name: Install dependencies
         run: npm ci
+      - name: Run SPEC tests
+        run: npm run test:spec:api
+      - name: Start containers
+        run: docker-compose -f "ci/docker-compose.yml" up -d --build
+      - name: Sleep for 10 seconds
+        run: sleep 10s
+        shell: bash
       - name: Build
         run: nx build dsb-client-gateway-api --prod
       - name: Build migrations
         run: npm run migrations:build
+      - name: Run migrations
+        run: npm run migrations:run
+        env:
+          DB_NAME: "postgresql://ddhub:ddhub@localhost:5432/ddhub"
+      - name: Prepare Vault KV Engine
+        run: docker-compose -f ci/docker-compose.yml exec -T vault_dev sh -c "vault secrets enable -version=1 -path=ddhub -address="http://localhost:8200" kv" || true
+      - name: Run E2E tests
+        env:
+          DB_NAME: "postgresql://ddhub:ddhub@localhost:5432/ddhub"
+          NODE_ENV: development
+          DSB_BASE_URL: "https://ddhub-dev.energyweb.org"
+          BACKEND_API_URL: "http://localhost:3333"
+          CACHE_SERVER_URL: "https://identitycache-dev.energyweb.org/v1"
+          EVENT_SERVER_URL: "https://identityevents-dev.energyweb.org"
+          SECRETS_ENGINE: "vault"
+          WEBSOCKET: "NONE"
+          WEBSOCKET_URL: "ws://localhost:8080"
+          VAULT_ENDPOINT: "http://localhost:8200"
+          VAULT_TOKEN: "root"
+          PORT: 3333
+          NEXT_PUBLIC_SENTRY_ENABLED: false
+          NEXT_PUBLIC_SERVER_BASE_URL: "http://localhost:3333"
+          PARENT_NAMESPACE: "ddhub.apps.energyweb.iam.ewc"
+          SCHEDULED_JOBS: false
+          SYMMETRIC_KEY_CLIENT_ID: "christestingsymmetrickeys1"
+          OPENTELEMETRY_ENABLED: false
+          MTLS_ENABLED: false
+          LOG_PRETTY: false
+          ONEPASSWORD_VAULT_ID: ${{ secrets.ONEPASSWORD_VAULT_ID }}
+          ONEPASSWORD_HOST: ${{ secrets.ONEPASSWORD_HOST }}
+          ONEPASSWORD_TOKEN: ${{ secrets.ONEPASSWORD_TOKEN }}
+        run: npm run test:e2e:api
+      - name: Stop containers
+        if: always()
+        run: docker-compose -f "docker-compose.yml" down

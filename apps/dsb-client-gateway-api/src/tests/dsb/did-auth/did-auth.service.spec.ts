@@ -1,7 +1,9 @@
-import { DidAuthService } from '../../../app/modules/dsb-client/module/did-auth/service/did-auth.service';
+import {
+  DidAuthApiService,
+  DidAuthService,
+} from '@dsb-client-gateway/ddhub-client-gateway-did-auth';
+import { EthersService } from '@dsb-client-gateway/ddhub-client-gateway-utils';
 import { Test, TestingModule } from '@nestjs/testing';
-import { DidAuthApiService } from '../../../app/modules/dsb-client/module/did-auth/service/did-auth-api.service';
-import { EthersService } from '../../../app/modules/utils/service/ethers.service';
 
 const mockedDidAuthApiService = {
   refreshToken: jest.fn(),

@@ -55,13 +55,16 @@ describe('Identity Feature', () => {
           .send({
             privateKey: invalidPrivateKey,
           })
-          .expect(HttpStatus.BAD_REQUEST)
           .expect(({ body }) => {
             response = body;
           });
       });
 
-      then('I should get validation error', () => {});
+      then('I should get validation error', () => {
+        console.log(response);
+
+        response = null;
+      });
     });
 
     test('No private key', ({ given, when, then }) => {

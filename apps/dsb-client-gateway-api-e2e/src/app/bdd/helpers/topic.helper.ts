@@ -41,25 +41,6 @@ const deleteTopic = async (
       await request(app().getHttpServer()).delete('/topics/' + topic.id);
     }
   }
-
-  // const { body } = await request(app().getHttpServer())
-  //   .get('/topics/search?keyword=' + topicName)
-  //   .expect(({ body }) => {
-  //     console.log(body);
-  //   })
-  //   .expect(HttpStatus.OK);
-  //
-  // if (body.count > 0) {
-  //   for (const topic of body.records) {
-  //     if (topic.name === topicName) {
-  //       await request(app().getHttpServer()).delete('/topics/' + topic.id);
-  //
-  //       console.debug(`topic with name ${topicName} deleted`);
-  //     }
-  //   }
-  // } else {
-  //   console.debug('no topics to delete');
-  // }
 };
 
 const createTopic = async (
