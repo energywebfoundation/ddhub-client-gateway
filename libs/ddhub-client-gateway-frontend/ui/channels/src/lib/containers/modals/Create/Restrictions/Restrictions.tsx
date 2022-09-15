@@ -1,24 +1,20 @@
-import { KeyboardEvent } from 'react';
 import {
   Grid,
-  InputAdornment,
   InputLabel,
-  MenuItem,
   Select,
-  SelectChangeEvent,
   Typography,
-  IconButton,
   Box,
 } from '@mui/material';
-import { TextField } from '@ddhub-client-gateway-frontend/ui/core';
-import { Plus, ChevronDown } from 'react-feather';
+import { ChevronDown, Filter } from 'react-feather';
 import { ChannelConditionsDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
-import { RestrictionBox } from './RestrictionBox/RestrictionBox';
 import { RestrictionType } from './models/restriction-type.enum';
 import { ActionButtons } from '../ActionButtons';
 import { TActionButtonsProps } from '../ActionButtons/ActionButtons';
 import { useRestrictionsEffects } from './Restrictions.effects';
 import { useStyles } from './Restrictions.styles';
+import { RestrictionSelect } from './RestrictionSelect/RestrictionSelect';
+import { TextField } from '@ddhub-client-gateway-frontend/ui/core';
+import { RestrictionList } from './RestrictionList/RestrictionList';
 
 export interface RestrictionsProps {
   restrictions: ChannelConditionsDto;
@@ -31,6 +27,7 @@ export const Restrictions = ({
 }: RestrictionsProps) => {
   const {
     type,
+    setType,
     dids,
     roles,
     didInput,
@@ -39,13 +36,19 @@ export const Restrictions = ({
     isRoleValid,
     removeRole,
     removeDID,
-    addRestriction,
-    restrictionTypeChangeHandler,
+    handleClose,
+    handleOpen,
+    open,
+    clear,
+    handleSaveRestriction,
+    handleUpdateRestriction,
     rolesInputChangeHandler,
     didInputChangeHandler,
     restrictionsCount,
+    setRoleInput,
+    setDIDInput,
   } = useRestrictionsEffects(restrictions);
-  const { classes, theme } = useStyles();
+  const { classes } = useStyles();
 
   const selectRoleRestriction = type === RestrictionType.Role && (
     <TextField
@@ -57,26 +60,8 @@ export const Restrictions = ({
       onChange={(event) => {
         rolesInputChangeHandler(event.target.value);
       }}
-      InputProps={{
-        endAdornment: (
-          <InputAdornment position="start">
-            <IconButton
-              sx={{ padding: 0 }}
-              disabled={!roleInput || !isRoleValid}
-              onClick={() => addRestriction(roleInput)}
-            >
-              <Plus color={theme.palette.common.white} size={15} />
-            </IconButton>
-          </InputAdornment>
-        )
-      }}
       error={!isRoleValid}
       helperText={!isRoleValid ? 'Role format is invalid' : ''}
-      onKeyPress={(event: KeyboardEvent<HTMLInputElement>) => {
-        if (event.key === 'Enter') {
-          roleInput && isRoleValid && addRestriction(roleInput);
-        }
-      }}
     />
   );
 
@@ -90,28 +75,38 @@ export const Restrictions = ({
       onChange={(event) => {
         didInputChangeHandler(event.target.value);
       }}
-      InputProps={{
-        endAdornment: (
-          <InputAdornment position="start">
-            <IconButton
-              sx={{ padding: 0 }}
-              disabled={!didInput || !isDIDValid}
-              onClick={() => addRestriction(didInput)}
-            >
-              <Plus color={theme.palette.common.white} size={15} />
-            </IconButton>
-          </InputAdornment>
-        )
-      }}
       error={!isDIDValid}
       helperText={!isDIDValid ? 'DID format is invalid' : ''}
-      onKeyPress={(event: KeyboardEvent<HTMLInputElement>) => {
-        if (event.key === 'Enter') {
-          didInput && isDIDValid && addRestriction(didInput);
-        }
-      }}
     />
   );
+
+  const restrictionsTypes = Object.values(RestrictionType);
+  const selectRestriction = restrictionsTypes.map((value, index) => {
+    return (
+      <RestrictionList
+        key={value}
+        type={value}
+        list={ value === RestrictionType.Role ? roles : dids}
+        remove={ value === RestrictionType.Role ? removeRole : removeDID }
+        canRemove={true}
+        canCopy={false}
+        setType={setType}
+        handleSaveRestriction={handleSaveRestriction}
+        roleInput={roleInput}
+        isRoleValid={isRoleValid}
+        didInput={didInput}
+        clear={clear}
+        isDIDValid={isDIDValid}
+        setRoleInput={setRoleInput}
+        setDIDInput={setDIDInput}
+        handleUpdateRestriction={handleUpdateRestriction}>
+        <>
+          {selectRoleRestriction}
+          {setDIDRestriction}
+        </>
+      </RestrictionList>
+    );
+  });
 
   return (
     <Grid
@@ -122,69 +117,60 @@ export const Restrictions = ({
       sx={{ height: '100%', flexWrap: 'nowrap' }}
     >
       <Grid item>
-        <Grid container spacing={2} sx={{ paddingRight: '27px' }}>
-          <Grid item sx={{ marginBottom: '22px' }}>
+        <Grid container spacing={2} sx={{ paddingRight: '27px' }} direction="column">
+          <Grid item sx={{ marginBottom: '22px' }} flexGrow="1">
             <InputLabel id="restriction-type" className={classes.label}>
               Restrictions
             </InputLabel>
             <Select
               labelId="restriction-type"
               value={type}
+              open={open}
+              onClose={handleClose}
+              onOpen={handleOpen}
               IconComponent={ChevronDown}
               classes={{
                 icon: classes.icon,
               }}
               className={classes.select}
-              onChange={(d: SelectChangeEvent<RestrictionType>) => {
-                restrictionTypeChangeHandler(d.target.value as RestrictionType);
-              }}
               sx={{ width: '100px' }}
+              displayEmpty={true}
+              renderValue={() => (
+                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                  <Typography className={classes.selectValue} variant="body2">{open ? type : 'Add Restriction'}</Typography>
+                </Box>
+              )}
             >
-              <MenuItem
-                value={RestrictionType.DID}
-                className={classes.menuItem}
-              >
-                {RestrictionType.DID}
-              </MenuItem>
-              <MenuItem
-                value={RestrictionType.Role}
-                className={classes.menuItem}
-              >
-                {RestrictionType.Role}
-              </MenuItem>
+              <RestrictionSelect
+                setType={setType}
+                clear={clear}
+                handleClose={handleClose}
+                handleSaveRestriction={handleSaveRestriction}
+                roleInput={roleInput}
+                isRoleValid={isRoleValid}
+                didInput={didInput}
+                isDIDValid={isDIDValid}>
+                <>
+                  {selectRoleRestriction}
+                  {setDIDRestriction}
+                </>
+              </RestrictionSelect>
             </Select>
           </Grid>
-          <Grid
-            item
-            alignSelf="flex-end"
-            flexGrow="1"
-            sx={{ marginBottom: '22px' }}
-          >
-            {selectRoleRestriction}
-            {setDIDRestriction}
-          </Grid>
         </Grid>
-        <Box>
+        <Box display="flex" justifyContent="space-between" pr={5.375}>
           <Typography className={classes.label}>
             {restrictionsCount} Restrictions
           </Typography>
+          <Typography className={classes.filterLabel}>
+            <Filter size={10}/> Filter
+          </Typography>
         </Box>
-        <Box display="flex" paddingRight="26px">
-          <RestrictionBox
-            type={RestrictionType.DID}
-            list={dids}
-            remove={removeDID}
-            wrapperProps={{ mr: 0.75 }}
-          />
-          <RestrictionBox
-            type={RestrictionType.Role}
-            list={roles}
-            remove={removeRole}
-            wrapperProps={{ ml: 0.75 }}
-          />
+        <Box className={classes.restrictionBox}>
+          {selectRestriction}
         </Box>
       </Grid>
-      <Grid item alignSelf="flex-end" width="100%" sx={{ paddingTop: '22px', paddingRight: '7px' }}>
+      <Grid item alignSelf="flex-end" width="100%" sx={{ padding: '22px 7px 27px 0px' }}>
         <ActionButtons
           {...actionButtonsProps}
           nextClickButtonProps={{

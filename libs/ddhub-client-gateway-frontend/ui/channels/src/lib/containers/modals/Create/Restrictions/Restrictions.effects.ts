@@ -11,8 +11,11 @@ export const useRestrictionsEffects = (restrictions: ChannelConditionsDto) => {
     dids,
     addDID,
     removeDID,
+    setIsValid: setIsDIDValid,
     didInputChangeHandler,
     isValid: isDIDValid,
+    setDIDInput,
+    updateDID,
   } = useDIDRestrictionEffects(restrictions.dids ?? []);
   const {
     roles,
@@ -20,27 +23,45 @@ export const useRestrictionsEffects = (restrictions: ChannelConditionsDto) => {
     clearRolesInput,
     removeRole,
     addRole,
+    setIsValid: setIsRoleValid,
     rolesInputChangeHandler,
     isValid: isRoleValid,
+    setRoleInput,
+    updateRole,
   } = useRolesRestrictionEffects(restrictions.roles ?? []);
   const [type, setType] = useState<RestrictionType>(RestrictionType.DID);
+  const [open, setOpen] = useState(false);
 
   const clear = () => {
     clearDIDInput();
     clearRolesInput();
+    setIsDIDValid(true);
+    setIsRoleValid(true);
   };
 
-  const restrictionTypeChangeHandler = (type: RestrictionType) => {
-    setType(type);
+  const handleClose = () => {
+    setOpen(false);
+    setType(RestrictionType.DID);
+  };
+
+  const handleOpen = () => {
     clear();
+    setOpen(true);
   };
 
-  const addRestriction = (value: string) => {
+  const handleSaveRestriction = () => {
     if (type === RestrictionType.DID) {
-      addDID(value);
+      addDID(didInput);
     } else {
-      addRole(value);
+      addRole(roleInput);
     }
+
+    handleClose();
+  };
+
+  const handleUpdateRestriction = (removeInput: string) => {
+    updateRole(type, removeInput, roleInput);
+    updateDID(type, removeInput, didInput);
   };
 
   const restrictionsCount = dids.length + roles.length;
@@ -55,10 +76,17 @@ export const useRestrictionsEffects = (restrictions: ChannelConditionsDto) => {
     isRoleValid,
     removeRole,
     removeDID,
-    addRestriction,
+    setType,
     restrictionsCount,
-    restrictionTypeChangeHandler,
+    handleSaveRestriction,
+    handleUpdateRestriction,
+    handleClose,
+    handleOpen,
+    open,
+    clear,
     rolesInputChangeHandler,
     didInputChangeHandler,
+    setRoleInput,
+    setDIDInput,
   };
 };

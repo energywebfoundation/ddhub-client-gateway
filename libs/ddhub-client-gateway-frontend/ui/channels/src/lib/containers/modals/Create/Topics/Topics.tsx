@@ -95,7 +95,7 @@ export const Topics = ({
           canCopy={true}
         />
       </Grid>
-      <Grid item alignSelf="flex-end" width="100%" sx={{paddingRight: '7px'}}>
+      <Grid item alignSelf="flex-end" width="100%" sx={{padding: '22px 7px 27px 0px'}}>
         <ActionButtons
           {...actionButtonsProps}
           nextClickButtonProps={{
