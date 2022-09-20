@@ -22,6 +22,10 @@ export const SCHEDULER_ENVS = Joi.object({
   MESSAGE_CLEANER_CRON_SCHEDULE: Joi.string()
     .default('*/30 * * * *')
     .description('How often should clean messages data'),
+  CLIENT_EXPIRATION_DAYS: Joi.number()
+    .positive()
+    .default(30)
+    .description('Time to live of a client'),
   SYMMETRIC_KEYS_CRON_SCHEDULE: Joi.string()
     .default('*/1 * * * *')
     .description('How often should poll for symmetric keys'),

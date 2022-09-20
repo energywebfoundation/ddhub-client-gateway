@@ -20,6 +20,7 @@ import { DdhubClientGatewayEventsModule } from '@dsb-client-gateway/ddhub-client
 import { EnrolmentModule } from './modules/enrolment/enrolment.module';
 import { ChannelModule } from './modules/channel/channel.module';
 import { MessageModule } from './modules/message/message.module';
+import { ClientsModule } from './modules/clients/clients.module';
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { MessageModule } from './modules/message/message.module';
     EnrolmentModule,
     ChannelModule,
     MessageModule,
+    ClientsModule,
   ],
   controllers: [],
   providers: [AppInitService, PrivateKeyWatcherService],

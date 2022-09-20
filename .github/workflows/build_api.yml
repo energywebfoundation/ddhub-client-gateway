@@ -39,7 +39,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: Run SPEC tests
-        run: npm run test:spec:api
+        run: npm run test:spec:api && npm run test:spec:clients
       - name: Start containers
         run: docker-compose -f "ci/docker-compose.yml" up -d --build
       - name: Sleep for 10 seconds

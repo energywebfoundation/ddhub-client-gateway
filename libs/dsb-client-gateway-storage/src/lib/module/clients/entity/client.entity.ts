@@ -1,4 +1,5 @@
 import {
+  Column,
   CreateDateColumn,
   Entity,
   PrimaryGeneratedColumn,
@@ -10,6 +11,9 @@ export class ClientEntity {
   @PrimaryGeneratedColumn('uuid')
   public id: string;
 
+  @Column({
+    unique: true,
+  })
   public clientId: string;
 
   @CreateDateColumn()
