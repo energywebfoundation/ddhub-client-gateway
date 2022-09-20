@@ -17,7 +17,7 @@ export const useStyles = makeStyles()((theme) => ({
     fontFamily: theme.typography.body2.fontFamily,
   },
   divider: {
-    margin: '21px 0 16px 0',
+    marginTop: '21px',
   },
   label: {
     fontSize: 12,
@@ -44,5 +44,35 @@ export const useStyles = makeStyles()((theme) => ({
     stroke: theme.palette.success.main,
     width: 21,
     height: 21,
+  },
+  tabRoot: {
+    '& .MuiBox-root:nth-of-type(even)': {
+      background: '#32394F',
+      '& .MuiBox-root': {
+        background: '#494A75',
+      },
+    },
+  },
+  tabBox: {
+    maxHeight: '200px',
+    overflow: 'auto',
+    '&::-webkit-scrollbar': {
+      width: 2,
+    },
+    '&::-webkit-scrollbar-track': {
+      backgroundColor: theme.palette.background.paper,
+      boxSizing: 'border-box',
+      borderRadius: 3,
+    },
+    '&::-webkit-scrollbar-thumb': {
+      backgroundColor: theme.palette.primary.main,
+      borderRadius: 3,
+    },
+  },
+  restrictionBox: {
+    border: `1px solid #404656`,
+    borderRadius: 6,
+    padding: 6,
+    marginBottom: 5,
   },
 }));

@@ -1,4 +1,4 @@
-import { MouseEvent, useState } from 'react';
+import { useState } from 'react';
 import { RestrictionType } from '../models/restriction-type.enum';
 
 export interface RestrictionListEffectsProps {
@@ -21,7 +21,6 @@ export const useRestrictionListEffects = (
     setDIDInput,
     setRoleInput,
     handleUpdateRestriction,
-    remove,
   }: RestrictionListEffectsProps) => {
   const [expanded, setExpanded] = useState<string | false>(false);
 
@@ -49,19 +48,10 @@ export const useRestrictionListEffects = (
     handleUpdateRestriction(value);
   };
 
-  const handleDelete = (event: MouseEvent<HTMLElement>, el: string) => {
-    event.stopPropagation();
-
-    if (remove) {
-      remove(el);
-    }
-  };
-
   return {
     expanded,
     handleOpen,
     handleClose,
     handleUpdate,
-    handleDelete,
   };
 };

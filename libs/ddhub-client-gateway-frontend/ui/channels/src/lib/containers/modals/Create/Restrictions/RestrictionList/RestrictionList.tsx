@@ -1,13 +1,8 @@
-import { MouseEvent, useState } from 'react';
 import { useStyles } from './RestrictionList.styles';
-import { Edit3, X as Close } from 'react-feather';
-import { Box, Grid, IconButton, Select, Typography } from '@mui/material';
-import { CopyToClipboard } from '@ddhub-client-gateway-frontend/ui/core';
-import { RestrictionType } from '../models/restriction-type.enum';
-import { didFormatMinifier } from '@ddhub-client-gateway-frontend/ui/utils';
+import { Select } from '@mui/material';
 import { RestrictionListEffectsProps, useRestrictionListEffects } from './RestrictionList.effects';
-import { RestrictionSelect } from "../RestrictionSelect/RestrictionSelect";
-import clsx from 'clsx';
+import { RestrictionSelect } from '../RestrictionSelect/RestrictionSelect';
+import { RestrictionListView } from '../RestrictionListView/RestrictionListView';
 
 export interface RestrictionListProps extends RestrictionListEffectsProps {
   canRemove: boolean;
@@ -44,7 +39,6 @@ export const RestrictionList = ({
     handleOpen,
     handleClose,
     handleUpdate,
-    handleDelete,
   } = useRestrictionListEffects({
     list,
     clear,
@@ -74,55 +68,30 @@ export const RestrictionList = ({
           sx={{ width: '100px' }}
           displayEmpty={true}
           renderValue={() => (
-            <Grid
-              container
-              justifyContent="space-between"
-              key={el}
-              className={classes.container}>
-              <Grid item display="flex" flexDirection="row">
-                <Box className={classes.gridItem}>
-                  <Typography variant="body2" className={classes.itemText}>{ type }</Typography>
-                </Box>
-                <Typography noWrap variant="body2" className={classes.itemText} pl='14px'>
-                  {type === RestrictionType.DID ? didFormatMinifier(el) : el}
-                </Typography>
-              </Grid>
-              {canRemove && (
-              <Grid item display="flex" flexDirection="row">
-                <IconButton
-                  onClick={handleOpen}
-                  className={clsx(classes.edit, {
-                    [classes.editActive]: (expanded && expanded === `panel-${index}`),
-                    [classes.editInactive]: (expanded && expanded !== `panel-${index}`),
-                  })}>
-                  <Edit3 size={18} />
-                </IconButton>
-                <IconButton
-                  onMouseDown={(event: MouseEvent<HTMLElement>) => {
-                    handleDelete(event, el);
-                  }}
-                  className={classes.close}>
-                  <Close size={18} />
-                </IconButton>
-              </Grid>
-              )}
-            {canCopy && <CopyToClipboard text={el} />}
-              </Grid>
+            <RestrictionListView
+              item={el}
+              type={type}
+              canRemove={canRemove}
+              canCopy={canCopy}
+              handleOpen={handleOpen}
+              remove={remove}
+              expanded={expanded}
+              index={index}/>
             )}>
-              <RestrictionSelect
-                setType={setType}
-                clear={clear}
-                handleClose={handleClose}
-                handleSaveRestriction={handleSaveRestriction}
-                handleUpdateRestriction={handleUpdate}
-                roleInput={roleInput}
-                isRoleValid={isRoleValid}
-                didInput={didInput}
-                isDIDValid={isDIDValid}
-                selectedType={type}
-                inputValue={el}>
-                {children}
-              </RestrictionSelect>
+          <RestrictionSelect
+            setType={setType}
+            clear={clear}
+            handleClose={handleClose}
+            handleSaveRestriction={handleSaveRestriction}
+            handleUpdateRestriction={handleUpdate}
+            roleInput={roleInput}
+            isRoleValid={isRoleValid}
+            didInput={didInput}
+            isDIDValid={isDIDValid}
+            selectedType={type}
+            inputValue={el}>
+            {children}
+          </RestrictionSelect>
         </Select>
       ))}
     </>
