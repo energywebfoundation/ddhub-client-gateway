@@ -7,6 +7,8 @@
 | APPLICATION_CRON_ENABLED | boolean | true | Should poll for applications data |  |  |
 | CHANNEL_DID_CRON_SCHEDULE | string | */1 * * * * | How often should exchange channel roles for DIDs |  |  |
 | CHANNEL_DID_CRON_ENABLED | boolean | true | Should poll for channel DIDs |  |  |
+| MESSAGE_CLEANER_CRON_ENABLED | boolean | true | Should clean messages data |  |  |
+| MESSAGE_CLEANER_CRON_SCHEDULE | string | */30 * * * * | How often should clean messages data |  |  |
 | SYMMETRIC_KEYS_CRON_SCHEDULE | string | */1 * * * * | How often should poll for symmetric keys |  |  |
 | SYMMETRIC_KEYS_CRON_ENABLED | boolean | true | Should poll for symmetric keys |  |  |
 | TOPICS_CRON_SCHEDULE | string | */1 * * * * | How often should poll for topics data |  |  |
