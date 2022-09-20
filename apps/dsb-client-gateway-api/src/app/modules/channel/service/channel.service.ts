@@ -21,7 +21,6 @@ import {
   Topic,
 } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
 import { ChannelInvalidTopicException } from '../exceptions/channel-invalid-topic.exception';
-import { TopicService } from '../../topic/service/topic.service';
 import { differenceBy } from 'lodash';
 
 @Injectable()
@@ -31,7 +30,6 @@ export class ChannelService {
   constructor(
     protected readonly wrapperRepository: ChannelWrapperRepository,
     protected readonly ddhubTopicsService: DdhubTopicsService,
-    protected readonly topicsService: TopicService,
     protected readonly commandBus: CommandBus
   ) {}
 

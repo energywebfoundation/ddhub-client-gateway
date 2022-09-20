@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { IdentityModule } from './modules/identity/identity.module';
 import { EnrolmentModule } from './modules/enrolment/enrolment.module';
 import { IamModule } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
@@ -36,11 +36,21 @@ export class AppModule {
   }) {
     const imports = [
       LoggerModule.forRootAsync({
-        useFactory: () => ({
+        useFactory: (configService: ConfigService) => ({
           pinoHttp: {
             genReqId: (req) => req.headers['x-request-id'] || uuidv4(),
+            transport: {
+              target: 'pino-pretty',
+              options: {
+                colorize: configService.get<boolean>('LOG_PRETTY'),
+                levelFirst: true,
+                translateTime: "UTC:yyyy-mm-dd'T'HH:MM:ss.l'Z'",
+                singleLine: true,
+              },
+            },
           },
         }),
+        inject: [ConfigService],
       }),
       ConfigModule.forRoot({
         isGlobal: true,

@@ -28,6 +28,8 @@
     "export": "npm run build:client && nx export dsb-client-gateway-frontend",
     "build:api": "nx build dsb-client-gateway-api",
     "test": "nx test",
+    "test:spec:api": "nx test dsb-client-gateway-api",
+    "test:e2e:api": "nx test dsb-client-gateway-api-e2e",
     "prepare": "husky install"
   },
   "private": true,

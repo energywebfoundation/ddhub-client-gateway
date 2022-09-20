@@ -7,9 +7,8 @@ import {
 } from './dto/gateway-response.dto';
 import { ConfigService } from '@nestjs/config';
 import { CertificateService } from '../certificate/service/certificate.service';
-import { HealthController } from '../health/health.controller';
 import { IamService } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
-import { DdhubHealthService } from 'libs/ddhub-client-gateway-message-broker/src/lib/services/ddhub-health.service';
+import { DdhubHealthService } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
 
 @Controller('gateway')
 @UseGuards(DigestGuard)

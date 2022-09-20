@@ -7,8 +7,8 @@
 | APPLICATION_CRON_ENABLED | boolean | true | Should poll for applications data |  |  |
 | CHANNEL_DID_CRON_SCHEDULE | string | */1 * * * * | How often should exchange channel roles for DIDs |  |  |
 | CHANNEL_DID_CRON_ENABLED | boolean | true | Should poll for channel DIDs |  |  |
-| MESSAGE_CLEANER_CRON_ENABLED | boolean | true | Should clean symmetric keys |  |  |
-| MESSAGE_CLEANER_CRON_SCHEDULE | string | */1 * * * * | How often should clean messages data |  |  |
+| MESSAGE_CLEANER_CRON_ENABLED | boolean | true | Should clean messages data |  |  |
+| MESSAGE_CLEANER_CRON_SCHEDULE | string | */30 * * * * | How often should clean messages data |  |  |
 | SYMMETRIC_KEYS_CRON_SCHEDULE | string | */1 * * * * | How often should poll for symmetric keys |  |  |
 | SYMMETRIC_KEYS_CRON_ENABLED | boolean | true | Should poll for symmetric keys |  |  |
 | TOPICS_CRON_SCHEDULE | string | */1 * * * * | How often should poll for topics data |  |  |
@@ -27,6 +27,7 @@
 | DSB_BASE_URL | string | https://dsb-demo.energyweb.org | Message broker URL |  |  |
 | UPLOAD_FILES_DIR | string | ./upload | Directory where we should store temporary files for upload |  |  |
 | DOWNLOAD_FILES_DIR | string | ./download | Directory where we should store downloaded files for limited time |  |  |
+| LOG_PRETTY | boolean | false | Should colorize logs, only use in dev mode |  |  |
 | MTLS_ENABLED | boolean | true | Should enable mTLS |  |  |
 | DB_SYNC | boolean | false | Should generate migrations (dev use only) |  |  |
 | DB_NAME | string | postgresql://ddhub:ddhub@localhost:5432/ddhub | Database connection string |  |  |
