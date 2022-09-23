@@ -15,7 +15,6 @@
     "generate:scheduler:envs": "npm run build:scheduler:envs && node dist/apps/dsb-client-gateway-scheduler-envs/main.js",
     "build:scheduler:envs": "nx build-envs dsb-client-gateway-scheduler",
     "build:api:envs": "nx build-envs dsb-client-gateway-api",
-    "test:e2e:api": "./test-prepare.sh && nx test dsb-client-gateway-api-e2e",
     "commit": "git-cz",
     "start": "nx serve",
     "start:prod": "npm run migrations:run && node dist/apps/dsb-client-gateway-api/main.js",
@@ -29,6 +28,7 @@
     "build:api": "nx build dsb-client-gateway-api",
     "test": "nx test",
     "test:spec:api": "nx test dsb-client-gateway-api",
+    "test:e2e:api": "nx test dsb-client-gateway-api-e2e",
     "prepare": "husky install"
   },
   "private": true,
