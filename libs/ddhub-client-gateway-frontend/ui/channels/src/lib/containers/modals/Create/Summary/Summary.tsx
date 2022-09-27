@@ -6,9 +6,10 @@ import { ActionButtons } from '../ActionButtons';
 import { TActionButtonsProps } from '../ActionButtons/ActionButtons';
 import { useSummaryEffects } from './Summary.effects';
 import { useStyles } from './Summary.styles';
-import { Check } from 'react-feather';
+import { Check, X } from 'react-feather';
 import React from 'react';
 import { RestrictionListView } from '../Restrictions/RestrictionListView/RestrictionListView';
+import { clone } from 'lodash';
 
 export interface SummaryProps {
   channelValues: ICreateChannel;
@@ -22,6 +23,7 @@ export const Summary = ({
   const { classes } = useStyles();
   const { countRestrictions } = useSummaryEffects();
   const restrictionCount = countRestrictions(channelValues?.conditions);
+  const restrictionRoles = clone(channelValues.conditions.roles);
 
   const tabProps: TabsProps[] = [
     {
@@ -34,7 +36,7 @@ export const Summary = ({
             </Typography>
           )}
 
-          {channelValues.conditions.roles?.map((el, index) => (
+          {restrictionRoles.sort().map((el, index) => (
             <RestrictionListView
               wrapperProps={{
                 className: classes.restrictionBox
@@ -121,7 +123,7 @@ export const Summary = ({
           </Typography>
           <Box display="flex">
             <Typography className={classes.encryptionValue} variant="body2">
-              {channelValues?.payloadEncryption ? <Check className={classes.iconCheck} /> : '-'}
+              {channelValues?.payloadEncryption ? <Check className={classes.iconCheck} /> : <X className={classes.iconX}/>}
             </Typography>
           </Box>
         </Stack>

@@ -6,7 +6,6 @@ import { Edit3, X as Close } from 'react-feather';
 import { MouseEvent } from 'react';
 import { CopyToClipboard } from '@ddhub-client-gateway-frontend/ui/core';
 import { useStyles } from './RestrictionListView.styles';
-import { useRestrictionListViewEffects } from './RestrictionListView.effects';
 
 interface RestrictionListViewProps {
   item: string;
@@ -33,7 +32,6 @@ export const RestrictionListView = (
     wrapperProps,
   }: RestrictionListViewProps) => {
   const { classes } = useStyles();
-  const { handleDelete } = useRestrictionListViewEffects(remove);
 
   return (
     <Box {...wrapperProps}>
@@ -64,7 +62,11 @@ export const RestrictionListView = (
             </IconButton>
             <IconButton
               onMouseDown={(event: MouseEvent<HTMLElement>) => {
-                handleDelete(event, item);
+                event.stopPropagation();
+
+                if (remove) {
+                  remove(item);
+                }
               }}
               className={classes.close}>
               <Close size={18} />

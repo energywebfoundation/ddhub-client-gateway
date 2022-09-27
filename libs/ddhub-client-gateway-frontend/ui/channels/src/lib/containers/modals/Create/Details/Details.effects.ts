@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState, ChangeEvent } from "react";
 import { FieldValues, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -52,6 +52,9 @@ const fields = {
 };
 
 export const useDetailsEffects = (channelValues: ICreateChannel) => {
+  const [showEncryption, setShowEncryption] = useState(false);
+  const [isEncrypt, setIsEncrypt] = useState(false);
+
   const initialValues = {
     fqcn: '',
     channelType: '',
@@ -83,10 +86,26 @@ export const useDetailsEffects = (channelValues: ICreateChannel) => {
     ]);
     Object.entries(details).forEach(([name, value]) => {
       setValue(name, value);
+
+      if (name === 'connectionType') {
+        const isPublish = value === ConnectionType.Publish;
+        setShowEncryption(isPublish);
+      } else if (name === 'payloadEncryption') {
+        setIsEncrypt(!!value);
+      }
     });
     triggerValidation();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [channelValues]);
 
-  return { fields, register, isValid, handleSubmit, control };
+  const connectionOnChange = (event: any) => {
+    const isPublish = event.target.value === ConnectionType.Publish;
+    setShowEncryption(isPublish);
+  };
+
+  const encryptionOnChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setIsEncrypt(event.target.checked);
+  };
+
+  return { fields, register, isValid, handleSubmit, control, connectionOnChange, showEncryption, encryptionOnChange, isEncrypt };
 };

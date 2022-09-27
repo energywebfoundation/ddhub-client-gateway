@@ -80,6 +80,12 @@ export const useStyles = makeStyles()((theme) => ({
     height: 21,
     marginTop: 3,
   },
+  iconX: {
+    stroke: theme.palette.error.main,
+    width: 21,
+    height: 21,
+    marginTop: 3,
+  },
   updateFormWrapper: {
     paddingTop: 16,
     flexGrow: 1,

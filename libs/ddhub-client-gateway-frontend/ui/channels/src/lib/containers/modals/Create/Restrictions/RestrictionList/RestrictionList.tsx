@@ -3,6 +3,7 @@ import { Select } from '@mui/material';
 import { RestrictionListEffectsProps, useRestrictionListEffects } from './RestrictionList.effects';
 import { RestrictionSelect } from '../RestrictionSelect/RestrictionSelect';
 import { RestrictionListView } from '../RestrictionListView/RestrictionListView';
+import clsx from 'clsx';
 
 export interface RestrictionListProps extends RestrictionListEffectsProps {
   canRemove: boolean;
@@ -13,6 +14,7 @@ export interface RestrictionListProps extends RestrictionListEffectsProps {
   isRoleValid: boolean;
   isDIDValid: boolean;
   children: React.ReactNode;
+  recent: string;
 }
 
 export const RestrictionList = ({
@@ -32,6 +34,7 @@ export const RestrictionList = ({
   children,
   setRoleInput,
   setDIDInput,
+  recent,
 }: RestrictionListProps) => {
   const { classes } = useStyles();
   const {
@@ -64,7 +67,9 @@ export const RestrictionList = ({
           classes={{
             icon: classes.icon,
           }}
-          className={classes.select}
+          className={clsx(classes.select, {
+            [classes.recent]: recent === el,
+          })}
           sx={{ width: '100px' }}
           displayEmpty={true}
           renderValue={() => (

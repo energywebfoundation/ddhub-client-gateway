@@ -45,6 +45,11 @@ export const useStyles = makeStyles()((theme) => ({
     width: 21,
     height: 21,
   },
+  iconX: {
+    stroke: theme.palette.error.main,
+    width: 21,
+    height: 21,
+  },
   tabRoot: {
     '& .MuiBox-root:nth-of-type(even)': {
       background: '#32394F',

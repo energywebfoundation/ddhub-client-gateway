@@ -41,8 +41,8 @@ export const useRolesRestrictionEffects = (currentRoles: string[]) => {
     if (roles.includes(role)) {
       return;
     }
-    const rolesToSet = [...roles, role];
-    setRoles(rolesToSet.sort());
+    const rolesToSet = [role, ...roles];
+    setRoles(rolesToSet);
     clearRolesInput();
   };
 
@@ -59,10 +59,10 @@ export const useRolesRestrictionEffects = (currentRoles: string[]) => {
     const rolesToSet = [...filteredRoles];
 
     if (type === RestrictionType.Role) {
-      rolesToSet.push(newValue);
+      rolesToSet.unshift(newValue);
     }
 
-    setRoles(rolesToSet.sort());
+    setRoles(rolesToSet);
     clearRolesInput();
   };
 

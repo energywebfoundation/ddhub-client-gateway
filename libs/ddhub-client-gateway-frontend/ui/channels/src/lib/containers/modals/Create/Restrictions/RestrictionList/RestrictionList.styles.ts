@@ -30,8 +30,14 @@ export const useStyles = makeStyles()((theme) => ({
       padding: '6px 10px 6px 7px !important',
     },
     '& .MuiOutlinedInput-notchedOutline': {
-      border: `1px solid ${theme.palette.grey[500]}`,
+      border: '1px solid #404656',
       borderRadius: 5,
+    },
+  },
+  recent: {
+    border: `1px solid ${theme.palette.common.white}`,
+    '& .MuiTypography-root': {
+      color: theme.palette.common.white,
     },
   },
 }));

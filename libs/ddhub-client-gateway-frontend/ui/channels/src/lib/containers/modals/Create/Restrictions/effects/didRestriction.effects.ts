@@ -39,7 +39,7 @@ export const useDIDRestrictionEffects = (currentDids: string[]) => {
     if (dids.includes(did)) {
       return;
     }
-    setDids([...dids, did]);
+    setDids([did, ...dids]);
     clearDIDInput();
   };
 
@@ -57,7 +57,7 @@ export const useDIDRestrictionEffects = (currentDids: string[]) => {
     const didsToSet = [...filteredDids];
 
     if (type === RestrictionType.DID) {
-      didsToSet.push(newValue);
+      didsToSet.unshift(newValue);
     }
     setDids(didsToSet);
     clearDIDInput();

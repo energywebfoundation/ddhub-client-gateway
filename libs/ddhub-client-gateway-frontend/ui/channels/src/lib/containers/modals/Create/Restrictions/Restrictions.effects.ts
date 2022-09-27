@@ -31,6 +31,7 @@ export const useRestrictionsEffects = (restrictions: ChannelConditionsDto) => {
   } = useRolesRestrictionEffects(restrictions.roles ?? []);
   const [type, setType] = useState<RestrictionType>(RestrictionType.DID);
   const [open, setOpen] = useState(false);
+  const [recent, setRecent] = useState('');
 
   const clear = () => {
     clearDIDInput();
@@ -51,8 +52,10 @@ export const useRestrictionsEffects = (restrictions: ChannelConditionsDto) => {
 
   const handleSaveRestriction = () => {
     if (type === RestrictionType.DID) {
+      setRecent(didInput);
       addDID(didInput);
     } else {
+      setRecent(roleInput);
       addRole(roleInput);
     }
 
@@ -60,6 +63,7 @@ export const useRestrictionsEffects = (restrictions: ChannelConditionsDto) => {
   };
 
   const handleUpdateRestriction = (removeInput: string) => {
+    setRecent('');
     updateRole(type, removeInput, roleInput);
     updateDID(type, removeInput, didInput);
   };
@@ -88,5 +92,6 @@ export const useRestrictionsEffects = (restrictions: ChannelConditionsDto) => {
     didInputChangeHandler,
     setRoleInput,
     setDIDInput,
+    recent,
   };
 };

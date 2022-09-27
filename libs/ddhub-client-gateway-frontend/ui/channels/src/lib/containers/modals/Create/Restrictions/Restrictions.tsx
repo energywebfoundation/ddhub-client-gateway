@@ -1,11 +1,5 @@
-import {
-  Grid,
-  InputLabel,
-  Select,
-  Typography,
-  Box,
-} from '@mui/material';
-import { ChevronDown, Filter } from 'react-feather';
+import { Box, Grid, InputLabel, Select, Typography } from '@mui/material';
+import { ChevronDown } from 'react-feather';
 import { ChannelConditionsDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { RestrictionType } from './models/restriction-type.enum';
 import { ActionButtons } from '../ActionButtons';
@@ -15,15 +9,19 @@ import { useStyles } from './Restrictions.styles';
 import { RestrictionSelect } from './RestrictionSelect/RestrictionSelect';
 import { TextField } from '@ddhub-client-gateway-frontend/ui/core';
 import { RestrictionList } from './RestrictionList/RestrictionList';
+import { ConnectionType } from "../Details/models/connection-type.enum";
+import { includes } from 'lodash';
 
 export interface RestrictionsProps {
   restrictions: ChannelConditionsDto;
   actionButtonsProps: TActionButtonsProps;
+  connectionType: ConnectionType | string;
 }
 
 export const Restrictions = ({
   actionButtonsProps,
   restrictions,
+  connectionType,
 }: RestrictionsProps) => {
   const {
     type,
@@ -47,6 +45,7 @@ export const Restrictions = ({
     restrictionsCount,
     setRoleInput,
     setDIDInput,
+    recent,
   } = useRestrictionsEffects(restrictions);
   const { classes } = useStyles();
 
@@ -99,6 +98,7 @@ export const Restrictions = ({
         isDIDValid={isDIDValid}
         setRoleInput={setRoleInput}
         setDIDInput={setDIDInput}
+        recent={recent}
         handleUpdateRestriction={handleUpdateRestriction}>
         <>
           {selectRoleRestriction}
@@ -120,7 +120,7 @@ export const Restrictions = ({
         <Grid container spacing={2} sx={{ paddingRight: '27px' }} direction="column">
           <Grid item sx={{ marginBottom: '22px' }} flexGrow="1">
             <InputLabel id="restriction-type" className={classes.label}>
-              Restrictions
+              { includes([ConnectionType.Subscribe, 'sub'], connectionType) ? 'Senders' : 'Recipients' }
             </InputLabel>
             <Select
               labelId="restriction-type"
@@ -162,9 +162,9 @@ export const Restrictions = ({
           <Typography className={classes.label}>
             {restrictionsCount} Restrictions
           </Typography>
-          <Typography className={classes.filterLabel}>
-            <Filter size={10}/> Filter
-          </Typography>
+          {/*<Typography className={classes.filterLabel}>*/}
+          {/*  <Filter size={10}/> Filter*/}
+          {/*</Typography>*/}
         </Box>
         <Box className={classes.restrictionBox}>
           {selectRestriction}
