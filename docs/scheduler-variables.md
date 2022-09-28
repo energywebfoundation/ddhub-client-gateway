@@ -5,6 +5,8 @@
 | DID_REGISTRY_ADDRESS | string | 0xc15d5a57a8eb0e1dcbe5d88b8f9a82017e5cc4af | DID Registry Address used for DID Listener |  |  |
 | APPLICATION_CRON_SCHEDULE | string | */1 * * * * | How often should poll for applications data |  |  |
 | APPLICATION_CRON_ENABLED | boolean | true | Should poll for applications data |  |  |
+| CLIENTS_CRON_SCHEDULE | string | */5 * * * * | How often should check for outdated clients |  |  |
+| CLIENTS_CRON_ENABLED | string | true | Should check for outdated clients |  |  |
 | CHANNEL_DID_CRON_SCHEDULE | string | */1 * * * * | How often should exchange channel roles for DIDs |  |  |
 | CHANNEL_DID_CRON_ENABLED | boolean | true | Should poll for channel DIDs |  |  |
 | MESSAGE_CLEANER_CRON_ENABLED | boolean | true | Should clean messages data |  |  |

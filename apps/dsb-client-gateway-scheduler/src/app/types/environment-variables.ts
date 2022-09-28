@@ -10,6 +10,12 @@ export const SCHEDULER_ENVS = Joi.object({
   APPLICATION_CRON_ENABLED: Joi.boolean()
     .default(true)
     .description('Should poll for applications data'),
+  CLIENTS_CRON_SCHEDULE: Joi.string()
+    .default('*/5 * * * *')
+    .description('How often should check for outdated clients'),
+  CLIENTS_CRON_ENABLED: Joi.string()
+    .default(true)
+    .description('Should check for outdated clients'),
   CHANNEL_DID_CRON_SCHEDULE: Joi.string()
     .default('*/1 * * * *')
     .description('How often should exchange channel roles for DIDs'),

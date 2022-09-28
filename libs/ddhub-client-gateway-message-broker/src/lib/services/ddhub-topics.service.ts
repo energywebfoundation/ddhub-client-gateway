@@ -57,7 +57,7 @@ export class DdhubTopicsService extends DdhubBaseService {
           stopOnResponseCodes: [MessageBrokerErrors.UNAUTHORIZED_ACCESS],
         }
       );
-      this.logger.error(`Get topic with topicId: ${topicId} successful`);
+      this.logger.log(`Get topic with topicId: ${topicId} successful`);
 
       return data;
     } catch (e) {
