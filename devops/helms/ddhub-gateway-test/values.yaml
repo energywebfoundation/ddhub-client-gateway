@@ -13,7 +13,7 @@ ddhub-client-gateway-api:
       parent_namespace: ddhub.apps.energyweb.iam.ewc
       secret_engine: azure
       secret_engine_endpoint: http://vault.ddhub-dev.svc:8200
-      # secret_prefix: "ddhubtest1/"
+      secret_prefix: "ddhubtest1/"
       node_env: test
       opentelemetry_enabled: false
     scheduler:
