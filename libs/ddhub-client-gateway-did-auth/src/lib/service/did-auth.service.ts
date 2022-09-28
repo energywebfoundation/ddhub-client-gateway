@@ -54,6 +54,8 @@ export class DidAuthService {
       throw new Error();
     }
 
+    console.log(response.access_token);
+
     this.accessToken = response.access_token;
     this.refreshToken = response.refresh_token;
   }

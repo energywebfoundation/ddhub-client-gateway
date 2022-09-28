@@ -17,16 +17,86 @@ const configService = {
   getConfig: jest.fn(),
 };
 
+const ddhubClientsService = {
+  getClients: jest.fn(),
+};
+
+const iamService = {
+  getDIDAddress: jest.fn(),
+};
+
 describe('ClientsService (SPEC)', () => {
   let clientsService: ClientsService;
 
   beforeEach(async () => {
-    clientsService = new ClientsService(wrapper as any, configService as any);
+    clientsService = new ClientsService(
+      wrapper as any,
+      configService as any,
+      ddhubClientsService as any,
+      iamService as any
+    );
   });
 
   afterEach(() => {
     jest.clearAllMocks();
     jest.resetAllMocks();
+  });
+
+  describe('syncMissingClientsIds', () => {
+    it('should not sync clients, iam is not initialized', async () => {
+      iamService.getDIDAddress = jest.fn().mockImplementationOnce(() => null);
+
+      await clientsService.syncMissingClientsIds();
+
+      expect(iamService.getDIDAddress).toBeCalledTimes(1);
+      expect(ddhubClientsService.getClients).toBeCalledTimes(0);
+    });
+
+    it('should not sync client as it already exists in database', async () => {
+      iamService.getDIDAddress = jest.fn().mockImplementationOnce(() => 'did');
+      ddhubClientsService.getClients = jest
+        .fn()
+        .mockImplementationOnce(async () => ['client1']);
+      wrapper.repository.count = jest
+        .fn()
+        .mockImplementationOnce(async () => 1);
+
+      await clientsService.syncMissingClientsIds();
+
+      expect(iamService.getDIDAddress).toBeCalledTimes(1);
+      expect(ddhubClientsService.getClients).toBeCalledTimes(1);
+      expect(wrapper.repository.count).toBeCalledTimes(1);
+      expect(wrapper.repository.count).toBeCalledWith({
+        where: {
+          clientId: 'client1',
+        },
+      });
+
+      expect(wrapper.repository.save).toBeCalledTimes(0);
+    });
+
+    it('should sync clients', async () => {
+      iamService.getDIDAddress = jest.fn().mockImplementationOnce(() => 'did');
+      ddhubClientsService.getClients = jest
+        .fn()
+        .mockImplementationOnce(async () => ['client1']);
+      wrapper.repository.count = jest
+        .fn()
+        .mockImplementationOnce(async () => 0);
+
+      await clientsService.syncMissingClientsIds();
+
+      expect(iamService.getDIDAddress).toBeCalledTimes(1);
+      expect(ddhubClientsService.getClients).toBeCalledTimes(1);
+      expect(wrapper.repository.count).toBeCalledTimes(1);
+      expect(wrapper.repository.count).toBeCalledWith({
+        where: {
+          clientId: 'client1',
+        },
+      });
+
+      expect(wrapper.repository.save).toBeCalledTimes(1);
+    });
   });
 
   describe('upsert', () => {

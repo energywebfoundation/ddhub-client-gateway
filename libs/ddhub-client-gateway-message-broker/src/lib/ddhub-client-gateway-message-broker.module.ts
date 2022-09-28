@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { HttpModule } from '@nestjs/axios';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import {
+  DdhubClientsService,
   DdhubConfigService,
   DdhubDidService,
   DdhubFilesService,
@@ -53,6 +54,7 @@ import { DdhubLogService } from './services/ddhub-log.service';
     ReloginHandler,
     DdhubLogService,
     DdhubConfigService,
+    DdhubClientsService,
   ],
   exports: [
     DdhubTopicsService,
@@ -62,6 +64,7 @@ import { DdhubLogService } from './services/ddhub-log.service';
     DdhubLoginService,
     DdhubDidService,
     DdhubConfigService,
+    DdhubClientsService,
   ],
 })
 export class DdhubClientGatewayMessageBrokerModule {}
