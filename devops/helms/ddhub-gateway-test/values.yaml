@@ -7,6 +7,9 @@ ddhub-client-gateway-api:
   clientgateway:
     config:
       dsb_base_url: http://ddhub-messagebroker-proxy-test.ddhub-test.svc
+      rpc_url: https://volta-rpc-vkn5r5zx4ke71f9hcu0c.energyweb.org/
+      cache_server_url: https://identitycache-dev.energyweb.org/v1
+      event_server_url: https://identitycache-dev.energyweb.org
       parent_namespace: ddhub.apps.energyweb.iam.ewc
       secret_engine: azure
       secret_engine_endpoint: http://vault.ddhub-dev.svc:8200
