@@ -1,0 +1,87 @@
+# Default values for ddhub-client-gateway-api.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+ddhub-client-gateway-api:
+  replicaCount: 1
+
+  clientgateway:
+    config:
+      dsb_base_url: http://ddhub-messagebroker-proxy-test.ddhub-test.svc
+      parent_namespace: ddhub.apps.energyweb.iam.ewc
+      secret_engine: azure
+      secret_engine_endpoint: http://vault.ddhub-dev.svc:8200
+      secret_prefix: "ddhubtest1/"
+      node_env: test
+      opentelemetry_enabled: false
+    scheduler:
+      enabled: true
+      image:
+        repository: aemocontainerregistry.azurecr.io/ddhub-client-gateway-scheduler
+        pullPolicy: IfNotPresent
+        # Overrides the image tag whose default is the chart appVersion.
+        tag: 0.12.0
+      appConfig:
+        EVENTS_MAX_PER_SECOND: "50"
+        NO_COLOR: "true"
+  image:
+    # repository: 098061033856.dkr.ecr.us-east-1.amazonaws.com/ew-dos-dsb-ecr
+    repository: aemocontainerregistry.azurecr.io/ddhub-client-gateway-backend
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: 0.12.0
+
+  imagePullSecrets: []
+  nameOverride: "ddhub-client-gateway-api-test-1"
+  fullnameOverride: "ddhub-client-gateway-api-test-1"
+
+  podSecurityContext:
+    fsGroup: 2000
+
+  ingress:
+    enabled: true
+    annotations:
+      kubernetes.io/ingress.class: nginx
+      nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+      external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
+      cert-manager.io/issuer: prod-issuer
+      cert-manager.io/issuer-kind: OriginIssuer
+      cert-manager.io/issuer-group: cert-manager.k8s.cloudflare.com
+    hosts:
+      - host: ddhub-gateway-test-1.energyweb.org
+        paths:
+        - path: /docs
+          pathType: Prefix
+          backend:
+            serviceName: ddhub-client-gateway-api-test-1
+            servicePort: 80
+        - path: /api
+          pathType: Prefix
+          backend:
+            serviceName: ddhub-client-gateway-api-test-1
+            servicePort: 80
+        - path: /docs-json
+          pathType: Prefix
+          backend:
+            serviceName: ddhub-client-gateway-api-test-1
+            servicePort: 80
+        - path: /events
+          pathType: Prefix
+          backend:
+            serviceName: ddhub-client-gateway-api-test-1
+            servicePort: 80
+        - path: /
+          pathType: Prefix
+          backend:
+            serviceName: ddhub-client-gateway-api-test-1-ui
+            servicePort: 80
+    tls:
+      - secretName: ddhub-gateway-test-tls-secret
+        hosts:
+          - ddhub-gateway-test-1.energyweb.org
+
+  probes:
+    liveness: true
+    livenessInitialDelay: 120
+    livenessPeriodSeconds: 10
+    readiness: true
+    readinessInitialDelay: 120
