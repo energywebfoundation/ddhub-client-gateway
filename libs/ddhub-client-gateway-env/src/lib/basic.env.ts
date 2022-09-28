@@ -1,6 +1,13 @@
 import * as Joi from 'joi';
 
 export const BASIC_ENVS = Joi.object({
+  IPFS_HOST: Joi.string().description('IPFS Host').required(),
+  IPFS_PORT: Joi.number().positive().description('IPFS Port').required(),
+  IPFS_PROTOCOL: Joi.string().description('IPFS Protocol').required(),
+  INFURA_PROJECT_ID: Joi.string().description('Infura project ID').required(),
+  INFURA_PROJECT_SECRET: Joi.string()
+    .description('Infura project api key')
+    .required(),
   NODE_ENV: Joi.string().description('Node environment'),
   DSB_BASE_URL: Joi.string()
     .uri()

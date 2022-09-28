@@ -27,6 +27,11 @@
 | SECRET_PREFIX | string | ddhub/ |  |  |  |
 | AWS_REGION | string | ap-southeast-2 | AWS Secrets Manager region |  | SECRETS_ENGINE == aws |
 | AZURE_VAULT_URL | string |  | Azure Vault URL |  | SECRETS_ENGINE == azure |
+| IPFS_HOST | string |  | IPFS Host |  |  |
+| IPFS_PORT | number |  | IPFS Port |  |  |
+| IPFS_PROTOCOL | string |  | IPFS Protocol |  |  |
+| INFURA_PROJECT_ID | string |  | Infura project ID |  |  |
+| INFURA_PROJECT_SECRET | string |  | Infura project api key |  |  |
 | NODE_ENV | string |  | Node environment |  |  |
 | DSB_BASE_URL | string | https://dsb-demo.energyweb.org | Message broker URL |  |  |
 | UPLOAD_FILES_DIR | string | ./upload | Directory where we should store temporary files for upload |  |  |
