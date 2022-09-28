@@ -128,6 +128,7 @@ export const useStyles = makeStyles()((theme) => ({
     '&:hover .MuiTypography-root': {
       color: theme.palette.primary.main,
     },
+
   },
   cancelButton: {
     height: 37,
@@ -203,5 +204,21 @@ export const useStyles = makeStyles()((theme) => ({
     letterSpacing: '0.4px',
     color: theme.palette.common.white,
     fontFamily: theme.typography.body2.fontFamily,
+  },
+  topicBox: {
+    overflow: 'auto',
+    '&::-webkit-scrollbar': {
+      width: 2,
+    },
+    '&::-webkit-scrollbar-track': {
+      backgroundColor: theme.palette.background.paper,
+      boxSizing: 'border-box',
+      borderRadius: 3,
+    },
+    '&::-webkit-scrollbar-thumb': {
+      backgroundColor: theme.palette.primary.main,
+      borderRadius: 3,
+    },
+    maxHeight: 200,
   },
 }));

@@ -149,20 +149,22 @@ export const SelectedTopic = ({
               </Typography>
             </Box>
 
-            {topicsList?.map((option) => {
-              return (
-                <Box
-                      className={clsx(classes.topic, {
-                        [classes.selected]: updatedTopic.topicName === option.topicName,
-                      })}
-                      key={option.id}
-                      onClick={() => handleClickTopic(option)}>
-                  <TopicItem
-                    option={option}
-                  />
-                </Box>
+            <Box className={classes.topicBox}>
+              {topicsList?.map((option) => {
+                return (
+                  <Box
+                        className={clsx(classes.topic, {
+                          [classes.selected]: updatedTopic.topicName === option.topicName,
+                        })}
+                        key={option.id}
+                        onClick={() => handleClickTopic(option)}>
+                    <TopicItem
+                      option={option}
+                    />
+                  </Box>
+                )}
               )}
-            )}
+            </Box>
 
             <Box display="flex" justifyContent="space-between" width="100%" pt={3} pr={2.5} pb={2.5}>
               <Button variant="outlined" className={classes.cancelButton} onClick={handleClose}>

@@ -1,4 +1,5 @@
 import { makeStyles } from 'tss-react/mui';
+import { alpha } from '@mui/material';
 
 export const useStyles = makeStyles()((theme) => ({
   detailsTitle: {
@@ -79,5 +80,17 @@ export const useStyles = makeStyles()((theme) => ({
     borderRadius: 6,
     padding: 6,
     marginBottom: 5,
+  },
+  noRecord: {
+    background: alpha(theme.palette.info.main, 0.12),
+    borderRadius: 4,
+    marginBottom: 20,
+  },
+  noRecordLabel: {
+    fontFamily: theme.typography.body2.fontFamily,
+    fontSize: 12,
+    lineHeight: '21px',
+    color: theme.palette.info.main,
+    padding: '9px 14px 10px 14px',
   },
 }));

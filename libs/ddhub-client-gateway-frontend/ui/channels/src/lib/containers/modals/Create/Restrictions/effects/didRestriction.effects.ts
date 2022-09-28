@@ -36,10 +36,10 @@ export const useDIDRestrictionEffects = (currentDids: string[]) => {
   };
 
   const addDID = (did: string) => {
-    if (dids.includes(did)) {
-      return;
+    if (!dids.includes(did)) {
+      setDids([did, ...dids]);
     }
-    setDids([did, ...dids]);
+
     clearDIDInput();
   };
 
@@ -50,16 +50,15 @@ export const useDIDRestrictionEffects = (currentDids: string[]) => {
   const updateDID = (type: RestrictionType, oldValue: string, newValue: string) => {
     const filteredDids = dids.filter((did) => did !== oldValue);
 
-    if (filteredDids.includes(newValue)) {
-      return;
+    if (!filteredDids.includes(newValue)) {
+      const didsToSet = [...filteredDids];
+
+      if (type === RestrictionType.DID) {
+        didsToSet.unshift(newValue);
+      }
+      setDids(didsToSet);
     }
 
-    const didsToSet = [...filteredDids];
-
-    if (type === RestrictionType.DID) {
-      didsToSet.unshift(newValue);
-    }
-    setDids(didsToSet);
     clearDIDInput();
   };
 

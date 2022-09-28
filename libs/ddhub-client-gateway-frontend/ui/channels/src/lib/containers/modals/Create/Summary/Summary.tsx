@@ -31,9 +31,11 @@ export const Summary = ({
       childrenProp: (
         <Box className={classes.tabRoot}>
           { !restrictionCount && (
-            <Typography variant={'body2'} className={classes.description} pt={1}>
-              No restrictions added
-            </Typography>
+            <Box className={classes.noRecord}>
+              <Typography className={classes.noRecordLabel}>
+                No restriction added
+              </Typography>
+            </Box>
           )}
 
           {restrictionRoles.sort().map((el, index) => (
@@ -65,9 +67,11 @@ export const Summary = ({
       childrenProp: (
         <Box className={classes.tabRoot}>
           {!channelValues.conditions.topics.length && (
-            <Typography variant={'body2'} className={classes.description} pt={1}>
-              No topics added
-            </Typography>
+            <Box className={classes.noRecord}>
+              <Typography className={classes.noRecordLabel}>
+                No topic added
+              </Typography>
+            </Box>
           )}
           {channelValues.conditions.topics?.map((el, index) => (
             <RestrictionListView

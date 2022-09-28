@@ -1,7 +1,6 @@
 import { KeyboardEvent, useEffect } from 'react';
 import { FieldValues, useForm } from 'react-hook-form';
 import { RestrictionType } from '../models/restriction-type.enum';
-import { RestrictionSelectProps } from './RestrictionSelect';
 
 export interface RestrictionSelectEffectsProps {
   setType: (value: RestrictionType) => void;

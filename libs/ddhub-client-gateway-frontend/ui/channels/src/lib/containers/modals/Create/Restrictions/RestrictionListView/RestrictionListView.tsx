@@ -43,7 +43,7 @@ export const RestrictionListView = (
         <Grid item display="flex" flexDirection="row">
           { type && (
             <Box className={classes.gridItem}>
-              <Typography variant="body2" className={classes.itemText}>{ type }</Typography>
+              <Typography variant="body2" className={classes.typeText}>{ type }</Typography>
             </Box>
           )}
           <Typography noWrap variant="body2" className={classes.itemText} pl='14px'>

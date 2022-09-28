@@ -42,10 +42,10 @@ export const useRestrictionsEffects = (restrictions: ChannelConditionsDto) => {
 
   const handleClose = () => {
     setOpen(false);
-    setType(RestrictionType.DID);
   };
 
   const handleOpen = () => {
+    setType(RestrictionType.DID);
     clear();
     setOpen(true);
   };
@@ -63,7 +63,7 @@ export const useRestrictionsEffects = (restrictions: ChannelConditionsDto) => {
   };
 
   const handleUpdateRestriction = (removeInput: string) => {
-    setRecent('');
+    setRecent(roleInput || didInput);
     updateRole(type, removeInput, roleInput);
     updateDID(type, removeInput, didInput);
   };

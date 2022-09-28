@@ -13,7 +13,7 @@ export const useStyles = makeStyles()((theme) => ({
   noRecord: {
     background: alpha(theme.palette.info.main, 0.12),
     borderRadius: 4,
-    marginBottom: 38,
+    marginBottom: 20,
   },
   noRecordLabel: {
     fontFamily: theme.typography.body2.fontFamily,

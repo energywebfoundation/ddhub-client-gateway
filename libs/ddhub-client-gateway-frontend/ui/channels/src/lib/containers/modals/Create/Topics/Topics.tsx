@@ -61,7 +61,7 @@ export const Topics = ({
           }}
           placeholder="Select Application"
           label="Select Application"
-          wrapperProps={{ mb: 1.2 }}
+          wrapperProps={{ mb: 2.375 }}
         />
         {topics.length > 0 && (
           <Autocomplete
@@ -79,9 +79,9 @@ export const Topics = ({
               }
             }}
             filterOptions={filterTopics}
-            placeholder="Add topic"
-            label="Add topic"
-            wrapperProps={{ mb: 1.2 }}
+            placeholder="Select topic"
+            label="Select topic"
+            wrapperProps={{ mb: 2.375 }}
           />
         )}
 
