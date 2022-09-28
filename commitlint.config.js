@@ -6,7 +6,7 @@ module.exports = {
   extends: ['@commitlint/config-nx-scopes', '@commitlint/config-conventional'],
   plugins: ['scope-empty-exceptions'],
   rules: {
-    'scope-empty': [2, 'never', ['ci', 'input']],
+    'scope-empty': [2, 'never', ['ci', 'input', 'chore', 'fix']],
     'scope-enum': async (ctx) => [
       2,
       'always',
