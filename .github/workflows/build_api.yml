@@ -10,6 +10,12 @@ on:
       ONEPASSWORD_TOKEN:
         required: true
         description: 1Password JWT
+      INFURA_PROJECT_ID:
+        required: true
+        description: Infura Project ID
+      INFURA_PROJECT_SECRET:
+        required: true
+        description: Infura Project Secret
 
 jobs:
   build-api:
@@ -57,6 +63,11 @@ jobs:
         run: docker-compose -f ci/docker-compose.yml exec -T vault_dev sh -c "vault secrets enable -version=1 -path=ddhub -address="http://localhost:8200" kv" || true
       - name: Run E2E tests
         env:
+          IPFS_HOST: ipfs.infura.io
+          IPFS_PROTOCOL: https://
+          IPFS_PORT: 5001
+          INFURA_PROJECT_ID: ${{ secrets.INFURA_PROJECT_ID }}
+          INFURA_PROJECT_SECRET: ${{ secrets.INFURA_PROJECT_SECRET }}
           DB_NAME: "postgresql://ddhub:ddhub@localhost:5432/ddhub"
           NODE_ENV: development
           DSB_BASE_URL: "https://ddhub-dev.energyweb.org"
