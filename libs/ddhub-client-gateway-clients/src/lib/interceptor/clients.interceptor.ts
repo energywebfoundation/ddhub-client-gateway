@@ -26,7 +26,7 @@ export function ClientsInterceptor(
       const param = request[fieldPath][fieldName];
 
       if (!param) {
-        throw new Error(`param not found ${fieldPath} ${fieldName}`);
+        return next.handle();
       }
 
       await this.clientsService.upsert(param);
