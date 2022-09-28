@@ -4,6 +4,7 @@ import {
   AcksEntity,
   ApplicationEntity,
   ChannelEntity,
+  ClientEntity,
   CronEntity,
   DidEntity,
   EnrolmentEntity,
@@ -13,11 +14,12 @@ import {
   ReqLockEntity,
   SymmetricKeysEntity,
   TopicEntity,
+  TopicMonitorEntity,
 } from './module';
 import { ConfigService } from '@nestjs/config';
-import { TopicMonitorEntity } from './module/topic-monitor';
 
 const ENTITIES = [
+  ClientEntity,
   ChannelEntity,
   IdentityEntity,
   EnrolmentEntity,

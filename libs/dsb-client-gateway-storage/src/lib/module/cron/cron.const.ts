@@ -10,6 +10,7 @@ export enum CronJobType {
   EVENTS = 'EVENTS',
   ROLES_REFRESH = 'ROLES_REFRESH',
   MESSAGE_CLEANER = 'MESSAGE_CLEANER',
+  CLIENTS = 'CLIENTS',
 }
 
 export enum CronStatus {

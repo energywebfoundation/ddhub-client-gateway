@@ -15,6 +15,7 @@
     "generate:scheduler:envs": "npm run build:scheduler:envs && node dist/apps/dsb-client-gateway-scheduler-envs/main.js",
     "build:scheduler:envs": "nx build-envs dsb-client-gateway-scheduler",
     "build:api:envs": "nx build-envs dsb-client-gateway-api",
+    "test:spec:clients": "nx test ddhub-client-gateway-clients",
     "commit": "git-cz",
     "start": "nx serve",
     "start:prod": "npm run migrations:run && node dist/apps/dsb-client-gateway-api/main.js",
