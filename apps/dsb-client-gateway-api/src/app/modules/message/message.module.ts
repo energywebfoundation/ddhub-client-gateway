@@ -24,6 +24,7 @@ import multer from 'multer';
 import { ConfigService } from '@nestjs/config';
 import { CertificateModule } from '../certificate/certificate.module';
 import { ReqLockService } from './service/req-lock.service';
+import { DdhubClientGatewayClientsModule } from '@dsb-client-gateway/ddhub-client-gateway-clients';
 
 @Module({
   imports: [
@@ -57,6 +58,7 @@ import { ReqLockService } from './service/req-lock.service';
     CertificateModule,
     AcksRepositoryModule,
     ReqLockRepositoryModule,
+    DdhubClientGatewayClientsModule,
   ],
   providers: [
     EventsGateway,

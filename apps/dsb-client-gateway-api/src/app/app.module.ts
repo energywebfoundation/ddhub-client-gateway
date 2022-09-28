@@ -24,6 +24,7 @@ import { GatewayModule } from './modules/gateway/gateway.module';
 import { HealthModule } from './modules/health/health.module';
 import { LoggerModule } from 'nestjs-pino';
 import { v4 as uuidv4 } from 'uuid';
+import { ClientModule } from './modules/client/client.module';
 
 @Module({})
 export class AppModule {
@@ -76,6 +77,7 @@ export class AppModule {
       DdhubClientGatewayEventsModule,
       GatewayModule,
       HealthModule,
+      ClientModule,
     ];
 
     const providers = [
