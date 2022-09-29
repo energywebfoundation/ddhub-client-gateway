@@ -32,7 +32,7 @@ export class DdhubClientsService extends DdhubBaseService {
     try {
       await this.request(
         () =>
-          this.httpService.delete('/channel/clientdIds', {
+          this.httpService.delete('/channel/clientIds', {
             httpsAgent: this.tlsAgentService.get(),
             data: {
               clientIds,
@@ -57,7 +57,7 @@ export class DdhubClientsService extends DdhubBaseService {
     try {
       const r = await this.request<string[]>(
         () =>
-          this.httpService.get('/channel/clientdIds', {
+          this.httpService.get('/channel/clientIds', {
             httpsAgent: this.tlsAgentService.get(),
             headers: {
               Authorization: `Bearer ${this.didAuthService.getToken()}`,
