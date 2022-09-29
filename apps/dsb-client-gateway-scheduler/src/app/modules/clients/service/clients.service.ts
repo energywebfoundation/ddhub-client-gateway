@@ -28,6 +28,8 @@ export class ClientsService implements OnApplicationBootstrap {
       true
     );
 
+    await this.clientsLibService.syncMissingClientsIds();
+
     if (!isCronEnabled) {
       this.logger.warn(`Clients cron job is disabled`);
 

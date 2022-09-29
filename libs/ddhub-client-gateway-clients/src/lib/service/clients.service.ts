@@ -5,11 +5,13 @@ import {
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
 import {
   ConfigDto,
+  DdhubClientsService,
   DdhubConfigService,
 } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
 import { Span } from 'nestjs-otel';
 import { MaximumNumberOfClientsReachedException } from '../exceptions/maximum-number-of-clients-reached.exception';
 import { LessThan } from 'typeorm';
+import { IamService } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
 
 @Injectable()
 export class ClientsService {
@@ -17,8 +19,49 @@ export class ClientsService {
 
   constructor(
     protected readonly wrapper: ClientWrapperRepository,
-    protected readonly ddhubConfigService: DdhubConfigService
+    protected readonly ddhubConfigService: DdhubConfigService,
+    protected readonly ddhubClientsService: DdhubClientsService,
+    protected readonly iamService: IamService
   ) {}
+
+  @Span('clients_sync')
+  public async syncMissingClientsIds(): Promise<void> {
+    const did: string | null = this.iamService.getDIDAddress();
+
+    if (!did) {
+      this.logger.error(
+        `failing to sync clients due to not initialized iam service`
+      );
+
+      return;
+    }
+
+    const clients: string[] = await this.ddhubClientsService.getClients();
+
+    this.logger.log(`found ${clients.length} clients`);
+
+    for (const client of clients) {
+      const clientWithRemovedDid: string = client.replace(did, '');
+
+      const clientExists: boolean = await this.wrapper.repository
+        .count({
+          where: {
+            clientId: clientWithRemovedDid,
+          },
+        })
+        .then((count: number) => count > 0);
+
+      if (clientExists) {
+        continue;
+      }
+
+      this.logger.log(`storing client ${clientWithRemovedDid}`);
+
+      await this.wrapper.repository.save({
+        clientId: clientWithRemovedDid,
+      });
+    }
+  }
 
   @Span('clients_upsert')
   public async upsert(clientId: string): Promise<void> {
