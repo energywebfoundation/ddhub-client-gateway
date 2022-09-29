@@ -14,6 +14,9 @@ export class AcksEntity {
   @PrimaryColumn()
   public clientId: string;
 
+  @Column()
+  public mbTimestamp!: Date;
+
   @CreateDateColumn()
-  createdDate!: Date;
+  createdDate?: Date;
 }

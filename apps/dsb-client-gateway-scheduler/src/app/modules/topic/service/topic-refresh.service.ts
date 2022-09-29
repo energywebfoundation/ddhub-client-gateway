@@ -116,7 +116,7 @@ export class TopicRefreshService implements OnApplicationBootstrap {
 
         const topicsForApplication: TopicDataResponse =
           await this.ddhubTopicsService.getTopics(
-            100,
+            500,
             undefined,
             application.namespace,
             1,
