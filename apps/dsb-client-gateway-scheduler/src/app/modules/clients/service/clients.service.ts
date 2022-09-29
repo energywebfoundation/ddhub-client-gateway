@@ -51,8 +51,6 @@ export class ClientsService implements OnApplicationBootstrap {
   }
 
   public async execute(): Promise<void> {
-    return;
-
     try {
       const till: Date = moment()
         .subtract(
