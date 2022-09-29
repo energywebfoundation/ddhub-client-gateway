@@ -37,21 +37,20 @@ export class ClientsService {
     }
 
     const clients: string[] = await this.ddhubClientsService.getClients();
+    const existingClients: ClientEntity[] = await this.wrapper.repository.find(
+      {}
+    );
 
-    this.logger.log(`found ${clients.length} clients`);
+    for (const clientId of clients) {
+      const clientWithRemovedDid: string = clientId.replace(did, '');
 
-    for (const client of clients) {
-      const clientWithRemovedDid: string = client.replace(did, '');
+      const matchingClient: ClientEntity | undefined = existingClients.find(
+        (clientEntity: ClientEntity) => clientEntity.clientId === clientId
+      );
 
-      const clientExists: boolean = await this.wrapper.repository
-        .count({
-          where: {
-            clientId: clientWithRemovedDid,
-          },
-        })
-        .then((count: number) => count > 0);
+      if (matchingClient) {
+        this.logger.debug(`client already exists ${clientId}`);
 
-      if (clientExists) {
         continue;
       }
 
