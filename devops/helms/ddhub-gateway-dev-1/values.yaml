@@ -60,6 +60,9 @@ ddhub-client-gateway-api:
         DID_REGISTRY_ADDRESS: "0xc15d5a57a8eb0e1dcbe5d88b8f9a82017e5cc4af"
         EVENTS_MAX_PER_SECOND: "50"
         NO_COLOR: "true"
+        IPFS_HOST: ipfs.infura.io
+        IPFS_PROTOCOL: https://
+        IPFS_PORT: 5001
   image:
     # repository: 098061033856.dkr.ecr.us-east-1.amazonaws.com/ew-dos-dsb-ecr
     repository: aemocontainerregistry.azurecr.io/ddhub-client-gateway-backend
@@ -96,8 +99,8 @@ ddhub-client-gateway-api:
   ingress:
     enabled: true
     annotations:
-      kubernetes.io/ingress.class: azure/application-gateway
-      appgw.ingress.kubernetes.io/ssl-redirect: "true"
+      kubernetes.io/ingress.class: nginx
+      nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
       external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
       cert-manager.io/issuer: prod-issuer
       cert-manager.io/issuer-kind: OriginIssuer
@@ -165,6 +168,8 @@ ddhub-client-gateway-api:
     encryptedData: 
       DB_NAME: AgBbQ10EVXPjRSwQCKgG4SZ4czRRTlFdA64gonLegy9CCBbbGV+Yc50CCmsKmMAukTkDJnX5q4KM8NI999Ew+geuJ69UctMpB9yxjnkz0gjO+ffiZAj5pA2IkU1D2g1DtQNcBkPqKTa4qNxxMlI2eS6QNSizm02FyLMoHYJPw9SLWISRY4VdtfXQht/SGVoOmT/TtpbXDIqBB2ogQq8q567BrHW1lTSrmdiQvxoV54P3k61nqJAoxOvlTYBYePrdMLs4GNLhQ8UJ8AaU6XRWWi/Y2toKYxaG6M7bGcO4sOQl9dmC3ybhfVxX5bRbduPcJUYKE+vZmoW1qtU1Yc/E0wPuP9fyvLLwrO3bje7i0z77wgRPI5jShs0Y27EZGCYkDUEPdy/jrqm2iHFhhFOB4DIHmowcamqnVrdftXQ4LMAMHlEDT6O55M+e6CUPChVDBhez0OdcUXoN2t6DksxIchuF0kCjoWNRbXE2ZD6VGP716KbfWe0NlrRm+ofcC2O4jlnM/UDpgWdl7bE47WER3gTS470wn0LafLIN0TuYPSynGXFKpo050sgO6l5cZqZ2DMLiYCosCTCyCrv8gJBNSaUzGOHF1ssKH49o2xuRg6q+TRt4+EsEymNz5+E0CCFG0dckshs1c8cChD/gbVg2IkoLR5kE6522lFc6YppRgcut0h3E17Utn+2eBpxFjW950Ds+1asX2eAvAF3cUD47PA01QH1CvZ4qA/XcI6X158wtrWbIGjK0d6YnXzUaJfKBElw8QnGIJ/t0Iaoevc9zagLsywuK58M3pvZGT3CmoEvKAuhtZqhcgRqDJfMYXkdTAE2xkPM=
       VAULT_TOKEN: AgAcJcl2KUxoZnTNPKlEnWt8bv9aJ2VqFtYPU4LiXeFXQgyFZzNPXkdFtWRd5xVOozkasOhHQOH10Qy5kGyaYIM2zBtzUCvD4M7kH0ItMNkJNWddQwkljO3wuA9co9WDlDMe9HlWt2ukcvYOlpimW/Z/1dGNVxzrv6y5Cfj8ndUgg6/aPhHBTkP3yY80mdX6IybupKLkU7aFCD9O5A5UyJBDgHfUnJ8jBHiSoZ0V/C9fcyXt1mTyJ+IdeBagBazIDKcyqFRlmaE5heZ/F+WagLlVH68AsypJwoAxmXnMVet4/zI+DzrLZqzQwidAYTSEeLiUDRs3cU8VaNG44i82fG32M54dLY6x9WoZLYhr2sCLofxg1RSU5N2Nq5kq7t4plvl0SfPVOwjt1unwz3xzKTpY+Mjkl4dHcEDvMTc0QHwbaw0zAju3EIiFu2WP9L8fHzicVBVF299rgSTZsawOFhQWBf3sH4p3hUzoMPVluA+MISE7ikTrrvy7Q2eNL2JNBaY0GQjF8hG8oeTvbLz3lEmpYSpo6rZjAXyY59aHs7JLCyWxeykajbetC/PBjnWaHq58WqhgpbmyY+NvOq8ZE64kaEpTxayqSyuDO0tTETxKeulK7Ru3sMdumMg1oUCJi21Y/VqeFXqgCJgjPtpefc2HpI08aQVQdWgvN9teuOkhwBxKPkcN/p57s03hTHNDMEDSI/aArxX0utIlDJPmrQgOYqZHUjJFTPnTsnwf
+      INFURA_PROJECT_ID: AgBhNPJUs8XZ552PNkr79uIqx66FcPoiyk6wJThEkYYL2mecq89VCZbL7CpbY/IB/e1jaiKvh5U/nuv4UA4amX3e1ogTFXVWE/wcYSNtC3eh4QlKXiTvEspwlYctfK5sGSpE+8zZZajOgRAin8cJR9ACTIHnjqxYHoZdLLwD+KdVIB7K0asPi+huJpsR+Qth1fh4KXQmy7GDM6PrkJNsowdV42tnJxS3S9MctEaXG8H0pLgtizfwoap+RdSNlUpO9oZZTkOSnvEZFhmPggKyPS4Gz2zFg+s2gyVmAo6/80VVjjk/B9Ja9y3i9sCHwnGhdwGCvpa+gAYu3C3i+sRBlj3M1wZTMMcF8iMJwXnDXm6w7WX95m8WbRGjQN0cQeOavrVHTz1xm4hNaee/Lv/JHpYCy4XBnJsMT/6ifJ6XXFCSrmNtlv4P1K4Iz6Lp3X6X0GF/+ZWZpdwcAYUYTjCr/GzaoonXV2+fl/rLSNHaL6M7sq7O21MK79HYs2huKkHfN4AIetpo8IYK6u4TA92inCW47iD1bDIOjeom2x58eY5Ckf/G+Gv67qT1EOVUSVIZWBqDJQnz3S5hxczfEJUWJdYtf0PhmxhGeIu1ih36sK94vo6ZGld2Qs7xj3cRJ9dpPCL+SKYstiQRMhSTKIOnfPb8PG3iJIi+cNBOyF3/N7VS3zaKlfkaq7DtbHQHHVNDBxuTpOz6GyEuTUr2ZkBFPk/V3354uHIDR1ONaPg=
+      INFURA_PROJECT_SECRET: AgCnW051ScFiM/VlL9LoRtHiKUZKVnwGOxrpYxsWIkIilAzG85mSLXaSCOTArZYHn9IaQhWx7D4BFDNHVwCXuvzfOOFeP6bTz4DTqYTJizoZpownq+LqICyZbKfqN6uezNNqKuZoxPAhrfGG5XvcJNkLMceQfQ18BRCS7cI4D/jcWhS3LBeDOGjO1RmClJD2hPfZCo7+5joN19jscan2mrssTZ1iMlcH+hoS+nlTuExG0ocAO1+HJr+PhXQRZUxb2aT0RZ3KGX+L4rV8vAlxlVRA0FUmX2VXpDgMS5psqllylkfuSRwNVry1vB68Ha/FHVoyalNPPyGeEDimtxV9Ae3v0EvbrFRJ3zaZ5HhgJt25HIIlSkGpeuZ3Duu9PLvOFkbiqTrWehrnnnQJiMLI8u8g+NDFyRZyfpwuZwBhVOof43/TjvNT8LDJ967SeDFOgUb6Xl4DHSxVdbARboQFqgFk9cWN0Y+NpCRCycx6AFZTSIJmhJMkBwc0NXm1ubNXkDgS4bqslmcYR3eEOqWXamwOK+WT/39tR3A7/BRN0AsZJl3ojhOcfqTLlCgR20RH/R5sd72+RAWJ1q2aro56NtLSon4DA9zjnN7L+chIp4XldFyUASsoiiOgJqtHhpn0mZOnGwkJVLNRamgmTqh5aHhaxtaw9DwvubbP1Zzqef6ciXGm+MnMw5YToVgAq7gRiNFPhxt5OwYIk7LilMi4eOI68hm0XM4Ny7KFT5LbpU0RQQ==
 
   probes:
     liveness: true

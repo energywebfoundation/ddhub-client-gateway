@@ -59,6 +59,9 @@ ddhub-client-gateway-api:
         DID_REGISTRY_ADDRESS: "0xc15d5a57a8eb0e1dcbe5d88b8f9a82017e5cc4af"
         EVENTS_MAX_PER_SECOND: "50"
         NO_COLOR: "true"
+        IPFS_HOST: ipfs.infura.io
+        IPFS_PROTOCOL: https://
+        IPFS_PORT: 5001
   image:
     # repository: 098061033856.dkr.ecr.us-east-1.amazonaws.com/ew-dos-dsb-ecr
     repository: aemocontainerregistry.azurecr.io/ddhub-client-gateway-backend
@@ -69,6 +72,11 @@ ddhub-client-gateway-api:
   imagePullSecrets: []
   nameOverride: "ddhub-gateway-api-dev"
   fullnameOverride: "ddhub-gateway-api-dev"
+
+  config:
+    enabled: true
+    secretRefName: ddhub-gateway-api-dev-sealedsecret
+    configRefName: ddhub-gateway-api-dev-configmap
 
   serviceAccount:
     # Specifies whether a service account should be created
@@ -99,8 +107,8 @@ ddhub-client-gateway-api:
   ingress:
     enabled: true
     annotations:
-      kubernetes.io/ingress.class: azure/application-gateway
-      appgw.ingress.kubernetes.io/ssl-redirect: "true"
+      kubernetes.io/ingress.class: nginx
+      nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
       # kubernetes.io/tls-acme: "true"
     hosts:
       - host: ddhub-gateway-dev.energyweb.org
@@ -158,7 +166,14 @@ ddhub-client-gateway-api:
 
   tolerations: []
 
-  affinity: {}
+  sealedSecret:
+    enabled: true
+    encryptedData: 
+      DB_NAME: AgCH5Sirl/qsMd6SWySQr+79QRL4UxPhEcvQBo/OyEve6ew1R5Yf0Iksll+WFpx4do+w+ZvdygWhIhP9vyOlxvwWHfZdc24rlvnAewdnDZ9W0y9sRD/TUo4acSSDRJcCnTkcoMRLQUoXivfaWHGEy5Fq2Z8+jvuPyL3vByeUD0QeStTH3bwxTKNpu4Qwtof2C1WWo7dmWR9ZXBucWAHKoZG9b5BwXb6VSBgr0NtyU5HuhEM5xZbbJskran45kUbd/ehDOeGjWZCkywdgdHOhyADEHOu+Qjn11WBpZqRnrFxXFOjjL6iEVxWh1RiPLB5CXcNhCARn/MV9ovwBBqfo+bJUsccqVeo3HdqbAcubyN6jswRtTi66/R4B3C+GLBojRem20slZJ+r8nbsN4B6KWyXyjCq6+/WLOPcL9tQf1T1buf8B25nBpiFemYyKsWcN2Ex8o6esIFsQ3e2M3vzSXYxfNhM9YFc0yeWIgAL6ud6z4i4+C6qTbndTAYjg88/fSsJ5pyMzYEATOf2lNY2VbaEIP9ta0BTF36oGBrWfktsF91u6U5Mx+JC27XNCDm/Eyy9/l/+FzkdLBUa/HVCIBm7cXvncQk8kcBYGsp4ciOfOOmcWPOFKEu0DVmRf+/zA4xD2YqCTZjAoa4kK9dcLywWPouAMrG1FFEs15oZ1HMQKyhFKLzFFFXPxiIWys9/7sXUJNASld5n0RKt4Om2qcf4/Oh8ZBxHXLFE7NBYFUjQn6wAaYuI4Dn5uPn+5OUdXNcGHkL5G+sdQw19AS+LTI86AhQxUeXnbfo4WnwReOBrmLB3IRziZBZHlErB4bOe2Rf62pg==
+      VAULT_TOKEN: AgAvrAtM3n21BLfvFIsMHsXNC22uoK/TNhIGZSBxnBHsYWJ1sk91UAF/uDApnFsPk33BJvf6ABg/eFbUvwGETrQsJGx1OlTzgfucxZOA0RcgjS8Om/o+BRMpa7rEsF7oStuSDnKWYgduIyaOQ+Lfw/wtK/9PfEx5xJ7ky7faUp5PjpL1KHbKQlLSLJuojhoJT91Huodxi6v0nYY5+2/AkO2ozDgr825mGrCbiJzelIQhZtvY//CXBqbdTCOaxNeK8AITEnYieRf1tEP8vKItVRsyg7N2Wl+t2QGsaJpnUNo2gFXuw9B/pT7w/h6IEGqcXgWd1jWEFD87IrlRfKonvQvSzb/WGUwuDo5NtSnxyCXJgv2HtGkvN5itwivCdbBNHhjHqits4w/P/NRePTQzwgHTLkH2OLQagCIdSmKvcR3vaQsUaCeECiNADCEqCBUpg+9vduem904CKLBnsX0RPKmnhzxjtaNYzBEMhSY4/QvNDkAA0umrSswMgQ8V7OJQrBYXYE+i3mxu5PuZl1q+SOtti026J3qvhSE8apfZTFOAS0MBwAtIT8rwBd+ZY2vpW2K7Z6BBK3CxXlVHUGDUAMb0/2g0XcIeuPF5Xy8JHXt8N3041UoFXXKfJR8yJqThIkn8w6O1m3j+2O2Cbwic4+WKE6u89/7avA/kO9o+xHHhmsL5YdHjTdkSvUAmufCc29LSw6etKWrNTCoNKUVaxB4cpRA2gIBcZnl5UW+I
+      INFURA_PROJECT_ID: AgB9kdiocH3aWIHoM71YXvQhaKpyxnzID5c7y9K3aC5DK491zKCdGQyIURAn4Fd1Ys0r7Nvxu5LAszUGVIniMR4NgLbzj4kt6+ySqVlWf7S67kRmuUBaCmhYs6/lyudC0Vxko/8hWLeUVt5bKfMJjzw5hZozlv7oJG6m19KdL8334zSB8q0qT1JDWEiHZaVuWSCAcEbWneVSJsv8mnO0fiAHknbNT2ya19WCY74t9Pc+ckwrAKpiQ59R3n6kBMwJIujGbnmxO9qsxyEIOwydXIAjlxIpfA4ulokBI11RV8A8Dk1kxZz6Xk3ADgc9k91aPjkJBGLJ76OyiXEBtEhxARzbUeebdrAXcRRjSEeVir7MnLsNZ1EGKtuxgGrQV0hBT77CJCovKkloJI4RYmO3HSDKU1SmHq9Dl5prqdTzjggW92lSUgMD3aqj8Ia3dJtKWQo8uhSx07EorHEfAE8rjVbrHpDl0OwmNJdAKnq3iygxEu2Lqe9JOO9JWJtpURo+m/FkWzXfHoXQvZj5OAQp1Pw52IXBXdwrkRGJ32+B39d8dlKNcV3n/lJq524g7TqTf1jFVlSLG9O59RNOw6RHYwtJkxHG6BIqs4Wnabc556M4SdLX8u8wefJbUDCNHO8jMM/YANiekgy7qoCF+aA1IA0hN0NwyatO/posZebYjHzBbx/r7UE9pbDK9L8U5qoiraLJ9HkxItEqiqKeFApgazq2KLt4oVx1HAOzEZs=
+      INFURA_PROJECT_SECRET: AgBMc48TSN9ZSK3RKqqIrqNyJZI4p6TkJ+Tw/KVaDF+eD3XgXs18rFRt/+IdJVM1lXkHKHgmdIrPuYvFGfUg/eHtYmQPdpmIZe908wAgiA85dNyTKg7lCj6xZXG+Kv7CcLQOrCH4rBWwFXiAuzb/VXeS2pNKMVeEJtpqykckLLVsJQXCeWRUtlma4lUvcl1digf+DMSIBmmWVad44zqPWRgcFYDAoZ0QndstTHM7UwFBRwaJoshenE8nqXzm95/w25FWB7nuI2BNj0r9MsxsxTE/xebUAAVkoF8oQ4Cb9Zt6hA50m351ai518X+cy9Mq4t8/Tf7Iedha9R2xdmPX3gqdfQ5w9aWM17XPLydDIB46FYEYgi+pDr112QFL5+/r76scse5PWZ5L18U2pZ43Oz4SQ0EGQqs16DlwbP7fQt+sjgDKXQioGCk7rvH+69u0AgVKpP/hCBQnBCQQ5J59sc1rRfM9BmaeJJUGMHSAhgJG5Nm+Jla2KD7rqhD6lZe6gZD+dcR0hNGrLGDmjrklUwm48SWL0BDiyRt0jMHVnhHQ746DpvI61eChOM1fkSz+QZyzgYd0grrf68lmMCgMjhjo3YpdvEVATZpBODCmlejFIYVKMx/vORpMacnsfZnfYYaVDAiY8aKio4YpIZppxx6gka769ZsON9Z3duVpbpPXGdbx1ZBLxZTESSKrSQojvHfeVVPaJycki6ruEPYT6hD3/sN7xS21/SlQW0aj28Z3MQ==
+
 
   pvc:
     enabled: true

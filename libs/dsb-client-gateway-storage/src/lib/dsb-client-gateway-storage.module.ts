@@ -4,19 +4,22 @@ import {
   AcksEntity,
   ApplicationEntity,
   ChannelEntity,
+  ClientEntity,
   CronEntity,
   DidEntity,
   EnrolmentEntity,
   EventsEntity,
   FileMetadataEntity,
   IdentityEntity,
+  ReqLockEntity,
   SymmetricKeysEntity,
   TopicEntity,
+  TopicMonitorEntity,
 } from './module';
 import { ConfigService } from '@nestjs/config';
-import { TopicMonitorEntity } from './module/topic-monitor';
 
 const ENTITIES = [
+  ClientEntity,
   ChannelEntity,
   IdentityEntity,
   EnrolmentEntity,
@@ -29,6 +32,7 @@ const ENTITIES = [
   EventsEntity,
   AcksEntity,
   TopicMonitorEntity,
+  ReqLockEntity,
 ];
 
 @Module({
