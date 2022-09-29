@@ -16,6 +16,10 @@ on:
       INFURA_PROJECT_SECRET:
         required: true
         description: Infura Project Secret
+  workflow_run:
+    paths-ignore:
+      - 'devops/**'
+      - 'get-started/**'
 
 jobs:
   build-api:
