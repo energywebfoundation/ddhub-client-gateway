@@ -1,10 +1,5 @@
 name: Build Frontend
-on:
-  workflow_call:
-  workflow_run:
-    paths-ignore:
-      - 'devops/**'
-      - 'get-started/**'
+on: [workflow_call]
 
 jobs:
   build-fe:
