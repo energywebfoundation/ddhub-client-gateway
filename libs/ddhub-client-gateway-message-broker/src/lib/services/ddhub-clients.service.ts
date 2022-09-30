@@ -72,7 +72,7 @@ export class DdhubClientsService extends DdhubBaseService {
     } catch (e) {
       this.logger.error(`get clients failed`, e);
 
-      return null;
+      return [];
     }
   }
 }
