@@ -32,6 +32,9 @@ ddhub-client-gateway-api:
       appConfig:
         EVENTS_MAX_PER_SECOND: "50"
         NO_COLOR: "true"
+        IPFS_HOST: "ipfs.infura.io"
+        IPFS_PROTOCOL: "https://"
+        IPFS_PORT: "5001"
   image:
     # repository: 098061033856.dkr.ecr.us-east-1.amazonaws.com/ew-dos-dsb-ecr
     repository: aemocontainerregistry.azurecr.io/ddhub-client-gateway-backend
