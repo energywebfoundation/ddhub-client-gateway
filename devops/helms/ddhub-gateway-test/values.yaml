@@ -18,7 +18,7 @@ ddhub-client-gateway-api:
       opentelemetry_enabled: false
     ui:
       image:
-        repository: aemocontainerregistry.azurecr.io/ddhub-client-gateway-scheduler
+        repository: aemocontainerregistry.azurecr.io/ddhub-client-gateway-frontend
         pullPolicy: IfNotPresent
         # Overrides the image tag whose default is the chart appVersion.
         tag: a82aeef3-193d-4534-99d4-900b835cb820
