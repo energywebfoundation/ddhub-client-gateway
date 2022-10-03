@@ -4,7 +4,10 @@ on:
   pull_request:
 
 jobs:
+  lint-commits:
+    uses: ./.github/workflows/commitlint.yml
   build-api:
+    needs: lint-commits
     uses: ./.github/workflows/build_api.yml
     secrets:
       ONEPASSWORD_VAULT_ID: ${{ secrets.ONEPASSWORD_VAULT_ID }}
@@ -12,9 +15,9 @@ jobs:
       ONEPASSWORD_TOKEN: ${{ secrets.ONEPASSWORD_TOKEN }}
       INFURA_PROJECT_SECRET: ${{ secrets.INFURA_PROJECT_SECRET }}
       INFURA_PROJECT_ID: ${{ secrets.INFURA_PROJECT_ID }}
-  lint-commits:
-    uses: ./.github/workflows/commitlint.yml
   build-frontend:
+    needs: lint-commits
     uses: ./.github/workflows/build_frontend.yml
   build-scheduler:
+    needs: lint-commits
     uses: ./.github/workflows/build_scheduler.yml

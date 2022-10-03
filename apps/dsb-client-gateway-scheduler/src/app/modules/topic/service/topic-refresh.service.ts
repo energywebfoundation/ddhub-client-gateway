@@ -123,7 +123,6 @@ export class TopicRefreshService implements OnApplicationBootstrap {
             [],
             true
           );
-
         for (const topic of topicsForApplication.records) {
           if (topic.deleted) {
             this.logger.log(`${topic.id} got deleted`);
