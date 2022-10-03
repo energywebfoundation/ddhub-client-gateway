@@ -30,7 +30,7 @@ ddhub-client-gateway-api:
         # Overrides the image tag whose default is the chart appVersion.
         tag: a82aeef3-193d-4534-99d4-900b835cb820
       appConfig:
-        EVENTS_MAX_PER_SECOND: "1000"
+        EVENTS_MAX_PER_SECOND: "50"
         NO_COLOR: "true"
         IPFS_HOST: "ipfs.infura.io"
         IPFS_PROTOCOL: "https://"
