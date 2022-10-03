@@ -28,8 +28,6 @@ export class ClientsService implements OnApplicationBootstrap {
       true
     );
 
-    await this.clientsLibService.syncMissingClientsIds();
-
     if (!isCronEnabled) {
       this.logger.warn(`Clients cron job is disabled`);
 
@@ -52,6 +50,8 @@ export class ClientsService implements OnApplicationBootstrap {
 
   public async execute(): Promise<void> {
     try {
+      await this.clientsLibService.syncMissingClientsIds();
+
       const till: Date = moment()
         .subtract(
           this.configService.get<number>('CLIENT_EXPIRATION_DAYS'),

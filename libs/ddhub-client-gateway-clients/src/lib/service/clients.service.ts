@@ -102,6 +102,8 @@ export class ClientsService {
     await this.wrapper.repository.delete({
       clientId,
     });
+
+    await this.ddhubClientsService.deleteClients([clientId]);
   }
 
   @Span('clients_getAll')
