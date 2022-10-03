@@ -1,0 +1,21 @@
+{
+  "fqcn": "testjson33456780dasdsa",
+  "payloadEncryption": true,
+  "type": "pub",
+  "conditions": {
+    "dids": [
+      "did:ethr:volta:0x09Df5d33f1242E1b8aA5E0E0F6BfA687E6846993"
+    ],
+    "roles": [],
+    "topics": [
+      {
+        "topicName": "Vikas_Topic_JSON_V345",
+        "owner": "dsb.apps.szostak.iam.ewc"
+      },
+      {
+        "topicName": "Vikas_Topic_JSON_V34",
+        "owner": "dsb.apps.szostak.iam.ewc"
+      }
+    ]
+  }
+}

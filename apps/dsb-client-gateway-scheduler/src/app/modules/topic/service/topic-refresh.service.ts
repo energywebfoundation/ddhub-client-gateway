@@ -116,14 +116,13 @@ export class TopicRefreshService implements OnApplicationBootstrap {
 
         const topicsForApplication: TopicDataResponse =
           await this.ddhubTopicsService.getTopics(
-            100,
+            500,
             undefined,
             application.namespace,
             1,
             [],
             true
           );
-
         for (const topic of topicsForApplication.records) {
           if (topic.deleted) {
             this.logger.log(`${topic.id} got deleted`);

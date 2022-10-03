@@ -16,6 +16,7 @@ ARG NODE_ENV=production
 
 FROM $IMAGE
 
+ARG NODE_ENV
 ENV NODE_ENV=$NODE_ENV
 
 RUN apk add --no-cache python3 py3-pip make g++

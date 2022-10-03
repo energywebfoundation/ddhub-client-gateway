@@ -11,3 +11,5 @@ export * from './events';
 export * from './acks';
 export * from './topic-monitor';
 export * from './req-lock';
+export * from './clients';
+5;

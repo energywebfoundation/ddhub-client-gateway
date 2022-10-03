@@ -1,4 +1,10 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 @Entity('symmetric_keys')
 export class SymmetricKeysEntity {
@@ -13,4 +19,10 @@ export class SymmetricKeysEntity {
 
   @Column()
   senderDid: string;
+
+  @CreateDateColumn()
+  createdDate!: Date;
+
+  @UpdateDateColumn()
+  updatedDate!: Date;
 }
