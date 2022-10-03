@@ -2,7 +2,7 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 ddhub-client-gateway-api:
-  replicaCount: 1
+  replicaCount: 2
 
   clientgateway:
     config:
@@ -16,13 +16,19 @@ ddhub-client-gateway-api:
       secret_prefix: "ddhubtest1/"
       node_env: test
       opentelemetry_enabled: false
+    ui:
+      image:
+        repository: aemocontainerregistry.azurecr.io/ddhub-client-gateway-scheduler
+        pullPolicy: IfNotPresent
+        # Overrides the image tag whose default is the chart appVersion.
+        tag: 656eb648-bb0f-4e50-9684-297394e27acb
     scheduler:
       enabled: true
       image:
         repository: aemocontainerregistry.azurecr.io/ddhub-client-gateway-scheduler
         pullPolicy: IfNotPresent
         # Overrides the image tag whose default is the chart appVersion.
-        tag: 0.12.0
+        tag: 656eb648-bb0f-4e50-9684-297394e27acb
       appConfig:
         EVENTS_MAX_PER_SECOND: "50"
         NO_COLOR: "true"
@@ -31,7 +37,7 @@ ddhub-client-gateway-api:
     repository: aemocontainerregistry.azurecr.io/ddhub-client-gateway-backend
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
-    tag: 0.12.0
+    tag: 656eb648-bb0f-4e50-9684-297394e27acb
 
   imagePullSecrets: []
   nameOverride: "ddhub-client-gateway-api-test-1"
