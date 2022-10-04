@@ -22,6 +22,7 @@ ddhub-client-gateway-api:
       IPFS_HOST: "ipfs.infura.io"
       IPFS_PROTOCOL: "https://"
       IPFS_PORT: "5001"
+      AZURE_VAULT_URL: https://aemo-vc-vault.vault.azure.net
     ui:
       image:
         repository: aemocontainerregistry.azurecr.io/ddhub-client-gateway-frontend
