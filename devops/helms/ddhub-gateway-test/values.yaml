@@ -21,14 +21,14 @@ ddhub-client-gateway-api:
         repository: aemocontainerregistry.azurecr.io/ddhub-client-gateway-frontend
         pullPolicy: IfNotPresent
         # Overrides the image tag whose default is the chart appVersion.
-        tag: bff23033-2bea-4cfa-9a65-3e7238aca823
+        tag: 656eb648-bb0f-4e50-9684-297394e27acb
     scheduler:
       enabled: true
       image:
         repository: aemocontainerregistry.azurecr.io/ddhub-client-gateway-scheduler
         pullPolicy: IfNotPresent
         # Overrides the image tag whose default is the chart appVersion.
-        tag: bff23033-2bea-4cfa-9a65-3e7238aca823
+        tag: 656eb648-bb0f-4e50-9684-297394e27acb
       appConfig:
         EVENTS_MAX_PER_SECOND: "200"
         NO_COLOR: "true"
@@ -40,7 +40,7 @@ ddhub-client-gateway-api:
     repository: aemocontainerregistry.azurecr.io/ddhub-client-gateway-backend
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
-    tag: bff23033-2bea-4cfa-9a65-3e7238aca823
+    tag: 656eb648-bb0f-4e50-9684-297394e27acb
 
   imagePullSecrets: []
   nameOverride: "ddhub-client-gateway-api-test-1"
@@ -97,3 +97,9 @@ ddhub-client-gateway-api:
     livenessPeriodSeconds: 10
     readiness: true
     readinessInitialDelay: 120
+
+  sealedSecret:
+    enabled: true
+    encryptedData: 
+      INFURA_PROJECT_ID: AgBDIP3QnIpo4X6J5scMh9SYZbjnTlwVeaGyX7jKfvef4r0HOLiffxJC/bwzsSC/q1e3Ycc96AIbZWkKuvdo9i2uJo5FnBiDpHJe3ImT3ZhlrC0XEOc3gygSq6IpGIGvfCbNEHFEaIKxJs+vuVc+1ifMqVe55Y2X24f67AqG2HBj3nWk2IainWVkHZH4Bb+K39aWq+JgOI9rhB3QmEPMZyQrs7T+G/rgJ5LZ9h0uKq+7ieskF5N/YI/mfCm9BRLMZ+H+0KYzisvOr2w6mlVNmbeeKHTo6oiwa2CTt7XNJTHfeMy5f+wTv5DPB3HOpjRVO1xO8+d5AhTJJ9ALLEQzbaXKEO1MF6fWjwcgXG2fox1qlLVs338oG57RnLJfLzS0nt3ccp+CZUOSt0oJRQWaHdsWM03qXFOIipYCC9YLqVEm78rmFbhchfvBWeTn727w3yey5FD7kglud6Gq03qX8d7S09Gq4JZmAcyFonNueihTaCofq3RYyZXGTW7MvzxJJUMiLrof+DkG7BsKFImvB8mnxU1P3bdqEkSnaZoV2oKuvhjaPMh6Lf0+ZCROmdh7AL/NDf6MwrBnaGlWy16VmU+6QW+g2aqgI/F+Gms4aBsSrlY5oeQXDkUrgZlrNNSWt+VJOWpS62wRb9x9RpaOSPm97VXE0y9nUOAAELdCYH+jTb/+2pbSCGOPiPw3iaERrp3JMdPRk0fak1EfnI9HMrzv7AlPJbX1+dt5De8=
+      INFURA_PROJECT_SECRET: AgC57eySz2kjsPXFJ6CNpIzrDHBK1mnJN8IB3wGhwXHnMkWVzFeqdeXiyQJvYYgdVj6k86UtciQSP6+cxNwe9yGPlvFBonq3/TNDGflafoqP5pZ7Vf7NPukEMU0LSL0JkhTSrwNGjanxcP56EhwpEB0QKt6EuOBz78BME27PcGQJG8cdHDvym93n0vpRH70rSqfsL4Ki6vihXMC6X0+s47zkDTVAw74F4OXNQv6GPE++OozeaUriKHbxfV/sA1qkJ7EME7x53v3X3vONShgDnuQLmAh8dzrCzwn8vGL3wKw6OHJdBUMoFQgKTsQ43B/BfcutcRL/KMUL71GY52mkabrSxd8/nydU1cwOTYqvK5Tus7PrTNfDRJv3VLrQudThc8wDlcZktMWxfm6GccZ1ePz/6dK90aU3Y8uWzj846TBOHrWLgFENEz4GU/RMY4Z++KztlrbostxI6VrUV44EtIDVkqcW2ADdLWHr6h/dMjaxDNtCtoQvYRHAZFF7BrFEUdlzl0M46Qncdz6E9ki7On40tcBcD5X6zNT8fT0J/nJbone7aloD//i26l5nRXtWTSrMiEE066Qt2GGCRgiRzARB1DtMEi/lKTjRs4y0eF9MAXFa0u3XwVYWEH5x1YSWwO0ARUpA2DpzDKiDcUydIIE+pSffQsbIwFXG4AE2CLCbnEMewARlEAczxJAJRgh2nISH0hLfYyAkJDjvuAmAZXN9zVkyAaJISEqR8aTmV6RkHQ==
