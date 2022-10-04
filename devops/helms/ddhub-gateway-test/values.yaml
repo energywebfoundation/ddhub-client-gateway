@@ -5,17 +5,23 @@ ddhub-client-gateway-api:
   replicaCount: 2
 
   clientgateway:
-    config:
-      dsb_base_url: http://ddhub-messagebroker-proxy-test.ddhub-test.svc
-      rpc_url: https://volta-rpc-vkn5r5zx4ke71f9hcu0c.energyweb.org/
-      cache_server_url: https://identitycache-dev.energyweb.org/v1
-      event_server_url: https://identitycache-dev.energyweb.org
-      parent_namespace: ddhub.apps.energyweb.iam.ewc
-      secret_engine: azure
-      secret_engine_endpoint: http://vault.ddhub-dev.svc:8200
-      secret_prefix: "ddhubtest1/"
-      node_env: test
-      opentelemetry_enabled: false
+    envVars :
+      CACHE_SERVER_URL: https://identitycache-dev.energyweb.org/v1
+      EVENT_SERVER_URL: https://identitycache-dev.energyweb.org
+      DSB_BASE_URL: http://ddhub-messagebroker-proxy-test.ddhub-test.svc
+      RPC_URL: https://volta-rpc-vkn5r5zx4ke71f9hcu0c.energyweb.org/
+      EVENT_SERVER_URL: https://identitycache-dev.energyweb.org
+      PARENT_NAMESPACE: ddhub.apps.energyweb.iam.ewc
+      SECRETS_ENGINE: azure
+      VAULT_ENDPOINT: http://vault.ddhub-dev.svc:8200
+      SECRET_PREFIX: "ddhubtest1/"
+      NODE_ENV: test
+      OPENTELEMETRY_ENABLED: false
+      EVENTS_MAX_PER_SECOND: "200"
+      NO_COLOR: "true"
+      IPFS_HOST: "ipfs.infura.io"
+      IPFS_PROTOCOL: "https://"
+      IPFS_PORT: "5001"
     ui:
       image:
         repository: aemocontainerregistry.azurecr.io/ddhub-client-gateway-frontend
@@ -29,12 +35,6 @@ ddhub-client-gateway-api:
         pullPolicy: IfNotPresent
         # Overrides the image tag whose default is the chart appVersion.
         tag: 656eb648-bb0f-4e50-9684-297394e27acb
-      appConfig:
-        EVENTS_MAX_PER_SECOND: "200"
-        NO_COLOR: "true"
-        IPFS_HOST: "ipfs.infura.io"
-        IPFS_PROTOCOL: "https://"
-        IPFS_PORT: "5001"
   image:
     # repository: 098061033856.dkr.ecr.us-east-1.amazonaws.com/ew-dos-dsb-ecr
     repository: aemocontainerregistry.azurecr.io/ddhub-client-gateway-backend
