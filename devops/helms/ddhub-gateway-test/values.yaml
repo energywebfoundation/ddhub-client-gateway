@@ -25,7 +25,7 @@ ddhub-client-gateway-api:
       NEXT_PUBLIC_PARENT_NAMESPACE: ddhub.apps.energyweb.iam.ewc
       CHAIN_ID: 73799
       DID_AUTH_URL: http://ddhub-messagebroker-proxy-test.ddhub-test.svc
-      PORT: 3333
+      # PORT: 3333
       WEBSOCKET: NONE
       WEBSOCKET_RECONNECT: false
       EVENTS_EMIT_MODE: BULK
