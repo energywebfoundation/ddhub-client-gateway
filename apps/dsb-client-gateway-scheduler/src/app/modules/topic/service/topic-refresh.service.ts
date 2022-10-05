@@ -171,27 +171,37 @@ export class TopicRefreshService implements OnApplicationBootstrap {
         break;
       }
 
+      // iterate over topics
       for (const topic of topicsForApplication.records) {
+        // if the topic is deleted, delete it from database
         if (topic.deleted) {
           this.logger.log(`${topic.id} got deleted`);
 
           await this.wrapper.topicRepository.delete({
             owner: topic.owner,
             name: topic.name,
+            id: topic.id,
           });
 
           continue;
         }
 
+        this.logger.log(
+          `attempting to fetch topic versions of ${topic.name} and ${topic.owner}`
+        );
+
+        // receive topic versions using it's id
         const topicVersions: TopicVersionResponse =
           await this.ddhubTopicsService.getTopicVersions(topic.id);
 
+        // iterate over topic versions
         for (const topicVersion of topicVersions.records) {
           if (topicVersion.deleted) {
             await this.wrapper.topicRepository.delete({
               version: topicVersion.version,
               name: topicVersion.name,
               owner: topicVersion.owner,
+              id: topic.id,
             });
 
             this.logger.log(
@@ -199,6 +209,22 @@ export class TopicRefreshService implements OnApplicationBootstrap {
             );
 
             continue;
+          }
+
+          if (
+            topic.owner !== topicVersion.owner ||
+            topic.name !== topicVersion.name
+          ) {
+            this.logger.error(`mismatch between topic version and topic`, {
+              topic: {
+                owner: topic.owner,
+                name: topic.name,
+              },
+              version: {
+                owner: topicVersion.owner,
+                name: topicVersion.name,
+              },
+            });
           }
 
           const [major, minor, patch]: string[] =
