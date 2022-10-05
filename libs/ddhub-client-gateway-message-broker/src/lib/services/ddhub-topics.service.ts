@@ -395,6 +395,9 @@ export class DdhubTopicsService extends DdhubBaseService {
       const result = await this.request<null>(
         () =>
           this.httpService.get(`/topics/${topicId}/versions`, {
+            params: {
+              includeDeleted: 'true',
+            },
             httpsAgent: this.tlsAgentService.get(),
             headers: {
               Authorization: `Bearer ${this.didAuthService.getToken()}`,
