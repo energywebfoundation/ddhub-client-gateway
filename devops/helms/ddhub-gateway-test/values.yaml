@@ -22,10 +22,14 @@ ddhub-client-gateway-api:
       IPFS_PROTOCOL: "https://"
       IPFS_PORT: "5001"
       AZURE_VAULT_URL: https://aemo-vc-vault.vault.azure.net
-      DID_REGISTRY_ADDRESS: 0xc15d5a57a8eb0e1dcbe5d88b8f9a82017e5cc4af
       NEXT_PUBLIC_PARENT_NAMESPACE: ddhub.apps.energyweb.iam.ewc
       CHAIN_ID: 73799
       DID_AUTH_URL: http://ddhub-messagebroker-proxy-test.ddhub-test.svc
+      PORT: 3333
+      WEBSOCKET: NONE
+      WEBSOCKET_RECONNECT: false
+      EVENTS_EMIT_MODE: BULK
+      MTLS_ENABLED: false
     ui:
       image:
         repository: aemocontainerregistry.azurecr.io/ddhub-client-gateway-frontend
@@ -39,6 +43,8 @@ ddhub-client-gateway-api:
         pullPolicy: IfNotPresent
         # Overrides the image tag whose default is the chart appVersion.
         tag: 656eb648-bb0f-4e50-9684-297394e27acb
+      extraEnvVars:
+        DID_REGISTRY_ADDRESS: "0xc15d5a57a8eb0e1dcbe5d88b8f9a82017e5cc4af"
   image:
     # repository: 098061033856.dkr.ecr.us-east-1.amazonaws.com/ew-dos-dsb-ecr
     repository: aemocontainerregistry.azurecr.io/ddhub-client-gateway-backend
