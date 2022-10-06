@@ -16,13 +16,14 @@ export interface ChannelsHavingTopic {
 export class ChannelRepository extends Repository<ChannelEntity> {
   public async getChannelsHavingTopics(
     topicName: string,
-    topicOwner: string
+    topicOwner: string,
+    topicId: string
   ): Promise<ChannelsHavingTopic[]> {
     return this.query(
       `
-      select * from (select json_array_elements(conditions::json->'topics') as c, fqcn from channels) t where t.c->>'topicName' = $1 AND t.c->>'owner' = $2
+      select * from (select json_array_elements(conditions::json->'topics') as c, fqcn from channels) t where t.c->>'topicName' = $1 AND t.c->>'owner' = $2 AND t.c->>'topicId' = $3
     `,
-      [topicName, topicOwner]
+      [topicName, topicOwner, topicId]
     );
   }
 

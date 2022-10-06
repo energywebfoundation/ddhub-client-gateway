@@ -1,7 +1,4 @@
-import {
-  Injectable,
-  Logger,
-} from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import {
   CacheClient,
   Claim as DIDClaim,
@@ -135,17 +132,35 @@ export class IamService {
 
   @Span('iam_setup')
   public async setup(privateKey: string) {
-    this.logger.log('Initializing IAM connection');
+    await promiseRetry(
+      async (retry, attempt: number) => {
+        this.logger.log('Initializing IAM connection, attempt ' + attempt);
 
-    const { cacheClient, didRegistry, signerService, claimsService } =
-      await this.iamFactoryService.initialize(privateKey, this.configService);
+        const connection = await this.iamFactoryService.initialize(
+          privateKey,
+          this.configService
+        );
 
-    this.cacheClient = cacheClient;
-    this.didRegistry = didRegistry;
-    this.signerService = signerService;
-    this.claimsService = claimsService;
+        if (!connection) {
+          return retry(null);
+        }
 
-    this.initialized = true;
+        const { cacheClient, didRegistry, signerService, claimsService } =
+          connection;
+
+        this.cacheClient = cacheClient;
+        this.didRegistry = didRegistry;
+        this.signerService = signerService;
+        this.claimsService = claimsService;
+
+        this.initialized = true;
+      },
+      {
+        forever: true,
+        minTimeout: 1000,
+        maxTimeout: 2000,
+      }
+    );
   }
 
   public isInitialized(): boolean {
