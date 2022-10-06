@@ -22,6 +22,7 @@ import { Span } from 'nestjs-otel';
 import { ConfigService } from '@nestjs/config';
 import { CommandBus } from '@nestjs/cqrs';
 import moment from 'moment';
+import { TopicDeletedCommand } from '../../channel/command/topic-deleted.command';
 
 @Injectable()
 export class TopicRefreshService implements OnApplicationBootstrap {
@@ -150,7 +151,7 @@ export class TopicRefreshService implements OnApplicationBootstrap {
     while (true) {
       const topicsForApplication: TopicDataResponse =
         await this.ddhubTopicsService
-          .getTopics(5000, application.namespace, page, true)
+          .getTopics(50, application.namespace, page, true)
           .catch((e) => {
             this.logger.error(`fetching topics failed`, {
               error: e,
@@ -182,6 +183,10 @@ export class TopicRefreshService implements OnApplicationBootstrap {
             name: topic.name,
             id: topic.id,
           });
+
+          await this.commandBus.execute(
+            new TopicDeletedCommand(topic.name, topic.owner, topic.id)
+          );
 
           continue;
         }
