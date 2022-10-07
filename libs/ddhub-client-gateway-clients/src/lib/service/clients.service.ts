@@ -111,6 +111,27 @@ export class ClientsService {
     return this.wrapper.repository.find();
   }
 
+  @Span('clients_canUse')
+  public async canUse(clientId: string): Promise<boolean> {
+    const exists: boolean = await this.wrapper.repository
+      .count({
+        where: {
+          clientId,
+        },
+      })
+      .then((count: number) => count > 0);
+
+    if (exists) {
+      return true;
+    }
+
+    const currentCount: number = await this.wrapper.repository.count();
+
+    const config: ConfigDto = await this.ddhubConfigService.getConfig();
+
+    return currentCount + 1 < config.natsMaxClientidSize;
+  }
+
   @Span('clients_attempt')
   public async attemptCreateClient(clientId: string): Promise<void> {
     this.logger.log(`attempting to create new client ${clientId}`);

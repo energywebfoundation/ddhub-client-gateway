@@ -9,9 +9,13 @@ import {
 import { ClientsService } from '../service/clients.service';
 import { Observable } from 'rxjs';
 
+type ReqParams = 'body' | 'params' | 'query';
+
 export function ClientsInterceptor(
   fieldName: string,
-  fieldPath: 'body' | 'params' | 'query' = 'body'
+  fieldPath: ReqParams,
+  fqcnName: string,
+  fqcnPath: ReqParams
 ): Type<NestInterceptor> {
   @Injectable()
   class MixinInterceptor implements NestInterceptor {
@@ -24,14 +28,22 @@ export function ClientsInterceptor(
       const request = context.switchToHttp().getRequest();
 
       const param = request[fieldPath][fieldName];
+      const fqcn = request[fqcnPath][fqcnName];
 
-      if (!param) {
+      if (!param || !fqcn) {
         return next.handle();
       }
 
-      await this.clientsService.upsert(param);
+      const fullClientId = `${param}:${fqcn}`;
+      const canUse: boolean = await this.clientsService.canUse(fullClientId);
 
-      return next.handle();
+      if (canUse) {
+        return next.handle();
+      }
+
+      await this.clientsService.upsert(fullClientId);
+
+      return next.handle().pipe();
     }
   }
 
