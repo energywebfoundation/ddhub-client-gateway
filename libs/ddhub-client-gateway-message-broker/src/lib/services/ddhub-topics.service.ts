@@ -395,6 +395,9 @@ export class DdhubTopicsService extends DdhubBaseService {
       const result = await this.request<null>(
         () =>
           this.httpService.get(`/topics/${topicId}/versions`, {
+            params: {
+              includeDeleted: 'true',
+            },
             httpsAgent: this.tlsAgentService.get(),
             headers: {
               Authorization: `Bearer ${this.didAuthService.getToken()}`,
@@ -415,10 +418,8 @@ export class DdhubTopicsService extends DdhubBaseService {
   @Span('ddhub_mb_getTopics')
   public async getTopics(
     limit: number,
-    name: string,
     applicationNameSpace: string,
     page: number,
-    tags: string[],
     includeDeleted = true
   ): Promise<TopicDataResponse> {
     //replacing double quotes in order to pass correct input to MB
@@ -430,10 +431,8 @@ export class DdhubTopicsService extends DdhubBaseService {
           this.httpService.get('/topics', {
             params: {
               limit,
-              name,
               owner,
               page,
-              tags,
               includeDeleted: includeDeleted ? 'true' : 'false',
             },
             httpsAgent: this.tlsAgentService.get(),

@@ -60,7 +60,7 @@ export class MessageControlller {
     description: 'Messages Not found',
   })
   @HttpCode(HttpStatus.OK)
-  @UseInterceptors(ClientsInterceptor('clientId', 'query'))
+  @UseInterceptors(ClientsInterceptor('clientId', 'query', 'fqcn', 'query'))
   public async getMessage(@Query() dto: GetMessagesDto): Promise<Array<any>> {
     this.pinoLogger.assign({
       fqcn: dto.fqcn,
@@ -133,7 +133,7 @@ export class MessageControlller {
     status: HttpStatus.NOT_FOUND,
     description: 'Channel not found or Topic not found',
   })
-  @UseInterceptors(ClientsInterceptor('clientId', 'body'))
+  @UseInterceptors(ClientsInterceptor('clientId', 'body', 'fqcn', 'body'))
   @HttpCode(HttpStatus.OK)
   public async create(
     @Body() dto: SendMessageDto

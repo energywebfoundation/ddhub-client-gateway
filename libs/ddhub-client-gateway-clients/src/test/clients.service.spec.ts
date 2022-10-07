@@ -10,6 +10,7 @@ const wrapper = {
     findOne: jest.fn(),
     count: jest.fn(),
     update: jest.fn(),
+    find: jest.fn(),
   },
 };
 
@@ -53,24 +54,28 @@ describe('ClientsService (SPEC)', () => {
     });
 
     it('should not sync client as it already exists in database', async () => {
+      const entity = new ClientEntity();
+
+      entity.id = 'ID';
+      entity.clientId = 'CLIENT_ID';
+      entity.createdDate = new Date();
+      entity.updatedDate = new Date();
+
       iamService.getDIDAddress = jest.fn().mockImplementationOnce(() => 'did');
+
       ddhubClientsService.getClients = jest
         .fn()
-        .mockImplementationOnce(async () => ['client1']);
-      wrapper.repository.count = jest
-        .fn()
-        .mockImplementationOnce(async () => 1);
+        .mockImplementationOnce(async () => [entity.clientId]);
+
+      wrapper.repository.find = jest.fn().mockImplementationOnce(async () => {
+        return [entity];
+      });
 
       await clientsService.syncMissingClientsIds();
 
       expect(iamService.getDIDAddress).toBeCalledTimes(1);
       expect(ddhubClientsService.getClients).toBeCalledTimes(1);
-      expect(wrapper.repository.count).toBeCalledTimes(1);
-      expect(wrapper.repository.count).toBeCalledWith({
-        where: {
-          clientId: 'client1',
-        },
-      });
+      expect(wrapper.repository.find).toBeCalledTimes(1);
 
       expect(wrapper.repository.save).toBeCalledTimes(0);
     });
@@ -80,20 +85,15 @@ describe('ClientsService (SPEC)', () => {
       ddhubClientsService.getClients = jest
         .fn()
         .mockImplementationOnce(async () => ['client1']);
-      wrapper.repository.count = jest
+      wrapper.repository.find = jest
         .fn()
-        .mockImplementationOnce(async () => 0);
+        .mockImplementationOnce(async () => []);
 
       await clientsService.syncMissingClientsIds();
 
       expect(iamService.getDIDAddress).toBeCalledTimes(1);
       expect(ddhubClientsService.getClients).toBeCalledTimes(1);
-      expect(wrapper.repository.count).toBeCalledTimes(1);
-      expect(wrapper.repository.count).toBeCalledWith({
-        where: {
-          clientId: 'client1',
-        },
-      });
+      expect(wrapper.repository.find).toBeCalledTimes(1);
 
       expect(wrapper.repository.save).toBeCalledTimes(1);
     });
