@@ -35,15 +35,10 @@ export function ClientsInterceptor(
       }
 
       const fullClientId = `${param}:${fqcn}`;
-      const canUse: boolean = await this.clientsService.canUse(fullClientId);
-
-      if (canUse) {
-        return next.handle();
-      }
 
       await this.clientsService.upsert(fullClientId);
 
-      return next.handle().pipe();
+      return next.handle();
     }
   }
 
