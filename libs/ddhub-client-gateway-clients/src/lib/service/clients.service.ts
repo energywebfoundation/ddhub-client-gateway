@@ -37,21 +37,20 @@ export class ClientsService {
     }
 
     const clients: string[] = await this.ddhubClientsService.getClients();
+    const existingClients: ClientEntity[] = await this.wrapper.repository.find(
+      {}
+    );
 
-    this.logger.log(`found ${clients.length} clients`);
+    for (const clientId of clients) {
+      const clientWithRemovedDid: string = clientId.replace(did, '');
 
-    for (const client of clients) {
-      const clientWithRemovedDid: string = client.replace(did, '');
+      const matchingClient: ClientEntity | undefined = existingClients.find(
+        (clientEntity: ClientEntity) => clientEntity.clientId === clientId
+      );
 
-      const clientExists: boolean = await this.wrapper.repository
-        .count({
-          where: {
-            clientId: clientWithRemovedDid,
-          },
-        })
-        .then((count: number) => count > 0);
+      if (matchingClient) {
+        this.logger.debug(`client already exists ${clientId}`);
 
-      if (clientExists) {
         continue;
       }
 
@@ -110,6 +109,27 @@ export class ClientsService {
   @Span('clients_getAll')
   public async getAll(): Promise<ClientEntity[]> {
     return this.wrapper.repository.find();
+  }
+
+  @Span('clients_canUse')
+  public async canUse(clientId: string): Promise<boolean> {
+    const exists: boolean = await this.wrapper.repository
+      .count({
+        where: {
+          clientId,
+        },
+      })
+      .then((count: number) => count > 0);
+
+    if (exists) {
+      return true;
+    }
+
+    const currentCount: number = await this.wrapper.repository.count();
+
+    const config: ConfigDto = await this.ddhubConfigService.getConfig();
+
+    return currentCount + 1 < config.natsMaxClientidSize;
   }
 
   @Span('clients_attempt')

@@ -80,7 +80,8 @@ export class ClientsService implements OnApplicationBootstrap {
         executedAt: new Date(),
       });
 
-      this.logger.error('clients failed', e);
+      this.logger.error('clients failed');
+      this.logger.error(e);
     }
   }
 }

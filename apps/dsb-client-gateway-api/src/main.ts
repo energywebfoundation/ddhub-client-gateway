@@ -10,7 +10,6 @@ import { otelSDK } from '@dsb-client-gateway/ddhub-client-gateway-tracing';
 import { ValidationException } from '@dsb-client-gateway/dsb-client-gateway-errors';
 import { Logger } from 'nestjs-pino';
 
-
 /**
  * Have to export this for nx to add it to the package.json
  * See: https://github.com/nrwl/nx/issues/6901

@@ -18,7 +18,8 @@ export class TopicDeletedHandler
     const res: ChannelsHavingTopic[] =
       await this.channelWrapper.channelRepository.getChannelsHavingTopics(
         command.topicName,
-        command.topicOwner
+        command.topicOwner,
+        command.topicId
       );
 
     if (res.length === 0) {
