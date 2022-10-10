@@ -13,10 +13,10 @@ ddhub-client-gateway-api:
       PARENT_NAMESPACE: ddhub.apps.energyweb.iam.ewc
       SECRETS_ENGINE: azure
       VAULT_ENDPOINT: http://vault.ddhub-dev.svc:8200
-      SECRET_PREFIX: "ddhubtest1/"
+      SECRET_PREFIX: "ddhubtest-1/"
       NODE_ENV: test
       OPENTELEMETRY_ENABLED: false
-      EVENTS_MAX_PER_SECOND: "200"
+      EVENTS_MAX_PER_SECOND: "1000"
       NO_COLOR: "true"
       IPFS_HOST: "ipfs.infura.io"
       IPFS_PROTOCOL: "https://"
@@ -35,14 +35,14 @@ ddhub-client-gateway-api:
         repository: aemocontainerregistry.azurecr.io/ddhub-client-gateway-frontend
         pullPolicy: IfNotPresent
         # Overrides the image tag whose default is the chart appVersion.
-        tag: 656eb648-bb0f-4e50-9684-297394e27acb
+        tag: 2547bc7b-2790-4ed4-a1a2-20723dfb6833
     scheduler:
       enabled: true
       image:
         repository: aemocontainerregistry.azurecr.io/ddhub-client-gateway-scheduler
         pullPolicy: IfNotPresent
         # Overrides the image tag whose default is the chart appVersion.
-        tag: 656eb648-bb0f-4e50-9684-297394e27acb
+        tag: 2547bc7b-2790-4ed4-a1a2-20723dfb6833
       extraEnvVars:
         DID_REGISTRY_ADDRESS: "0xc15d5a57a8eb0e1dcbe5d88b8f9a82017e5cc4af"
   image:
@@ -50,7 +50,7 @@ ddhub-client-gateway-api:
     repository: aemocontainerregistry.azurecr.io/ddhub-client-gateway-backend
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
-    tag: 656eb648-bb0f-4e50-9684-297394e27acb
+    tag: 2547bc7b-2790-4ed4-a1a2-20723dfb6833
 
   imagePullSecrets: []
   nameOverride: "ddhub-client-gateway-api-test-1"
@@ -114,6 +114,6 @@ ddhub-client-gateway-api:
       AZURE_CLIENT_ID: AgCRIi8JSwHhm5O+TfjsQSEgQA9bGZ2RoGES+KkUPPlQS4DQbtiV9vl9vAPzmXLGtqyJdT02SBQTkiivBuMKltG1dj65VK1X6yltIsHxjCGkTO/zqy7Cr6MLWr+kWtt07Evx32U/8SHL2u58XxjjbOf7THtY4X+LtG20i6urNen1hU+Zfs1z9DJQRt+xdVbIWdU3X3baTShC0X086yNUIJLi2ezELl+6Kd9SJr2fCYytpbXMwssVNDPTozVuowENPJYPIRCiZvlZKLwF25JTRuT6Bok0RAVgAKqyRH6qVmgaAgu3ShdZIsVkinpird7U89AoeIw6ZV6FgN1+RjjaC/wEjxqGwZPp0t/3g2xmETo2KbXzn3JHmA+JD89yZ837NhGlq9A6z1ZrvWMiZeOFM4h11uVtTakEz/TT/DI8hb3mMshYHR6h+2muWPGEjM6Vq+gbkFTKrjuTRbbXZPjqpQO+7hSwNDUDunMbbFvOCvqqpoUvO2/c7W0BQP4yiCHqweIHpZiek0QfvQLzk/Y6/mhvdo/7NhQrlDaE8wA3y8qPny6w/bNWm0YfDC5Szh+c2t/W11MnU3CeUxkpm/w2v6OaAa8XFr1wxqYxpA3Td6LrcRb+FPDqZhb+ceyrxzjpi6fGL2LV53ec6mZhqGElchiVBdulNWoxE8z8u0XxrpsrnxuIKDar2irEO6V+lV4GlT97kieIDAhckpOju8Cus+TIt6pvAiT2b0Y0TB856+t9ZiEiol8=
       AZURE_CLIENT_SECRET: AgBQNbkMYAzKKwot+mm04b1MrQQtAL4bwa/wuGIRxFDQwdm/IkNeVQKfj5voT8IP+lIPQ9S1647NtzmaxRWrfB6lpFCpl1AMeugJhPwpPRnZGOJ7DKEl5mwNU12kz4mpTEwbSWY0Ye+et2JET83E4yXcdH5rDfGjTKK1FnAjDTfvUKm7AfYU4zg+pSznF6AIuRjV3Afa27MVDAHaX2f+A4XcbLkaEoyMeng5Zz0DgdpFM5rj/XRUWCIMgeigd7lo0cefFGaKv7rpf9FnCzXhELtWFA0Q0A1aPNdmDogVTVxs6Vmp4ovu9dMCurqegokAkhjcf5mPXqcnUiCbeLH4lYQiDxdBt5ji3slnMw7x8lx2SmMHphGmtOpMPVUmc2pXLrZ0NhD+ivs1uNI+iWJzUWs1GiETCW0GnBxiUYAQX3/jBUUBZSctNnddGBt5EgzsJQy3AjkkiDN6jYkx/Rzv8HRw+PNpg+vsq8Nq4xQWulLZ8mRg1y2lXhj3LbWs6KsDOnCcY0NUQYlpPBE+zPfj22s/K4CQg6k9zLfs0kynS6pPD60N3vi+nNe43VpODfbAsPNY6gFM6maA3FTkQ6HE9e8rx5XLdZp6aqqUavMCSBXsuYDWP+NF1NAnEzIRUwLha78H6HAqTtQHvLVnQFWa/XhJjz2Z90IfOpKYn3rTQa2u7ajRaNlmKxUMSUX8yInnNwNBDQ5g/fg8VvIana53hJ/PZU08qtG3iJqdpJhtWO3NcKcK
       AZURE_TENANT_ID: AgA/2ZRwze9Suw0bh1mPhnAUvpXgCW7GPpkoe5/xUiJpdI6o41rUjj/7pkmP3+udxTh2N2WzWy2+Sy751cj/rVNmwb3Ne79g7eNx3iKaU1f0Zy6emIgKiVD2YbrE59BVUDZdl3wKPy85GzASQqfJ33yosWRTpbBsqMAhob6IPNWMQBmPks41RTXu4Dd34eOXudQlx7wdXMJe7IMgL5Ti5f6Kj/N09D9VsRgY+RVJHmgg1vwXUozsvxu8/P23/HpmEn3jiY+DRO4tXDSTt5aIvnmYuF65Wt4m2Q4luCVSGRTFlvlk6u6rNsyca97kXtME2lbXleXPtNI6sW0wF59jM9SeMj5MBQyLh4TNl9Kz00apr1YnObJWj75xB1fh4AHgMuunXIwReggvZRHaiKntSMU1zFgMjoqonLuILk+D/0HMlgSeZEEOKot1Y/bX0vCDtemC7wwBnDPXDejR6Wxzbf5rKb+QNbCzNsN2Y0Mk61VDPE1TTLdg/lSvlG5x6f9VwYSa6wK9Jv8Po5C+AKC1+CKUZPR1YgOP8yKrcPlLSwyCtvp/R0iXVXovyu91dZhePcf40lJ7Rs93xjGUQnIYmDZhKWtJfrPFZDNKN412ZWvbo9z73CteX57Uh79PiUt9Qmz/jcPKOm2nyWl3eHNhlNnqSfICz04BllGF2MLD6C6ZnPw1CWG99CmE+K19t543oq+QgpNYwK3MTOKwzGKn2buLlQYdyExHO94qa8xlAOd23lJtVXg=
-      DB_NAME: AgAWXQsBh7DfrCprzOQYY2jaVAb49DE5Ge4/wyWN+nIUI1c3Bttoaycwarx/qc12E3rlPByJSyeV0rinROkScHKxLxk22LVnOy9OyNDmNrlnQNo6uMeSgodYAm8FBYcC0h6YtocgxIj7Wnn2+grA+sSMJwszFx/3Dyu9aFNUWlqsRemjUN0yjwER3Eh7kYZjiPW66sFyzXeVuDFrs1ooajiRvZQ2XBxvlC79ZUwTScSAoHgb907fm0EeFm1ZbXzzd2XWqh55zgvP8A5r9Wlq1J3pntqdoIunhTvoCg2koHndNWOQpOW5O1pnZ9NFxMx0BX/+E99Uhapr6JMHOr+OezZPqUP4IEdaTgnP7nj/1fxqmt5LVCXUlreVHiDIc0VzlCD3c9Wq+WQnXabWyPTubjR9+UE/LgxjCZ0V9WCaoyKu0qwD5vgFPNXHYZr7EAMNYs83rAdS09+pccltqhVz0v8JKf24BNDKs6KgkmGZmwaUjrhvsx2rw8GnKzY85iTtU/ZMCurZzudAQVLXyAqUXU05LUzHQOnC2skcVvmfcgWyq9GDkhLkHyAQkVPfA4m1VNgIDlhwbJWf+O7p1zGsnKwcDku2xKHG0RpTb0Z+ZU2tL5ktaTir3JBZwVzUr5qRcjWU32+XvQ1nV1lsSrNNsYC+D1J6uqpLPjAWxrDS0PdHUOesLlHe5bUjLx413W/mSYxt/OBJY9Q6js/+jsUJtH7g296MJUggh//lSvn8DNQucsNba/HEFhkM5G0S41xO+nNX92PpoPXpT9PkWHGpffzLseyzKvwT5MshxKClwKetjdwHbsgWqpEs+aC0L9U5DYMkx9ChU+8=
+      DB_NAME: AgBsRwtyQVz91o83BTvcaKnNIap9PWwP9jmIscfB6uZc8AQ1aS36pcO3lIuw40YLCDZI5n9bxpgD+U2mt313P2HUAunEJSXB6I/rXsJNJBx2wbGtQX1Ma3D9Dk4XHFEkY+Xvi5SwpoHqkIazZyUk/FxfrBQMQdS8awzfK5hW8QUCUf2aSxvxz7IBjDhURB90IcwC5eO/oFBvpT3mvVRxz10v1THUUAaqo4SvhiM46LaIyc6pEAQoS6cccz+RqbeM4dsZYvsJcesdmofkJITcvSLvmWH/mhLWkPjVmt0es31FMEAXOThbZkmhXg9BFA8Bv4RI1K+qLfCkIe8xT4TRpgopDDk3vfuK7f+wx6XbS75iY5rY97aVMYhPBC//OpaIke14CG/IpCTYpOZ58KdiOkiGGLNysL5gMMHwVPPpk0TSzHYBuyoG+MCKuY2NUUWXos8VaQ+QiTFwG4Zfm4LoNyj6Z0UHcw1SH82c1jIFXNWRCGKkP4k2ucCoKNXtc18SuOsydSptOKgghlHxGZTklKzzfPUKs3yqvtH885TwqOF9OAhXphvaK57woVnwrKTUyKh3U+Vlfxx8DmXqwiCoJisW2DzTP5sLlv1N3ex/UBdzxEWcT8gPgBzR0R4XZPK3Bx5e2hZjBbtjZvFFjm1b/ww9Ray3mN+P9cMAHEDn0PbcaHOVPIRT4BEQxdVCzlntqCVaPoLiYLvdEAi2z12lW42WKLygYIVq5DD7oUNFGLaG1TEgj1+q6dydDg5O/iLuwqk9PyUYddvNwQTVYSzLkm80gl5sLD7Y101HpFDZIG8ZP2HTPcCyL5Yeu0b15lbGEZhNq7FLGnJSrziT
       INFURA_PROJECT_ID: AgBoOw3E16sW21dsQPpXELFEBUEpeCTVB83/eh7p5OsRSSXplf9boZk16a76EQuQ03pNl6WFHVYN6dCrsWpQRhPDc3VyP7GJnJxOXyDwdkCvbf4v6tsjrjdAftCe061oObpyh1JmcmWwgv3HkHQft/ryNhSMiwnSj2RY73FpdS09ZwkwzVeshNUcSZ9pdi1Y/IF3bmwsUzgBRLfSbrQ9YxGujZ221mJoVd3rgXXT8Ojb/Ij+IR3Z+FTWLMbgsTPp0K1DlIPZLrnvYSou2EsosLMrXsaDTl3Y8gFmEZ5uBQsnRC0T7Eqmf6bsfkbkVJPDygm8hoQ/PhnMrLJGsJJky/LsRnevcqgYqQUeBbaqyk9h/ZpuUEeMtk+uVoUmG/C6hys40nmRRqwy80mNGbCXlLbcVPpVkIRbm9WcDGvXXM9Bzd545ooig+v9MUbAN82j1q1RBFQq9WcW8CDGwxMqJjc0j97h/vshc0M6Ou6ZJH47pJSOEQivB/f3XaPE1xhBvh/WO/wju/2a7uhYRTc46ARFbjuS9AKCRIxmaUI0BcxXmZqLgzqyS6ZrxsF7ABHvUsX62sxR6lMCxwb7gbaBuTnBRkcuHjjqqt8kwprNsbrll3C1M/KuXuS6m4J8fj+QYm+Fn8LtyrtWkdOzurxnqKipM3FTv9XC07BAOcBHW6hkHZEd90mzkWJvJ07wpUVO2uppZY0xly8UHY2wJptawKHX731MgTuOchlpAwg=
       INFURA_PROJECT_SECRET: AgDcmwQY4UIcJhIk1RO9J1kvz7nU3bYSN9NVDg8GM9OtCcTOKUDgm+YS1BCcz0HlkzoAZDppt4UaTRbdRyUzxogyObtB6eJCRvMecTT+pOh+BN8J5/xwzwQbcsQjTPhzLR2r6N6/KkuBZxYbywvpfdbDiMgnEWz6/qIGOk7mKW5hdSVCL68qtKgCCRGbl9FENXihI+TvWLeluPe8p+GmgRA0asJNe+QQ8QnzHY1nGmsxXQSUaM2qEStfxDPiukI1T7Te9ZeztwMu2WYpJXbCRVATylCc60XM+CMmwoTntNgV8ROkRoMGji000SCBbxzpdlGdzpv6q2i22IFOrUpcD5/BOd3SrbGUbPljZR+tXYlMflXlfChDfWOyND7topOJ5pfm/o0pGIo55+kMHdqFyuRp+qZzqV+vEfplkrKP/fsjWZlezwKC/srKCBXlGHvofG+qA5X2x+4T9C996Tt7WOi7M3zrT1KVB77oXYWtsxr6QfFOoP0wTMD0Csz5/bxyiFSJqX9gzrLV+KAuT2P+e6BJvA228mca4ZyrwbuL81IRCZx7+xr3kqgtqDAXFjAJ6BM4TnOxFhOPFyMHGgdDHBaEAVlRI02G9TrmI+8hjMJnIihr9oOCsazwWTIu73N0kKI91XJG1QbFhViTvskBuWaReIbgCEh3Vb14fLDr6/bsYDvef/ci/SKm27l41PowbMlQxzvEPu8It22zldXb9oiKF3aZo6BalZt9yb+nXlziBQ==
