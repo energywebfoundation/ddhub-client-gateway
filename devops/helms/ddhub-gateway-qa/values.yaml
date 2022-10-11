@@ -57,9 +57,12 @@ ddhub-client-gateway-api:
   ingress:
     enabled: true
     annotations:
-        kubernetes.io/ingress.class: azure/application-gateway
-        appgw.ingress.kubernetes.io/ssl-redirect: "true"
-      # kubernetes.io/tls-acme: "true"
+      kubernetes.io/ingress.class: nginx
+      nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+      external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
+      cert-manager.io/issuer: prod-issuer
+      cert-manager.io/issuer-kind: OriginIssuer
+      cert-manager.io/issuer-group: cert-manager.k8s.cloudflare.com
     hosts:
       - host: ddhub-gateway-qa.energyweb.org
         paths:
@@ -89,7 +92,7 @@ ddhub-client-gateway-api:
             serviceName: ddhub-client-gateway-qa-ui
             servicePort: 80
     tls:
-      - secretName: dsb-tls-secret
+      - secretName: ddhub-client-gateway-qa-tls-secret
         hosts:
           - ddhub-gateway-qa.energyweb.org
 
