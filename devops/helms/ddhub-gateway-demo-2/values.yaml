@@ -1,0 +1,114 @@
+# Default values for ddhub-client-gateway-api.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+ddhub-client-gateway-api:
+  replicaCount: 1
+
+  clientgateway:
+    config:
+      parent_namespace: ddhub.apps.energyweb.iam.ewc
+      secret_engine: azure
+      secret_prefix: "ddhub-demo2"
+      node_env: test
+      opentelemetry_enabled: false
+      mtls_enabled: false
+    scheduler:
+      enabled: true
+      image:
+        repository: aemocontainerregistry.azurecr.io/ddhub-client-gateway-scheduler
+        pullPolicy: IfNotPresent
+        # Overrides the image tag whose default is the chart appVersion.
+        tag: 0.12.0
+      probes:
+        liveness: true
+        readiness: true
+      appConfig:
+        DID_REGISTRY_ADDRESS: "0xc15d5a57a8eb0e1dcbe5d88b8f9a82017e5cc4af"
+        EVENTS_MAX_PER_SECOND: "50"
+        NO_COLOR: "true"
+        IPFS_HOST: "ipfs.infura.io"
+        IPFS_PROTOCOL: "https://"
+        IPFS_PORT: "5001"
+    ui:
+      enabled: true
+      replicaCount: 1
+      image:
+        repository: aemocontainerregistry.azurecr.io/ddhub-client-gateway-frontend
+        pullPolicy: IfNotPresent
+        # Overrides the image tag whose default is the chart appVersion.
+        tag: 0.12.0
+  image:
+    # repository: 098061033856.dkr.ecr.us-east-1.amazonaws.com/ew-dos-dsb-ecr
+    repository: aemocontainerregistry.azurecr.io/ddhub-client-gateway-backend
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: 0.12.0
+
+  imagePullSecrets: []
+  nameOverride: "ddhub-client-gateway-api-demo-2"
+  fullnameOverride: "ddhub-client-gateway-api-demo-2"
+
+  config:
+    enabled: true
+    secretRefName: ddhub-client-gateway-api-demo-2-sealedsecret
+    configRefName: ddhub-client-gateway-api-demo-2-configmap
+
+  ingress:
+    enabled: true
+    annotations:
+        kubernetes.io/ingress.class: azure/application-gateway
+        appgw.ingress.kubernetes.io/ssl-redirect: "true"
+        external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
+        cert-manager.io/issuer: prod-issuer
+        cert-manager.io/issuer-kind: OriginIssuer
+        cert-manager.io/issuer-group: cert-manager.k8s.cloudflare.com
+    hosts:
+      - host: ddhub-gateway-demo-2.energyweb.org
+        paths:
+        - path: /docs
+          pathType: Prefix
+          backend:
+            serviceName: ddhub-client-gateway-api-demo-2
+            servicePort: 80
+        - path: /api
+          pathType: Prefix
+          backend:
+            serviceName: ddhub-client-gateway-api-demo-2
+            servicePort: 80
+        - path: /docs-json
+          pathType: Prefix
+          backend:
+            serviceName: ddhub-client-gateway-api-demo-2
+            servicePort: 80
+        - path: /events
+          pathType: Prefix
+          backend:
+            serviceName: ddhub-client-gateway-api-demo-2
+            servicePort: 80
+        - path: /
+          pathType: Prefix
+          backend:
+            serviceName: ddhub-client-gateway-api-demo-2-ui
+            servicePort: 80
+    tls:
+      - secretName: ddhub-gateway-demo-2-tls-secret
+        hosts:
+          - ddhub-gateway-demo-2.energyweb.org
+
+  sealedSecret:
+    enabled: true
+    encryptedData: 
+      DB_NAME: AgAOd+ssK49n3UE50AvmVf1xwjrVw9eNgyUuZJ9nPC5BpNzMl4hZBKp/eUcNm2mcEpCbjRPYy1FsDAZpPP79ZpZfC3r6yg5h7raLhOcfREFqgCOesW+kehox2GZjn7VfImmdSmUihOOlNygtopG229ndawL4X887Mp/5RuVhpQB+B7DQa9kPiilvP0AcEiz4GIY1yF7DLpiD2ivN72e4RzE2S2bbHEuNd5nWAZB+pjcjtf/7orpFZ0NMQZKXIeYzbmK65K8BLl3qqSRGA2OuaLSkDQ42RAh99t+1jUF9buaMQeIezjFni6mnIqklP4LCmb63+E3pt3e0puc1rcXhjo0xmL1BxnCWCdM5bbI8lzLPtFzdUeoX8E4oT3ClMOBod+qZWJ14GudOj2/1dVO7RdbJU83WPActA2EjWK30G3jTcIcgUngwWnMunpWymy03Ovfue5COExuLFxljjDkSXdDWFTa61LgFKMhajIDQdVdaWWhIf/UEdJhLrwvUkUx32D9TRpf9oGWvnZIQUTGpE3IYAiACKYYh6kuUfIVL4GS+x3UOJFwnngn9ecgGjEjYKzJer6kPlRcNju9bN2QZfjOk+U4IIoOyblfJ8s/Zcs7NsIaEYVO/mE3kDkITql9XadHtVW6B6VzMwBeln1fmqQqJqTub892WQtmW7iTUw+1YcsJou2hg5AxiVvKjqOrdmH3pB1Ao6KaFRgkWsGL5C+PEt/YZsdl0JnIlO2Cc7TKxM5nVSbV8JAEsEodwyS1pnp3hKH/rlBTEgOUwGHtZbu5eLiHe72W1tdgWEgYykl0C8x5F4m/mlx4LShKLEmn2/5oc9dkwoKHTng==
+      AZURE_VAULT_URL: AgBvrBlkfwMQ3GP1w1mY46Fb3Zu6Kvl0JDBZGhRH8ahDZnXIJjK38MzAkIpfFbLU8gU9gDDY/0kU8wktTm/hFH/z0aAgSsCpqpvY3LTkARK9J26bV4QoYsdSMdmXxH/0lJUN5MJLXkqLPBQX5jtSaWFueXr9zARoN27CRgwzrZC0fMlXjirjns5Z0J6TMEZJ3xi7nf5jfhpuFmDvTdb5HCU7bfCuIpx7FT0oOJifPaf91VKKFjmx+Jpk4wWGUaRroLnF6qmOxq7rg3SR5VeuCj7yhBSqFH+PWvxY/mf6zilFE30CZbau7cHum9YU2vEMWcIqPTrX2+vpC0n8ODRSupOGfWQuL4WfPMbR6RVu7U8ttwlEeNINhsDndmT9gYmSSnsg4sPU9hHsDecUpCqm7Q6jkKrEIjvnuBS0Be+z2jMk1dXe5sqeu5gyV2zG3cFw3QzrqwQ4brgBZMpv4OBDg8SpTOaB9ARXKc52zLGxMgN22Uc5yRedPqenCFDXQBIuQhUUwv1t2Jp6l98d3fSFV93ih68f5OXbQUajF+nCsOQ2lcrVWgPq88Hdr/lmdMSCi1OkPEVgYqzEqK2hkydiCvB7Aa4mRGVfjTft4tA+Y0qtk471tqO7WtJfh7NEnM0dykEmBujJ7HoqnSeIvC/YE1ObjoZ66Yo2rHkW0jmuMCTkhPVflyKVrTTiXKjzd89LjB7YIyLOEvm+jDYKAS4mgbRru/xZ7KIg2wVdA3iQe0jl2173U0jGnQ==
+      AZURE_CLIENT_ID: AgAmv390dkQef2ExDHTidErvQwktuZfd6eZOBRb+ESLNuwokOVq8gFaK0NRZX4UNCrFvePKtoMhpb+ZL8fP1AhlShEanQbREodqG1xBo4zcOQE9JDuo0OUdoCZrBHR6JJlbSh1mnWIJXpUi+Dhcsb8s7cv9flFbURasujOBoRxZ9/y3LflrXlje8wER+IXeAlF9PSpy710mxgUGEmlt2BlHROS6W81WAuKJIA2gQfIoM0SY6/NKpmiuRPRirw2j7gdIQyD4guv5S6jdC+2e0BQ5sxu/1YO4X032F0vqy2ASJeu90t1WhuA9LLXsplzJ1w0l+z5n/Oldb8+OhBCDZD2bjy1iXbtOp+bF9tGRHgdFA93kCYKnRY8NlRXq28HD92HCCg5xl85HXpvTtprtufLyyweNcSLH613aPE4lTTTc4O7doeob52QpeyB3/maIE0Whf4aFZYJgszT1C2C9eafAz9C/UTHZAvMOBSPAiTTFq4IBCJysDbsUFp6va4+8UQ8k4fZbe2Fwjq9Yr9MgxX3Fwp8FIvc51u4fREcOki+2rBW9Ut6wiWMbTdvMc+exHc/ouYJrnZNvtoa/HRVw6zUp/pFgP/VugN8tC3R5zxkCSwnQROj/F2wx//i9+6gn+1zBvdVQqBuPa9fUhDNxryyLrWZsMpy+5O+f0J5C/+cmfyLJLeKRfAPv7QtNuzwfUjbZK27z5KPSlo6W1Xid31uxOisSqCu4tFlp6U/KxRuoDl5RidxE=
+      AZURE_CLIENT_SECRET: AgBx/7GRKhHY0E+Vhmkmsir6syCaahtTx5Fe6LQHtQRyUkPxpOxbJlMqR1BItNvdVpk95/YHnjtRiE4KDVcMi/LaEejIFdnOR5RrIAqrB3ZGplQU9lesGJDth0kl7TKhc570kxtuJveWZu3L7vPXrjQLki+Tk2wmcV8IODNZdHgTCW2qQouv97dna0Q4Ja5iVE8nMhxh8CptPjZSmFuov82NmwD+FWU7FGE+WaeA8hKAOBGXZ7pHODeFA/M8wDr5/BpPRVd9UV3LTwu/ToS9YoZGmSsU2Dzukg50XchtcfyHTP/LiyVLknhnQZM0nz/WaEZhDtXCfBdtEFW8NQNcRbabXb7fGduUwBJC0AEagiJHRUmQE10jj2/oAbX9Qzn9YJsGHx4wfeG5eXM8hy//M1xGQw1vrAy81Jt7PKIsWKYc3srK1yYRvHjRAT2uxbMNsr1HX4raxwk+VcooIqtT7chhjMYwQA+ly93nko+t/wxORysbnai2jxJmbI3D/YgDMlmW4ARLWvJYXJtdPf54ngR5Bx5HRkEawaUfYMAcX3DyDpcKSGlGLz3houaoYN4JxFBkpiN9ec8w09IvM/vSmi69j0LLqLLsVqGspUGWx9P9sK7VlF/HRYVy0G3YgkJ4V8EOQy7nwor6jPejfXUvECJZQqpC3kqwGoPKCZUhpdQtX/Of0D/F87HQZ++rwZnV64A0Lao7BSPOacqMQJN1L3VsG8L3jxF1igzdIPoOeayXVs3M
+      AZURE_TENANT_ID: AgCL3SK4EHeXglfx0P8/v5wNkDnIyvebeHVvyP7IyZkLV+XjnNHJkaUauQnPbP9m9LIN7ve05B/uvC+Wg1pMx/k0wtqWV9pl08yMm7JkT+Rtl5kSTeRJntiLwuNIafkOZzAVldQ7LSdz1hl57JVOMqg+gu89EnIHLTWClYzJFJoALiOmZBdKyQO5VUPSTc+htfYamZFarCBc01QnAH43k0m7+6Nc76VrW4jqIgnoyNZo0/jnGVrMW0m2Uyu+mEjQnwGxhqrN+Lj8sQPPCJ8JoCon1FoByTePGMvJh76rvQuVZmdJberNO9bi/93V3RA6fVh3d3VmielacghdaBTNwHZSnrSEOm+NoiCb7TSAG/wczcNE4VXTvUShPVwTJAp4OyrNZUsELw3Bk6T3q632ZxrczmZnsRWCYy0mj4W2oM12MTJ3AOXSyZe4qwEzj+rW0A571OIdqK4BL1F9ItygYEQZNQZ38z8+S/v/GQ1SEsK6zzXvOgVpbqzvuZ/o0WhBKKvFK3XIW3RtpR1m16oqp/N6E+sGSBWpzXrVbr3lt3UZ1afYgtMWFO2QtI68PW62nyzDw4Gb9Bwhal2Q6cJOB0Pfb1ATkt7/iJCOiXFiQNTTSuHYxV6P7c9ZTf2gTJaZTB8ZXoT0MO0GZO+DPG7rrZBnjz8hKt2/7VFsstA7OxH6/+9MkKS8GxewvsQh+KWXvKJx5CpphL7gcymEI1z+VUF2GCkMUFSz+E/+gl/s044NNe9h+DI=
+      INFURA_PROJECT_ID: AgAyT4+G+mNkuB39/ef3nbXky65IPWRknBZbqSZidDqXtperu85cI/U9mdPZXoXBJIRp+tkzYaQJyfY/R2dasXKGbGr6anLZiUW9iRV1LWBTeJASTtUcm8+Z0ZzbUGe6hI5F6tonu+pjT2JaDjXQmsptukBWwSvZ1xPRhLMvM3n8fDhsfXD4CnEoMCLC3l3Vl/pnnWBdPsSoTODrRBBfMlGTORnAH5twc0fpi6LVTzEtYQb/k4JzR8mrt5XavOLM+TfhiEV3SUssHyblcS5d4+7IYnrOSSo3B4pfiGLFhYedB8CQAW9F1HTZo2ifdA9MapVjm5ji9hyzZqm7SzOzm1LErxcqF5fbk4vscSqGGv7mFU+eqNdzsTClKYRFLaPahpFteOffAk/64GvZVAkCAlH2TEtoXFWihgSyN7rS9b6+APNIiDct68uWIlWuYMDh+S0x0VODhnRW8Gt0Q7e3+YPK/4v1YRfnaUyefq68qSs/TwFEAxy8puA+8u4R4lWMqpFHK4DN5PTA5Y2zBI4idR/k0PNHLoCG4RbqLkIry4ltgNopksS3Spuff0bV3DLigx//uqJlpJeOZykxokZJutfJFPlLUhGQ/bTtfHvaSj1jY6da13TVQEZUohixJX6RKhyrXWEZLffwiB8Mo+dfAR3Vo0U+gBIFMdqYrC06Q0UthT06dp9LtgZCW822kIoDDew2u6hf21NXI+azkZGxshzDIvB8PlKuLxPDp0g=
+      INFURA_PROJECT_SECRET: AgB2rXNqu/XJH0wzgSSQstLvTUpM8oYwaK+VDdV4SEZ9Oele/4WsbiB9oBe/Xm1LiLCXC90+SodoS3Xq6oirTt9K5ueNWPcxHLVjwyhjmyTrLijxrwCbA/WPeE9U7hTJOq5UO4DvlHm3nxc5yj+X2hFkyRUTIPenOqMONRwsE15Im7cTzl+EabaBrLX002SBEjIOir3zMas7LmvWPwvvye+GAhNIIlJ8ZOidM5jqCE0LfsN/Z9kUUOYyJv2etx1vH41pgQbH0Vpd4ZKD5OiPg2LVBzDf423QomRp+iT7xGXrIQzNkorv8Ol5V5Odxj5dAtJXMB23qHLTk+/yF21ZE2pBjpiyOqxdkAVtEYhbo9tlhBgu/wmyLWJDXSTgRVZpn3JpghxBeXoLp/5JE0AFisVZX2kn5h3R2TJN15xBrtaWLHx3KZq4CYAUv32VhVWTtPQOtubNgALf3DWtmZ2eCm2XC+PAHdhfvoxs30LpmfUei8cFdLBedCA0RwC6a1p2Ln5t16qNZWaLbyBd+aa3Vu/QwJb5dOnLhnz+ArwePcy1HHh3a2h2yFrz52haczYBqirrCsg+lDTkUc/4yPyK3/xF410npeKzX7vEFYj4IF4EWsLSD8h0IrqhCowlPOvsbmU+ONXSy1ncC8axVN7I4dEjQkykGkITkedIFly6hcVVIRMTBcy+bJRY0SXYKxP4AYqIXbFXkyn7Hy9wocFzD0fu/0TDXMPyx/OOAVlam91fjA==
+
+  probes:
+    liveness: true
+    livenessInitialDelay: 120
+    livenessPeriodSeconds: 10
+    readiness: true
+    readinessInitialDelay: 120
