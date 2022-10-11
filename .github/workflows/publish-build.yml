@@ -90,6 +90,13 @@ jobs:
         with:
           command: app set ddhub-gateway-dev
           options: -p ddhub-client-gateway-api.clientgateway.scheduler.image.tag=${{needs.unique_id.outputs.unique_id}}
+
+      - name: ArgoCD overwrite Dev-1 scheduler image tag
+        uses: clowdhaus/argo-cd-action/@v1.12.1
+        id: argocd_image_tag_overwrite_dev1_scheduler
+        with:
+          command: app set ddhub-gateway-dev-1
+          options: -p ddhub-client-gateway-api.clientgateway.scheduler.image.tag=${{needs.unique_id.outputs.unique_id}}
   build-be:
     name: Build Backend
     runs-on: ubuntu-latest
@@ -153,10 +160,30 @@ jobs:
         with:
           command: app set ddhub-gateway-dev
           options: -p ddhub-client-gateway-api.image.tag=${{needs.unique_id.outputs.unique_id}}
+
+      - name: ArgoCD overwrite DEV-1 image tag
+        uses: clowdhaus/argo-cd-action/@v1.12.1
+        id: argocd_image_tag_dev1_overwrite
+        with:
+          command: app set ddhub-gateway-dev-1
+          options: -p ddhub-client-gateway-api.image.tag=${{needs.unique_id.outputs.unique_id}}
   build-fe:
     name: Build Frontend
     runs-on: ubuntu-latest
     needs: [cancel-previous, unique_id]
+    services:
+      postgres:
+        image: postgres
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_PASSWORD: ddhub
+          POSTGRES_USER: ddhub
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - uses: actions/checkout@v2
         with:
@@ -182,7 +209,8 @@ jobs:
         run: npm ci
       - name: Build
         run: npm run export
-
+        env:
+          DB_NAME: postgresql://ddhub:ddhub@localhost:5432/ddhub
       - name: 'Login via Azure CLI'
         uses: azure/login@v1
         with:
@@ -213,4 +241,11 @@ jobs:
         id: argocd_image_tag_overwrite_dev_ui
         with:
           command: app set ddhub-gateway-dev
+          options: -p ddhub-client-gateway-api.clientgateway.ui.image.tag=${{needs.unique_id.outputs.unique_id}}
+
+      - name: ArgoCD overwrite DEV-1 image tag
+        uses: clowdhaus/argo-cd-action/@v1.12.1
+        id: argocd_image_tag_overwrite_dev1_ui
+        with:
+          command: app set ddhub-gateway-dev-1
           options: -p ddhub-client-gateway-api.clientgateway.ui.image.tag=${{needs.unique_id.outputs.unique_id}}

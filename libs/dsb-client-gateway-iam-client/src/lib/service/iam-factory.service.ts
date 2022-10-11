@@ -64,7 +64,21 @@ export class IamFactoryService {
         'connected to iam cache server, connecting to did registry'
       );
 
-      const { claimsService, didRegistry } = await connectToDidRegistry();
+      const projectId = configService.get('INFURA_PROJECT_ID');
+      const projectSecret = configService.get('INFURA_PROJECT_SECRET');
+
+      const auth =
+        'Basic ' +
+        Buffer.from(projectId + ':' + projectSecret).toString('base64');
+
+      const { claimsService, didRegistry } = await connectToDidRegistry({
+        host: configService.get<string>('IPFS_HOST'),
+        port: configService.get<number>('IPFS_PORT'),
+        protocol: configService.get<string>('IPFS_PROTOCOL'),
+        headers: {
+          authorization: auth,
+        },
+      });
 
       await didRegistry.init();
       await claimsService.init();
@@ -78,23 +92,21 @@ export class IamFactoryService {
   }
 
   protected getLogger(): ILogger {
-    const logger = new Logger('IAM-Client-Lib');
-
     return {
       log: (message) => {
-        console.log(message);
+        this.logger.log(message);
       },
       error: (message) => {
-        console.error(message);
+        this.logger.error(message);
       },
       info: (message) => {
-        console.log(message);
+        this.logger.log(message);
       },
       warn: (message) => {
-        console.warn(message);
+        this.logger.warn(message);
       },
       debug: (message) => {
-        console.debug(message);
+        this.logger.debug(message);
       },
       _logLevel: LogLevel.debug,
     } as unknown as ILogger;

@@ -16,7 +16,7 @@ export const useViewTopicDetailsEffects = () => {
   const router = useRouter();
   const {userData} = useSetUserDataEffect();
   const {
-    topicDetails: { open, topic, application, showActionButtons },
+    topicDetails: { open, topic, application, showActionButtons, isSearch },
   } = useTopicsModalsStore();
   const dispatch = useTopicsModalsDispatch();
 
@@ -49,6 +49,7 @@ export const useViewTopicDetailsEffects = () => {
         canUpdateSchema: !!topicId,
         application,
         topic,
+        isSearch,
       },
     });
   };

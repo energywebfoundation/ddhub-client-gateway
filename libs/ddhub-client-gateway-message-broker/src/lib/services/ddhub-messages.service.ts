@@ -38,6 +38,47 @@ export class DdhubMessagesService extends DdhubBaseService {
     );
   }
 
+  @Span('ddhub_mb_messagesAckBy')
+  public async messagesAckBy(
+    messageIds: string[],
+    clientId?: string
+  ): Promise<string[]> {
+    const requestBody = {
+      messageIds,
+      clientId
+    };
+
+    try {
+      const result = await this.request<string[]>(
+        () =>
+          this.httpService.post('/messages/ack', requestBody, {
+            httpsAgent: this.tlsAgentService.get(),
+            headers: {
+              Authorization: `Bearer ${this.didAuthService.getToken()}`,
+            },
+          }).pipe(timeout(+this.configService.get<number>('MESSAGING_MAX_TIMEOUT', 60000))),
+        {
+          stopOnResponseCodes: ['10'],
+        }
+      );
+
+      const idsNotAck: string[] = messageIds.filter(id => !result.data.includes(id));
+      if (idsNotAck.length === 0) {
+        this.logger.log('messages ack successful', result.data);
+      } else {
+        this.logger.log('messages not ack', result.data);
+        this.logger.error(`['/messages/ack'][post]${JSON.stringify(requestBody)}`);
+      }
+
+      return result.data;
+    } catch (e) {
+      this.logger.error('messages ack failed', e);
+      this.logger.error(`['/messages/ack'][post]${JSON.stringify(requestBody)}`);
+      throw e;
+    }
+  }
+
+
   @Span('ddhub_mb_messagesSearch')
   public async messagesSearch(
     topicId: string[],

@@ -3,18 +3,20 @@ import { alpha, darken } from '@mui/material/styles';
 
 export const useStyles = makeStyles()((theme) => ({
   wrapper: {
+    display: 'flex',
     backgroundColor: theme.palette.background.paper,
     borderRadius: 6,
-    minHeight: 401,
-    padding: '37px 23px 27px 25px',
+  },
+  uploadWrapper: {
+    width: 466,
+    height: 317,
+    padding: '53px 23px 27px 71px',
+    flexGrow: 1,
   },
   channelWrapper: {
-    backgroundColor: theme.palette.background.paper,
-    borderRadius: 6,
-    minHeight: 133,
-    marginTop: 36,
-    padding: '46px 21px 28px 25px',
-    marginBottom: 20,
+    marginTop: 47,
+    padding: '0px 70px 204px 25px',
+    flexGrow: 1,
   },
   field: {
     '& .MuiOutlinedInput-root input::placeholder': {

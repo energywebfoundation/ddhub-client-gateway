@@ -8,3 +8,4 @@ export * from './ApplicationRefresh';
 export * from './FileCleaner';
 export * from './RolesRefresh';
 export * from './DefaultScheduler';
+export * from './FileUploadPartial';

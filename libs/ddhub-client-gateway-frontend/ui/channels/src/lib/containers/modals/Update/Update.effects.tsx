@@ -16,7 +16,9 @@ import { useUpdateChannel } from '@ddhub-client-gateway-frontend/ui/api-hooks';
 import { ChannelTopic } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { Topic } from '../Create/Topics/Topics.effects';
 
-type TGetActionButtonsProps = TActionButtonsProps['nextClickButtonProps'];
+type TGetActionButtonsProps = TActionButtonsProps['nextClickButtonProps'] & {
+  canGoBack: boolean;
+};
 
 const initialState = {
   type: '' as UpdateChannelDtoType,
@@ -80,20 +82,6 @@ export const useUpdateChannelEffects = () => {
     });
   };
 
-  const hideModal = () => {
-    dispatch({
-      type: ModalActionsEnum.HIDE_UPDATE,
-      payload: true,
-    });
-  };
-
-  const showModal = () => {
-    dispatch({
-      type: ModalActionsEnum.HIDE_UPDATE,
-      payload: false,
-    });
-  };
-
   const onUpdate = () => {
     queryClient.invalidateQueries(getChannelControllerGetByTypeQueryKey());
     closeModal();
@@ -116,16 +104,18 @@ export const useUpdateChannelEffects = () => {
   };
 
   const openCancelModal = async () => {
-    hideModal();
+
     const result = await Swal.warning({
-      text: 'you will close update channel form',
+      text: 'Your changes will be lost!',
     });
 
     if (result.isConfirmed) {
       closeModal();
-    } else {
-      showModal();
     }
+  };
+
+  const goBack = () => {
+    setActiveStep(activeStep - 1);
   };
 
   const getActionButtonsProps = ({
@@ -133,6 +123,7 @@ export const useUpdateChannelEffects = () => {
     loading = false,
     text = 'Save',
     showArrowIcon = false,
+    canGoBack = false,
   }: TGetActionButtonsProps): TActionButtonsProps => ({
     nextClickButtonProps: {
       onClick,
@@ -141,13 +132,8 @@ export const useUpdateChannelEffects = () => {
       showArrowIcon,
     },
     onCancel: openCancelModal,
+    ...(canGoBack && { goBack }),
   });
-
-  const navigateToStep = (index: number) => {
-    if (index !== activeStep) {
-      setActiveStep(index);
-    }
-  };
 
   return {
     open,
@@ -159,6 +145,5 @@ export const useUpdateChannelEffects = () => {
     channelUpdateHandler,
     isUpdating,
     getActionButtonsProps,
-    navigateToStep,
   };
 };

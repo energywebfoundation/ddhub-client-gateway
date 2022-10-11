@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { IdentityModule } from './modules/identity/identity.module';
 import { EnrolmentModule } from './modules/enrolment/enrolment.module';
 import { IamModule } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
@@ -22,6 +22,9 @@ import { StorageModule } from './modules/storage/storage.module';
 import { DdhubClientGatewayEventsModule } from '@dsb-client-gateway/ddhub-client-gateway-events';
 import { GatewayModule } from './modules/gateway/gateway.module';
 import { HealthModule } from './modules/health/health.module';
+import { LoggerModule } from 'nestjs-pino';
+import { v4 as uuidv4 } from 'uuid';
+import { ClientModule } from './modules/client/client.module';
 
 @Module({})
 export class AppModule {
@@ -33,6 +36,23 @@ export class AppModule {
     envFilePath?: string;
   }) {
     const imports = [
+      LoggerModule.forRootAsync({
+        useFactory: (configService: ConfigService) => ({
+          pinoHttp: {
+            genReqId: (req) => req.headers['x-request-id'] || uuidv4(),
+            transport: {
+              target: 'pino-pretty',
+              options: {
+                colorize: configService.get<boolean>('LOG_PRETTY'),
+                levelFirst: true,
+                translateTime: "UTC:yyyy-mm-dd'T'HH:MM:ss.l'Z'",
+                singleLine: true,
+              },
+            },
+          },
+        }),
+        inject: [ConfigService],
+      }),
       ConfigModule.forRoot({
         isGlobal: true,
         envFilePath: envFilePath,
@@ -57,6 +77,7 @@ export class AppModule {
       DdhubClientGatewayEventsModule,
       GatewayModule,
       HealthModule,
+      ClientModule,
     ];
 
     const providers = [

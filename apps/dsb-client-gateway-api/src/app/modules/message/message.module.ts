@@ -9,7 +9,9 @@ import { KeysModule } from '../keys/keys.module';
 import { SecretsEngineModule } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
 import { StorageModule } from '../storage/storage.module';
 import {
+  AcksRepositoryModule,
   FileMetadataRepositoryModule,
+  ReqLockRepositoryModule,
   SymmetricKeysRepositoryModule,
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
 import { DdhubClientGatewayMessageBrokerModule } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
@@ -21,6 +23,8 @@ import { MulterModule } from '@nestjs/platform-express';
 import multer from 'multer';
 import { ConfigService } from '@nestjs/config';
 import { CertificateModule } from '../certificate/certificate.module';
+import { ReqLockService } from './service/req-lock.service';
+import { DdhubClientGatewayClientsModule } from '@dsb-client-gateway/ddhub-client-gateway-clients';
 
 @Module({
   imports: [
@@ -52,12 +56,16 @@ import { CertificateModule } from '../certificate/certificate.module';
     DdhubClientGatewayMessageBrokerModule,
     FileMetadataRepositoryModule,
     CertificateModule,
+    AcksRepositoryModule,
+    ReqLockRepositoryModule,
+    DdhubClientGatewayClientsModule,
   ],
   providers: [
     EventsGateway,
     MessageService,
     WsClientService,
     DsbMessagePoolingService,
+    ReqLockService,
   ],
   exports: [MessageService],
   controllers: [MessageControlller],

@@ -5,8 +5,13 @@
 | DID_REGISTRY_ADDRESS | string | 0xc15d5a57a8eb0e1dcbe5d88b8f9a82017e5cc4af | DID Registry Address used for DID Listener |  |  |
 | APPLICATION_CRON_SCHEDULE | string | */1 * * * * | How often should poll for applications data |  |  |
 | APPLICATION_CRON_ENABLED | boolean | true | Should poll for applications data |  |  |
+| CLIENTS_CRON_SCHEDULE | string | */5 * * * * | How often should check for outdated clients |  |  |
+| CLIENTS_CRON_ENABLED | string | true | Should check for outdated clients |  |  |
 | CHANNEL_DID_CRON_SCHEDULE | string | */1 * * * * | How often should exchange channel roles for DIDs |  |  |
 | CHANNEL_DID_CRON_ENABLED | boolean | true | Should poll for channel DIDs |  |  |
+| MESSAGE_CLEANER_CRON_ENABLED | boolean | true | Should clean messages data |  |  |
+| MESSAGE_CLEANER_CRON_SCHEDULE | string | */30 * * * * | How often should clean messages data |  |  |
+| CLIENT_EXPIRATION_DAYS | number | 30 | Time to live of a client |  |  |
 | SYMMETRIC_KEYS_CRON_SCHEDULE | string | */1 * * * * | How often should poll for symmetric keys |  |  |
 | SYMMETRIC_KEYS_CRON_ENABLED | boolean | true | Should poll for symmetric keys |  |  |
 | TOPICS_CRON_SCHEDULE | string | */1 * * * * | How often should poll for topics data |  |  |
@@ -21,11 +26,18 @@
 | HEARTBEAT_CRON_ENABLED | boolean | true | Should run heartbeat |  |  |
 | DOWNLOAD_FILES_LIFETIME | number | 30 | Specifies how long downloaded file should live (in minutes) |  |  |
 | DID_LISTENER_ENABLED | boolean | true | Should listen for DID attributes changes |  |  |
+| IPFS_HOST | string |  | IPFS Host |  |  |
+| IPFS_PORT | number |  | IPFS Port |  |  |
+| IPFS_PROTOCOL | string |  | IPFS Protocol |  |  |
+| INFURA_PROJECT_ID | string |  | Infura project ID |  |  |
+| INFURA_PROJECT_SECRET | string |  | Infura project api key |  |  |
 | NODE_ENV | string |  | Node environment |  |  |
 | DSB_BASE_URL | string | https://dsb-demo.energyweb.org | Message broker URL |  |  |
 | UPLOAD_FILES_DIR | string | ./upload | Directory where we should store temporary files for upload |  |  |
 | DOWNLOAD_FILES_DIR | string | ./download | Directory where we should store downloaded files for limited time |  |  |
+| LOG_PRETTY | boolean | false | Should colorize logs, only use in dev mode |  |  |
 | MTLS_ENABLED | boolean | true | Should enable mTLS |  |  |
+| DB_SYNC | boolean | false | Should generate migrations (dev use only) |  |  |
 | DB_NAME | string | postgresql://ddhub:ddhub@localhost:5432/ddhub | Database connection string |  |  |
 | DB_DRIVER | string | postgres | Database driver | postgres,better-sqlite3 |  |
 | CLIENT_ID | string | WS_CONSUMER | WS client id |  |  |

@@ -1,5 +1,5 @@
 import * as dotenv from 'dotenv';
-import { Logger, ValidationPipe } from '@nestjs/common';
+import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { WsAdapter } from '@nestjs/platform-ws';
 import * as bodyParser from 'body-parser';
@@ -8,6 +8,14 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 import { otelSDK } from '@dsb-client-gateway/ddhub-client-gateway-tracing';
 import { ValidationException } from '@dsb-client-gateway/dsb-client-gateway-errors';
+import { Logger } from 'nestjs-pino';
+
+/**
+ * Have to export this for nx to add it to the package.json
+ * See: https://github.com/nrwl/nx/issues/6901
+ * TODO: We should upgrade to new version of nx with the webpack executor
+ */
+export * from 'pino-pretty';
 
 dotenv.config({
   path: '.env',
@@ -15,15 +23,20 @@ dotenv.config({
 
 async function bootstrap() {
   if (process.env.OPENTELEMETRY_ENABLED === 'true') {
-    Logger.log('starting open telemetry');
+    console.log('starting open telemetry');
     await otelSDK.start();
   } else {
-    Logger.log('open telemetry disabled');
+    console.log('open telemetry disabled');
   }
 
   const app = await NestFactory.create(
-    AppModule.register({ shouldValidate: true })
+    AppModule.register({ shouldValidate: true }),
+    {
+      bufferLogs: true,
+    }
   );
+
+  app.useLogger(app.get(Logger));
 
   app.enableCors({
     origin: true,
@@ -81,7 +94,7 @@ async function bootstrap() {
 
   await app.listen(port);
 
-  Logger.log(
+  console.log(
     `Application is running on: http://localhost:${port}/${globalPrefix}`
   );
 }
