@@ -50,6 +50,8 @@ export class ClientsService implements OnApplicationBootstrap {
 
   public async execute(): Promise<void> {
     try {
+      await this.clientsLibService.syncMissingClientsIds();
+
       const till: Date = moment()
         .subtract(
           this.configService.get<number>('CLIENT_EXPIRATION_DAYS'),
@@ -78,7 +80,8 @@ export class ClientsService implements OnApplicationBootstrap {
         executedAt: new Date(),
       });
 
-      this.logger.error('clients failed', e);
+      this.logger.error('clients failed');
+      this.logger.error(e);
     }
   }
 }

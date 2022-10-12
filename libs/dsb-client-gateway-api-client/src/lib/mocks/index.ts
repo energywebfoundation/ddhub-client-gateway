@@ -238,7 +238,7 @@ export const getChannelMessagesMock = () => [
     signature:
       '0xd3a2e04d344261ee648d00baba8477a575030371862ee9f11d339726cff8d47b579321dc99312c84d63ab33e065e752c9639a5615ed5c9bf757a634772c506dc1b',
     sender: 'did:ethr:volta:0x03830466Ce257f9B798B0f27359D7639dFB6457D',
-    timestampNanos: 1652768367254,
+    timestampNanos: 1662428065121000000,
     transactionId: "''",
     signatureValid: false,
     decryption: {
@@ -253,7 +253,7 @@ export const getChannelMessagesMock = () => [
     signature:
       '0xd3a2e04d344261ee648d00baba8477a575030371862ee9f11d339726cff8d47b579321dc99312c84d63ab33e065e752c9639a5615ed5c9bf757a634772c506dc1b',
     sender: 'did:ethr:volta:0x03830466Ce257f9B798B0f27359D7639dFB6457D',
-    timestampNanos: 1652768367254,
+    timestampNanos: 1662428065121000000,
     transactionId: "''",
     signatureValid: true,
     decryption: {

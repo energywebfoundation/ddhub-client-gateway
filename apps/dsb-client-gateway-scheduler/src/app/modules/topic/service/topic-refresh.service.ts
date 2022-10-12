@@ -21,8 +21,8 @@ import { CronJob } from 'cron';
 import { Span } from 'nestjs-otel';
 import { ConfigService } from '@nestjs/config';
 import { CommandBus } from '@nestjs/cqrs';
-import { TopicDeletedCommand } from '../../channel/command/topic-deleted.command';
 import moment from 'moment';
+import { TopicDeletedCommand } from '../../channel/command/topic-deleted.command';
 
 @Injectable()
 export class TopicRefreshService implements OnApplicationBootstrap {
@@ -90,9 +90,10 @@ export class TopicRefreshService implements OnApplicationBootstrap {
         return;
       }
 
-      const applicationsToCheck: string[] = await this.computeOwners(
-        applications.map((app) => app.namespace)
-      );
+      const [applicationsToCheck, topicMonitors]: [
+        string[],
+        TopicMonitorUpdates[]
+      ] = await this.computeOwners(applications.map((app) => app.namespace));
 
       if (applicationsToCheck.length === 0) {
         this.logger.log('no applications to run');
@@ -112,73 +113,14 @@ export class TopicRefreshService implements OnApplicationBootstrap {
       );
 
       for (const application of applicationsToRun) {
-        this.logger.log(`running application ${application.namespace}`);
-
-        const topicsForApplication: TopicDataResponse =
-          await this.ddhubTopicsService.getTopics(
-            500,
-            undefined,
-            application.namespace,
-            1,
-            [],
-            true
+        const matchingTopicMonitor: TopicMonitorUpdates | undefined =
+          topicMonitors.find(
+            ({ owner }: TopicMonitorUpdates) =>
+              (owner) =>
+                application.namespace
           );
 
-        for (const topic of topicsForApplication.records) {
-          if (topic.deleted) {
-            this.logger.log(`${topic.id} got deleted`);
-
-            await this.commandBus.execute(
-              new TopicDeletedCommand(topic.name, topic.owner)
-            );
-
-            await this.wrapper.topicRepository.delete({
-              owner: topic.owner,
-              name: topic.name,
-            });
-
-            continue;
-          }
-
-          const topicVersions: TopicVersionResponse =
-            await this.ddhubTopicsService.getTopicVersions(topic.id);
-
-          for (const topicVersion of topicVersions.records) {
-            if (topicVersion.deleted) {
-              await this.wrapper.topicRepository.delete({
-                version: topicVersion.version,
-                name: topicVersion.name,
-                owner: topicVersion.owner,
-              });
-
-              this.logger.log(
-                `deleted topic ${topicVersion.version} ${topicVersion.name} ${topicVersion.owner}`
-              );
-
-              continue;
-            }
-
-            const [major, minor, patch]: string[] =
-              topicVersion.version.split('.');
-
-            await this.wrapper.topicRepository.save({
-              id: topic.id,
-              owner: topic.owner,
-              name: topic.name,
-              schemaType: topic.schemaType,
-              version: topicVersion.version,
-              schema: topicVersion.schema,
-              tags: topicVersion.tags,
-              majorVersion: major,
-              minorVersion: minor,
-              patchVersion: patch,
-            });
-
-            this.logger.log(
-              `stored topic with name ${topicVersion.name} and owner ${topicVersion.owner} with version ${topicVersion.version}`
-            );
-          }
-        }
+        await this.handleApplications(application, matchingTopicMonitor);
       }
 
       await this.cronWrapper.cronRepository.save({
@@ -194,6 +136,129 @@ export class TopicRefreshService implements OnApplicationBootstrap {
       });
 
       this.logger.error('refresh topics failed', e);
+    }
+  }
+
+  private async handleApplications(
+    application: ApplicationEntity,
+    monitor?: TopicMonitorUpdates
+  ): Promise<void> {
+    this.logger.log(`running application ${application.namespace}`);
+
+    let page = 1;
+
+    // eslint-disable-next-line no-constant-condition
+    while (true) {
+      const topicsForApplication: TopicDataResponse =
+        await this.ddhubTopicsService
+          .getTopics(50, application.namespace, page, true)
+          .catch((e) => {
+            this.logger.error(`fetching topics failed`, {
+              error: e,
+              appNamespace: application.namespace,
+            });
+
+            page++;
+
+            return {
+              count: 0,
+              page: 0,
+              records: [],
+              limit: 0,
+            };
+          });
+
+      if (topicsForApplication.records.length === 0) {
+        break;
+      }
+
+      // iterate over topics
+      for (const topic of topicsForApplication.records) {
+        // if the topic is deleted, delete it from database
+        if (topic.deleted) {
+          this.logger.log(`${topic.id} got deleted`);
+
+          await this.wrapper.topicRepository.delete({
+            owner: topic.owner,
+            name: topic.name,
+            id: topic.id,
+          });
+
+          await this.commandBus.execute(
+            new TopicDeletedCommand(topic.name, topic.owner, topic.id)
+          );
+
+          continue;
+        }
+
+        this.logger.log(
+          `attempting to fetch topic versions of ${topic.name} and ${topic.owner}`
+        );
+
+        // receive topic versions using it's id
+        const topicVersions: TopicVersionResponse =
+          await this.ddhubTopicsService.getTopicVersions(topic.id);
+
+        // iterate over topic versions
+        for (const topicVersion of topicVersions.records) {
+          if (topicVersion.deleted) {
+            await this.wrapper.topicRepository.delete({
+              version: topicVersion.version,
+              name: topicVersion.name,
+              owner: topicVersion.owner,
+              id: topic.id,
+            });
+
+            this.logger.log(
+              `deleted topic ${topicVersion.version} ${topicVersion.name} ${topicVersion.owner}`
+            );
+
+            continue;
+          }
+
+          if (
+            topic.owner !== topicVersion.owner ||
+            topic.name !== topicVersion.name
+          ) {
+            this.logger.error(`mismatch between topic version and topic`, {
+              topic: {
+                owner: topic.owner,
+                name: topic.name,
+              },
+              version: {
+                owner: topicVersion.owner,
+                name: topicVersion.name,
+              },
+            });
+          }
+
+          const [major, minor, patch]: string[] =
+            topicVersion.version.split('.');
+
+          await this.wrapper.topicRepository.save({
+            id: topic.id,
+            owner: topic.owner,
+            name: topic.name,
+            schemaType: topic.schemaType,
+            version: topicVersion.version,
+            schema: topicVersion.schema,
+            tags: topicVersion.tags,
+            majorVersion: major,
+            minorVersion: minor,
+            patchVersion: patch,
+          });
+
+          this.logger.log(
+            `stored topic with name ${topicVersion.name} and owner ${topicVersion.owner} with version ${topicVersion.version}`
+          );
+        }
+      }
+
+      page++;
+    }
+
+    if (monitor) {
+      await this.saveMonitor(monitor);
     }
   }
 
@@ -216,14 +281,16 @@ export class TopicRefreshService implements OnApplicationBootstrap {
     }, []);
   }
 
-  protected async computeOwners(allOwners: string[]): Promise<string[]> {
+  protected async computeOwners(
+    allOwners: string[]
+  ): Promise<[string[], TopicMonitorUpdates[]]> {
     const topicUpdatesMonitor: TopicMonitorUpdates[] =
       await this.ddhubTopicsService.topicUpdatesMonitor(allOwners);
 
     if (topicUpdatesMonitor.length === 0) {
       this.logger.warn('no topic monitors received from MB');
 
-      return allOwners;
+      return [allOwners, []];
     }
 
     const existingTopicsMonitors: TopicMonitorEntity[] =
@@ -232,16 +299,11 @@ export class TopicRefreshService implements OnApplicationBootstrap {
     if (existingTopicsMonitors.length === 0) {
       this.logger.warn('no previously stored monitors');
 
-      await Promise.all(
-        topicUpdatesMonitor.map((topicMonitor: TopicMonitorUpdates) =>
-          this.saveMonitor(topicMonitor)
-        )
-      );
-
-      return allOwners;
+      return [allOwners, topicUpdatesMonitor];
     }
 
     const ownersToReturn: string[] = [];
+    const monitorsToReturn: TopicMonitorUpdates[] = [];
 
     for (const topicMonitor of topicUpdatesMonitor) {
       const matchingElement: TopicMonitorEntity | undefined =
@@ -257,7 +319,9 @@ export class TopicRefreshService implements OnApplicationBootstrap {
           `${topicMonitor.owner} monitor first time stored in database`
         );
 
-        await this.saveMonitor(topicMonitor);
+        monitorsToReturn.push(topicMonitor);
+
+        continue;
       }
 
       const hasTopicUpdated: boolean = moment(matchingElement.lastTopicUpdate)
@@ -279,11 +343,11 @@ export class TopicRefreshService implements OnApplicationBootstrap {
 
         this.logger.log(`${topicMonitor.owner} monitor updated`);
 
-        await this.saveMonitor(topicMonitor);
+        monitorsToReturn.push(topicMonitor);
       }
     }
 
-    return ownersToReturn;
+    return [ownersToReturn, monitorsToReturn];
   }
 
   protected async saveMonitor(mb: TopicMonitorUpdates): Promise<void> {
