@@ -10,7 +10,7 @@ import {
 } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
 import { Span } from 'nestjs-otel';
 import { MaximumNumberOfClientsReachedException } from '../exceptions/maximum-number-of-clients-reached.exception';
-import { LessThan } from 'typeorm';
+import { In, LessThan } from 'typeorm';
 import { IamService } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
 
 @Injectable()
@@ -154,5 +154,14 @@ export class ClientsService {
     });
 
     this.logger.log(`created new client ${clientId}`);
+  }
+
+  @Span('clients_deleteMany')
+  public async deleteMany(clientsIds: string[]): Promise<void> {
+    await this.wrapper.repository.delete({
+      clientId: In(clientsIds),
+    });
+
+    await this.ddhubClientsService.deleteClients(clientsIds);
   }
 }

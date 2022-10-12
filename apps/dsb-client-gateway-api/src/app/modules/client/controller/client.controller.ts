@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Delete,
   Get,
@@ -10,6 +11,7 @@ import { ClientsService } from '@dsb-client-gateway/ddhub-client-gateway-clients
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { GetAllClientsResponseDto } from '../dto/get-all.dto';
 import { DeleteClientParamsDto } from '../dto/delete.dto';
+import { DeleteManyClientsBodyDto } from '../dto/delete-many.dto';
 
 @Controller('clients')
 @ApiTags('Clients')
@@ -22,7 +24,7 @@ export class ClientController {
     description: 'List of clients',
     type: [GetAllClientsResponseDto],
   })
-  public async getAll(): Promise<any> {
+  public async getAll(): Promise<GetAllClientsResponseDto[]> {
     return this.clientsService.getAll();
   }
 
@@ -31,14 +33,22 @@ export class ClientController {
     status: HttpStatus.NO_CONTENT,
     description: 'Client deleted',
   })
-  @ApiResponse({
-    status: HttpStatus.UNAUTHORIZED,
-    description: 'Unauthorized',
-  })
   @HttpCode(HttpStatus.NO_CONTENT)
   public async delete(
     @Param() { clientId }: DeleteClientParamsDto
   ): Promise<void> {
     await this.clientsService.delete(clientId);
+  }
+
+  @Delete('/')
+  @ApiResponse({
+    status: HttpStatus.NO_CONTENT,
+    description: 'Clients deleted',
+  })
+  @HttpCode(HttpStatus.NO_CONTENT)
+  public async deleteAll(
+    @Body() { clientsIds }: DeleteManyClientsBodyDto
+  ): Promise<void> {
+    await this.clientsService.deleteMany(clientsIds);
   }
 }
