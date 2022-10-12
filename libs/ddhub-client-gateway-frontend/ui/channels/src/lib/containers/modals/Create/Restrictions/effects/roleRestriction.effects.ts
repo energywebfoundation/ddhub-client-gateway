@@ -54,13 +54,11 @@ export const useRolesRestrictionEffects = (currentRoles: string[]) => {
     const filteredRoles = roles.filter((role) => role !== oldValue);
 
     if (!filteredRoles.includes(newValue)) {
-      const rolesToSet = [...filteredRoles];
-
       if (type === RestrictionType.Role) {
-        rolesToSet.unshift(newValue);
+        filteredRoles.unshift(newValue);
       }
 
-      setRoles(rolesToSet);
+      setRoles(filteredRoles);
     }
 
     clearRolesInput();

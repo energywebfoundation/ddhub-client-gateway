@@ -51,12 +51,10 @@ export const useDIDRestrictionEffects = (currentDids: string[]) => {
     const filteredDids = dids.filter((did) => did !== oldValue);
 
     if (!filteredDids.includes(newValue)) {
-      const didsToSet = [...filteredDids];
-
       if (type === RestrictionType.DID) {
-        didsToSet.unshift(newValue);
+        filteredDids.unshift(newValue);
       }
-      setDids(didsToSet);
+      setDids(filteredDids);
     }
 
     clearDIDInput();
