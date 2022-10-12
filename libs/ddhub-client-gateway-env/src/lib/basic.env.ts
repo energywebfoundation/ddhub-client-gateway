@@ -1,6 +1,7 @@
 import * as Joi from 'joi';
 
 export const BASIC_ENVS = Joi.object({
+  VERSION_FILE_PATH: Joi.string().description('Version file path'),
   IPFS_HOST: Joi.string().description('IPFS Host').required(),
   IPFS_PORT: Joi.number().positive().description('IPFS Port').required(),
   IPFS_PROTOCOL: Joi.string().description('IPFS Protocol').required(),

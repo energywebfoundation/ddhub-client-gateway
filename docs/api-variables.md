@@ -27,6 +27,7 @@
 | SECRET_PREFIX | string | ddhub/ |  |  |  |
 | AWS_REGION | string | ap-southeast-2 | AWS Secrets Manager region |  | SECRETS_ENGINE == aws |
 | AZURE_VAULT_URL | string |  | Azure Vault URL |  | SECRETS_ENGINE == azure |
+| VERSION_FILE_PATH | string |  | Version file path |  |  |
 | IPFS_HOST | string |  | IPFS Host |  |  |
 | IPFS_PORT | number |  | IPFS Port |  |  |
 | IPFS_PROTOCOL | string |  | IPFS Protocol |  |  |

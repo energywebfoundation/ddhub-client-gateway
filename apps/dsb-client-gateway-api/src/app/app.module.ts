@@ -25,6 +25,7 @@ import { HealthModule } from './modules/health/health.module';
 import { LoggerModule } from 'nestjs-pino';
 import { v4 as uuidv4 } from 'uuid';
 import { ClientModule } from './modules/client/client.module';
+import { DdhubClientGatewayVersionModule } from '@dsb-client-gateway/ddhub-client-gateway-version';
 
 @Module({})
 export class AppModule {
@@ -36,6 +37,11 @@ export class AppModule {
     envFilePath?: string;
   }) {
     const imports = [
+      ConfigModule.forRoot({
+        isGlobal: true,
+        envFilePath: envFilePath,
+        validate: shouldValidate && configValidate,
+      }),
       LoggerModule.forRootAsync({
         useFactory: (configService: ConfigService) => ({
           pinoHttp: {
@@ -53,11 +59,7 @@ export class AppModule {
         }),
         inject: [ConfigService],
       }),
-      ConfigModule.forRoot({
-        isGlobal: true,
-        envFilePath: envFilePath,
-        validate: shouldValidate && configValidate,
-      }),
+      DdhubClientGatewayVersionModule,
       StorageModule,
       DdhubClientGatewayTracingModule.forRoot(),
       SecretsEngineModule,
