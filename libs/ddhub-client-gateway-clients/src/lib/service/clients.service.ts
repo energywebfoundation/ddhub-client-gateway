@@ -45,7 +45,8 @@ export class ClientsService {
       const clientWithRemovedDid: string = clientId.replace(did, '');
 
       const matchingClient: ClientEntity | undefined = existingClients.find(
-        (clientEntity: ClientEntity) => clientEntity.clientId === clientId
+        (clientEntity: ClientEntity) =>
+          clientEntity.clientId === clientWithRemovedDid
       );
 
       if (matchingClient) {
