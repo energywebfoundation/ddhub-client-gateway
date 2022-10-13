@@ -46,6 +46,7 @@ export const Create = () => {
               onClick: setRestrictions,
             })}
             restrictions={channelValues.conditions}
+            connectionType={channelValues.connectionType}
           />
         );
       case 2:

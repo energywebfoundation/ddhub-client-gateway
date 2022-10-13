@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { debounce } from 'lodash';
+import { RestrictionType } from '../models/restriction-type.enum';
 
 const didRegex = new RegExp(/^did:[a-z0-9]+:([a-z0-9]+:)?(0x[0-9a-fA-F]{40})$/);
 
@@ -35,15 +36,28 @@ export const useDIDRestrictionEffects = (currentDids: string[]) => {
   };
 
   const addDID = (did: string) => {
-    if (dids.includes(did)) {
-      return;
+    if (!dids.includes(did)) {
+      setDids([did, ...dids]);
     }
-    setDids([...dids, did]);
+
     clearDIDInput();
   };
 
   const removeDID = (value: string) => {
     setDids(dids.filter((did) => did !== value));
+  };
+
+  const updateDID = (type: RestrictionType, oldValue: string, newValue: string) => {
+    const filteredDids = dids.filter((did) => did !== oldValue);
+
+    if (!filteredDids.includes(newValue)) {
+      if (type === RestrictionType.DID) {
+        filteredDids.unshift(newValue);
+      }
+      setDids(filteredDids);
+    }
+
+    clearDIDInput();
   };
 
   return {
@@ -56,5 +70,7 @@ export const useDIDRestrictionEffects = (currentDids: string[]) => {
     addDID,
     removeDID,
     didInputChangeHandler,
+    setIsValid,
+    updateDID,
   };
 };

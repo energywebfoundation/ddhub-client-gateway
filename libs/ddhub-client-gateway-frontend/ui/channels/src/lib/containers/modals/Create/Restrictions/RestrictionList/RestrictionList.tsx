@@ -1,16 +1,20 @@
 import { useStyles } from './RestrictionList.styles';
-import { X as Close } from 'react-feather';
-import { Grid, Typography, IconButton } from '@mui/material';
-import { CopyToClipboard } from '@ddhub-client-gateway-frontend/ui/core';
-import { RestrictionType } from '../models/restriction-type.enum';
-import { didFormatMinifier } from '@ddhub-client-gateway-frontend/ui/utils';
+import { Select } from '@mui/material';
+import { RestrictionListEffectsProps, useRestrictionListEffects } from './RestrictionList.effects';
+import { RestrictionSelect } from '../RestrictionSelect/RestrictionSelect';
+import { RestrictionListView } from '../RestrictionListView/RestrictionListView';
+import clsx from 'clsx';
 
-export interface RestrictionListProps {
-  list: string[];
+export interface RestrictionListProps extends RestrictionListEffectsProps {
   canRemove: boolean;
   canCopy: boolean;
-  remove?: (value: string) => void;
-  type: RestrictionType;
+  handleSaveRestriction: () => void;
+  roleInput: string;
+  didInput: string;
+  isRoleValid: boolean;
+  isDIDValid: boolean;
+  children: React.ReactNode;
+  recent: string;
 }
 
 export const RestrictionList = ({
@@ -19,37 +23,82 @@ export const RestrictionList = ({
   canRemove,
   canCopy,
   type,
+  setType,
+  clear,
+  handleSaveRestriction,
+  handleUpdateRestriction,
+  roleInput,
+  isRoleValid,
+  didInput,
+  isDIDValid,
+  children,
+  setRoleInput,
+  setDIDInput,
+  recent,
 }: RestrictionListProps) => {
   const { classes } = useStyles();
+  const {
+    expanded,
+    handleOpen,
+    handleClose,
+    handleUpdate,
+  } = useRestrictionListEffects({
+    list,
+    clear,
+    setType,
+    type,
+    setDIDInput,
+    setRoleInput,
+    handleUpdateRestriction,
+    remove,
+  });
+
   return (
-    <div className={classes.root}>
-      {list.map((el) => (
-        <Grid
-          container
-          justifyContent="space-between"
-          key={el}
-          className={classes.container}
-        >
-          <Grid item>
-            <Typography noWrap variant="body2" className={classes.itemText}>
-              {type === RestrictionType.DID ? didFormatMinifier(el) : el}
-            </Typography>
-          </Grid>
-          {canRemove && (
-            <IconButton
-              onClick={() => {
-                if (remove) {
-                  remove(el);
-                }
-              }}
-              className={classes.close}
-            >
-              <Close size={18} />
-            </IconButton>
-          )}
-          {canCopy && <CopyToClipboard text={el} />}
-        </Grid>
+    <>
+      {list.map((el, index) => (
+        <Select
+          id={`panel-${index}`}
+          key={`panel-${index}`}
+          value={el}
+          open={expanded === `panel-${index}`}
+          onOpen={handleOpen}
+          onClose={handleClose}
+          IconComponent={() => null}
+          classes={{
+            icon: classes.icon,
+          }}
+          className={clsx(classes.select, {
+            [classes.recent]: recent === el,
+          })}
+          sx={{ width: '100px' }}
+          displayEmpty={true}
+          renderValue={() => (
+            <RestrictionListView
+              item={el}
+              type={type}
+              canRemove={canRemove}
+              canCopy={canCopy}
+              handleOpen={handleOpen}
+              remove={remove}
+              expanded={expanded}
+              index={index}/>
+            )}>
+          <RestrictionSelect
+            setType={setType}
+            clear={clear}
+            handleClose={handleClose}
+            handleSaveRestriction={handleSaveRestriction}
+            handleUpdateRestriction={handleUpdate}
+            roleInput={roleInput}
+            isRoleValid={isRoleValid}
+            didInput={didInput}
+            isDIDValid={isDIDValid}
+            selectedType={type}
+            inputValue={el}>
+            {children}
+          </RestrictionSelect>
+        </Select>
       ))}
-    </div>
+    </>
   );
 };
