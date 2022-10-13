@@ -4,6 +4,7 @@ import { GenericFormField } from '../../../containers/GenericForm';
 export type FormSelectOption = {
   value: string | number;
   label: string;
+  subLabel?: string;
 };
 
 export interface FormSelectProps {

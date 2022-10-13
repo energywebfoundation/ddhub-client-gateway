@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { debounce } from 'lodash';
+import { RestrictionType } from '../models/restriction-type.enum';
 
 const roleRegex = new RegExp(
   /^[a-z0-9]+\.roles\.((\w+).)*(ewc)$/
@@ -37,15 +38,30 @@ export const useRolesRestrictionEffects = (currentRoles: string[]) => {
   };
 
   const addRole = (role: string) => {
-    if (roles.includes(role)) {
-      return;
+    if (!roles.includes(role)) {
+      const rolesToSet = [role, ...roles];
+      setRoles(rolesToSet);
     }
-    setRoles([...roles, role]);
+
     clearRolesInput();
   };
 
   const removeRole = (value: string) => {
     setRoles(roles.filter((role) => role !== value));
+  };
+
+  const updateRole = (type: RestrictionType, oldValue: string, newValue: string) => {
+    const filteredRoles = roles.filter((role) => role !== oldValue);
+
+    if (!filteredRoles.includes(newValue)) {
+      if (type === RestrictionType.Role) {
+        filteredRoles.unshift(newValue);
+      }
+
+      setRoles(filteredRoles);
+    }
+
+    clearRolesInput();
   };
 
   return {
@@ -56,5 +72,8 @@ export const useRolesRestrictionEffects = (currentRoles: string[]) => {
     addRole,
     isValid,
     rolesInputChangeHandler,
+    setIsValid,
+    setRoleInput,
+    updateRole,
   };
 };

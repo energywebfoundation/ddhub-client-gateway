@@ -11,7 +11,7 @@ export const useStyles = makeStyles()((theme) => ({
     maxWidth: 860,
     minHeight: 693,
     maxHeight: 800,
-    padding: '39px 20px 27px 39px',
+    padding: '39px 20px 0px 39px',
     borderRadius: 0,
   },
   title: {
@@ -30,7 +30,8 @@ export const useStyles = makeStyles()((theme) => ({
   formWrapper: {
     paddingTop: 16,
     flexGrow: 1,
-    paddingLeft: 63,
+    paddingLeft: 23,
+    borderLeft: '1px solid #404656'
   },
   channelWrapper: {
     display: 'flex',
@@ -75,6 +76,12 @@ export const useStyles = makeStyles()((theme) => ({
   },
   iconCheck: {
     stroke: theme.palette.success.main,
+    width: 21,
+    height: 21,
+    marginTop: 3,
+  },
+  iconX: {
+    stroke: theme.palette.error.main,
     width: 21,
     height: 21,
     marginTop: 3,

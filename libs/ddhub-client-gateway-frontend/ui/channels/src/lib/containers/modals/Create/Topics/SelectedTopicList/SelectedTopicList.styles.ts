@@ -16,12 +16,8 @@ export const useStyles = makeStyles()((theme) => ({
     '&::-webkit-scrollbar-thumb': {
       backgroundColor: theme.palette.primary.main,
       borderRadius: 3,
+      maxHeight: 372,
     },
+    maxHeight: 230,
   },
-  create: {
-    maxHeight: 372,
-  },
-  summary: {
-    maxHeight: 134,
-  }
 }));

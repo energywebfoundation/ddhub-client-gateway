@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState, ChangeEvent } from "react";
 import { FieldValues, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -6,6 +6,13 @@ import { ConnectionType } from "./models/connection-type.enum";
 import { ChannelType } from "../../../../models/channel-type.enum";
 import { ICreateChannel } from "../../models/create-channel.interface";
 import { pick } from "lodash";
+
+enum FieldName {
+  ConnectionType = 'connectionType',
+  PayloadEncryption = 'payloadEncryption',
+  Fqcn = 'fqcn',
+  ChannelType = 'channelType',
+}
 
 const validationSchema = yup
   .object({
@@ -18,7 +25,7 @@ const validationSchema = yup
 
 const fields = {
   fqcn: {
-    name: 'fqcn',
+    name: FieldName.Fqcn,
     label: 'Internal channel namespace',
     formInputsWrapperProps: {
       margin: '23px 15px 0 0',
@@ -28,7 +35,7 @@ const fields = {
     },
   },
   channelType: {
-    name: 'channelType',
+    name: FieldName.ChannelType,
     formInputsWrapperProps: {
       marginBottom: '20px',
     },
@@ -38,7 +45,7 @@ const fields = {
     ],
   },
   connectionType: {
-    name: 'connectionType',
+    name: FieldName.ConnectionType,
     label: 'Type',
     options: [
       { label: 'Subscribe', value: ConnectionType.Subscribe },
@@ -46,12 +53,15 @@ const fields = {
     ],
   },
   payloadEncryption: {
-    name: 'payloadEncryption',
+    name: FieldName.PayloadEncryption,
     label: 'Payload Encryption'
   }
 };
 
 export const useDetailsEffects = (channelValues: ICreateChannel) => {
+  const [showEncryption, setShowEncryption] = useState(false);
+  const [isEncrypt, setIsEncrypt] = useState(false);
+
   const initialValues = {
     fqcn: '',
     channelType: '',
@@ -76,17 +86,33 @@ export const useDetailsEffects = (channelValues: ICreateChannel) => {
     if (!channelValues) return;
 
     const details = pick(channelValues, [
-      'channelType',
-      'connectionType',
-      'fqcn',
-      'payloadEncryption'
+      FieldName.ChannelType,
+      FieldName.ConnectionType,
+      FieldName.Fqcn,
+      FieldName.PayloadEncryption,
     ]);
     Object.entries(details).forEach(([name, value]) => {
       setValue(name, value);
+
+      if (name === FieldName.ConnectionType) {
+        const isPublish = value === ConnectionType.Publish;
+        setShowEncryption(isPublish);
+      } else if (name === FieldName.PayloadEncryption) {
+        setIsEncrypt(!!value);
+      }
     });
     triggerValidation();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [channelValues]);
 
-  return { fields, register, isValid, handleSubmit, control };
+  const connectionOnChange = (event: any) => {
+    const isPublish = event.target.value === ConnectionType.Publish;
+    setShowEncryption(isPublish);
+  };
+
+  const encryptionOnChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setIsEncrypt(event.target.checked);
+  };
+
+  return { fields, register, isValid, handleSubmit, control, connectionOnChange, showEncryption, encryptionOnChange, isEncrypt };
 };
