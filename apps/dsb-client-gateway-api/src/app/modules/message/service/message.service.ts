@@ -75,7 +75,7 @@ export class MessageService {
     protected readonly ddhubMessageService: DdhubMessagesService,
     protected readonly ddhubFilesService: DdhubFilesService,
     protected readonly fileMetadataWrapper: FileMetadataWrapperRepository,
-    protected readonly reqLockService: ReqLockService,
+    protected readonly reqLockService: ReqLockService
   ) {
     this.uploadPath = configService.get<string>('UPLOAD_FILES_DIR');
     this.downloadPath = configService.get<string>('DOWNLOAD_FILES_DIR');
@@ -119,15 +119,15 @@ export class MessageService {
 
     messageLoggerContext.debug(
       'attempting to encrypt payload, encryption enabled: ' +
-      channel.payloadEncryption
+        channel.payloadEncryption
     );
 
     const message = channel.payloadEncryption
       ? this.keyService.encryptMessage(
-        dto.payload,
-        randomKey,
-        EncryptedMessageType['UTF-8']
-      )
+          dto.payload,
+          randomKey,
+          EncryptedMessageType['UTF-8']
+        )
       : dto.payload;
 
     messageLoggerContext.debug('fetching private key');
@@ -264,18 +264,18 @@ export class MessageService {
     message: SearchMessageResponseDto
   ): Promise<GetMessageResponse> {
     let baseMessage: Omit<GetMessageResponse, 'signatureValid' | 'decryption'> =
-    {
-      id: message.messageId,
-      topicVersion: message.topicVersion,
-      topicName: '',
-      topicOwner: '',
-      topicSchemaType: '',
-      payload: message.payload,
-      signature: message.signature,
-      sender: message.senderDid,
-      timestampNanos: message.timestampNanos,
-      transactionId: message.transactionId,
-    };
+      {
+        id: message.messageId,
+        topicVersion: message.topicVersion,
+        topicName: '',
+        topicOwner: '',
+        topicSchemaType: '',
+        payload: message.payload,
+        signature: message.signature,
+        sender: message.senderDid,
+        timestampNanos: message.timestampNanos,
+        transactionId: message.transactionId,
+      };
 
     try {
       const topic: TopicEntity = await this.topicService.getTopicById(
@@ -400,10 +400,14 @@ export class MessageService {
     ack: boolean | undefined = true
   ): Promise<GetMessageResponse[]> {
     try {
-      await this.reqLockService.attemptLock(clientId, fqcn);
+      const usableClientId: string = clientId ? clientId : 'DEFAULT';
 
-      const messages: GetMessageResponse[] =
-        await this.getMessages({ fqcn, from, amount, topicName, topicOwner, clientId }, ack);
+      await this.reqLockService.attemptLock(usableClientId, fqcn);
+
+      const messages: GetMessageResponse[] = await this.getMessages(
+        { fqcn, from, amount, topicName, topicOwner, clientId },
+        ack
+      );
 
       await this.reqLockService.clearLock(clientId, fqcn);
 
