@@ -5,6 +5,7 @@ import { lastValueFrom, timeout } from 'rxjs';
 import { TlsAgentService } from '@dsb-client-gateway/ddhub-client-gateway-tls-agent';
 import { useInterceptors } from '@dsb-client-gateway/ddhub-client-gateway-utils';
 import { ConfigService } from '@nestjs/config';
+import { VersionService } from '@dsb-client-gateway/ddhub-client-gateway-version';
 
 @Injectable()
 export class DidAuthApiService {
@@ -13,9 +14,10 @@ export class DidAuthApiService {
   constructor(
     protected readonly httpService: HttpService,
     protected readonly tlsAgentService: TlsAgentService,
-    protected readonly configService: ConfigService
+    protected readonly configService: ConfigService,
+    protected readonly versionService: VersionService
   ) {
-    useInterceptors(this.httpService, this.logger);
+    useInterceptors(this.httpService, this.logger, versionService);
   }
 
   public async login(identityToken: string): Promise<DidAuthResponse> {

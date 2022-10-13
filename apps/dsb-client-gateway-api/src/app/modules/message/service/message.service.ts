@@ -406,10 +406,14 @@ export class MessageService {
     ack: boolean | undefined = true
   ): Promise<GetMessageResponse[]> {
     try {
-      await this.reqLockService.attemptLock(clientId, fqcn);
+      const usableClientId: string = clientId ? clientId : 'DEFAULT';
 
-      const messages: GetMessageResponse[] =
-        await this.getMessages({ fqcn, from, amount, topicName, topicOwner, clientId }, ack);
+      await this.reqLockService.attemptLock(usableClientId, fqcn);
+
+      const messages: GetMessageResponse[] = await this.getMessages(
+        { fqcn, from, amount, topicName, topicOwner, clientId },
+        ack
+      );
 
       await this.reqLockService.clearLock(clientId, fqcn);
 
@@ -479,7 +483,7 @@ export class MessageService {
           }).then();
         }
 
-        if (ackResponse.acked.length === 0) {
+        if (ackResponse.acked.length === 0 && ackResponse.notFound.length === 0) {
           return [];
         } else {
           this.pendingAcksWrapperRepository.pendingAcksRepository.delete({
