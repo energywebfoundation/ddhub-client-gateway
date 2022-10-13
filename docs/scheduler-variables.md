@@ -26,6 +26,7 @@
 | HEARTBEAT_CRON_ENABLED | boolean | true | Should run heartbeat |  |  |
 | DOWNLOAD_FILES_LIFETIME | number | 30 | Specifies how long downloaded file should live (in minutes) |  |  |
 | DID_LISTENER_ENABLED | boolean | true | Should listen for DID attributes changes |  |  |
+| VERSION_FILE_PATH | string |  | Version file path |  |  |
 | IPFS_HOST | string |  | IPFS Host |  |  |
 | IPFS_PORT | number |  | IPFS Port |  |  |
 | IPFS_PROTOCOL | string |  | IPFS Protocol |  |  |
