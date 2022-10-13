@@ -459,42 +459,11 @@ export class MessageService {
     const consumer = `${clientId}:${fqcn}`;
 
     if (ack) {
-      const data: PendingAcksEntity[] = await this.pendingAcksWrapperRepository.pendingAcksRepository.find({
-        where: {
-          clientId: consumer
-        },
-      });
-      if (data.length > 0) {
-        const idsPendingAck: string[] = data.map(e => e.messageId);
-
-        const ackResponse: AckResponse = await this.sendAckBy(
-          idsPendingAck,
-          consumer
-        ).catch(e => {
-          return {
-            acked: [], notFound: []
-          }
-        });
-
-        if (ackResponse.notFound.length > 0) {
-          this.pendingAcksWrapperRepository.pendingAcksRepository.delete({
-            messageId: In(ackResponse.notFound),
-            clientId: consumer
-          }).then();
-        }
-
-        if (ackResponse.acked.length === 0 && ackResponse.notFound.length === 0) {
-          return [];
-        } else {
-          this.pendingAcksWrapperRepository.pendingAcksRepository.delete({
-            messageId: In(ackResponse.acked),
-            clientId: consumer
-          }).then();
-        }
-      }
-
+      messageLoggerContext.log(
+        `[getMessages] Sending for ack for consumer ${consumer}`
+      );
+      this.validatePendingAck(consumer);
     }
-
 
     const messages: Array<SearchMessageResponseDto> =
       await this.ddhubMessageService.messagesSearch(
@@ -566,7 +535,7 @@ export class MessageService {
     });
 
     if (idsPendingAck.length > 0) {
-      this.pendingAcksWrapperRepository.pendingAcksRepository.save(idsPendingAck).then();
+      await this.pendingAcksWrapperRepository.pendingAcksRepository.save(idsPendingAck);
     }
 
     return fulfilledMessages.sort((a, b) => {
@@ -751,6 +720,45 @@ export class MessageService {
 
     if (isTopicNotRelatedToChannel) {
       throw new TopicNotRelatedToChannelException();
+    }
+  }
+
+  private async validatePendingAck(consumer: string) {
+    const data: PendingAcksEntity[] = await this.pendingAcksWrapperRepository.pendingAcksRepository.find({
+      where: {
+        clientId: consumer
+      },
+    });
+    if (data.length == 0) {
+      return;
+    }
+    const idsPendingAck: string[] = data.map(e => e.messageId);
+
+    const ackResponse: AckResponse = await this.sendAckBy(
+      idsPendingAck,
+      consumer
+    ).catch(e => {
+      this.logger.error(`something went wrong when ack messages`);
+      this.logger.error(e);
+      return {
+        acked: [], notFound: []
+      }
+    });
+
+    if (ackResponse.notFound.length > 0) {
+      this.pendingAcksWrapperRepository.pendingAcksRepository.delete({
+        messageId: In(ackResponse.notFound),
+        clientId: consumer
+      }).then();
+    }
+
+    if (ackResponse.acked.length === 0 && ackResponse.notFound.length === 0) {
+      return [];
+    } else {
+      this.pendingAcksWrapperRepository.pendingAcksRepository.delete({
+        messageId: In(ackResponse.acked),
+        clientId: consumer
+      }).then();
     }
   }
 
