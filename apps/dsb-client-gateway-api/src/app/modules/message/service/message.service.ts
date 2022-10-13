@@ -1,4 +1,5 @@
 import {
+  AckResponse,
   DdhubFilesService,
   DdhubMessagesService,
   SendMessageResponseFile,
@@ -9,6 +10,8 @@ import {
   ChannelTopic,
   FileMetadataEntity,
   FileMetadataWrapperRepository,
+  PendingAcksEntity,
+  PendingAcksWrapperRepository,
   TopicEntity,
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
 import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
@@ -50,6 +53,8 @@ import { FileTypeNotSupportedException } from '../exceptions/file-type-not-suppo
 import { MessageSignatureNotValidException } from '../exceptions/messages-signature-not-valid.exception';
 import { ReqLockExistsException } from '../exceptions/req-lock-exists.exception';
 import { ReqLockService } from './req-lock.service';
+import moment from 'moment';
+import { In } from 'typeorm';
 
 export enum EventEmitMode {
   SINGLE = 'SINGLE',
@@ -75,7 +80,8 @@ export class MessageService {
     protected readonly ddhubMessageService: DdhubMessagesService,
     protected readonly ddhubFilesService: DdhubFilesService,
     protected readonly fileMetadataWrapper: FileMetadataWrapperRepository,
-    protected readonly reqLockService: ReqLockService
+    protected readonly reqLockService: ReqLockService,
+    protected readonly pendingAcksWrapperRepository: PendingAcksWrapperRepository,
   ) {
     this.uploadPath = configService.get<string>('UPLOAD_FILES_DIR');
     this.downloadPath = configService.get<string>('DOWNLOAD_FILES_DIR');
@@ -119,15 +125,15 @@ export class MessageService {
 
     messageLoggerContext.debug(
       'attempting to encrypt payload, encryption enabled: ' +
-        channel.payloadEncryption
+      channel.payloadEncryption
     );
 
     const message = channel.payloadEncryption
       ? this.keyService.encryptMessage(
-          dto.payload,
-          randomKey,
-          EncryptedMessageType['UTF-8']
-        )
+        dto.payload,
+        randomKey,
+        EncryptedMessageType['UTF-8']
+      )
       : dto.payload;
 
     messageLoggerContext.debug('fetching private key');
@@ -264,18 +270,18 @@ export class MessageService {
     message: SearchMessageResponseDto
   ): Promise<GetMessageResponse> {
     let baseMessage: Omit<GetMessageResponse, 'signatureValid' | 'decryption'> =
-      {
-        id: message.messageId,
-        topicVersion: message.topicVersion,
-        topicName: '',
-        topicOwner: '',
-        topicSchemaType: '',
-        payload: message.payload,
-        signature: message.signature,
-        sender: message.senderDid,
-        timestampNanos: message.timestampNanos,
-        transactionId: message.transactionId,
-      };
+    {
+      id: message.messageId,
+      topicVersion: message.topicVersion,
+      topicName: '',
+      topicOwner: '',
+      topicSchemaType: '',
+      payload: message.payload,
+      signature: message.signature,
+      sender: message.senderDid,
+      timestampNanos: message.timestampNanos,
+      transactionId: message.transactionId,
+    };
 
     try {
       const topic: TopicEntity = await this.topicService.getTopicById(
@@ -387,9 +393,9 @@ export class MessageService {
   public async sendAckBy(
     messageIds: string[],
     clientId: string
-  ): Promise<string[]> {
+  ): Promise<AckResponse> {
     this.logger.log(messageIds);
-    const successAckMessageIds: string[] =
+    const successAckMessageIds: AckResponse =
       await this.ddhubMessageService.messagesAckBy(messageIds, clientId);
     return successAckMessageIds;
   }
@@ -449,6 +455,15 @@ export class MessageService {
     );
 
     messageLoggerContext.debug(`found topics`, topicsIds);
+
+    const consumer = `${clientId}:${fqcn}`;
+
+    if (ack) {
+      messageLoggerContext.log(
+        `[getMessages] Sending for ack for consumer ${consumer}`
+      );
+      this.validatePendingAck(consumer);
+    }
 
     const messages: Array<SearchMessageResponseDto> =
       await this.ddhubMessageService.messagesSearch(
@@ -511,14 +526,16 @@ export class MessageService {
       `[getMessages] Total fulfilled messages ${messageResponses.length}`
     );
 
-    if (ack) {
-      const successAckMessageIds: string[] = await this.sendAckBy(
-        fulfilledMessages.map((message) => message.id),
-        `${clientId}:${fqcn}`
-      );
-      fulfilledMessages = fulfilledMessages.filter((msg) =>
-        successAckMessageIds.includes(msg.id)
-      );
+    const idsPendingAck: PendingAcksEntity[] = fulfilledMessages.map(e => {
+      return {
+        clientId: consumer,
+        messageId: e.id,
+        mbTimestamp: moment(e.timestampNanos / (1000 * 1000)).utc().toDate()
+      }
+    });
+
+    if (idsPendingAck.length > 0) {
+      await this.pendingAcksWrapperRepository.pendingAcksRepository.save(idsPendingAck);
     }
 
     return fulfilledMessages.sort((a, b) => {
@@ -703,6 +720,45 @@ export class MessageService {
 
     if (isTopicNotRelatedToChannel) {
       throw new TopicNotRelatedToChannelException();
+    }
+  }
+
+  private async validatePendingAck(consumer: string) {
+    const data: PendingAcksEntity[] = await this.pendingAcksWrapperRepository.pendingAcksRepository.find({
+      where: {
+        clientId: consumer
+      },
+    });
+    if (data.length == 0) {
+      return;
+    }
+    const idsPendingAck: string[] = data.map(e => e.messageId);
+
+    const ackResponse: AckResponse = await this.sendAckBy(
+      idsPendingAck,
+      consumer
+    ).catch(e => {
+      this.logger.error(`something went wrong when ack messages`);
+      this.logger.error(e);
+      return {
+        acked: [], notFound: []
+      }
+    });
+
+    if (ackResponse.notFound.length > 0) {
+      this.pendingAcksWrapperRepository.pendingAcksRepository.delete({
+        messageId: In(ackResponse.notFound),
+        clientId: consumer
+      }).then();
+    }
+
+    if (ackResponse.acked.length === 0 && ackResponse.notFound.length === 0) {
+      return [];
+    } else {
+      this.pendingAcksWrapperRepository.pendingAcksRepository.delete({
+        messageId: In(ackResponse.acked),
+        clientId: consumer
+      }).then();
     }
   }
 

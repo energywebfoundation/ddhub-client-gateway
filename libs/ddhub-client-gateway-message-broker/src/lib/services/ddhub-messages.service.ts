@@ -9,6 +9,7 @@ import { timeout } from 'rxjs';
 
 import { OperationOptions } from 'retry';
 import {
+  AckResponse,
   GetInternalMessageResponse,
   Message,
   SearchMessageResponseDto,
@@ -42,14 +43,14 @@ export class DdhubMessagesService extends DdhubBaseService {
   public async messagesAckBy(
     messageIds: string[],
     clientId?: string
-  ): Promise<string[]> {
+  ): Promise<AckResponse> {
     const requestBody = {
       messageIds,
       clientId
     };
 
     try {
-      const result = await this.request<string[]>(
+      const result = await this.request<AckResponse>(
         () =>
           this.httpService.post('/messages/ack', requestBody, {
             httpsAgent: this.tlsAgentService.get(),
@@ -62,7 +63,7 @@ export class DdhubMessagesService extends DdhubBaseService {
         }
       );
 
-      const idsNotAck: string[] = messageIds.filter(id => !result.data.includes(id));
+      const idsNotAck: string[] = messageIds.filter(id => !result.data.acked.includes(id));
       if (idsNotAck.length === 0) {
         this.logger.log('messages ack successful', result.data);
       } else {

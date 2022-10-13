@@ -11,6 +11,7 @@ import {
   EventsEntity,
   FileMetadataEntity,
   IdentityEntity,
+  PendingAcksEntity,
   ReqLockEntity,
   SymmetricKeysEntity,
   TopicEntity,
@@ -31,6 +32,7 @@ const ENTITIES = [
   FileMetadataEntity,
   EventsEntity,
   AcksEntity,
+  PendingAcksEntity,
   TopicMonitorEntity,
   ReqLockEntity,
 ];
@@ -50,4 +52,4 @@ const ENTITIES = [
     }),
   ],
 })
-export class DsbClientGatewayStorageModule {}
+export class DsbClientGatewayStorageModule { }
