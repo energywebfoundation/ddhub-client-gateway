@@ -309,3 +309,20 @@ export const getGatewayMock = () => {
     "namespace": "ddhub.apps.energyweb.iam.ewc"
   };
 };
+
+export const getClientsMock = () => {
+  return [
+    {
+      "id": "d682d25f-24b0-4b9f-afcc-08a40f8855d1",
+      "clientId": "test.cursor",
+      "createdDate": "2022-09-21 08:04:06.020037",
+      "updatedDate": "2022-09-21 08:04:06.020037"
+    },
+    {
+      "id": "d682d25f-24b0-4b9f-afcc-08a40f8855d2",
+      "clientId": "test.cursor2",
+      "createdDate": "2022-09-21 08:04:06.020037",
+      "updatedDate": "2022-09-21 08:04:06.020037"
+    }
+  ];
+};
