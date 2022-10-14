@@ -31,6 +31,11 @@ export const routeRestrictions = new Map<string, string>()
   .set('fileUpload', routerConst.DataMessagingFileUpload)
   .set('fileDownload', routerConst.DataMessagingFileDownload);
 
+enum VersionStatus {
+  Unavailable = 'Unavailable',
+  NOT_DETECTED = 'NOT_DETECTED',
+}
+
 export const getRoutesToDisplay = (
   accountRoles: Role[],
   restrictions: IndexableRouteRestrictions,
@@ -73,26 +78,33 @@ export const useSetUserDataEffect = () => {
   const queryClient = useQueryClient();
   const [routeRestrictionList, setRouteRestrictionList] = useState({} as RouteRestrictions);
   const [result, setResult] = useState({} as IdentityWithEnrolment);
+  const [version, setVersion] = useState<string>(VersionStatus.Unavailable);
 
   useEffect(() => {
-    if (!isEmpty(config) && result?.enrolment?.roles) {
-      const accountStatus = checkAccountStatus(result);
+    if (!isEmpty(config)) {
+      if (config.version !== 'NOT_DETECTED') {
+        setVersion(config.version);
+      }
 
-      const displayedRoutes = getRoutesToDisplay(
-        result.enrolment.roles,
-        routeRestrictionList as unknown as IndexableRouteRestrictions,
-        config,
-      );
+      if (result?.enrolment?.roles) {
+        const accountStatus = checkAccountStatus(result);
 
-      setUserData({
-        ...userData,
-        accountStatus,
-        roles: result.enrolment.roles,
-        isChecking: false,
-        routeRestrictions: routeRestrictionList,
-        displayedRoutes,
-        did: result.enrolment.did,
-      });
+        const displayedRoutes = getRoutesToDisplay(
+          result.enrolment.roles,
+          routeRestrictionList as unknown as IndexableRouteRestrictions,
+          config,
+        );
+
+        setUserData({
+          ...userData,
+          accountStatus,
+          roles: result.enrolment.roles,
+          isChecking: false,
+          routeRestrictions: routeRestrictionList,
+          displayedRoutes,
+          did: result.enrolment.did,
+        });
+      }
     }
   }, [config, result, routeRestrictionList]);
 
@@ -158,5 +170,6 @@ export const useSetUserDataEffect = () => {
     setIsChecking,
     setDataOnError,
     setRestrictions,
+    version,
   };
 };
