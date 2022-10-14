@@ -11,6 +11,7 @@ import {
   TableRow,
   Box,
   TableSortLabel,
+  Checkbox,
 } from '@mui/material';
 import { ColumnInstance } from 'react-table';
 import { Search } from './Search';
@@ -44,6 +45,8 @@ export function GenericTable<T>({
   onSearchInput,
   defaultOrder,
   defaultSortBy,
+  showCheckbox = false,
+  setSelectedItems,
 }: TableProps<T>) {
   const { classes } = useStyles();
 
@@ -66,6 +69,8 @@ export function GenericTable<T>({
     handleSearchInput,
     paginationText,
     handleChangeRowsPerPage,
+    isSelected,
+    handleCheckboxClick,
   } = useTableEffects({
     headers,
     tableRows,
@@ -76,6 +81,7 @@ export function GenericTable<T>({
     defaultOrder,
     defaultSortBy,
     backendSearch,
+    setSelectedItems,
   });
 
   return (
@@ -103,6 +109,12 @@ export function GenericTable<T>({
           >
             <TableHead>
               <TableRow>
+                { showCheckbox && (
+                  <TableCell
+                    classes={{ head: classes.head }}>
+                  </TableCell>
+                )}
+
                 {headers.map((column) => (
                   <TableCell
                     style={{ ...column?.style }}
@@ -149,7 +161,11 @@ export function GenericTable<T>({
                       pageIndex * pageSize + pageSize
                     )
                 : rows.sort(getComparator(order, orderBy))
-              ).map((row) => {
+              ).map((row, index) => {
+                const firstCol = row.cells[0].value;
+                const isItemSelected = showCheckbox ? isSelected(firstCol) : false;
+                const labelId = `enhanced-table-checkbox-${index}`;
+
                 const data = row.original as any;
                 prepareRow(row);
                 return (
@@ -160,6 +176,18 @@ export function GenericTable<T>({
                     {...row.getRowProps()}
                     onClick={() => handleRowClick(data)}
                   >
+                    { showCheckbox && (
+                      <TableCell padding="checkbox">
+                        <Checkbox
+                          color="primary"
+                          onClick={(event) => handleCheckboxClick(event, firstCol)}
+                          checked={isItemSelected}
+                          inputProps={{
+                            'aria-labelledby': labelId,
+                          }}
+                        />
+                      </TableCell>
+                    )}
                     {row.cells.map((cell) => {
                       const column = cell.column as ColumnInstance & {
                         color: string;

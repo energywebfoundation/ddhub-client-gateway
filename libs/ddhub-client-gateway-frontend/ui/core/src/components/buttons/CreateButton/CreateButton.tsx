@@ -3,9 +3,10 @@ import { useStyles } from './CreateButton.styles';
 
 export interface CreateButtonProps {
   onCreate: () => void;
+  buttonText?: string;
 }
 
-export function CreateButton({ onCreate }: CreateButtonProps) {
+export function CreateButton({ onCreate, buttonText }: CreateButtonProps) {
   const { classes } = useStyles();
   return (
     <div className={classes.createTopicButtonWrapper}>
@@ -16,7 +17,7 @@ export function CreateButton({ onCreate }: CreateButtonProps) {
         onClick={onCreate}
       >
         <Typography variant="body2" className={classes.createTopicButtonText}>
-          Create
+          { buttonText ?? 'Create' }
         </Typography>
       </Button>
     </div>

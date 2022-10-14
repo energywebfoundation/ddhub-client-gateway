@@ -50,6 +50,9 @@
       "@ddhub-client-gateway-frontend/ui/utils": [
         "libs/ddhub-client-gateway-frontend/ui/utils/src/index.ts"
       ],
+      "@ddhub-client-gateway-frontend/ui/client-ids": [
+        "libs/ddhub-client-gateway-frontend/ui/client-ids/src/index.ts"
+      ],
       "@ddhub-client-gateway/identity/models": [
         "libs/ddhub-client-gateway-frontend/identity/models/src/index.ts"
       ],

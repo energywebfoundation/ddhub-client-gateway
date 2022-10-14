@@ -18,6 +18,7 @@ export const routerConst = {
   ChannelsManagement: '/channels/management',
   Channel: `/channels/[${Queries.FQCN}]`,
   IntegrationAPIs: '/integration',
+  ClientIds: '/client-ids',
   LargeDataMessagingFileUpload: '/messages/large-file-upload',
   LargeDataMessagingFileDownload: '/messages/large-file-download',
   LargeFileDownloadChannel: `/messages/large-file-download/[${Queries.FQCN}]`,

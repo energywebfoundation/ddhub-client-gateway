@@ -6,3 +6,4 @@ export * from './messaging';
 export * from './settings';
 export * from './scheduler';
 export * from './gateway';
+export * from './clientIds';
