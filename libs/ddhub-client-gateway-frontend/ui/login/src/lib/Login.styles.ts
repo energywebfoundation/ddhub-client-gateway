@@ -36,4 +36,18 @@ export const useStyles = makeStyles()((theme) => ({
       border: `1px solid ${lighten(theme.palette.background.paper, 0.17)}`,
     },
   },
+  footerDiv: {
+    position: 'fixed',
+    bottom: 0,
+    textAlign: 'center',
+    paddingBottom: 17,
+    paddingTop: 17,
+    placeSelf: 'center'
+  },
+  version: {
+    fontSize: 10,
+    lineHeight: '21px',
+    color: '#9CA1AA',
+    alignSelf: 'center',
+  },
 }));
