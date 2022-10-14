@@ -28,9 +28,12 @@ export function useTableEffects<T>({
   defaultOrder = 'asc',
   defaultSortBy = '',
   backendSearch = false,
+  setSelectedItems,
 }: TableProps<T>) {
   const [order, setOrder] = useState<Order>(defaultOrder);
   const [orderBy, setOrderBy] = useState(defaultSortBy);
+  const [selected, setSelected] = useState<string[]>([]);
+
   const data = React.useMemo(
     () => tableRows,
     [tableRows]
@@ -163,6 +166,32 @@ export function useTableEffects<T>({
     return `Showing ${props.from} to ${(rows.length < props.to ? rows.length : props.to)} of ${rows.length}`
   };
 
+  const handleCheckboxClick = (event: React.MouseEvent<unknown>, name: string) => {
+    const selectedIndex = selected.indexOf(name);
+    let newSelected: string[] = [];
+
+    if (selectedIndex === -1) {
+      newSelected = newSelected.concat(selected, name);
+    } else if (selectedIndex === 0) {
+      newSelected = newSelected.concat(selected.slice(1));
+    } else if (selectedIndex === selected.length - 1) {
+      newSelected = newSelected.concat(selected.slice(0, -1));
+    } else if (selectedIndex > 0) {
+      newSelected = newSelected.concat(
+        selected.slice(0, selectedIndex),
+        selected.slice(selectedIndex + 1),
+      );
+    }
+
+    setSelected(newSelected);
+
+    if (setSelectedItems) {
+      setSelectedItems(newSelected);
+    }
+  };
+
+  const isSelected = (name: string) => selected.indexOf(name) !== -1;
+
   return {
     getTableProps,
     prepareRow,
@@ -183,5 +212,7 @@ export function useTableEffects<T>({
     handleSearchInput,
     paginationText,
     handleChangeRowsPerPage,
+    isSelected,
+    handleCheckboxClick,
   };
 }
