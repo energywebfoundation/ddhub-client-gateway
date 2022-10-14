@@ -8,6 +8,7 @@ import {
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
 import { CronJob } from 'cron';
 import { ConfigService } from '@nestjs/config';
+import { PendingAcksService } from './pending-acks.service';
 
 @Injectable()
 export class MessageService implements OnApplicationBootstrap {
@@ -17,7 +18,8 @@ export class MessageService implements OnApplicationBootstrap {
     protected readonly symmetricKeysService: SymmetricKeysCacheService,
     protected readonly schedulerRegistry: SchedulerRegistry,
     protected readonly cronWrapper: CronWrapperRepository,
-    protected readonly configService: ConfigService
+    protected readonly configService: ConfigService,
+    protected readonly pendingAcksService: PendingAcksService
   ) {}
 
   async onApplicationBootstrap() {
@@ -52,6 +54,8 @@ export class MessageService implements OnApplicationBootstrap {
   public async delete(): Promise<void> {
     try {
       await this.symmetricKeysService.deleteExpiredKeys();
+
+      await this.pendingAcksService.deleteOutdated();
 
       await this.cronWrapper.cronRepository.save({
         jobName: CronJobType.MESSAGE_CLEANER,
