@@ -6,9 +6,11 @@ import { Module } from '@nestjs/common';
 import { CertificateService } from '../certificate/service/certificate.service';
 import { HealthModule } from '../health/health.module';
 import { GatewayController } from './gateway.controller';
+import { DdhubClientGatewayVersionModule } from '@dsb-client-gateway/ddhub-client-gateway-version';
 
 @Module({
   imports: [
+    DdhubClientGatewayVersionModule,
     SecretsEngineModule,
     DdhubClientGatewayTlsAgentModule,
     DdhubClientGatewayEventsModule,

@@ -24,6 +24,7 @@
     "ddhub-client-gateway-ui-utils": "libs/ddhub-client-gateway-frontend/ui/utils",
     "ddhub-client-gateway-ui-client-ids": "libs/ddhub-client-gateway-frontend/ui/client-ids",
     "ddhub-client-gateway-utils": "libs/ddhub-client-gateway-utils",
+    "ddhub-client-gateway-version": "libs/ddhub-client-gateway-version",
     "dsb-client-gateway-api": "apps/dsb-client-gateway-api",
     "dsb-client-gateway-api-client": "libs/dsb-client-gateway-api-client",
     "dsb-client-gateway-api-e2e": "apps/dsb-client-gateway-api-e2e",

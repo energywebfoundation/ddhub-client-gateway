@@ -3,8 +3,8 @@ import { AcksRepository } from '../repository/acks.repository';
 import { PendingAcksRepository } from '../repository/pending-acks.repository';
 
 @Injectable()
-export class AcksWrapperRepository {
+export class PendingAcksWrapperRepository {
   constructor(
-    public readonly acksRepository: AcksRepository,
+    public readonly pendingAcksRepository: PendingAcksRepository
   ) { }
 }

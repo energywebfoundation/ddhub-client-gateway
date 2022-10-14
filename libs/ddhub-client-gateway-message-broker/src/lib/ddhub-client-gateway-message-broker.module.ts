@@ -19,9 +19,11 @@ import { DdhubClientGatewayEnrolmentModule } from '@dsb-client-gateway/ddhub-cli
 import { ReloginHandler } from './handler/relogin.handler';
 import { DdhubClientGatewayTlsAgentModule } from '@dsb-client-gateway/ddhub-client-gateway-tls-agent';
 import { DdhubLogService } from './services/ddhub-log.service';
+import { DdhubClientGatewayVersionModule } from '@dsb-client-gateway/ddhub-client-gateway-version';
 
 @Module({
   imports: [
+    DdhubClientGatewayVersionModule,
     DdhubClientGatewayEnrolmentModule,
     HttpModule.registerAsync({
       imports: [ConfigModule],

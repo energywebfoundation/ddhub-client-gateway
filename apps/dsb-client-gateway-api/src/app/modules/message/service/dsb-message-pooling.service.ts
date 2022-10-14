@@ -1,4 +1,4 @@
-import { DdhubLoginService } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
+import { AckResponse, DdhubLoginService } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
 import { AcksEntity, AcksWrapperRepository, ChannelEntity } from '@dsb-client-gateway/dsb-client-gateway-storage';
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -198,11 +198,13 @@ export class DsbMessagePoolingService implements OnModuleInit {
           }
         });
       }
-      const successAckMessageIds: string[] = await this.messageService.sendAckBy(_messages.map((message) => message.id).concat(idsNotAckVerify), clientId).catch((e) => {
+      const successAckMessageIds: AckResponse = await this.messageService.sendAckBy(_messages.map((message) => message.id).concat(idsNotAckVerify), clientId).catch((e) => {
         this.logger.warn(`[WS][sendMessagesToSubscribers][sendAckBy] ${e}`);
-        return [];
+        return {
+          acked: [], notFound: []
+        }
       });
-      const idsNotAck: AcksEntity[] = messages.filter(e => !successAckMessageIds.includes(e.id)).map(e => {
+      const idsNotAck: AcksEntity[] = messages.filter(e => !successAckMessageIds.acked.includes(e.id)).map(e => {
         return {
           clientId: clientId,
           messageId: e.id,
@@ -214,7 +216,7 @@ export class DsbMessagePoolingService implements OnModuleInit {
         this.acksWrapperRepository.acksRepository.save(idsNotAck).then();
       }
 
-      const deleteAckMessageIds = idsNotAckVerify.filter(e => successAckMessageIds.includes(e));
+      const deleteAckMessageIds = idsNotAckVerify.filter(e => successAckMessageIds.acked.includes(e));
       if (deleteAckMessageIds.length > 0) {
         this.acksWrapperRepository.acksRepository.delete({
           messageId: In(deleteAckMessageIds),

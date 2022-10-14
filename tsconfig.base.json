@@ -89,6 +89,9 @@
       "@dsb-client-gateway/ddhub-client-gateway-utils": [
         "libs/ddhub-client-gateway-utils/src/index.ts"
       ],
+      "@dsb-client-gateway/ddhub-client-gateway-version": [
+        "libs/ddhub-client-gateway-version/src/index.ts"
+      ],
       "@dsb-client-gateway/dsb-client-gateway-api": [
         "apps/dsb-client-gateway-api/src/main.ts"
       ],

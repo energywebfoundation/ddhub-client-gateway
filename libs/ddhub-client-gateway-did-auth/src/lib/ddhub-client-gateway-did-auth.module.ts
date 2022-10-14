@@ -6,11 +6,13 @@ import { DidAuthApiService, DidAuthService } from './service';
 import { DdhubClientGatewayUtilsModule } from '@dsb-client-gateway/ddhub-client-gateway-utils';
 import { CqrsModule } from '@nestjs/cqrs';
 import { DdhubClientGatewayTlsAgentModule } from '@dsb-client-gateway/ddhub-client-gateway-tls-agent';
+import { DdhubClientGatewayVersionModule } from '@dsb-client-gateway/ddhub-client-gateway-version';
 
 @Module({
   imports: [
     CqrsModule,
     DdhubClientGatewayUtilsModule,
+    DdhubClientGatewayVersionModule,
     HttpModule.registerAsync({
       useFactory: (configService: ConfigService) => {
         return {
