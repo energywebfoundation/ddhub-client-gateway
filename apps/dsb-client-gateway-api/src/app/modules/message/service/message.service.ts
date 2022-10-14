@@ -462,7 +462,7 @@ export class MessageService {
       messageLoggerContext.log(
         `[getMessages] Sending for ack for consumer ${consumer}`
       );
-      this.validatePendingAck(consumer);
+      await this.validatePendingAck(consumer);
     }
 
     const messages: Array<SearchMessageResponseDto> =
