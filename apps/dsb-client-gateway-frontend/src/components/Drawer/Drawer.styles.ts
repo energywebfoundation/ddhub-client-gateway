@@ -21,6 +21,9 @@ export const useStyles = makeStyles()((theme) => ({
   icon: {
     marginRight: 10,
   },
+  clientIcon: {
+    margin: '4px 12px 0px 2px',
+  },
   subMenuIcon: {
     margin: '0 14px 0 4px',
   },

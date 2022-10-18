@@ -13,6 +13,7 @@ import {
   getTopicsControllerGetTopicsSearchMock,
   getCronMock,
   getGatewayMock,
+  getClientsMock,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 
 export function makeServer({ environment = 'development' }) {
@@ -117,6 +118,18 @@ export function makeServer({ environment = 'development' }) {
       });
 
       this.post('certificate', () => {
+        return {};
+      });
+
+      this.get('clients', () => {
+        return getClientsMock();
+      });
+
+      this.delete('clients/:clientId', () => {
+        return {};
+      });
+
+      this.delete('clients', () => {
         return {};
       });
 

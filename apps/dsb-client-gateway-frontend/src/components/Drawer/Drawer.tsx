@@ -9,6 +9,7 @@ import {
   Layers,
   Settings,
 } from 'react-feather';
+import { ClientSubscriptionIcon } from '@ddhub-client-gateway-frontend/ui/core';
 import { routerConst } from '@ddhub-client-gateway-frontend/ui/utils';
 import { useStyles } from './Drawer.styles';
 import { CollapsableMenu } from './CollapsableMenu/CollapsableMenu';
@@ -77,6 +78,12 @@ export const Drawer = () => {
           href={routerConst.IntegrationAPIs}
           title="Integration APIs"
           icon={<GitMerge className={classes.icon} size={18} />}
+        />
+
+        <MenuItem
+          href={routerConst.ClientIds}
+          title="Client Subscriptions"
+          icon={<Box className={classes.clientIcon}><ClientSubscriptionIcon /></Box>}
         />
 
         <CollapsableMenu

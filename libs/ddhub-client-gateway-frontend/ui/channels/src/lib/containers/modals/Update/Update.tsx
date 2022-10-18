@@ -13,7 +13,7 @@ import { ChannelConnectionType } from '../../../models/channel-connection-type.e
 import { ChannelImage } from '../../../components';
 import { useUpdateChannelEffects } from './Update.effects';
 import { useStyles } from '../Create/Create.styles';
-import { Check } from 'react-feather';
+import { Check, X } from 'react-feather';
 
 export const Update = () => {
   const {
@@ -43,6 +43,7 @@ export const Update = () => {
               canGoBack: false,
             })}
             restrictions={channelValues.conditions}
+            connectionType={channelValues.type}
           />
         );
       case 1:
@@ -115,7 +116,7 @@ export const Update = () => {
                 </Typography>
                 <Box display="flex">
                   <Typography className={classes.encryptionValue} variant="body2">
-                    {channelValues?.payloadEncryption ? <Check className={classes.iconCheck} /> : '-'}
+                    {channelValues?.payloadEncryption ? <Check className={classes.iconCheck} /> : <X className={classes.iconX} />}
                   </Typography>
                 </Box>
               </Stack>

@@ -1,15 +1,15 @@
-import { Divider, Grid, Stack, Typography, Box } from '@mui/material';
-import { CopyToClipboard } from '@ddhub-client-gateway-frontend/ui/core';
-import { didFormatMinifier } from '@ddhub-client-gateway-frontend/ui/utils';
-import { RestrictionsViewBox } from '../../../../components';
-import { SelectedTopicList } from '../Topics/SelectedTopicList/SelectedTopicList';
+import { Box, Divider, Grid, Stack, Typography } from '@mui/material';
+import { CopyToClipboard, Tabs, TabsProps } from '@ddhub-client-gateway-frontend/ui/core';
 import { ICreateChannel } from '../../models/create-channel.interface';
 import { RestrictionType } from '../Restrictions/models/restriction-type.enum';
 import { ActionButtons } from '../ActionButtons';
 import { TActionButtonsProps } from '../ActionButtons/ActionButtons';
 import { useSummaryEffects } from './Summary.effects';
 import { useStyles } from './Summary.styles';
-import { Check } from 'react-feather';
+import { Check, X } from 'react-feather';
+import React from 'react';
+import { RestrictionListView } from '../Restrictions/RestrictionListView/RestrictionListView';
+import { clone } from 'lodash';
 
 export interface SummaryProps {
   channelValues: ICreateChannel;
@@ -20,8 +20,73 @@ export const Summary = ({
   channelValues,
   actionButtonsProps,
 }: SummaryProps) => {
-  const { countRestrictions } = useSummaryEffects();
   const { classes } = useStyles();
+  const { countRestrictions } = useSummaryEffects();
+  const restrictionCount = countRestrictions(channelValues?.conditions);
+  const restrictionRoles = clone(channelValues.conditions.roles);
+
+  const tabProps: TabsProps[] = [
+    {
+      label: 'Restrictions',
+      childrenProp: (
+        <Box className={classes.tabRoot}>
+          { !restrictionCount && (
+            <Box className={classes.noRecord}>
+              <Typography className={classes.noRecordLabel}>
+                No restriction added
+              </Typography>
+            </Box>
+          )}
+
+          {restrictionRoles.sort().map((el, index) => (
+            <RestrictionListView
+              wrapperProps={{
+                className: classes.restrictionBox
+              }}
+              key={index}
+              item={el}
+              type={RestrictionType.Role}
+              index={index}/>
+          ))}
+
+          {channelValues.conditions.dids?.map((el, index) => (
+            <RestrictionListView
+              wrapperProps={{
+                className: classes.restrictionBox
+              }}
+              key={index}
+              item={el}
+              type={RestrictionType.DID}
+              index={index}/>
+          ))}
+        </Box>
+      )
+    },
+    {
+      label: 'Topics',
+      childrenProp: (
+        <Box className={classes.tabRoot}>
+          {!channelValues.conditions.topics.length && (
+            <Box className={classes.noRecord}>
+              <Typography className={classes.noRecordLabel}>
+                No topic added
+              </Typography>
+            </Box>
+          )}
+          {channelValues.conditions.topics?.map((el, index) => (
+            <RestrictionListView
+              wrapperProps={{
+                className: classes.restrictionBox
+              }}
+              key={index}
+              item={el.topicName}
+              index={index}/>
+          ))}
+        </Box>
+      )
+    }
+  ];
+
   return (
     <Grid
       container
@@ -62,43 +127,17 @@ export const Summary = ({
           </Typography>
           <Box display="flex">
             <Typography className={classes.encryptionValue} variant="body2">
-              {channelValues?.payloadEncryption ? <Check className={classes.iconCheck} /> : '-'}
+              {channelValues?.payloadEncryption ? <Check className={classes.iconCheck} /> : <X className={classes.iconX}/>}
             </Typography>
           </Box>
         </Stack>
         <Divider className={classes.divider} />
-        <Typography variant={'body2'} className={classes.label}>
-          {countRestrictions(channelValues?.conditions)} Restrictions
-        </Typography>
-        <Box display="flex">
-          <RestrictionsViewBox
-            label={RestrictionType.DID}
-            list={channelValues.conditions.dids}
-            formatter={(value: string) => didFormatMinifier(value, 5, 3)}
-            wrapperProps={{ mr: 0.75 }}
-          />
-          <RestrictionsViewBox
-            label={RestrictionType.Role}
-            list={channelValues.conditions.roles}
-            wrapperProps={{ ml: 0.75 }}
-          />
-        </Box>
-        <Divider className={classes.divider} />
-        <Typography variant={'body2'} className={classes.label}>
-          Topics
-        </Typography>
-        {!channelValues.conditions.topics.length && (
-          <Typography variant={'body2'} className={classes.description}>
-            No topics added
-          </Typography>
-        )}
-        <SelectedTopicList
-          topics={channelValues.conditions.topics}
-          canRemove={false}
-          canCopy={true}
-        />
+        <Tabs tabProps={tabProps}
+              wrapperProps={{
+                className: classes.tabBox
+              }}/>
       </Grid>
-      <Grid item alignSelf="flex-end" width="100%" sx={{ paddingRight: '7px' }}>
+      <Grid item alignSelf="flex-end" width="100%" sx={{ padding: '22px 7px 27px 0px' }}>
         <ActionButtons {...actionButtonsProps} />
       </Grid>
     </Grid>

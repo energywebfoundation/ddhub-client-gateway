@@ -26,11 +26,12 @@
 | HEARTBEAT_CRON_ENABLED | boolean | true | Should run heartbeat |  |  |
 | DOWNLOAD_FILES_LIFETIME | number | 30 | Specifies how long downloaded file should live (in minutes) |  |  |
 | DID_LISTENER_ENABLED | boolean | true | Should listen for DID attributes changes |  |  |
-| IPFS_HOST | string |  | IPFS Host |  |  |
-| IPFS_PORT | number |  | IPFS Port |  |  |
-| IPFS_PROTOCOL | string |  | IPFS Protocol |  |  |
-| INFURA_PROJECT_ID | string |  | Infura project ID |  |  |
-| INFURA_PROJECT_SECRET | string |  | Infura project api key |  |  |
+| VERSION_FILE_PATH | string |  | Version file path |  |  |
+| IPFS_HOST | string | ipfs.infura.io | IPFS Host |  |  |
+| IPFS_PORT | number | 5001 | IPFS Port |  |  |
+| IPFS_PROTOCOL | string | https:// | IPFS Protocol |  |  |
+| INFURA_PROJECT_ID | string | 2GHrFIa6STLEM25RKf9GIcdD1kt | Infura Project ID |  |  |
+| INFURA_PROJECT_SECRET | string | d978891a32df1ff04a800e54fbfbb6b6 | Infura Project API Key |  |  |
 | NODE_ENV | string |  | Node environment |  |  |
 | DSB_BASE_URL | string | https://dsb-demo.energyweb.org | Message broker URL |  |  |
 | UPLOAD_FILES_DIR | string | ./upload | Directory where we should store temporary files for upload |  |  |

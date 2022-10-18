@@ -6,8 +6,10 @@ interface SettingsItemProps {
   title: string;
   icon: string;
   buttonText: string;
+  buttonText2?: string;
   content: React.ReactElement;
   onClick: () => void;
+  onClick2?: () => void;
   footer?: React.ReactElement;
 }
 
@@ -15,7 +17,9 @@ export const SettingsItem: FC<SettingsItemProps> = ({
   icon,
   title,
   buttonText,
+  buttonText2,
   onClick,
+  onClick2,
   content,
   footer,
 }) => {
@@ -36,6 +40,19 @@ export const SettingsItem: FC<SettingsItemProps> = ({
       <Box className={classes.footer}>
         <Box flexGrow={1}>{footer}</Box>
         <Box display="flex" alignItems="flex-end">
+          { buttonText2 && (
+            <Button
+              type="button"
+              variant="outlined"
+              className={classes.secondaryButton}
+              onClick={onClick2}
+            >
+              <Typography className={classes.buttonText2} variant="body2">
+                {buttonText2}
+              </Typography>
+            </Button>
+          )}
+
           <Button
             type="submit"
             variant="contained"

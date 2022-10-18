@@ -158,12 +158,14 @@ export const useCreateChannelEffects = () => {
   const channelSubmitHandler = () => {
     const values = channelValues;
     const topicsData = values.conditions.topics.map(topic => pick(topic, ['owner', 'topicName']));
+    const rolesData = values.conditions.roles.sort();
 
     const channelCreateValues: CreateChannelDto = {
       fqcn: values.fqcn,
       type: values.type,
       conditions: {
         ...values.conditions,
+        roles: rolesData,
         topics: topicsData,
       },
       payloadEncryption: values.payloadEncryption,

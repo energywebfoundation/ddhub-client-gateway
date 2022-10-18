@@ -125,6 +125,12 @@ export const useStyles = makeStyles()((theme) => ({
     height: 21,
     strokeWidth: 1,
   },
+  iconX: {
+    stroke: theme.palette.error.main,
+    width: 21,
+    height: 21,
+    strokeWidth: 1,
+  },
   contentWrapper: {
     minWidth: '450px',
     paddingTop: 48,

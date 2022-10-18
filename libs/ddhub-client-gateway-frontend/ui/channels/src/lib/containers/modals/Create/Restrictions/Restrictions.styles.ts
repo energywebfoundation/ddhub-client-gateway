@@ -12,6 +12,7 @@ export const useStyles = makeStyles()((theme) => ({
       lineHeight: '24px',
       fontWeight: 400,
       color: theme.palette.common.white,
+      width: '100%',
       '&.Mui-disabled .MuiOutlinedInput-notchedOutline': {
         border: `1px solid ${theme.palette.grey[500]}`,
       },
@@ -62,5 +63,50 @@ export const useStyles = makeStyles()((theme) => ({
     color: theme.palette.common.white,
     fontFamily: theme.typography.body2.fontFamily,
     marginBottom: 8,
+  },
+  filterLabel: {
+    fontSize: 10,
+    lineHeight: '12px',
+    fontWeight: 405,
+    color: theme.palette.primary.main,
+    fontFamily: theme.typography.body2.fontFamily,
+    cursor: 'pointer',
+  },
+  selectValue: {
+    color: theme.palette.grey[300],
+    fontSize: 12,
+    lineHeight: '24px',
+    fontWeight: 405,
+  },
+  restrictionBox: {
+    display: 'flex',
+    flexDirection: 'column',
+    maxHeight: 413,
+    overflow: 'auto',
+    paddingRight: '26px',
+    fontSize: '12px',
+    color: theme.palette.grey[300],
+    flexGrow: 1,
+    '&::-webkit-scrollbar': {
+      width: 2,
+    },
+    '&::-webkit-scrollbar-track': {
+      backgroundColor: theme.palette.background.paper,
+      boxSizing: 'border-box',
+      borderRadius: 3,
+    },
+    '&::-webkit-scrollbar-thumb': {
+      backgroundColor: theme.palette.primary.main,
+      borderRadius: 3,
+    },
+    '& .MuiOutlinedInput-root.MuiInputBase-root:nth-of-type(even)': {
+      background: '#32374A',
+      '& .MuiGrid-root.MuiGrid-container': {
+        background: '#32374A',
+      },
+      '& .MuiBox-root': {
+        background: '#494A75',
+      },
+    },
   },
 }));

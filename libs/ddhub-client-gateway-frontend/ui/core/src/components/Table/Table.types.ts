@@ -1,4 +1,4 @@
-import { ReactElement } from 'react';
+import { ReactElement, ChangeEvent } from 'react';
 import { TableCellProps, TableContainerProps } from '@mui/material';
 import { TTableComponentAction } from '../Table/TableComponentActions';
 import { FilterValue } from 'react-table';
@@ -42,4 +42,6 @@ export interface TableProps<T> {
   customStyle?: TableCustomStyle;
   backendSearch?: boolean;
   stripedTable?: boolean;
+  showCheckbox?: boolean;
+  setSelectedItems?: (values: string[]) => void;
 }

@@ -33,4 +33,11 @@ export class GatewayResponseDto implements GatewayConfig {
     example: 'ddhub.apps.energyweb.iam.ewc',
   })
   namespace: string;
+
+  @ApiProperty({
+    type: String,
+    description: 'Application version',
+    example: 'v15.15.0',
+  })
+  version: string;
 }
