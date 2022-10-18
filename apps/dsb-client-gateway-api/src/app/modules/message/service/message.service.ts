@@ -81,7 +81,7 @@ export class MessageService {
     protected readonly ddhubFilesService: DdhubFilesService,
     protected readonly fileMetadataWrapper: FileMetadataWrapperRepository,
     protected readonly reqLockService: ReqLockService,
-    protected readonly pendingAcksWrapperRepository: PendingAcksWrapperRepository,
+    protected readonly pendingAcksWrapperRepository: PendingAcksWrapperRepository
   ) {
     this.uploadPath = configService.get<string>('UPLOAD_FILES_DIR');
     this.downloadPath = configService.get<string>('DOWNLOAD_FILES_DIR');
@@ -125,15 +125,15 @@ export class MessageService {
 
     messageLoggerContext.debug(
       'attempting to encrypt payload, encryption enabled: ' +
-      channel.payloadEncryption
+        channel.payloadEncryption
     );
 
     const message = channel.payloadEncryption
       ? this.keyService.encryptMessage(
-        dto.payload,
-        randomKey,
-        EncryptedMessageType['UTF-8']
-      )
+          dto.payload,
+          randomKey,
+          EncryptedMessageType['UTF-8']
+        )
       : dto.payload;
 
     messageLoggerContext.debug('fetching private key');
@@ -270,18 +270,18 @@ export class MessageService {
     message: SearchMessageResponseDto
   ): Promise<GetMessageResponse> {
     let baseMessage: Omit<GetMessageResponse, 'signatureValid' | 'decryption'> =
-    {
-      id: message.messageId,
-      topicVersion: message.topicVersion,
-      topicName: '',
-      topicOwner: '',
-      topicSchemaType: '',
-      payload: message.payload,
-      signature: message.signature,
-      sender: message.senderDid,
-      timestampNanos: message.timestampNanos,
-      transactionId: message.transactionId,
-    };
+      {
+        id: message.messageId,
+        topicVersion: message.topicVersion,
+        topicName: '',
+        topicOwner: '',
+        topicSchemaType: '',
+        payload: message.payload,
+        signature: message.signature,
+        sender: message.senderDid,
+        timestampNanos: message.timestampNanos,
+        transactionId: message.transactionId,
+      };
 
     try {
       const topic: TopicEntity = await this.topicService.getTopicById(
@@ -405,25 +405,31 @@ export class MessageService {
     { fqcn, from, amount, topicName, topicOwner, clientId }: GetMessagesDto,
     ack: boolean | undefined = true
   ): Promise<GetMessageResponse[]> {
-    try {
-      const usableClientId: string = clientId ? clientId : 'DEFAULT';
+    const usableClientId: string = clientId ? clientId : 'DEFAULT';
 
+    try {
       await this.reqLockService.attemptLock(usableClientId, fqcn);
 
       const messages: GetMessageResponse[] = await this.getMessages(
         { fqcn, from, amount, topicName, topicOwner, clientId },
         ack
-      );
+      ).catch(async (e) => {
+        await this.reqLockService.clearLock(usableClientId, fqcn);
 
-      await this.reqLockService.clearLock(clientId, fqcn);
+        throw e;
+      });
+
+      await this.reqLockService.clearLock(usableClientId, fqcn);
 
       return messages;
     } catch (e) {
       if (e instanceof ReqLockExistsException) {
+        this.logger.log(`request locked on client id ${usableClientId}`);
+
         return [];
       }
 
-      await this.reqLockService.clearLock(clientId, fqcn);
+      await this.reqLockService.clearLock(usableClientId, fqcn);
 
       this.logger.error(`something went wrong when fetching messages`);
 
@@ -516,7 +522,7 @@ export class MessageService {
       '[getMessages] Returned processed messages',
       messageResponses
     );
-    let fulfilledMessages = messageResponses
+    const fulfilledMessages = messageResponses
       .map((message) => (message.status === 'fulfilled' ? message.value : null))
       .filter(
         (message: GetMessageResponse | null) => !!message
@@ -526,16 +532,20 @@ export class MessageService {
       `[getMessages] Total fulfilled messages ${messageResponses.length}`
     );
 
-    const idsPendingAck: PendingAcksEntity[] = fulfilledMessages.map(e => {
+    const idsPendingAck: PendingAcksEntity[] = fulfilledMessages.map((e) => {
       return {
         clientId: consumer,
         messageId: e.id,
-        mbTimestamp: moment(e.timestampNanos / (1000 * 1000)).utc().toDate()
-      }
+        mbTimestamp: moment(e.timestampNanos / (1000 * 1000))
+          .utc()
+          .toDate(),
+      };
     });
 
     if (idsPendingAck.length > 0) {
-      await this.pendingAcksWrapperRepository.pendingAcksRepository.save(idsPendingAck);
+      await this.pendingAcksWrapperRepository.pendingAcksRepository.save(
+        idsPendingAck
+      );
     }
 
     return fulfilledMessages.sort((a, b) => {
@@ -724,41 +734,47 @@ export class MessageService {
   }
 
   private async validatePendingAck(consumer: string) {
-    const data: PendingAcksEntity[] = await this.pendingAcksWrapperRepository.pendingAcksRepository.find({
-      where: {
-        clientId: consumer
-      },
-    });
+    const data: PendingAcksEntity[] =
+      await this.pendingAcksWrapperRepository.pendingAcksRepository.find({
+        where: {
+          clientId: consumer,
+        },
+      });
     if (data.length == 0) {
       return;
     }
-    const idsPendingAck: string[] = data.map(e => e.messageId);
+    const idsPendingAck: string[] = data.map((e) => e.messageId);
 
     const ackResponse: AckResponse = await this.sendAckBy(
       idsPendingAck,
       consumer
-    ).catch(e => {
+    ).catch((e) => {
       this.logger.error(`something went wrong when ack messages`);
       this.logger.error(e);
       return {
-        acked: [], notFound: []
-      }
+        acked: [],
+        notFound: [],
+      };
     });
 
     if (ackResponse.notFound.length > 0) {
-      this.pendingAcksWrapperRepository.pendingAcksRepository.delete({
-        messageId: In(ackResponse.notFound),
-        clientId: consumer
-      }).then();
+      this.pendingAcksWrapperRepository.pendingAcksRepository
+        .delete({
+          messageId: In(ackResponse.notFound),
+          clientId: consumer,
+        })
+        .then();
     }
 
     if (ackResponse.acked.length === 0 && ackResponse.notFound.length === 0) {
       return [];
     } else {
-      this.pendingAcksWrapperRepository.pendingAcksRepository.delete({
-        messageId: In(ackResponse.acked),
-        clientId: consumer
-      }).then();
+      this.pendingAcksWrapperRepository.pendingAcksRepository
+        .delete({
+          messageId: In(ackResponse.acked),
+          clientId: consumer,
+        })
+        .then();
     }
   }
 
