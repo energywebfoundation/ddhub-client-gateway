@@ -160,6 +160,8 @@ jobs:
         run: nx build dsb-client-gateway-api --prod
       - name: Build migrations
         run: npm run migrations:build
+      - name: Generate version file
+        run: echo ${{needs.semantic-version.outputs.new_version}} > version.md
 
       - name: 'Login via Azure CLI'
         uses: azure/login@v1
