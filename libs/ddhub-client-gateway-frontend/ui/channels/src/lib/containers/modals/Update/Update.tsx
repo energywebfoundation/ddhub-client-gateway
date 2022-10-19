@@ -110,16 +110,20 @@ export const Update = () => {
                   </Typography>
                 </Box>
               </Stack>
-              <Stack direction="row" mt={1.5} mb={2.3}>
-                <Typography className={classes.encryptionLabel} variant="body2">
-                  Payload encryption:
-                </Typography>
-                <Box display="flex">
-                  <Typography className={classes.encryptionValue} variant="body2">
-                    {channelValues?.payloadEncryption ? <Check className={classes.iconCheck} /> : <X className={classes.iconX} />}
-                  </Typography>
-                </Box>
-              </Stack>
+              {
+                (ChannelConnectionType[channel.type] === ChannelConnectionType.pub) && (
+                  <Stack direction="row" mt={1.5}>
+                    <Typography className={classes.encryptionLabel} variant="body2">
+                      Payload encryption:
+                    </Typography>
+                    <Box display="flex">
+                      <Typography className={classes.encryptionValue} variant="body2">
+                        { channelValues?.payloadEncryption ? <Check className={classes.iconCheck} /> : <X className={classes.iconX} />}
+                      </Typography>
+                    </Box>
+                  </Stack>
+                )
+              }
             </Box>
           )}
           <Box className={classes.divider} />
