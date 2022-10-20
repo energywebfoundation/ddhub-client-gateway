@@ -13,6 +13,7 @@ import { ConfigService } from '@nestjs/config';
 import { WebSocketImplementation } from '../message.const';
 import { AuthService } from '../../utils/service/auth.service';
 import { MessageService } from '../service/message.service';
+import { ClientsService } from '@dsb-client-gateway/ddhub-client-gateway-clients';
 
 @WebSocketGateway({
   cors: {
@@ -32,7 +33,8 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayInit {
     protected readonly configService: ConfigService,
     protected readonly authService: AuthService,
     @Inject(forwardRef(() => MessageService))
-    protected readonly messageService: MessageService
+    protected readonly messageService: MessageService,
+    protected readonly clientsService: ClientsService
   ) {}
 
   public async afterInit(server: Server) {
@@ -93,6 +95,8 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayInit {
       );
       return;
     }
+
+    await this.clientsService.attemptCreateClient(_clientId);
 
     const authHeaderTokenValue: string | undefined =
       client.request.headers['authorization'];

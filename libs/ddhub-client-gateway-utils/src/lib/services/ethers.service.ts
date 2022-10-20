@@ -1,8 +1,9 @@
 import { BalanceState } from '@dsb-client-gateway/dsb-client-gateway-storage';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { BigNumber, providers, utils, Wallet } from 'ethers';
 import { parseEther } from 'ethers/lib/utils';
 import { Span } from 'nestjs-otel';
+import { InvalidPrivateKeyException } from '../exceptions/invalid-private-key.exception';
 
 @Injectable()
 export class EthersService {
@@ -60,7 +61,7 @@ export class EthersService {
   @Span('ethers_getWalletFromPrivateKey')
   public getWalletFromPrivateKey(privateKey: string): Wallet {
     if (!this.validatePrivateKey(privateKey)) {
-      throw new BadRequestException('Invalid private key');
+      throw new InvalidPrivateKeyException();
     }
 
     return new Wallet(privateKey);

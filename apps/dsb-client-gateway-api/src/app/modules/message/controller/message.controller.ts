@@ -28,6 +28,8 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { Readable } from 'stream';
 import { MtlsGuard } from '../../certificate/guards/mtls.guard';
 import { PinoLogger } from 'nestjs-pino';
+import { ClientsInterceptor } from '@dsb-client-gateway/ddhub-client-gateway-clients';
+
 @Controller('messages')
 @UseGuards(DigestGuard, MtlsGuard)
 @ApiTags('Messaging')
@@ -36,7 +38,7 @@ export class MessageControlller {
   constructor(
     protected readonly messageService: MessageService,
     protected readonly pinoLogger: PinoLogger
-  ) { }
+  ) {}
 
   @Get('/')
   @ApiResponse({
@@ -58,6 +60,7 @@ export class MessageControlller {
     description: 'Messages Not found',
   })
   @HttpCode(HttpStatus.OK)
+  @UseInterceptors(ClientsInterceptor('clientId', 'query', 'fqcn', 'query'))
   public async getMessage(@Query() dto: GetMessagesDto): Promise<Array<any>> {
     this.pinoLogger.assign({
       fqcn: dto.fqcn,
@@ -130,6 +133,7 @@ export class MessageControlller {
     status: HttpStatus.NOT_FOUND,
     description: 'Channel not found or Topic not found',
   })
+  @UseInterceptors(ClientsInterceptor('clientId', 'body', 'fqcn', 'body'))
   @HttpCode(HttpStatus.OK)
   public async create(
     @Body() dto: SendMessageDto
