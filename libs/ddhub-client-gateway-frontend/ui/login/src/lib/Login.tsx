@@ -18,11 +18,13 @@ export function Login() {
           <LoginStatus />
         </Container>
       </Stack>
-      <Box display="flex" justifyContent="center" className={classes.footerDiv}>
-        <Typography variant="body2" className={classes.version}>
-          Version {version}
-        </Typography>
-      </Box>
+      { version && (
+        <Box display="flex" justifyContent="center" className={classes.footerDiv}>
+          <Typography variant="body2" className={classes.version}>
+            Version {version}
+          </Typography>
+        </Box>
+      )}
     </>
   );
 }
