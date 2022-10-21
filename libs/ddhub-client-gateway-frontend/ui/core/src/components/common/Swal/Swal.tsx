@@ -51,6 +51,7 @@ export const Swal = () => {
         confirmButton: classes.actions,
         cancelButton: classes.actions,
         container: classes.container,
+        actions: classes.actionsContainer,
       },
     });
 };
