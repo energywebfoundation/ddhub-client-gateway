@@ -59,6 +59,10 @@ ddhub-client-gateway-api:
   podSecurityContext:
     fsGroup: 2000
 
+  service:
+    type: LoadBalancer
+    port: 80
+
   ingress:
     enabled: true
     annotations:
