@@ -3,7 +3,6 @@ import { Box, Divider, List, Typography } from '@mui/material';
 import {
   Command,
   Database,
-  Disc,
   GitMerge,
   Home,
   Layers,
@@ -26,7 +25,6 @@ export const Drawer = () => {
     <div>
       <Box className={classes.logoWrapper}>
         <img src="/ew-main-logo.svg" alt="logo" className={classes.logo} />
-        <Disc className={classes.disc} size={18} />
       </Box>
       <List>
         <MenuItem
