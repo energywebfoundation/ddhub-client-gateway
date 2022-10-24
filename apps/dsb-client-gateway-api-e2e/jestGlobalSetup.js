@@ -9,7 +9,11 @@ const fn = () => {
     path: '.env.test',
   });
 
-  console.log('Configuring .env.test files');
+  require('dotenv').config({
+    path: '.env.secret',
+  });
+
+  console.log('Configuring .env.test, .env.secret files');
 };
 
 module.exports = fn;

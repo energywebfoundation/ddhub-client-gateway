@@ -27,6 +27,7 @@
 | SECRET_PREFIX | string | ddhub/ |  |  |  |
 | AWS_REGION | string | ap-southeast-2 | AWS Secrets Manager region |  | SECRETS_ENGINE == aws |
 | AZURE_VAULT_URL | string |  | Azure Vault URL |  | SECRETS_ENGINE == azure |
+| REQ_LOCK_TIMEOUT | number | 5 | Maximum request lock lifetime (in seconds) |  |  |
 | VERSION_FILE_PATH | string |  | Version file path |  |  |
 | IPFS_HOST | string | ipfs.infura.io | IPFS Host |  |  |
 | IPFS_PORT | number | 5001 | IPFS Port |  |  |

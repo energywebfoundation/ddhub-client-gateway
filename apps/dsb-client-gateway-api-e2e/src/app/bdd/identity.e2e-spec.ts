@@ -1,6 +1,6 @@
 import { defineFeature, loadFeature } from 'jest-cucumber';
 import { HttpStatus, INestApplication } from '@nestjs/common';
-import { clearSecrets, getVaultPassword } from './helpers/secrets.helper';
+import { clearSecrets } from './helpers/secrets.helper';
 import request from 'supertest';
 import { DsbClientGatewayErrors } from '@dsb-client-gateway/dsb-client-gateway-errors';
 import { IamService } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
@@ -61,7 +61,7 @@ describe('Identity Feature', () => {
       });
 
       then('I should get validation error', () => {
-        console.log(response);
+        expect(response.err.code).toBe('ID::INVALID_PRIVATE_KEY');
 
         response = null;
       });
@@ -93,11 +93,11 @@ describe('Identity Feature', () => {
         await clearSecrets(app);
       });
 
-      when(/^The (.*) is submitted to the system$/, async (privateKey) => {
+      when(/^The private key is submitted to the system$/, async () => {
         await request(app.getHttpServer())
           .post('/identity')
           .send({
-            privateKey: await getVaultPassword(privateKey),
+            privateKey: process.env.PRIVATE_KEY_E2E,
           })
           .expect(HttpStatus.OK)
           .expect(({ body }) => {
