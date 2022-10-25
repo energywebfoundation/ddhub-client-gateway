@@ -20,7 +20,7 @@ export abstract class DdhubBaseService {
     protected readonly retryConfigService: RetryConfigService,
     protected readonly ddhubLoginService: DdhubLoginService,
     protected readonly tlsAgentService: TlsAgentService
-  ) {}
+  ) { }
 
   protected async request<T>(
     requestFn: () => Observable<AxiosResponse<T>>,
@@ -151,7 +151,7 @@ export abstract class DdhubBaseService {
     }
 
     throw new MessageBrokerException(
-      e.message,
+      `${e.message} -> ${e.response.data.returnMessage}`,
       DsbClientGatewayErrors.MB_ERROR,
       e.response.data.returnCode,
       e.request.path
