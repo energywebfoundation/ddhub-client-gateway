@@ -16,6 +16,9 @@ on:
       INFURA_PROJECT_SECRET:
         required: true
         description: Infura Project Secret
+      PRIVATE_KEY_E2E:
+        required: true
+        description: Private key for E2E testing
 
 jobs:
   build-api:
@@ -63,6 +66,7 @@ jobs:
         run: docker-compose -f ci/docker-compose.yml exec -T vault_dev sh -c "vault secrets enable -version=1 -path=ddhub -address="http://localhost:8200" kv" || true
       - name: Run E2E tests
         env:
+          PRIVATE_KEY_E2E: ${{ secrets.PRIVATE_KEY_E2E }}
           IPFS_HOST: ipfs.infura.io
           IPFS_PROTOCOL: https://
           IPFS_PORT: 5001

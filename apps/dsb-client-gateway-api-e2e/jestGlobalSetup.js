@@ -13,6 +13,10 @@ const fn = () => {
     path: '.env.secret',
   });
 
+  if (!process.env.PRIVATE_KEY_E2E) {
+    throw new Error('env. variable PRIVATE_KEY_E2E is missing');
+  }
+
   console.log('Configuring .env.test, .env.secret files');
 };
 
