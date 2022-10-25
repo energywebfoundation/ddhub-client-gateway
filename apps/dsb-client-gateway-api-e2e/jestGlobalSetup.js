@@ -6,11 +6,11 @@ const fn = () => {
   }
 
   require('dotenv').config({
-    path: '.env.test',
+    path: __dirname + '/.env.test',
   });
 
   require('dotenv').config({
-    path: '.env.secret',
+    path: __dirname + '/.env.secret',
   });
 
   if (!process.env.PRIVATE_KEY_E2E) {

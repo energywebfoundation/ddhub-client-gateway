@@ -1,8 +1,4 @@
-import {
-  registerDecorator,
-  ValidationArguments,
-  ValidationOptions,
-} from 'class-validator';
+import { registerDecorator, ValidationOptions } from 'class-validator';
 
 export function IsValidVersion(validationOptions?: ValidationOptions) {
   return function (object: unknown, propertyName: string) {
@@ -12,7 +8,7 @@ export function IsValidVersion(validationOptions?: ValidationOptions) {
       propertyName: propertyName,
       options: validationOptions,
       validator: {
-        validate(value: any, args: ValidationArguments) {
+        validate(value) {
           if (typeof value === 'string' && value.length > 0) {
             return !!value.match(/^(\d+\.)(\d+\.)(\d+)$/);
           }

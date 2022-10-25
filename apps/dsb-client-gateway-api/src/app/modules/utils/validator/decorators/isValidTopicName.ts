@@ -1,8 +1,4 @@
-import {
-  registerDecorator,
-  ValidationArguments,
-  ValidationOptions,
-} from 'class-validator';
+import { registerDecorator, ValidationOptions } from 'class-validator';
 
 export function IsValidTopicName(validationOptions?: ValidationOptions) {
   // eslint-disable-next-line @typescript-eslint/ban-types
@@ -13,7 +9,7 @@ export function IsValidTopicName(validationOptions?: ValidationOptions) {
       propertyName: propertyName,
       options: validationOptions,
       validator: {
-        validate(value: any, args: ValidationArguments) {
+        validate(value) {
           if (typeof value === 'string' && value.length > 0) {
             return !!value.match(/^[a-zA-z0-9.]{1,255}$/);
           }

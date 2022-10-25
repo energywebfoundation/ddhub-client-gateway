@@ -225,7 +225,7 @@ export class DsbMessagePoolingService implements OnModuleInit {
 
   private async pullMessages(
     subscriptions: ChannelEntity[],
-    client: any
+    client
   ): Promise<number> {
     const clientId: string = this.configService.get<string>(
       'CLIENT_ID',
@@ -282,7 +282,7 @@ export class DsbMessagePoolingService implements OnModuleInit {
   public async sendMessagesToSubscribers(
     messages: GetMessageResponse[],
     fqcn: string,
-    client: any,
+    client,
     clientId: string
   ): Promise<void> {
     try {
@@ -324,7 +324,8 @@ export class DsbMessagePoolingService implements OnModuleInit {
       const successAckMessageIds: AckResponse = await this.messageService
         .sendAckBy(
           _messages.map((message) => message.id).concat(idsNotAckVerify),
-          clientId
+          clientId,
+          null
         )
         .catch((e) => {
           this.logger.warn(`[WS][sendMessagesToSubscribers][sendAckBy] ${e}`);
