@@ -4,6 +4,10 @@ on:
   pull_request:
 
 jobs:
+  snyk:
+    uses: ././github/workflows/snyk.yml
+    secrets:
+      SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
   lint-commits:
     uses: ./.github/workflows/commitlint.yml
   build-api:
