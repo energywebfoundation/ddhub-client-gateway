@@ -23,6 +23,9 @@ export const useStyles = makeStyles()((theme) => ({
     animation: 'none',
     borderRadius: 6,
   },
+  actionsContainer: {
+    paddingTop: 19,
+  },
   actions: {
     '&.swal2-confirm': {
       transition: theme.transitions.create(

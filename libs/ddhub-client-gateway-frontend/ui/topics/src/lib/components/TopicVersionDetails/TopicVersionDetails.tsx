@@ -65,6 +65,7 @@ export const TopicVersionDetails: FC<TopicVersionDetailsProps> = (
           containerProps={{ style: { boxShadow: 'none' }}}
           stripedTable={true}
           customStyle={{ tableMinWidth: 'auto' }}
+          rowsPerPageOptions={[]}
         />
       </Grid>
     </Grid>

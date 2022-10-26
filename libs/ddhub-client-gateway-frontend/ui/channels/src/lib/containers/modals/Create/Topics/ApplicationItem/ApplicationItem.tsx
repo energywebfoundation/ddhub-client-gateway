@@ -16,7 +16,7 @@ export const ApplicationItem = ({ listProps, option }: ApplicationItemProps) => 
   const { classes } = useStyles();
 
   return (
-    <div key={listProps.key}>
+    <Box key={listProps.key}>
       { listProps['data-option-index'] === 0 && (
         <Typography className={classes.select}>
           Select
@@ -36,6 +36,6 @@ export const ApplicationItem = ({ listProps, option }: ApplicationItemProps) => 
           </Grid>
         </Grid>
       </Box>
-    </div>
+    </Box>
   );
 };
