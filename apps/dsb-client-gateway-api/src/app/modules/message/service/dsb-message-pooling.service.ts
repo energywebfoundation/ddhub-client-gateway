@@ -198,7 +198,7 @@ export class DsbMessagePoolingService implements OnModuleInit {
           }
         });
       }
-      const successAckMessageIds: AckResponse = await this.messageService.sendAckBy(_messages.map((message) => message.id).concat(idsNotAckVerify), clientId).catch((e) => {
+      const successAckMessageIds: AckResponse = await this.messageService.sendAckBy(_messages.map((message) => message.id).concat(idsNotAckVerify), clientId, null).catch((e) => {
         this.logger.warn(`[WS][sendMessagesToSubscribers][sendAckBy] ${e}`);
         return {
           acked: [], notFound: []

@@ -42,11 +42,13 @@ export class DdhubMessagesService extends DdhubBaseService {
   @Span('ddhub_mb_messagesAckBy')
   public async messagesAckBy(
     messageIds: string[],
-    clientId?: string
+    clientId?: string,
+    from?: string
   ): Promise<AckResponse> {
     const requestBody = {
       messageIds,
-      clientId
+      clientId,
+      from
     };
 
     try {
