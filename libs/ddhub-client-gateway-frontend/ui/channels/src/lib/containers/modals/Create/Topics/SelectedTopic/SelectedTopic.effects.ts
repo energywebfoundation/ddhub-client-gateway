@@ -31,7 +31,6 @@ export const useSelectedTopicEffects = (
   const [filteredTopics, setFilteredTopics] = useState<Topic[]>([]);
 
   useEffect(() => {
-    console.log(topicsList);
     if (Array.isArray(topicsList)) {
       setFilteredTopics(topicsList);
     }
