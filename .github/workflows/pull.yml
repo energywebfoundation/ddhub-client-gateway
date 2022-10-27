@@ -4,10 +4,21 @@ on:
   pull_request:
 
 jobs:
-  snyk:
-    uses: ././github/workflows/snyk.yml
-    secrets:
-      SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: Run Snyk to check for vulnerabilities
+        uses: snyk/actions/node@master
+        continue-on-error: true # To make sure that SARIF upload gets called
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --sarif-file-output=snyk.sarif
+      - name: Upload result to GitHub Code Scanning
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: snyk.sarif
   lint-commits:
     uses: ./.github/workflows/commitlint.yml
   build-api:
@@ -19,6 +30,7 @@ jobs:
       ONEPASSWORD_TOKEN: ${{ secrets.ONEPASSWORD_TOKEN }}
       INFURA_PROJECT_SECRET: ${{ secrets.INFURA_PROJECT_SECRET }}
       INFURA_PROJECT_ID: ${{ secrets.INFURA_PROJECT_ID }}
+      PRIVATE_KEY_E2E: ${{ secrets.PRIVATE_KEY_E2E }}
   build-frontend:
     needs: lint-commits
     uses: ./.github/workflows/build_frontend.yml

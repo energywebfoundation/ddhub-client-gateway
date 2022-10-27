@@ -71,9 +71,12 @@ export const useStyles = makeStyles()((theme) => ({
     },
   },
   recent: {
-    border: `1px solid ${theme.palette.common.white}`,
     '& .MuiTypography-root': {
       color: theme.palette.common.white,
+    },
+    '& .MuiOutlinedInput-notchedOutline': {
+      border: `1px solid ${theme.palette.common.white}`,
+      borderRadius: 5,
     },
   },
   appBox: {
@@ -115,7 +118,6 @@ export const useStyles = makeStyles()((theme) => ({
     color: theme.palette.text.secondary,
     padding: '12px 18px 14px 18px',
     fontWeight: 405,
-    borderBottom: '1px solid #404656',
   },
   topic: {
     padding: '8px 18px 14px 18px',
@@ -219,6 +221,61 @@ export const useStyles = makeStyles()((theme) => ({
       backgroundColor: theme.palette.primary.main,
       borderRadius: 3,
     },
-    maxHeight: 200,
+    maxHeight: 380,
+  },
+  listHeader: {
+    borderBottom: '1px solid #404656',
+    display: 'flex',
+    flexDirection: 'column',
+    paddingBottom: 12,
+  },
+  searchField: {
+    margin: '0 0 0 16px',
+    background: alpha(theme.palette.background.default, 0.45),
+    borderRadius: 2,
+    width: 211,
+    '& .MuiInputBase-root': {
+      fontFamily: theme.typography.body2.fontFamily,
+      fontSize: 10,
+      lineHeight: '12px',
+      fontWeight: 405,
+      paddingLeft: 8,
+    },
+    '& .MuiOutlinedInput-notchedOutline': {
+      border: `1px solid ${theme.palette.grey[500]}`,
+      borderRadius: 5,
+    },
+    '& input': {
+      padding: '6px 7px 7px 0px',
+      fontSize: 10,
+      color: theme.palette.common.white,
+      minHeight: 22,
+      fontFamily: theme.typography.body2.fontFamily,
+      '&:disabled': {
+        color: theme.palette.grey[500],
+        WebkitTextFillColor: theme.palette.grey[500],
+        '& + .MuiOutlinedInput-notchedOutline': {
+          border: `1px solid ${theme.palette.grey[500]}`,
+        },
+      },
+      '&::placeholder': {
+        fontSize: 10,
+        lineHeight: '12px',
+        fontWeight: 405,
+        color: theme.palette.grey[300],
+        opacity: 1,
+      },
+    },
+  },
+  closeSearch: {
+    color: theme.palette.common.white,
+    cursor: 'pointer',
+    width: 16,
+    height: 16,
+  },
+  searchIcon: {
+    color: theme.palette.common.white,
+    width: 10,
+    height: 10,
   },
 }));

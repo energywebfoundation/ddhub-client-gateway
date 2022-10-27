@@ -1,4 +1,4 @@
-import { Controller, Get, Logger, UseGuards } from '@nestjs/common';
+import { Controller, Get, UseGuards } from '@nestjs/common';
 import { HealthCheck } from '@nestjs/terminus';
 import { DigestGuard } from '../utils/guards/digest.guard';
 import { ApiTags } from '@nestjs/swagger';
@@ -7,8 +7,6 @@ import { ApiTags } from '@nestjs/swagger';
 @UseGuards(DigestGuard)
 @ApiTags('Health')
 export class HealthController {
-  constructor() {}
-
   @Get()
   @HealthCheck()
   public async check(): Promise<{
