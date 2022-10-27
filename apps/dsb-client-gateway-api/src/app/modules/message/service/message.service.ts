@@ -55,6 +55,7 @@ import { ReqLockExistsException } from '../exceptions/req-lock-exists.exception'
 import { ReqLockService } from './req-lock.service';
 import moment from 'moment';
 import { In } from 'typeorm';
+import { AckPendingNotFoundException } from '../exceptions/ack-pending-not-found.exception';
 
 export enum EventEmitMode {
   SINGLE = 'SINGLE',
@@ -466,10 +467,13 @@ export class MessageService {
     const consumer = `${clientId}:${fqcn}`;
 
     if (ack) {
-      messageLoggerContext.log(
-        `[getMessages] Sending for ack for consumer ${consumer}`
-      );
-      await this.validatePendingAck(consumer, from);
+      try {
+        messageLoggerContext.log(`[getMessages] Sending for ack for consumer ${consumer}`);
+        await this.validatePendingAck(consumer, from);
+      } catch (e) {
+        this.logger.error(`[getMessages] error ocurred while sending ack`, e);
+        return [];
+      }
     }
 
     const messages: Array<SearchMessageResponseDto> =
@@ -769,7 +773,7 @@ export class MessageService {
     }
 
     if (ackResponse.acked.length === 0 && ackResponse.notFound.length === 0) {
-      return [];
+      throw new AckPendingNotFoundException();
     } else {
       this.pendingAcksWrapperRepository.pendingAcksRepository
         .delete({
