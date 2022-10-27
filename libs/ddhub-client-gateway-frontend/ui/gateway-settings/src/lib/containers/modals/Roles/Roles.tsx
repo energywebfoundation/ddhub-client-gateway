@@ -63,6 +63,7 @@ export const Roles: FC = () => {
             defaultSortBy='namespace'
             defaultOrder='asc'
             customStyle={{ tableMinWidth: 'auto' }}
+            rowsPerPageOptions={[]}
           />
         </Grid>
       </Grid>

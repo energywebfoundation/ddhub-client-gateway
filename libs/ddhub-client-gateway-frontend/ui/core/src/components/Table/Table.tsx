@@ -47,6 +47,7 @@ export function GenericTable<T>({
   defaultSortBy,
   showCheckbox = false,
   setSelectedItems,
+  rowsPerPageOptions = [10, 20, 50, 100],
 }: TableProps<T>) {
   const { classes } = useStyles();
 
@@ -216,7 +217,7 @@ export function GenericTable<T>({
               <TableFooter>
                 <TableRow>
                   <TablePagination
-                    rowsPerPageOptions={[10, 20, 50, 100]}
+                    rowsPerPageOptions={rowsPerPageOptions}
                     labelDisplayedRows={paginationText}
                     count={pagination.count}
                     rowsPerPage={Number(pagination.limit)}
