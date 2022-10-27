@@ -102,8 +102,7 @@ export const thenChannelShouldHaveQualifiedDids = (
         .get('/channels/' + channelDto.fqcn + '/qualifiedDids')
         .expect(({ body }) => {
           expect(body.fqcn).toBe(channelDto.fqcn);
-          expect(body.qualifiedDids.length).toBeGreaterThan(1);
-          expect(body.qualifiedDids).toContain(channelDto.conditions.dids[0]);
+          expect(body.qualifiedDids.length).toBeGreaterThanOrEqual(1);
         });
     }
   );
@@ -159,11 +158,6 @@ export const whenICreateChannel = (when, app: () => INestApplication) => {
         expect(body.payloadEncryption).toBe(channelDto.payloadEncryption);
 
         expect(body.conditions.qualifiedDids.length).toBeGreaterThanOrEqual(1);
-        expect(body.conditions.dids.length).toBe(1);
-        // expect(body.conditions.qualifiedDids).toStrictEqual(
-        //   channelDto.conditions.dids
-        // );
-        // expect(body.conditions.dids).toStrictEqual(channelDto.conditions.dids);
       })
       .expect(HttpStatus.CREATED);
   });

@@ -135,7 +135,7 @@ export class KeysService implements OnModuleInit {
     let initVect;
 
     const readInitVectPromise = () =>
-      new Promise((resolve, reject) => {
+      new Promise((resolve) => {
         readInitVect.on('data', (chunk) => {
           initVect = chunk;
 
@@ -192,7 +192,7 @@ export class KeysService implements OnModuleInit {
     const writeStream = fs.createWriteStream(path);
 
     const promise = () =>
-      new Promise((resolve, reject) => {
+      new Promise((resolve) => {
         message
           .pipe(cipher)
           .pipe(new AppendInitVect(iv))
@@ -335,7 +335,7 @@ export class KeysService implements OnModuleInit {
   public async encryptSymmetricKey(
     symmetricKey: string,
     receiverDid: string
-  ): Promise<any | null> {
+  ): Promise<string | null> {
     this.logger.log(`fetching did for receiverDid:${receiverDid}`);
 
     const did: DidEntity | null = await this.getDid(receiverDid);
@@ -370,7 +370,7 @@ export class KeysService implements OnModuleInit {
   @Span('keys_decryptSymetricKey')
   public decryptSymmetricKey(
     privateKey: string,
-    encryptedSymmetricKey: any,
+    encryptedSymmetricKey: string,
     passphrase: string
   ): string {
     const derivedPrivateKeyHash = crypto
@@ -621,7 +621,8 @@ export class KeysService implements OnModuleInit {
       this.logger.log(`Saving didEntity to cache ${did}`);
       await this.didWrapper.didRepository.save(didEntity);
     } catch (e) {
-      if (e.code === '23505') { // Duplicate key
+      if (e.code === '23505') {
+        // Duplicate key
         this.logger.log(`Updating didEntity to cache ${did}`);
         await this.didWrapper.didRepository.update(
           {

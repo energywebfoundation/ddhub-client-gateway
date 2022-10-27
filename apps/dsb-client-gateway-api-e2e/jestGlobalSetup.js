@@ -6,10 +6,18 @@ const fn = () => {
   }
 
   require('dotenv').config({
-    path: '.env.test',
+    path: __dirname + '/.env.test',
   });
 
-  console.log('Configuring .env.test files');
+  require('dotenv').config({
+    path: __dirname + '/.env.secret',
+  });
+
+  if (!process.env.PRIVATE_KEY_E2E) {
+    throw new Error('env. variable PRIVATE_KEY_E2E is missing');
+  }
+
+  console.log('Configuring .env.test, .env.secret files');
 };
 
 module.exports = fn;

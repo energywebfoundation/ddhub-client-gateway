@@ -26,7 +26,12 @@ export const clearSecrets = async (app: INestApplication): Promise<void> => {
 export const getVaultPassword = async (uuid): Promise<string> => {
   const vaultId = process.env.ONEPASSWORD_VAULT_ID;
 
-  const vaultItem: FullItem = await op.getItem(vaultId, uuid);
+  const vaultItem: FullItem = await op.getItem(vaultId, uuid).catch((e) => {
+    console.error('Vault failed');
+    console.error(e);
+
+    throw e;
+  });
 
   if (!vaultItem.fields) {
     throw new Error(`no fields for ${uuid}`);
