@@ -1,5 +1,5 @@
 import { makeStyles } from 'tss-react/mui';
-import { alpha } from '@mui/material/styles';
+import { alpha, darken } from '@mui/material/styles';
 
 export const useStyles = makeStyles()((theme) => ({
   chip: {
@@ -14,5 +14,17 @@ export const useStyles = makeStyles()((theme) => ({
     letterSpacing: '0.4px',
     color: theme.palette.primary.main,
     fontFamily: theme.typography.body2.fontFamily,
+  },
+  chipMore: {
+    background: theme.palette.primary.main,
+    height: 20,
+    borderRadius: 21,
+    '&:hover': {
+      backgroundColor: darken(theme.palette.primary.main, 0.2),
+    },
+  },
+  chipLabelWhite: {
+    color: theme.palette.common.white,
+    fontWeight: 600,
   },
 }));
