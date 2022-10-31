@@ -50,9 +50,7 @@ export const useRestrictionSelectEffects = (
   }, [watch, selectedType]);
 
   const handleKeyDown = (e: KeyboardEvent<HTMLImageElement>) => {
-    if (e.key.toLowerCase() === 's') {
-      e.stopPropagation();
-    }
+    e.stopPropagation();
   };
 
   const handleSubmitForm = () => {

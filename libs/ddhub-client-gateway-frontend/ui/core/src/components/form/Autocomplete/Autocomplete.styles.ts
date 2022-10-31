@@ -87,7 +87,6 @@ export const useStyles = makeStyles()((theme) => ({
     boxShadow: `0px 5px 8px ${alpha(theme.palette.common.black, 0.1)}`,
   },
   listBox: {
-    maxHeight: 210,
     borderRadius: 6,
     '& .MuiAutocomplete-option': {
       '&:hover, &.Mui-focused': {
@@ -107,6 +106,12 @@ export const useStyles = makeStyles()((theme) => ({
       backgroundColor: theme.palette.primary.main,
       borderRadius: 3,
     },
+  },
+  listBoxHeightDefault: {
+    maxHeight: 210,
+  },
+  listBoxHeightFull: {
+    maxHeight: 380,
   },
   label: {
     fontSize: 12,

@@ -13,6 +13,7 @@ export enum DsbClientGatewayErrors {
   MB_UNABLE_TO_LOGIN = 'MB::UNABLE_TO_LOGIN',
   MB_ERROR = 'MB::ERROR',
   MB_UNKNOWN = 'MB::UNKNOWN',
+  MB_ACK_PENDING = 'MB::ACK_PENDING',
 
   // Channel errors
 

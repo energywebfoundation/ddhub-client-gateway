@@ -1,5 +1,9 @@
 import { CertificateService } from './certificate.service';
 import { Agent } from 'https';
+import { SecretsEngineService } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
+import { TlsAgentService } from '@dsb-client-gateway/ddhub-client-gateway-tls-agent';
+import { ConfigService } from '@nestjs/config';
+import { EventsService } from '@dsb-client-gateway/ddhub-client-gateway-events';
 
 const secretsEngineMock = {
   setCertificateDetails: jest.fn(),
@@ -24,10 +28,10 @@ describe.skip('CertificateService (SPEC)', () => {
 
   beforeEach(() => {
     certificateService = new CertificateService(
-      secretsEngineMock as any,
-      tlsAgentService as any,
-      configService as any,
-      eventsService as any
+      secretsEngineMock as unknown as SecretsEngineService,
+      tlsAgentService as unknown as TlsAgentService,
+      configService as unknown as ConfigService,
+      eventsService as unknown as EventsService
     );
   });
 

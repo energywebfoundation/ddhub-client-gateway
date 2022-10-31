@@ -29,6 +29,7 @@ import { Readable } from 'stream';
 import { MtlsGuard } from '../../certificate/guards/mtls.guard';
 import { PinoLogger } from 'nestjs-pino';
 import { ClientsInterceptor } from '@dsb-client-gateway/ddhub-client-gateway-clients';
+import { GetMessageResponse } from '../message.interface';
 
 @Controller('messages')
 @UseGuards(DigestGuard, MtlsGuard)
@@ -43,7 +44,7 @@ export class MessageControlller {
   @Get('/')
   @ApiResponse({
     status: HttpStatus.OK,
-    description: 'Message recieved successfully',
+    description: 'Message received successfully',
     type: [GetMessagesResponseDto],
   })
   @ApiResponse({
@@ -61,7 +62,9 @@ export class MessageControlller {
   })
   @HttpCode(HttpStatus.OK)
   @UseInterceptors(ClientsInterceptor('clientId', 'query', 'fqcn', 'query'))
-  public async getMessage(@Query() dto: GetMessagesDto): Promise<Array<any>> {
+  public async getMessage(
+    @Query() dto: GetMessagesDto
+  ): Promise<GetMessageResponse[]> {
     this.pinoLogger.assign({
       fqcn: dto.fqcn,
       topicName: dto.topicName,

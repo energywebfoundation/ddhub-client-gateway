@@ -60,9 +60,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayInit {
   }
 
   public async handleConnection(
-    client: WebSocket & { request: any },
-    a: any[],
-    b: any
+    client: WebSocket & { request }
   ): Promise<void> {
     const protocol = client.protocol;
 
@@ -74,9 +72,6 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayInit {
 
     const _clientId = new URLSearchParams(client.request.url.split('?')[1]).get(
       'clientId'
-    );
-    const _size = new URLSearchParams(client.request.url.split('?')[1]).get(
-      'size'
     );
 
     if (_clientId === null) {
@@ -126,7 +121,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayInit {
 
   @SubscribeMessage('message')
   public async handleMessage(
-    @ConnectedSocket() client: any,
+    @ConnectedSocket() client,
     @MessageBody() data
   ): Promise<void> {
     this.logger.log(

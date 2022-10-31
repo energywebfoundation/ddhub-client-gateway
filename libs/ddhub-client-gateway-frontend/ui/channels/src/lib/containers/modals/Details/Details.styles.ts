@@ -117,6 +117,7 @@ export const useStyles = makeStyles()((theme) => ({
   },
   divider: {
     marginBottom: 27,
+    marginTop: 18.4,
     borderBottom: `1px solid ${lighten(theme.palette.background.paper, 0.07)}`,
   },
   iconCheck: {

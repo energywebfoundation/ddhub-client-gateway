@@ -2,13 +2,16 @@ import { ChannelService } from '../../app/modules/channel/service/channel.servic
 import {
   ChannelEntity,
   ChannelType,
+  ChannelWrapperRepository,
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
 import { ChannelAlreadyExistsException } from '../../app/modules/channel/exceptions/channel-already-exists.exception';
 import {
+  DdhubTopicsService,
   SchemaType,
   TopicDataResponse,
 } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
 import { ChannelInvalidTopicException } from '../../app/modules/channel/exceptions/channel-invalid-topic.exception';
+import { CommandBus } from '@nestjs/cqrs';
 
 const mockedChannelWrapperMock = {
   channelRepository: {
@@ -34,9 +37,9 @@ describe('ChannelService (SPEC)', () => {
 
   beforeEach(() => {
     channelService = new ChannelService(
-      mockedChannelWrapperMock as any,
-      ddhubTopicsServiceMock as any,
-      commandBus as any
+      mockedChannelWrapperMock as unknown as ChannelWrapperRepository,
+      ddhubTopicsServiceMock as unknown as DdhubTopicsService,
+      commandBus as unknown as CommandBus
     );
   });
 
