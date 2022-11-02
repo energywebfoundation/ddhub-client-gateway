@@ -1,29 +1,27 @@
 import { DynamicModule, Module } from '@nestjs/common';
 import { OpenTelemetryModule } from 'nestjs-otel';
-import { ConfigService } from '@nestjs/config';
+
+const getIgnoredRoutes = () => {
+  if (!process.env.OTEL_IGNORED_ROUTES) {
+    return;
+  }
+
+  return process.env.OTEL_IGNORED_ROUTES.split(',');
+};
 
 @Module({})
 export class DdhubClientGatewayTracingModule {
   public static forRoot(): DynamicModule {
     return {
       imports: [
-        OpenTelemetryModule.forRootAsync({
-          useFactory: (configService: ConfigService) => {
-            return {
-              metrics: {
-                hostMetrics: true,
-                defaultMetrics: false,
-                apiMetrics: {
-                  enable: true,
-                  ignoreRoutes: configService
-                    .get<string>('OTEL_IGNORED_ROUTES', 'favicon.ico')
-                    .split(','), // You can ignore specific routes (See https://docs.nestjs.com/middleware#excluding-routes for options)
-                  ignoreUndefinedRoutes: false, //Records metrics for all URLs, even undefined ones
-                },
-              },
-            };
+        OpenTelemetryModule.forRoot({
+          metrics: {
+            hostMetrics: true,
+            apiMetrics: {
+              enable: true,
+              ignoreRoutes: getIgnoredRoutes(), // You can ignore specific routes (See https://docs.nestjs.com/middleware#excluding-routes for options)
+            },
           },
-          inject: [ConfigService],
         }),
       ],
       controllers: [],
