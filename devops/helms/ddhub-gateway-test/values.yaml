@@ -72,7 +72,7 @@ ddhub-client-gateway-api:
       cert-manager.io/issuer: prod-issuer
       cert-manager.io/issuer-kind: OriginIssuer
       cert-manager.io/issuer-group: cert-manager.k8s.cloudflare.com
-      nginx.org/client-max-body-size: "8m"
+      nginx.org/client-max-body-size: "20m"
     hosts:
       - host: ddhub-gateway-test-1.energyweb.org
         paths:
