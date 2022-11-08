@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm, SubmitHandler, FieldValues } from 'react-hook-form';
 import { useQueryClient } from 'react-query';
 import { useRouter } from 'next/router';
@@ -42,6 +42,7 @@ export const useCreateTopicEffects = () => {
     handleSubmit,
     formState: { isValid },
     reset,
+    getValues,
   } = useForm<FieldValues>({
     defaultValues: initialValues,
     resolver: yupResolver(validationSchema),
@@ -110,7 +111,7 @@ export const useCreateTopicEffects = () => {
   const openCancelModal = async () => {
     hideModal();
     const result = await Swal.fire({
-      title: 'Are you sure?',
+      title: 'Are you sure you want to proceed?',
       text: 'you will close create topic form',
       type: 'warning',
       showCancelButton: true,
@@ -135,5 +136,6 @@ export const useCreateTopicEffects = () => {
     buttonDisabled,
     application,
     isCreatingTopic,
+    getValues,
   };
 };

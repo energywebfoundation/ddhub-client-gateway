@@ -6,7 +6,7 @@ import { Tags } from '@ddhub-client-gateway-frontend/ui/core';
 
 export interface TopicItemProps {
   option: Topic;
-  listProps: HTMLAttributes<HTMLLIElement>;
+  listProps?: HTMLAttributes<HTMLLIElement>;
 }
 
 export const TopicItem = ({ listProps, option }: TopicItemProps) => {

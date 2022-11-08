@@ -22,7 +22,7 @@ export const FormRadio: FC<FormRadioProps> = ({
     <Box {...field.formInputsWrapperProps} flexShrink={0}>
       {field.label && (
         <FormLabel id={field.label} className={classes.label}>
-          Type
+          {field.label}
         </FormLabel>
       )}
       <Controller

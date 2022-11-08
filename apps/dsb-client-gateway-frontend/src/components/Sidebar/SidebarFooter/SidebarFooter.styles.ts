@@ -3,16 +3,12 @@ import {alpha} from "@mui/material/styles";
 
 export const useStyles = makeStyles()((theme) => ({
   footerDiv: {
-    position: "fixed",
+    position: 'fixed',
     bottom: 0,
-    textAlign: "center",
+    textAlign: 'center',
     paddingBottom: 17,
     paddingTop: 17,
-    placeSelf: "center"
-  },
-  footerRow: {
-    display: "flex",
-    alignItems: 'center'
+    placeSelf: 'center'
   },
   logoWrapper: {
     top: 0,
@@ -31,6 +27,13 @@ export const useStyles = makeStyles()((theme) => ({
   label: {
     fontSize: 12,
     lineHeight: '21px',
-    color: alpha(theme.palette.text.primary, 0.7)
-  }
+    color: alpha(theme.palette.text.primary, 0.7),
+  },
+  version: {
+    marginTop: 3,
+    fontSize: 9,
+    lineHeight: '21px',
+    color: '#9CA1AA',
+    alignSelf: 'center',
+  },
 }));

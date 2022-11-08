@@ -9,8 +9,8 @@ export class ReloginHandler implements ICommandHandler<ReloginCommand> {
 
   constructor(protected readonly ddhubLoginService: DdhubLoginService) {}
 
-  public async execute(): Promise<void> {
-    await this.ddhubLoginService.login().catch((e) => {
+  public async execute(command: ReloginCommand): Promise<void> {
+    await this.ddhubLoginService.login(true, command.source).catch((e) => {
       this.logger.error('Failed to relogin', e);
     });
   }

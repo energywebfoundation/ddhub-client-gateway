@@ -59,5 +59,5 @@ export const useChannelListEffects = () => {
     },
   ];
 
-  return { channels, isLoading, onCreateHandler, actions, channelsLoaded };
+  return { channels, isLoading, onCreateHandler, actions, channelsLoaded, openChannelDetails };
 };

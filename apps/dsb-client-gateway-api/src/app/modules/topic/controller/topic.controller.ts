@@ -119,6 +119,9 @@ export class TopicsController {
   public async getTopicsBySearch(
     @Query() { keyword, owner, limit, page }: GetTopicsSearchQueryDto
   ) {
+    limit = limit ? limit : 5;
+    page = page ? page : 1;
+
     return this.topicService.getTopicsBySearch(keyword, owner, limit, page);
   }
 

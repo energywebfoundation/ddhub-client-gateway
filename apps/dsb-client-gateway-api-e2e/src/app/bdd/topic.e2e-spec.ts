@@ -15,14 +15,14 @@ const feature = loadFeature('../../feature/topic.feature', {
 
 jest.setTimeout(100000);
 
-describe('Topic Feature', () => {
+describe.skip('Topic Feature', () => {
   let app: INestApplication;
-
-  const getApp = () => app;
 
   beforeAll(async () => {
     app = await setupApp();
   });
+
+  const getApp = () => app;
 
   afterAll(async () => {
     await app.close();

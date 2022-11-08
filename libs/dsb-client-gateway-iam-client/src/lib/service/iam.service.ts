@@ -132,17 +132,35 @@ export class IamService {
 
   @Span('iam_setup')
   public async setup(privateKey: string) {
-    this.logger.log('Initializing IAM connection');
+    await promiseRetry(
+      async (retry, attempt: number) => {
+        this.logger.log('Initializing IAM connection, attempt ' + attempt);
 
-    const { cacheClient, didRegistry, signerService, claimsService } =
-      await this.iamFactoryService.initialize(privateKey, this.configService);
+        const connection = await this.iamFactoryService.initialize(
+          privateKey,
+          this.configService
+        );
 
-    this.cacheClient = cacheClient;
-    this.didRegistry = didRegistry;
-    this.signerService = signerService;
-    this.claimsService = claimsService;
+        if (!connection) {
+          return retry(null);
+        }
 
-    this.initialized = true;
+        const { cacheClient, didRegistry, signerService, claimsService } =
+          connection;
+
+        this.cacheClient = cacheClient;
+        this.didRegistry = didRegistry;
+        this.signerService = signerService;
+        this.claimsService = claimsService;
+
+        this.initialized = true;
+      },
+      {
+        forever: true,
+        minTimeout: 1000,
+        maxTimeout: 2000,
+      }
+    );
   }
 
   public isInitialized(): boolean {
@@ -264,25 +282,38 @@ export class IamService {
 
   @Span('iam_getDid')
   public async getDid(did?: string, includeClaims = false) {
+    const didToGet = did ?? this.getDIDAddress();
     return promiseRetry(
       async (retryFn, attempt) => {
-        this.logger.log(`attempting to receive DID ${did}, attempt ${attempt}`);
+        this.logger.log(
+          `attempting to fetch DID ${didToGet} from registry, attempt ${attempt}`
+        );
 
         return this.didRegistry
           .getDidDocument({
-            did: this.getDIDAddress(),
+            did: didToGet,
             includeClaims,
           })
           .catch((e) => {
-            this.logger.error(`Failed fetching did ${did}`, e);
-
-            return retryFn(e);
+            this.logger.error(`Failed fetching did ${didToGet}`, e);
+            if (e.code === 'ETIMEDOUT' || e.code === 'ECONNREFUSED') {
+              return retryFn(e);
+            } else {
+              throw e;
+            }
           });
       },
       {
         ...this.retryConfigService.config,
       }
-    );
+    )
+      .then((didDocument) => didDocument)
+      .catch((error) => {
+        this.logger.error(
+          `Unable to retrieve DID ${did} from the DID registry due to an upstream error: ${error.message}`
+        );
+        return null;
+      });
   }
 
   public getDIDAddress(): string | null {

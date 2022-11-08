@@ -10,7 +10,8 @@ export const TOPICS_HEADERS: TableHeader[] = [
   {
     Header: 'TOPIC NAME',
     accessor: 'name',
-    isSortable: true
+    isSortable: true,
+    style: { minWidth: '200px' },
   },
   {
     Header: 'SCHEMA TYPE',

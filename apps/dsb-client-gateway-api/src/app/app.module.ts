@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { IdentityModule } from './modules/identity/identity.module';
 import { EnrolmentModule } from './modules/enrolment/enrolment.module';
 import { IamModule } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
@@ -9,7 +9,6 @@ import { SecretsEngineModule } from '@dsb-client-gateway/dsb-client-gateway-secr
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { AllExceptionsFilter } from './modules/utils/filter/all-exceptions.filter';
 import { TerminusModule } from '@nestjs/terminus';
-import { HealthController } from './modules/health/health.controller';
 import { ScheduleModule } from '@nestjs/schedule';
 import { UtilsModule } from './modules/utils/utils.module';
 import { configValidate } from './modules/utils/config.validate';
@@ -23,6 +22,11 @@ import { StorageModule } from './modules/storage/storage.module';
 import { DdhubClientGatewayEventsModule } from '@dsb-client-gateway/ddhub-client-gateway-events';
 import { GatewayModule } from './modules/gateway/gateway.module';
 import { ApiKeyGuard } from '@dsb-client-gateway/ddhub-client-gateway-guard';
+import { HealthModule } from './modules/health/health.module';
+import { LoggerModule } from 'nestjs-pino';
+import { v4 as uuidv4 } from 'uuid';
+import { ClientModule } from './modules/client/client.module';
+import { DdhubClientGatewayVersionModule } from '@dsb-client-gateway/ddhub-client-gateway-version';
 
 @Module({})
 export class AppModule {
@@ -39,6 +43,24 @@ export class AppModule {
         envFilePath: envFilePath,
         validate: shouldValidate && configValidate,
       }),
+      LoggerModule.forRootAsync({
+        useFactory: (configService: ConfigService) => ({
+          pinoHttp: {
+            genReqId: (req) => req.headers['x-request-id'] || uuidv4(),
+            transport: {
+              target: 'pino-pretty',
+              options: {
+                colorize: configService.get<boolean>('LOG_PRETTY'),
+                levelFirst: true,
+                translateTime: "UTC:yyyy-mm-dd'T'HH:MM:ss.l'Z'",
+                singleLine: true,
+              },
+            },
+          },
+        }),
+        inject: [ConfigService],
+      }),
+      DdhubClientGatewayVersionModule,
       StorageModule,
       DdhubClientGatewayTracingModule.forRoot(),
       SecretsEngineModule,
@@ -57,6 +79,8 @@ export class AppModule {
       CronModule,
       DdhubClientGatewayEventsModule,
       GatewayModule,
+      HealthModule,
+      ClientModule,
     ];
 
     const providers = [
@@ -69,13 +93,12 @@ export class AppModule {
         useClass: ApiKeyGuard,
       },
     ];
-    const controllers = [HealthController];
 
     return {
       module: AppModule,
       imports,
       providers,
-      controllers,
+      controllers: [],
     };
   }
 }

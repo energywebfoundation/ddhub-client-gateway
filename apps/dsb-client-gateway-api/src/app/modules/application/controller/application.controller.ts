@@ -1,5 +1,6 @@
 import { Controller, Get, HttpStatus, Param, Query } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { PinoLogger } from 'nestjs-pino';
 
 import { ApplicationDTO, GetApplicationsQueryDto } from '../dto';
 import { ApplicationsService } from '../service/applications.service';
@@ -8,7 +9,10 @@ import { GetApplicationsByNamespaceDto } from '../dto/get-by-namespace.dto';
 @Controller('applications')
 @ApiTags('Applications')
 export class ApplicationsController {
-  constructor(protected readonly applicationsService: ApplicationsService) {}
+  constructor(
+    protected readonly applicationsService: ApplicationsService,
+    protected readonly logger: PinoLogger
+  ) {}
 
   @Get('')
   @ApiOperation({
@@ -22,6 +26,10 @@ export class ApplicationsController {
   public async getApplications(
     @Query() { roleName }: GetApplicationsQueryDto
   ): Promise<ApplicationDTO[]> {
+    this.logger.assign({
+      requestedRoleName: roleName,
+    });
+
     return this.applicationsService.getApplications(roleName);
   }
 
@@ -37,6 +45,10 @@ export class ApplicationsController {
   public async getApplicationsByNamespace(
     @Param() { namespace }: GetApplicationsByNamespaceDto
   ): Promise<ApplicationDTO[]> {
+    this.logger.assign({
+      requestedNamespace: namespace,
+    });
+
     return this.applicationsService.getApplicationsByNamespace(namespace);
   }
 }

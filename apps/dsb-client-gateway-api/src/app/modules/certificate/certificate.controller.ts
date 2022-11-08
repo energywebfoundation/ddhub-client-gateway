@@ -61,6 +61,7 @@ export class CertificateController {
       privateKey;
       caCertificate;
     },
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     @Body() dto: UploadCertificateBodyDto
   ): Promise<void> {
     await this.certificateService.save(

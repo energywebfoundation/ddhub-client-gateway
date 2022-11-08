@@ -33,7 +33,7 @@ export const Editor: FC<EditorProps> = memo(
     const { name } = register(field.name);
 
     return (
-      <Box height={132} sx={{ position: 'relative' }}>
+      <Box height={180} sx={{ position: 'relative' }}>
         {showPlaceholder && placeholder && (
           <Box
             className={classes.wrapper}

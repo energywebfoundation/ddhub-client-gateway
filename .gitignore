@@ -1,4 +1,6 @@
 # See http://help.github.com/ignore-files/ for more about ignoring files.
+.history
+logs
 
 # compiled output
 /dist
@@ -56,3 +58,4 @@ uploads
 certificate
 migrations-build
 get-started/data
+apps/dsb-client-gateway-api-e2e/.env.secret

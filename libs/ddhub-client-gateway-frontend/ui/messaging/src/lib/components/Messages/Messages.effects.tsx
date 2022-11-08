@@ -37,8 +37,9 @@ export const useMessagesEffects = () => {
   });
 
   const data: TMessage[] = messages.map((message) => {
+    const timestampMillis = Math.round(message?.timestampNanos/1e6);
     return {
-      timestampNanos: dayjs(message?.timestampNanos).format('MM/DD/YYYY'),
+      timestampNanos: dayjs(timestampMillis).format('MM/DD/YYYY'),
       sender: didFormatMinifier(message?.sender),
       schemaType: message?.topicSchemaType,
       details: {

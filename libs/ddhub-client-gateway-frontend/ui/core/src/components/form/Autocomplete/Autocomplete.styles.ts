@@ -87,7 +87,6 @@ export const useStyles = makeStyles()((theme) => ({
     boxShadow: `0px 5px 8px ${alpha(theme.palette.common.black, 0.1)}`,
   },
   listBox: {
-    maxHeight: 210,
     borderRadius: 6,
     '& .MuiAutocomplete-option': {
       '&:hover, &.Mui-focused': {
@@ -108,6 +107,12 @@ export const useStyles = makeStyles()((theme) => ({
       borderRadius: 3,
     },
   },
+  listBoxHeightDefault: {
+    maxHeight: 210,
+  },
+  listBoxHeightFull: {
+    maxHeight: 380,
+  },
   label: {
     fontSize: 12,
     lineHeight: '14px',
@@ -116,5 +121,14 @@ export const useStyles = makeStyles()((theme) => ({
     color: theme.palette.common.white,
     fontFamily: theme.typography.body2.fontFamily,
     marginBottom: 8,
+  },
+  altOption: {
+    fontSize: 14,
+    lineHeight: '21px',
+    fontWeight: 400,
+    color: theme.palette.text.primary,
+    minHeight: 22,
+    fontFamily: theme.typography.body2.fontFamily,
+    padding: '10px 16px 9px',
   },
 }));

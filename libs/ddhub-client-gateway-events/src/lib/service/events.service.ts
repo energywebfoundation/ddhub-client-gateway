@@ -106,12 +106,12 @@ export class EventsService implements OnApplicationBootstrap {
           new SecretChangeCommand(SecretType.PRIVATE_KEY)
         );
         await this.commandBus.execute(new InitIamCommand());
-        await this.commandBus.execute(new ReloginCommand());
+        await this.commandBus.execute(new ReloginCommand('PRIVATE_KEY'));
         await this.commandBus.execute(new EnrolmentIdentityChangedCommand());
 
         return;
       case Events.ROLES_CHANGE:
-        await this.commandBus.execute(new ReloginCommand());
+        await this.commandBus.execute(new ReloginCommand('ROLES_CHANGE'));
         return;
       case Events.CERTIFICATE_CHANGED:
         await this.commandBus.execute(new CertificateChangedCommand());

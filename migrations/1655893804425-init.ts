@@ -41,7 +41,7 @@ export class init1655893804425 implements MigrationInterface {
         '-- Name: applications; Type: TABLE; Schema: public; Owner: -\n' +
         '--\n' +
         '\n' +
-        'CREATE TABLE public.applications (\n' +
+        'CREATE TABLE IF NOT EXISTS public.applications (\n' +
         '    "appName" character varying NOT NULL,\n' +
         '    "logoUrl" character varying,\n' +
         '    "websiteUrl" character varying,\n' +
@@ -58,7 +58,7 @@ export class init1655893804425 implements MigrationInterface {
         '-- Name: channels; Type: TABLE; Schema: public; Owner: -\n' +
         '--\n' +
         '\n' +
-        'CREATE TABLE public.channels (\n' +
+        'CREATE TABLE IF NOT EXISTS public.channels (\n' +
         '    fqcn character varying NOT NULL,\n' +
         '    type text NOT NULL,\n' +
         '    conditions text NOT NULL,\n' +
@@ -72,7 +72,7 @@ export class init1655893804425 implements MigrationInterface {
         '-- Name: cron; Type: TABLE; Schema: public; Owner: -\n' +
         '--\n' +
         '\n' +
-        'CREATE TABLE public.cron (\n' +
+        'CREATE TABLE IF NOT EXISTS public.cron (\n' +
         '    "jobName" text NOT NULL,\n' +
         '    "latestStatus" text NOT NULL,\n' +
         '    "executedAt" timestamp without time zone NOT NULL,\n' +
@@ -85,7 +85,7 @@ export class init1655893804425 implements MigrationInterface {
         '-- Name: dids; Type: TABLE; Schema: public; Owner: -\n' +
         '--\n' +
         '\n' +
-        'CREATE TABLE public.dids (\n' +
+        'CREATE TABLE IF NOT EXISTS public.dids (\n' +
         '    did character varying NOT NULL,\n' +
         '    "publicRSAKey" character varying,\n' +
         '    "publicSignatureKey" character varying,\n' +
@@ -98,7 +98,7 @@ export class init1655893804425 implements MigrationInterface {
         '-- Name: enrolment; Type: TABLE; Schema: public; Owner: -\n' +
         '--\n' +
         '\n' +
-        'CREATE TABLE public.enrolment (\n' +
+        'CREATE TABLE IF NOT EXISTS public.enrolment (\n' +
         '    did character varying NOT NULL,\n' +
         '    roles text NOT NULL\n' +
         ');\n' +
@@ -108,7 +108,7 @@ export class init1655893804425 implements MigrationInterface {
         '-- Name: events; Type: TABLE; Schema: public; Owner: -\n' +
         '--\n' +
         '\n' +
-        'CREATE TABLE public.events (\n' +
+        'CREATE TABLE IF NOT EXISTS public.events (\n' +
         '    "eventType" character varying NOT NULL,\n' +
         '    "workerId" character varying NOT NULL,\n' +
         '    "createdDate" timestamp without time zone DEFAULT now() NOT NULL,\n' +
@@ -120,7 +120,7 @@ export class init1655893804425 implements MigrationInterface {
         '-- Name: files; Type: TABLE; Schema: public; Owner: -\n' +
         '--\n' +
         '\n' +
-        'CREATE TABLE public.files (\n' +
+        'CREATE TABLE IF NOT EXISTS public.files (\n' +
         '    "fileId" character varying NOT NULL,\n' +
         '    did character varying NOT NULL,\n' +
         '    "clientGatewayMessageId" character varying NOT NULL,\n' +
@@ -135,14 +135,14 @@ export class init1655893804425 implements MigrationInterface {
         '-- Name: identity; Type: TABLE; Schema: public; Owner: -\n' +
         '--\n' +
         '\n' +
-        'CREATE TABLE public.identity (\n' +
+        'CREATE TABLE IF NOT EXISTS public.identity (\n' +
         '    address character varying NOT NULL,\n' +
         '    "publicKey" character varying NOT NULL,\n' +
         '    balance text NOT NULL\n' +
         ');\n' +
         '\n' +
         '\n' +
-        'CREATE TABLE public.symmetric_keys (\n' +
+        'CREATE TABLE IF NOT EXISTS public.symmetric_keys (\n' +
         '    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,\n' +
         '    "clientGatewayMessageId" character varying NOT NULL,\n' +
         '    payload character varying NOT NULL,\n' +
@@ -154,7 +154,7 @@ export class init1655893804425 implements MigrationInterface {
         '-- Name: topic; Type: TABLE; Schema: public; Owner: -\n' +
         '--\n' +
         '\n' +
-        'CREATE TABLE public.topic (\n' +
+        'CREATE TABLE IF NOT EXISTS public.topic (\n' +
         '    id character varying NOT NULL,\n' +
         '    name character varying NOT NULL,\n' +
         '    "schemaType" character varying NOT NULL,\n' +
@@ -179,6 +179,7 @@ export class init1655893804425 implements MigrationInterface {
         '-- Name: files PK_1179e2352b2958dbbeb9d0beb64; Type: CONSTRAINT; Schema: public; Owner: -\n' +
         '--\n' +
         '\n' +
+        'ALTER TABLE ONLY public.files DROP CONSTRAINT IF EXISTS "PK_1179e2352b2958dbbeb9d0beb64";\n' +
         'ALTER TABLE ONLY public.files\n' +
         '    ADD CONSTRAINT "PK_1179e2352b2958dbbeb9d0beb64" PRIMARY KEY ("fileId", did, "clientGatewayMessageId", signature);\n' +
         '\n' +
@@ -187,6 +188,7 @@ export class init1655893804425 implements MigrationInterface {
         '-- Name: cron PK_16202414b0bd7ffb1b8587e8a1c; Type: CONSTRAINT; Schema: public; Owner: -\n' +
         '--\n' +
         '\n' +
+        'ALTER TABLE ONLY public.cron DROP CONSTRAINT IF EXISTS "PK_16202414b0bd7ffb1b8587e8a1c";\n' +
         'ALTER TABLE ONLY public.cron\n' +
         '    ADD CONSTRAINT "PK_16202414b0bd7ffb1b8587e8a1c" PRIMARY KEY ("jobName");\n' +
         '\n' +
@@ -195,6 +197,7 @@ export class init1655893804425 implements MigrationInterface {
         '-- Name: applications PK_4449bcd12d59ea5fc46b986b66a; Type: CONSTRAINT; Schema: public; Owner: -\n' +
         '--\n' +
         '\n' +
+        'ALTER TABLE ONLY public.applications DROP CONSTRAINT IF EXISTS "PK_4449bcd12d59ea5fc46b986b66a";\n' +
         'ALTER TABLE ONLY public.applications\n' +
         '    ADD CONSTRAINT "PK_4449bcd12d59ea5fc46b986b66a" PRIMARY KEY ("appName");\n' +
         '\n' +
@@ -203,6 +206,7 @@ export class init1655893804425 implements MigrationInterface {
         '-- Name: topic PK_4bef2be9b01f24c8b13b95c7c86; Type: CONSTRAINT; Schema: public; Owner: -\n' +
         '--\n' +
         '\n' +
+        'ALTER TABLE ONLY public.topic DROP CONSTRAINT IF EXISTS "PK_4bef2be9b01f24c8b13b95c7c86";\n' +
         'ALTER TABLE ONLY public.topic\n' +
         '    ADD CONSTRAINT "PK_4bef2be9b01f24c8b13b95c7c86" PRIMARY KEY (id, name, "schemaType", version);\n' +
         '\n' +
@@ -211,6 +215,7 @@ export class init1655893804425 implements MigrationInterface {
         '-- Name: channels PK_51bc8efb4bb4d9b3ef77a4bdebc; Type: CONSTRAINT; Schema: public; Owner: -\n' +
         '--\n' +
         '\n' +
+        'ALTER TABLE ONLY public.channels DROP CONSTRAINT IF EXISTS "PK_51bc8efb4bb4d9b3ef77a4bdebc";\n' +
         'ALTER TABLE ONLY public.channels\n' +
         '    ADD CONSTRAINT "PK_51bc8efb4bb4d9b3ef77a4bdebc" PRIMARY KEY (fqcn);\n' +
         '\n' +
@@ -219,6 +224,7 @@ export class init1655893804425 implements MigrationInterface {
         '-- Name: events PK_8295642fc842a7e1b03d54eccc0; Type: CONSTRAINT; Schema: public; Owner: -\n' +
         '--\n' +
         '\n' +
+        'ALTER TABLE ONLY public.events DROP CONSTRAINT IF EXISTS "PK_8295642fc842a7e1b03d54eccc0";\n' +
         'ALTER TABLE ONLY public.events\n' +
         '    ADD CONSTRAINT "PK_8295642fc842a7e1b03d54eccc0" PRIMARY KEY ("eventType");\n' +
         '\n' +
@@ -227,6 +233,7 @@ export class init1655893804425 implements MigrationInterface {
         '-- Name: dids PK_8a065e738c56f0bd50f8658f8f0; Type: CONSTRAINT; Schema: public; Owner: -\n' +
         '--\n' +
         '\n' +
+        'ALTER TABLE ONLY public.dids DROP CONSTRAINT IF EXISTS "PK_8a065e738c56f0bd50f8658f8f0";\n' +
         'ALTER TABLE ONLY public.dids\n' +
         '    ADD CONSTRAINT "PK_8a065e738c56f0bd50f8658f8f0" PRIMARY KEY (did);\n' +
         '\n' +
@@ -235,6 +242,7 @@ export class init1655893804425 implements MigrationInterface {
         '-- Name: symmetric_keys PK_a8e8f1d57d3f6817a0ab114b2f5; Type: CONSTRAINT; Schema: public; Owner: -\n' +
         '--\n' +
         '\n' +
+        'ALTER TABLE ONLY public.symmetric_keys DROP CONSTRAINT IF EXISTS "PK_a8e8f1d57d3f6817a0ab114b2f5";\n' +
         'ALTER TABLE ONLY public.symmetric_keys\n' +
         '    ADD CONSTRAINT "PK_a8e8f1d57d3f6817a0ab114b2f5" PRIMARY KEY (id);\n' +
         '\n' +
@@ -243,6 +251,7 @@ export class init1655893804425 implements MigrationInterface {
         '-- Name: enrolment PK_c1b11dc21bdb2ccad48ac137822; Type: CONSTRAINT; Schema: public; Owner: -\n' +
         '--\n' +
         '\n' +
+        'ALTER TABLE ONLY public.enrolment DROP CONSTRAINT IF EXISTS "PK_c1b11dc21bdb2ccad48ac137822";\n' +
         'ALTER TABLE ONLY public.enrolment\n' +
         '    ADD CONSTRAINT "PK_c1b11dc21bdb2ccad48ac137822" PRIMARY KEY (did);\n' +
         '\n' +
@@ -251,6 +260,7 @@ export class init1655893804425 implements MigrationInterface {
         '-- Name: identity PK_d0b02e497d54aa8464bdde4f80a; Type: CONSTRAINT; Schema: public; Owner: -\n' +
         '--\n' +
         '\n' +
+        'ALTER TABLE ONLY public.identity DROP CONSTRAINT IF EXISTS "PK_d0b02e497d54aa8464bdde4f80a";\n' +
         'ALTER TABLE ONLY public.identity\n' +
         '    ADD CONSTRAINT "PK_d0b02e497d54aa8464bdde4f80a" PRIMARY KEY (address);\n' +
         '\n' +

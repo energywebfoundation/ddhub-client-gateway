@@ -25,6 +25,7 @@ export const Create = () => {
     channelValues,
     isCreating,
     getActionButtonsProps,
+    validFqcn,
   } = useCreateChannelEffects();
   const { classes } = useStyles();
 
@@ -36,7 +37,7 @@ export const Create = () => {
   const formPart = (id: number) => {
     switch (id) {
       case 0:
-        return <Details nextClick={setDetails} channelValues={channelValues} />;
+        return <Details nextClick={setDetails} channelValues={channelValues} validFqcn={validFqcn} />;
       case 1:
         return (
           <Restrictions
@@ -45,6 +46,7 @@ export const Create = () => {
               onClick: setRestrictions,
             })}
             restrictions={channelValues.conditions}
+            connectionType={channelValues.connectionType}
           />
         );
       case 2:
@@ -83,10 +85,10 @@ export const Create = () => {
       <DialogTitle className={classes.title}>Create Channel</DialogTitle>
       <DialogSubTitle>{subTitle}</DialogSubTitle>
       <Grid container className={classes.content}>
-        <Grid item pt={2}>
+        <Grid item pt={2} xs={4}>
           <Steps steps={CREATION_STEPS} activeStep={activeStep} />
         </Grid>
-        <Grid item className={classes.formWrapper}>
+        <Grid item className={classes.formWrapper} xs={8}>
           {formPart(activeStep)}
         </Grid>
       </Grid>

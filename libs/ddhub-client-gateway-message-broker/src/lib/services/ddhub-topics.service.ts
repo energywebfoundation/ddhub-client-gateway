@@ -11,6 +11,7 @@ import {
   Topic,
   TopicCountDto,
   TopicDataResponse,
+  TopicMonitorUpdates,
   TopicVersion,
   TopicVersionResponse,
   UpdateTopicBodyDTO,
@@ -56,7 +57,7 @@ export class DdhubTopicsService extends DdhubBaseService {
           stopOnResponseCodes: [MessageBrokerErrors.UNAUTHORIZED_ACCESS],
         }
       );
-      this.logger.error(`Get topic with topicId: ${topicId} successful`);
+      this.logger.log(`Get topic with topicId: ${topicId} successful`);
 
       return data;
     } catch (e) {
@@ -199,6 +200,8 @@ export class DdhubTopicsService extends DdhubBaseService {
   @Span('ddhub_mb_postTopics')
   public async postTopics(topicData: PostTopicBodyDto): Promise<Topic> {
     try {
+      this.logger.log('attempting to create topic ' + topicData.name);
+
       const { data } = await this.request<null>(
         () =>
           this.httpService.post('/topics', topicData, {
@@ -353,6 +356,37 @@ export class DdhubTopicsService extends DdhubBaseService {
     }
   }
 
+  @Span('ddhub_mb_refreshTopicsMonitor')
+  public async topicUpdatesMonitor(
+    owners: string[]
+  ): Promise<TopicMonitorUpdates[]> {
+    try {
+      const result = await this.request<null>(
+        () =>
+          this.httpService.get(`/topics/topicUpdatesMonitor`, {
+            params: {
+              namespaceList: owners,
+            },
+            paramsSerializer: function (params) {
+              return qs.stringify(params, { arrayFormat: 'repeat' });
+            },
+            httpsAgent: this.tlsAgentService.get(),
+            headers: {
+              Authorization: `Bearer ${this.didAuthService.getToken()}`,
+            },
+          }),
+        {
+          stopOnResponseCodes: [MessageBrokerErrors.UNAUTHORIZED_ACCESS],
+        }
+      );
+
+      return result.data;
+    } catch (e) {
+      this.logger.error(`get topics monitor failed`, e);
+      throw e;
+    }
+  }
+
   @Span('ddhub_mb_getTopicVersions')
   public async getTopicVersions(
     topicId: string
@@ -361,6 +395,9 @@ export class DdhubTopicsService extends DdhubBaseService {
       const result = await this.request<null>(
         () =>
           this.httpService.get(`/topics/${topicId}/versions`, {
+            params: {
+              includeDeleted: 'true',
+            },
             httpsAgent: this.tlsAgentService.get(),
             headers: {
               Authorization: `Bearer ${this.didAuthService.getToken()}`,
@@ -381,10 +418,9 @@ export class DdhubTopicsService extends DdhubBaseService {
   @Span('ddhub_mb_getTopics')
   public async getTopics(
     limit: number,
-    name: string,
     applicationNameSpace: string,
     page: number,
-    tags: string[]
+    includeDeleted = true
   ): Promise<TopicDataResponse> {
     //replacing double quotes in order to pass correct input to MB
     const owner = applicationNameSpace.replace(/"/g, '');
@@ -395,10 +431,9 @@ export class DdhubTopicsService extends DdhubBaseService {
           this.httpService.get('/topics', {
             params: {
               limit,
-              name,
               owner,
               page,
-              tags,
+              includeDeleted: includeDeleted ? 'true' : 'false',
             },
             httpsAgent: this.tlsAgentService.get(),
             headers: {

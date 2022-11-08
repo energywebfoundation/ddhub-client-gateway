@@ -21,12 +21,19 @@ export class TlsAgentService implements OnApplicationBootstrap {
     return this.agent;
   }
 
-  public async create(): Promise<void> {
+  public async create(): Promise<Agent | undefined> {
+    const mtlsEnabled = this.configService.get<boolean>('MTLS_ENABLED');
+    if (!mtlsEnabled) {
+      this.logger.debug('Not creating HTTPS agent: mTLS is not enabled');
+
+      return undefined;
+    }
+
     const certificateDetails =
       await this.secretsEngineService.getCertificateDetails();
 
     if (!certificateDetails) {
-      this.logger.debug('no certificate details, not creating https agent');
+      this.logger.debug('Not creating HTTPS agent: no stored certificate details');
 
       return undefined;
     }
@@ -38,5 +45,7 @@ export class TlsAgentService implements OnApplicationBootstrap {
       key: certificateDetails.privateKey,
       ca: certificateDetails.caCertificate,
     });
+
+    return this.agent;
   }
 }

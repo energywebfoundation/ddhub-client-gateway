@@ -1,4 +1,4 @@
-import { ReactElement } from 'react';
+import { ReactElement, ChangeEvent } from 'react';
 import { TableCellProps, TableContainerProps } from '@mui/material';
 import { TTableComponentAction } from '../Table/TableComponentActions';
 import { FilterValue } from 'react-table';
@@ -35,10 +35,14 @@ export interface TableProps<T> {
   containerProps?: TableContainerProps;
   loadingRows?: number;
   paginationProps?: TablePagination;
-  onPageChange?: (newPage: number) => void;
-  onSearchInput?: (filterValue: FilterValue) => void;
+  onPageChange?: (newPage: number, limit: number) => void;
+  onSearchInput?: (filterValue: FilterValue, limit: number) => void;
   defaultSortBy?: string;
   defaultOrder?: 'asc' | 'desc';
   customStyle?: TableCustomStyle;
   backendSearch?: boolean;
+  stripedTable?: boolean;
+  showCheckbox?: boolean;
+  setSelectedItems?: (values: string[]) => void;
+  rowsPerPageOptions?: number[];
 }

@@ -238,7 +238,7 @@ export const getChannelMessagesMock = () => [
     signature:
       '0xd3a2e04d344261ee648d00baba8477a575030371862ee9f11d339726cff8d47b579321dc99312c84d63ab33e065e752c9639a5615ed5c9bf757a634772c506dc1b',
     sender: 'did:ethr:volta:0x03830466Ce257f9B798B0f27359D7639dFB6457D',
-    timestampNanos: 1652768367254,
+    timestampNanos: 1662428065121000000,
     transactionId: "''",
     signatureValid: false,
     decryption: {
@@ -253,7 +253,7 @@ export const getChannelMessagesMock = () => [
     signature:
       '0xd3a2e04d344261ee648d00baba8477a575030371862ee9f11d339726cff8d47b579321dc99312c84d63ab33e065e752c9639a5615ed5c9bf757a634772c506dc1b',
     sender: 'did:ethr:volta:0x03830466Ce257f9B798B0f27359D7639dFB6457D',
-    timestampNanos: 1652768367254,
+    timestampNanos: 1662428065121000000,
     transactionId: "''",
     signatureValid: true,
     decryption: {
@@ -306,6 +306,27 @@ export const getCronMock = () => {
 
 export const getGatewayMock = () => {
   return {
-    "namespace": "ddhub.apps.energyweb.iam.ewc"
+    "did": "string",
+    "messageBrokerStatus": "OK",
+    "mtlsIsValid": true,
+    "namespace": "ddhub.apps.energyweb.iam.ewc",
+    "version": "v15.15.0"
   };
+};
+
+export const getClientsMock = () => {
+  return [
+    {
+      "id": "d682d25f-24b0-4b9f-afcc-08a40f8855d1",
+      "clientId": "test.cursor",
+      "createdDate": "2022-09-21 08:04:06.020037",
+      "updatedDate": "2022-09-21 08:04:06.020037"
+    },
+    {
+      "id": "d682d25f-24b0-4b9f-afcc-08a40f8855d2",
+      "clientId": "test.cursor2",
+      "createdDate": "2022-09-21 08:04:06.020037",
+      "updatedDate": "2022-09-21 08:04:06.020037"
+    }
+  ];
 };

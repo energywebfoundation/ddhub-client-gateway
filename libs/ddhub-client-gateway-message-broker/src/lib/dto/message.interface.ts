@@ -69,3 +69,8 @@ export interface SendMessageResponse {
   recipients: Recipients;
   status: Status[];
 }
+
+export interface AckResponse {
+  acked: string[];
+  notFound: string[];
+}

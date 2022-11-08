@@ -2,6 +2,8 @@ import { Module } from '@nestjs/common';
 import { HttpModule } from '@nestjs/axios';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import {
+  DdhubClientsService,
+  DdhubConfigService,
   DdhubDidService,
   DdhubFilesService,
   DdhubLoginService,
@@ -17,9 +19,11 @@ import { DdhubClientGatewayEnrolmentModule } from '@dsb-client-gateway/ddhub-cli
 import { ReloginHandler } from './handler/relogin.handler';
 import { DdhubClientGatewayTlsAgentModule } from '@dsb-client-gateway/ddhub-client-gateway-tls-agent';
 import { DdhubLogService } from './services/ddhub-log.service';
+import { DdhubClientGatewayVersionModule } from '@dsb-client-gateway/ddhub-client-gateway-version';
 
 @Module({
   imports: [
+    DdhubClientGatewayVersionModule,
     DdhubClientGatewayEnrolmentModule,
     HttpModule.registerAsync({
       imports: [ConfigModule],
@@ -51,6 +55,8 @@ import { DdhubLogService } from './services/ddhub-log.service';
     DdhubDidService,
     ReloginHandler,
     DdhubLogService,
+    DdhubConfigService,
+    DdhubClientsService,
   ],
   exports: [
     DdhubTopicsService,
@@ -59,6 +65,8 @@ import { DdhubLogService } from './services/ddhub-log.service';
     DdhubMessagesService,
     DdhubLoginService,
     DdhubDidService,
+    DdhubConfigService,
+    DdhubClientsService,
   ],
 })
 export class DdhubClientGatewayMessageBrokerModule {}

@@ -16,6 +16,7 @@ ARG NODE_ENV=production
 
 FROM $IMAGE
 
+ARG NODE_ENV
 ENV NODE_ENV=$NODE_ENV
 
 RUN apk add --no-cache python3 py3-pip make g++
@@ -24,6 +25,8 @@ COPY --chown=node:node dist/apps/dsb-client-gateway-api/* /usr/app/
 COPY --chown=node:node ormconfig.js /usr/app/
 COPY --chown=node:node migrations-build/ /usr/app/migrations-build
 COPY --chown=node:node package-lock.json /usr/app/
+# version.md is expected to exist, CI will create the file
+COPY --chown=node:node version.md /usr/app/
 
 WORKDIR /usr/app
 RUN npm ci --production

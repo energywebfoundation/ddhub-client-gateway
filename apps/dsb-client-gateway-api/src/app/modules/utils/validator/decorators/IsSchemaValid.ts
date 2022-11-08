@@ -46,7 +46,7 @@ export function IsSchemaValid(
 }
 
 function validateJSONSchema(schema: object, payload: string) {
-  let validate: any;
+  let validate;
   let jsonPayload: object;
   try {
     jsonPayload = JSON.parse(payload);
@@ -64,8 +64,6 @@ function validateJSONSchema(schema: object, payload: string) {
   if (valid) {
     return true;
   } else if (validate) {
-    throw new SchemaNotValidException(
-      validate.errors[0]
-    );
+    throw new SchemaNotValidException(validate.errors[0]);
   }
 }

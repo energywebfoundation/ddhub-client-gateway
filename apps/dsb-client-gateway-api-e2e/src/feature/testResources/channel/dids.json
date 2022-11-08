@@ -1,0 +1,10 @@
+{
+  "fqcn": "dids_test",
+  "payloadEncryption": true,
+  "type": "pub",
+  "conditions": {
+    "dids": [],
+    "roles": ["topiccreator.roles.EWTEST.apps.ewaemotest.iam.ewc"],
+    "topics": []
+  }
+}

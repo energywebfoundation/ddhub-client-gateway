@@ -96,4 +96,8 @@ export const mapUrlToBreadcrumbs = new Map<string, Breadcrumb[]>()
     { title: 'Integration APIs' },
     { title: 'Integration APIs', path: routerConst.IntegrationAPIs },
     { title: 'Websocket API' },
+  ])
+  .set(routerConst.ClientIds, [
+    { title: 'Client Subscriptions' },
+    { title: 'Client Subscriptions' },
   ]);

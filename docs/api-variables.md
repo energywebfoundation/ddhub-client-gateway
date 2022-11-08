@@ -9,7 +9,7 @@
 | WEBSOCKET | string | NONE | Websocket mode | NONE,SERVER,CLIENT |  |
 | EVENTS_MAX_PER_SECOND | number | 2 | Amount of messages to pull for each WebSocket run |  |  |
 | EVENTS_EMIT_MODE | string | BULK | Should Websocket emit messages as array or single object | SINGLE,BULK |  |
-| DID_TTL | number | 60 | How long cached DID attributes should be valid |  |  |
+| DID_TTL | number | 3600 | How long cached DID attributes should be valid in seconds |  |  |
 | WEBSOCKET_URL | string |  | WebSocket Client URL to connect |  | WEBSOCKET == CLIENT |
 | WEBSOCKET_PROTOCOL | string | dsb-protocol | WebSocket Client protocol |  | WEBSOCKET == CLIENT |
 | WEBSOCKET_RECONNECT_TIMEOUT | number | 3000 | WebSocket Client reconnect timeout |  | WEBSOCKET == CLIENT |
@@ -30,17 +30,28 @@
 | SECRET_PREFIX | string | ddhub/ |  |  |  |
 | AWS_REGION | string | ap-southeast-2 | AWS Secrets Manager region |  | SECRETS_ENGINE == aws |
 | AZURE_VAULT_URL | string |  | Azure Vault URL |  | SECRETS_ENGINE == azure |
+| REQ_LOCK_TIMEOUT | number | 5 | Maximum request lock lifetime (in seconds) |  |  |
+| VERSION_FILE_PATH | string | ./version.md | Version file path |  |  |
+| IPFS_HOST | string | ipfs.infura.io | IPFS Host |  |  |
+| IPFS_PORT | number | 5001 | IPFS Port |  |  |
+| IPFS_PROTOCOL | string | https:// | IPFS Protocol |  |  |
+| INFURA_PROJECT_ID | string | 2GHrFIa6STLEM25RKf9GIcdD1kt | Infura Project ID |  |  |
+| INFURA_PROJECT_SECRET | string | d978891a32df1ff04a800e54fbfbb6b6 | Infura Project API Key |  |  |
 | NODE_ENV | string |  | Node environment |  |  |
 | DSB_BASE_URL | string | https://dsb-demo.energyweb.org | Message broker URL |  |  |
 | UPLOAD_FILES_DIR | string | ./upload | Directory where we should store temporary files for upload |  |  |
 | DOWNLOAD_FILES_DIR | string | ./download | Directory where we should store downloaded files for limited time |  |  |
+| LOG_PRETTY | boolean | false | Should colorize logs, only use in dev mode |  |  |
 | MTLS_ENABLED | boolean | true | Should enable mTLS |  |  |
+| DB_SYNC | boolean | false | Should generate migrations (dev use only) |  |  |
 | DB_NAME | string | postgresql://ddhub:ddhub@localhost:5432/ddhub | Database connection string |  |  |
 | DB_DRIVER | string | postgres | Database driver | postgres,better-sqlite3 |  |
 | CLIENT_ID | string | WS_CONSUMER | WS client id |  |  |
 | MAX_RETRIES | number | 3 | Specifies maximum amount of retries for vulnerable methods |  |  |
 | RETRY_FACTOR | number | 2 | Specifies retry factor (multiplier for timeout) for vulnerable methods |  |  |
-| TIMEOUT | number | 1000 | Specifies timeout (how much app should wait before retries) for vulnerable methods |  |  |
+| TIMEOUT | number | 1000 | Specifies mininum timeout (how much app should wait before retries) for vulnerable methods |  |  |
+| MAX_TIMEOUT | number | 60000 | Specifies maximum timeout (how much app should wait before retries) for vulnerable methods |  |  |
+| MESSAGING_MAX_TIMEOUT | number | 60000 | Specifies messaging maximum timeout (how much app should wait before retries) for vulnerable methods |  |  |
 | INTERNAL_EVENTS_TIMEOUT | number | 5 | How often internal events interval should execute (seconds) |  |  |
 | OPENTELEMETRY_ENABLED | boolean | false |  |  |  |
 | OTEL_IGNORED_ROUTES | string | health,api/v2/health | OTEL ignored routes |  | OPENTELEMETRY_ENABLED == true |

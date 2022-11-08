@@ -8,6 +8,7 @@ import {
   Autocomplete as MuiAutocomplete,
 } from '@mui/material';
 import { useStyles } from './Autocomplete.styles';
+import clsx from 'clsx';
 
 interface AutocompleteProps {
   options: any[];
@@ -28,6 +29,7 @@ interface AutocompleteProps {
   placeholder?: string;
   wrapperProps?: BoxProps;
   filterOptions?: (options: Array<any>, state: object) => Array<any>;
+  listBoxHeightFull?: boolean;
 }
 
 export const Autocomplete: FC<AutocompleteProps> = ({
@@ -47,6 +49,7 @@ export const Autocomplete: FC<AutocompleteProps> = ({
   disabled,
   wrapperProps,
   filterOptions,
+  listBoxHeightFull,
 }) => {
   const { classes } = useStyles();
   return (
@@ -74,8 +77,13 @@ export const Autocomplete: FC<AutocompleteProps> = ({
           popupIndicator: classes.popupIcon,
           clearIndicator: classes.clearIndicator,
           option: classes.menuItem,
-          listbox: classes.listBox,
+          listbox: clsx(classes.listBox, {
+            [classes.listBoxHeightDefault]: !listBoxHeightFull,
+            [classes.listBoxHeightFull]: listBoxHeightFull,
+          }),
           paper: classes.paper,
+          noOptions: classes.altOption,
+          loading: classes.altOption,
         }}
         renderInput={(params) => (
           <TextField

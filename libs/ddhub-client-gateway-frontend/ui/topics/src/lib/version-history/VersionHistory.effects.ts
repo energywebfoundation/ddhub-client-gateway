@@ -12,10 +12,10 @@ export const useVersionHistoryEffects = () => {
     limit: 10,
     page: 1,
   });
-  const { actions } = useVersionActionsEffects(applicationNamespace, topicId);
+  const { actions, openTopicDetails } = useVersionActionsEffects(applicationNamespace, topicId);
 
-  const handlePageChange = (newPage: number) => {
-    getTopicHistory({ page: newPage });
+  const handlePageChange = (newPage: number, limit: number) => {
+    getTopicHistory({ page: newPage, limit });
   };
 
   return {
@@ -27,5 +27,6 @@ export const useVersionHistoryEffects = () => {
     isLoading,
     pagination,
     handlePageChange,
+    openTopicDetails,
   };
 };

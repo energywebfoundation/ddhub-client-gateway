@@ -7,9 +7,11 @@ import { ApiTags } from '@nestjs/swagger';
 export class HealthController {
   @Get()
   @HealthCheck()
-  public check(): { status: 'healthy' } {
+  public async check(): Promise<{
+    message: string;
+  }> {
     return {
-      status: 'healthy',
+      message: 'OK',
     };
   }
 }

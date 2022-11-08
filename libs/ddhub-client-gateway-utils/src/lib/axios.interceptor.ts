@@ -1,8 +1,26 @@
-import { AxiosResponse } from '@nestjs/terminus/dist/health-indicator/http/axios.interfaces';
+import {
+  AxiosRequestConfig,
+  AxiosResponse,
+} from '@nestjs/terminus/dist/health-indicator/http/axios.interfaces';
 import { HttpService } from '@nestjs/axios';
 import { Logger } from '@nestjs/common';
+import { reqIdAccess } from './req-id-access';
+import { VersionService } from '@dsb-client-gateway/ddhub-client-gateway-version';
 
-export const useErrorHandler = (httpService: HttpService, logger: Logger) => {
+export const useInterceptors = (
+  httpService: HttpService,
+  logger: Logger,
+  versionService: VersionService
+) => {
+  httpService.axiosRef.interceptors.request.use(
+    (config: AxiosRequestConfig) => {
+      config.headers['X-Request-Id'] = reqIdAccess();
+      config.headers['X-DDHUB-Client-Version'] = versionService.getVersion();
+
+      return config;
+    }
+  );
+
   httpService.axiosRef.interceptors.response.use(
     (res: AxiosResponse) => {
       return res;
