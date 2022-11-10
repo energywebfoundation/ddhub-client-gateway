@@ -8,7 +8,7 @@ export class ChannelUpdateRestrictedFieldsException extends BaseException {
 
   constructor() {
     super(
-      'Attempt to update restricted fields (channelName, type)',
+      'Attempt to update restricted fields (channelName, type, useAnonymousExtChannel)',
       DsbClientGatewayErrors.CHANNEL_RESTRICTED_FIELDS_UPDATE
     );
 
