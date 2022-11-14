@@ -44,7 +44,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
           code: DsbClientGatewayErrors.UNAUTHORIZED,
           reason: exception.message,
           additionalDetails: {
-            hint: 'check if mTLS is configured',
+            hint: 'check if mTLS is configured or if API Key is specified',
           },
         },
         timestamp: new Date().toISOString(),
