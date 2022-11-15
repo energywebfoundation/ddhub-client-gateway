@@ -1,15 +1,6 @@
-import {
-  Controller,
-  Get,
-  HttpStatus,
-  Param,
-  Query,
-  UseGuards,
-} from '@nestjs/common';
-import { PinoLogger } from 'nestjs-pino';
-
-import { DigestGuard } from '../../utils/guards/digest.guard';
+import { Controller, Get, HttpStatus, Param, Query } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { PinoLogger } from 'nestjs-pino';
 
 import { ApplicationDTO, GetApplicationsQueryDto } from '../dto';
 import { ApplicationsService } from '../service/applications.service';
@@ -17,7 +8,6 @@ import { GetApplicationsByNamespaceDto } from '../dto/get-by-namespace.dto';
 
 @Controller('applications')
 @ApiTags('Applications')
-@UseGuards(DigestGuard)
 export class ApplicationsController {
   constructor(
     protected readonly applicationsService: ApplicationsService,

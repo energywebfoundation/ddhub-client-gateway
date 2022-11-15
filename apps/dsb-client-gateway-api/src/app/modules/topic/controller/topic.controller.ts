@@ -11,7 +11,6 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { DigestGuard } from '../../utils/guards/digest.guard';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import {
   DeleteTopic,
@@ -36,7 +35,7 @@ import { TopicService } from '../service/topic.service';
 import { MtlsGuard } from '../../certificate/guards/mtls.guard';
 
 @Controller('topics')
-@UseGuards(DigestGuard, MtlsGuard)
+@UseGuards(MtlsGuard)
 @ApiTags('Topics')
 export class TopicsController {
   constructor(
