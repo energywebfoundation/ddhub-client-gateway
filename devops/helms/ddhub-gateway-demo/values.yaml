@@ -50,7 +50,7 @@ ddhub-client-gateway-api:
         repository: aemocontainerregistry.azurecr.io/ddhub-client-gateway-scheduler
         pullPolicy: IfNotPresent
         # Overrides the image tag whose default is the chart appVersion.
-        tag: canary
+        tag: latest
       podAnnotations: {}
       resources: {}
       probes:
@@ -68,7 +68,7 @@ ddhub-client-gateway-api:
         repository: aemocontainerregistry.azurecr.io/ddhub-client-gateway-frontend
         pullPolicy: IfNotPresent
         # Overrides the image tag whose default is the chart appVersion.
-        tag: canary
+        tag: latest
       podAnnotations: {}
       resources: {}
       probes:
@@ -89,7 +89,7 @@ ddhub-client-gateway-api:
     repository: aemocontainerregistry.azurecr.io/ddhub-client-gateway-backend
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
-    tag: canary
+    tag: latest
 
   imagePullSecrets: []
   nameOverride: "ddhub-client-gateway-api-demo"
