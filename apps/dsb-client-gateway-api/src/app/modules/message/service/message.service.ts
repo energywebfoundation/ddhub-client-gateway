@@ -545,6 +545,7 @@ export class MessageService {
       return {
         clientId: consumer,
         messageId: e.id,
+        from,
         mbTimestamp: moment(e.timestampNanos / (1000 * 1000))
           .utc()
           .toDate(),
@@ -747,6 +748,7 @@ export class MessageService {
       await this.pendingAcksWrapperRepository.pendingAcksRepository.find({
         where: {
           clientId: consumer,
+          from: from ? from : ''
         },
       });
     if (data.length == 0) {
@@ -772,6 +774,7 @@ export class MessageService {
         .delete({
           messageId: In(ackResponse.notFound),
           clientId: consumer,
+          from: from ? from : ''
         })
         .then();
     }
@@ -783,6 +786,7 @@ export class MessageService {
         .delete({
           messageId: In(ackResponse.acked),
           clientId: consumer,
+          from: from ? from : ''
         })
         .then();
     }
