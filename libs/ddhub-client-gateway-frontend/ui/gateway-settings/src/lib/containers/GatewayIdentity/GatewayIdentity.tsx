@@ -14,9 +14,9 @@ export const GatewayIdentity: FC = () => {
       title="Gateway identity"
       icon="/icons/gateway-identity.svg"
       buttonText="Update"
-      buttonText2="Roles"
+      secondaryButtonText="Roles"
       onClick={update}
-      onClick2={openRolesModal}
+      onClickSecondary={openRolesModal}
       content={
         <>
           <Box display="flex" mt={1.6} mb={0.7}>

@@ -39,6 +39,7 @@ export const fields = {
     tags: true,
     inputProps: {
       placeholder: 'Tags',
+      maxLength: 50,
     },
   },
   schemaType: {

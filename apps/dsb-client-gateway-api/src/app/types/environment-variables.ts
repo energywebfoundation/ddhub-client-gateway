@@ -12,6 +12,13 @@ export enum WebSocketImplementation {
 }
 
 export const API_ENVS = Joi.object({
+  API_KEY: Joi.string().optional().description('API Key to protect API'),
+  API_USERNAME: Joi.string()
+    .optional()
+    .description('USERNAME for authentication'),
+  API_PASSWORD: Joi.string()
+    .optional()
+    .description('PASSWORD for authentication'),
   PORT: Joi.number().port().default(3333).description('HTTP port'),
   WEBSOCKET: Joi.string()
     .valid(...Object.values(WebSocketImplementation))

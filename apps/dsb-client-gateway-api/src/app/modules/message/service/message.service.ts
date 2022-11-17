@@ -55,6 +55,7 @@ import { ReqLockExistsException } from '../exceptions/req-lock-exists.exception'
 import { ReqLockService } from './req-lock.service';
 import moment from 'moment';
 import { In } from 'typeorm';
+import { AckPendingNotFoundException } from '../exceptions/ack-pending-not-found.exception';
 
 export enum EventEmitMode {
   SINGLE = 'SINGLE',
@@ -125,15 +126,15 @@ export class MessageService {
 
     messageLoggerContext.debug(
       'attempting to encrypt payload, encryption enabled: ' +
-        channel.payloadEncryption
+      channel.payloadEncryption
     );
 
     const message = channel.payloadEncryption
       ? this.keyService.encryptMessage(
-          dto.payload,
-          randomKey,
-          EncryptedMessageType['UTF-8']
-        )
+        dto.payload,
+        randomKey,
+        EncryptedMessageType['UTF-8']
+      )
       : dto.payload;
 
     messageLoggerContext.debug('fetching private key');
@@ -230,36 +231,37 @@ export class MessageService {
     }
 
     //Get Topic Ids
-    let topicIds = [];
+    const topicIds = [];
+
     if (!topicName && !topicOwner) {
-      topicIds = channel.conditions.topics.map((topic) => topic.topicId);
-    } else {
-      const topic: TopicEntity = await this.topicService.getTopic(
-        topicName,
-        topicOwner
+      return topicIds;
+    }
+
+    const topic: TopicEntity = await this.topicService.getTopic(
+      topicName,
+      topicOwner
+    );
+
+    const hasNonBoundTopics: ChannelTopic | undefined =
+      channel.conditions.topics.find(
+        (channelTopic: ChannelTopic) =>
+          topicName === channelTopic.topicName &&
+          channelTopic.owner === topicOwner
       );
 
-      const hasNonBoundTopics: ChannelTopic | undefined =
-        channel.conditions.topics.find(
-          (channelTopic: ChannelTopic) =>
-            topicName === channelTopic.topicName &&
-            channelTopic.owner === topicOwner
-        );
-
-      if (!hasNonBoundTopics) {
-        throw new TopicNotRelatedToChannelException();
-      }
-
-      if (!topic) {
-        this.logger.error(
-          `Couldn't find topic - topicName: ${topicName}, owner: ${topicOwner}`
-        );
-
-        return [];
-      }
-
-      topicIds.push(topic.id);
+    if (!hasNonBoundTopics) {
+      throw new TopicNotRelatedToChannelException();
     }
+
+    if (!topic) {
+      this.logger.error(
+        `Couldn't find topic - topicName: ${topicName}, owner: ${topicOwner}`
+      );
+
+      return topicIds;
+    }
+
+    topicIds.push(topic.id);
 
     return topicIds;
   }
@@ -270,18 +272,18 @@ export class MessageService {
     message: SearchMessageResponseDto
   ): Promise<GetMessageResponse> {
     let baseMessage: Omit<GetMessageResponse, 'signatureValid' | 'decryption'> =
-      {
-        id: message.messageId,
-        topicVersion: message.topicVersion,
-        topicName: '',
-        topicOwner: '',
-        topicSchemaType: '',
-        payload: message.payload,
-        signature: message.signature,
-        sender: message.senderDid,
-        timestampNanos: message.timestampNanos,
-        transactionId: message.transactionId,
-      };
+    {
+      id: message.messageId,
+      topicVersion: message.topicVersion,
+      topicName: '',
+      topicOwner: '',
+      topicSchemaType: '',
+      payload: message.payload,
+      signature: message.signature,
+      sender: message.senderDid,
+      timestampNanos: message.timestampNanos,
+      transactionId: message.transactionId,
+    };
 
     try {
       const topic: TopicEntity = await this.topicService.getTopicById(
@@ -392,11 +394,12 @@ export class MessageService {
   @Span('message_sendAckBy')
   public async sendAckBy(
     messageIds: string[],
-    clientId: string
+    clientId: string,
+    from: string
   ): Promise<AckResponse> {
     this.logger.log(messageIds);
     const successAckMessageIds: AckResponse =
-      await this.ddhubMessageService.messagesAckBy(messageIds, clientId);
+      await this.ddhubMessageService.messagesAckBy(messageIds, clientId, from);
     return successAckMessageIds;
   }
 
@@ -460,21 +463,27 @@ export class MessageService {
       topicName
     );
 
+    const fqcnTopicList: string[] = channel.conditions.topics.map(topic => topic.topicId);
+
     messageLoggerContext.debug(`found topics`, topicsIds);
 
     const consumer = `${clientId}:${fqcn}`;
 
     if (ack) {
-      messageLoggerContext.log(
-        `[getMessages] Sending for ack for consumer ${consumer}`
-      );
-      await this.validatePendingAck(consumer);
+      try {
+        messageLoggerContext.log(`[getMessages] Sending for ack for consumer ${consumer}`);
+        await this.validatePendingAck(consumer, from);
+      } catch (e) {
+        this.logger.error(`[getMessages] error ocurred while sending ack`, e);
+        return [];
+      }
     }
 
     const messages: Array<SearchMessageResponseDto> =
       await this.ddhubMessageService.messagesSearch(
-        topicsIds,
+        fqcnTopicList,
         channel.conditions.qualifiedDids,
+        topicsIds,
         `${clientId}:${fqcn}`,
         from,
         amount
@@ -536,6 +545,7 @@ export class MessageService {
       return {
         clientId: consumer,
         messageId: e.id,
+        from,
         mbTimestamp: moment(e.timestampNanos / (1000 * 1000))
           .utc()
           .toDate(),
@@ -733,11 +743,12 @@ export class MessageService {
     }
   }
 
-  private async validatePendingAck(consumer: string) {
+  private async validatePendingAck(consumer: string, from: string) {
     const data: PendingAcksEntity[] =
       await this.pendingAcksWrapperRepository.pendingAcksRepository.find({
         where: {
           clientId: consumer,
+          from: from ? from : ''
         },
       });
     if (data.length == 0) {
@@ -747,7 +758,8 @@ export class MessageService {
 
     const ackResponse: AckResponse = await this.sendAckBy(
       idsPendingAck,
-      consumer
+      consumer,
+      from
     ).catch((e) => {
       this.logger.error(`something went wrong when ack messages`);
       this.logger.error(e);
@@ -762,17 +774,19 @@ export class MessageService {
         .delete({
           messageId: In(ackResponse.notFound),
           clientId: consumer,
+          from: from ? from : ''
         })
         .then();
     }
 
     if (ackResponse.acked.length === 0 && ackResponse.notFound.length === 0) {
-      return [];
+      throw new AckPendingNotFoundException();
     } else {
       this.pendingAcksWrapperRepository.pendingAcksRepository
         .delete({
           messageId: In(ackResponse.acked),
           clientId: consumer,
+          from: from ? from : ''
         })
         .then();
     }

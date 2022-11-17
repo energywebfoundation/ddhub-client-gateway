@@ -2,6 +2,9 @@
 
 | KEY | TYPE | DEFAULT | DESCRIPTION | ALLOWED_VALUES | DEPENDENCY |
 | --- | ---- | ------- | ----------- | -------------- | ---------- |
+| API_KEY | string |  | API Key to protect API |  |  |
+| API_USERNAME | string |  | USERNAME for authentication |  |  |
+| API_PASSWORD | string |  | PASSWORD for authentication |  |  |
 | PORT | number | 3333 | HTTP port |  |  |
 | WEBSOCKET | string | NONE | Websocket mode | NONE,SERVER,CLIENT |  |
 | EVENTS_MAX_PER_SECOND | number | 2 | Amount of messages to pull for each WebSocket run |  |  |
@@ -27,7 +30,8 @@
 | SECRET_PREFIX | string | ddhub/ |  |  |  |
 | AWS_REGION | string | ap-southeast-2 | AWS Secrets Manager region |  | SECRETS_ENGINE == aws |
 | AZURE_VAULT_URL | string |  | Azure Vault URL |  | SECRETS_ENGINE == azure |
-| VERSION_FILE_PATH | string |  | Version file path |  |  |
+| REQ_LOCK_TIMEOUT | number | 5 | Maximum request lock lifetime (in seconds) |  |  |
+| VERSION_FILE_PATH | string | ./version.md | Version file path |  |  |
 | IPFS_HOST | string | ipfs.infura.io | IPFS Host |  |  |
 | IPFS_PORT | number | 5001 | IPFS Port |  |  |
 | IPFS_PROTOCOL | string | https:// | IPFS Protocol |  |  |

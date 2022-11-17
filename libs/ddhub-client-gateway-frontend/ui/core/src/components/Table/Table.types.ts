@@ -44,4 +44,5 @@ export interface TableProps<T> {
   stripedTable?: boolean;
   showCheckbox?: boolean;
   setSelectedItems?: (values: string[]) => void;
+  rowsPerPageOptions?: number[];
 }

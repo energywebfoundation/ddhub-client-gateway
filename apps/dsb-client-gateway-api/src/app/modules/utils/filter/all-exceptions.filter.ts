@@ -21,7 +21,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
   constructor(private readonly httpAdapterHost: HttpAdapterHost) {}
 
-  catch(exception: any, host: ArgumentsHost): void {
+  catch(exception, host: ArgumentsHost): void {
     const { httpAdapter } = this.httpAdapterHost;
 
     const ctx = host.switchToHttp();
@@ -44,7 +44,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
           code: DsbClientGatewayErrors.UNAUTHORIZED,
           reason: exception.message,
           additionalDetails: {
-            hint: 'check if mTLS is configured',
+            hint: 'check if mTLS is configured or if API Key is specified',
           },
         },
         timestamp: new Date().toISOString(),

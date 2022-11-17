@@ -1,11 +1,4 @@
-import {
-  IsArray,
-  IsNotEmpty,
-  IsNumber,
-  IsObject,
-  IsOptional,
-  IsString,
-} from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { IsValidChannelName } from '../../../utils/validator/decorators/IsValidChannelName';
 import { ApiProperty } from '@nestjs/swagger';
 

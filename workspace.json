@@ -7,6 +7,7 @@
     "ddhub-client-gateway-enrolment": "libs/ddhub-client-gateway-enrolment",
     "ddhub-client-gateway-env": "libs/ddhub-client-gateway-env",
     "ddhub-client-gateway-events": "libs/ddhub-client-gateway-events",
+    "ddhub-client-gateway-guard": "libs/ddhub-client-gateway-guard",
     "ddhub-client-gateway-identity": "libs/ddhub-client-gateway-identity",
     "ddhub-client-gateway-message-broker": "libs/ddhub-client-gateway-message-broker",
     "ddhub-client-gateway-storage": "libs/dsb-client-gateway-storage",

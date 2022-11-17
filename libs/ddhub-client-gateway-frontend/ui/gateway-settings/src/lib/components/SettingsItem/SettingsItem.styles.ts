@@ -86,7 +86,7 @@ export const useStyles = makeStyles()((theme) => ({
       duration: theme.transitions.duration.short,
     }),
   },
-  buttonText2: {
+  secondaryButtonText: {
     fontSize: 14,
     lineHeight: '17px',
     fontWeight: 400,
