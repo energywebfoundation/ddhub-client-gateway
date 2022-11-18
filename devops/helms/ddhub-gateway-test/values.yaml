@@ -126,7 +126,7 @@ ddhub-client-gateway-api:
   resources:
     limits:
       cpu: 800m
-      memory: 900Mi
+      memory: 1.1Gi
     requests:
       cpu: 600m
-      memory: 1.1Gi
+      memory: 900Mi
