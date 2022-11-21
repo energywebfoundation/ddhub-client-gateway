@@ -8,6 +8,7 @@ import { SecretsEngineService } from '@dsb-client-gateway/dsb-client-gateway-sec
 import {
   ChannelEntity,
   ChannelTopic,
+  DidEntity,
   FileMetadataEntity,
   FileMetadataWrapperRepository,
   PendingAcksEntity,
@@ -126,15 +127,15 @@ export class MessageService {
 
     messageLoggerContext.debug(
       'attempting to encrypt payload, encryption enabled: ' +
-      channel.payloadEncryption
+        channel.payloadEncryption
     );
 
     const message = channel.payloadEncryption
       ? this.keyService.encryptMessage(
-        dto.payload,
-        randomKey,
-        EncryptedMessageType['UTF-8']
-      )
+          dto.payload,
+          randomKey,
+          EncryptedMessageType['UTF-8']
+        )
       : dto.payload;
 
     messageLoggerContext.debug('fetching private key');
@@ -269,21 +270,22 @@ export class MessageService {
   @Span('message_processMessage')
   private async processMessage(
     payloadEncryption: boolean,
-    message: SearchMessageResponseDto
+    message: SearchMessageResponseDto,
+    didEntity: DidEntity | null
   ): Promise<GetMessageResponse> {
     let baseMessage: Omit<GetMessageResponse, 'signatureValid' | 'decryption'> =
-    {
-      id: message.messageId,
-      topicVersion: message.topicVersion,
-      topicName: '',
-      topicOwner: '',
-      topicSchemaType: '',
-      payload: message.payload,
-      signature: message.signature,
-      sender: message.senderDid,
-      timestampNanos: message.timestampNanos,
-      transactionId: message.transactionId,
-    };
+      {
+        id: message.messageId,
+        topicVersion: message.topicVersion,
+        topicName: '',
+        topicOwner: '',
+        topicSchemaType: '',
+        payload: message.payload,
+        signature: message.signature,
+        sender: message.senderDid,
+        timestampNanos: message.timestampNanos,
+        transactionId: message.transactionId,
+      };
 
     try {
       const topic: TopicEntity = await this.topicService.getTopicById(
@@ -310,7 +312,8 @@ export class MessageService {
       const isSignatureValid: boolean = await this.keyService.verifySignature(
         message.senderDid,
         message.signature,
-        message.payload
+        message.payload,
+        didEntity
       );
 
       /* TODO: fix predicate, this won't run currently.
@@ -463,7 +466,9 @@ export class MessageService {
       topicName
     );
 
-    const fqcnTopicList: string[] = channel.conditions.topics.map(topic => topic.topicId);
+    const fqcnTopicList: string[] = channel.conditions.topics.map(
+      (topic) => topic.topicId
+    );
 
     messageLoggerContext.debug(`found topics`, topicsIds);
 
@@ -471,7 +476,9 @@ export class MessageService {
 
     if (ack) {
       try {
-        messageLoggerContext.log(`[getMessages] Sending for ack for consumer ${consumer}`);
+        messageLoggerContext.log(
+          `[getMessages] Sending for ack for consumer ${consumer}`
+        );
         await this.validatePendingAck(consumer, from);
       } catch (e) {
         this.logger.error(`[getMessages] error ocurred while sending ack`, e);
@@ -496,13 +503,21 @@ export class MessageService {
       return [];
     }
 
+    const uniqueSenderDids: string[] = [
+      ...new Set(messages.map(({ senderDid }) => senderDid)),
+    ];
+
+    const prefetchedSignatureKeys: Record<string, DidEntity | null> =
+      await this.keyService.prefetchSignatureKeys(uniqueSenderDids);
+
     const messageResponses = await Promise.allSettled(
       messages.map(async (message): Promise<GetMessageResponse> => {
         messageLoggerContext.debug(`processing message ${message.messageId}`);
 
         const processedMessage: GetMessageResponse = await this.processMessage(
           message.payloadEncryption,
-          message
+          message,
+          prefetchedSignatureKeys[message.senderDid]
         );
 
         return processedMessage;
@@ -677,7 +692,8 @@ export class MessageService {
     const isSignatureValid: boolean = await this.keyService.verifySignature(
       fileMetadata.did,
       fileMetadata.signature,
-      await this.keyService.checksumFile(fullPath)
+      await this.keyService.checksumFile(fullPath),
+      await this.keyService.getDid(fileMetadata.did)
     );
 
     if (!isSignatureValid) {
