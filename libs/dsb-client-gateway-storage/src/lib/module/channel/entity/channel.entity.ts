@@ -46,6 +46,11 @@ export class ChannelEntity {
   @PrimaryColumn()
   fqcn: string;
 
+  @Column({
+    default: false,
+  })
+  useAnonymousExtChannel: boolean;
+
   @IsEnum(ChannelType)
   @Column({
     enum: [
