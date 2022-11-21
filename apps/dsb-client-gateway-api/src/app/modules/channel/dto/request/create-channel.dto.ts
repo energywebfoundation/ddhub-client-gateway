@@ -86,6 +86,16 @@ export class CreateChannelDto {
   fqcn: string;
 
   @ApiProperty({
+    description: 'Use anonymous external channels',
+    type: Boolean,
+    example: true,
+    required: false,
+  })
+  @IsBoolean()
+  @IsOptional()
+  useAnonymousExtChannel: boolean;
+
+  @ApiProperty({
     description: 'Channel encryption',
     type: Boolean,
     example: true,

@@ -9,7 +9,7 @@ export function IsValidChannelName(validationOptions?: ValidationOptions) {
       propertyName: propertyName,
       options: validationOptions,
       validator: {
-        validate(value: any) {
+        validate(value) {
           if (typeof value === 'string' && value.length > 0) {
             return !!value.match(/^[a-z0-9.]{1,255}$/);
           }
