@@ -35,14 +35,14 @@ ddhub-client-gateway-api:
         repository: aemocontainerregistry.azurecr.io/ddhub-client-gateway-frontend
         pullPolicy: IfNotPresent
         # Overrides the image tag whose default is the chart appVersion.
-        tag: 231fbf52-1c75-4871-a6e4-3e33499660d7
+        tag: 1.1.1
     scheduler:
       enabled: true
       image:
         repository: aemocontainerregistry.azurecr.io/ddhub-client-gateway-scheduler
         pullPolicy: IfNotPresent
         # Overrides the image tag whose default is the chart appVersion.
-        tag: 231fbf52-1c75-4871-a6e4-3e33499660d7
+        tag: 1.1.1
       extraEnvVars:
         DID_REGISTRY_ADDRESS: "0xc15d5a57a8eb0e1dcbe5d88b8f9a82017e5cc4af"
   image:
@@ -50,7 +50,7 @@ ddhub-client-gateway-api:
     repository: aemocontainerregistry.azurecr.io/ddhub-client-gateway-backend
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
-    tag: 231fbf52-1c75-4871-a6e4-3e33499660d7
+    tag: 1.1.1
 
   imagePullSecrets: []
   nameOverride: "ddhub-client-gateway-api-test-2"
