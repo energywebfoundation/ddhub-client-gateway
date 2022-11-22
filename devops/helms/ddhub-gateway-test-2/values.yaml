@@ -130,3 +130,10 @@ ddhub-client-gateway-api:
     requests:
       cpu: 600m
       memory: 900Mi
+
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 6
+    targetCPUUtilizationPercentage: 80
+    targetMemoryUtilizationPercentage: 80
