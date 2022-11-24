@@ -9,7 +9,7 @@ ddhub-client-gateway-api:
       # -- Define the port the gateway will run on.
       port: 3333
       # -- Select WebSocket mode depending on architecture (i.e. preference for inbound or outbound connections). By default, the gateway will run a WebSocket server on /events. However, it can also operate as a client with additional configuration (see below). Alternatively, this functionality can be turned off. Options: SERVER, CLIENT, NONE
-      websocket: NONE
+      websocket: SERVER
       # -- Sets the URL of the WebSocket server the client should try to connect to. Required if WEBSOCKET is set to CLIENT.
       websocket_url: ""
       # -- Sets the protocol the WebSocket client should request access to. Acceptable protocols are defined by the WebSocket server, however, this can also be left undefined. Note that if WEBSOCKET is set to SERVER this variable is ignored. The server will only accept connection requests on the dsb-messages protocol.
@@ -194,7 +194,7 @@ ddhub-client-gateway-api:
 
   sealedSecret:
     enabled: true
-    encryptedData: 
+    encryptedData:
       DB_NAME: AgAcjlf7a9Tg9DE/TsiYO9W0VnVcgX7oEtOP2Fz6cBFsTDbj/Ov4c2vSfhYUQ0TC9NFT457dmaZJCk7WgDOkU2AQwp89nxgBZv9Xotkhp/epysKMB8kUwySGusBVgWFL73vr/lcSywMk2skIeOAK8KDsal/QvJ0wBWU0+dQ3MaCl43M7JWbP72a69tFhmBp47KJnfSlGV7+6sfGvXLZvVaazfXcOGHKn604kLXaq6x2GBgSVsg8KzyrT5b2bNcyvm9iqRTiQCE6LdRsrWwjLUIXfUleW0Uj43q5b9PbNuIA/y6dLwwbZUd/7AkwbTPd3ZX9oA82ZNWmR5ASvWGhB5mS8eN13xlyuOnqT5R4nu2bISQ9iy94OL7toua+AOvN7fKoVSl3MmEHGFpx1jmUGhX13Pyv2aYgwq5L6yF7NK/RIjjUwtEIS3gxq/AI+gkYZvw+i1IfNrYvccy+/8EPkgsHCyFze7d4t4uKxJ9attgBETrp+dL/fXsSqLtgPPi4ZbivkZiMFDaJo6FkK2PEY25ANQFGTE40ySUCOgsFVikG64FXu2H5cJlXIvaSHr7An4ZYylXamAKtFeYgW3La9Tzq3bAceldbQ/cgbFqEmXsC56Ap4/hy3OixcKmQXo59x9ixf1DhjElqVllenfbbvzmPan2QctHV1k2mtOdytFU+zTK3APMpWCiZ+QeE1r6m4PFDcWokzIaBNHMPzC8BM9jd7Qb6dsvtHO/Aq2jH/RN/vjVIb5j2jQiZ1spEiTfmZOMZ1RIRxpI9kikHKUhn0Gmz+m0Ofnf2A0wjFYcTl0jo8twtP1AXZ6CdK2tkrnipmxvVEF05cLJ3dmg==
       VAULT_TOKEN: AgAgEJaXPGWV5ldEIzzf6e5gJv015smubP8y3AMNu+vhlIgB+wjFFR2yWQuLd6thCbJECjpZvzFklhktkpaodvy1EqWocjNKJcRcWNvPkRx996joGgr/vu+8BerziiuwIz2FxNq6DHrA7Wn2w4qPsUzoOeb2dqHdsBS4qVLHOTP7+mbmGfx6QfWe5NjdYYXOyNtV4hOkNCpJuIAbQCS8+fGBDHTIhEbAVsXLerhO7cpe4G443CJIq/aXEOZVy7hLe1fE8DeHK9atsGPDr/7xzlCbUtuF+Btb4QQI0hQFL3H7rpmmsghD0R3rj3Mqeed8C92SEj/2Z+yLnQTZoAuiXx96Tx1xgTX5BuLX4uUlACX0Z5lvoTiv75kzMu1gc49cGyEcnrWt4E/pDzrVFUZ/m6oJsXezNwblzhYk9DYx2nkLlmWCI8jewvTOTO0uyxjSF8OP8P5JqEoPUPGoABdJzUWmJ3/xOj0IIlbtpH807MqyS2aCDpEPiqLKNhdWfF50XV3yLvDrFSNLjWoc6wdrKy9skZ6ozjD8X+H/HpunmLm3bQI9uxWVmEef7ZTtCzIjg4LoQQ+QpmknSMsnH/aag1fEhQGJL7W5xQYoHEZ1hQYJ8JBO+rW4hwVeeI/x4WYBOgoqpDE5ubg/Pw9WifOu5PP9sR7pa2C5mGC102v2u0qZnY7urjpsj6N1aTBtd50kr9Oubo4MA1eAtijhi+CqqliPGtO6NNTJFs2n/DnD
       AZURE_VAULT_URL: AgASwKZQz1+tIQv9gOkcu9zVhtSsA5O4PY+qcu6Qwto6ErQSvVrmOKFbNh8VJxywtzsb0eI4Cfdi3fm9NGQQBXdha7DdbpQzAF6clG429aKxhdECGUrDIjfGHeX8jLB/UI8bR/Zw/8Yqb8n4tsnU9pTAaOqD2NrvIwCaxspaYCxbiL7iqYDA0HGMN2f2FY/z62LhnM3CWeR/0nqqbXnEtqzuOiGThyRuqVrWpHvY3ZioPYxVmISkhf5KK/rCYRd5DWqFx2gaXKx8TgAE+Zq5RDq9NEnF6vdfi9b+q1GmYvB+wyj/PtozgS7X2IsWnTv+QvgvDIGRcS/cR4mEpXgZoBrJvx6tjdag76+mI2x7d/MED/hY2arvWMiurZQ2qSDpg1WvOqaSDdncxqZuuewkjBLSaGBFKznYDEJ1/covHItxWwS3Ue7Zy7WNOvuqukSGezBT6hgL5vFHg41f/dvsDLEdbX2kd/h60Utk3JYKlApT9Z3SUktnA7SS7Ae/t2BkUTAV4SlrxkHTOiRFtUW3IFAJm7eV//BnG7s0VZsL7vjCj7fO1/I/mPT3iE2EzSlc0An2ida39Z8gt1rebrfLRHvd5l/uSbdEleQFCTb2YhBFE2mXwwVkP/QDIzblixFcdWCM9rfwx74Nvv/YpKLsSXVN70DxDwWt67jwXBHY/j3jaytDq2VtFU3VqtfmY4kUgTCC6Oqqps/LgVXdtggU9c6e1tDwQVx44ADeuBKNaat7wLKt8fqrJQ==
