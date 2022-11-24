@@ -1,19 +1,17 @@
 import {
-  Column,
   CreateDateColumn,
   Entity,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { PrimaryKey } from '@mikro-orm/core';
 
 @Entity('clients')
 export class ClientEntity {
   @PrimaryGeneratedColumn('uuid')
   public id: string;
 
-  @Column({
-    unique: true,
-  })
+  @PrimaryKey()
   public clientId: string;
 
   @CreateDateColumn()
