@@ -69,7 +69,7 @@ export class DdhubMessagesService extends DdhubBaseService {
       if (idsNotAck.length === 0) {
         this.logger.log('messages ack successful', result.data);
       } else {
-        this.logger.log('messages not ack', result.data);
+        this.logger.log('messages not ack', idsNotAck);
         this.logger.error(`['/messages/ack'][post]${JSON.stringify(requestBody)}`);
       }
 
