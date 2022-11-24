@@ -81,7 +81,6 @@ export class ClientsService {
     await this.wrapper.repository.update(
       {
         clientId,
-        id: exists.id,
       },
       {
         clientId,
@@ -149,9 +148,22 @@ export class ClientsService {
       );
     }
 
-    await this.wrapper.repository.save({
-      clientId,
-    });
+    await this.wrapper.repository
+      .save({
+        clientId,
+      })
+      .then(() => {
+        this.logger.log(`created new client ${clientId}`);
+      })
+      .catch((e) => {
+        if (e?.code === '23505') {
+          this.logger.warn(
+            `Duplicate clientid ${clientId} detected. No need save to db.`
+          );
+        } else {
+          throw e;
+        }
+      });
 
     this.logger.log(`created new client ${clientId}`);
   }

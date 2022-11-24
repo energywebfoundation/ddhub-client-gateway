@@ -17,7 +17,7 @@ export class ReqLockService {
   constructor(
     protected readonly reqLockWrapper: ReqLockWrapperRepository,
     protected readonly configService: ConfigService
-  ) {}
+  ) { }
 
   public getLocks(): ReqLocksCache {
     return this.locks;
@@ -91,14 +91,16 @@ export class ReqLockService {
           fqcn,
           clientId,
         });
+
+        await this.reqLockWrapper.repository.insert({
+          fqcn,
+          clientId,
+        });
+
+        this.logger.log(`lock with ${fqcn}:${clientId} saved`);
+
+        return;
       }
-
-      await this.reqLockWrapper.repository.insert({
-        fqcn,
-        clientId,
-      });
-
-      this.logger.log(`lock with ${fqcn}:${clientId} saved`);
     } catch (e) {
       if (e?.code === '23505') {
         throw new ReqLockExistsException();
