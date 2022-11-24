@@ -1,7 +1,7 @@
 import {
-  Column,
   CreateDateColumn,
   Entity,
+  PrimaryColumn,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -11,9 +11,7 @@ export class ClientEntity {
   @PrimaryGeneratedColumn('uuid')
   public id: string;
 
-  @Column({
-    unique: true,
-  })
+  @PrimaryColumn()
   public clientId: string;
 
   @CreateDateColumn()
