@@ -91,7 +91,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayInit {
       return;
     }
 
-    await this.clientsService.attemptCreateClient(_clientId);
+    await this.clientsService.upsert(_clientId);
 
     const authHeaderTokenValue: string | undefined =
       client.request.headers['authorization'];
