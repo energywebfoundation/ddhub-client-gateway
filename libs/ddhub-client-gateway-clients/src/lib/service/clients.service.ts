@@ -22,7 +22,7 @@ export class ClientsService {
     protected readonly ddhubConfigService: DdhubConfigService,
     protected readonly ddhubClientsService: DdhubClientsService,
     protected readonly iamService: IamService
-  ) {}
+  ) { }
 
   @Span('clients_sync')
   public async syncMissingClientsIds(): Promise<void> {
@@ -151,9 +151,15 @@ export class ClientsService {
 
     await this.wrapper.repository.save({
       clientId,
+    }).then(() => {
+      this.logger.log(`created new client ${clientId}`);
+    }).catch(e => {
+      if (e?.code === '23505') {
+        this.logger.warn(`Duplicate clientid ${clientId} detected. No need save to db.`);
+      } else {
+        throw e;
+      }
     });
-
-    this.logger.log(`created new client ${clientId}`);
   }
 
   @Span('clients_deleteMany')
