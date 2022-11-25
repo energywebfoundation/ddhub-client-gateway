@@ -68,8 +68,8 @@ describe('Channel Feature', () => {
       givenTopicWithIdNoExists(given, getApp);
       givenIHaveCreatedTopic(given, getApp);
       whenICreateChannel(when, getApp, testMemory);
-      thenResponseMemTypeShouldBe(when, testMemory);
       thenIShouldReceiveChannelEntity(then, getApp);
+      thenResponseMemTypeShouldBe(then, testMemory);
     });
 
     test('Should update channel payload encryption', ({
