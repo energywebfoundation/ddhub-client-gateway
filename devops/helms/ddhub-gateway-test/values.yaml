@@ -137,13 +137,13 @@ ddhub-client-gateway-api:
     maxReplicas: 6
     targetCPUUtilizationPercentage: 50
 
-  affinity:
-    podAntiAffinity:
-      requiredDuringSchedulingIgnoredDuringExecution:
-      - labelSelector:
-          matchExpressions:
-          - key: "app.kubernetes.io/name"
-            operator: In
-            values:
-            - ddhub-client-gateway-api-test-1
-        topologyKey: "kubernetes.io/hostname"
+  # affinity:
+  #   podAntiAffinity:
+  #     requiredDuringSchedulingIgnoredDuringExecution:
+  #     - labelSelector:
+  #         matchExpressions:
+  #         - key: "app.kubernetes.io/name"
+  #           operator: In
+  #           values:
+  #           - ddhub-client-gateway-api-test-1
+  #       topologyKey: "kubernetes.io/hostname"
