@@ -135,7 +135,7 @@ ddhub-client-gateway-api:
     enabled: true
     minReplicas: 2
     maxReplicas: 6
-    targetCPUUtilizationPercentage: 50
+    targetCPUUtilizationPercentage: 40
 
   # affinity:
   #   podAntiAffinity:
