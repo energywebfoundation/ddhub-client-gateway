@@ -15,10 +15,12 @@ export class SecretsCacheProxyService extends SecretsEngineService {
     certificate: CertificateDetails | null;
     privateKey: string | null;
     rsaPrivateKey: string | null;
+    mnemonic: string | null;
   } = {
     certificate: null,
     rsaPrivateKey: null,
     privateKey: null,
+    mnemonic: null,
   };
 
   constructor(protected readonly secretsEngineService: SecretsEngineService) {
@@ -41,6 +43,12 @@ export class SecretsCacheProxyService extends SecretsEngineService {
       await this.secretsEngineService.getRSAPrivateKey();
   }
 
+  public async refreshMnemonic(): Promise<void> {
+    this.logger.log('refreshing mnemonic');
+
+    this.cachedObjects.mnemonic = await this.secretsEngineService.getMnemonic();
+  }
+
   public async refreshCertificate(): Promise<void> {
     this.logger.log('refreshing certificate');
 
@@ -53,6 +61,7 @@ export class SecretsCacheProxyService extends SecretsEngineService {
       this.refreshCertificate(),
       this.refreshPrivateKey(),
       this.refreshRsaPrivateKey(),
+      this.refreshMnemonic(),
     ]);
   }
 
@@ -117,6 +126,20 @@ export class SecretsCacheProxyService extends SecretsEngineService {
       await this.secretsEngineService.setRSAPrivateKey(privateKey);
 
     this.cachedObjects.rsaPrivateKey = privateKey;
+
+    return response;
+  }
+
+  public async getMnemonic(): Promise<string | null> {
+    return this.cachedObjects.mnemonic;
+  }
+
+  public async setMnemonic(mnemonic: string): Promise<string> {
+    const response: string = await this.secretsEngineService.setMnemonic(
+      mnemonic
+    );
+
+    this.cachedObjects.mnemonic = response;
 
     return response;
   }

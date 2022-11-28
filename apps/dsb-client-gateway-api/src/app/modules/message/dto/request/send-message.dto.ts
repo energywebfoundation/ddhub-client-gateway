@@ -1,8 +1,28 @@
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import {
+  ArrayMaxSize,
+  ArrayUnique,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  MaxLength,
+} from 'class-validator';
 import { IsValidChannelName } from '../../../utils/validator/decorators/IsValidChannelName';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class SendMessageDto {
+  @IsString({
+    each: true,
+  })
+  @IsNotEmpty({
+    each: true,
+  })
+  @ArrayUnique()
+  @ArrayMaxSize(25)
+  @MaxLength(255, {
+    each: true,
+  })
+  anonymousRecipient: string[] = [];
+
   @IsValidChannelName({
     message:
       '$value is invalid channel name. Should contain only alphanumeric lowercase letters, use . as a separator. Max length 255',
