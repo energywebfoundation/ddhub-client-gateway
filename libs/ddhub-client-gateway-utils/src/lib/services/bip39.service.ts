@@ -21,10 +21,16 @@ export class Bip39Service {
     return HDKEY.fromMasterSeed(seed);
   }
 
-  public deriveKey(mnemonic: string, iteration: number): Bip39KeySet {
+  public deriveKey(
+    mnemonic: string,
+    firstIteration: number,
+    secondIteration: number
+  ): Bip39KeySet {
     const masterKey = this.generateMasterHDKey(mnemonic);
 
-    const derivedKey = masterKey.derive(`m/44' /246' /0' /${iteration}`);
+    const derivedKey = masterKey.derive(
+      `m/44' /246' /0' /${firstIteration} /${secondIteration}`
+    );
 
     return {
       publicKey: derivedKey.publicKey.toString('hex'),

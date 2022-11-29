@@ -110,6 +110,7 @@ export class DdhubMessagesService extends DdhubBaseService {
       amount,
       from,
       senderId,
+      anonymousRecipient,
     };
 
     try {
@@ -215,6 +216,7 @@ export class DdhubMessagesService extends DdhubBaseService {
       signature,
       clientGatewayMessageId,
       payloadEncryption,
+      anonymousRecipient,
     };
 
     try {

@@ -3,6 +3,7 @@ import { SecretsEngineService } from '@dsb-client-gateway/dsb-client-gateway-sec
 import {
   Bip39KeySet,
   Bip39Service,
+  RetryConfigService,
 } from '@dsb-client-gateway/ddhub-client-gateway-utils';
 import { MnemonicDoesNotExistsException } from '../exception/mnemonic-does-not-exists.exception';
 import {
@@ -15,6 +16,8 @@ import {
   IamNotInitializedException,
   IamService,
 } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
+import { DdhubLoginService } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
+import promiseRetry from 'promise-retry';
 
 @Injectable()
 export class AssociationKeysService implements OnApplicationBootstrap {
@@ -26,8 +29,14 @@ export class AssociationKeysService implements OnApplicationBootstrap {
     protected readonly bip39Service: Bip39Service,
     protected readonly wrapper: AssociationKeysWrapperRepository,
     protected readonly configService: ConfigService,
-    protected readonly iamService: IamService
+    protected readonly iamService: IamService,
+    protected readonly ddhubLoginService: DdhubLoginService,
+    protected readonly retryConfigService: RetryConfigService
   ) {}
+
+  public async getForDate(forDate: Date): Promise<AssociationKeyEntity | null> {
+    return this.wrapper.repository.get(forDate);
+  }
 
   public async getCurrentKey(): Promise<AssociationKeyEntity | null> {
     if (!this.currentKey) {
@@ -36,13 +45,17 @@ export class AssociationKeysService implements OnApplicationBootstrap {
 
       if (!currentKey) {
         try {
-          await this.derivePublicKeys();
+          await this.derivePublicKeys(new Date());
+
+          return this.getCurrentKey();
         } catch (e) {
           this.logger.error(e);
 
           return null;
         }
       }
+
+      this.currentKey = currentKey;
     }
 
     if (moment(this.currentKey.validTo).isSameOrBefore()) {
@@ -92,78 +105,141 @@ export class AssociationKeysService implements OnApplicationBootstrap {
     return mnemonic;
   }
 
-  public async derivePublicKeys(): Promise<void> {
+  public async derivePublicKeys(forDate: Date = new Date()): Promise<void> {
     const isIamInitialized: boolean = this.iamService.isInitialized();
 
     if (!isIamInitialized) {
       throw new IamNotInitializedException();
     }
 
-    const currentKey: AssociationKeyEntity | undefined =
-      await this.wrapper.repository.get(new Date());
-
     const mnemonic: string = await this.getMnemonicOrThrow();
-    const iteration: number = +moment().format('YYYYMMDD');
 
-    const currentDate: moment.Moment = moment();
+    let currentKey: AssociationKeyEntity | undefined =
+      await this.wrapper.repository.get(forDate);
 
-    const currentKeyValidity = currentDate
-      .add(this.configService.get<number>('ASSOCIATION_KEY_OFFSET'))
-      .toDate();
+    const associationKeyOffset: number = this.configService.get<number>(
+      'ASSOCIATION_KEY_OFFSET',
+      24
+    );
+
+    const [firstIterationKey, secondIterationKey]: [number, number] = [
+      +moment(forDate).format('YYYYMMDD'),
+      +moment(forDate).format('HHmmss'),
+    ];
 
     if (!currentKey) {
-      this.logger.log('creating current association key');
+      const currentKeyValidity = moment(forDate).add(
+        associationKeyOffset,
+        'hours'
+      );
 
       const key: Bip39KeySet = await this.bip39Service.deriveKey(
         mnemonic,
-        iteration
+        firstIterationKey,
+        secondIterationKey
       );
 
-      await this.wrapper.repository
-        .save({
-          iteration,
-          associationKey: key.publicKey,
-          isSent: false,
-          owner: this.iamService.getDIDAddress(),
-          sentDate: null,
-          validFrom: currentDate.toDate(),
-          validTo: currentKeyValidity,
-        })
-        .catch((e) => {
-          this.logger.error(`saving current association key failed`);
-          this.logger.error(e);
-        });
-    }
+      this.logger.log(
+        `creating new current association key with ${firstIterationKey}_${secondIterationKey} iteration`
+      );
 
-    const nextIteration: number = +moment().add(1, 'day').format('YYYYMMDD');
-    const next: AssociationKeyEntity | undefined =
-      await this.wrapper.repository.findOne({
-        where: {
-          iteration: nextIteration,
-        },
+      currentKey = await this.wrapper.repository.save({
+        associationKey: key.publicKey,
+        isSent: false,
+        owner: this.iamService.getDIDAddress(),
+        sentDate: null,
+        validFrom: forDate,
+        validTo: currentKeyValidity,
+        iteration: `${firstIterationKey}_${secondIterationKey}`,
       });
 
-    if (next) {
+      await this.initKeyChannel(currentKey);
+    }
+
+    const nextIterationDate: moment.Moment = moment(currentKey.validTo).add(
+      associationKeyOffset,
+      'hours'
+    );
+
+    const hasNextKey: AssociationKeyEntity | undefined =
+      await this.wrapper.repository.get(nextIterationDate.toDate());
+
+    const [nextFirstIterationKey, nextSecondIterationKey]: [number, number] = [
+      +moment(nextIterationDate).format('YYYYMMDD'),
+      +moment(nextIterationDate).format('HHmmss'),
+    ];
+
+    if (hasNextKey) {
+      this.logger.log(
+        `next key exists for iteration ${nextFirstIterationKey}_${nextSecondIterationKey}`
+      );
+
       return;
     }
 
-    this.logger.log('creating next association key');
-
     const key: Bip39KeySet = await this.bip39Service.deriveKey(
       mnemonic,
-      nextIteration
+      nextFirstIterationKey,
+      nextSecondIterationKey
     );
 
-    await this.wrapper.repository.save({
-      iteration: nextIteration,
+    this.logger.log(
+      `creating new current association key with ${nextFirstIterationKey}_${nextSecondIterationKey} iteration`
+    );
+
+    const nextKey: AssociationKeyEntity = await this.wrapper.repository.save({
+      iteration: `${firstIterationKey}_${secondIterationKey}`,
       associationKey: key.publicKey,
       isSent: false,
       owner: this.iamService.getDIDAddress(),
       sentDate: null,
-      validFrom: currentKeyValidity,
-      validTo: moment(currentKeyValidity)
+      validFrom: currentKey.validTo,
+      validTo: moment(currentKey.validTo)
         .add(this.configService.get<number>('ASSOCIATION_KEY_OFFSET'))
         .toDate(),
     });
+
+    await this.initKeyChannel(nextKey);
+  }
+
+  protected async initKeyChannel(key: AssociationKeyEntity): Promise<void> {
+    await promiseRetry(async (retry, number) => {
+      this.logger.log(
+        `attempting to init ext channel for key ${key.associationKey}, attempt number #${number}`
+      );
+
+      await this.ddhubLoginService
+        .initExtChannel({
+          anonymousKeys: [
+            {
+              anonymousKey: key.associationKey,
+            },
+          ],
+        })
+        .catch((e) => retry(e));
+
+      key.isSent = true;
+      key.sentDate = new Date();
+
+      await this.wrapper.repository.save(key).catch((e) => retry(e));
+
+      this.logger.log(`association key ${key.associationKey} is sent to mb`);
+    });
+  }
+
+  public async initExternalChannels(): Promise<void> {
+    const currentKey: AssociationKeyEntity | null = await this.getCurrentKey();
+
+    const nextKey: AssociationKeyEntity | null = currentKey
+      ? await this.getForDate(currentKey.validTo)
+      : null;
+
+    if (currentKey) {
+      await this.initKeyChannel(currentKey);
+    }
+
+    if (nextKey) {
+      await this.initKeyChannel(nextKey);
+    }
   }
 }

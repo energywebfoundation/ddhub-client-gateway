@@ -28,6 +28,7 @@
 | HEARTBEAT_CRON_ENABLED | boolean | true | Should run heartbeat |  |  |
 | DOWNLOAD_FILES_LIFETIME | number | 30 | Specifies how long downloaded file should live (in minutes) |  |  |
 | DID_LISTENER_ENABLED | boolean | true | Should listen for DID attributes changes |  |  |
+| ASSOCIATION_KEY_OFFSET | number | 24 | Association key validity time (hours) |  |  |
 | REQ_LOCK_TIMEOUT | number | 5 | Maximum request lock lifetime (in seconds) |  |  |
 | VERSION_FILE_PATH | string | ./version.md | Version file path |  |  |
 | IPFS_HOST | string | ipfs.infura.io | IPFS Host |  |  |

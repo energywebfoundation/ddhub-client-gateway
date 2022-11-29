@@ -118,6 +118,7 @@ export class MessageService {
     if (channel.type !== ChannelType.PUB) {
       throw new ChannelTypeNotPubException(channel.fqcn);
     }
+
     const clientGatewayMessageId: string = uuidv4();
 
     // @TODO this is not a ideal solution, change once new logger is introduced

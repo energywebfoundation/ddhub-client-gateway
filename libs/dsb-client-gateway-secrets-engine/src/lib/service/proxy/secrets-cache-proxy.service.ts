@@ -139,7 +139,7 @@ export class SecretsCacheProxyService extends SecretsEngineService {
       mnemonic
     );
 
-    this.cachedObjects.mnemonic = response;
+    this.cachedObjects.mnemonic = mnemonic;
 
     return response;
   }

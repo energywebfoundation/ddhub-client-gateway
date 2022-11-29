@@ -41,9 +41,9 @@ export class GetAssociationKeysDto {
   @ApiProperty({
     description: 'key iteration',
     type: Number,
-    example: 2022111,
+    example: '20222222_2222',
   })
-  public iteration: number;
+  public iteration: string;
 
   @ApiProperty({
     description: 'key owner DID',

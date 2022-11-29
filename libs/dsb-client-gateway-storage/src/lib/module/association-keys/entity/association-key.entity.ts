@@ -26,7 +26,7 @@ export class AssociationKeyEntity {
   public sentDate: Date | null;
 
   @Column()
-  public iteration: number;
+  public iteration: string;
 
   @Column()
   public owner: string;
