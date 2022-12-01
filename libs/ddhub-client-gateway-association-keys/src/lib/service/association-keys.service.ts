@@ -18,6 +18,7 @@ import {
 } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
 import { DdhubLoginService } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
 import promiseRetry from 'promise-retry';
+import { LessThanOrEqual } from 'typeorm';
 
 @Injectable()
 export class AssociationKeysService implements OnApplicationBootstrap {
@@ -117,8 +118,8 @@ export class AssociationKeysService implements OnApplicationBootstrap {
     let currentKey: AssociationKeyEntity | undefined =
       await this.wrapper.repository.get(forDate);
 
-    const associationKeyOffset: number = this.configService.get<number>(
-      'ASSOCIATION_KEY_OFFSET',
+    const associationKeyInterval: number = this.configService.get<number>(
+      'ASSOCIATION_KEY_INTERVAL',
       24
     );
 
@@ -129,7 +130,7 @@ export class AssociationKeysService implements OnApplicationBootstrap {
 
     if (!currentKey) {
       const currentKeyValidity = moment(forDate).add(
-        associationKeyOffset,
+        associationKeyInterval,
         'hours'
       );
 
@@ -157,7 +158,7 @@ export class AssociationKeysService implements OnApplicationBootstrap {
     }
 
     const nextIterationDate: moment.Moment = moment(currentKey.validTo).add(
-      associationKeyOffset,
+      associationKeyInterval,
       'hours'
     );
 
@@ -188,14 +189,14 @@ export class AssociationKeysService implements OnApplicationBootstrap {
     );
 
     const nextKey: AssociationKeyEntity = await this.wrapper.repository.save({
-      iteration: `${firstIterationKey}_${secondIterationKey}`,
+      iteration: `${nextFirstIterationKey}_${nextSecondIterationKey}`,
       associationKey: key.publicKey,
       isSent: false,
       owner: this.iamService.getDIDAddress(),
       sentDate: null,
       validFrom: currentKey.validTo,
       validTo: moment(currentKey.validTo)
-        .add(this.configService.get<number>('ASSOCIATION_KEY_OFFSET'))
+        .add(associationKeyInterval, 'hours')
         .toDate(),
     });
 
@@ -241,5 +242,15 @@ export class AssociationKeysService implements OnApplicationBootstrap {
     if (nextKey) {
       await this.initKeyChannel(nextKey);
     }
+  }
+
+  public async clearOldKeys(): Promise<void> {
+    const offset: number = this.configService.get<number>(
+      'ASSOCIATION_KEY_OFFSET'
+    );
+
+    await this.wrapper.repository.delete({
+      validTo: LessThanOrEqual(moment().subtract(offset, 'hours').toDate()),
+    });
   }
 }

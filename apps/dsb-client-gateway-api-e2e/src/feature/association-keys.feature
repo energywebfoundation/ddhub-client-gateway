@@ -22,3 +22,13 @@ Feature: Association Keys
     Examples:
       | MNEMONIC | DATE | KEYS_AMOUNT |
       | prevent bridge survey obvious lecture excuse year disorder crowd burst shadow maze | 2022-11-29T10:26:57.588Z | 2 |
+  Scenario Outline: Deleting expiring keys
+    Given The system has identity set
+    Given No association keys are generated
+    Given The <MNEMONIC> mnenomic is set
+    When Deriving keys for <DATE>
+    When Deleting outdated keys
+    Then I should have at least <KEYS_AMOUNT> association keys available
+    Examples:
+      | MNEMONIC | DATE | KEYS_AMOUNT |
+      | prevent bridge survey obvious lecture excuse year disorder crowd burst shadow maze | 2020-11-29T10:26:57.588Z | 0 |

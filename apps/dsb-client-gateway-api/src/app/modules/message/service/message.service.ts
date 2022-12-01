@@ -150,7 +150,6 @@ export class MessageService {
 
     const signature: string | undefined = await this.generateSignature(
       message,
-      channel.useAnonymousExtChannel,
       messageLoggerContext
     );
 
@@ -195,13 +194,8 @@ export class MessageService {
 
   private async generateSignature(
     message,
-    useAnonymousExtChannel: boolean,
     messageLoggerContext: Logger
   ): Promise<string | undefined> {
-    if (useAnonymousExtChannel) {
-      return undefined;
-    }
-
     const privateKey = await this.secretsEngineService.getPrivateKey();
 
     if (!privateKey) {

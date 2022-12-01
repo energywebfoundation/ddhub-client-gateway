@@ -54,6 +54,7 @@ export class AssociationKeysCronService implements OnApplicationBootstrap {
       this.logger.log('attempting to fetch association keys');
 
       await this.associationKeysService.derivePublicKeys();
+      await this.associationKeysService.clearOldKeys();
 
       await this.cronWrapper.cronRepository.save({
         jobName: CronJobType.ASSOCIATION_KEYS,

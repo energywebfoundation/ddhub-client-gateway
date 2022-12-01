@@ -12,6 +12,7 @@ import {
   thenDatesOfKeysShouldCrossEachOther,
   thenIshouldHaveNKeysAvailable,
   thenNKeysShouldBeVisibleInResponse,
+  whenDeletingOutdatedKeys,
   whenDerivingKeys,
 } from './helpers/association-keys.helper';
 
@@ -61,6 +62,15 @@ describe('Association Keys Feature', () => {
       whenDerivingKeys(when, getApp);
       thenIshouldHaveNKeysAvailable(then, getApp);
       thenDatesOfKeysShouldCrossEachOther(then, getApp);
+    });
+
+    test('Deleting expiring keys', ({ given, when, then }) => {
+      givenIHaveIdentitySet(given, getApp);
+      givenNoAssociationKeysAreGenerated(given, getApp);
+      givenTheMnemonicIsSet(given, getApp);
+      whenDerivingKeys(when, getApp);
+      whenDeletingOutdatedKeys(when, getApp);
+      thenIshouldHaveNKeysAvailable(then, getApp);
     });
   });
 });

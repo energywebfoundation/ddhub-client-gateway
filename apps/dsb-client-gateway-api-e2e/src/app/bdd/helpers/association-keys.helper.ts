@@ -50,6 +50,12 @@ export const whenDerivingKeys = (when, app: () => INestApplication) => {
   });
 };
 
+export const whenDeletingOutdatedKeys = (when, app: () => INestApplication) => {
+  when('Deleting outdated keys', async () => {
+    await app().get(AssociationKeysService).clearOldKeys();
+  });
+};
+
 export const thenIshouldHaveNKeysAvailable = (
   then,
   app: () => INestApplication
@@ -105,7 +111,7 @@ export const thenDatesOfKeysShouldCrossEachOther = (
   then,
   app: () => INestApplication
 ) => {
-  then(/^Then dates of keys should cross each other$/, async () => {
+  then('Then dates of keys should cross each other', async () => {
     const allKeys = await app()
       .get(AssociationKeysWrapperRepository)
       .repository.find({
