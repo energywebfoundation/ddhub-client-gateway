@@ -603,21 +603,23 @@ export class MessageService {
       `[getMessages] Total fulfilled messages ${messageResponses.length}`
     );
 
-    const idsPendingAck: PendingAcksEntity[] = fulfilledMessages.map((e) => {
-      return {
-        clientId: consumer,
-        messageId: e.id,
-        from,
-        mbTimestamp: moment(e.timestampNanos / (1000 * 1000))
-          .utc()
-          .toDate(),
-      };
-    });
+    if (ack) {
+      const idsPendingAck: PendingAcksEntity[] = fulfilledMessages.map((e) => {
+        return {
+          clientId: consumer,
+          messageId: e.id,
+          from,
+          mbTimestamp: moment(e.timestampNanos / (1000 * 1000))
+            .utc()
+            .toDate(),
+        };
+      });
 
-    if (idsPendingAck.length > 0) {
-      await this.pendingAcksWrapperRepository.pendingAcksRepository.save(
-        idsPendingAck
-      );
+      if (idsPendingAck.length > 0) {
+        await this.pendingAcksWrapperRepository.pendingAcksRepository.save(
+          idsPendingAck
+        );
+      }
     }
 
     return fulfilledMessages.sort((a, b) => {

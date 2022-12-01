@@ -9,7 +9,7 @@ export class associationKeys1669197901049 implements MigrationInterface {
            "validFrom" timestamp without time zone DEFAULT now() NOT NULL,
            "isSent" boolean NOT NULL,
            "sentDate" timestamp without time zone DEFAULT NULL,
-           iteration integer NOT NULL,
+           iteration character varying NOT NULL,
            owner character varying NOT NULL,
            "createdDate" timestamp without time zone DEFAULT now() NOT NULL,
            "updatedDate" timestamp without time zone DEFAULT now() NOT NULL,
