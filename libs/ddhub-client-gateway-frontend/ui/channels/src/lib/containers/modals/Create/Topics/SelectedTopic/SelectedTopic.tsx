@@ -1,10 +1,10 @@
 import clsx from 'clsx';
-import { Grid, Typography, IconButton, Select, Box, Button } from '@mui/material';
+import { Grid, Typography, IconButton, Select, Box, Button, InputAdornment, TextField } from '@mui/material';
 import { useStyles } from './SelectedTopic.styles';
-import { Edit3, X as Close } from 'react-feather';
+import { Edit3, X as Close, Search } from 'react-feather';
 import { Topic } from '../Topics.effects';
 import { CopyToClipboard } from '@ddhub-client-gateway-frontend/ui/core';
-import { MouseEvent } from 'react';
+import React, { MouseEvent } from 'react';
 import { TopicItem } from '../TopicItem/TopicItem';
 import { useSelectedTopicEffects } from './SelectedTopic.effects';
 
@@ -42,10 +42,18 @@ export const SelectedTopic = ({
     updatedTopic,
     handleClickTopic,
     handleSubmitForm,
+    inputProps,
+    value,
+    field,
+    handleReset,
+    onFilterChange,
+    filteredTopics,
+    handleKeyDown,
   } = useSelectedTopicEffects({
     setSelectedApplication,
     topic,
     edit,
+    topicsList,
   });
 
   return (
@@ -142,15 +150,51 @@ export const SelectedTopic = ({
         )}
 
         {(topicsList.length !== 0 && !topicsLoading) && (
-          <>
-            <Box>
+          <Box onKeyDown={handleKeyDown}>
+            <Box className={classes.listHeader}>
               <Typography className={classes.optionTitle}>
-                Edit topic
+                Edit topic {topic?.topicName}
               </Typography>
+              <TextField
+                autoComplete='off'
+                fullWidth
+                type="text"
+                margin="normal"
+                variant="outlined"
+                name={inputProps.name}
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                  onFilterChange(event.target.value);
+                  inputProps.onChange(event);
+                }}
+                inputRef={inputProps.ref}
+                inputProps={{
+                  ...field.inputProps,
+                }}
+                classes={{
+                  root: classes.searchField,
+                }}
+                InputProps={{
+                  endAdornment: value && (
+                    <InputAdornment position="end">
+                      <Close className={classes.closeSearch} onClick={handleReset} />
+                    </InputAdornment>
+                  ),
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Search className={classes.searchIcon}/>
+                    </InputAdornment>
+                  )
+                }}
+              />
             </Box>
 
             <Box className={classes.topicBox}>
-              {topicsList?.map((option) => {
+              { !filteredTopics.length && (
+                <Box className={classes.topic}>
+                  <Typography className={classes.name}>No options</Typography>
+                </Box>
+              )}
+              {filteredTopics?.map((option) => {
                 return (
                   <Box
                         className={clsx(classes.topic, {
@@ -178,7 +222,7 @@ export const SelectedTopic = ({
                 </Typography>
               </Button>
             </Box>
-          </>
+          </Box>
         )}
       </Box>
     </Select>

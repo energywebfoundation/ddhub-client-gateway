@@ -20,7 +20,6 @@ import {
 import { GetMessagesDto } from '../dto/request/get-messages.dto';
 import { DownloadMessagesDto } from '../dto/request/download-file.dto';
 import { MessageService } from '../service/message.service';
-import { DigestGuard } from '../../utils/guards/digest.guard';
 import { SendMessagelResponseDto } from '../dto/response/send-message.dto';
 import { GetMessagesResponseDto } from '../dto/response/get-message-response.dto';
 import { DownloadMessageResponse } from '../entity/message.entity';
@@ -29,9 +28,10 @@ import { Readable } from 'stream';
 import { MtlsGuard } from '../../certificate/guards/mtls.guard';
 import { PinoLogger } from 'nestjs-pino';
 import { ClientsInterceptor } from '@dsb-client-gateway/ddhub-client-gateway-clients';
+import { GetMessageResponse } from '../message.interface';
 
 @Controller('messages')
-@UseGuards(DigestGuard, MtlsGuard)
+@UseGuards(MtlsGuard)
 @ApiTags('Messaging')
 export class MessageControlller {
   private readonly logger = new Logger();
@@ -43,7 +43,7 @@ export class MessageControlller {
   @Get('/')
   @ApiResponse({
     status: HttpStatus.OK,
-    description: 'Message recieved successfully',
+    description: 'Message received successfully',
     type: [GetMessagesResponseDto],
   })
   @ApiResponse({
@@ -61,7 +61,9 @@ export class MessageControlller {
   })
   @HttpCode(HttpStatus.OK)
   @UseInterceptors(ClientsInterceptor('clientId', 'query', 'fqcn', 'query'))
-  public async getMessage(@Query() dto: GetMessagesDto): Promise<Array<any>> {
+  public async getMessage(
+    @Query() dto: GetMessagesDto
+  ): Promise<GetMessageResponse[]> {
     this.pinoLogger.assign({
       fqcn: dto.fqcn,
       topicName: dto.topicName,
@@ -74,7 +76,7 @@ export class MessageControlller {
   @Get('/download')
   @ApiResponse({
     status: HttpStatus.OK,
-    description: 'Message Dwonloaded successfully',
+    description: 'Message download successfully',
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,

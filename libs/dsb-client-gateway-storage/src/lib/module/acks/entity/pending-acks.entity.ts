@@ -3,7 +3,6 @@ import {
   CreateDateColumn,
   Entity,
   PrimaryColumn,
-  UpdateDateColumn,
 } from 'typeorm';
 
 @Entity('pending_acks')
@@ -13,6 +12,9 @@ export class PendingAcksEntity {
 
   @PrimaryColumn()
   public clientId: string;
+
+  @PrimaryColumn()
+  from: string;
 
   @Column()
   public mbTimestamp!: Date;

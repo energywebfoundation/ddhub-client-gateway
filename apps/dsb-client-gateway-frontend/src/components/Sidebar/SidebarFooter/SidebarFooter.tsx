@@ -18,11 +18,13 @@ function SidebarFooter() {
             <img src="/ew-logo-main.svg" alt="bottom logo" className={classes.logo} />
           </Box>
         </Box>
-        <Box display="flex" justifyContent="center">
-          <Typography variant="body2" className={classes.version}>
-            Version {version}
-          </Typography>
-        </Box>
+        { version && (
+          <Box display="flex" justifyContent="center">
+            <Typography variant="body2" className={classes.version}>
+              Version {version}
+            </Typography>
+          </Box>
+        )}
       </Box>
     </div>
   );

@@ -34,6 +34,7 @@ export const CreateTopic: FC = () => {
     buttonDisabled,
     application,
     isCreatingTopic,
+    getValues,
   } = useCreateTopicEffects();
 
   return (
@@ -65,6 +66,7 @@ export const CreateTopic: FC = () => {
                   register={register}
                   control={control}
                   variant="outlined"
+                  disabled={getValues(fields.tags.name)?.length >= 20}
                 />
               </Box>
               <Box mb={2.7}>

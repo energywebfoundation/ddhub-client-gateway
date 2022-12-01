@@ -1,11 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsNotEmpty,
-  IsString,
-  IsNumber,
-  IsEnum,
-  IsBoolean
-} from 'class-validator';
+import { IsEnum, IsNotEmpty, IsNumber, IsString } from 'class-validator';
 import { SchemaType } from '../../../topic/topic.const';
 import { EncryptionStatus } from '../../message.const';
 
@@ -107,7 +101,7 @@ export class GetMessagesResponseDto {
       EncryptionStatus.NOT_PERFORMED,
       EncryptionStatus.NOT_REQUIRED,
       EncryptionStatus.REQUIRED_NOT_PERFORMED,
-      EncryptionStatus.SUCCESS
+      EncryptionStatus.SUCCESS,
     ],
     example: 'SUCCESS',
   })

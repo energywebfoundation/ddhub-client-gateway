@@ -5,10 +5,12 @@ import {
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { theme } from '@ddhub-client-gateway-frontend/ui/utils';
 import { useRemoveClientId, useRemoveClientIds } from '@ddhub-client-gateway-frontend/ui/api-hooks';
+import { useBackdropContext } from '@ddhub-client-gateway-frontend/ui/context';
 
 export const useClientIdsEffects = () => {
-  const { removeClientIdHandler } = useRemoveClientId();
-  const { removeClientIdsHandler } = useRemoveClientIds();
+  const { setIsLoading, isLoading: isBackdropLoading } = useBackdropContext();
+  const { removeClientIdHandler, isLoading: isRemoveIdLoading } = useRemoveClientId();
+  const { removeClientIdsHandler, isLoading: isRemoveIdsLoading } = useRemoveClientIds();
   let selectedClientIds: string[] = [];
 
   const Swal = useCustomAlert();
@@ -51,6 +53,12 @@ export const useClientIdsEffects = () => {
     selectedClientIds = clientIds;
   };
 
+  const isRemoveLoading = isRemoveIdsLoading || isRemoveIdLoading;
+
+  if (isBackdropLoading !== isRemoveLoading) {
+    setIsLoading(isRemoveLoading);
+  }
+
   return {
     clientIds,
     isLoading,
@@ -58,6 +66,5 @@ export const useClientIdsEffects = () => {
     actions,
     removeClientIds,
     setSelectedItems,
-    selectedClientIds,
   };
 };

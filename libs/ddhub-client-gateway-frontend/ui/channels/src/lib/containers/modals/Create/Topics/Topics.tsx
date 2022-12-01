@@ -62,6 +62,7 @@ export const Topics = ({
           placeholder="Select Application"
           label="Select Application"
           wrapperProps={{ mb: 2.375 }}
+          listBoxHeightFull={true}
         />
         {topics.length > 0 && (
           <Autocomplete
@@ -79,9 +80,10 @@ export const Topics = ({
               }
             }}
             filterOptions={filterTopics}
-            placeholder="Select topic"
-            label="Select topic"
+            placeholder="Select Topic"
+            label="Select Topic"
             wrapperProps={{ mb: 2.375 }}
+            listBoxHeightFull={true}
           />
         )}
 

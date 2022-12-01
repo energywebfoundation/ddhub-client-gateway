@@ -1,6 +1,7 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
+nx lint dsb-client-gateway-api
 npm run generate:envs
 
 git add docs/api-variables.md

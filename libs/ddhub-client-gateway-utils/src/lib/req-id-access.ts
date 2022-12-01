@@ -20,7 +20,13 @@ export const reqIdAccess = (): string | null => {
   const reqPass = props.split(',').find((t) => t.startsWith('"req":'));
 
   if (!reqPass) {
-    return null;
+    const runIdPass = props.split(',').find((t) => t.startsWith('"runId":'));
+
+    if (!runIdPass) {
+      return null;
+    }
+
+    return runIdPass.split(':')[1].split('"').join('');
   }
 
   return reqPass.split(':')[2].split('"').join('');

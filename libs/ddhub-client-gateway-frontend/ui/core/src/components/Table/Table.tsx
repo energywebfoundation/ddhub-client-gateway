@@ -47,6 +47,7 @@ export function GenericTable<T>({
   defaultSortBy,
   showCheckbox = false,
   setSelectedItems,
+  rowsPerPageOptions = [10, 20, 50, 100],
 }: TableProps<T>) {
   const { classes } = useStyles();
 
@@ -71,6 +72,8 @@ export function GenericTable<T>({
     handleChangeRowsPerPage,
     isSelected,
     handleCheckboxClick,
+    handleSelectAllClick,
+    selected,
   } = useTableEffects({
     headers,
     tableRows,
@@ -82,7 +85,11 @@ export function GenericTable<T>({
     defaultSortBy,
     backendSearch,
     setSelectedItems,
+    showCheckbox,
   });
+
+  const selectedTotal = selected.length;
+  const currentPageRowsTotal = rows.length < pageSize ? rows.length : pageSize;
 
   return (
     <>
@@ -110,8 +117,15 @@ export function GenericTable<T>({
             <TableHead>
               <TableRow>
                 { showCheckbox && (
-                  <TableCell
-                    classes={{ head: classes.head }}>
+                  <TableCell padding="checkbox" classes={{ head: classes.head }}>
+                    <Checkbox
+                      color="primary"
+                      checked={rows.length > 0 && selectedTotal === currentPageRowsTotal}
+                      onChange={handleSelectAllClick}
+                      inputProps={{
+                        'aria-label': 'select all',
+                      }}
+                    />
                   </TableCell>
                 )}
 
@@ -216,7 +230,7 @@ export function GenericTable<T>({
               <TableFooter>
                 <TableRow>
                   <TablePagination
-                    rowsPerPageOptions={[10, 20, 50, 100]}
+                    rowsPerPageOptions={rowsPerPageOptions}
                     labelDisplayedRows={paginationText}
                     count={pagination.count}
                     rowsPerPage={Number(pagination.limit)}

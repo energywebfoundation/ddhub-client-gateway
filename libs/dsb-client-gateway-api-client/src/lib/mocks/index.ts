@@ -306,7 +306,11 @@ export const getCronMock = () => {
 
 export const getGatewayMock = () => {
   return {
-    "namespace": "ddhub.apps.energyweb.iam.ewc"
+    "did": "string",
+    "messageBrokerStatus": "OK",
+    "mtlsIsValid": true,
+    "namespace": "ddhub.apps.energyweb.iam.ewc",
+    "version": "v15.15.0"
   };
 };
 
