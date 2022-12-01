@@ -20,7 +20,7 @@ export abstract class DdhubBaseService {
     protected readonly retryConfigService: RetryConfigService,
     protected readonly ddhubLoginService: DdhubLoginService,
     protected readonly tlsAgentService: TlsAgentService
-  ) {}
+  ) { }
 
   protected async request<T>(
     requestFn: () => Observable<AxiosResponse<T>>,
@@ -68,6 +68,7 @@ export abstract class DdhubBaseService {
         e.message,
         DsbClientGatewayErrors.MB_UNKNOWN,
         null,
+        null,
         null
       );
     }
@@ -105,6 +106,7 @@ export abstract class DdhubBaseService {
         e.message,
         DsbClientGatewayErrors.MB_ERROR,
         e.response.data.returnCode,
+        e.response.data.returnMessage,
         e.request.path
       );
     }
@@ -138,6 +140,7 @@ export abstract class DdhubBaseService {
         e.message,
         DsbClientGatewayErrors.MB_ERROR,
         e.response.data.returnCode,
+        e.response.data.returnMessage,
         e.request.path
       );
     }
@@ -154,6 +157,7 @@ export abstract class DdhubBaseService {
       e.message,
       DsbClientGatewayErrors.MB_ERROR,
       e.response.data.returnCode,
+      e.response.data.returnMessage,
       e.request.path
     );
   }
