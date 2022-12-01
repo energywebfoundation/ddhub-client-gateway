@@ -12,6 +12,7 @@ enum FieldName {
   PayloadEncryption = 'payloadEncryption',
   Fqcn = 'fqcn',
   ChannelType = 'channelType',
+  AnonymousExtChannel = 'useAnonymousExtChannel'
 }
 
 const validationSchema = yup
@@ -52,6 +53,10 @@ const fields = {
       { label: 'Publish', value: ConnectionType.Publish },
     ],
   },
+  useAnonymousExtChannel: {
+    name: FieldName.AnonymousExtChannel,
+    label: 'Use Anonymous External Channel'
+  },
   payloadEncryption: {
     name: FieldName.PayloadEncryption,
     label: 'Payload Encryption'
@@ -61,12 +66,14 @@ const fields = {
 export const useDetailsEffects = (channelValues: ICreateChannel) => {
   const [showEncryption, setShowEncryption] = useState(false);
   const [isEncrypt, setIsEncrypt] = useState(false);
+  const [isUseAnonExtChnl, setIsUseAnonExtChnl] = useState(false);
 
   const initialValues = {
     fqcn: '',
     channelType: '',
     connectionType: '',
     payloadEncryption: false,
+    useAnonymousExtChannel: false,
   };
 
   const {
@@ -90,6 +97,7 @@ export const useDetailsEffects = (channelValues: ICreateChannel) => {
       FieldName.ConnectionType,
       FieldName.Fqcn,
       FieldName.PayloadEncryption,
+      FieldName.AnonymousExtChannel,
     ]);
     Object.entries(details).forEach(([name, value]) => {
       setValue(name, value);
@@ -99,6 +107,8 @@ export const useDetailsEffects = (channelValues: ICreateChannel) => {
         setShowEncryption(isPublish);
       } else if (name === FieldName.PayloadEncryption) {
         setIsEncrypt(!!value);
+      } else if (name === FieldName.AnonymousExtChannel) {
+        setIsUseAnonExtChnl(!!value);
       }
     });
     triggerValidation();
@@ -114,5 +124,21 @@ export const useDetailsEffects = (channelValues: ICreateChannel) => {
     setIsEncrypt(event.target.checked);
   };
 
-  return { fields, register, isValid, handleSubmit, control, connectionOnChange, showEncryption, encryptionOnChange, isEncrypt };
+  const useAnonExtChnlOnChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setIsUseAnonExtChnl(event.target.checked);
+  };
+
+  return {
+    fields,
+    register,
+    isValid,
+    handleSubmit,
+    control,
+    connectionOnChange,
+    showEncryption,
+    encryptionOnChange,
+    isEncrypt,
+    isUseAnonExtChnl,
+    useAnonExtChnlOnChange
+  };
 };

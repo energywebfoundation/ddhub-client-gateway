@@ -18,6 +18,7 @@ import { useDetailsEffects } from './Details.effects';
 import { useStyles } from './Details.styles';
 import { Steps } from '../Create/Steps/Steps';
 import { VIEW_STEPS } from '../Create/Steps/models/viewSteps';
+import { includes } from 'lodash';
 
 export const Details: FC = () => {
   const { classes } = useStyles();
@@ -118,9 +119,19 @@ export const Details: FC = () => {
                     </Typography>
                   </Box>
                 </Stack>
+                <Stack direction="row" mt={1.5}>
+                  <Typography className={classes.encryptionLabel} variant="body2">
+                    Use anonymous external channel:
+                  </Typography>
+                  <Box display="flex">
+                    <Typography className={classes.encryptionValue} variant="body2">
+                      { channel?.useAnonymousExtChannel ? <Check className={classes.iconCheck} /> : <X className={classes.iconX}/>}
+                    </Typography>
+                  </Box>
+                </Stack>
                 {
-                  (ChannelConnectionType[channel.type] === ChannelConnectionType.pub) && (
-                  <Stack direction="row" mt={1.5}>
+                  (includes([ChannelConnectionType.pub, ChannelConnectionType.upload], ChannelConnectionType[channel.type])) && (
+                  <Stack direction="row" mt={0.5}>
                     <Typography className={classes.encryptionLabel} variant="body2">
                       Payload encryption:
                     </Typography>
