@@ -68,6 +68,7 @@ export abstract class DdhubBaseService {
         e.message,
         DsbClientGatewayErrors.MB_UNKNOWN,
         null,
+        null,
         null
       );
     }
@@ -105,6 +106,7 @@ export abstract class DdhubBaseService {
         e.message,
         DsbClientGatewayErrors.MB_ERROR,
         e.response.data.returnCode,
+        e.response.data.returnMessage,
         e.request.path
       );
     }
@@ -138,6 +140,7 @@ export abstract class DdhubBaseService {
         e.message,
         DsbClientGatewayErrors.MB_ERROR,
         e.response.data.returnCode,
+        e.response.data.returnMessage,
         e.request.path
       );
     }
@@ -151,9 +154,10 @@ export abstract class DdhubBaseService {
     }
 
     throw new MessageBrokerException(
-      `${e.message} -> ${e.response.data.returnMessage}`,
+      e.message,
       DsbClientGatewayErrors.MB_ERROR,
       e.response.data.returnCode,
+      e.response.data.returnMessage,
       e.request.path
     );
   }
