@@ -11,6 +11,7 @@ export class MessageBrokerException extends BaseException {
     message: string,
     code: DsbClientGatewayErrors,
     errorCode: string | MessageBrokerErrors,
+    errorCodeMessage: string,
     path: string
   ) {
     super(
@@ -19,6 +20,7 @@ export class MessageBrokerException extends BaseException {
       {
         errorCodeName: DsbMessageBrokerErrors[errorCode] || 'UNKNOWN',
         errorCode,
+        errorCodeMessage,
         path,
       },
       HttpStatus.BAD_REQUEST
