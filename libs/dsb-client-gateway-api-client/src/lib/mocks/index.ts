@@ -150,7 +150,9 @@ export const getTopicsControllerGetTopicHistoryByIdAndVersionMock = () => ({
 export const getChannelControllerGetByTypeMock = () => [
   {
     fqcn: 'channel.name',
+    payloadEncryption: false,
     type: 'sub',
+    useAnonymousExtChannel: true,
     conditions: {
       dids: ['did:ethr:volta:0x09Df5d33f1242E1b8aA5E0E0F6BfA687E6846993'],
       roles: ['marketoperator.roles', 'marketoperator.roles', 'marketoperator.roles', 'marketoperator.roles', 'marketoperator.roles'],
@@ -165,7 +167,9 @@ export const getChannelControllerGetByTypeMock = () => [
   },
   {
     fqcn: 'channel.name.2',
+    payloadEncryption: false,
     type: 'pub',
+    useAnonymousExtChannel: false,
     conditions: {
       dids: ['did:ethr:volta:0x09Df5d33f1242E1b8aA5E0E0F6BfA687E6846993'],
       roles: ['marketoperator.roles'],
@@ -180,7 +184,9 @@ export const getChannelControllerGetByTypeMock = () => [
   },
   {
     fqcn: 'channel.name.3',
+    payloadEncryption: true,
     type: 'upload',
+    useAnonymousExtChannel: true,
     conditions: {
       dids: ['did:ethr:volta:0x09Df5d33f1242E1b8aA5E0E0F6BfA687E6846993'],
       roles: ['marketoperator.roles'],
@@ -195,7 +201,9 @@ export const getChannelControllerGetByTypeMock = () => [
   },
   {
     fqcn: 'channel.name.4',
+    payloadEncryption: false,
     type: 'download',
+    useAnonymousExtChannel: false,
     conditions: {
       dids: ['did:ethr:volta:0x09Df5d33f1242E1b8aA5E0E0F6BfA687E6846993'],
       roles: ['marketoperator.roles'],
