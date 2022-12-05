@@ -239,10 +239,9 @@ export class KeysService implements OnModuleInit {
   public async verifySignature(
     senderDid: string,
     signature: string,
-    encryptedData: string
+    encryptedData: string,
+    did: DidEntity | null
   ): Promise<boolean> {
-    const did = await this.getDid(senderDid);
-
     if (!did) {
       this.logger.error(
         `Sender does not have public key configured on path ${senderDid}#${DIDPublicKeyTags.DSB_SIGNATURE_KEY}`
@@ -563,7 +562,7 @@ export class KeysService implements OnModuleInit {
     return { publicKey, privateKey };
   }
 
-  protected async getDid(did: string): Promise<DidEntity | null> {
+  public async getDid(did: string): Promise<DidEntity | null> {
     const cacheDid: DidEntity | null =
       await this.didWrapper.didRepository.findOne({
         where: {
@@ -634,5 +633,21 @@ export class KeysService implements OnModuleInit {
     }
 
     return didEntity;
+  }
+
+  public async prefetchSignatureKeys(
+    uniqueSenderDids: string[]
+  ): Promise<Record<string, DidEntity | null>> {
+    return uniqueSenderDids.reduce(async (acc, curr: string) => {
+      const did: DidEntity | null = await this.getDid(curr);
+
+      if (!did) {
+        acc[curr] = null;
+      }
+
+      acc[curr] = did;
+
+      return acc;
+    }, {});
   }
 }

@@ -5,17 +5,14 @@ import {
   HttpStatus,
   Post,
   UploadedFiles,
-  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { CertificateService } from './service/certificate.service';
-import { DigestGuard } from '../utils/guards/digest.guard';
 import { ApiConsumes, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UploadCertificateBodyDto } from './dto/request/upload-certificates-body.dto';
 
 @Controller('certificate')
-@UseGuards(DigestGuard)
 @ApiTags('Gateway Configuration')
 export class CertificateController {
   constructor(protected readonly certificateService: CertificateService) {}
