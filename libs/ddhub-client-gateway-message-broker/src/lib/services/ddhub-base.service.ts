@@ -54,7 +54,7 @@ export abstract class DdhubBaseService {
       ...options,
     };
 
-    if (e.errno === -3001) {
+    if (e.errno === -3001 || e.errno === -113) {
       this.logger.error('incorrect network activity');
       this.logger.error(e);
 
