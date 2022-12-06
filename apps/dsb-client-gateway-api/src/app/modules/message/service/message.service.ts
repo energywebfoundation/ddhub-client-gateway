@@ -181,7 +181,7 @@ export class MessageService {
 
     for (const res of result.status) {
       for (const detail of res.details) {
-        this.logger.log(
+        messageLoggerContext.log(
           `message sent with id ${detail.messageId} to ${detail.did} with status code ${detail.statusCode}`
         );
       }
