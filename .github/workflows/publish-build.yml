@@ -2,7 +2,7 @@ name: Build and publish images
 
 on:
   push:
-    branches: [ develop ]
+    branches: [ develop, chore/shrink_image_size ]
     paths-ignore:
       - 'devops/**'
       - 'get-started/**'
