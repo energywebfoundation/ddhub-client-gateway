@@ -54,7 +54,7 @@ export abstract class DdhubBaseService {
       ...options,
     };
 
-    if (e.errno === -3001) {
+    if (e.errno === -3001 || e.errno === -113) {
       this.logger.error('incorrect network activity');
       this.logger.error(e);
 
@@ -67,6 +67,7 @@ export abstract class DdhubBaseService {
       throw new MessageBrokerException(
         e.message,
         DsbClientGatewayErrors.MB_UNKNOWN,
+        null,
         null,
         null
       );
@@ -105,6 +106,7 @@ export abstract class DdhubBaseService {
         e.message,
         DsbClientGatewayErrors.MB_ERROR,
         e.response.data.returnCode,
+        e.response.data.returnMessage,
         e.request.path
       );
     }
@@ -138,6 +140,7 @@ export abstract class DdhubBaseService {
         e.message,
         DsbClientGatewayErrors.MB_ERROR,
         e.response.data.returnCode,
+        e.response.data.returnMessage,
         e.request.path
       );
     }
@@ -154,6 +157,7 @@ export abstract class DdhubBaseService {
       e.message,
       DsbClientGatewayErrors.MB_ERROR,
       e.response.data.returnCode,
+      e.response.data.returnMessage,
       e.request.path
     );
   }

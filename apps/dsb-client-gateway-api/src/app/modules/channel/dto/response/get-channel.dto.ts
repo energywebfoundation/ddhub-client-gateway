@@ -86,6 +86,13 @@ export class GetChannelResponseDto {
   type: ChannelType;
 
   @ApiProperty({
+    description: 'Use anonymous external channel',
+    default: false,
+    example: false,
+  })
+  useAnonymousExtChannel: boolean;
+
+  @ApiProperty({
     description: 'Channel conditions',
   })
   conditions: ChannelConditions;

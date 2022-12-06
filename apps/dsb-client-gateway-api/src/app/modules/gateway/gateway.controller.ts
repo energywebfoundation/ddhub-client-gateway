@@ -1,5 +1,4 @@
-import { Controller, Get, HttpStatus, UseGuards } from '@nestjs/common';
-import { DigestGuard } from '../utils/guards/digest.guard';
+import { Controller, Get, HttpStatus } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import {
   GatewayResponseDto,
@@ -12,7 +11,6 @@ import { DdhubHealthService } from '@dsb-client-gateway/ddhub-client-gateway-mes
 import { VersionService } from '@dsb-client-gateway/ddhub-client-gateway-version';
 
 @Controller('gateway')
-@UseGuards(DigestGuard)
 @ApiTags('Gateway')
 export class GatewayController {
   constructor(
