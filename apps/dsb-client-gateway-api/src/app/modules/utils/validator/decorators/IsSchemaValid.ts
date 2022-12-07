@@ -4,33 +4,6 @@ import { SchemaType } from '../../../message/message.const';
 import addFormats from 'ajv-formats';
 import { MalformedJSONException } from '../../../message/exceptions/malformed-json.exception';
 
-const ajv = new Ajv({ allErrors: true, multipleOfPrecision: 1 });
-addFormats(ajv, {
-  mode: 'fast',
-  formats: [
-    'date',
-    'time',
-    'date-time',
-    'duration',
-    'uri',
-    'uri-reference',
-    'uri-template',
-    'email',
-    'hostname',
-    'ipv4',
-    'ipv6',
-    'uuid',
-    'json-pointer',
-    'byte',
-    'int32',
-    'int64',
-    'float',
-    'double',
-    'password',
-    'binary',
-  ],
-  keywords: true,
-});
 export function IsSchemaValid(
   schemaType: string,
   schema: object,
@@ -46,6 +19,35 @@ export function IsSchemaValid(
 }
 
 function validateJSONSchema(schema: object, payload: string) {
+  const ajv = new Ajv({ allErrors: true, multipleOfPrecision: 1 });
+
+  addFormats(ajv, {
+    mode: 'fast',
+    formats: [
+      'date',
+      'time',
+      'date-time',
+      'duration',
+      'uri',
+      'uri-reference',
+      'uri-template',
+      'email',
+      'hostname',
+      'ipv4',
+      'ipv6',
+      'uuid',
+      'json-pointer',
+      'byte',
+      'int32',
+      'int64',
+      'float',
+      'double',
+      'password',
+      'binary',
+    ],
+    keywords: true,
+  });
+
   let validate;
   let jsonPayload: object;
   try {
