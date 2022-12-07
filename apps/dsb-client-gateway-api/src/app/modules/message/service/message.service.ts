@@ -140,10 +140,10 @@ export class MessageService {
 
     const message = shouldEncrypt
       ? this.keyService.encryptMessage(
-          dto.payload,
-          randomKey,
-          EncryptedMessageType['UTF-8']
-        )
+        dto.payload,
+        randomKey,
+        EncryptedMessageType['UTF-8']
+      )
       : dto.payload;
 
     messageLoggerContext.debug('fetching private key');
@@ -299,18 +299,18 @@ export class MessageService {
     useAnonymousExtChannel: boolean
   ): Promise<GetMessageResponse> {
     let baseMessage: Omit<GetMessageResponse, 'signatureValid' | 'decryption'> =
-      {
-        id: message.messageId,
-        topicVersion: message.topicVersion,
-        topicName: '',
-        topicOwner: '',
-        topicSchemaType: '',
-        payload: message.payload,
-        signature: message.signature,
-        sender: message.senderDid,
-        timestampNanos: message.timestampNanos,
-        transactionId: message.transactionId,
-      };
+    {
+      id: message.messageId,
+      topicVersion: message.topicVersion,
+      topicName: '',
+      topicOwner: '',
+      topicSchemaType: '',
+      payload: message.payload,
+      signature: message.signature,
+      sender: message.senderDid,
+      timestampNanos: message.timestampNanos,
+      transactionId: message.transactionId,
+    };
 
     try {
       const topic: TopicEntity = await this.topicService.getTopicById(
@@ -609,6 +609,7 @@ export class MessageService {
           clientId: consumer,
           messageId: e.id,
           from,
+          anonymousRecipient: associationKey,
           mbTimestamp: moment(e.timestampNanos / (1000 * 1000))
             .utc()
             .toDate(),
@@ -818,6 +819,7 @@ export class MessageService {
         where: {
           clientId: consumer,
           from: from ? from : '',
+          anonymousRecipient: anonymousRecipient ? anonymousRecipient : '',
         },
       });
     if (data.length == 0) {
@@ -845,6 +847,7 @@ export class MessageService {
           messageId: In(ackResponse.notFound),
           clientId: consumer,
           from: from ? from : '',
+          anonymousRecipient: anonymousRecipient ? anonymousRecipient : '',
         })
         .then();
     }
@@ -857,6 +860,7 @@ export class MessageService {
           messageId: In(ackResponse.acked),
           clientId: consumer,
           from: from ? from : '',
+          anonymousRecipient: anonymousRecipient ? anonymousRecipient : '',
         })
         .then();
     }
