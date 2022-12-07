@@ -2,7 +2,6 @@ import { Controller, Get, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AssociationKeysService } from '@dsb-client-gateway/ddhub-client-gateway-association-keys';
 import { GetAssociationKeysDto } from './dto/get-association-keys.dto';
-import { AssociationKeyEntity } from '@dsb-client-gateway/dsb-client-gateway-storage';
 import { GetCurrentKeyDto } from './dto/get-current-key.dto';
 
 @Controller('keys')
@@ -50,16 +49,6 @@ export class KeysController {
   })
   @Get('/association/current')
   public async getCurrentAssociationKey(): Promise<GetCurrentKeyDto> {
-    const currentKey: AssociationKeyEntity | null =
-      await this.associationKeysService.getCurrentKey();
-
-    const nextKey: AssociationKeyEntity | null = currentKey
-      ? await this.associationKeysService.getForDate(currentKey.validTo)
-      : null;
-
-    return {
-      current: currentKey,
-      next: nextKey,
-    };
+    return this.associationKeysService.getCurrentAndNext();
   }
 }

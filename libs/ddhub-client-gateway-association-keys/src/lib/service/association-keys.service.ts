@@ -35,6 +35,19 @@ export class AssociationKeysService implements OnApplicationBootstrap {
     protected readonly retryConfigService: RetryConfigService
   ) {}
 
+  public async getCurrentAndNext() {
+    const currentKey: AssociationKeyEntity | null = await this.getCurrentKey();
+
+    const nextKey: AssociationKeyEntity | null = currentKey
+      ? await this.getForDate(currentKey.validTo)
+      : null;
+
+    return {
+      current: currentKey,
+      next: nextKey,
+    };
+  }
+
   public async getForDate(forDate: Date): Promise<AssociationKeyEntity | null> {
     return this.wrapper.repository.get(forDate);
   }
@@ -242,6 +255,31 @@ export class AssociationKeysService implements OnApplicationBootstrap {
     if (nextKey) {
       await this.initKeyChannel(nextKey);
     }
+  }
+
+  public async emitKey(key: AssociationKeyEntity): Promise<void> {
+    await promiseRetry(async (retry, number) => {
+      this.logger.log(
+        `attempting to emit key ${key.associationKey}, attempt number #${number}`
+      );
+
+      await this.ddhubLoginService
+        .initExtChannel({
+          anonymousKeys: [
+            {
+              anonymousKey: key.associationKey,
+            },
+          ],
+        })
+        .catch((e) => retry(e));
+
+      key.isSent = true;
+      key.sentDate = new Date();
+
+      await this.wrapper.repository.save(key).catch((e) => retry(e));
+
+      this.logger.log(`association key ${key.associationKey} is sent to mb`);
+    });
   }
 
   public async clearOldKeys(): Promise<void> {

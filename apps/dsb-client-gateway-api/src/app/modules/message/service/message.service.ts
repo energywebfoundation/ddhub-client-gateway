@@ -433,11 +433,17 @@ export class MessageService {
   public async sendAckBy(
     messageIds: string[],
     clientId: string,
-    from: string
+    from: string,
+    anonymousRecipient?: string
   ): Promise<AckResponse> {
     this.logger.log(messageIds);
     const successAckMessageIds: AckResponse =
-      await this.ddhubMessageService.messagesAckBy(messageIds, clientId, from);
+      await this.ddhubMessageService.messagesAckBy(
+        messageIds,
+        clientId,
+        from,
+        anonymousRecipient
+      );
     return successAckMessageIds;
   }
 
@@ -509,21 +515,21 @@ export class MessageService {
 
     const consumer = `${clientId}:${fqcn}`;
 
+    const associationKey: string | undefined = await this.getAssociationKey(
+      channel.useAnonymousExtChannel
+    );
+
     if (ack) {
       try {
         messageLoggerContext.log(
           `[getMessages] Sending for ack for consumer ${consumer}`
         );
-        await this.validatePendingAck(consumer, from);
+        await this.validatePendingAck(consumer, from, associationKey);
       } catch (e) {
         this.logger.error(`[getMessages] error ocurred while sending ack`, e);
         return [];
       }
     }
-
-    const associationKey: string | undefined = await this.getAssociationKey(
-      channel.useAnonymousExtChannel
-    );
 
     const messages: Array<SearchMessageResponseDto> =
       await this.ddhubMessageService.messagesSearch(
@@ -802,7 +808,11 @@ export class MessageService {
     }
   }
 
-  private async validatePendingAck(consumer: string, from: string) {
+  private async validatePendingAck(
+    consumer: string,
+    from: string,
+    anonymousRecipient?: string
+  ) {
     const data: PendingAcksEntity[] =
       await this.pendingAcksWrapperRepository.pendingAcksRepository.find({
         where: {
@@ -818,7 +828,8 @@ export class MessageService {
     const ackResponse: AckResponse = await this.sendAckBy(
       idsPendingAck,
       consumer,
-      from
+      from,
+      anonymousRecipient
     ).catch((e) => {
       this.logger.error(`something went wrong when ack messages`);
       this.logger.error(e);
