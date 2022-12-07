@@ -24,9 +24,11 @@ export class DdhubHealthService extends DdhubBaseService {
 
   public async health(): Promise<{ statusCode: number; message?: string }> {
     try {
+      const agent = await this.tlsAgentService.create();
+      this.logger.log('agent cert: ', JSON.stringify(agent));
       const { data, status } = await lastValueFrom(
         this.httpService.get('/health', {
-          httpsAgent: await this.tlsAgentService.create(),
+          httpsAgent: agent,
         })
       );
 
@@ -37,8 +39,8 @@ export class DdhubHealthService extends DdhubBaseService {
       }
 
       return {
-        statusCode: e.response.status,
-        message: e.response.data,
+        statusCode: e.response? e.response.status : e.status,
+        message: e.response? e.response.data : e.message,
       };
     }
   }
