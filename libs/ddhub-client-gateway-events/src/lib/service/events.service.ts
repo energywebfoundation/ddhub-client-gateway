@@ -32,13 +32,13 @@ export class EventsService implements OnApplicationBootstrap {
     protected readonly commandBus: CommandBus,
     protected readonly configService: ConfigService,
     protected readonly schedulerRegistry: SchedulerRegistry
-  ) {}
+  ) { }
 
   public async onApplicationBootstrap(): Promise<void> {
-    const cronJob = new CronJob('* * * * *', async () => {
+    const cronJob = new CronJob('* * * * *', () => {
       this.logger.log(`Executing refresh events`);
 
-      await this.execute();
+      this.execute().then();
     });
 
     this.schedulerRegistry.addCronJob(CronJobType.EVENTS, cronJob);
