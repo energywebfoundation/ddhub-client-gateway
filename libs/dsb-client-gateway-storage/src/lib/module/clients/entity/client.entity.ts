@@ -1,19 +1,13 @@
 import {
-  Column,
   CreateDateColumn,
   Entity,
-  PrimaryGeneratedColumn,
+  PrimaryColumn,
   UpdateDateColumn,
 } from 'typeorm';
 
 @Entity('clients')
 export class ClientEntity {
-  @PrimaryGeneratedColumn('uuid')
-  public id: string;
-
-  @Column({
-    unique: true,
-  })
+  @PrimaryColumn()
   public clientId: string;
 
   @CreateDateColumn()

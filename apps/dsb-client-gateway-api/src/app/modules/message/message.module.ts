@@ -25,6 +25,7 @@ import { ConfigService } from '@nestjs/config';
 import { CertificateModule } from '../certificate/certificate.module';
 import { ReqLockService } from './service/req-lock.service';
 import { DdhubClientGatewayClientsModule } from '@dsb-client-gateway/ddhub-client-gateway-clients';
+import { DdhubClientGatewayAssociationKeysModule } from '@dsb-client-gateway/ddhub-client-gateway-association-keys';
 
 @Module({
   imports: [
@@ -59,6 +60,7 @@ import { DdhubClientGatewayClientsModule } from '@dsb-client-gateway/ddhub-clien
     AcksRepositoryModule,
     ReqLockRepositoryModule,
     DdhubClientGatewayClientsModule,
+    DdhubClientGatewayAssociationKeysModule,
   ],
   providers: [
     EventsGateway,

@@ -11,7 +11,7 @@ do
   curl --location --request POST 'http://localhost:3333/api/v2/messages' \
   --header 'Content-Type: application/json' \
   --data-raw '{
-      "fqcn": "noenc1test",
+      "fqcn": "test.non.pub",
       "topicName": "testmessage1234",
       "topicVersion": "1.0.1",
       "topicOwner": "dsb.apps.szostak.iam.ewc",

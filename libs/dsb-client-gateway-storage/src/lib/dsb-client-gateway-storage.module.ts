@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import {
   AcksEntity,
   ApplicationEntity,
+  AssociationKeyEntity,
   ChannelEntity,
   ClientEntity,
   CronEntity,
@@ -35,6 +36,7 @@ const ENTITIES = [
   PendingAcksEntity,
   TopicMonitorEntity,
   ReqLockEntity,
+  AssociationKeyEntity,
 ];
 
 @Module({
@@ -52,4 +54,4 @@ const ENTITIES = [
     }),
   ],
 })
-export class DsbClientGatewayStorageModule { }
+export class DsbClientGatewayStorageModule {}

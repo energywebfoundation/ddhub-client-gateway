@@ -9,6 +9,7 @@ import { Span } from 'nestjs-otel';
 import { DefaultAzureCredential } from '@azure/identity';
 import { KeyVaultSecret, SecretClient } from '@azure/keyvault-secrets';
 import { setLogLevel } from '@azure/logger';
+
 setLogLevel('info');
 
 @Injectable()
@@ -34,6 +35,14 @@ export class AzureKeyVaultService
     this.client = new SecretClient(url, credential);
 
     this.logger.log('Azure Key Vault Service initialized');
+  }
+
+  getMnemonic(): Promise<string | null> {
+    return Promise.resolve(undefined);
+  }
+
+  setMnemonic(mnemonic: string): Promise<string> {
+    return Promise.resolve('');
   }
 
   @Span('azure_kv_setRSAKey')
