@@ -2,7 +2,7 @@ name: Build and publish images
 
 on:
   push:
-    branches: [ develop ]
+    branches: [ develop, build-deploy-on-dev-1 ]
     paths-ignore:
       - 'devops/**'
       - 'get-started/**'
@@ -84,12 +84,12 @@ jobs:
           command: login ${{ secrets.ARGOCD_DEV_URL }}
           options: --insecure --password ${{ secrets.ARGOCD_DEV_PASS }} --username ${{ secrets.ARGOCD_DEV_USERNAME }}
 
-      - name: ArgoCD overwrite Dev scheduler image tag
-        uses: clowdhaus/argo-cd-action/@v1.12.1
-        id: argocd_image_tag_overwrite_dev_scheduler
-        with:
-          command: app set ddhub-gateway-dev
-          options: -p ddhub-client-gateway-api.clientgateway.scheduler.image.tag=${{needs.unique_id.outputs.unique_id}}
+      # - name: ArgoCD overwrite Dev scheduler image tag
+      #   uses: clowdhaus/argo-cd-action/@v1.12.1
+      #   id: argocd_image_tag_overwrite_dev_scheduler
+      #   with:
+      #     command: app set ddhub-gateway-dev
+      #     options: -p ddhub-client-gateway-api.clientgateway.scheduler.image.tag=${{needs.unique_id.outputs.unique_id}}
 
       - name: ArgoCD overwrite Dev-1 scheduler image tag
         uses: clowdhaus/argo-cd-action/@v1.12.1
@@ -156,12 +156,12 @@ jobs:
           command: login ${{ secrets.ARGOCD_DEV_URL }}
           options: --insecure --password ${{ secrets.ARGOCD_DEV_PASS }} --username ${{ secrets.ARGOCD_DEV_USERNAME }}
 
-      - name: ArgoCD overwrite DEV image tag
-        uses: clowdhaus/argo-cd-action/@v1.12.1
-        id: argocd_image_tag_overwrite
-        with:
-          command: app set ddhub-gateway-dev
-          options: -p ddhub-client-gateway-api.image.tag=${{needs.unique_id.outputs.unique_id}}
+      # - name: ArgoCD overwrite DEV image tag
+      #   uses: clowdhaus/argo-cd-action/@v1.12.1
+      #   id: argocd_image_tag_overwrite
+      #   with:
+      #     command: app set ddhub-gateway-dev
+      #     options: -p ddhub-client-gateway-api.image.tag=${{needs.unique_id.outputs.unique_id}}
 
       - name: ArgoCD overwrite DEV-1 image tag
         uses: clowdhaus/argo-cd-action/@v1.12.1
@@ -238,12 +238,12 @@ jobs:
           command: login ${{ secrets.ARGOCD_DEV_URL }}
           options: --insecure --password ${{ secrets.ARGOCD_DEV_PASS }} --username ${{ secrets.ARGOCD_DEV_USERNAME }}
 
-      - name: ArgoCD overwrite DEV image tag
-        uses: clowdhaus/argo-cd-action/@v1.12.1
-        id: argocd_image_tag_overwrite_dev_ui
-        with:
-          command: app set ddhub-gateway-dev
-          options: -p ddhub-client-gateway-api.clientgateway.ui.image.tag=${{needs.unique_id.outputs.unique_id}}
+      # - name: ArgoCD overwrite DEV image tag
+      #   uses: clowdhaus/argo-cd-action/@v1.12.1
+      #   id: argocd_image_tag_overwrite_dev_ui
+      #   with:
+      #     command: app set ddhub-gateway-dev
+      #     options: -p ddhub-client-gateway-api.clientgateway.ui.image.tag=${{needs.unique_id.outputs.unique_id}}
 
       - name: ArgoCD overwrite DEV-1 image tag
         uses: clowdhaus/argo-cd-action/@v1.12.1
