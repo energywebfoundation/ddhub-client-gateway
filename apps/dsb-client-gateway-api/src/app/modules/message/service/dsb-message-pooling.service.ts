@@ -46,7 +46,7 @@ export class DsbMessagePoolingService implements OnModuleInit {
     protected readonly wsClient: WsClientService,
     protected readonly acksWrapperRepository: AcksWrapperRepository,
     protected readonly pinoLogger: PinoLogger
-  ) {}
+  ) { }
 
   public async onModuleInit(): Promise<void> {
     if (this.websocketMode === WebSocketImplementation.NONE) {
@@ -55,8 +55,8 @@ export class DsbMessagePoolingService implements OnModuleInit {
       return;
     }
 
-    const callback = async () => {
-      await this.handleInterval();
+    const callback = () => {
+      this.handleInterval().then();
     };
     const timeout = setTimeout(
       callback,
@@ -69,12 +69,12 @@ export class DsbMessagePoolingService implements OnModuleInit {
 
   @Span('ws_pool_messages')
   public async handleInterval(): Promise<void> {
-    const callback = async () => {
+    const callback = () => {
       // handling callback polling msg
       this.logger.log('[handleInterval] handling callback polling msg');
       const store = new Store(this.pinoLogger.logger);
 
-      await storage.run(store, async () => {
+      storage.run(store, async () => {
         const runId: string = uuidv4();
 
         this.pinoLogger.assign({
@@ -83,7 +83,8 @@ export class DsbMessagePoolingService implements OnModuleInit {
 
         this.logger.log(`run id ${runId}`);
 
-        await this.handleInterval();
+      }).then(() => {
+        this.handleInterval().then();
       });
     };
 
@@ -102,8 +103,7 @@ export class DsbMessagePoolingService implements OnModuleInit {
         );
         this.schedulerRegistry.addTimeout(SCHEDULER_HANDLERS.MESSAGES, timeout);
         this.logger.log(
-          `${
-            this.gateway.server.clients.size
+          `${this.gateway.server.clients.size
           } client connected. Skip pooling trigger. waiting ${this.configService.get<number>(
             'WEBSOCKET_POOLING_TIMEOUT',
             5000
@@ -165,7 +165,7 @@ export class DsbMessagePoolingService implements OnModuleInit {
       if (msdCount == 0) {
         throw new Error(
           `empty msg, waiting to ` +
-            this.configService.get<number>('WEBSOCKET_POOLING_TIMEOUT', 5000)
+          this.configService.get<number>('WEBSOCKET_POOLING_TIMEOUT', 5000)
         );
       }
 
@@ -257,8 +257,7 @@ export class DsbMessagePoolingService implements OnModuleInit {
           );
 
         this.logger.log(
-          `Found ${messages.length} in ${subscription.fqcn} for ${
-            _clientId ? _clientId : clientId
+          `Found ${messages.length} in ${subscription.fqcn} for ${_clientId ? _clientId : clientId
           }`
         );
 
