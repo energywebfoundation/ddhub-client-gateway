@@ -18,6 +18,14 @@ export class AssociationKeyEntity {
   public validFrom: Date;
 
   @Column()
+  public isShared: boolean;
+
+  @Column({
+    nullable: true,
+  })
+  public sharedDate: Date | null;
+
+  @Column()
   public isSent: boolean;
 
   @Column({

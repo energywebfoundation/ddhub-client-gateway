@@ -11,7 +11,6 @@ import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { SchedulerRegistry } from '@nestjs/schedule';
 import moment from 'moment';
-import { Span } from 'nestjs-otel';
 import { In } from 'typeorm';
 import { ChannelType } from '../../channel/channel.const';
 import { ChannelService } from '../../channel/service/channel.service';
@@ -25,11 +24,6 @@ import { storage, Store } from 'nestjs-pino/storage.js';
 import { v4 as uuidv4 } from 'uuid';
 import type { queue } from 'fastq';
 import * as fastq from 'fastq';
-
-enum SCHEDULER_HANDLERS {
-  MESSAGES = 'ws-messages',
-  MESSAGES_HEARTBEAT = 'ws-messages-heartbeat',
-}
 
 export interface Task {
   id: string;
@@ -90,6 +84,8 @@ export class DsbMessagePoolingService implements OnApplicationBootstrap {
   protected async worker(task: Task): Promise<void> {
     try {
       await storage.run(this.store, async () => {
+        this.store.logger = PinoLogger.root;
+
         this.pinoLogger.assign({
           runId: task.id,
         });
@@ -104,7 +100,7 @@ export class DsbMessagePoolingService implements OnApplicationBootstrap {
     }
     // this.store.logger[Object.getOwnPropertySymbols(this.store.logger)[2]] = '';
 
-    this.store.logger = PinoLogger.root;
+    this.store.logger = null;
     storage.disable();
   }
 
@@ -204,27 +200,6 @@ export class DsbMessagePoolingService implements OnApplicationBootstrap {
         this.configService.get<number>('WEBSOCKET_POOLING_TIMEOUT', 5000)
       );
     }
-  }
-
-  @Span('ws_pool_messages')
-  public async handleInterval(): Promise<void> {
-    const callback = async () => {
-      // handling callback polling msg
-      this.logger.log('[handleInterval] handling callback polling msg');
-      const store = new Store(this.pinoLogger.logger);
-
-      await storage.run(store, async () => {
-        const runId: string = uuidv4();
-
-        this.pinoLogger.assign({
-          runId,
-        });
-
-        this.logger.log(`run id ${runId}`);
-
-        await this.handleInterval();
-      });
-    };
   }
 
   private async pullMessagesAndEmit(

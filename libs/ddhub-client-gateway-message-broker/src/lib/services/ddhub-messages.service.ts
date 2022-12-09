@@ -218,7 +218,9 @@ export class DdhubMessagesService extends DdhubBaseService {
       signature,
       clientGatewayMessageId,
       payloadEncryption,
-      anonymousRecipient,
+      anonymousRecipient: anonymousRecipient.length
+        ? anonymousRecipient
+        : undefined,
     };
 
     try {

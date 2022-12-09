@@ -18,7 +18,7 @@ import {
 } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
 import { DdhubLoginService } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
 import promiseRetry from 'promise-retry';
-import { LessThanOrEqual } from 'typeorm';
+import { In, LessThanOrEqual } from 'typeorm';
 
 @Injectable()
 export class AssociationKeysService implements OnApplicationBootstrap {
@@ -34,6 +34,26 @@ export class AssociationKeysService implements OnApplicationBootstrap {
     protected readonly ddhubLoginService: DdhubLoginService,
     protected readonly retryConfigService: RetryConfigService
   ) {}
+
+  public async updateKeySharedState(keys: string[]): Promise<void> {
+    await this.wrapper.repository.update(
+      {
+        associationKey: In(keys),
+      },
+      {
+        isShared: true,
+        sharedDate: new Date(),
+      }
+    );
+  }
+
+  public async getNotSharedKeys(): Promise<AssociationKeyEntity[]> {
+    return this.wrapper.repository.find({
+      where: {
+        isShared: false,
+      },
+    });
+  }
 
   public async getCurrentAndNext() {
     const currentKey: AssociationKeyEntity | null = await this.getCurrentKey();
@@ -164,6 +184,8 @@ export class AssociationKeysService implements OnApplicationBootstrap {
         sentDate: null,
         validFrom: forDate,
         validTo: currentKeyValidity,
+        isShared: false,
+        sharedDate: null,
         iteration: `${firstIterationKey}_${secondIterationKey}`,
       });
 
@@ -207,6 +229,8 @@ export class AssociationKeysService implements OnApplicationBootstrap {
       isSent: false,
       owner: this.iamService.getDIDAddress(),
       sentDate: null,
+      isShared: false,
+      sharedDate: null,
       validFrom: currentKey.validTo,
       validTo: moment(currentKey.validTo)
         .add(associationKeyInterval, 'hours')

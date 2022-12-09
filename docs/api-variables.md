@@ -2,6 +2,12 @@
 
 | KEY | TYPE | DEFAULT | DESCRIPTION | ALLOWED_VALUES | DEPENDENCY |
 | --- | ---- | ------- | ----------- | -------------- | ---------- |
+| AK_SHARE_CRON_ENABLED | boolean | true | Should share association keys |  |  |
+| AK_SHARE_CRON_SCHEDULE | string | */1 * * * * | How often should share association keys |  |  |
+| AK_FQCN | string |  | Association keys FQCN |  |  |
+| AK_TOPIC_NAME | string |  | Association keys topic name |  |  |
+| AK_TOPIC_OWNER | string |  | Association keys topic owner |  |  |
+| AK_TOPIC_VERSION | string |  | Association keys topic version |  |  |
 | API_KEY | string |  | API Key to protect API |  |  |
 | API_USERNAME | string |  | USERNAME for authentication |  |  |
 | API_PASSWORD | string |  | PASSWORD for authentication |  |  |
