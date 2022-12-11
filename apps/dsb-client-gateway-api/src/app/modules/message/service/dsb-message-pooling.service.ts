@@ -85,6 +85,8 @@ export class DsbMessagePoolingService implements OnApplicationBootstrap {
 
   protected async worker(task: Task): Promise<void> {
     try {
+      this.store.logger = PinoLogger.root;
+
       await storage.run(this.store, async () => {
         this.pinoLogger.assign({
           runId: task.id,
