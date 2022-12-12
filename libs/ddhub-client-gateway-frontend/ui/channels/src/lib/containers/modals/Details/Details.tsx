@@ -8,7 +8,7 @@ import {
   Grid,
   Stack,
 } from '@mui/material';
-import { CloseButton, Dialog } from '@ddhub-client-gateway-frontend/ui/core';
+import { CloseButton, Dialog, Steps } from '@ddhub-client-gateway-frontend/ui/core';
 import { didFormatMinifier } from '@ddhub-client-gateway-frontend/ui/utils';
 import { ChannelConnectionType } from '../../../models/channel-connection-type.enum';
 import { getChannelType } from '../../../utils';
@@ -16,7 +16,6 @@ import { ChannelImage, RestrictionsViewBox } from '../../../components';
 import { Topics } from './Topics/Topics';
 import { useDetailsEffects } from './Details.effects';
 import { useStyles } from './Details.styles';
-import { Steps } from '../Create/Steps/Steps';
 import { VIEW_STEPS } from '../Create/Steps/models/viewSteps';
 
 export const Details: FC = () => {
