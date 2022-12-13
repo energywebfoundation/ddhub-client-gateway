@@ -20,7 +20,7 @@ export abstract class DdhubBaseService {
     protected readonly retryConfigService: RetryConfigService,
     protected readonly ddhubLoginService: DdhubLoginService,
     protected readonly tlsAgentService: TlsAgentService
-  ) { }
+  ) {}
 
   protected async request<T>(
     requestFn: () => Observable<AxiosResponse<T>>,
@@ -54,7 +54,7 @@ export abstract class DdhubBaseService {
       ...options,
     };
 
-    if (e.errno === -3001) {
+    if (e.errno === -3001 || e.errno === -113) {
       this.logger.error('incorrect network activity');
       this.logger.error(e);
 
