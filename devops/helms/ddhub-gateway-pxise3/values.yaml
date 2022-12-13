@@ -11,7 +11,7 @@ ddhub-client-gateway-api:
       parent_namespace: ddhub.apps.aemo.iam.ewc
       secret_engine: azure
       # -- Sets the secret prefix in the secret engine.
-      secret_prefix: "ddhub-pxise2/"
+      secret_prefix: "ddhub-pxise3/"
       node_env: test
       opentelemetry_enabled: false
     scheduler:
