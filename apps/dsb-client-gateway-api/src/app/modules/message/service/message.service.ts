@@ -140,10 +140,10 @@ export class MessageService {
 
     const message = shouldEncrypt
       ? this.keyService.encryptMessage(
-        dto.payload,
-        randomKey,
-        EncryptedMessageType['UTF-8']
-      )
+          dto.payload,
+          randomKey,
+          EncryptedMessageType['UTF-8']
+        )
       : dto.payload;
 
     messageLoggerContext.debug('fetching private key');
@@ -299,18 +299,18 @@ export class MessageService {
     useAnonymousExtChannel: boolean
   ): Promise<GetMessageResponse> {
     let baseMessage: Omit<GetMessageResponse, 'signatureValid' | 'decryption'> =
-    {
-      id: message.messageId,
-      topicVersion: message.topicVersion,
-      topicName: '',
-      topicOwner: '',
-      topicSchemaType: '',
-      payload: message.payload,
-      signature: message.signature,
-      sender: message.senderDid,
-      timestampNanos: message.timestampNanos,
-      transactionId: message.transactionId,
-    };
+      {
+        id: message.messageId,
+        topicVersion: message.topicVersion,
+        topicName: '',
+        topicOwner: '',
+        topicSchemaType: '',
+        payload: message.payload,
+        signature: message.signature,
+        sender: message.senderDid,
+        timestampNanos: message.timestampNanos,
+        transactionId: message.transactionId,
+      };
 
     this.logger.log(`attempting to process message ${message.messageId}`);
 

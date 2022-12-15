@@ -380,7 +380,8 @@ export class DsbMessagePoolingService implements OnApplicationBootstrap {
         });
       }
     } catch (e) {
-      this.logger.error(`[WS][sendMessagesToSubscribers] ${e}`);
+      this.logger.error(`[WS][sendMessagesToSubscribers]`);
+      this.logger.error(e);
     }
   }
 }
