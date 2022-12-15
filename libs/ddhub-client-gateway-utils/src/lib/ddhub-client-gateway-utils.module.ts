@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { EthersService, RetryConfigService } from './services';
+import { Bip39Service, EthersService, RetryConfigService } from './services';
 import { ConfigService } from '@nestjs/config';
 import { providers } from 'ethers';
 import { DirectoryCreatedService } from './services/directory-created.service';
@@ -22,8 +22,9 @@ import { DirectoryCreatedService } from './services/directory-created.service';
       },
       inject: [ConfigService],
     },
-    DirectoryCreatedService
+    DirectoryCreatedService,
+    Bip39Service,
   ],
-  exports: [RetryConfigService, EthersService],
+  exports: [RetryConfigService, EthersService, Bip39Service],
 })
-export class DdhubClientGatewayUtilsModule { }
+export class DdhubClientGatewayUtilsModule {}
