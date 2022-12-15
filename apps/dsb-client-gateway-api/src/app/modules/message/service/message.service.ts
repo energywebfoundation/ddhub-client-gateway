@@ -312,6 +312,8 @@ export class MessageService {
       transactionId: message.transactionId,
     };
 
+    this.logger.log(`attempting to process message ${message.messageId}`);
+
     try {
       const topic: TopicEntity = await this.topicService.getTopicById(
         message.topicId
@@ -325,6 +327,8 @@ export class MessageService {
       };
 
       if (useAnonymousExtChannel) {
+        this.logger.log(`message ${message.messageId} comes from anon. ext. channel`);
+
         return {
           ...baseMessage,
           signatureValid: EncryptionStatus.NOT_REQUIRED,
@@ -335,6 +339,8 @@ export class MessageService {
       }
 
       if (message.isFile) {
+        this.logger.log(`message ${message.messageId} is a message file`);
+
         return {
           ...baseMessage,
           signatureValid: EncryptionStatus.NOT_REQUIRED,
@@ -366,6 +372,10 @@ export class MessageService {
       } */
 
       if (!payloadEncryption) {
+        this.logger.log(
+          `payload encryption is disabled for message ${message.messageId}`
+        );
+
         return {
           ...baseMessage,
           signatureValid: isSignatureValid
@@ -378,6 +388,8 @@ export class MessageService {
       }
 
       if (!isSignatureValid) {
+        this.logger.warn(`invalid signature for message ${message.messageId}`);
+
         return {
           ...baseMessage,
           signatureValid: EncryptionStatus.FAILED,
@@ -394,6 +406,10 @@ export class MessageService {
       );
 
       if (error) {
+        this.logger.warn(
+          `something went wrong when decrypting message ${message.messageId}`
+        );
+
         return {
           ...baseMessage,
           signatureValid: EncryptionStatus.SUCCESS,
@@ -403,6 +419,8 @@ export class MessageService {
           },
         };
       }
+
+      this.logger.log(`successful message decryption ${message.messageId}`);
 
       return {
         ...baseMessage,
@@ -414,9 +432,10 @@ export class MessageService {
       };
     } catch (e) {
       this.logger.error(
-        `Error while processing message - messageId: ${message.messageId} topicId: ${message.topicId}`,
-        e
+        `Error while processing message - messageId: ${message.messageId} topicId: ${message.topicId}`
       );
+
+      this.logger.error(e);
 
       return {
         ...baseMessage,
@@ -558,7 +577,7 @@ export class MessageService {
 
     const messageResponses = await Promise.allSettled(
       messages.map(async (message): Promise<GetMessageResponse> => {
-        messageLoggerContext.debug(`processing message ${message.messageId}`);
+        messageLoggerContext.log(`processing message ${message.messageId}`);
 
         const processedMessage: GetMessageResponse = await this.processMessage(
           message.payloadEncryption,
@@ -576,7 +595,10 @@ export class MessageService {
     );
     if (rejected.length > 0) {
       messageLoggerContext.error(
-        '[getMessages] Error while processing messages',
+        '[getMessages] Error while processing messages'
+      );
+
+      messageLoggerContext.error(
         rejected.map((value) =>
           value.status === 'rejected' ? value.reason : value
         )
@@ -587,12 +609,15 @@ export class MessageService {
       `[getMessages] Total message broker messages ${messages.length}`
     );
     messageLoggerContext.log(
-      `[getMessages] Total returned (fulfilled/rejected) messages ${messageResponses.length}`
+      `[getMessages] Total returned (fulfilled & rejected) messages ${messageResponses.length}`
     );
+    messageLoggerContext.log('[getMessages] Returned processed messages');
     messageLoggerContext.log(
-      '[getMessages] Returned processed messages',
-      messageResponses
+      messageResponses.map((message) =>
+        message.status === 'fulfilled' ? message.value.id : message.reason
+      )
     );
+
     const fulfilledMessages = messageResponses
       .map((message) => (message.status === 'fulfilled' ? message.value : null))
       .filter(
@@ -605,6 +630,8 @@ export class MessageService {
 
     if (ack) {
       const idsPendingAck: PendingAcksEntity[] = fulfilledMessages.map((e) => {
+        messageLoggerContext.log(`adding message ${e.id} to pending acks`);
+
         return {
           clientId: consumer,
           messageId: e.id,
@@ -726,7 +753,8 @@ export class MessageService {
       fs.unlinkSync(filePath);
       fs.unlinkSync(file.path);
     } catch (e) {
-      this.logger.error('file unlink failed', e);
+      this.logger.error('file unlink failed');
+      this.logger.error(e);
     }
 
     return result;

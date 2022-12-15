@@ -348,6 +348,7 @@ export class DsbMessagePoolingService implements OnApplicationBootstrap {
         )
         .catch((e) => {
           this.logger.warn(`[WS][sendMessagesToSubscribers][sendAckBy] ${e}`);
+          this.logger.warn(e);
           return {
             acked: [],
             notFound: [],
