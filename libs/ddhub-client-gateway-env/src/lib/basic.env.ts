@@ -5,7 +5,9 @@ export const BASIC_ENVS = Joi.object({
     .positive()
     .description('Maximum request lock lifetime (in seconds)')
     .default(5),
-  VERSION_FILE_PATH: Joi.string().description('Version file path').default('./version.md'),
+  VERSION_FILE_PATH: Joi.string()
+    .description('Version file path')
+    .default('./version.md'),
   IPFS_HOST: Joi.string().description('IPFS Host').default('ipfs.infura.io'),
   IPFS_PORT: Joi.number().positive().description('IPFS Port').default(5001),
   IPFS_PROTOCOL: Joi.string().description('IPFS Protocol').default('https://'),
@@ -27,6 +29,12 @@ export const BASIC_ENVS = Joi.object({
     .default('./download')
     .description(
       'Directory where we should store downloaded files for limited time'
+    ),
+  LOG_LEVEL: Joi.string()
+    .valid(...['fatal', 'error', 'warn', 'info', 'debug', 'trace'])
+    .default('info')
+    .description(
+      'Minimal log level ("fatal" | "error" | "warn" | "info" | "debug" | "trace" | "silent")'
     ),
   LOG_PRETTY: Joi.boolean()
     .default(false)
