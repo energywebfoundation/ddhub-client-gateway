@@ -3,7 +3,7 @@
 | KEY | TYPE | DEFAULT | DESCRIPTION | ALLOWED_VALUES | DEPENDENCY |
 | --- | ---- | ------- | ----------- | -------------- | ---------- |
 | DID_REGISTRY_ADDRESS | string | 0xc15d5a57a8eb0e1dcbe5d88b8f9a82017e5cc4af | DID Registry Address used for DID Listener |  |  |
-| ASSOCIATION_KEYS_CRON_ENABLED | boolean | true | Should generate association keys |  |  |
+| ASSOCIATION_KEYS_CRON_ENABLED | boolean | false | Should generate association keys |  |  |
 | ASSOCIATION_KEYS_CRON_SCHEDULE | string | */1 * * * * | How often should generate association keys |  |  |
 | APPLICATION_CRON_SCHEDULE | string | */1 * * * * | How often should poll for applications data |  |  |
 | APPLICATION_CRON_ENABLED | boolean | true | Should poll for applications data |  |  |
