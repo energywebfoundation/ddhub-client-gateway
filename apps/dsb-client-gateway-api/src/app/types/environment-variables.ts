@@ -13,7 +13,7 @@ export enum WebSocketImplementation {
 
 export const API_ENVS = Joi.object({
   AK_SHARE_CRON_ENABLED: Joi.boolean()
-    .default(true)
+    .default(false)
     .description('Should share association keys'),
   AK_SHARE_CRON_SCHEDULE: Joi.string()
     .default('*/1 * * * *')

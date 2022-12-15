@@ -5,7 +5,7 @@ export const SCHEDULER_ENVS = Joi.object({
     .default('0xc15d5a57a8eb0e1dcbe5d88b8f9a82017e5cc4af')
     .description('DID Registry Address used for DID Listener'),
   ASSOCIATION_KEYS_CRON_ENABLED: Joi.boolean()
-    .default(true)
+    .default(false)
     .description('Should generate association keys'),
   ASSOCIATION_KEYS_CRON_SCHEDULE: Joi.string()
     .default('*/1 * * * *')

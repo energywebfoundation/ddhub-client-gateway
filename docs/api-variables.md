@@ -2,7 +2,7 @@
 
 | KEY | TYPE | DEFAULT | DESCRIPTION | ALLOWED_VALUES | DEPENDENCY |
 | --- | ---- | ------- | ----------- | -------------- | ---------- |
-| AK_SHARE_CRON_ENABLED | boolean | true | Should share association keys |  |  |
+| AK_SHARE_CRON_ENABLED | boolean | false | Should share association keys |  |  |
 | AK_SHARE_CRON_SCHEDULE | string | */1 * * * * | How often should share association keys |  |  |
 | AK_FQCN | string |  | Association keys FQCN |  |  |
 | AK_TOPIC_NAME | string |  | Association keys topic name |  |  |
