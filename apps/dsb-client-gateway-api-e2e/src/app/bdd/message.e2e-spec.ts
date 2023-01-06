@@ -11,6 +11,9 @@ import { givenICreatedChannel } from './helpers/channel.helper';
 import {
   thenMessageResponseShouldContainSuccessfulRecipient,
   thenMessageResponseStatusCodeShouldBe,
+  thenReceivedMessagesShouldContainPreviousMessage,
+  thenReceivedMessagesStatusCodeShouldBe,
+  whenIQueryForMessages,
   whenISendMessage,
 } from './helpers/message.helper';
 import { clearDatabase } from './helpers/setup.helper';
@@ -49,6 +52,19 @@ describe('Message Feature', () => {
       whenISendMessage(when, getApp, testMemory);
       thenMessageResponseStatusCodeShouldBe(then, testMemory);
       thenMessageResponseShouldContainSuccessfulRecipient(then, testMemory);
+    });
+
+    test('Should send and receive message', ({ given, when, then }) => {
+      givenIHaveIdentitySet(given, getApp);
+      givenTopicWithIdNoExists(given, getApp);
+      givenIHaveCreatedTopic(given, getApp);
+      givenICreatedChannel(given, getApp, testMemory);
+      whenISendMessage(when, getApp, testMemory);
+      whenIQueryForMessages(when, getApp, testMemory);
+      thenMessageResponseStatusCodeShouldBe(then, testMemory);
+      thenMessageResponseShouldContainSuccessfulRecipient(then, testMemory);
+      thenReceivedMessagesStatusCodeShouldBe(then, testMemory);
+      thenReceivedMessagesShouldContainPreviousMessage(then, testMemory);
     });
   });
 });

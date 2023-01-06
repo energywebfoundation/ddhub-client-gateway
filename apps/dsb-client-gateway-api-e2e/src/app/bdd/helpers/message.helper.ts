@@ -4,6 +4,8 @@ import { SendMessageDto } from '../../../../../dsb-client-gateway-api/src/app/mo
 import request from 'supertest';
 import { MemoryHelper } from './memory.helper';
 import { v4 as uuidv4 } from 'uuid';
+import { getChannelPayload } from './channel.helper';
+import { loadTopic } from './topic.helper';
 
 const getMessagePayload = <T = SendMessageDto>(payloadId: string): T => {
   const channelDto: T = JSON.parse(
@@ -15,6 +17,74 @@ const getMessagePayload = <T = SendMessageDto>(payloadId: string): T => {
   ) as unknown as T;
 
   return channelDto;
+};
+
+export const whenIQueryForMessages = (
+  when,
+  app: () => INestApplication,
+  testMemory: MemoryHelper
+) => {
+  when(
+    /^I query for messages for topic (.*) and channel (.*)$/,
+    async (topicPayloadId: string, channelPayloadId: string) => {
+      const channelPayload = getChannelPayload(channelPayloadId);
+      const topicPayload = loadTopic(topicPayloadId);
+
+      await request(app().getHttpServer())
+        .get('/messages/')
+        .query({
+          fqcn: channelPayload.fqcn,
+          amount: 5,
+          topicName: topicPayload.name,
+          topicOwner: topicPayload.owner,
+          clientId: 'TEST',
+        })
+        .expect(({ body, statusCode }) => {
+          testMemory.map['RECEIVE_MESSAGE_RESPONSE'] = {
+            response: body,
+            statusCode,
+          };
+        });
+    }
+  );
+};
+
+export const thenReceivedMessagesShouldContainPreviousMessage = (
+  then,
+  testMemory: MemoryHelper
+) => {
+  then('Received messages should contain previously sent message', () => {
+    const hasMessages = testMemory.map[
+      'RECEIVE_MESSAGE_RESPONSE'
+    ].response.some((message) => {
+      return (
+        message.payload ===
+        JSON.stringify({
+          data: testMemory.map['SENT_MESSAGE_RESPONSE'].payloadToEmit,
+        })
+      );
+    });
+
+    expect(hasMessages).toBeTruthy();
+  });
+};
+
+export const thenReceivedMessagesStatusCodeShouldBe = (
+  then,
+  testMemory: MemoryHelper
+) => {
+  then(
+    /^Receive message response status should be (.*)$/,
+    (statusCode: string) => {
+      if (testMemory.map['RECEIVE_MESSAGE_RESPONSE'].statusCode !== 200) {
+        console.error(testMemory.map['RECEIVE_MESSAGE_RESPONSE'].response);
+      }
+
+      expect(testMemory.map['RECEIVE_MESSAGE_RESPONSE'].statusCode).toBe(
+        +statusCode
+      );
+    }
+  );
 };
 
 export const whenISendMessage = (
