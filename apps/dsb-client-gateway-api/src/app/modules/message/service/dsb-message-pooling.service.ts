@@ -7,11 +7,10 @@ import {
   AcksWrapperRepository,
   ChannelEntity,
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { SchedulerRegistry } from '@nestjs/schedule';
 import moment from 'moment';
-import { Span } from 'nestjs-otel';
 import { In } from 'typeorm';
 import { ChannelType } from '../../channel/channel.const';
 import { ChannelService } from '../../channel/service/channel.service';
@@ -23,14 +22,17 @@ import { WsClientService } from './ws-client.service';
 import { PinoLogger } from 'nestjs-pino';
 import { storage, Store } from 'nestjs-pino/storage.js';
 import { v4 as uuidv4 } from 'uuid';
+import type { queue } from 'fastq';
+import * as fastq from 'fastq';
 
-enum SCHEDULER_HANDLERS {
-  MESSAGES = 'ws-messages',
-  MESSAGES_HEARTBEAT = 'ws-messages-heartbeat',
+export interface Task {
+  id: string;
 }
 
 @Injectable()
-export class DsbMessagePoolingService implements OnModuleInit {
+export class DsbMessagePoolingService implements OnApplicationBootstrap {
+  private queue: queue<Task>;
+  private store;
   private readonly logger = new Logger(DsbMessagePoolingService.name);
   private readonly websocketMode = this.configService.get(
     'WEBSOCKET',
@@ -48,59 +50,66 @@ export class DsbMessagePoolingService implements OnModuleInit {
     protected readonly pinoLogger: PinoLogger
   ) {}
 
-  public async onModuleInit(): Promise<void> {
+  public async onApplicationBootstrap(): Promise<void> {
     if (this.websocketMode === WebSocketImplementation.NONE) {
       this.logger.log(`Websockets are disabled, not polling messages`);
 
       return;
     }
 
-    const callback = async () => {
-      await this.handleInterval();
+    const handler = async (task: Task) => {
+      await this.worker(task);
     };
-    const timeout = setTimeout(
-      callback,
-      this.configService.get<number>('WEBSOCKET_POOLING_TIMEOUT', 5000)
-    );
-    this.schedulerRegistry.addTimeout(SCHEDULER_HANDLERS.MESSAGES, timeout);
 
-    this.logger.log('Enabling websockets');
+    this.store = new Store(PinoLogger.root);
+    this.queue = fastq.promise(async (task: Task) => {
+      await this.worker(task);
+    }, 1);
+
+    this.logger.log('Running websockets');
+
+    this.queue.push({
+      id: uuidv4(),
+    });
   }
 
-  @Span('ws_pool_messages')
-  public async handleInterval(): Promise<void> {
-    const callback = async () => {
-      // handling callback polling msg
-      this.logger.log('[handleInterval] handling callback polling msg');
-      const store = new Store(this.pinoLogger.logger);
+  protected async sleepAndIterate(ms: number): Promise<void> {
+    await new Promise((r) => setTimeout(r, ms));
 
-      await storage.run(store, async () => {
-        const runId: string = uuidv4();
+    this.queue.push({
+      id: uuidv4(),
+    });
+  }
+
+  protected async worker(task: Task): Promise<void> {
+    try {
+      await storage.run(this.store, async () => {
+        this.store.logger = PinoLogger.root;
 
         this.pinoLogger.assign({
-          runId,
+          runId: task.id,
         });
 
-        this.logger.log(`run id ${runId}`);
+        await this.handleTask();
 
-        await this.handleInterval();
+        this.logger.log(`run id ${task.id}`);
       });
-    };
+    } catch (e) {
+      this.logger.error(`ws worker failed`);
+      this.logger.error(e);
+    }
+    // this.store.logger[Object.getOwnPropertySymbols(this.store.logger)[2]] = '';
 
+    this.store.logger = null;
+    storage.disable();
+  }
+
+  protected async handleTask(): Promise<void> {
     try {
-      this.logger.log('[deleteTimeout] Start deleteTimeout');
-      this.schedulerRegistry.deleteTimeout(SCHEDULER_HANDLERS.MESSAGES);
-      this.logger.log('[deleteTimeout] End deleteTimeout');
-
       if (
         this.websocketMode === WebSocketImplementation.SERVER &&
         this.gateway.server.clients.size === 0
       ) {
-        const timeout = setTimeout(
-          callback,
-          this.configService.get<number>('WEBSOCKET_POOLING_TIMEOUT', 5000)
-        );
-        this.schedulerRegistry.addTimeout(SCHEDULER_HANDLERS.MESSAGES, timeout);
         this.logger.log(
           `${
             this.gateway.server.clients.size
@@ -109,6 +118,11 @@ export class DsbMessagePoolingService implements OnModuleInit {
             5000
           )}`
         );
+
+        await this.sleepAndIterate(
+          this.configService.get<number>('WEBSOCKET_POOLING_TIMEOUT', 5000)
+        );
+
         return;
       }
 
@@ -121,17 +135,18 @@ export class DsbMessagePoolingService implements OnModuleInit {
         if (this.wsClient.rws === undefined) {
           await this.wsClient.connect();
         }
-        const timeout = setTimeout(
-          callback,
-          this.configService.get<number>('WEBSOCKET_POOLING_TIMEOUT', 5000)
-        );
-        this.schedulerRegistry.addTimeout(SCHEDULER_HANDLERS.MESSAGES, timeout);
+
         this.logger.log(
           `Skip pooling trigger. waiting ${this.configService.get<number>(
             'WEBSOCKET_POOLING_TIMEOUT',
             5000
           )}`
         );
+
+        await this.sleepAndIterate(
+          this.configService.get<number>('WEBSOCKET_POOLING_TIMEOUT', 5000)
+        );
+
         return;
       }
 
@@ -147,17 +162,17 @@ export class DsbMessagePoolingService implements OnModuleInit {
           'No subscriptions found. Push messages are enabled when the DID is added to a channel'
         );
 
-        const timeout = setTimeout(
-          callback,
-          this.configService.get<number>('WEBSOCKET_POOLING_TIMEOUT', 5000)
-        );
-        this.schedulerRegistry.addTimeout(SCHEDULER_HANDLERS.MESSAGES, timeout);
         this.logger.log(
           `[no subscriptions] Waiting ${this.configService.get<number>(
             'WEBSOCKET_POOLING_TIMEOUT',
             5000
           )}`
         );
+
+        await this.sleepAndIterate(
+          this.configService.get<number>('WEBSOCKET_POOLING_TIMEOUT', 5000)
+        );
+
         return;
       }
 
@@ -169,20 +184,20 @@ export class DsbMessagePoolingService implements OnModuleInit {
         );
       }
 
-      const timeout = setTimeout(callback, 1000); //immediate get msg available
-      this.schedulerRegistry.addTimeout(SCHEDULER_HANDLERS.MESSAGES, timeout);
+      await this.sleepAndIterate(1000);
+
+      return;
     } catch (e) {
       this.logger.error(e);
-      const timeout = setTimeout(
-        callback,
-        this.configService.get<number>('WEBSOCKET_POOLING_TIMEOUT', 5000)
-      );
-      this.schedulerRegistry.addTimeout(SCHEDULER_HANDLERS.MESSAGES, timeout);
-      this.logger.log(
+      this.logger.error(
         `[exception caught] Waiting ${this.configService.get<number>(
           'WEBSOCKET_POOLING_TIMEOUT',
           5000
         )}`
+      );
+
+      await this.sleepAndIterate(
+        this.configService.get<number>('WEBSOCKET_POOLING_TIMEOUT', 5000)
       );
     }
   }
@@ -206,7 +221,9 @@ export class DsbMessagePoolingService implements OnModuleInit {
             .then((totalMsg) => {
               msgCount += totalMsg;
             })
-            .catch();
+            .catch((e) => {
+              this.logger.error(e);
+            });
         })
       );
       this.logger.log('[pullMessagesAndEmit] End Promise.allSettled');
@@ -216,7 +233,9 @@ export class DsbMessagePoolingService implements OnModuleInit {
         .then((totalMsg) => {
           msgCount += totalMsg;
         })
-        .catch();
+        .catch((e) => {
+          this.logger.error(e);
+        });
       this.logger.log('[pullMessagesAndEmit] End pullMessagesAndEmit');
     }
 
@@ -347,19 +366,17 @@ export class DsbMessagePoolingService implements OnModuleInit {
         });
 
       if (idsNotAck.length > 0) {
-        this.acksWrapperRepository.acksRepository.save(idsNotAck).then();
+        await this.acksWrapperRepository.acksRepository.save(idsNotAck);
       }
 
       const deleteAckMessageIds = idsNotAckVerify.filter((e) =>
         successAckMessageIds.acked.includes(e)
       );
       if (deleteAckMessageIds.length > 0) {
-        this.acksWrapperRepository.acksRepository
-          .delete({
-            messageId: In(deleteAckMessageIds),
-            clientId,
-          })
-          .then();
+        await this.acksWrapperRepository.acksRepository.delete({
+          messageId: In(deleteAckMessageIds),
+          clientId,
+        });
       }
     } catch (e) {
       this.logger.error(`[WS][sendMessagesToSubscribers] ${e}`);

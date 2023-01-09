@@ -6,6 +6,7 @@ import {
 } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
 import { SecretsEngineService } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
 import {
+  AssociationKeyEntity,
   ChannelEntity,
   ChannelTopic,
   DidEntity,
@@ -57,6 +58,10 @@ import { ReqLockService } from './req-lock.service';
 import moment from 'moment';
 import { In } from 'typeorm';
 import { AckPendingNotFoundException } from '../exceptions/ack-pending-not-found.exception';
+import {
+  AssociationKeyNotAvailableException,
+  AssociationKeysService,
+} from '@dsb-client-gateway/ddhub-client-gateway-association-keys';
 
 export enum EventEmitMode {
   SINGLE = 'SINGLE',
@@ -83,7 +88,8 @@ export class MessageService {
     protected readonly ddhubFilesService: DdhubFilesService,
     protected readonly fileMetadataWrapper: FileMetadataWrapperRepository,
     protected readonly reqLockService: ReqLockService,
-    protected readonly pendingAcksWrapperRepository: PendingAcksWrapperRepository
+    protected readonly pendingAcksWrapperRepository: PendingAcksWrapperRepository,
+    protected readonly associationKeysService: AssociationKeysService
   ) {
     this.uploadPath = configService.get<string>('UPLOAD_FILES_DIR');
     this.downloadPath = configService.get<string>('DOWNLOAD_FILES_DIR');
@@ -112,6 +118,7 @@ export class MessageService {
     if (channel.type !== ChannelType.PUB) {
       throw new ChannelTypeNotPubException(channel.fqcn);
     }
+
     const clientGatewayMessageId: string = uuidv4();
 
     // @TODO this is not a ideal solution, change once new logger is introduced
@@ -125,34 +132,28 @@ export class MessageService {
     messageLoggerContext.debug('generating random key');
     const randomKey: string = this.keyService.generateRandomKey();
 
+    const shouldEncrypt: boolean = this.shouldEncrypt(channel);
+
     messageLoggerContext.debug(
-      'attempting to encrypt payload, encryption enabled: ' +
-        channel.payloadEncryption
+      'attempting to encrypt payload, encryption enabled: ' + shouldEncrypt
     );
 
-    const message = channel.payloadEncryption
+    const message = shouldEncrypt
       ? this.keyService.encryptMessage(
-          dto.payload,
-          randomKey,
-          EncryptedMessageType['UTF-8']
-        )
+        dto.payload,
+        randomKey,
+        EncryptedMessageType['UTF-8']
+      )
       : dto.payload;
 
     messageLoggerContext.debug('fetching private key');
-    const privateKey = await this.secretsEngineService.getPrivateKey();
 
-    if (!privateKey) {
-      throw new NoPrivateKeyException();
-    }
-
-    messageLoggerContext.debug('generating signature');
-
-    const signature = this.keyService.createSignature(
+    const signature: string | undefined = await this.generateSignature(
       message,
-      privateKey.length === 66 ? privateKey : '0x' + privateKey
+      messageLoggerContext
     );
 
-    if (channel.payloadEncryption) {
+    if (shouldEncrypt) {
       messageLoggerContext.debug('sending symmetric keys');
 
       await this.sendSymmetricKeys(
@@ -175,19 +176,42 @@ export class MessageService {
         topic.version,
         signature,
         clientGatewayMessageId,
-        channel.payloadEncryption,
+        shouldEncrypt,
+        dto.anonymousRecipient ?? [],
         dto.transactionId
       );
 
     for (const res of result.status) {
       for (const detail of res.details) {
-        this.logger.log(
+        messageLoggerContext.log(
           `message sent with id ${detail.messageId} to ${detail.did} with status code ${detail.statusCode}`
         );
       }
     }
 
     return result;
+  }
+
+  private async generateSignature(
+    message,
+    messageLoggerContext: Logger
+  ): Promise<string | undefined> {
+    const privateKey = await this.secretsEngineService.getPrivateKey();
+
+    if (!privateKey) {
+      throw new NoPrivateKeyException();
+    }
+
+    messageLoggerContext.debug('generating signature');
+
+    return this.keyService.createSignature(
+      message,
+      privateKey.length === 66 ? privateKey : '0x' + privateKey
+    );
+  }
+
+  private shouldEncrypt(channel: ChannelEntity): boolean {
+    return channel.useAnonymousExtChannel ? false : channel.payloadEncryption;
   }
 
   @Span('message_sendSymmetricKeys')
@@ -271,21 +295,22 @@ export class MessageService {
   private async processMessage(
     payloadEncryption: boolean,
     message: SearchMessageResponseDto,
-    didEntity: DidEntity | null
+    didEntity: DidEntity | null,
+    useAnonymousExtChannel: boolean
   ): Promise<GetMessageResponse> {
     let baseMessage: Omit<GetMessageResponse, 'signatureValid' | 'decryption'> =
-      {
-        id: message.messageId,
-        topicVersion: message.topicVersion,
-        topicName: '',
-        topicOwner: '',
-        topicSchemaType: '',
-        payload: message.payload,
-        signature: message.signature,
-        sender: message.senderDid,
-        timestampNanos: message.timestampNanos,
-        transactionId: message.transactionId,
-      };
+    {
+      id: message.messageId,
+      topicVersion: message.topicVersion,
+      topicName: '',
+      topicOwner: '',
+      topicSchemaType: '',
+      payload: message.payload,
+      signature: message.signature,
+      sender: message.senderDid,
+      timestampNanos: message.timestampNanos,
+      transactionId: message.transactionId,
+    };
 
     try {
       const topic: TopicEntity = await this.topicService.getTopicById(
@@ -298,6 +323,16 @@ export class MessageService {
         topicOwner: topic.owner,
         topicSchemaType: topic.schemaType,
       };
+
+      if (useAnonymousExtChannel) {
+        return {
+          ...baseMessage,
+          signatureValid: EncryptionStatus.NOT_REQUIRED,
+          decryption: {
+            status: EncryptionStatus.NOT_REQUIRED,
+          },
+        };
+      }
 
       if (message.isFile) {
         return {
@@ -398,11 +433,17 @@ export class MessageService {
   public async sendAckBy(
     messageIds: string[],
     clientId: string,
-    from: string
+    from: string,
+    anonymousRecipient?: string
   ): Promise<AckResponse> {
     this.logger.log(messageIds);
     const successAckMessageIds: AckResponse =
-      await this.ddhubMessageService.messagesAckBy(messageIds, clientId, from);
+      await this.ddhubMessageService.messagesAckBy(
+        messageIds,
+        clientId,
+        from,
+        anonymousRecipient
+      );
     return successAckMessageIds;
   }
 
@@ -474,12 +515,16 @@ export class MessageService {
 
     const consumer = `${clientId}:${fqcn}`;
 
+    const associationKey: string | undefined = await this.getAssociationKey(
+      channel.useAnonymousExtChannel
+    );
+
     if (ack) {
       try {
         messageLoggerContext.log(
           `[getMessages] Sending for ack for consumer ${consumer}`
         );
-        await this.validatePendingAck(consumer, from);
+        await this.validatePendingAck(consumer, from, associationKey);
       } catch (e) {
         this.logger.error(`[getMessages] error ocurred while sending ack`, e);
         return [];
@@ -493,7 +538,8 @@ export class MessageService {
         topicsIds,
         `${clientId}:${fqcn}`,
         from,
-        amount
+        amount,
+        associationKey
       );
 
     //no messages then return empty array
@@ -517,7 +563,8 @@ export class MessageService {
         const processedMessage: GetMessageResponse = await this.processMessage(
           message.payloadEncryption,
           message,
-          prefetchedSignatureKeys[message.senderDid]
+          prefetchedSignatureKeys[message.senderDid],
+          channel.useAnonymousExtChannel
         );
 
         return processedMessage;
@@ -556,21 +603,24 @@ export class MessageService {
       `[getMessages] Total fulfilled messages ${messageResponses.length}`
     );
 
-    const idsPendingAck: PendingAcksEntity[] = fulfilledMessages.map((e) => {
-      return {
-        clientId: consumer,
-        messageId: e.id,
-        from,
-        mbTimestamp: moment(e.timestampNanos / (1000 * 1000))
-          .utc()
-          .toDate(),
-      };
-    });
+    if (ack) {
+      const idsPendingAck: PendingAcksEntity[] = fulfilledMessages.map((e) => {
+        return {
+          clientId: consumer,
+          messageId: e.id,
+          from,
+          anonymousRecipient: associationKey,
+          mbTimestamp: moment(e.timestampNanos / (1000 * 1000))
+            .utc()
+            .toDate(),
+        };
+      });
 
-    if (idsPendingAck.length > 0) {
-      await this.pendingAcksWrapperRepository.pendingAcksRepository.save(
-        idsPendingAck
-      );
+      if (idsPendingAck.length > 0) {
+        await this.pendingAcksWrapperRepository.pendingAcksRepository.save(
+          idsPendingAck
+        );
+      }
     }
 
     return fulfilledMessages.sort((a, b) => {
@@ -759,12 +809,17 @@ export class MessageService {
     }
   }
 
-  private async validatePendingAck(consumer: string, from: string) {
+  private async validatePendingAck(
+    consumer: string,
+    from: string,
+    anonymousRecipient?: string
+  ) {
     const data: PendingAcksEntity[] =
       await this.pendingAcksWrapperRepository.pendingAcksRepository.find({
         where: {
           clientId: consumer,
-          from: from ? from : ''
+          from: from ? from : '',
+          anonymousRecipient: anonymousRecipient ? anonymousRecipient : '',
         },
       });
     if (data.length == 0) {
@@ -775,7 +830,8 @@ export class MessageService {
     const ackResponse: AckResponse = await this.sendAckBy(
       idsPendingAck,
       consumer,
-      from
+      from,
+      anonymousRecipient
     ).catch((e) => {
       this.logger.error(`something went wrong when ack messages`);
       this.logger.error(e);
@@ -790,7 +846,8 @@ export class MessageService {
         .delete({
           messageId: In(ackResponse.notFound),
           clientId: consumer,
-          from: from ? from : ''
+          from: from ? from : '',
+          anonymousRecipient: anonymousRecipient ? anonymousRecipient : '',
         })
         .then();
     }
@@ -802,7 +859,8 @@ export class MessageService {
         .delete({
           messageId: In(ackResponse.acked),
           clientId: consumer,
-          from: from ? from : ''
+          from: from ? from : '',
+          anonymousRecipient: anonymousRecipient ? anonymousRecipient : '',
         })
         .then();
     }
@@ -897,5 +955,22 @@ export class MessageService {
     }
 
     return null;
+  }
+
+  private async getAssociationKey(
+    useAnonymousExtChannel: boolean
+  ): Promise<string | undefined> {
+    if (!useAnonymousExtChannel) {
+      return undefined;
+    }
+
+    const currentKey: AssociationKeyEntity | null =
+      await this.associationKeysService.getCurrentKey();
+
+    if (!currentKey) {
+      throw new AssociationKeyNotAvailableException();
+    }
+
+    return currentKey.associationKey;
   }
 }

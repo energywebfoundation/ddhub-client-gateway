@@ -56,7 +56,6 @@ describe('ClientsService (SPEC)', () => {
     it('should not sync client as it already exists in database', async () => {
       const entity = new ClientEntity();
 
-      entity.id = 'ID';
       entity.clientId = 'CLIENT_ID';
       entity.createdDate = new Date();
       entity.updatedDate = new Date();
@@ -103,7 +102,6 @@ describe('ClientsService (SPEC)', () => {
     it('should directly save entity as client does not exists', async () => {
       const entity = new ClientEntity();
 
-      entity.id = 'ID';
       entity.clientId = 'CLIENT_ID';
       entity.createdDate = new Date();
       entity.updatedDate = new Date();
@@ -130,7 +128,6 @@ describe('ClientsService (SPEC)', () => {
     it('should not create new client due to limit', async () => {
       const entity = new ClientEntity();
 
-      entity.id = 'ID';
       entity.clientId = 'CLIENT_ID';
       entity.createdDate = new Date();
       entity.updatedDate = new Date();
@@ -165,7 +162,6 @@ describe('ClientsService (SPEC)', () => {
     it('should create new client', async () => {
       const entity = new ClientEntity();
 
-      entity.id = 'ID';
       entity.clientId = 'CLIENT_ID';
       entity.createdDate = new Date();
       entity.updatedDate = new Date();
@@ -177,6 +173,12 @@ describe('ClientsService (SPEC)', () => {
       wrapper.repository.count = jest
         .fn()
         .mockImplementationOnce(async () => 0);
+
+      wrapper.repository.save = jest.fn().mockImplementationOnce(async () => {
+        return new Promise((resolve, reject) => {
+          resolve(null);
+        });
+      });
 
       configService.getConfig = jest.fn().mockImplementationOnce(async () => ({
         msgExpired: 5,
