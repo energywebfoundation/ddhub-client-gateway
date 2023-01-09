@@ -1,0 +1,24 @@
+{
+  "root": "libs/ddhub-client-gateway-association-keys",
+  "sourceRoot": "libs/ddhub-client-gateway-association-keys/src",
+  "targets": {
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": [
+          "libs/ddhub-client-gateway-association-keys/**/*.ts"
+        ]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/libs/ddhub-client-gateway-association-keys"],
+      "options": {
+        "jestConfig": "libs/ddhub-client-gateway-association-keys/jest.config.js",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": []
+}

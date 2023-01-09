@@ -59,3 +59,5 @@ certificate
 migrations-build
 get-started/data
 apps/dsb-client-gateway-api-e2e/.env.secret
+*.heapsnapshot
+.clinic
