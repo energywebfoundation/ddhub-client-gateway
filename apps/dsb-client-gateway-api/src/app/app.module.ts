@@ -47,6 +47,7 @@ export class AppModule {
         useFactory: (configService: ConfigService) => ({
           pinoHttp: {
             genReqId: (req) => req.headers['x-request-id'] || uuidv4(),
+            level: configService.get<string>('LOG_LEVEL'),
             transport: {
               target: 'pino-pretty',
               options: {
