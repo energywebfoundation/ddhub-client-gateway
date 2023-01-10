@@ -12,6 +12,7 @@ export interface SwalProps {
   text?: string;
   showCancelButton?: boolean;
   confirmButtonText?: string;
+  cancelButtonText?: string;
   width?: string;
   html?: string | HTMLElement
 }
@@ -33,6 +34,7 @@ export const Swal = () => {
     text,
     showCancelButton,
     confirmButtonText,
+    cancelButtonText,
     width,
     html,
   }: SwalProps) =>
@@ -42,6 +44,7 @@ export const Swal = () => {
       text,
       showCancelButton,
       confirmButtonText: confirmButtonText ?? 'Confirm',
+      cancelButtonText: cancelButtonText ?? 'Cancel',
       width: width ?? '512px',
       html,
       customClass: {
