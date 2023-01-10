@@ -2,12 +2,12 @@ import {
   Dialog,
   DialogSubTitle,
   CloseButton,
+  Steps,
 } from '@ddhub-client-gateway-frontend/ui/core';
 import { DialogTitle, Grid, Box, Typography, Stack } from '@mui/material';
 import { UPDATE_STEPS } from '../Create/Steps/models/updateSteps';
 import { Restrictions } from '../Create/Restrictions/Restrictions';
 import { Topics } from '../Create/Topics/Topics';
-import { Steps } from '../Create/Steps/Steps';
 import { getChannelType } from '../../../utils';
 import { ChannelConnectionType } from '../../../models/channel-connection-type.enum';
 import { ChannelImage } from '../../../components';

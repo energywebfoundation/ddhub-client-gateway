@@ -53,6 +53,8 @@ export const useCustomAlert = () => {
 
       if (errData.additionalDetails?.errors?.[0]) {
         subtitle = errData.additionalDetails.errors[0];
+      } else if (errData.additionalDetails?.message) {
+        subtitle = errData.additionalDetails.message;
       }
     }
 
