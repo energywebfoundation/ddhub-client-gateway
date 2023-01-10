@@ -62,7 +62,7 @@ ddhub-client-gateway-api:
         IPFS_HOST: "ipfs.infura.io"
         IPFS_PROTOCOL: "https://"
         IPFS_PORT: "5001"
-        AK_FQCN: "ak.enc.sub"
+        AK_FQCN: "ak.enc.pub"
         AK_TOPIC_NAME: "associationKey"
         AK_TOPIC_OWNER: "ddhub.apps.energyweb.iam.ewc"
         AK_TOPIC_VERSION: "1.0.0"
