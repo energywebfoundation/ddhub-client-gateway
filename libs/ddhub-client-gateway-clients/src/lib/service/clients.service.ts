@@ -164,7 +164,6 @@ export class ClientsService {
           throw e;
         }
       });
-
     this.logger.log(`created new client ${clientId}`);
   }
 

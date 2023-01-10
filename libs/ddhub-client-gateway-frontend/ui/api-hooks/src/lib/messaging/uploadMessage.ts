@@ -5,6 +5,14 @@ import {
   SendMessageDto,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { useCustomAlert } from '@ddhub-client-gateway-frontend/ui/core';
+import { Subject } from 'rxjs';
+
+const subject = new Subject();
+
+export const messageDataService = {
+  setData: (d: any) => subject.next({ value: d }),
+  getData: () => subject.asObservable(),
+};
 
 export const useUploadMessage = (isLarge: boolean) => {
   const Swal = useCustomAlert();
@@ -12,12 +20,6 @@ export const useUploadMessage = (isLarge: boolean) => {
     useMessageControlllerCreate();
   const { mutate: messageUploadMutate, isLoading: messageUploading } =
     useMessageControlllerUploadFile();
-
-  const uploadMessageSuccess = async () => {
-    await Swal.success({
-      text: 'You have successfully uploaded the message',
-    });
-  };
 
   const uploadMessageError = async (err: any) => {
     console.error(err);
@@ -33,8 +35,8 @@ export const useUploadMessage = (isLarge: boolean) => {
         data: values,
       },
       {
-        onSuccess: () => {
-          uploadMessageSuccess();
+        onSuccess: (res) => {
+          messageDataService.setData(res);
           onUpload();
         },
         onError: uploadMessageError,
@@ -58,8 +60,8 @@ export const useUploadMessage = (isLarge: boolean) => {
         data: formattedValues,
       },
       {
-        onSuccess: () => {
-          uploadMessageSuccess();
+        onSuccess: (res) => {
+          messageDataService.setData(res);
           onUpload();
         },
         onError: uploadMessageError,

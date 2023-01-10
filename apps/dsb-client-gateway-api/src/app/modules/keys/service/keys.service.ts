@@ -239,10 +239,9 @@ export class KeysService implements OnModuleInit {
   public async verifySignature(
     senderDid: string,
     signature: string,
-    encryptedData: string
+    encryptedData: string,
+    did: DidEntity | null
   ): Promise<boolean> {
-    const did = await this.getDid(senderDid);
-
     if (!did) {
       this.logger.error(
         `Sender does not have public key configured on path ${senderDid}#${DIDPublicKeyTags.DSB_SIGNATURE_KEY}`
@@ -257,9 +256,10 @@ export class KeysService implements OnModuleInit {
       return recoveredPublicKey === did.publicSignatureKey;
     } catch (e) {
       this.logger.error(
-        `error ocurred while recoverPublicKey in verify signature`,
-        e
+        `error occurred while recoverPublicKey in verify signature`
       );
+      this.logger.error(e);
+
       return false;
     }
   }
@@ -412,7 +412,7 @@ export class KeysService implements OnModuleInit {
 
     if (identity.balance === BalanceState.NONE) {
       this.logger.error(
-        'Not updating keys as balance is none',
+        'Not updating keys as balance is none %s',
         identity.address
       );
 
@@ -475,9 +475,10 @@ export class KeysService implements OnModuleInit {
         }
       } catch (e) {
         this.logger.error(
-          'something is wrong with private RSA key, creating new one',
-          e
+          'something is wrong with private RSA key, creating new one'
         );
+
+        this.logger.error(e);
       }
 
       this.logger.error(
@@ -563,7 +564,7 @@ export class KeysService implements OnModuleInit {
     return { publicKey, privateKey };
   }
 
-  protected async getDid(did: string): Promise<DidEntity | null> {
+  public async getDid(did: string): Promise<DidEntity | null> {
     const cacheDid: DidEntity | null =
       await this.didWrapper.didRepository.findOne({
         where: {
@@ -634,5 +635,21 @@ export class KeysService implements OnModuleInit {
     }
 
     return didEntity;
+  }
+
+  public async prefetchSignatureKeys(
+    uniqueSenderDids: string[]
+  ): Promise<Record<string, DidEntity | null>> {
+    return uniqueSenderDids.reduce(async (acc, curr: string) => {
+      const did: DidEntity | null = await this.getDid(curr);
+
+      if (!did) {
+        acc[curr] = null;
+      }
+
+      acc[curr] = did;
+
+      return acc;
+    }, {});
   }
 }

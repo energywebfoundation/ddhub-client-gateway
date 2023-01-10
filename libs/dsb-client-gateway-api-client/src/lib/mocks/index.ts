@@ -150,7 +150,9 @@ export const getTopicsControllerGetTopicHistoryByIdAndVersionMock = () => ({
 export const getChannelControllerGetByTypeMock = () => [
   {
     fqcn: 'channel.name',
+    payloadEncryption: false,
     type: 'sub',
+    useAnonymousExtChannel: true,
     conditions: {
       dids: ['did:ethr:volta:0x09Df5d33f1242E1b8aA5E0E0F6BfA687E6846993'],
       roles: ['marketoperator.roles', 'marketoperator.roles', 'marketoperator.roles', 'marketoperator.roles', 'marketoperator.roles'],
@@ -165,7 +167,9 @@ export const getChannelControllerGetByTypeMock = () => [
   },
   {
     fqcn: 'channel.name.2',
+    payloadEncryption: false,
     type: 'pub',
+    useAnonymousExtChannel: false,
     conditions: {
       dids: ['did:ethr:volta:0x09Df5d33f1242E1b8aA5E0E0F6BfA687E6846993'],
       roles: ['marketoperator.roles'],
@@ -180,7 +184,9 @@ export const getChannelControllerGetByTypeMock = () => [
   },
   {
     fqcn: 'channel.name.3',
+    payloadEncryption: true,
     type: 'upload',
+    useAnonymousExtChannel: true,
     conditions: {
       dids: ['did:ethr:volta:0x09Df5d33f1242E1b8aA5E0E0F6BfA687E6846993'],
       roles: ['marketoperator.roles'],
@@ -195,7 +201,9 @@ export const getChannelControllerGetByTypeMock = () => [
   },
   {
     fqcn: 'channel.name.4',
+    payloadEncryption: false,
     type: 'download',
+    useAnonymousExtChannel: false,
     conditions: {
       dids: ['did:ethr:volta:0x09Df5d33f1242E1b8aA5E0E0F6BfA687E6846993'],
       roles: ['marketoperator.roles'],
@@ -329,4 +337,35 @@ export const getClientsMock = () => {
       "updatedDate": "2022-09-21 08:04:06.020037"
     }
   ];
+};
+
+export const postMessageMock = () => {
+  return {
+    "clientGatewayMessageId": "a6072307-5d65-4f3a-8e57-9db899b5d853",
+    "recipients": {
+      "failed": 1,
+      "sent": 1,
+      "total": 2
+    },
+    "status": [{
+      "details": [{
+        "did": "did:ethr:volta:0x552761011ea5b332605Bc1Cc2020A4a4f8C738CD",
+        "messageId": "6359e97b15f7386ee0a3fd34",
+        "statusCode": 200
+      }],
+      "name": "SENT"
+    }, {
+      "details": [
+        {
+          "did": "did:ethr:volta:0x6d0175fB07325925766A5B68A1cDbb459C2DFa1b",
+          "err": {
+            "code": "MB::INVALID_FQCN",
+            "reason": "fqcn:did:ethr:volta:0x6d0175fB07325925766A5B68A1cDbb459C2DFa1b not exists"
+          },
+          "statusCode": 500
+        }
+      ],
+      "name": "FAILED"
+    }]
+  };
 };

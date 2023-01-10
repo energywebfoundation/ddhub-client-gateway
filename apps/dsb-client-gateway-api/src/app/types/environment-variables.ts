@@ -12,6 +12,22 @@ export enum WebSocketImplementation {
 }
 
 export const API_ENVS = Joi.object({
+  AK_SHARE_CRON_ENABLED: Joi.boolean()
+    .default(false)
+    .description('Should share association keys'),
+  AK_SHARE_CRON_SCHEDULE: Joi.string()
+    .default('*/1 * * * *')
+    .description('How often should share association keys'),
+  AK_FQCN: Joi.string().optional().description('Association keys FQCN'),
+  AK_TOPIC_NAME: Joi.string()
+    .optional()
+    .description('Association keys topic name'),
+  AK_TOPIC_OWNER: Joi.string()
+    .optional()
+    .description('Association keys topic owner'),
+  AK_TOPIC_VERSION: Joi.string()
+    .optional()
+    .description('Association keys topic version'),
   API_KEY: Joi.string().optional().description('API Key to protect API'),
   API_USERNAME: Joi.string()
     .optional()

@@ -13,7 +13,19 @@ export interface DetailsProps {
 
 export const Details = ({ nextClick, channelValues, validFqcn }: DetailsProps) => {
   const { classes } = useStyles();
-  const { register, fields, handleSubmit, isValid, control, connectionOnChange, showEncryption, encryptionOnChange, isEncrypt } =
+  const {
+    register,
+    fields,
+    handleSubmit,
+    isValid,
+    control,
+    connectionOnChange,
+    showEncryption,
+    encryptionOnChange,
+    isEncrypt,
+    isUseAnonExtChnl,
+    useAnonExtChnlOnChange
+  } =
     useDetailsEffects(channelValues);
 
   return (
@@ -46,6 +58,24 @@ export const Details = ({ nextClick, channelValues, validFqcn }: DetailsProps) =
           />
 
           <Divider className={classes.divider} />
+
+          <FormControlLabel
+            className={classes.switchLabel}
+            control={
+              <CheckSwitch
+                id={fields.useAnonymousExtChannel.name}
+                checked={isUseAnonExtChnl}
+                name={fields.useAnonymousExtChannel.name}
+                onChange={useAnonExtChnlOnChange}
+                color="primary"
+              />
+            }
+            labelPlacement="start"
+            id={fields.useAnonymousExtChannel.name}
+            name={fields.useAnonymousExtChannel.name}
+            label={fields.useAnonymousExtChannel.label}
+            {...register(fields.useAnonymousExtChannel.name)}
+          />
 
           { showEncryption && (
             <FormControlLabel

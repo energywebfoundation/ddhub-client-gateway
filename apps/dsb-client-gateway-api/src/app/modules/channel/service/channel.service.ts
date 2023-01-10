@@ -63,6 +63,7 @@ export class ChannelService {
     await this.wrapperRepository.channelRepository.save({
       fqcn: payload.fqcn,
       type: payload.type,
+      useAnonymousExtChannel: payload.useAnonymousExtChannel,
       payloadEncryption: payload.payloadEncryption,
       conditions: {
         topics: topicsWithIds,
@@ -150,7 +151,10 @@ export class ChannelService {
     const channel: ChannelEntity = await this.getChannelOrThrow(fqcn);
 
     const hasChangedRestrictedFields: boolean =
-      channel.type !== dto.type || channel.fqcn !== fqcn;
+      channel.type !== dto.type ||
+      channel.fqcn !== fqcn ||
+      (channel.useAnonymousExtChannel !== dto.useAnonymousExtChannel &&
+        dto.useAnonymousExtChannel !== undefined);
 
     if (hasChangedRestrictedFields) {
       throw new ChannelUpdateRestrictedFieldsException();

@@ -16,6 +16,9 @@ export class PendingAcksEntity {
   @PrimaryColumn()
   from: string;
 
+  @PrimaryColumn()
+  anonymousRecipient: string;
+
   @Column()
   public mbTimestamp!: Date;
 

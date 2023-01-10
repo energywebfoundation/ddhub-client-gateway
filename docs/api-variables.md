@@ -2,6 +2,12 @@
 
 | KEY | TYPE | DEFAULT | DESCRIPTION | ALLOWED_VALUES | DEPENDENCY |
 | --- | ---- | ------- | ----------- | -------------- | ---------- |
+| AK_SHARE_CRON_ENABLED | boolean | false | Should share association keys |  |  |
+| AK_SHARE_CRON_SCHEDULE | string | */1 * * * * | How often should share association keys |  |  |
+| AK_FQCN | string |  | Association keys FQCN |  |  |
+| AK_TOPIC_NAME | string |  | Association keys topic name |  |  |
+| AK_TOPIC_OWNER | string |  | Association keys topic owner |  |  |
+| AK_TOPIC_VERSION | string |  | Association keys topic version |  |  |
 | API_KEY | string |  | API Key to protect API |  |  |
 | API_USERNAME | string |  | USERNAME for authentication |  |  |
 | API_PASSWORD | string |  | PASSWORD for authentication |  |  |
@@ -30,6 +36,8 @@
 | SECRET_PREFIX | string | ddhub/ |  |  |  |
 | AWS_REGION | string | ap-southeast-2 | AWS Secrets Manager region |  | SECRETS_ENGINE == aws |
 | AZURE_VAULT_URL | string |  | Azure Vault URL |  | SECRETS_ENGINE == azure |
+| ASSOCIATION_KEY_INTERVAL | number | 24 | Association key interval (hours) |  |  |
+| ASSOCIATION_KEY_OFFSET | number | 144 | Association key validity time (hours) |  |  |
 | REQ_LOCK_TIMEOUT | number | 5 | Maximum request lock lifetime (in seconds) |  |  |
 | VERSION_FILE_PATH | string | ./version.md | Version file path |  |  |
 | IPFS_HOST | string | ipfs.infura.io | IPFS Host |  |  |
@@ -41,6 +49,7 @@
 | DSB_BASE_URL | string | https://dsb-demo.energyweb.org | Message broker URL |  |  |
 | UPLOAD_FILES_DIR | string | ./upload | Directory where we should store temporary files for upload |  |  |
 | DOWNLOAD_FILES_DIR | string | ./download | Directory where we should store downloaded files for limited time |  |  |
+| LOG_LEVEL | string | info | Minimal log level ("fatal" \| "error" | "warn" | "info" | "debug" | "trace" | "silent") | fatal,error,warn,info,debug,trace |  |
 | LOG_PRETTY | boolean | false | Should colorize logs, only use in dev mode |  |  |
 | MTLS_ENABLED | boolean | true | Should enable mTLS |  |  |
 | DB_SYNC | boolean | false | Should generate migrations (dev use only) |  |  |

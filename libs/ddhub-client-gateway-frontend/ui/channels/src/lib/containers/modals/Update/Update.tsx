@@ -2,18 +2,19 @@ import {
   Dialog,
   DialogSubTitle,
   CloseButton,
+  Steps,
 } from '@ddhub-client-gateway-frontend/ui/core';
 import { DialogTitle, Grid, Box, Typography, Stack } from '@mui/material';
 import { UPDATE_STEPS } from '../Create/Steps/models/updateSteps';
 import { Restrictions } from '../Create/Restrictions/Restrictions';
 import { Topics } from '../Create/Topics/Topics';
-import { Steps } from '../Create/Steps/Steps';
 import { getChannelType } from '../../../utils';
 import { ChannelConnectionType } from '../../../models/channel-connection-type.enum';
 import { ChannelImage } from '../../../components';
 import { useUpdateChannelEffects } from './Update.effects';
 import { useStyles } from '../Create/Create.styles';
 import { Check, X } from 'react-feather';
+import { includes } from 'lodash';
 
 export const Update = () => {
   const {
@@ -110,9 +111,19 @@ export const Update = () => {
                   </Typography>
                 </Box>
               </Stack>
+              <Stack direction="row" mt={1.5}>
+                <Typography className={classes.encryptionLabel} variant="body2">
+                  Use anonymous external channel:
+                </Typography>
+                <Box display="flex">
+                  <Typography className={classes.encryptionValue} variant="body2">
+                    { channelValues?.useAnonymousExtChannel ? <Check className={classes.iconCheck} /> : <X className={classes.iconX} />}
+                  </Typography>
+                </Box>
+              </Stack>
               {
-                (ChannelConnectionType[channel.type] === ChannelConnectionType.pub) && (
-                  <Stack direction="row" mt={1.5}>
+                (includes([ChannelConnectionType.pub, ChannelConnectionType.upload], ChannelConnectionType[channel.type])) && (
+                  <Stack direction="row" mt={0.5}>
                     <Typography className={classes.encryptionLabel} variant="body2">
                       Payload encryption:
                     </Typography>

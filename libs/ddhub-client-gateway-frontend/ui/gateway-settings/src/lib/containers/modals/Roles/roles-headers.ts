@@ -10,4 +10,4 @@ export const ROLES_HEADERS = [
     accessor: 'status',
     color: '#fff',
   },
-]
+];

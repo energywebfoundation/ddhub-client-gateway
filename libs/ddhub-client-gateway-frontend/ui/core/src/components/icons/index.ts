@@ -11,3 +11,4 @@ export * from './DefaultScheduler';
 export * from './FileUploadPartial';
 export * from './ClientSubscriptionIcon';
 export * from './RolesIcon';
+export * from './AlertIcon';

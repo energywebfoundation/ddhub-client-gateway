@@ -87,6 +87,7 @@ describe('ChannelService (SPEC)', () => {
 
       const payload = {
         fqcn: 'test',
+        useAnonymousExtChannel: false,
         type: ChannelType.PUB,
         conditions: {
           topics: [
@@ -153,6 +154,7 @@ describe('ChannelService (SPEC)', () => {
       const payload = {
         fqcn: 'test',
         type: ChannelType.DOWNLOAD,
+        useAnonymousExtChannel: false,
         conditions: {
           topics: [
             {
@@ -183,6 +185,7 @@ describe('ChannelService (SPEC)', () => {
       const channelEntity: ChannelEntity = {
         fqcn: 'test',
         type: ChannelType.DOWNLOAD,
+        useAnonymousExtChannel: false,
         conditions: {
           topics: [],
           roles: [],
@@ -202,6 +205,7 @@ describe('ChannelService (SPEC)', () => {
         await channelService.createChannel({
           fqcn: channelEntity.fqcn,
           type: channelEntity.type,
+          useAnonymousExtChannel: false,
           payloadEncryption: channelEntity.payloadEncryption,
           conditions: channelEntity.conditions,
         });

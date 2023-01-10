@@ -72,6 +72,8 @@ export function GenericTable<T>({
     handleChangeRowsPerPage,
     isSelected,
     handleCheckboxClick,
+    handleSelectAllClick,
+    selected,
   } = useTableEffects({
     headers,
     tableRows,
@@ -83,7 +85,11 @@ export function GenericTable<T>({
     defaultSortBy,
     backendSearch,
     setSelectedItems,
+    showCheckbox,
   });
+
+  const selectedTotal = selected.length;
+  const currentPageRowsTotal = rows.length < pageSize ? rows.length : pageSize;
 
   return (
     <>
@@ -111,8 +117,15 @@ export function GenericTable<T>({
             <TableHead>
               <TableRow>
                 { showCheckbox && (
-                  <TableCell
-                    classes={{ head: classes.head }}>
+                  <TableCell padding="checkbox" classes={{ head: classes.head }}>
+                    <Checkbox
+                      color="primary"
+                      checked={rows.length > 0 && selectedTotal === currentPageRowsTotal}
+                      onChange={handleSelectAllClick}
+                      inputProps={{
+                        'aria-label': 'select all',
+                      }}
+                    />
                   </TableCell>
                 )}
 
