@@ -16,7 +16,10 @@ import {
   IamNotInitializedException,
   IamService,
 } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
-import { DdhubLoginService } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
+import {
+  DdhubChannelStreamService,
+  DdhubLoginService,
+} from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
 import promiseRetry from 'promise-retry';
 import { In, LessThanOrEqual } from 'typeorm';
 
@@ -32,7 +35,8 @@ export class AssociationKeysService implements OnApplicationBootstrap {
     protected readonly configService: ConfigService,
     protected readonly iamService: IamService,
     protected readonly ddhubLoginService: DdhubLoginService,
-    protected readonly retryConfigService: RetryConfigService
+    protected readonly retryConfigService: RetryConfigService,
+    protected readonly ddhubChannelStreamService: DdhubChannelStreamService
   ) {}
 
   public async updateKeySharedState(keys: string[]): Promise<void> {
@@ -311,8 +315,25 @@ export class AssociationKeysService implements OnApplicationBootstrap {
       'ASSOCIATION_KEY_OFFSET'
     );
 
-    await this.wrapper.repository.delete({
-      validTo: LessThanOrEqual(moment().subtract(offset, 'hours').toDate()),
-    });
+    const keysToDelete: AssociationKeyEntity[] =
+      await this.wrapper.repository.find({
+        validTo: LessThanOrEqual(moment().subtract(offset, 'hours').toDate()),
+      });
+
+    for (const key of keysToDelete) {
+      try {
+        await this.ddhubChannelStreamService.deleteStream(key.associationKey);
+
+        await this.wrapper.repository.delete({
+          associationKey: key.associationKey,
+          owner: key.owner,
+        });
+      } catch (e) {
+        this.logger.error(
+          `delete association key ${key.associationKey} failed`
+        );
+        this.logger.error(e);
+      }
+    }
   }
 }

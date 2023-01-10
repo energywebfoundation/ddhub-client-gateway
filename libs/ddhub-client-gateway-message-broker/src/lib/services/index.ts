@@ -6,3 +6,4 @@ export * from './ddhub-did.service';
 export * from './ddhub-health.service';
 export * from './ddhub-config.service';
 export * from './ddhub-clients.service';
+export * from './ddhub-channel-stream.service';
