@@ -133,19 +133,6 @@ export const Summary = ({
           </Box>
         </Stack>
 
-        { channelValues.connectionType === ConnectionType.Publish && (
-          <Stack direction="row" mt={1}>
-            <Typography className={classes.detailsTitle} variant="body2">
-              Payload encryption:
-            </Typography>
-            <Box display="flex">
-              <Typography className={classes.encryptionValue} variant="body2">
-                {channelValues?.payloadEncryption ? <Check className={classes.iconCheck} /> : <X className={classes.iconX}/>}
-              </Typography>
-            </Box>
-          </Stack>
-        )}
-
         {(channelValues?.connectionType === ConnectionType.Publish) && (
           <Stack direction="row" mt={1}>
             <Typography className={classes.detailsTitle} variant="body2">
