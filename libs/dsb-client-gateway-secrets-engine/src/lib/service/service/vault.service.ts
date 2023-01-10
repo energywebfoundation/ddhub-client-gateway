@@ -69,6 +69,36 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
       });
   }
 
+  getMnemonic(): Promise<string | null> {
+    this.logger.log('Retrieving mnemonic');
+
+    if (!this.client) {
+      this.logger.warn('Vault client not initialized during getPrivateKey');
+
+      return null;
+    }
+
+    return this.client
+      .read(`${this.prefix}${PATHS.MNEMONIC}`)
+      .then(({ data }) => data.mnemonic)
+      .catch((err) => {
+        this.logger.error(err.message);
+
+        this.logger.error(err);
+
+        return null;
+      });
+  }
+
+  public async setMnemonic(mnemonic: string): Promise<string> {
+    this.logger.log('Attempting to write mnemonic');
+
+    await this.client.write(`${this.prefix}${PATHS.MNEMONIC}`, { mnemonic });
+
+    this.logger.log('Writing mnemonic');
+    return null;
+  }
+
   @Span('vault_getPrivateKey')
   public async getPrivateKey(): Promise<string> {
     this.logger.log('Retrieving private key');

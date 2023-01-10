@@ -50,7 +50,7 @@ export class ReqLockService {
         ) {
           this.logger.log(`outdated lock cache ${combinedClientId}`);
 
-          this.locks[combinedClientId] = undefined;
+          delete this.locks[combinedClientId];
         }
 
         throw new ReqLockExistsException();

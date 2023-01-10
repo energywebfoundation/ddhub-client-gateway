@@ -14,6 +14,7 @@ import {
   getCronMock,
   getGatewayMock,
   getClientsMock,
+  postMessageMock,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 
 export function makeServer({ environment = 'development' }) {
@@ -110,11 +111,11 @@ export function makeServer({ environment = 'development' }) {
       });
 
       this.post('messages', () => {
-        return {};
+        return postMessageMock();
       });
 
       this.post('messages/upload', () => {
-        return {};
+        return postMessageMock();
       });
 
       this.post('certificate', () => {

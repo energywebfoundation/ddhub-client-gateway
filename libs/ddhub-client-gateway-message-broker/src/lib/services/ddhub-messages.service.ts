@@ -43,44 +43,57 @@ export class DdhubMessagesService extends DdhubBaseService {
   public async messagesAckBy(
     messageIds: string[],
     clientId?: string,
-    from?: string
+    from?: string,
+    anonymousRecipient?: string
   ): Promise<AckResponse> {
     const requestBody = {
       messageIds,
       clientId,
-      from
+      from,
+      anonymousRecipient,
     };
 
     try {
       const result = await this.request<AckResponse>(
         () =>
-          this.httpService.post('/messages/ack', requestBody, {
-            httpsAgent: this.tlsAgentService.get(),
-            headers: {
-              Authorization: `Bearer ${this.didAuthService.getToken()}`,
-            },
-          }).pipe(timeout(+this.configService.get<number>('MESSAGING_MAX_TIMEOUT', 60000))),
+          this.httpService
+            .post('/messages/ack', requestBody, {
+              httpsAgent: this.tlsAgentService.get(),
+              headers: {
+                Authorization: `Bearer ${this.didAuthService.getToken()}`,
+              },
+            })
+            .pipe(
+              timeout(
+                +this.configService.get<number>('MESSAGING_MAX_TIMEOUT', 60000)
+              )
+            ),
         {
           stopOnResponseCodes: ['10'],
         }
       );
 
-      const idsNotAck: string[] = messageIds.filter(id => !result.data.acked.includes(id));
+      const idsNotAck: string[] = messageIds.filter(
+        (id) => !result.data.acked.includes(id)
+      );
       if (idsNotAck.length === 0) {
         this.logger.log('messages ack successful', result.data);
       } else {
-        this.logger.log('messages not ack', result.data);
-        this.logger.error(`['/messages/ack'][post]${JSON.stringify(requestBody)}`);
+        this.logger.log('messages not ack', idsNotAck);
+        this.logger.error(
+          `['/messages/ack'][post]${JSON.stringify(requestBody)}`
+        );
       }
 
       return result.data;
     } catch (e) {
       this.logger.error('messages ack failed', e);
-      this.logger.error(`['/messages/ack'][post]${JSON.stringify(requestBody)}`);
+      this.logger.error(
+        `['/messages/ack'][post]${JSON.stringify(requestBody)}`
+      );
       throw e;
     }
   }
-
 
   @Span('ddhub_mb_messagesSearch')
   public async messagesSearch(
@@ -89,7 +102,8 @@ export class DdhubMessagesService extends DdhubBaseService {
     topicId?: string[],
     clientId?: string,
     from?: string,
-    amount?: number
+    amount?: number,
+    anonymousRecipient?: string
   ): Promise<SearchMessageResponseDto[]> {
     const requestBody = {
       topicId,
@@ -98,17 +112,24 @@ export class DdhubMessagesService extends DdhubBaseService {
       amount,
       from,
       senderId,
+      anonymousRecipient,
     };
 
     try {
       const result = await this.request<SearchMessageResponseDto[]>(
         () =>
-          this.httpService.post('/messages/search', requestBody, {
-            httpsAgent: this.tlsAgentService.get(),
-            headers: {
-              Authorization: `Bearer ${this.didAuthService.getToken()}`,
-            },
-          }).pipe(timeout(+this.configService.get<number>('MESSAGING_MAX_TIMEOUT', 60000))),
+          this.httpService
+            .post('/messages/search', requestBody, {
+              httpsAgent: this.tlsAgentService.get(),
+              headers: {
+                Authorization: `Bearer ${this.didAuthService.getToken()}`,
+              },
+            })
+            .pipe(
+              timeout(
+                +this.configService.get<number>('MESSAGING_MAX_TIMEOUT', 60000)
+              )
+            ),
         {
           stopOnResponseCodes: ['10'],
         }
@@ -119,7 +140,9 @@ export class DdhubMessagesService extends DdhubBaseService {
       return result.data;
     } catch (e) {
       this.logger.error('messages search failed', e);
-      this.logger.error(`['/messages/search'][post]${JSON.stringify(requestBody)}`);
+      this.logger.error(
+        `['/messages/search'][post]${JSON.stringify(requestBody)}`
+      );
       throw e;
     }
   }
@@ -134,18 +157,24 @@ export class DdhubMessagesService extends DdhubBaseService {
     try {
       const result = await this.request<null>(
         () =>
-          this.httpService.get('/messages', {
-            httpsAgent: this.tlsAgentService.get(),
-            params: {
-              fqcn,
-              from,
-              clientId,
-              amount,
-            },
-            headers: {
-              Authorization: `Bearer ${this.didAuthService.getToken()}`,
-            },
-          }).pipe(timeout(+this.configService.get<number>('MESSAGING_MAX_TIMEOUT', 60000))),
+          this.httpService
+            .get('/messages', {
+              httpsAgent: this.tlsAgentService.get(),
+              params: {
+                fqcn,
+                from,
+                clientId,
+                amount,
+              },
+              headers: {
+                Authorization: `Bearer ${this.didAuthService.getToken()}`,
+              },
+            })
+            .pipe(
+              timeout(
+                +this.configService.get<number>('MESSAGING_MAX_TIMEOUT', 60000)
+              )
+            ),
         {
           stopOnResponseCodes: ['10'],
         }
@@ -156,12 +185,14 @@ export class DdhubMessagesService extends DdhubBaseService {
       return result.data;
     } catch (e) {
       this.logger.error(`get messages failed for fqcn: ${fqcn}`, e);
-      this.logger.error(`['/messages'][get]${JSON.stringify({
-        fqcn,
-        from,
-        clientId,
-        amount,
-      })}`);
+      this.logger.error(
+        `['/messages'][get]${JSON.stringify({
+          fqcn,
+          from,
+          clientId,
+          amount,
+        })}`
+      );
       throw e;
     }
   }
@@ -175,6 +206,7 @@ export class DdhubMessagesService extends DdhubBaseService {
     signature: string,
     clientGatewayMessageId: string,
     payloadEncryption: boolean,
+    anonymousRecipient: string[],
     transactionId?: string
   ): Promise<SendMessageResponse> {
     const messageData: SendMessageData = {
@@ -186,17 +218,26 @@ export class DdhubMessagesService extends DdhubBaseService {
       signature,
       clientGatewayMessageId,
       payloadEncryption,
+      anonymousRecipient: anonymousRecipient.length
+        ? anonymousRecipient
+        : undefined,
     };
 
     try {
       const result = await this.request<null>(
         () =>
-          this.httpService.post('/messages', messageData, {
-            httpsAgent: this.tlsAgentService.get(),
-            headers: {
-              Authorization: `Bearer ${this.didAuthService.getToken()}`,
-            },
-          }).pipe(timeout(+this.configService.get<number>('MESSAGING_MAX_TIMEOUT', 60000))),
+          this.httpService
+            .post('/messages', messageData, {
+              httpsAgent: this.tlsAgentService.get(),
+              headers: {
+                Authorization: `Bearer ${this.didAuthService.getToken()}`,
+              },
+            })
+            .pipe(
+              timeout(
+                +this.configService.get<number>('MESSAGING_MAX_TIMEOUT', 60000)
+              )
+            ),
         {
           stopOnResponseCodes: ['10'],
         }
@@ -227,12 +268,18 @@ export class DdhubMessagesService extends DdhubBaseService {
     try {
       const result = await this.request<null>(
         () =>
-          this.httpService.post('/messages/internal', requestData, {
-            httpsAgent: this.tlsAgentService.get(),
-            headers: {
-              Authorization: `Bearer ${this.didAuthService.getToken()}`,
-            },
-          }).pipe(timeout(+this.configService.get<number>('MESSAGING_MAX_TIMEOUT', 60000))),
+          this.httpService
+            .post('/messages/internal', requestData, {
+              httpsAgent: this.tlsAgentService.get(),
+              headers: {
+                Authorization: `Bearer ${this.didAuthService.getToken()}`,
+              },
+            })
+            .pipe(
+              timeout(
+                +this.configService.get<number>('MESSAGING_MAX_TIMEOUT', 60000)
+              )
+            ),
         {
           stopOnResponseCodes: ['10'],
         }
@@ -248,7 +295,9 @@ export class DdhubMessagesService extends DdhubBaseService {
         `send message internal failed with clientGatewayMessageId: ${clientGatewayMessageId}`,
         e
       );
-      this.logger.error(`['/messages/internal'][post]${JSON.stringify(requestData)}`);
+      this.logger.error(
+        `['/messages/internal'][post]${JSON.stringify(requestData)}`
+      );
       throw e;
     }
   }
@@ -261,12 +310,18 @@ export class DdhubMessagesService extends DdhubBaseService {
     try {
       const { data } = await this.request<null>(
         () =>
-          this.httpService.post('/messages/internal/search', dto, {
-            httpsAgent: this.tlsAgentService.get(),
-            headers: {
-              Authorization: `Bearer ${this.didAuthService.getToken()}`,
-            },
-          }).pipe(timeout(+this.configService.get<number>('MESSAGING_MAX_TIMEOUT', 60000))),
+          this.httpService
+            .post('/messages/internal/search', dto, {
+              httpsAgent: this.tlsAgentService.get(),
+              headers: {
+                Authorization: `Bearer ${this.didAuthService.getToken()}`,
+              },
+            })
+            .pipe(
+              timeout(
+                +this.configService.get<number>('MESSAGING_MAX_TIMEOUT', 60000)
+              )
+            ),
         {
           stopOnResponseCodes: ['10'],
         },
@@ -278,7 +333,9 @@ export class DdhubMessagesService extends DdhubBaseService {
       return data;
     } catch (e) {
       this.logger.error(`get symmetric keys failed with dto:`, dto, e);
-      this.logger.error(`['/messages/internal/search'][get]${JSON.stringify(dto)}`);
+      this.logger.error(
+        `['/messages/internal/search'][get]${JSON.stringify(dto)}`
+      );
       throw e;
     }
   }

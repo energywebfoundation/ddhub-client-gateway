@@ -27,6 +27,21 @@ export class TopicService {
     return this.wrapper.topicRepository.getOne(name, owner);
   }
 
+  @Span('topics_getTopic')
+  public async getTopic(
+    name: string,
+    owner: string,
+    version: string
+  ): Promise<TopicEntity | null> {
+    return this.wrapper.topicRepository.findOne({
+      where: {
+        name,
+        owner,
+        version,
+      },
+    });
+  }
+
   @Span('topics_getTopics')
   public async getTopics(
     limit: number,
