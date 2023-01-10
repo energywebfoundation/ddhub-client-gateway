@@ -1,5 +1,5 @@
 import { MessageCircle, Slash } from 'react-feather';
-import { TStep } from './types';
+import { TStep } from '@ddhub-client-gateway-frontend/ui/core';
 
 export const UPDATE_STEPS: TStep[] = [
   {
