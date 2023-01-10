@@ -122,6 +122,17 @@ export const Summary = ({
             />
           </Box>
         </Stack>
+        <Stack direction="row" mt={1}>
+          <Typography className={classes.detailsTitle} variant="body2">
+            Use anonymous external channel:
+          </Typography>
+          <Box display="flex">
+            <Typography className={classes.encryptionValue} variant="body2">
+              {channelValues?.useAnonymousExtChannel ? <Check className={classes.iconCheck} /> : <X className={classes.iconX}/>}
+            </Typography>
+          </Box>
+        </Stack>
+
         {(channelValues?.connectionType === ConnectionType.Publish) && (
           <Stack direction="row" mt={1}>
             <Typography className={classes.detailsTitle} variant="body2">
