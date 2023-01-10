@@ -6,7 +6,9 @@ import { HttpStatus, INestApplication } from '@nestjs/common';
 import { UpdateChannelDto } from '../../../../../dsb-client-gateway-api/src/app/modules/channel/dto/request/update-channel.dto';
 import { MEM_TYPE, MemoryHelper } from './memory.helper';
 
-const getChannelPayload = <T = CreateChannelDto>(payloadId: string): T => {
+export const getChannelPayload = <T = CreateChannelDto>(
+  payloadId: string
+): T => {
   const channelDto: T = JSON.parse(
     fs
       .readFileSync(
