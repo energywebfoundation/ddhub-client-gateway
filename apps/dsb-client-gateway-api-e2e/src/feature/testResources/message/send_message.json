@@ -1,0 +1,7 @@
+{
+  "fqcn": "send.message.pub",
+  "topicName": "E2E_CHANNEL_TEST_PUB",
+  "topicVersion": "1.0.0",
+  "topicOwner": "EWTEST.apps.ewaemotest.iam.ewc",
+  "payload": "{ \"data\": 104 }"
+}

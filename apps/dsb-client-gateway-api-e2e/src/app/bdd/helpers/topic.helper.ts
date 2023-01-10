@@ -7,7 +7,7 @@ import {
   TopicDataResponse,
 } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
 
-const loadTopic = (topicPayloadId: string): PostTopicBodyDto => {
+export const loadTopic = (topicPayloadId: string): PostTopicBodyDto => {
   const topicPayload: PostTopicBodyDto = JSON.parse(
     fs
       .readFileSync(
