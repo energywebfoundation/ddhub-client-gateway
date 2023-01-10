@@ -1,52 +1,46 @@
 import { makeStyles } from 'tss-react/mui';
-import { lighten } from '@mui/material/styles';
+import { alpha } from '@mui/material';
 
 export const useStyles = makeStyles()((theme) => ({
-  root: {
-    border: '1px solid',
-    borderColor: '#384151',
-    padding: '2px 0',
-    background: '#21273B',
-    fontSize: '12px',
-    color: theme.palette.grey[300],
-    height: '125px',
-    overflow: 'auto',
-    '&::-webkit-scrollbar': {
-      width: 2,
-    },
-    '&::-webkit-scrollbar-track': {
-      backgroundColor: theme.palette.background.paper,
-      boxSizing: 'border-box',
-      borderRadius: 3,
-    },
-    '&::-webkit-scrollbar-thumb': {
-      backgroundColor: theme.palette.primary.main,
-      borderRadius: 3,
-    },
-    '& .MuiGrid-root:nth-of-type(even)': {
-      background: lighten('#21273B', 0.1),
-    },
-  },
-  close: {
-    padding: 0,
+  icon: {
+    top: 8,
+    right: 13,
+    stroke: alpha(theme.palette.grey[100], 0.5),
     width: 20,
-    height: 20,
-    '& svg': {
-      stroke: theme.palette.secondary.main,
+    '&.Mui-disabled': {
+      stroke: theme.palette.grey[500],
     },
   },
-  container: {
-    height: 24,
-    padding: '0 3px 0 6px',
-    alignItems: 'center',
+  select: {
+    marginBottom: 5,
+    background: alpha(theme.palette.background.default, 0.45),
+    borderRadius: 5,
+    '&.MuiInputBase-root': {
+      fontFamily: theme.typography.body2.fontFamily,
+      fontSize: 12,
+      lineHeight: '24px',
+      fontWeight: 400,
+      color: theme.palette.common.white,
+      width: '100%',
+      '&.Mui-disabled .MuiOutlinedInput-notchedOutline': {
+        border: `1px solid ${theme.palette.grey[500]}`,
+      },
+    },
+    '& .MuiSelect-select': {
+      padding: '6px 10px 6px 7px !important',
+    },
+    '& .MuiOutlinedInput-notchedOutline': {
+      border: '1px solid #404656',
+      borderRadius: 5,
+    },
   },
-  itemText: {
-    fontSize: 12,
-    lineHeight: '21px',
-    fontWeight: 400,
-    letterSpacing: '0.4px',
-    color: theme.palette.grey[300],
-    fontFamily: theme.typography.body2.fontFamily,
-    maxWidth: 160,
+  recent: {
+    '& .MuiOutlinedInput-notchedOutline': {
+      border: `1px solid ${theme.palette.common.white}`,
+      borderRadius: 5,
+    },
+    '& .MuiTypography-root': {
+      color: theme.palette.common.white,
+    },
   },
 }));

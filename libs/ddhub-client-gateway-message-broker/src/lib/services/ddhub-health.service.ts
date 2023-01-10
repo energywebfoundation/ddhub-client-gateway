@@ -1,9 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { RetryConfigService } from '@dsb-client-gateway/ddhub-client-gateway-utils';
-import { TlsAgentService } from './tls-agent.service';
+import { TlsAgentService } from '@dsb-client-gateway/ddhub-client-gateway-tls-agent';
 import { DdhubBaseService } from './ddhub-base.service';
 import { DdhubLoginService } from './ddhub-login.service';
+import { lastValueFrom } from 'rxjs';
 
 @Injectable()
 export class DdhubHealthService extends DdhubBaseService {
@@ -23,11 +24,13 @@ export class DdhubHealthService extends DdhubBaseService {
 
   public async health(): Promise<{ statusCode: number; message?: string }> {
     try {
-      await this.httpService.get('/health', {
-        httpsAgent: this.tlsAgentService.create(),
-      });
+      const { data, status } = await lastValueFrom(
+        this.httpService.get('/health', {
+          httpsAgent: await this.tlsAgentService.create(),
+        })
+      );
 
-      return { statusCode: 200 };
+      return { statusCode: status, message: data?.status };
     } catch (e) {
       if (e.response) {
         this.logger.error(`DSB Health failed - ${e.response.data}`);

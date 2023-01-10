@@ -1,7 +1,7 @@
 import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { EventEmitter } from 'events';
 import { ConfigService } from '@nestjs/config';
-import { connect, JSONCodec } from 'nats.ws';
+import { connect, JSONCodec, Subscription } from 'nats.ws';
 import { ClaimEventType } from 'iam-client-lib';
 import { IamService } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
 import { w3cwebsocket } from 'websocket';
@@ -17,6 +17,7 @@ export enum EnrolmentEvents {
 export class ClaimListenerService {
   private readonly logger = new Logger(ClaimListenerService.name);
   private eventEmitter: EventEmitter;
+  private sub: Subscription;
   private rolesToListen: string[];
 
   constructor(
@@ -25,6 +26,13 @@ export class ClaimListenerService {
     @Inject(forwardRef(() => EnrolmentService))
     private readonly enrolmentService: EnrolmentService
   ) {}
+
+  public async stop(): Promise<void> {
+    this.sub.unsubscribe();
+
+    this.eventEmitter.removeAllListeners();
+    this.eventEmitter = null;
+  }
 
   public async listen(roles: string[]): Promise<void> {
     if (this.eventEmitter) {
@@ -35,7 +43,6 @@ export class ClaimListenerService {
     }
 
     this.eventEmitter = new EventEmitter();
-    this.rolesToListen = roles;
 
     const eventsUrl = this.configService.get<string>('EVENT_SERVER_URL');
 
@@ -44,14 +51,14 @@ export class ClaimListenerService {
     });
 
     this.eventEmitter.on(EnrolmentEvents.LISTEN, async () => {
-      const sub = nc.subscribe(this.getTopicName());
+      this.sub = nc.subscribe(this.getTopicName());
 
       this.logger.log(`Listening to ${this.getTopicName()}`);
 
       try {
         const jc = JSONCodec<{ type: string; claimId: string }>();
 
-        for await (const m of sub) {
+        for await (const m of this.sub) {
           const claimMessage = jc.decode(m.data);
 
           if (!claimMessage.claimId) {
@@ -81,38 +88,27 @@ export class ClaimListenerService {
           }
 
           if (claim.issuedToken) {
-            this.logger.log(`Received ${sub.getProcessed()} messages`);
+            this.logger.log(`Received ${this.sub.getProcessed()} messages`);
 
             const decodedToken = (await this.iamService.decodeJWTToken(
               claim.issuedToken
             )) as any;
 
-            if (this.rolesToListen.includes(decodedToken.claimData.claimType)) {
+            if (roles.includes(decodedToken.claimData.claimType)) {
               this.logger.log(
                 `Attempting to publish ${decodedToken.claimData.claimType} to DID document`
               );
 
               await this.iamService.publishPublicClaim(claim.issuedToken);
-              await this.enrolmentService.generateEnrolment();
 
               this.logger.log(
                 `Synced ${decodedToken.claimData.claimType} claim to DID document`
               );
-
-              this.rolesToListen = this.rolesToListen.filter(
-                (role) => role !== decodedToken.claimData.claimType
-              );
-
-              if (this.rolesToListen.length === 0) {
-                this.logger.log('All required roles are synced');
-
-                await nc.close();
-              }
             }
           }
         }
       } catch (e) {
-        sub.unsubscribe();
+        this.sub.unsubscribe();
 
         this.logger.error('Connection failed', e);
 

@@ -2,17 +2,19 @@ import {
   Dialog,
   DialogSubTitle,
   CloseButton,
+  Steps,
 } from '@ddhub-client-gateway-frontend/ui/core';
 import { DialogTitle, Grid, Box, Typography, Stack } from '@mui/material';
 import { UPDATE_STEPS } from '../Create/Steps/models/updateSteps';
 import { Restrictions } from '../Create/Restrictions/Restrictions';
 import { Topics } from '../Create/Topics/Topics';
-import { Steps } from '../Create/Steps/Steps';
 import { getChannelType } from '../../../utils';
 import { ChannelConnectionType } from '../../../models/channel-connection-type.enum';
 import { ChannelImage } from '../../../components';
 import { useUpdateChannelEffects } from './Update.effects';
 import { useStyles } from '../Create/Create.styles';
+import { Check, X } from 'react-feather';
+import { includes } from 'lodash';
 
 export const Update = () => {
   const {
@@ -25,7 +27,6 @@ export const Update = () => {
     channelUpdateHandler,
     isUpdating,
     getActionButtonsProps,
-    navigateToStep,
   } = useUpdateChannelEffects();
   const { classes } = useStyles();
 
@@ -40,8 +41,10 @@ export const Update = () => {
               onClick: setRestrictions,
               text: 'Next',
               showArrowIcon: true,
+              canGoBack: false,
             })}
             restrictions={channelValues.conditions}
+            connectionType={channelValues.type}
           />
         );
       case 1:
@@ -50,6 +53,7 @@ export const Update = () => {
             actionButtonsProps={getActionButtonsProps({
               onClick: channelUpdateHandler,
               loading: isUpdating,
+              canGoBack: true,
             })}
             channelValues={{
               topics: channelValues.conditions?.topics || [],
@@ -71,7 +75,7 @@ export const Update = () => {
       <DialogTitle className={classes.title}>Update Channel</DialogTitle>
       <DialogSubTitle>{subTitle}</DialogSubTitle>
       <Grid container className={classes.content}>
-        <Grid item pt={2}>
+        <Grid item pt={2} xs={4}>
           {channel && (
             <Box className={classes.channelWrapper}>
               <ChannelImage
@@ -97,9 +101,9 @@ export const Update = () => {
                   </Typography>
                 </Box>
               </Stack>
-              <Stack direction="column" mt={1} mb={2.3}>
+              <Stack direction="column" mt={1}>
                 <Typography className={classes.label} variant="body2">
-                  Type:
+                  Type
                 </Typography>
                 <Box display="flex">
                   <Typography className={classes.value} variant="body2">
@@ -107,12 +111,36 @@ export const Update = () => {
                   </Typography>
                 </Box>
               </Stack>
+              <Stack direction="row" mt={1.5}>
+                <Typography className={classes.encryptionLabel} variant="body2">
+                  Use anonymous external channel:
+                </Typography>
+                <Box display="flex">
+                  <Typography className={classes.encryptionValue} variant="body2">
+                    { channelValues?.useAnonymousExtChannel ? <Check className={classes.iconCheck} /> : <X className={classes.iconX} />}
+                  </Typography>
+                </Box>
+              </Stack>
+              {
+                (includes([ChannelConnectionType.pub, ChannelConnectionType.upload], ChannelConnectionType[channel.type])) && (
+                  <Stack direction="row" mt={0.5}>
+                    <Typography className={classes.encryptionLabel} variant="body2">
+                      Payload encryption:
+                    </Typography>
+                    <Box display="flex">
+                      <Typography className={classes.encryptionValue} variant="body2">
+                        { channelValues?.payloadEncryption ? <Check className={classes.iconCheck} /> : <X className={classes.iconX} />}
+                      </Typography>
+                    </Box>
+                  </Stack>
+                )
+              }
             </Box>
           )}
           <Box className={classes.divider} />
-          <Steps steps={UPDATE_STEPS} activeStep={activeStep} setActiveStep={navigateToStep} />
+          <Steps steps={UPDATE_STEPS} activeStep={activeStep} />
         </Grid>
-        <Grid item className={classes.formWrapper}>
+        <Grid item className={classes.updateFormWrapper} xs={8}>
           {formPart(activeStep)}
         </Grid>
       </Grid>

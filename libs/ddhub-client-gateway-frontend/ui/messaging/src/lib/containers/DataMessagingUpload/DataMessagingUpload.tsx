@@ -34,55 +34,56 @@ export const DataMessagingUpload: FC<DataMessagingUploadProps> = (props) => {
   } = useDataMessagingUploadEffects(props);
 
   return (
-    <Box>
+    <Box className={classes.wrapper}>
       <Box className={classes.channelWrapper}>
         <Grid container>
-          <Grid item xs={6}>
+          <Grid item xs={12}>
             <Autocomplete
               value={selectedChannel ?? ''}
               loading={channelsLoading}
               options={channelOptions}
               label="Channel name"
               placeholder="Channel name"
-              wrapperProps={{ flexGrow: 1, mr: 1.3 }}
+              wrapperProps={{ flexGrow: 1, mb: 3.75 }}
               className={classes.field}
               onChange={onChannelChange}
             />
           </Grid>
-          <Grid item xs={6}>
+          <Grid item xs={12}>
             <Autocomplete
               value={topicInputValue}
               options={topicsOptions}
               label="Topic name"
               placeholder="Topic name"
-              wrapperProps={{ flexGrow: 1, ml: 1.3 }}
+              wrapperProps={{ flexGrow: 1, mb: 3.75 }}
               className={classes.field}
               onChange={onTopicChange}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <Autocomplete
+              value={selectedTopicVersion ?? ''}
+              loading={topicHistoryLoading}
+              options={topicHistoryOptions}
+              label="Schema version"
+              placeholder="Select"
+              className={classes.field}
+              onChange={onTopicVersionChange}
+              wrapperProps={{ flexGrow: 1, width: '232px' }}
             />
           </Grid>
         </Grid>
       </Box>
 
-      <Box className={classes.wrapper}>
-        <Autocomplete
-          value={selectedTopicVersion ?? ''}
-          loading={topicHistoryLoading}
-          options={topicHistoryOptions}
-          label="Schema version"
-          placeholder="Select"
-          className={classes.field}
-          onChange={onTopicVersionChange}
-          wrapperProps={{ flexGrow: 1, mb: 2.7, width: 266 }}
-        />
+      <Box className={classes.uploadWrapper}>
         <UploadForm
           acceptedFileType={uploadFileType}
           acceptedFiles={acceptedFiles}
           onFileChange={onFileChange}
           maxFileSize={maxFileSize}
           fileSizeInfo={fileSizeInfo}
-          wrapperProps={{ mt: 3.8 }}
         />
-        <Box display="flex" justifyContent="flex-end" mt={3.7}>
+        <Box display="flex" justifyContent="flex-end" mt={6.1}>
           <Button
             type="submit"
             variant="contained"

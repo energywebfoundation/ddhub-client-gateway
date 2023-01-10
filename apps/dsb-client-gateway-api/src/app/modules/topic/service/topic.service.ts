@@ -1,6 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
 import {
-  ApplicationWrapperRepository,
   TopicEntity,
   TopicRepositoryWrapper,
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
@@ -13,21 +12,34 @@ import {
   PostTopicDto,
 } from '../dto';
 import { SchemaType } from '../topic.const';
+import { TopicOrVersionNotFoundException } from '../exceptions/topic-or-version-not-found.exception';
 
 @Injectable()
 export class TopicService {
   protected readonly logger = new Logger(TopicService.name);
 
-  constructor(
-    protected readonly wrapper: TopicRepositoryWrapper,
-    protected readonly applicationsWrapper: ApplicationWrapperRepository
-  ) {}
+  constructor(protected readonly wrapper: TopicRepositoryWrapper) {}
 
   public async getOne(
     name: string,
     owner: string
   ): Promise<TopicEntity | null> {
     return this.wrapper.topicRepository.getOne(name, owner);
+  }
+
+  @Span('topics_getTopic')
+  public async getTopic(
+    name: string,
+    owner: string,
+    version: string
+  ): Promise<TopicEntity | null> {
+    return this.wrapper.topicRepository.findOne({
+      where: {
+        name,
+        owner,
+        version,
+      },
+    });
   }
 
   @Span('topics_getTopics')
@@ -64,13 +76,17 @@ export class TopicService {
     limit: number,
     page: number
   ) {
-    const [topics, allCount] =
-      await this.wrapper.topicRepository.getTopicsAndCountSearch(
-        limit,
-        keyword,
-        owner,
-        page
-      );
+    const topics = await this.wrapper.topicRepository.getTopicsAndCountSearch(
+      limit,
+      keyword,
+      owner,
+      page
+    );
+
+    const allCount = await this.wrapper.topicRepository.getTopicsCountSearch(
+      keyword,
+      owner
+    );
 
     return {
       limit,
@@ -82,15 +98,6 @@ export class TopicService {
 
   @Span('topics_saveTopic')
   public async saveTopic(data: PostTopicDto): Promise<void> {
-    await this.applicationsWrapper.repository.update(
-      {
-        namespace: data.owner,
-      },
-      {
-        topicsCount: () => 'topicsCount + 1',
-      }
-    );
-
     await this.wrapper.topicRepository.save({
       id: data.id,
       owner: data.owner,
@@ -162,15 +169,6 @@ export class TopicService {
         ...{ id },
         ...(versionNumber ? { version: versionNumber } : null),
       });
-
-      await this.applicationsWrapper.repository.update(
-        {
-          namespace: data.owner,
-        },
-        {
-          topicsCount: () => 'topicsCount - 1',
-        }
-      );
     }
   }
 
@@ -181,6 +179,10 @@ export class TopicService {
     const topic: TopicEntity = await this.wrapper.topicRepository.findOne({
       where: { id, version: versionNumber },
     });
+
+    if (!topic) {
+      throw new TopicOrVersionNotFoundException(id, versionNumber);
+    }
 
     return {
       id: topic.id,

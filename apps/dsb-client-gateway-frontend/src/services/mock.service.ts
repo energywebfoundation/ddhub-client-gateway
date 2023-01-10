@@ -12,6 +12,9 @@ import {
   getFrontendConfigMock,
   getTopicsControllerGetTopicsSearchMock,
   getCronMock,
+  getGatewayMock,
+  getClientsMock,
+  postMessageMock,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 
 export function makeServer({ environment = 'development' }) {
@@ -26,6 +29,10 @@ export function makeServer({ environment = 'development' }) {
 
       this.namespace = 'api/v2';
       this.urlPrefix = 'http://localhost:3333';
+
+      this.get('/gateway', () => {
+        return getGatewayMock();
+      });
 
       this.get('/applications', () => {
         return getApplicationsControllerGetApplicationsMock();
@@ -67,8 +74,8 @@ export function makeServer({ environment = 'development' }) {
         return getTopicsControllerGetTopicsSearchMock(request.queryParams);
       });
 
-      this.get('/topics/:id/versions', () => {
-        return getTopicsControllerGetTopicsHistoryByIdMock();
+      this.get('/topics/:id/versions', (_schema, request) => {
+        return getTopicsControllerGetTopicsHistoryByIdMock(request.queryParams);
       });
 
       this.put('/topics/:id', (_schema, request) => {
@@ -104,14 +111,26 @@ export function makeServer({ environment = 'development' }) {
       });
 
       this.post('messages', () => {
-        return {};
+        return postMessageMock();
       });
 
       this.post('messages/upload', () => {
-        return {};
+        return postMessageMock();
       });
 
       this.post('certificate', () => {
+        return {};
+      });
+
+      this.get('clients', () => {
+        return getClientsMock();
+      });
+
+      this.delete('clients/:clientId', () => {
+        return {};
+      });
+
+      this.delete('clients', () => {
         return {};
       });
 

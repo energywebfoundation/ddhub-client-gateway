@@ -2,7 +2,6 @@ import { makeStyles } from 'tss-react/mui';
 
 export const useStyles = makeStyles()((theme) => ({
   root: {
-    maxHeight: 92,
     overflow: 'auto',
     margin: '0 -2px 30px 0',
     paddingRight: 2,
@@ -17,6 +16,8 @@ export const useStyles = makeStyles()((theme) => ({
     '&::-webkit-scrollbar-thumb': {
       backgroundColor: theme.palette.primary.main,
       borderRadius: 3,
+      maxHeight: 372,
     },
+    maxHeight: 230,
   },
 }));

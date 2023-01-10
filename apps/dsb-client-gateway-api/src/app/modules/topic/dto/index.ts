@@ -61,6 +61,22 @@ export class GetTopicDto {
   @IsString()
   @IsNotEmpty()
   @ApiProperty({
+    description: 'schema of the topic',
+    type: String,
+    example: JSON.stringify({
+      type: 'object',
+      properties: {
+        data: {
+          type: 'number',
+        },
+      },
+    }),
+  })
+  schema: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({
     description: 'version of the topic',
     type: String,
     example: '1.0.9',
@@ -607,7 +623,9 @@ export class GetTopicsParamsDto {
     example: '62545547fe37f174d7715ff3',
   })
   public id: string;
+}
 
+export class GetTopicsWithLimitParamsDto {
   @IsOptional()
   @IsNumber()
   @ApiProperty({

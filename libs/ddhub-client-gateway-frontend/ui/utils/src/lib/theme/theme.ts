@@ -17,7 +17,7 @@ const dsbTheme: ThemeOptions = {
     },
     warning: {
       main: '#FF5A00',
-      light: '#FF9F43'
+      light: '#FF9F43',
     },
     success: {
       main: '#2EB67D',
@@ -25,7 +25,7 @@ const dsbTheme: ThemeOptions = {
     info: {
       main: '#0B80DF',
       dark: '#1c2338',
-      light: '#00CFE8'
+      light: '#00CFE8',
     },
     action: {
       hover: '#CC98FF',
@@ -51,12 +51,33 @@ const dsbTheme: ThemeOptions = {
   },
   typography: {
     fontFamily: 'Rajdhani',
-    body1: {
+    h2: {
       fontFamily: 'Bw Gradual',
+      fontSize: 26,
+      lineHeight: '32px',
+      letterSpacing: '0.6px',
+      fontWeight: 400,
+    },
+    body1: {
+      fontFamily: 'Sequel Sans',
+      fontSize: 18,
+      lineHeight: '21px',
+      fontWeight: 400,
     },
     body2: {
       fontFamily: 'Sequel Sans',
-      letterSpacing: '0.4px',
+      fontSize: 14,
+      lineHeight: '21px',
+      fontWeight: 400,
+    },
+  },
+  breakpoints: {
+    values: {
+      xs: 0,
+      sm: 600,
+      md: 1024, // only this and above is supported
+      lg: 1200,
+      xl: 1536,
     },
   },
   components: {

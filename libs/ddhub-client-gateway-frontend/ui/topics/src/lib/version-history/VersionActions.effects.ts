@@ -12,7 +12,7 @@ import {
   useCachedApplications,
 } from '@ddhub-client-gateway-frontend/ui/api-hooks';
 import { useRouter } from 'next/router';
-import { GetTopicDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
+import { GetTopicSearchDto} from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { useTopicsModalsDispatch, TopicsModalsActionsEnum } from '../context';
 
 export const useVersionActionsEffects = (
@@ -26,7 +26,7 @@ export const useVersionActionsEffects = (
 
   const { removeTopicVersionHistoryHandler } = useRemoveTopicVersionHistory();
 
-  const openUpdateTopic = (topic: GetTopicDto) => {
+  const openUpdateTopic = (topic: GetTopicSearchDto) => {
     dispatch({
       type: TopicsModalsActionsEnum.SHOW_UPDATE_TOPIC,
       payload: {
@@ -38,13 +38,14 @@ export const useVersionActionsEffects = (
     });
   };
 
-  const openTopicDetails = (topic: GetTopicDto) => {
+  const openTopicDetails = (topic: GetTopicSearchDto) => {
     dispatch({
       type: TopicsModalsActionsEnum.SHOW_TOPIC_DETAILS,
       payload: {
         open: true,
         application: applicationsByNamespace[namespace],
         topic,
+        showActionButtons: true,
       },
     });
   };
@@ -60,19 +61,19 @@ export const useVersionActionsEffects = (
     }
   };
 
-  const actions: TTableComponentAction<GetTopicDto>[] = [
+  const actions: TTableComponentAction<GetTopicSearchDto>[] = [
     {
       label: 'View details',
-      onClick: (topic: GetTopicDto) => openTopicDetails(topic),
+      onClick: (topic: GetTopicSearchDto) => openTopicDetails(topic),
     },
     {
       label: 'Update',
-      onClick: (topic: GetTopicDto) => openUpdateTopic(topic),
+      onClick: (topic: GetTopicSearchDto) => openUpdateTopic(topic),
     },
     {
       label: 'Remove',
       color: theme.palette.error.main,
-      onClick: async (topic: GetTopicDto) => {
+      onClick: async (topic: GetTopicSearchDto) => {
         const { isDismissed } = await Swal.warning({
           text: 'you will delete or remove the topic',
         });
@@ -88,5 +89,5 @@ export const useVersionActionsEffects = (
     },
   ];
 
-  return { actions };
+  return { actions, openTopicDetails };
 };

@@ -9,7 +9,7 @@ ddhub-client-gateway-api:
       # -- Define the port the gateway will run on.
       port: 3333
       # -- Select WebSocket mode depending on architecture (i.e. preference for inbound or outbound connections). By default, the gateway will run a WebSocket server on /events. However, it can also operate as a client with additional configuration (see below). Alternatively, this functionality can be turned off. Options: SERVER, CLIENT, NONE
-      websocket: NONE
+      websocket: SERVER
       # -- Sets the URL of the WebSocket server the client should try to connect to. Required if WEBSOCKET is set to CLIENT.
       websocket_url: ""
       # -- Sets the protocol the WebSocket client should request access to. Acceptable protocols are defined by the WebSocket server, however, this can also be left undefined. Note that if WEBSOCKET is set to SERVER this variable is ignored. The server will only accept connection requests on the dsb-messages protocol.
@@ -17,29 +17,30 @@ ddhub-client-gateway-api:
       # -- Define whether the WebSocket client should reconnect on connection error/close.
       websocket_reconnect: false
       # -- Define the interval between receiving a connection error/close and attempting to reconnect, in milliseconds.
-      websocket_reconnect_timeout: 10000
+      websocket_reconnect_timeout: 2000
       # -- Define how many times the WebSocket client should attempt reconnection with the server upon receving connection error/close.
       websocket_reconnect_max_retries: 10
+       # -- Define the websocket message pooling timeout.
+      websocket_pooling_timeout: 2000
       # -- Defines the format for messages pushed over a real-time communication channel. If bulk mode is chosen, messages will be sent as an array. At every 1 second interval, the gateway will emit an array of the latest messages received. If single mode is chosen, messages will be sent individually. Options: BULK, SINGLE
       events_emit_mode: BULK
       # -- Defines how many events should be pushed per second, regardless of mode chosen (see above).
-      events_max_per_second: 2
+      events_max_per_second: 50
       # -- The URL of the DSB Message Broker you want to connect to. Trailing / allowed.
       dsb_base_url: http://ddhub-messagebroker-proxy-dev.ddhub-dev.svc
       # -- Sets the chain ID of the blockchain network. Options: 73799 (Volta), 246 (EWC)
       chain_id: 73799
       # -- Sets the blockchain RPC node to connect to retreive state from and submit transactions to. Should match the network given in CHAIN_ID.
-      rpc_url: https://volta-rpc-vkn5r5zx4ke71f9hcu0c.energyweb.org/
+      rpc_url: https://volta-rpc.energyweb.org/
       # -- Sets the Energy Web IAM cache server URL, used to cache identities (as it can be expensive to rely only on querying smart contract data).
       cache_server_url: https://identitycache-dev.energyweb.org/v1
       # -- Sets the Energy Web IAM events server URL, used to receive notification of approved DSB role claims.
-      event_server_url: https://identityevents-dev.energyweb.org
-      # -- Sets the Energy Web IAM application namespace. DSB related roles, such as user and messagebroker should fall under this namespace.
+      event_server_url: https://identitycache-dev.energyweb.org
+      # -- Sets the Energy Web IAM application namespace. DDHub related roles, such as user and messagebroker should fall under this namespace.
       parent_namespace: ddhub.apps.energyweb.iam.ewc
       secret_engine: vault
       secret_engine_endpoint: http://vault.ddhub-dev.svc:8200
       node_env: development
-      db_name: ./data/local.db
       opentelemetry_enabled: false
     scheduler:
       enabled: true
@@ -50,14 +51,25 @@ ddhub-client-gateway-api:
         tag: canary
       podAnnotations: {}
       resources: {}
-      probes: 
+      probes:
         liveness: true
         readiness: true
       appConfig:
         DID_AUTH_URL: "http://ddhub-messagebroker-proxy-dev.ddhub-dev.svc"
         DID_REGISTRY_ADDRESS: "0xc15d5a57a8eb0e1dcbe5d88b8f9a82017e5cc4af"
-        WEBSOCKET_POOLING_TIMEOUT: "834000"
+        EVENTS_MAX_PER_SECOND: "50"
         NO_COLOR: "true"
+        IPFS_HOST: "ipfs.infura.io"
+        IPFS_PROTOCOL: "https://"
+        IPFS_PORT: "5001"
+        AK_FQCN: "ak.enc.pub"
+        AK_TOPIC_NAME: "associationKey"
+        AK_TOPIC_OWNER: "ddhub.apps.energyweb.iam.ewc"
+        AK_TOPIC_VERSION: "1.0.0"
+        AK_SHARE_CRON_ENABLED: "true"
+        AK_SHARE_CRON_SCHEDULE: "*/1 * * * *"
+        ASSOCIATION_KEYS_CRON_ENABLED: "true"
+
   image:
     # repository: 098061033856.dkr.ecr.us-east-1.amazonaws.com/ew-dos-dsb-ecr
     repository: aemocontainerregistry.azurecr.io/ddhub-client-gateway-backend
@@ -68,6 +80,11 @@ ddhub-client-gateway-api:
   imagePullSecrets: []
   nameOverride: "ddhub-gateway-api-dev"
   fullnameOverride: "ddhub-gateway-api-dev"
+
+  config:
+    enabled: true
+    secretRefName: ddhub-gateway-api-dev-sealedsecret
+    configRefName: ddhub-gateway-api-dev-configmap
 
   serviceAccount:
     # Specifies whether a service account should be created
@@ -98,8 +115,8 @@ ddhub-client-gateway-api:
   ingress:
     enabled: true
     annotations:
-      kubernetes.io/ingress.class: azure/application-gateway
-      appgw.ingress.kubernetes.io/ssl-redirect: "true"
+      kubernetes.io/ingress.class: nginx
+      nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
       # kubernetes.io/tls-acme: "true"
     hosts:
       - host: ddhub-gateway-dev.energyweb.org
@@ -157,7 +174,14 @@ ddhub-client-gateway-api:
 
   tolerations: []
 
-  affinity: {}
+  sealedSecret:
+    enabled: true
+    encryptedData:
+      DB_NAME: AgCH5Sirl/qsMd6SWySQr+79QRL4UxPhEcvQBo/OyEve6ew1R5Yf0Iksll+WFpx4do+w+ZvdygWhIhP9vyOlxvwWHfZdc24rlvnAewdnDZ9W0y9sRD/TUo4acSSDRJcCnTkcoMRLQUoXivfaWHGEy5Fq2Z8+jvuPyL3vByeUD0QeStTH3bwxTKNpu4Qwtof2C1WWo7dmWR9ZXBucWAHKoZG9b5BwXb6VSBgr0NtyU5HuhEM5xZbbJskran45kUbd/ehDOeGjWZCkywdgdHOhyADEHOu+Qjn11WBpZqRnrFxXFOjjL6iEVxWh1RiPLB5CXcNhCARn/MV9ovwBBqfo+bJUsccqVeo3HdqbAcubyN6jswRtTi66/R4B3C+GLBojRem20slZJ+r8nbsN4B6KWyXyjCq6+/WLOPcL9tQf1T1buf8B25nBpiFemYyKsWcN2Ex8o6esIFsQ3e2M3vzSXYxfNhM9YFc0yeWIgAL6ud6z4i4+C6qTbndTAYjg88/fSsJ5pyMzYEATOf2lNY2VbaEIP9ta0BTF36oGBrWfktsF91u6U5Mx+JC27XNCDm/Eyy9/l/+FzkdLBUa/HVCIBm7cXvncQk8kcBYGsp4ciOfOOmcWPOFKEu0DVmRf+/zA4xD2YqCTZjAoa4kK9dcLywWPouAMrG1FFEs15oZ1HMQKyhFKLzFFFXPxiIWys9/7sXUJNASld5n0RKt4Om2qcf4/Oh8ZBxHXLFE7NBYFUjQn6wAaYuI4Dn5uPn+5OUdXNcGHkL5G+sdQw19AS+LTI86AhQxUeXnbfo4WnwReOBrmLB3IRziZBZHlErB4bOe2Rf62pg==
+      VAULT_TOKEN: AgAvrAtM3n21BLfvFIsMHsXNC22uoK/TNhIGZSBxnBHsYWJ1sk91UAF/uDApnFsPk33BJvf6ABg/eFbUvwGETrQsJGx1OlTzgfucxZOA0RcgjS8Om/o+BRMpa7rEsF7oStuSDnKWYgduIyaOQ+Lfw/wtK/9PfEx5xJ7ky7faUp5PjpL1KHbKQlLSLJuojhoJT91Huodxi6v0nYY5+2/AkO2ozDgr825mGrCbiJzelIQhZtvY//CXBqbdTCOaxNeK8AITEnYieRf1tEP8vKItVRsyg7N2Wl+t2QGsaJpnUNo2gFXuw9B/pT7w/h6IEGqcXgWd1jWEFD87IrlRfKonvQvSzb/WGUwuDo5NtSnxyCXJgv2HtGkvN5itwivCdbBNHhjHqits4w/P/NRePTQzwgHTLkH2OLQagCIdSmKvcR3vaQsUaCeECiNADCEqCBUpg+9vduem904CKLBnsX0RPKmnhzxjtaNYzBEMhSY4/QvNDkAA0umrSswMgQ8V7OJQrBYXYE+i3mxu5PuZl1q+SOtti026J3qvhSE8apfZTFOAS0MBwAtIT8rwBd+ZY2vpW2K7Z6BBK3CxXlVHUGDUAMb0/2g0XcIeuPF5Xy8JHXt8N3041UoFXXKfJR8yJqThIkn8w6O1m3j+2O2Cbwic4+WKE6u89/7avA/kO9o+xHHhmsL5YdHjTdkSvUAmufCc29LSw6etKWrNTCoNKUVaxB4cpRA2gIBcZnl5UW+I
+      INFURA_PROJECT_ID: AgB9kdiocH3aWIHoM71YXvQhaKpyxnzID5c7y9K3aC5DK491zKCdGQyIURAn4Fd1Ys0r7Nvxu5LAszUGVIniMR4NgLbzj4kt6+ySqVlWf7S67kRmuUBaCmhYs6/lyudC0Vxko/8hWLeUVt5bKfMJjzw5hZozlv7oJG6m19KdL8334zSB8q0qT1JDWEiHZaVuWSCAcEbWneVSJsv8mnO0fiAHknbNT2ya19WCY74t9Pc+ckwrAKpiQ59R3n6kBMwJIujGbnmxO9qsxyEIOwydXIAjlxIpfA4ulokBI11RV8A8Dk1kxZz6Xk3ADgc9k91aPjkJBGLJ76OyiXEBtEhxARzbUeebdrAXcRRjSEeVir7MnLsNZ1EGKtuxgGrQV0hBT77CJCovKkloJI4RYmO3HSDKU1SmHq9Dl5prqdTzjggW92lSUgMD3aqj8Ia3dJtKWQo8uhSx07EorHEfAE8rjVbrHpDl0OwmNJdAKnq3iygxEu2Lqe9JOO9JWJtpURo+m/FkWzXfHoXQvZj5OAQp1Pw52IXBXdwrkRGJ32+B39d8dlKNcV3n/lJq524g7TqTf1jFVlSLG9O59RNOw6RHYwtJkxHG6BIqs4Wnabc556M4SdLX8u8wefJbUDCNHO8jMM/YANiekgy7qoCF+aA1IA0hN0NwyatO/posZebYjHzBbx/r7UE9pbDK9L8U5qoiraLJ9HkxItEqiqKeFApgazq2KLt4oVx1HAOzEZs=
+      INFURA_PROJECT_SECRET: AgBMc48TSN9ZSK3RKqqIrqNyJZI4p6TkJ+Tw/KVaDF+eD3XgXs18rFRt/+IdJVM1lXkHKHgmdIrPuYvFGfUg/eHtYmQPdpmIZe908wAgiA85dNyTKg7lCj6xZXG+Kv7CcLQOrCH4rBWwFXiAuzb/VXeS2pNKMVeEJtpqykckLLVsJQXCeWRUtlma4lUvcl1digf+DMSIBmmWVad44zqPWRgcFYDAoZ0QndstTHM7UwFBRwaJoshenE8nqXzm95/w25FWB7nuI2BNj0r9MsxsxTE/xebUAAVkoF8oQ4Cb9Zt6hA50m351ai518X+cy9Mq4t8/Tf7Iedha9R2xdmPX3gqdfQ5w9aWM17XPLydDIB46FYEYgi+pDr112QFL5+/r76scse5PWZ5L18U2pZ43Oz4SQ0EGQqs16DlwbP7fQt+sjgDKXQioGCk7rvH+69u0AgVKpP/hCBQnBCQQ5J59sc1rRfM9BmaeJJUGMHSAhgJG5Nm+Jla2KD7rqhD6lZe6gZD+dcR0hNGrLGDmjrklUwm48SWL0BDiyRt0jMHVnhHQ746DpvI61eChOM1fkSz+QZyzgYd0grrf68lmMCgMjhjo3YpdvEVATZpBODCmlejFIYVKMx/vORpMacnsfZnfYYaVDAiY8aKio4YpIZppxx6gka769ZsON9Z3duVpbpPXGdbx1ZBLxZTESSKrSQojvHfeVVPaJycki6ruEPYT6hD3/sN7xS21/SlQW0aj28Z3MQ==
+
 
   pvc:
     enabled: true
@@ -165,4 +189,7 @@ ddhub-client-gateway-api:
 
   probes:
     liveness: true
+    livenessInitialDelay: 120
+    livenessPeriodSeconds: 10
     readiness: true
+    readinessInitialDelay: 120

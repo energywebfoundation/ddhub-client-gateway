@@ -3,12 +3,12 @@ import { Box, Divider, List, Typography } from '@mui/material';
 import {
   Command,
   Database,
-  Disc,
   GitMerge,
   Home,
   Layers,
   Settings,
 } from 'react-feather';
+import { ClientSubscriptionIcon } from '@ddhub-client-gateway-frontend/ui/core';
 import { routerConst } from '@ddhub-client-gateway-frontend/ui/utils';
 import { useStyles } from './Drawer.styles';
 import { CollapsableMenu } from './CollapsableMenu/CollapsableMenu';
@@ -25,7 +25,6 @@ export const Drawer = () => {
     <div>
       <Box className={classes.logoWrapper}>
         <img src="/ew-main-logo.svg" alt="logo" className={classes.logo} />
-        <Disc className={classes.disc} size={18} />
       </Box>
       <List>
         <MenuItem
@@ -77,6 +76,12 @@ export const Drawer = () => {
           href={routerConst.IntegrationAPIs}
           title="Integration APIs"
           icon={<GitMerge className={classes.icon} size={18} />}
+        />
+
+        <MenuItem
+          href={routerConst.ClientIds}
+          title="Client Subscriptions"
+          icon={<Box className={classes.clientIcon}><ClientSubscriptionIcon /></Box>}
         />
 
         <CollapsableMenu

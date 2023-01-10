@@ -10,8 +10,9 @@ import {
 } from '@dsb-client-gateway/ddhub-client-gateway-utils';
 import { DdhubLoginService } from './ddhub-login.service';
 import { DsbClientGatewayErrors } from '@dsb-client-gateway/dsb-client-gateway-errors';
-import { TlsAgentService } from './tls-agent.service';
 import { MessageBrokerException } from '../exceptions';
+import { MessageBrokerUnauthrizedException } from '../exceptions/message-broker-unauthrized.exception';
+import { TlsAgentService } from '@dsb-client-gateway/ddhub-client-gateway-tls-agent';
 
 export abstract class DdhubBaseService {
   protected constructor(
@@ -53,12 +54,20 @@ export abstract class DdhubBaseService {
       ...options,
     };
 
+    if (e.errno === -3001 || e.errno === -113) {
+      this.logger.error('incorrect network activity');
+      this.logger.error(e);
+
+      return retry(e);
+    }
+
     if (!isAxiosError(e)) {
       this.logger.error('Request failed due to unknown error', e);
 
       throw new MessageBrokerException(
         e.message,
         DsbClientGatewayErrors.MB_UNKNOWN,
+        null,
         null,
         null
       );
@@ -97,6 +106,22 @@ export abstract class DdhubBaseService {
         e.message,
         DsbClientGatewayErrors.MB_ERROR,
         e.response.data.returnCode,
+        e.response.data.returnMessage,
+        e.request.path
+      );
+    }
+
+    if (e.response.data.returnCode && status === HttpStatus.FORBIDDEN) {
+      this.logger.error(
+        'Request stopped because resource forbidden',
+        e.response.data.returnCode,
+        defaults.stopOnResponseCodes
+      );
+
+      throw new MessageBrokerUnauthrizedException(
+        e.message,
+        DsbClientGatewayErrors.MB_ERROR,
+        e.response.data.returnCode,
         e.request.path
       );
     }
@@ -115,6 +140,7 @@ export abstract class DdhubBaseService {
         e.message,
         DsbClientGatewayErrors.MB_ERROR,
         e.response.data.returnCode,
+        e.response.data.returnMessage,
         e.request.path
       );
     }
@@ -122,7 +148,7 @@ export abstract class DdhubBaseService {
     if (status === HttpStatus.UNAUTHORIZED) {
       this.logger.log('Unauthorized, attempting to login');
 
-      await this.ddhubLoginService.login();
+      await this.ddhubLoginService.login(false, 'UNAUTHORIZED');
 
       return retry();
     }
@@ -131,6 +157,7 @@ export abstract class DdhubBaseService {
       e.message,
       DsbClientGatewayErrors.MB_ERROR,
       e.response.data.returnCode,
+      e.response.data.returnMessage,
       e.request.path
     );
   }

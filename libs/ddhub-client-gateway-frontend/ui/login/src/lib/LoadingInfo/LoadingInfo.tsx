@@ -1,17 +1,16 @@
-import { CircularProgress, Stack, Typography } from '@mui/material';
+import { CircularProgress, Stack } from '@mui/material';
 import { makeStyles } from 'tss-react/mui';
 
 export interface LoadingInfoProps {
   children: React.ReactNode;
+  mt?: number;
 }
 
 export function LoadingInfo(props: LoadingInfoProps) {
-  const { classes } = useStyles();
-
   return (
-    <Stack spacing={1} alignItems="center" direction={'row'} mt={4}>
+    <Stack spacing={1} direction={'row'} mt={props?.mt ?? 0}>
       <CircularProgress color="primary" size={22} />
-      <Typography className={classes.label}>{props.children}</Typography>
+      <Stack>{props.children}</Stack>
     </Stack>
   );
 }

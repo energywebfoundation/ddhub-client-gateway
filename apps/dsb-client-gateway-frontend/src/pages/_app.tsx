@@ -11,10 +11,10 @@ import { CssBaseline } from '@mui/material';
 import createCache from '@emotion/cache';
 import { Layout } from '../components/Layout';
 import { queryClientOptions } from '../utils';
-import { BackdropContextProvider } from "@ddhub-client-gateway-frontend/ui/context";
-import { Backdrop } from '@ddhub-client-gateway-frontend/ui/core'
+import { BackdropContextProvider } from '@ddhub-client-gateway-frontend/ui/context';
+import { Backdrop } from '@ddhub-client-gateway-frontend/ui/core';
 import {
-  useCheckAccountOnInitEffects,
+  useCheckAccountStatusEffects,
   UserDataContext,
   useUserData,
 } from '@ddhub-client-gateway-frontend/ui/login';
@@ -22,6 +22,7 @@ import { makeServer } from '../services/mock.service';
 import '@asyncapi/react-component/styles/default.min.css';
 import 'nprogress/nprogress.css';
 import '../styles/globals.css';
+import { useGatewayIdentityEffects } from 'libs/ddhub-client-gateway-frontend/ui/gateway-settings/src/lib/containers/GatewayIdentity/GatewayIdentity.effects';
 
 if (
   process.env.NODE_ENV !== 'production' &&
@@ -41,7 +42,8 @@ export interface MyAppProps extends AppProps {
 }
 
 function InitializeAccountStatus(props) {
-  useCheckAccountOnInitEffects();
+  useGatewayIdentityEffects();
+  useCheckAccountStatusEffects();
   return <>{props.children}</>;
 }
 

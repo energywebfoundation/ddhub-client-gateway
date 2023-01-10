@@ -1,0 +1,186 @@
+# Default values for ddhub-client-gateway-api.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+ddhub-client-gateway-api:
+  replicaCount: 1
+
+  clientgateway:
+    config:
+      # -- Define the port the gateway will run on.
+      port: 3333
+      # -- Select WebSocket mode depending on architecture (i.e. preference for inbound or outbound connections). By default, the gateway will run a WebSocket server on /events. However, it can also operate as a client with additional configuration (see below). Alternatively, this functionality can be turned off. Options: SERVER, CLIENT, NONE
+      websocket: NONE
+      # -- Sets the URL of the WebSocket server the client should try to connect to. Required if WEBSOCKET is set to CLIENT.
+      websocket_url: ""
+      # -- Sets the protocol the WebSocket client should request access to. Acceptable protocols are defined by the WebSocket server, however, this can also be left undefined. Note that if WEBSOCKET is set to SERVER this variable is ignored. The server will only accept connection requests on the dsb-messages protocol.
+      websocket_protocol: ""
+      # -- Define whether the WebSocket client should reconnect on connection error/close.
+      websocket_reconnect: false
+      # -- Define the interval between receiving a connection error/close and attempting to reconnect, in milliseconds.
+      websocket_reconnect_timeout: 2000
+      # -- Define how many times the WebSocket client should attempt reconnection with the server upon receving connection error/close.
+      websocket_reconnect_max_retries: 10
+       # -- Define the websocket message pooling timeout.
+      websocket_pooling_timeout: 2000
+      # -- Defines the format for messages pushed over a real-time communication channel. If bulk mode is chosen, messages will be sent as an array. At every 1 second interval, the gateway will emit an array of the latest messages received. If single mode is chosen, messages will be sent individually. Options: BULK, SINGLE
+      events_emit_mode: BULK
+      # -- Defines how many events should be pushed per second, regardless of mode chosen (see above).
+      events_max_per_second: 50
+      # -- The URL of the DSB Message Broker you want to connect to. Trailing / allowed.
+      dsb_base_url: http://ddhub-messagebroker-proxy-dev.ddhub-dev.svc
+      # -- Sets the chain ID of the blockchain network. Options: 73799 (Volta), 246 (EWC)
+      chain_id: 73799
+      # -- Sets the blockchain RPC node to connect to retreive state from and submit transactions to. Should match the network given in CHAIN_ID.
+      rpc_url: https://volta-rpc.energyweb.org/
+      # -- Sets the Energy Web IAM cache server URL, used to cache identities (as it can be expensive to rely only on querying smart contract data).
+      cache_server_url: https://identitycache-dev.energyweb.org/v1
+      # -- Sets the Energy Web IAM events server URL, used to receive notification of approved DSB role claims.
+      event_server_url: https://identitycache-dev.energyweb.org
+      # -- Sets the Energy Web IAM application namespace. DDHub related roles, such as user and messagebroker should fall under this namespace.
+      parent_namespace: ddhub.apps.energyweb.iam.ewc
+      secret_engine: vault
+      secret_engine_endpoint: http://vault.ddhub-dev.svc:8200
+      secret_prefix: "ddhubdev1"
+      node_env: development
+      opentelemetry_enabled: false
+    scheduler:
+      enabled: true
+      image:
+        repository: aemocontainerregistry.azurecr.io/ddhub-client-gateway-scheduler
+        pullPolicy: IfNotPresent
+        # Overrides the image tag whose default is the chart appVersion.
+        tag: canary
+      podAnnotations: {}
+      resources: {}
+      probes:
+        liveness: true
+        readiness: true
+      appConfig:
+        DID_AUTH_URL: "http://ddhub-messagebroker-proxy-dev.ddhub-dev.svc"
+        DID_REGISTRY_ADDRESS: "0xc15d5a57a8eb0e1dcbe5d88b8f9a82017e5cc4af"
+        EVENTS_MAX_PER_SECOND: "50"
+        NO_COLOR: "true"
+        IPFS_HOST: "ipfs.infura.io"
+        IPFS_PROTOCOL: "https://"
+        IPFS_PORT: "5001"
+        AK_FQCN: "ak.enc.pub"
+        AK_TOPIC_NAME: "associationKey"
+        AK_TOPIC_OWNER: "ddhub.apps.energyweb.iam.ewc"
+        AK_TOPIC_VERSION: "1.0.0"
+        AK_SHARE_CRON_ENABLED: "true"
+        AK_SHARE_CRON_SCHEDULE: "*/1 * * * *"
+        ASSOCIATION_KEYS_CRON_ENABLED: "true"
+  image:
+    # repository: 098061033856.dkr.ecr.us-east-1.amazonaws.com/ew-dos-dsb-ecr
+    repository: aemocontainerregistry.azurecr.io/ddhub-client-gateway-backend
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: canary
+
+  imagePullSecrets: []
+  nameOverride: "ddhub-gateway-api-dev-1"
+  fullnameOverride: "ddhub-gateway-api-dev-1"
+
+  config:
+    enabled: true
+    secretRefName: ddhub-gateway-api-dev-1-sealedsecret
+    configRefName: ddhub-gateway-api-dev-1-configmap
+
+  podAnnotations: {}
+
+  podSecurityContext:
+    fsGroup: 2000
+
+  securityContext: {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
+
+  service:
+    type: ClusterIP
+    port: 80
+
+  ingress:
+    enabled: true
+    annotations:
+      kubernetes.io/ingress.class: nginx
+      nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+      external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
+      cert-manager.io/issuer: prod-issuer
+      cert-manager.io/issuer-kind: OriginIssuer
+      cert-manager.io/issuer-group: cert-manager.k8s.cloudflare.com
+    hosts:
+      - host: ddhub-gateway-dev-1.energyweb.org
+        paths:
+        - path: /docs
+          pathType: Prefix
+          backend:
+            serviceName: ddhub-gateway-api-dev-1
+            servicePort: 80
+        - path: /api
+          pathType: Prefix
+          backend:
+            serviceName: ddhub-gateway-api-dev-1
+            servicePort: 80
+        - path: /docs-json
+          pathType: Prefix
+          backend:
+            serviceName: ddhub-gateway-api-dev-1
+            servicePort: 80
+        - path: /events
+          pathType: Prefix
+          backend:
+            serviceName: ddhub-gateway-api-dev-1
+            servicePort: 80
+        - path: /
+          pathType: Prefix
+          backend:
+            serviceName: ddhub-gateway-api-dev-1-ui
+            servicePort: 80
+    tls:
+      - secretName: ddhub-gateway-dev-tls-secret
+        hosts:
+          - ddhub-gateway-dev-1.energyweb.org
+
+  resources: {}
+    # We usually recommend not to specify default resources and to leave this as a conscious
+    # choice for the user. This also increases chances charts run on environments with little
+    # resources, such as Minikube. If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 100
+    targetCPUUtilizationPercentage: 80
+    # targetMemoryUtilizationPercentage: 80
+
+  nodeSelector: {}
+
+  tolerations: []
+
+  affinity: {}
+
+  sealedSecret:
+    enabled: true
+    encryptedData:
+      DB_NAME: AgBbQ10EVXPjRSwQCKgG4SZ4czRRTlFdA64gonLegy9CCBbbGV+Yc50CCmsKmMAukTkDJnX5q4KM8NI999Ew+geuJ69UctMpB9yxjnkz0gjO+ffiZAj5pA2IkU1D2g1DtQNcBkPqKTa4qNxxMlI2eS6QNSizm02FyLMoHYJPw9SLWISRY4VdtfXQht/SGVoOmT/TtpbXDIqBB2ogQq8q567BrHW1lTSrmdiQvxoV54P3k61nqJAoxOvlTYBYePrdMLs4GNLhQ8UJ8AaU6XRWWi/Y2toKYxaG6M7bGcO4sOQl9dmC3ybhfVxX5bRbduPcJUYKE+vZmoW1qtU1Yc/E0wPuP9fyvLLwrO3bje7i0z77wgRPI5jShs0Y27EZGCYkDUEPdy/jrqm2iHFhhFOB4DIHmowcamqnVrdftXQ4LMAMHlEDT6O55M+e6CUPChVDBhez0OdcUXoN2t6DksxIchuF0kCjoWNRbXE2ZD6VGP716KbfWe0NlrRm+ofcC2O4jlnM/UDpgWdl7bE47WER3gTS470wn0LafLIN0TuYPSynGXFKpo050sgO6l5cZqZ2DMLiYCosCTCyCrv8gJBNSaUzGOHF1ssKH49o2xuRg6q+TRt4+EsEymNz5+E0CCFG0dckshs1c8cChD/gbVg2IkoLR5kE6522lFc6YppRgcut0h3E17Utn+2eBpxFjW950Ds+1asX2eAvAF3cUD47PA01QH1CvZ4qA/XcI6X158wtrWbIGjK0d6YnXzUaJfKBElw8QnGIJ/t0Iaoevc9zagLsywuK58M3pvZGT3CmoEvKAuhtZqhcgRqDJfMYXkdTAE2xkPM=
+      VAULT_TOKEN: AgAcJcl2KUxoZnTNPKlEnWt8bv9aJ2VqFtYPU4LiXeFXQgyFZzNPXkdFtWRd5xVOozkasOhHQOH10Qy5kGyaYIM2zBtzUCvD4M7kH0ItMNkJNWddQwkljO3wuA9co9WDlDMe9HlWt2ukcvYOlpimW/Z/1dGNVxzrv6y5Cfj8ndUgg6/aPhHBTkP3yY80mdX6IybupKLkU7aFCD9O5A5UyJBDgHfUnJ8jBHiSoZ0V/C9fcyXt1mTyJ+IdeBagBazIDKcyqFRlmaE5heZ/F+WagLlVH68AsypJwoAxmXnMVet4/zI+DzrLZqzQwidAYTSEeLiUDRs3cU8VaNG44i82fG32M54dLY6x9WoZLYhr2sCLofxg1RSU5N2Nq5kq7t4plvl0SfPVOwjt1unwz3xzKTpY+Mjkl4dHcEDvMTc0QHwbaw0zAju3EIiFu2WP9L8fHzicVBVF299rgSTZsawOFhQWBf3sH4p3hUzoMPVluA+MISE7ikTrrvy7Q2eNL2JNBaY0GQjF8hG8oeTvbLz3lEmpYSpo6rZjAXyY59aHs7JLCyWxeykajbetC/PBjnWaHq58WqhgpbmyY+NvOq8ZE64kaEpTxayqSyuDO0tTETxKeulK7Ru3sMdumMg1oUCJi21Y/VqeFXqgCJgjPtpefc2HpI08aQVQdWgvN9teuOkhwBxKPkcN/p57s03hTHNDMEDSI/aArxX0utIlDJPmrQgOYqZHUjJFTPnTsnwf
+      INFURA_PROJECT_ID: AgBhNPJUs8XZ552PNkr79uIqx66FcPoiyk6wJThEkYYL2mecq89VCZbL7CpbY/IB/e1jaiKvh5U/nuv4UA4amX3e1ogTFXVWE/wcYSNtC3eh4QlKXiTvEspwlYctfK5sGSpE+8zZZajOgRAin8cJR9ACTIHnjqxYHoZdLLwD+KdVIB7K0asPi+huJpsR+Qth1fh4KXQmy7GDM6PrkJNsowdV42tnJxS3S9MctEaXG8H0pLgtizfwoap+RdSNlUpO9oZZTkOSnvEZFhmPggKyPS4Gz2zFg+s2gyVmAo6/80VVjjk/B9Ja9y3i9sCHwnGhdwGCvpa+gAYu3C3i+sRBlj3M1wZTMMcF8iMJwXnDXm6w7WX95m8WbRGjQN0cQeOavrVHTz1xm4hNaee/Lv/JHpYCy4XBnJsMT/6ifJ6XXFCSrmNtlv4P1K4Iz6Lp3X6X0GF/+ZWZpdwcAYUYTjCr/GzaoonXV2+fl/rLSNHaL6M7sq7O21MK79HYs2huKkHfN4AIetpo8IYK6u4TA92inCW47iD1bDIOjeom2x58eY5Ckf/G+Gv67qT1EOVUSVIZWBqDJQnz3S5hxczfEJUWJdYtf0PhmxhGeIu1ih36sK94vo6ZGld2Qs7xj3cRJ9dpPCL+SKYstiQRMhSTKIOnfPb8PG3iJIi+cNBOyF3/N7VS3zaKlfkaq7DtbHQHHVNDBxuTpOz6GyEuTUr2ZkBFPk/V3354uHIDR1ONaPg=
+      INFURA_PROJECT_SECRET: AgCnW051ScFiM/VlL9LoRtHiKUZKVnwGOxrpYxsWIkIilAzG85mSLXaSCOTArZYHn9IaQhWx7D4BFDNHVwCXuvzfOOFeP6bTz4DTqYTJizoZpownq+LqICyZbKfqN6uezNNqKuZoxPAhrfGG5XvcJNkLMceQfQ18BRCS7cI4D/jcWhS3LBeDOGjO1RmClJD2hPfZCo7+5joN19jscan2mrssTZ1iMlcH+hoS+nlTuExG0ocAO1+HJr+PhXQRZUxb2aT0RZ3KGX+L4rV8vAlxlVRA0FUmX2VXpDgMS5psqllylkfuSRwNVry1vB68Ha/FHVoyalNPPyGeEDimtxV9Ae3v0EvbrFRJ3zaZ5HhgJt25HIIlSkGpeuZ3Duu9PLvOFkbiqTrWehrnnnQJiMLI8u8g+NDFyRZyfpwuZwBhVOof43/TjvNT8LDJ967SeDFOgUb6Xl4DHSxVdbARboQFqgFk9cWN0Y+NpCRCycx6AFZTSIJmhJMkBwc0NXm1ubNXkDgS4bqslmcYR3eEOqWXamwOK+WT/39tR3A7/BRN0AsZJl3ojhOcfqTLlCgR20RH/R5sd72+RAWJ1q2aro56NtLSon4DA9zjnN7L+chIp4XldFyUASsoiiOgJqtHhpn0mZOnGwkJVLNRamgmTqh5aHhaxtaw9DwvubbP1Zzqef6ciXGm+MnMw5YToVgAq7gRiNFPhxt5OwYIk7LilMi4eOI68hm0XM4Ny7KFT5LbpU0RQQ==
+
+  probes:
+    liveness: true
+    livenessInitialDelay: 120
+    livenessPeriodSeconds: 10
+    readiness: true
+    readinessInitialDelay: 120

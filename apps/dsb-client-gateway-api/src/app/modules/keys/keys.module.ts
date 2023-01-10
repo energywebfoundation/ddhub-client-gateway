@@ -14,6 +14,7 @@ import { DdhubClientGatewayIdentityModule } from '@dsb-client-gateway/ddhub-clie
 import { DdhubClientGatewayEnrolmentModule } from '@dsb-client-gateway/ddhub-client-gateway-enrolment';
 import { DdhubClientGatewayEncryptionModule } from '@dsb-client-gateway/ddhub-client-gateway-encryption';
 import { DdhubClientGatewayUtilsModule } from '@dsb-client-gateway/ddhub-client-gateway-utils';
+import { DdhubClientGatewayAssociationKeysModule } from '@dsb-client-gateway/ddhub-client-gateway-association-keys';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { DdhubClientGatewayUtilsModule } from '@dsb-client-gateway/ddhub-client-
     DdhubClientGatewayUtilsModule,
     DdhubClientGatewayMessageBrokerModule,
     DdhubClientGatewayEncryptionModule,
+    DdhubClientGatewayAssociationKeysModule,
   ],
   providers: [KeysService, RefreshKeysHandler],
   controllers: [KeysController],

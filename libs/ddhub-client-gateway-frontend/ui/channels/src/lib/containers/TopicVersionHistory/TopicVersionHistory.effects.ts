@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router';
-import { GetTopicDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
+import { GetTopicSearchDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import {
   useTopicVersionHistory,
   useApplications,
@@ -15,13 +15,17 @@ export const useTopicVersionHistoryEffects = () => {
   // TODO: add useApplication
   const { applicationsByNamespace, applicationsFetched } =
     useApplications('user');
-  const { topicHistory, topicHistoryLoaded } = useTopicVersionHistory(topicId);
+  const { topicHistory, topicHistoryLoaded, getTopicHistory, pagination } = useTopicVersionHistory({
+    id: topicId,
+    page: 1,
+    limit: 10,
+  });
 
   const application = applicationsByNamespace[applicationNamespace];
 
   const loading = !topicHistoryLoaded || !applicationsFetched;
 
-  const openTopicDetails = (topic: GetTopicDto) => {
+  const openTopicDetails = (topic: GetTopicSearchDto) => {
     dispatch({
       type: ModalActionsEnum.SHOW_TOPIC_DETAILS,
       payload: {
@@ -34,6 +38,10 @@ export const useTopicVersionHistoryEffects = () => {
     });
   };
 
+  const handlePageChange = (newPage: number, limit: number) => {
+    getTopicHistory({ page: newPage, limit });
+  };
+
   return {
     applicationNamespace,
     topicId,
@@ -41,5 +49,7 @@ export const useTopicVersionHistoryEffects = () => {
     topicHistoryLoaded,
     loading,
     openTopicDetails,
+    handlePageChange,
+    pagination,
   };
 };

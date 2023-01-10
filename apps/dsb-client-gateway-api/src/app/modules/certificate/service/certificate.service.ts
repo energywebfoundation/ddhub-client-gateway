@@ -1,9 +1,13 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { SecretsEngineService } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
 import 'multer';
-import { TlsAgentService } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
+import { TlsAgentService } from '@dsb-client-gateway/ddhub-client-gateway-tls-agent';
 import { ConfigService } from '@nestjs/config';
 import { Agent } from 'https';
+import {
+  Events,
+  EventsService,
+} from '@dsb-client-gateway/ddhub-client-gateway-events';
 
 @Injectable()
 export class CertificateService {
@@ -12,7 +16,8 @@ export class CertificateService {
   constructor(
     protected readonly secretsEngineService: SecretsEngineService,
     protected readonly tlsAgentService: TlsAgentService,
-    protected readonly configService: ConfigService
+    protected readonly configService: ConfigService,
+    protected readonly eventsService: EventsService
   ) {}
 
   public async isMTLSConfigured(): Promise<boolean> {
@@ -29,13 +34,15 @@ export class CertificateService {
 
       return true;
     }
+    return false;
+  }
 
+  public async configureMTLS(): Promise<boolean> {
     this.logger.debug('attempting to configure mTLS Agent');
 
     await this.tlsAgentService.create();
 
-    const agentAfterCreation: Agent | undefined =
-      await this.tlsAgentService.get();
+    const agentAfterCreation: Agent | undefined = this.tlsAgentService.get();
 
     return !!agentAfterCreation;
   }
@@ -53,5 +60,8 @@ export class CertificateService {
       certificate: certificateString,
       privateKey: privateKeyString,
     });
+
+    await this.eventsService.triggerEvent(Events.CERTIFICATE_CHANGED);
+    await this.eventsService.emitEvent(Events.CERTIFICATE_CHANGED);
   }
 }

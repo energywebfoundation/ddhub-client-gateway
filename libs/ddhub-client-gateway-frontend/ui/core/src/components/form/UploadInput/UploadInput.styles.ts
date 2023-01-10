@@ -48,4 +48,33 @@ export const useStyles = makeStyles()((theme) => ({
       },
     },
   },
+  subtitle: {
+    fontSize: 12,
+    fontWeight: 405,
+    lineHeight: '14.16px',
+    color: theme.palette.common.white,
+    alignSelf: 'center',
+    '&#replace-message': {
+      display: 'none',
+    },
+  },
+  subtitleDisabled: {
+    color: '#676D7D',
+  },
+  icon: {
+    stroke: theme.palette.primary.main,
+    strokeWidth: 1,
+    width: 45,
+    height: 45,
+    alignSelf: 'center',
+  },
+  iconFile: {
+    alignSelf: 'center',
+  },
+  iconInvalidFile: {
+    stroke: theme.palette.error.main,
+  },
+  iconDisabled: {
+    stroke: '#676D7D',
+  },
 }));

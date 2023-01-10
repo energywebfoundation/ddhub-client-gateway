@@ -1,25 +1,29 @@
 import {
   ApplicationDTO,
-  GetTopicDto,
+  GetTopicSearchDto,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { TopicsModalsActionsEnum } from './reducer';
 
 type TCreateTopic = {
   open: boolean;
   application: ApplicationDTO;
+  isSearch?: boolean;
 };
 
 type TUpdateTopic = {
   open: boolean;
-  topic: GetTopicDto;
+  topic: GetTopicSearchDto;
   application: ApplicationDTO;
   canUpdateSchema?: boolean;
+  isSearch?: boolean;
 };
 
 type TTopicDetails = {
   open: boolean;
-  topic: GetTopicDto;
+  topic: GetTopicSearchDto;
   application: ApplicationDTO;
+  showActionButtons: boolean;
+  isSearch?: boolean;
 };
 
 export interface ITopicsModalsStore {

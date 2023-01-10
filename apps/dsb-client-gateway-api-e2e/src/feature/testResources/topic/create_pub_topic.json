@@ -1,0 +1,8 @@
+{
+  "name":"E2E_CHANNEL_TEST",
+  "schemaType":"JSD7",
+  "schema": "{\n   \"type\": \"object\",    \"properties\":{ \"data\":  {  \"type\": \"number\"\n} }  \n}",
+  "version":"1.0.0",
+  "owner":"EWTEST.apps.ewaemotest.iam.ewc",
+  "tags":["Test"]
+}

@@ -34,10 +34,11 @@ export const CreateTopic: FC = () => {
     buttonDisabled,
     application,
     isCreatingTopic,
+    getValues,
   } = useCreateTopicEffects();
 
   return (
-    <Dialog open={open} onClose={openCancelModal}>
+    <Dialog open={open} onClose={openCancelModal} paperClassName={classes.paper}>
       <DialogTitle>Create topic</DialogTitle>
       <form onSubmit={onSubmit}>
         <DialogContent sx={{ padding: 0 }}>
@@ -65,6 +66,7 @@ export const CreateTopic: FC = () => {
                   register={register}
                   control={control}
                   variant="outlined"
+                  disabled={getValues(fields.tags.name)?.length >= 20}
                 />
               </Box>
               <Box mb={2.7}>

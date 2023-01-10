@@ -22,7 +22,7 @@ export const useCustomAlert = () => {
     props: Partial<SwalProps>
   ): Promise<SweetAlertResult> => {
     return await CustomSwal({
-      title: 'Are you sure?',
+      title: 'Are you sure you want to proceed?',
       type: 'warning',
       showCancelButton: true,
       confirmButtonText: 'Confirm',
@@ -41,22 +41,36 @@ export const useCustomAlert = () => {
     }).fire();
   };
 
-  const httpError = async (
-    error: any
-  ): Promise<SweetAlertResult> => {
+  const httpError = async (error: any): Promise<SweetAlertResult> => {
+    let title = 'System Error';
+    let subtitle = 'Please try again later.';
+    const errData = error?.response?.data?.err;
+
+    if (errData) {
+      if (errData.reason) {
+        title = errData.reason;
+      }
+
+      if (errData.additionalDetails?.errors?.[0]) {
+        subtitle = errData.additionalDetails.errors[0];
+      } else if (errData.additionalDetails?.message) {
+        subtitle = errData.additionalDetails.message;
+      }
+    }
+
     return await CustomSwal({
       title: 'Error',
       type: 'error',
       confirmButtonText: 'Dismiss',
-      html:
-        `${error?.response?.data?.err?.reason} <br /> ${error?.response?.data?.err?.additionalData ?? ''}`,
+      html: `${title} <br /> ${subtitle}`,
     }).fire();
   };
+
   return {
     fire,
     error,
     warning,
     success,
-    httpError
+    httpError,
   };
 };

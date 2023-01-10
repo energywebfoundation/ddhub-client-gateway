@@ -73,7 +73,7 @@ export const getTopicsControllerGetTopicsMock = (queryParams: any) => ({
       count: 24,
       limit: Number(queryParams.limit),
       page: Number(queryParams.page),
-      records: [...Array(Number(queryParams.limit))].map(() => ({
+      records: [...Array(10)].map(() => ({
         id: faker.datatype.uuid(),
         name: faker.word.noun(),
         owner: faker.random.arrayElement([
@@ -92,7 +92,7 @@ export const getTopicsControllerGetTopicsSearchMock = (queryParams: any) => ({
   count: 12,
   limit: Number(queryParams.limit),
   page: Number(queryParams.page),
-  records: [...Array(6)].map(() => ({
+  records: [...Array(10)].map(() => ({
     id: faker.datatype.uuid(),
     name: faker.word.noun(),
     owner: faker.random.arrayElement([
@@ -118,12 +118,12 @@ export const getTopicsControllerPostTopicsMock = () => ({
   version: faker.random.word(),
 });
 
-export const getTopicsControllerGetTopicsHistoryByIdMock = () => {
+export const getTopicsControllerGetTopicsHistoryByIdMock = (queryParams: any) => {
   return {
-    count: 1,
-    limit: 1,
-    page: 1,
-    records: [...Array(1)].map(() => ({
+    count: 12,
+    limit: Number(queryParams.limit),
+    page: Number(queryParams.page),
+    records: [...Array(10)].map(() => ({
       id: faker.datatype.uuid(),
       name: faker.word.adverb(),
       owner: 'ddhub.apps.energyweb.iam.ewc',
@@ -150,7 +150,9 @@ export const getTopicsControllerGetTopicHistoryByIdAndVersionMock = () => ({
 export const getChannelControllerGetByTypeMock = () => [
   {
     fqcn: 'channel.name',
+    payloadEncryption: false,
     type: 'sub',
+    useAnonymousExtChannel: true,
     conditions: {
       dids: ['did:ethr:volta:0x09Df5d33f1242E1b8aA5E0E0F6BfA687E6846993'],
       roles: ['marketoperator.roles', 'marketoperator.roles', 'marketoperator.roles', 'marketoperator.roles', 'marketoperator.roles'],
@@ -165,7 +167,9 @@ export const getChannelControllerGetByTypeMock = () => [
   },
   {
     fqcn: 'channel.name.2',
+    payloadEncryption: false,
     type: 'pub',
+    useAnonymousExtChannel: false,
     conditions: {
       dids: ['did:ethr:volta:0x09Df5d33f1242E1b8aA5E0E0F6BfA687E6846993'],
       roles: ['marketoperator.roles'],
@@ -180,7 +184,9 @@ export const getChannelControllerGetByTypeMock = () => [
   },
   {
     fqcn: 'channel.name.3',
+    payloadEncryption: true,
     type: 'upload',
+    useAnonymousExtChannel: true,
     conditions: {
       dids: ['did:ethr:volta:0x09Df5d33f1242E1b8aA5E0E0F6BfA687E6846993'],
       roles: ['marketoperator.roles'],
@@ -195,7 +201,9 @@ export const getChannelControllerGetByTypeMock = () => [
   },
   {
     fqcn: 'channel.name.4',
+    payloadEncryption: false,
     type: 'download',
+    useAnonymousExtChannel: false,
     conditions: {
       dids: ['did:ethr:volta:0x09Df5d33f1242E1b8aA5E0E0F6BfA687E6846993'],
       roles: ['marketoperator.roles'],
@@ -238,7 +246,7 @@ export const getChannelMessagesMock = () => [
     signature:
       '0xd3a2e04d344261ee648d00baba8477a575030371862ee9f11d339726cff8d47b579321dc99312c84d63ab33e065e752c9639a5615ed5c9bf757a634772c506dc1b',
     sender: 'did:ethr:volta:0x03830466Ce257f9B798B0f27359D7639dFB6457D',
-    timestampNanos: 1652768367254,
+    timestampNanos: 1662428065121000000,
     transactionId: "''",
     signatureValid: false,
     decryption: {
@@ -253,7 +261,7 @@ export const getChannelMessagesMock = () => [
     signature:
       '0xd3a2e04d344261ee648d00baba8477a575030371862ee9f11d339726cff8d47b579321dc99312c84d63ab33e065e752c9639a5615ed5c9bf757a634772c506dc1b',
     sender: 'did:ethr:volta:0x03830466Ce257f9B798B0f27359D7639dFB6457D',
-    timestampNanos: 1652768367254,
+    timestampNanos: 1662428065121000000,
     transactionId: "''",
     signatureValid: true,
     decryption: {
@@ -293,6 +301,71 @@ export const getCronMock = () => {
       "executedAt": "2022-06-02T09:06:03.339Z",
       "createdDate": "2022-05-25T22:36:07.000Z",
       "updatedDate": "2022-06-02T09:06:03.000Z"
+    },
+    {
+      "jobName": "ROLES_REFRESH",
+      "latestStatus": "SUCCESS",
+      "executedAt": "2022-06-02T09:06:03.339Z",
+      "createdDate": "2022-05-25T22:36:07.000Z",
+      "updatedDate": "2022-06-02T09:06:03.000Z"
     }
   ]
-}
+};
+
+export const getGatewayMock = () => {
+  return {
+    "did": "string",
+    "messageBrokerStatus": "OK",
+    "mtlsIsValid": true,
+    "namespace": "ddhub.apps.energyweb.iam.ewc",
+    "version": "v15.15.0"
+  };
+};
+
+export const getClientsMock = () => {
+  return [
+    {
+      "id": "d682d25f-24b0-4b9f-afcc-08a40f8855d1",
+      "clientId": "test.cursor",
+      "createdDate": "2022-09-21 08:04:06.020037",
+      "updatedDate": "2022-09-21 08:04:06.020037"
+    },
+    {
+      "id": "d682d25f-24b0-4b9f-afcc-08a40f8855d2",
+      "clientId": "test.cursor2",
+      "createdDate": "2022-09-21 08:04:06.020037",
+      "updatedDate": "2022-09-21 08:04:06.020037"
+    }
+  ];
+};
+
+export const postMessageMock = () => {
+  return {
+    "clientGatewayMessageId": "a6072307-5d65-4f3a-8e57-9db899b5d853",
+    "recipients": {
+      "failed": 1,
+      "sent": 1,
+      "total": 2
+    },
+    "status": [{
+      "details": [{
+        "did": "did:ethr:volta:0x552761011ea5b332605Bc1Cc2020A4a4f8C738CD",
+        "messageId": "6359e97b15f7386ee0a3fd34",
+        "statusCode": 200
+      }],
+      "name": "SENT"
+    }, {
+      "details": [
+        {
+          "did": "did:ethr:volta:0x6d0175fB07325925766A5B68A1cDbb459C2DFa1b",
+          "err": {
+            "code": "MB::INVALID_FQCN",
+            "reason": "fqcn:did:ethr:volta:0x6d0175fB07325925766A5B68A1cDbb459C2DFa1b not exists"
+          },
+          "statusCode": 500
+        }
+      ],
+      "name": "FAILED"
+    }]
+  };
+};

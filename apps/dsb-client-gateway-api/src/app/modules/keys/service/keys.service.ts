@@ -31,7 +31,6 @@ import { Readable } from 'stream';
 import { AppendInitVect } from './append-init-vect';
 import * as fs from 'fs';
 import { join } from 'path';
-import * as zlib from 'zlib';
 
 @Injectable()
 export class KeysService implements OnModuleInit {
@@ -136,7 +135,7 @@ export class KeysService implements OnModuleInit {
     let initVect;
 
     const readInitVectPromise = () =>
-      new Promise((resolve, reject) => {
+      new Promise((resolve) => {
         readInitVect.on('data', (chunk) => {
           initVect = chunk;
 
@@ -157,7 +156,7 @@ export class KeysService implements OnModuleInit {
       initVect
     );
 
-    return readStream.pipe(decipher).pipe(zlib.createBrotliDecompress());
+    return readStream.pipe(decipher);
   }
 
   @Span('keys_checksumFile')
@@ -193,9 +192,8 @@ export class KeysService implements OnModuleInit {
     const writeStream = fs.createWriteStream(path);
 
     const promise = () =>
-      new Promise((resolve, reject) => {
+      new Promise((resolve) => {
         message
-          .pipe(zlib.createBrotliCompress())
           .pipe(cipher)
           .pipe(new AppendInitVect(iv))
           .pipe(writeStream)
@@ -241,10 +239,9 @@ export class KeysService implements OnModuleInit {
   public async verifySignature(
     senderDid: string,
     signature: string,
-    encryptedData: string
+    encryptedData: string,
+    did: DidEntity | null
   ): Promise<boolean> {
-    const did = await this.getDid(senderDid);
-
     if (!did) {
       this.logger.error(
         `Sender does not have public key configured on path ${senderDid}#${DIDPublicKeyTags.DSB_SIGNATURE_KEY}`
@@ -259,9 +256,10 @@ export class KeysService implements OnModuleInit {
       return recoveredPublicKey === did.publicSignatureKey;
     } catch (e) {
       this.logger.error(
-        `error ocurred while recoverPublicKey in verify signature`,
-        e
+        `error occurred while recoverPublicKey in verify signature`
       );
+      this.logger.error(e);
+
       return false;
     }
   }
@@ -271,16 +269,28 @@ export class KeysService implements OnModuleInit {
     encryptedMessage: string,
     clientGatewayMessageId: string,
     senderDid: string
-  ): Promise<string | null> {
+  ): Promise<{
+    decrypted: string | null;
+    error: string | null;
+  }> {
+    let decrypted: string | null = null;
+    let error: string | null = null;
+
+    const decryptMessageResponse = () => {
+      return {
+        decrypted,
+        error,
+      };
+    };
+
     const symmetricKey: KeysEntity | null = await this.getSymmetricKey(
       senderDid,
       clientGatewayMessageId
     );
     if (!symmetricKey) {
-      this.logger.error(
-        `${senderDid}:${clientGatewayMessageId} does not have symmetric key`
-      );
-      return null;
+      error = `${senderDid}:${clientGatewayMessageId} does not have symmetric key`;
+      this.logger.error(error);
+      return decryptMessageResponse();
     }
 
     const [iv, encryptedData] = encryptedMessage.split(':');
@@ -288,18 +298,18 @@ export class KeysService implements OnModuleInit {
       await this.secretsEngineService.getRSAPrivateKey();
 
     if (!privateKey) {
-      this.logger.error('No private RSA key to decrypt');
-
-      return null;
+      error = 'No private RSA key to decrypt';
+      this.logger.error(error);
+      return decryptMessageResponse();
     }
 
     const rootKey: string | null =
       await this.secretsEngineService.getPrivateKey();
 
     if (!rootKey) {
-      this.logger.error('No root key');
-
-      return null;
+      error = 'No root key';
+      this.logger.error(error);
+      return decryptMessageResponse();
     }
 
     const decryptedKey: string = this.decryptSymmetricKey(
@@ -314,18 +324,18 @@ export class KeysService implements OnModuleInit {
       Buffer.from(iv, 'hex')
     );
 
-    let decrypted = decipher.update(encryptedData, 'hex', 'utf-8');
+    decrypted = decipher.update(encryptedData, 'hex', 'utf-8');
 
     decrypted = decrypted + decipher.final('utf-8');
 
-    return decrypted;
+    return decryptMessageResponse();
   }
 
   @Span('keys_encryptSymmetricKey')
   public async encryptSymmetricKey(
     symmetricKey: string,
     receiverDid: string
-  ): Promise<any | null> {
+  ): Promise<string | null> {
     this.logger.log(`fetching did for receiverDid:${receiverDid}`);
 
     const did: DidEntity | null = await this.getDid(receiverDid);
@@ -360,7 +370,7 @@ export class KeysService implements OnModuleInit {
   @Span('keys_decryptSymetricKey')
   public decryptSymmetricKey(
     privateKey: string,
-    encryptedSymmetricKey: any,
+    encryptedSymmetricKey: string,
     passphrase: string
   ): string {
     const derivedPrivateKeyHash = crypto
@@ -402,7 +412,7 @@ export class KeysService implements OnModuleInit {
 
     if (identity.balance === BalanceState.NONE) {
       this.logger.error(
-        'Not updating keys as balance is none',
+        'Not updating keys as balance is none %s',
         identity.address
       );
 
@@ -465,9 +475,10 @@ export class KeysService implements OnModuleInit {
         }
       } catch (e) {
         this.logger.error(
-          'something is wrong with private RSA key, creating new one',
-          e
+          'something is wrong with private RSA key, creating new one'
         );
+
+        this.logger.error(e);
       }
 
       this.logger.error(
@@ -553,7 +564,7 @@ export class KeysService implements OnModuleInit {
     return { publicKey, privateKey };
   }
 
-  protected async getDid(did: string): Promise<DidEntity | null> {
+  public async getDid(did: string): Promise<DidEntity | null> {
     const cacheDid: DidEntity | null =
       await this.didWrapper.didRepository.findOne({
         where: {
@@ -561,8 +572,10 @@ export class KeysService implements OnModuleInit {
         },
       });
 
-    if (cacheDid) {
-      const didTtl: number = this.configService.get<number>('DID_TTL');
+    if (!cacheDid) {
+      this.logger.log(`DID ${did} not found in cache`);
+    } else {
+      const didTtl: number = this.configService.get<number>('DID_TTL', 3600);
 
       if (
         moment(cacheDid.updatedDate).add(didTtl, 'seconds').isSameOrBefore()
@@ -605,10 +618,38 @@ export class KeysService implements OnModuleInit {
     didEntity.publicSignatureKey = signatureKey.publicKeyHex;
     didEntity.publicRSAKey = rsaKey.publicKeyHex;
 
-    this.logger.log(`Saving didEntity to cache ${did}`);
-
-    await this.didWrapper.didRepository.save(didEntity);
+    try {
+      this.logger.log(`Saving didEntity to cache ${did}`);
+      await this.didWrapper.didRepository.save(didEntity);
+    } catch (e) {
+      if (e.code === '23505') {
+        // Duplicate key
+        this.logger.log(`Updating didEntity to cache ${did}`);
+        await this.didWrapper.didRepository.update(
+          {
+            did: didEntity.did,
+          },
+          didEntity
+        );
+      }
+    }
 
     return didEntity;
+  }
+
+  public async prefetchSignatureKeys(
+    uniqueSenderDids: string[]
+  ): Promise<Record<string, DidEntity | null>> {
+    return uniqueSenderDids.reduce(async (acc, curr: string) => {
+      const did: DidEntity | null = await this.getDid(curr);
+
+      if (!did) {
+        acc[curr] = null;
+      }
+
+      acc[curr] = did;
+
+      return acc;
+    }, {});
   }
 }

@@ -3,15 +3,19 @@ import { lighten } from '@mui/material/styles';
 
 export const useStyles = makeStyles()((theme) => ({
   paper: {
-    maxWidth: 514,
-    minHeight: 641,
-    padding: '55px 43px 34px 50px',
+    maxWidth: 860,
+    minHeight: 693,
+    padding: '48px 41px 34px 46px',
     borderRadius: 0,
+  },
+  content: {
+    height: '100%',
+    flexGrow: 1,
+    flexWrap: 'nowrap',
   },
   channelWrapper: {
     display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
+    placeItems: 'start',
     flexDirection: 'column',
   },
   type: {
@@ -20,7 +24,7 @@ export const useStyles = makeStyles()((theme) => ({
     fontWeight: 500,
     color: theme.palette.common.white,
     fontFamily: theme.typography.body1.fontFamily,
-    marginBottom: 6,
+    marginBottom: 13,
   },
   namespace: {
     fontSize: 12,
@@ -29,6 +33,15 @@ export const useStyles = makeStyles()((theme) => ({
     textAlign: 'center',
     color: theme.palette.grey[400],
     fontFamily: theme.typography.body2.fontFamily,
+  },
+  value: {
+    fontSize: 12,
+    lineHeight: '14px',
+    fontWeight: 400,
+    color: theme.palette.grey[400],
+    fontFamily: theme.typography.body2.fontFamily,
+    maxWidth: 224,
+    alignSelf: 'center',
   },
   title: {
     fontSize: 18,
@@ -49,24 +62,25 @@ export const useStyles = makeStyles()((theme) => ({
     marginTop: 10,
   },
   details: {
-    marginTop: 36,
     position: 'relative',
   },
   icon: {
     stroke: theme.palette.primary.main,
-    width: 18,
-    height: 18,
+    width: 16,
+    height: 16,
   },
   editIconButton: {
     position: 'absolute',
-    top: -10,
-    right: 0,
+    right: -10,
+    top: 10,
   },
   label: {
     fontSize: 12,
-    lineHeight: '14px',
+    lineHeight: '24px',
     fontWeight: 400,
-    color: theme.palette.grey[300],
+    color: theme.palette.common.white,
+    fontFamily: theme.typography.body2.fontFamily,
+    marginBottom: 1,
   },
   typeWrapper: {
     margin: '17px 0 16px',
@@ -86,6 +100,14 @@ export const useStyles = makeStyles()((theme) => ({
     color: theme.palette.common.white,
     marginLeft: 38,
   },
+  encryptionLabel: {
+    fontSize: 12,
+    lineHeight: '21px',
+    fontWeight: 405,
+    color: theme.palette.grey[400],
+    fontFamily: theme.typography.body2.fontFamily,
+    marginBottom: 12,
+  },
   encryptionValue: {
     fontSize: 14,
     lineHeight: '21px',
@@ -94,17 +116,26 @@ export const useStyles = makeStyles()((theme) => ({
     marginLeft: 25,
   },
   divider: {
-    marginTop: 22,
+    marginBottom: 27,
+    marginTop: 18.4,
     borderBottom: `1px solid ${lighten(theme.palette.background.paper, 0.07)}`,
   },
   iconCheck: {
     stroke: theme.palette.success.main,
     width: 21,
     height: 21,
+    strokeWidth: 1,
   },
-  iconCross: {
+  iconX: {
     stroke: theme.palette.error.main,
     width: 21,
     height: 21,
-  }
+    strokeWidth: 1,
+  },
+  contentWrapper: {
+    minWidth: '450px',
+    paddingTop: 48,
+    flexGrow: 1,
+    paddingLeft: 60,
+  },
 }));

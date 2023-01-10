@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { ChangeEvent, useState } from 'react';
 import { fuzzyTextFilterFn } from './filters/fuzzy-text-filter';
 import { textFilter } from './filters/text-filter';
 import {
@@ -28,9 +28,13 @@ export function useTableEffects<T>({
   defaultOrder = 'asc',
   defaultSortBy = '',
   backendSearch = false,
+  setSelectedItems,
+  showCheckbox = false,
 }: TableProps<T>) {
   const [order, setOrder] = useState<Order>(defaultOrder);
   const [orderBy, setOrderBy] = useState(defaultSortBy);
+  const [selected, setSelected] = useState<string[]>([]);
+
   const data = React.useMemo(
     () => tableRows,
     [tableRows]
@@ -51,13 +55,14 @@ export function useTableEffects<T>({
     rows,
     gotoPage,
     setGlobalFilter,
+    setPageSize,
     state: { pageIndex, pageSize, globalFilter },
   } = useTable(
     {
       filterTypes,
       columns,
       data,
-      initialState: { pageIndex: 0, pageSize: 6 },
+      initialState: { pageIndex: 0, pageSize: 10 },
     },
     useFilters,
     useGlobalFilter,
@@ -65,19 +70,42 @@ export function useTableEffects<T>({
     usePagination
   );
 
+  const resetCheckbox = () => {
+    if (!showCheckbox) return;
+
+    setSelected([]);
+
+    if (setSelectedItems) {
+      setSelectedItems([]);
+    }
+  };
+
   const emptyRows: number =
     pageIndex > 0 ? Math.max(0, (1 + pageIndex) * pageSize - rows.length) : 0;
+
+  const changePage = (newPage: number, limit: number) => {
+    resetCheckbox();
+    if (paginationProps && onPageChange) {
+      // page starts at 0 index
+      onPageChange(newPage + 1, limit);
+    } else {
+      gotoPage(newPage);
+    }
+  };
 
   const handleChangePage = (
     _event: React.MouseEvent<HTMLButtonElement> | null,
     newPage: number
   ) => {
-    if (paginationProps && onPageChange) {
-      // page starts at 0 index
-      onPageChange(newPage + 1);
-    } else {
-      gotoPage(newPage);
-    }
+    changePage(newPage, pageSize);
+  };
+
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    const limit = parseInt(event.target.value, 10);
+    setPageSize(limit);
+    changePage(0, limit);
   };
 
   const handleRowClick = (selectedRow: T) => {
@@ -101,7 +129,7 @@ export function useTableEffects<T>({
       return;
     }
 
-    onSearchInput(searchInput);
+    onSearchInput(searchInput, pageSize);
   };
 
   function descendingComparator(
@@ -133,7 +161,7 @@ export function useTableEffects<T>({
   const pagination = paginationProps
     ? {
         count: paginationProps.count,
-        limit: paginationProps.limit,
+        limit: paginationProps.limit === 0 ? paginationProps.limit : pageSize,
         page: paginationProps.page - 1,
       }
     : {
@@ -144,11 +172,53 @@ export function useTableEffects<T>({
 
   const paginationText = (props: LabelRowProps) => {
     if (backendSearch) {
-      return `Showing ${props.from} to ${props.to} of ${props.count} entries`;
+      return `Showing ${props.from} to ${props.to} of ${props.count}`;
     }
 
-    return `Showing ${props.from} to ${(rows.length < props.to ? rows.length : props.to)} of ${rows.length} entries`
+    return `Showing ${props.from} to ${(rows.length < props.to ? rows.length : props.to)} of ${rows.length}`
   };
+
+  const handleCheckboxClick = (event: React.MouseEvent<unknown>, name: string) => {
+    const selectedIndex = selected.indexOf(name);
+    let newSelected: string[] = [];
+
+    if (selectedIndex > -1) {
+      const copy = [...selected];
+      copy.splice(selectedIndex, 1);
+      newSelected = copy;
+    } else {
+      newSelected = [...selected, name];
+    }
+
+    setSelected(newSelected);
+
+    if (setSelectedItems) {
+      setSelectedItems(newSelected);
+    }
+  };
+
+  const handleSelectAllClick = (event: ChangeEvent<HTMLInputElement>) => {
+    const newSelected: string[] = [];
+
+    if (event.target.checked) {
+      const startIdx = pageIndex * pageSize;
+      const endIdx = startIdx + pageSize;
+
+      for (let i = startIdx; i < endIdx; i++) {
+        if (rows[i]) {
+          newSelected.push(rows[i].cells[0].value);
+        }
+      }
+    }
+
+    setSelected(newSelected);
+
+    if (setSelectedItems) {
+      setSelectedItems(newSelected);
+    }
+  };
+
+  const isSelected = (name: string) => selected.indexOf(name) !== -1;
 
   return {
     getTableProps,
@@ -169,5 +239,10 @@ export function useTableEffects<T>({
     pagination,
     handleSearchInput,
     paginationText,
+    handleChangeRowsPerPage,
+    isSelected,
+    handleCheckboxClick,
+    handleSelectAllClick,
+    selected,
   };
 }

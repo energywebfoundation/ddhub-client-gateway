@@ -5,6 +5,8 @@ on:
     branches: [ develop ]
     paths-ignore:
       - 'devops/**'
+      - 'get-started/**'
+
 env:
   SECRETS_ENGINE: vault
 
@@ -38,10 +40,6 @@ jobs:
       - uses: actions/setup-node@v2-beta
         with:
           node-version: '16.14.2'
-      - name: Setup app dependencies
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
       - name: Cache node modules
         uses: actions/cache@v2
         env:
@@ -80,17 +78,24 @@ jobs:
           docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-scheduler:canary
 
       - name: ArgoCD login
-        uses: clowdhaus/argo-cd-action/@main
+        uses: clowdhaus/argo-cd-action/@v1.12.1
         id: argocd_login
         with:
           command: login ${{ secrets.ARGOCD_DEV_URL }}
           options: --insecure --password ${{ secrets.ARGOCD_DEV_PASS }} --username ${{ secrets.ARGOCD_DEV_USERNAME }}
 
       - name: ArgoCD overwrite Dev scheduler image tag
-        uses: clowdhaus/argo-cd-action/@main
+        uses: clowdhaus/argo-cd-action/@v1.12.1
         id: argocd_image_tag_overwrite_dev_scheduler
         with:
           command: app set ddhub-gateway-dev
+          options: -p ddhub-client-gateway-api.clientgateway.scheduler.image.tag=${{needs.unique_id.outputs.unique_id}}
+
+      - name: ArgoCD overwrite Dev-1 scheduler image tag
+        uses: clowdhaus/argo-cd-action/@v1.12.1
+        id: argocd_image_tag_overwrite_dev1_scheduler
+        with:
+          command: app set ddhub-gateway-dev-1
           options: -p ddhub-client-gateway-api.clientgateway.scheduler.image.tag=${{needs.unique_id.outputs.unique_id}}
   build-be:
     name: Build Backend
@@ -103,10 +108,6 @@ jobs:
       - uses: actions/setup-node@v2-beta
         with:
           node-version: '16.14.2'
-      - name: Setup app dependencies
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
       - name: Cache node modules
         uses: actions/cache@v2
         env:
@@ -125,6 +126,10 @@ jobs:
         run: npm ci
       - name: Build
         run: nx build dsb-client-gateway-api --prod
+      - name: Build migrations
+        run: npm run migrations:build
+      - name: Generate version file
+        run: echo ${{needs.unique_id.outputs.unique_id}} > version.md
 
       - name: 'Login via Azure CLI'
         uses: azure/login@v1
@@ -145,22 +150,42 @@ jobs:
           docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-backend:canary
 
       - name: ArgoCD login
-        uses: clowdhaus/argo-cd-action/@main
+        uses: clowdhaus/argo-cd-action/@v1.12.1
         id: argocd_login
         with:
           command: login ${{ secrets.ARGOCD_DEV_URL }}
           options: --insecure --password ${{ secrets.ARGOCD_DEV_PASS }} --username ${{ secrets.ARGOCD_DEV_USERNAME }}
 
       - name: ArgoCD overwrite DEV image tag
-        uses: clowdhaus/argo-cd-action/@main
+        uses: clowdhaus/argo-cd-action/@v1.12.1
         id: argocd_image_tag_overwrite
         with:
           command: app set ddhub-gateway-dev
+          options: -p ddhub-client-gateway-api.image.tag=${{needs.unique_id.outputs.unique_id}}
+
+      - name: ArgoCD overwrite DEV-1 image tag
+        uses: clowdhaus/argo-cd-action/@v1.12.1
+        id: argocd_image_tag_dev1_overwrite
+        with:
+          command: app set ddhub-gateway-dev-1
           options: -p ddhub-client-gateway-api.image.tag=${{needs.unique_id.outputs.unique_id}}
   build-fe:
     name: Build Frontend
     runs-on: ubuntu-latest
     needs: [cancel-previous, unique_id]
+    services:
+      postgres:
+        image: postgres
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_PASSWORD: ddhub
+          POSTGRES_USER: ddhub
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - uses: actions/checkout@v2
         with:
@@ -168,10 +193,6 @@ jobs:
       - uses: actions/setup-node@v2-beta
         with:
           node-version: '16.14.2'
-      - name: Setup app dependencies
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
       - name: Cache node modules
         uses: actions/cache@v2
         env:
@@ -190,7 +211,8 @@ jobs:
         run: npm ci
       - name: Build
         run: npm run export
-
+        env:
+          DB_NAME: postgresql://ddhub:ddhub@localhost:5432/ddhub
       - name: 'Login via Azure CLI'
         uses: azure/login@v1
         with:
@@ -210,15 +232,22 @@ jobs:
           docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-frontend:canary
 
       - name: ArgoCD login
-        uses: clowdhaus/argo-cd-action/@main
+        uses: clowdhaus/argo-cd-action/@v1.12.1
         id: argocd_login
         with:
           command: login ${{ secrets.ARGOCD_DEV_URL }}
           options: --insecure --password ${{ secrets.ARGOCD_DEV_PASS }} --username ${{ secrets.ARGOCD_DEV_USERNAME }}
 
       - name: ArgoCD overwrite DEV image tag
-        uses: clowdhaus/argo-cd-action/@main
+        uses: clowdhaus/argo-cd-action/@v1.12.1
         id: argocd_image_tag_overwrite_dev_ui
         with:
           command: app set ddhub-gateway-dev
+          options: -p ddhub-client-gateway-api.clientgateway.ui.image.tag=${{needs.unique_id.outputs.unique_id}}
+
+      - name: ArgoCD overwrite DEV-1 image tag
+        uses: clowdhaus/argo-cd-action/@v1.12.1
+        id: argocd_image_tag_overwrite_dev1_ui
+        with:
+          command: app set ddhub-gateway-dev-1
           options: -p ddhub-client-gateway-api.clientgateway.ui.image.tag=${{needs.unique_id.outputs.unique_id}}

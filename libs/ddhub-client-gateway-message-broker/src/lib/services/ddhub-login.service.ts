@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { RetryConfigService } from '@dsb-client-gateway/ddhub-client-gateway-utils';
 import { DidAuthService } from '@dsb-client-gateway/ddhub-client-gateway-did-auth';
-import { TlsAgentService } from './tls-agent.service';
+import { TlsAgentService } from '@dsb-client-gateway/ddhub-client-gateway-tls-agent';
 import { Span } from 'nestjs-otel';
 import { RoleStatus } from '@ddhub-client-gateway/identity/models';
 import promiseRetry from 'promise-retry';
@@ -11,6 +11,7 @@ import { IamService } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
 import { lastValueFrom } from 'rxjs';
 import { UnableToLoginException } from '../exceptions';
 import { EnrolmentService } from '@dsb-client-gateway/ddhub-client-gateway-enrolment';
+import { InitExtChannelDto } from '../dto/init-ext-channel.dto';
 
 @Injectable()
 export class DdhubLoginService {
@@ -27,7 +28,18 @@ export class DdhubLoginService {
   ) {}
 
   @Span('ddhub_mb_login')
-  public async login(): Promise<void> {
+  public async login(forceRelogin = true, source: string): Promise<void> {
+    this.logger.log('Attempting to login... with source ' + source);
+
+    const privateKey: string | null =
+      await this.secretsEngineService.getPrivateKey();
+
+    if (!privateKey) {
+      this.logger.error('Private key is missing');
+
+      throw new UnableToLoginException();
+    }
+
     const enrolment = await this.enrolmentService.get();
 
     if (!enrolment) {
@@ -47,22 +59,14 @@ export class DdhubLoginService {
       throw new UnableToLoginException();
     }
 
-    this.logger.log('Attempting to login to DID Auth Server');
-
-    const privateKey: string | null =
-      await this.secretsEngineService.getPrivateKey();
-
-    if (!privateKey) {
-      this.logger.error('Private key is missing');
-
-      return;
-    }
-
-    await promiseRetry(async (retry) => {
+    await promiseRetry(async (retry, number) => {
+      this.logger.log(
+        `[ddhub_mb_login] Attempting to login to DID Auth Server #${number}`
+      );
       await this.didAuthService
-        .login(privateKey, this.iamService.getDIDAddress())
+        .login(privateKey, this.iamService.getDIDAddress(), forceRelogin)
         .catch((e) => retry(e));
-    }, this.retryConfigService.config);
+    }, this.retryConfigService.loginConfig);
 
     this.logger.log('Login successful, attempting to init ext channel');
 
@@ -70,27 +74,26 @@ export class DdhubLoginService {
   }
 
   @Span('ddhub_mb_initExtChannel')
-  protected async initExtChannel(): Promise<void> {
+  public async initExtChannel(dto?: InitExtChannelDto): Promise<void> {
     try {
       await promiseRetry(async (retry) => {
+        await this.tlsAgentService.create();
+
         await lastValueFrom(
-          this.httpService.post(
-            '/channel/initExtChannel',
-            {
-              httpsAgent: this.tlsAgentService.get(),
+          this.httpService.post('/channel/initExtChannel', dto, {
+            httpsAgent: this.tlsAgentService.get(),
+            headers: {
+              Authorization: `Bearer ${this.didAuthService.getToken()}`,
             },
-            {
-              headers: {
-                Authorization: `Bearer ${this.didAuthService.getToken()}`,
-              },
-            }
-          )
+          })
         ).catch((e) => retry(e));
       }, this.retryConfigService.config);
 
       this.logger.log('Init ext channel successful');
     } catch (e) {
-      this.logger.error('Init ext channel failed', e);
+      this.logger.error('Init ext channel failed');
+      this.logger.error(e);
+      this.logger.error(e.response.data);
     }
   }
 }

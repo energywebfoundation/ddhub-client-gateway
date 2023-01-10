@@ -12,6 +12,29 @@ export enum WebSocketImplementation {
 }
 
 export const API_ENVS = Joi.object({
+  AK_SHARE_CRON_ENABLED: Joi.boolean()
+    .default(false)
+    .description('Should share association keys'),
+  AK_SHARE_CRON_SCHEDULE: Joi.string()
+    .default('*/1 * * * *')
+    .description('How often should share association keys'),
+  AK_FQCN: Joi.string().optional().description('Association keys FQCN'),
+  AK_TOPIC_NAME: Joi.string()
+    .optional()
+    .description('Association keys topic name'),
+  AK_TOPIC_OWNER: Joi.string()
+    .optional()
+    .description('Association keys topic owner'),
+  AK_TOPIC_VERSION: Joi.string()
+    .optional()
+    .description('Association keys topic version'),
+  API_KEY: Joi.string().optional().description('API Key to protect API'),
+  API_USERNAME: Joi.string()
+    .optional()
+    .description('USERNAME for authentication'),
+  API_PASSWORD: Joi.string()
+    .optional()
+    .description('PASSWORD for authentication'),
   PORT: Joi.number().port().default(3333).description('HTTP port'),
   WEBSOCKET: Joi.string()
     .valid(...Object.values(WebSocketImplementation))
@@ -27,8 +50,8 @@ export const API_ENVS = Joi.object({
     .description('Should Websocket emit messages as array or single object'),
   DID_TTL: Joi.number()
     .positive()
-    .default(60)
-    .description('How long cached DID attributes should be valid'),
+    .default(3600) // 1 hour
+    .description('How long cached DID attributes should be valid in seconds'),
   WEBSOCKET_URL: Joi.alternatives()
     .conditional('WEBSOCKET', {
       is: WebSocketImplementation.CLIENT,

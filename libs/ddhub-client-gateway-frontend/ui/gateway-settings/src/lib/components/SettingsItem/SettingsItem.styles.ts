@@ -62,6 +62,20 @@ export const useStyles = makeStyles()((theme) => ({
       boxShadow: `0px 0px 10px ${alpha(theme.palette.primary.main, 0.65)}`,
     },
   },
+  secondaryButton: {
+    height: 37,
+    minWidth: 75,
+    textTransform: 'capitalize',
+    padding: '11px 22px',
+    justifyContent: 'center',
+    border: `1px solid ${alpha(theme.palette.secondary.main, 0.5)}`,
+    marginRight: 17.5,
+    '&:hover': {
+      border: `1px solid ${alpha(theme.palette.secondary.main, 0.5)}`,
+      background: alpha(theme.palette.secondary.main, 0.04),
+    },
+    color: theme.palette.secondary.main,
+  },
   buttonText: {
     fontSize: 14,
     lineHeight: '17px',
@@ -71,5 +85,15 @@ export const useStyles = makeStyles()((theme) => ({
     transition: theme.transitions.create('color', {
       duration: theme.transitions.duration.short,
     }),
-  }
+  },
+  secondaryButtonText: {
+    fontSize: 14,
+    lineHeight: '17px',
+    fontWeight: 400,
+    color: theme.palette.secondary.main,
+    fontFamily: theme.typography.body2.fontFamily,
+    transition: theme.transitions.create('color', {
+      duration: theme.transitions.duration.short,
+    }),
+  },
 }));

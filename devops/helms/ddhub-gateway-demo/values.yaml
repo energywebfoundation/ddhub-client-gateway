@@ -20,7 +20,7 @@ ddhub-client-gateway-api:
       websocket_reconnect_timeout: 10000
       # -- Define how many times the WebSocket client should attempt reconnection with the server upon receving connection error/close.
       websocket_reconnect_max_retries: 10
-      websocket_pooling_timeout: 834000
+      websocket_pooling_timeout: 2000
       # -- Defines the format for messages pushed over a real-time communication channel. If bulk mode is chosen, messages will be sent as an array. At every 1 second interval, the gateway will emit an array of the latest messages received. If single mode is chosen, messages will be sent individually. Options: BULK, SINGLE
       events_emit_mode: BULK
       # -- Defines how many events should be pushed per second, regardless of mode chosen (see above).
@@ -34,16 +34,16 @@ ddhub-client-gateway-api:
       # -- Sets the Energy Web IAM cache server URL, used to cache identities (as it can be expensive to rely only on querying smart contract data).
       cache_server_url: https://identitycache-staging.energyweb.org/v1
       # -- Sets the Energy Web IAM events server URL, used to receive notification of approved DSB role claims.
-      event_server_url: https://identityevents-staging.energyweb.org
-      # -- Sets the Energy Web IAM application namespace. DSB related roles, such as user and messagebroker should fall under this namespace.
+      event_server_url: https://identitycache-staging.energyweb.org
+      # -- Sets the Energy Web IAM application namespace. DDHub related roles, such as user and messagebroker should fall under this namespace.
       parent_namespace: ddhub.apps.energyweb.iam.ewc
       secret_engine: vault
       secret_engine_endpoint: http://demo-vault.ddhub-demo.svc:8200
       # -- Enable basic auth. (Once enabled, associated secret is required, eg: "ddhub-client-gateway-api-secret")
       basic_auth_enabled: true
       node_env: test
-      db_name: ./data/local.db
       opentelemetry_enabled: false
+      mtls_enabled: false
     scheduler:
       enabled: true
       image:
@@ -53,12 +53,14 @@ ddhub-client-gateway-api:
         tag: canary
       podAnnotations: {}
       resources: {}
-      probes: 
+      probes:
         liveness: true
         readiness: true
       appConfig:
         DID_AUTH_URL: "https://ddhub-demo.energyweb.org"
         DID_REGISTRY_ADDRESS: "0xc15d5a57a8eb0e1dcbe5d88b8f9a82017e5cc4af"
+        EVENTS_MAX_PER_SECOND: "50"
+        NO_COLOR: "true"
     ui:
       enabled: true
       replicaCount: 1
@@ -69,7 +71,7 @@ ddhub-client-gateway-api:
         tag: canary
       podAnnotations: {}
       resources: {}
-      probes: 
+      probes:
         liveness: true
         readiness: true
       port: 80
@@ -122,9 +124,12 @@ ddhub-client-gateway-api:
   ingress:
     enabled: true
     annotations:
-        kubernetes.io/ingress.class: azure/application-gateway
-        appgw.ingress.kubernetes.io/ssl-redirect: "true"
-      # kubernetes.io/tls-acme: "true"
+      kubernetes.io/ingress.class: nginx
+      nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+      external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
+      cert-manager.io/issuer: prod-issuer
+      cert-manager.io/issuer-kind: OriginIssuer
+      cert-manager.io/issuer-group: cert-manager.k8s.cloudflare.com
     hosts:
       - host: ddhub-gateway-demo.energyweb.org
         paths:
@@ -143,13 +148,18 @@ ddhub-client-gateway-api:
           backend:
             serviceName: ddhub-client-gateway-api-demo
             servicePort: 80
+        - path: /events
+          pathType: Prefix
+          backend:
+            serviceName: ddhub-client-gateway-api-demo
+            servicePort: 80
         - path: /
           pathType: Prefix
           backend:
             serviceName: ddhub-client-gateway-api-demo-ui
             servicePort: 80
     tls:
-      - secretName: dsb-tls-secret
+      - secretName: ddhub-client-gateway-api-demo-tls-secret
         hosts:
           - ddhub-gateway-demo.energyweb.org
 
@@ -184,4 +194,7 @@ ddhub-client-gateway-api:
 
   probes:
     liveness: true
+    livenessInitialDelay: 120
+    livenessPeriodSeconds: 10
     readiness: true
+    readinessInitialDelay: 120

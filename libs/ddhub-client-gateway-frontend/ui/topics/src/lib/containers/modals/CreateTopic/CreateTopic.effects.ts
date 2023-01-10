@@ -1,10 +1,11 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm, SubmitHandler, FieldValues } from 'react-hook-form';
 import { useQueryClient } from 'react-query';
 import { useRouter } from 'next/router';
 import {
   PostTopicBodyDto,
   getTopicsControllerGetTopicsQueryKey,
+  getTopicsControllerGetTopicsBySearchQueryKey,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { useCreateTopic } from '@ddhub-client-gateway-frontend/ui/api-hooks';
 import { useCustomAlert } from '@ddhub-client-gateway-frontend/ui/core';
@@ -21,7 +22,7 @@ export const useCreateTopicEffects = () => {
   const queryClient = useQueryClient();
   const router = useRouter();
   const {
-    createTopic: { open, application },
+    createTopic: { open, application, isSearch },
   } = useTopicsModalsStore();
   const dispatch = useTopicsModalsDispatch();
   const Swal = useCustomAlert();
@@ -41,6 +42,7 @@ export const useCreateTopicEffects = () => {
     handleSubmit,
     formState: { isValid },
     reset,
+    getValues,
   } = useForm<FieldValues>({
     defaultValues: initialValues,
     resolver: yupResolver(validationSchema),
@@ -82,7 +84,12 @@ export const useCreateTopicEffects = () => {
   };
 
   const onCreateTopic = () => {
-    queryClient.invalidateQueries(getTopicsControllerGetTopicsQueryKey());
+    if (isSearch) {
+      queryClient.invalidateQueries(getTopicsControllerGetTopicsBySearchQueryKey());
+    } else {
+      queryClient.invalidateQueries(getTopicsControllerGetTopicsQueryKey());
+    }
+
     closeModal();
     Swal.success({
       text: 'You have successfully created the topic',
@@ -104,7 +111,7 @@ export const useCreateTopicEffects = () => {
   const openCancelModal = async () => {
     hideModal();
     const result = await Swal.fire({
-      title: 'Are you sure?',
+      title: 'Are you sure you want to proceed?',
       text: 'you will close create topic form',
       type: 'warning',
       showCancelButton: true,
@@ -129,5 +136,6 @@ export const useCreateTopicEffects = () => {
     buttonDisabled,
     application,
     isCreatingTopic,
+    getValues,
   };
 };

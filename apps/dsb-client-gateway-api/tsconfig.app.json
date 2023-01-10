@@ -5,11 +5,16 @@
     "module": "commonjs",
     "types": ["node"],
     "emitDecoratorMetadata": true,
-    "target": "es2015"
+    "target": "es2015",
+    "removeComments": true
   },
   "exclude": ["**/*.spec.ts", "**/*.test.ts"],
-  "include": ["**/*.ts", "../../libs/hello-tsc/response-type.ts", "../../libs/hello-tsc/orval.config.ts"],
+  "include": [
+    "**/*.ts",
+    "../../libs/hello-tsc/response-type.ts",
+    "../../libs/hello-tsc/orval.config.ts"
+  ],
   "ts-node": {
     "require": ["tsconfig-paths/register"]
-  },
+  }
 }

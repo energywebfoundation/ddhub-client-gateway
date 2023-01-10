@@ -1,8 +1,4 @@
-import {
-  registerDecorator,
-  ValidationArguments,
-  ValidationOptions,
-} from 'class-validator';
+import { registerDecorator, ValidationOptions } from 'class-validator';
 import { ConfigService } from '@nestjs/config';
 
 export function IsValidApplicationNameSpace(
@@ -16,7 +12,7 @@ export function IsValidApplicationNameSpace(
       propertyName: propertyName,
       options: validationOptions,
       validator: {
-        validate(value: string, args: ValidationArguments) {
+        validate(value: string) {
           const applicationNameSpacePattern: string = configService.get(
             'APPLICATION_NAMESPACE_REGULAR_EXPRESSION'
           );

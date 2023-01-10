@@ -19,10 +19,10 @@ export class ResponseError<T> {
   })
   additionalDetails: T;
 
-  exception?: any;
+  exception?: unknown;
 }
 
-export class ResponseErrorDto<T = any> {
+export class ResponseErrorDto<T = unknown> {
   @ApiProperty({
     type: () => ResponseError,
     description: 'Error details',

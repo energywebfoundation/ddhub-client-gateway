@@ -11,6 +11,7 @@ export const VERSION_HISTORY_HEADERS = [
     Header: 'TOPIC NAME',
     accessor: 'name',
     isSortable: true,
+    style: { minWidth: '180px' },
   },
   {
     Header: 'SCHEMA TYPE',

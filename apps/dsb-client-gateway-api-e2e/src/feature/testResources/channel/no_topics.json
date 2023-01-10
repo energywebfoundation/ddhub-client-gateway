@@ -1,0 +1,12 @@
+{
+  "fqcn": "testjson33456780dasdsa",
+  "payloadEncryption": true,
+  "type": "pub",
+  "conditions": {
+    "dids": [
+      "did:ethr:volta:0x14B9f6D0E00d601D32E02AAf88585505Bb659dC2"
+    ],
+    "roles": [],
+    "topics": []
+  }
+}

@@ -1,5 +1,5 @@
-import { DataMessagingUpload } from '@ddhub-client-gateway-frontend/ui/messaging';
+import { DataMessagingUploadContainer } from '@ddhub-client-gateway-frontend/ui/messaging';
 
 export default function LargeFileUpload() {
-  return <DataMessagingUpload isLarge />;
+  return <DataMessagingUploadContainer isLarge />;
 }

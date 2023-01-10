@@ -8,11 +8,24 @@ import { useStyles, CheckSwitch } from "./Details.styles";
 export interface DetailsProps {
   nextClick: (data) => void;
   channelValues: ICreateChannel;
+  validFqcn: boolean;
 }
 
-export const Details = ({ nextClick, channelValues }: DetailsProps) => {
+export const Details = ({ nextClick, channelValues, validFqcn }: DetailsProps) => {
   const { classes } = useStyles();
-  const { register, fields, handleSubmit, isValid, control } =
+  const {
+    register,
+    fields,
+    handleSubmit,
+    isValid,
+    control,
+    connectionOnChange,
+    showEncryption,
+    encryptionOnChange,
+    isEncrypt,
+    isUseAnonExtChnl,
+    useAnonExtChnlOnChange
+  } =
     useDetailsEffects(channelValues);
 
   return (
@@ -31,6 +44,7 @@ export const Details = ({ nextClick, channelValues }: DetailsProps) => {
             field={fields.connectionType}
             formControlLabelProps={{
               style: { marginRight: 36 },
+              onChange: connectionOnChange,
             }}
           />
 
@@ -39,6 +53,8 @@ export const Details = ({ nextClick, channelValues }: DetailsProps) => {
             register={register}
             control={control}
             variant="outlined"
+            errorExists={!validFqcn}
+            errorText={!validFqcn && `Should contain only alphanumeric lowercase characters, use . as a separator.`}
           />
 
           <Divider className={classes.divider} />
@@ -47,19 +63,41 @@ export const Details = ({ nextClick, channelValues }: DetailsProps) => {
             className={classes.switchLabel}
             control={
               <CheckSwitch
-                id={fields.payloadEncryption.name}
-                name={fields.payloadEncryption.name}
+                id={fields.useAnonymousExtChannel.name}
+                checked={isUseAnonExtChnl}
+                name={fields.useAnonymousExtChannel.name}
+                onChange={useAnonExtChnlOnChange}
                 color="primary"
               />
             }
             labelPlacement="start"
-            id={fields.payloadEncryption.name}
-            name={fields.payloadEncryption.name}
-            label={fields.payloadEncryption.label}
-            {...register(fields.payloadEncryption.name)}
+            id={fields.useAnonymousExtChannel.name}
+            name={fields.useAnonymousExtChannel.name}
+            label={fields.useAnonymousExtChannel.label}
+            {...register(fields.useAnonymousExtChannel.name)}
           />
+
+          { showEncryption && (
+            <FormControlLabel
+              className={classes.switchLabel}
+              control={
+                <CheckSwitch
+                  id={fields.payloadEncryption.name}
+                  checked={isEncrypt}
+                  name={fields.payloadEncryption.name}
+                  onChange={encryptionOnChange}
+                  color="primary"
+                />
+              }
+              labelPlacement="start"
+              id={fields.payloadEncryption.name}
+              name={fields.payloadEncryption.name}
+              label={fields.payloadEncryption.label}
+              {...register(fields.payloadEncryption.name)}
+            />
+          )}
         </Grid>
-        <Grid item alignSelf="flex-end">
+        <Grid item alignSelf="flex-end" sx={{ paddingRight: '7px', paddingBottom: '27px' }}>
           <ActionButton
             disabled={!isValid}
             showArrowIcon

@@ -24,17 +24,32 @@ const topicsFilters: Record<ChannelType, GetTopicDtoSchemaType[]> = {
 export interface Topic extends Partial<GetTopicDto> {
   owner: string;
   topicName: string;
+  topicId?: string;
+  appName?: string;
 }
 
+export interface Application {
+  label: string;
+  topicsCount: number;
+  value: string;
+}
+
+const initialState = {
+  label: '',
+  topicsCount: 0,
+  value: '',
+};
+
 export const useTopicsEffects = (channelValues: TopicsProps['channelValues']) => {
-  const [selectedApplication, setSelectedApplication] = useState('');
+  const [selectedApplication, setSelectedApplication] = useState<Application>(initialState);
   const [selectedTopics, setSelectedTopics] = useState<Topic[]>(
     channelValues.topics
   );
   const { applications, isLoading: isLoadingApplications } =
     useApplications('user');
+  const [recent, setRecent] = useState('');
 
-  const { topics } = useTopics({ owner: selectedApplication });
+  const { topics, topicsLoading } = useTopics({ owner: selectedApplication.value });
 
   const channelType = getChannelType(channelValues.channelType);
   const filters = topicsFilters[channelType as ChannelType];
@@ -49,23 +64,58 @@ export const useTopicsEffects = (channelValues: TopicsProps['channelValues']) =>
     if (!exist) {
       return;
     }
+    setRecent(selectedTopic.name);
     setSelectedTopics([
-      ...selectedTopics,
       {
         ...selectedTopic,
-        owner: selectedApplication,
+        owner: selectedApplication.value,
         topicName: selectedTopic.name as string,
+        appName: selectedApplication.label,
       },
+      ...selectedTopics,
     ]);
   };
 
-  const removeSelectedTopic = (data: Topic) => {
-    setSelectedTopics(selectedTopics.filter((topic) => topic.id !== data.id));
+  const getFilteredTopics = (data: Topic) => {
+    const filteredTopic = selectedTopics.filter((topic) => {
+      const topicId = topic.id || topic.topicId;
+
+      if (data.topicId) {
+        return data.topicId !== topicId;
+      }
+      return data.id !== topicId;
+    });
+
+    return filteredTopic;
   };
+
+  const removeSelectedTopic = (data: Topic) => {
+    const filteredTopic = getFilteredTopics(data);
+    setRecent('');
+    setSelectedTopics(filteredTopic);
+  };
+
+  const updateSelectedTopic = (oldTopic: Topic, newTopic: Topic) => {
+    const filteredTopic = getFilteredTopics(oldTopic);
+    setRecent(newTopic.topicName);
+
+    setSelectedTopics([
+      {
+        ...newTopic,
+        appName: oldTopic.appName,
+      },
+      ...filteredTopic,
+    ]);
+  };
+
+  const formattedSelectedTopics = selectedTopics.map((topic) => ({
+    id: topic.topicId,
+    ...topic,
+  }));
 
   const availableTopics: Topic[] = differenceBy(
     filteredTopics,
-    selectedTopics,
+    formattedSelectedTopics,
     'id'
   ).map((topic: GetTopicDto) => ({
     label: topic.name,
@@ -96,14 +146,19 @@ export const useTopicsEffects = (channelValues: TopicsProps['channelValues']) =>
     applicationList: applications.map((application) => ({
       label: application.appName,
       value: application.namespace,
+      topicsCount: application.topicsCount,
     })),
     isLoadingApplications,
     selectedApplication,
     addSelectedTopic,
     removeSelectedTopic,
     setSelectedApplication,
+    updateSelectedTopic,
     topics: availableTopics,
     selectedTopics,
     filterTopics,
+    topicsLoading,
+    filters,
+    recent,
   };
 };

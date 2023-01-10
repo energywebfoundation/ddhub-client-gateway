@@ -12,14 +12,14 @@ import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { WebSocketImplementation } from '../message.const';
 import { AuthService } from '../../utils/service/auth.service';
-import { ChannelService } from '../../channel/service/channel.service';
 import { MessageService } from '../service/message.service';
+import { ClientsService } from '@dsb-client-gateway/ddhub-client-gateway-clients';
 
 @WebSocketGateway({
   cors: {
     origin: '*',
   },
-  path: '/events'
+  path: '/events',
 })
 @Injectable()
 export class EventsGateway implements OnGatewayConnection, OnGatewayInit {
@@ -32,10 +32,10 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayInit {
   constructor(
     protected readonly configService: ConfigService,
     protected readonly authService: AuthService,
-    protected readonly channelService: ChannelService,
     @Inject(forwardRef(() => MessageService))
     protected readonly messageService: MessageService,
-  ) { }
+    protected readonly clientsService: ClientsService
+  ) {}
 
   public async afterInit(server: Server) {
     const websocketMode = this.configService.get(
@@ -60,64 +60,114 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayInit {
   }
 
   public async handleConnection(
-    client: WebSocket & { request: any },
-    a: any[],
-    b: any
+    client: WebSocket & { request }
   ): Promise<void> {
-    const protocol = client.protocol;
+    try {
+      const protocol = client.protocol;
 
-    if (protocol !== this.protocol) {
-      client.close(1002, 'Protocol Not Supported');
+      if (protocol !== this.protocol) {
+        this.logger.warn(
+          `connection dropped as protocol ${protocol} is not supported`
+        );
+        client.close(1002, 'Protocol Not Supported');
 
-      return;
+        return;
+      }
+
+      const _clientId = new URLSearchParams(
+        client.request.url.split('?')[1]
+      ).get('clientId');
+
+      if (_clientId === null) {
+        this.logger.warn(
+          `required parameter 'clientId' not specified, dropping connection`
+        );
+
+        client.close(
+          1003,
+          "Required paramater 'clientId' ex. ws://localhost:3333/events?clientId=id_name"
+        );
+        return;
+      }
+
+      const clientIdRegex = new RegExp(/^[a-zA-Z0-9\-:]+$/);
+      if (!clientIdRegex.test(_clientId)) {
+        this.logger.warn(
+          `Required paramater 'clientId' with format Alphanumeric string`
+        );
+
+        client.close(
+          1003,
+          "Required paramater 'clientId' with format Alphanumeric string"
+        );
+        return;
+      }
+
+      await this.clientsService.attemptCreateClient(_clientId).catch((e) => {
+        this.logger.error(`failed to use client ${_clientId}`);
+
+        client.close(
+          1000,
+          'Max consumers reached. Please check Client GW UI and remove unused clientIds.'
+        );
+
+        return;
+      });
+
+      const authHeaderTokenValue: string | undefined =
+        client.request.headers['authorization'];
+
+      if (!authHeaderTokenValue && this.authService.isAuthEnabled()) {
+        this.logger.warn('Login attempt without token');
+
+        client.close(1000, 'Forbidden');
+
+        return;
+      }
+
+      const isAuthorized = this.authService.isAuthorized(authHeaderTokenValue);
+
+      if (!isAuthorized) {
+        this.logger.warn(`Attempt to login with incorrect username/password`);
+
+        client.close(1000, 'Forbidden');
+
+        return;
+      }
+
+      this.logger.log(
+        `New client connected ${_clientId}, total client connected ${this.server.clients.size}`
+      );
+    } catch (e) {
+      this.logger.error(`unexpected websocket error`);
+      this.logger.error(e);
+
+      client.close(1000, 'Unknown error');
     }
-
-    const _clientId = new URLSearchParams(client.request.url.split("?")[1]).get("clientId");
-    const _size = new URLSearchParams(client.request.url.split("?")[1]).get("size");
-
-    if (_clientId === null) {
-      client.close(1003, 'Required paramater \'clientId\' ex. ws://localhost:3333/events?clientId=id_name');
-      return;
-    }
-
-    const clientIdRegex = new RegExp(/^[a-zA-Z0-9\-:]+$/);
-    if (!clientIdRegex.test(_clientId)) {
-      client.close(1003, 'Required paramater \'clientId\' with format Alphanumeric string');
-      return;
-    }
-
-    const authHeaderTokenValue: string | undefined =
-      client.request.headers['authorization'];
-
-    if (!authHeaderTokenValue && this.authService.isAuthEnabled()) {
-      this.logger.warn('Login attempt without token');
-
-      client.close(1000, 'Forbidden');
-
-      return;
-    }
-
-    const isAuthorized = this.authService.isAuthorized(authHeaderTokenValue);
-
-    if (!isAuthorized) {
-      this.logger.warn(`Attempt to login with incorrect username/password`);
-
-      client.close(1000, 'Forbidden');
-
-      return;
-    }
-
-    this.logger.log('New client connected');
   }
 
   @SubscribeMessage('message')
-  public async handleMessage(@ConnectedSocket() client: any, @MessageBody() data): Promise<void> {
-    this.logger.log(`${client.request.connection.remoteAddress}:${client.request.connection.remotePort}${client.request.url} ${JSON.stringify(data)}`);
-    this.messageService.sendMessage(JSON.parse(data)).then((response) => {
-      client.send(JSON.stringify(response));
-    }).catch((ex) => {
-      this.logger.error(`${client.request.connection.remoteAddress}:${client.request.connection.remotePort}${client.request.url} ${JSON.stringify(ex.response)}`);
-      client.send(JSON.stringify(ex.response));
-    });
+  public async handleMessage(
+    @ConnectedSocket() client,
+    @MessageBody() data
+  ): Promise<void> {
+    this.logger.log(
+      `${client.request.connection.remoteAddress}:${
+        client.request.connection.remotePort
+      }${client.request.url} ${JSON.stringify(data)}`
+    );
+    this.messageService
+      .sendMessage(JSON.parse(data))
+      .then((response) => {
+        client.send(JSON.stringify(response));
+      })
+      .catch((ex) => {
+        this.logger.error(
+          `${client.request.connection.remoteAddress}:${
+            client.request.connection.remotePort
+          }${client.request.url} ${JSON.stringify(ex.response)}`
+        );
+        client.send(JSON.stringify(ex.response));
+      });
   }
 }

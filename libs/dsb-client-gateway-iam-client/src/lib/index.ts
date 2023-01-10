@@ -3,3 +3,4 @@ export * from './service';
 export * from './iam.interface';
 export * from './command';
 export * from './handler';
+export * from './exception';

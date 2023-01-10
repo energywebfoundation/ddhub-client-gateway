@@ -13,7 +13,6 @@ import { Span } from 'nestjs-otel';
 import {
   ChannelEntity,
   ChannelWrapperRepository,
-  TopicEntity,
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
 import { TopicNotFoundException } from '../exceptions/topic-not-found.exception';
 import {
@@ -22,7 +21,7 @@ import {
   Topic,
 } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
 import { ChannelInvalidTopicException } from '../exceptions/channel-invalid-topic.exception';
-import { TopicService } from '../../topic/service/topic.service';
+import { differenceBy } from 'lodash';
 
 @Injectable()
 export class ChannelService {
@@ -31,7 +30,6 @@ export class ChannelService {
   constructor(
     protected readonly wrapperRepository: ChannelWrapperRepository,
     protected readonly ddhubTopicsService: DdhubTopicsService,
-    protected readonly topicsService: TopicService,
     protected readonly commandBus: CommandBus
   ) {}
 
@@ -65,6 +63,7 @@ export class ChannelService {
     await this.wrapperRepository.channelRepository.save({
       fqcn: payload.fqcn,
       type: payload.type,
+      useAnonymousExtChannel: payload.useAnonymousExtChannel,
       payloadEncryption: payload.payloadEncryption,
       conditions: {
         topics: topicsWithIds,
@@ -152,7 +151,10 @@ export class ChannelService {
     const channel: ChannelEntity = await this.getChannelOrThrow(fqcn);
 
     const hasChangedRestrictedFields: boolean =
-      channel.type !== dto.type || channel.fqcn !== fqcn;
+      channel.type !== dto.type ||
+      channel.fqcn !== fqcn ||
+      (channel.useAnonymousExtChannel !== dto.useAnonymousExtChannel &&
+        dto.useAnonymousExtChannel !== undefined);
 
     if (hasChangedRestrictedFields) {
       throw new ChannelUpdateRestrictedFieldsException();
@@ -186,22 +188,13 @@ export class ChannelService {
   ): Promise<void> {
     const textSchemaTypes: SchemaType[] = [SchemaType.JSD7, SchemaType.XML];
     for (const topic of topics) {
-      const topicEntity: TopicEntity | null = await this.topicsService.getOne(
-        topic.topicName,
-        topic.owner
-      );
-
-      if (!topicEntity) {
-        throw new TopicNotFoundException();
-      }
-
       if ([ChannelType.PUB, ChannelType.SUB].includes(channelType)) {
-        if (!textSchemaTypes.includes(topicEntity.schemaType as SchemaType)) {
-          throw new ChannelInvalidTopicException(topicEntity.id);
+        if (!textSchemaTypes.includes(topic.schemaType as SchemaType)) {
+          throw new ChannelInvalidTopicException(topic.topicId);
         }
       } else {
-        if (textSchemaTypes.includes(topicEntity.schemaType as SchemaType)) {
-          throw new ChannelInvalidTopicException(topicEntity.id);
+        if (textSchemaTypes.includes(topic.schemaType as SchemaType)) {
+          throw new ChannelInvalidTopicException(topic.topicId);
         }
       }
     }
@@ -216,7 +209,11 @@ export class ChannelService {
     for (const { topicName, owner } of topics) {
       const receivedTopics = await this.ddhubTopicsService
         .getTopicsByOwnerAndName(topicName, owner)
-        .catch(() => {
+        .catch((e) => {
+          if (e?.response?.status !== 404) {
+            throw e;
+          }
+
           return {
             records: [],
           };
@@ -227,16 +224,26 @@ export class ChannelService {
           `Topic ${topicName} with owner ${owner} does not exists`
         );
 
-        return [];
+        continue;
       }
 
-      const { id }: Topic = receivedTopics.records[0];
+      const { id, schemaType }: Topic = receivedTopics.records[0];
 
       topicsToReturn.push({
         topicName,
         owner,
         topicId: id,
+        schemaType,
       });
+    }
+
+    const invalidTopics = differenceBy(topics, topicsToReturn, 'topicName');
+    if (invalidTopics.length > 0) {
+      throw new TopicNotFoundException(
+        `Topics not found: ${invalidTopics
+          .map(({ owner, topicName }) => `${topicName} (owner: ${owner})`)
+          .join(', ')}.`
+      );
     }
 
     return topicsToReturn;

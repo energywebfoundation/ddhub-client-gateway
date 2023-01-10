@@ -23,6 +23,7 @@ export interface SendMessageData {
   topicId: string;
   topicVersion: string;
   signature: string;
+  anonymousRecipient: string[];
 }
 
 export interface SendInternalMessageRequestDTO {
@@ -68,4 +69,9 @@ export interface SendMessageResponse {
   did: string;
   recipients: Recipients;
   status: Status[];
+}
+
+export interface AckResponse {
+  acked: string[];
+  notFound: string[];
 }

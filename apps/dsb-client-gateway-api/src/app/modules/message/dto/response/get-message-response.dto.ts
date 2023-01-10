@@ -1,12 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsNotEmpty,
-  IsString,
-  IsNumber,
-  IsEnum,
-  IsBoolean
-} from 'class-validator';
+import { IsEnum, IsNotEmpty, IsNumber, IsString } from 'class-validator';
 import { SchemaType } from '../../../topic/topic.const';
+import { EncryptionStatus } from '../../message.const';
 
 export class GetMessagesResponseDto {
   @IsString()
@@ -76,7 +71,7 @@ export class GetMessagesResponseDto {
 
   @IsString()
   @ApiProperty({
-    description: 'signature sent to message',
+    description: 'message sender',
     type: String,
     example: 'did:ethr:volta:0x03830466Ce257f9B798B0f27359D7639dFB6457D',
   })
@@ -84,7 +79,7 @@ export class GetMessagesResponseDto {
 
   @IsNumber()
   @ApiProperty({
-    description: 'signature sent to message',
+    description: 'timestamp in nano seconds',
     type: Number,
     example: 1649147198388,
   })
@@ -98,11 +93,17 @@ export class GetMessagesResponseDto {
   })
   transactionId: string;
 
-  @IsBoolean()
+  @IsEnum(EncryptionStatus)
   @ApiProperty({
-    description: 'transactionId sent to message for idempotency',
-    type: Boolean,
-    example: true,
+    description: 'Signature validation status for a message',
+    enum: [
+      EncryptionStatus.FAILED,
+      EncryptionStatus.NOT_PERFORMED,
+      EncryptionStatus.NOT_REQUIRED,
+      EncryptionStatus.REQUIRED_NOT_PERFORMED,
+      EncryptionStatus.SUCCESS,
+    ],
+    example: 'SUCCESS',
   })
-  signatureValid: boolean;
+  signatureValid: EncryptionStatus;
 }

@@ -1,10 +1,11 @@
 import { defineFeature, loadFeature } from 'jest-cucumber';
 import { HttpStatus, INestApplication } from '@nestjs/common';
-import { clearSecrets, getVaultPassword } from './helpers/secrets.helper';
+import { clearSecrets } from './helpers/secrets.helper';
 import request from 'supertest';
 import { DsbClientGatewayErrors } from '@dsb-client-gateway/dsb-client-gateway-errors';
 import { IamService } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
 import { setupApp } from './helpers/app.helper';
+import { MemoryHelper } from './helpers/memory.helper';
 
 const feature = loadFeature('../../feature/identity.feature', {
   loadRelativePath: true,
@@ -28,14 +29,15 @@ const roleExists = (
 describe('Identity Feature', () => {
   defineFeature(feature, (test) => {
     let app: INestApplication;
-    let response;
 
     beforeAll(async () => {
       app = await setupApp();
     });
 
+    const testMemory = new MemoryHelper();
+
     beforeEach(async () => {
-      response = null;
+      testMemory.map = {};
     });
 
     afterAll(async () => {
@@ -43,8 +45,6 @@ describe('Identity Feature', () => {
     });
 
     test('Invalid private key', ({ given, when, then }) => {
-      let response;
-
       given('The system has no identity set', async () => {
         await clearSecrets(app);
       });
@@ -55,13 +55,16 @@ describe('Identity Feature', () => {
           .send({
             privateKey: invalidPrivateKey,
           })
-          .expect(HttpStatus.BAD_REQUEST)
           .expect(({ body }) => {
-            response = body;
+            testMemory.map.INVALID_PRIVATE_KEY_RESPONSE_BODY = body;
           });
       });
 
-      then('I should get validation error', () => {});
+      then('I should get validation error', () => {
+        expect(testMemory.map.INVALID_PRIVATE_KEY_RESPONSE_BODY.err.code).toBe(
+          'ID::INVALID_PRIVATE_KEY'
+        );
+      });
     });
 
     test('No private key', ({ given, when, then }) => {
@@ -90,20 +93,22 @@ describe('Identity Feature', () => {
         await clearSecrets(app);
       });
 
-      when(/^The (.*) is submitted to the system$/, async (privateKey) => {
+      when(/^The private key is submitted to the system$/, async () => {
         await request(app.getHttpServer())
           .post('/identity')
           .send({
-            privateKey: await getVaultPassword(privateKey),
+            privateKey: process.env.PRIVATE_KEY_E2E,
           })
           .expect(HttpStatus.OK)
           .expect(({ body }) => {
-            response = body;
+            testMemory.map.VALID_PRIVATE_KEY_RESPONSE_BODY = body;
           });
       });
 
       then(/^I should get in POST response (.*)$/, (address) => {
-        expect(response.address).toEqual(address);
+        expect(testMemory.map.VALID_PRIVATE_KEY_RESPONSE_BODY.address).toEqual(
+          address
+        );
       });
 
       then(

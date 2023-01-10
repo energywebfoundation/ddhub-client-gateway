@@ -1,8 +1,4 @@
-import {
-  registerDecorator,
-  ValidationArguments,
-  ValidationOptions,
-} from 'class-validator';
+import { registerDecorator, ValidationOptions } from 'class-validator';
 
 export function IsDID(validationOptions?: ValidationOptions) {
   // eslint-disable-next-line @typescript-eslint/ban-types
@@ -13,7 +9,7 @@ export function IsDID(validationOptions?: ValidationOptions) {
       propertyName: propertyName,
       options: validationOptions,
       validator: {
-        validate(value: any, args: ValidationArguments) {
+        validate(value) {
           const didPattern =
             '^(?:did:(?<method>[a-z0-9]+?):)((?<chain>[a-z0-9]+?):)?(?<id>0x[A-Fa-f0-9]{40})$';
 
