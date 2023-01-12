@@ -9,6 +9,7 @@
   "scripts": {
     "migrations:build": "rimraf migrations-build && tsc -p tsconfig.migrations.json",
     "migrations:run": "npm run typeorm -- migration:run",
+    "migrations:test:run": "DB_NAME=postgresql://ddhub:ddhub@localhost:5432/ddhub_test npm run typeorm -- migration:run",
     "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/.bin/typeorm",
     "generate:envs": "npm run generate:api:envs && npm run generate:scheduler:envs",
     "generate:api:envs": "npm run build:api:envs && node dist/apps/dsb-client-gateway-api-envs/main.js",
@@ -90,6 +91,7 @@
     "core-js": "^3.6.5",
     "dotenv": "^16.0.0",
     "ethers": "^5.5.4",
+    "fastq": "^1.14.0",
     "form-data": "^4.0.0",
     "formidable": "^2.0.1",
     "hdkey": "^2.0.1",

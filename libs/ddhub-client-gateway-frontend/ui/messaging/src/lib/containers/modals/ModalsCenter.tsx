@@ -1,6 +1,12 @@
 import { FC } from 'react';
 import { Details } from './Details';
+import { PostDetails } from './PostDetails';
 
 export const ModalsCenter: FC = () => {
-  return <Details />;
+  return (
+    <>
+      <Details />
+      <PostDetails />
+    </>
+  );
 };

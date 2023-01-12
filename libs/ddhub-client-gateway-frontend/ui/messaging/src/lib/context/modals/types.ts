@@ -1,4 +1,5 @@
 import { ModalActionsEnum } from './reducer';
+import { SendMessagelResponseDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 
 type TDetails = {
   open: boolean;
@@ -11,8 +12,14 @@ type TDetails = {
   }
 };
 
+type TPostDetails = {
+  open: boolean;
+  data: SendMessagelResponseDto;
+};
+
 export interface IModalStore {
   details: TDetails;
+  postDetails: TPostDetails;
 }
 
 interface IShowDetailsAction {
@@ -20,5 +27,9 @@ interface IShowDetailsAction {
   payload: TDetails;
 }
 
+interface IShowPostDetailsAction {
+  type: ModalActionsEnum.SHOW_POST_DETAILS;
+  payload: TPostDetails;
+}
 
-export type TModalAction = IShowDetailsAction
+export type TModalAction = IShowDetailsAction | IShowPostDetailsAction;

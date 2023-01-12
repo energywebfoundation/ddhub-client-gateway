@@ -2,6 +2,7 @@ import { INestApplication } from '@nestjs/common';
 import {
   AcksWrapperRepository,
   ApplicationWrapperRepository,
+  AssociationKeysWrapperRepository,
   ChannelWrapperRepository,
   CronWrapperRepository,
   DidWrapperRepository,
@@ -30,6 +31,7 @@ export const clearDatabase = async (
   await ref.get(EnrolmentWrapperRepository).enrolmentRepository.clear();
   await ref.get(EventsWrapperRepository).repository.clear();
   await ref.get(FileMetadataWrapperRepository).repository.clear();
+  await ref.get(AssociationKeysWrapperRepository).repository.clear();
   // await ref.get(TopicMonitorRepositoryWrapper).topicRepository.clear();
 
   console.log('database clear');
