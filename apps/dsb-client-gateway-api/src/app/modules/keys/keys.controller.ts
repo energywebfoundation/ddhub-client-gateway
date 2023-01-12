@@ -3,12 +3,15 @@ import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AssociationKeysService } from '@dsb-client-gateway/ddhub-client-gateway-association-keys';
 import { GetAssociationKeysDto } from './dto/get-association-keys.dto';
 import { GetCurrentKeyDto } from './dto/get-current-key.dto';
+import { CommandBus } from '@nestjs/cqrs';
+import { ForceAssociationKeysRunCommand } from '../message/command/force-association-keys-run.command';
 
 @Controller('keys')
 @ApiTags('Keys configuration')
 export class KeysController {
   constructor(
-    protected readonly associationKeysService: AssociationKeysService
+    protected readonly associationKeysService: AssociationKeysService,
+    protected readonly commandBus: CommandBus
   ) {}
 
   @Post('/association')
@@ -40,6 +43,16 @@ export class KeysController {
   })
   public async initAssociationKeys(): Promise<void> {
     await this.associationKeysService.initExternalChannels();
+  }
+
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @Post('/association/send')
+  @ApiResponse({
+    status: HttpStatus.NO_CONTENT,
+    description: 'Force sharing association keys',
+  })
+  public async sendAssociationKeys(): Promise<void> {
+    await this.commandBus.execute(new ForceAssociationKeysRunCommand());
   }
 
   @ApiResponse({
