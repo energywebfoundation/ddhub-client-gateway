@@ -43,6 +43,7 @@ ddhub-client-gateway-api:
       secret_prefix: "ddhubshareddev/"
       node_env: development
       opentelemetry_enabled: false
+      mtls_enabled: false
     scheduler:
       enabled: true
       image:
