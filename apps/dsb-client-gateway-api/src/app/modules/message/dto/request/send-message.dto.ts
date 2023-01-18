@@ -21,6 +21,10 @@ export class SendMessageDto {
   @MaxLength(255, {
     each: true,
   })
+  @ApiProperty({
+    description: 'List of anonymous keys which will serve as recipients of the message.',
+    type: [String],
+  })
   anonymousRecipient: string[] = [];
 
   @IsValidChannelName({
