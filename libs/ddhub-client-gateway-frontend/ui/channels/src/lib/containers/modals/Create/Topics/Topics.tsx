@@ -38,6 +38,7 @@ export const Topics = ({
     recent,
     topicInputValue,
     setTopicInputValue,
+    topicValue,
   } = useTopicsEffects(channelValues);
 
   return (
@@ -90,6 +91,7 @@ export const Topics = ({
             wrapperProps={{ mb: 2.375 }}
             listBoxHeightFull={true}
             inputValue={topicInputValue}
+            value={topicValue}
           />
         )}
 

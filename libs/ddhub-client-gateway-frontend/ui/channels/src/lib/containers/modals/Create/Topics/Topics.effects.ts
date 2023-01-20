@@ -49,6 +49,7 @@ export const useTopicsEffects = (channelValues: TopicsProps['channelValues']) =>
     useApplications('user');
   const [recent, setRecent] = useState('');
   const [topicInputValue, setTopicInputValue] = useState('');
+  const [topicValue, setTopicValue] = useState<string | null>(null);
 
   const { topics, topicsLoading } = useTopics({ owner: selectedApplication.value });
 
@@ -79,6 +80,7 @@ export const useTopicsEffects = (channelValues: TopicsProps['channelValues']) =>
       },
       ...selectedTopics,
     ]);
+    setTopicValue('');
   };
 
   const getFilteredTopics = (data: Topic) => {
@@ -167,5 +169,6 @@ export const useTopicsEffects = (channelValues: TopicsProps['channelValues']) =>
     recent,
     topicInputValue,
     setTopicInputValue,
+    topicValue,
   };
 };
