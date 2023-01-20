@@ -2,7 +2,7 @@ import {
   useApplications,
   useTopics,
 } from '@ddhub-client-gateway-frontend/ui/api-hooks';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { differenceBy } from 'lodash';
 import {
   GetTopicDto,
@@ -48,6 +48,8 @@ export const useTopicsEffects = (channelValues: TopicsProps['channelValues']) =>
   const { applications, isLoading: isLoadingApplications } =
     useApplications('user');
   const [recent, setRecent] = useState('');
+  const [topicInputValue, setTopicInputValue] = useState('');
+  const [topicValue, setTopicValue] = useState<string | null>(null);
 
   const { topics, topicsLoading } = useTopics({ owner: selectedApplication.value });
 
@@ -56,6 +58,10 @@ export const useTopicsEffects = (channelValues: TopicsProps['channelValues']) =>
   const filteredTopics = topics.filter(
     (item) => filters.includes(item.schemaType)
   );
+
+  useEffect(() => {
+    setTopicInputValue('');
+  }, [recent]);
 
   const addSelectedTopic = (selectedTopic: Topic) => {
     const exist =
@@ -74,6 +80,7 @@ export const useTopicsEffects = (channelValues: TopicsProps['channelValues']) =>
       },
       ...selectedTopics,
     ]);
+    setTopicValue('');
   };
 
   const getFilteredTopics = (data: Topic) => {
@@ -160,5 +167,8 @@ export const useTopicsEffects = (channelValues: TopicsProps['channelValues']) =>
     topicsLoading,
     filters,
     recent,
+    topicInputValue,
+    setTopicInputValue,
+    topicValue,
   };
 };
