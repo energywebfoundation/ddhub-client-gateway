@@ -36,6 +36,9 @@ export const Topics = ({
     filters,
     updateSelectedTopic,
     recent,
+    topicInputValue,
+    setTopicInputValue,
+    topicValue,
   } = useTopicsEffects(channelValues);
 
   return (
@@ -79,11 +82,16 @@ export const Topics = ({
                 addSelectedTopic(newValue);
               }
             }}
+            onInputChange={(event: any, newInputValue: string | null) => {
+              setTopicInputValue(newInputValue);
+            }}
             filterOptions={filterTopics}
             placeholder="Select Topic"
             label="Select Topic"
             wrapperProps={{ mb: 2.375 }}
             listBoxHeightFull={true}
+            inputValue={topicInputValue}
+            value={topicValue}
           />
         )}
 

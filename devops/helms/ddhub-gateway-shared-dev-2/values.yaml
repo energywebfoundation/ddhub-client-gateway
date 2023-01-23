@@ -9,7 +9,7 @@ ddhub-client-gateway-api:
       # -- Define the port the gateway will run on.
       port: 3333
       # -- Select WebSocket mode depending on architecture (i.e. preference for inbound or outbound connections). By default, the gateway will run a WebSocket server on /events. However, it can also operate as a client with additional configuration (see below). Alternatively, this functionality can be turned off. Options: SERVER, CLIENT, NONE
-      websocket: SERVER
+      websocket: NONE
       # -- Sets the URL of the WebSocket server the client should try to connect to. Required if WEBSOCKET is set to CLIENT.
       websocket_url: ""
       # -- Sets the protocol the WebSocket client should request access to. Acceptable protocols are defined by the WebSocket server, however, this can also be left undefined. Note that if WEBSOCKET is set to SERVER this variable is ignored. The server will only accept connection requests on the dsb-messages protocol.
@@ -27,7 +27,7 @@ ddhub-client-gateway-api:
       # -- Defines how many events should be pushed per second, regardless of mode chosen (see above).
       events_max_per_second: 50
       # -- The URL of the DSB Message Broker you want to connect to. Trailing / allowed.
-      dsb_base_url: http://ddhub-messagebroker-proxy-dev.ddhub-dev.svc
+      dsb_base_url: http://ddhub-messagebroker-proxy-shared-dev.ddhub-shared.svc
       # -- Sets the chain ID of the blockchain network. Options: 73799 (Volta), 246 (EWC)
       chain_id: 73799
       # -- Sets the blockchain RPC node to connect to retreive state from and submit transactions to. Should match the network given in CHAIN_ID.
@@ -40,21 +40,17 @@ ddhub-client-gateway-api:
       parent_namespace: ddhub.apps.energyweb.iam.ewc
       secret_engine: vault
       secret_engine_endpoint: http://vault.ddhub-dev.svc:8200
-      secret_prefix: "ddhubdev2/"
+      secret_prefix: "ddhubshareddev2/"
       node_env: development
       opentelemetry_enabled: false
+      mtls_enabled: false
     scheduler:
       enabled: true
       image:
         repository: aemocontainerregistry.azurecr.io/ddhub-client-gateway-scheduler
         pullPolicy: IfNotPresent
         # Overrides the image tag whose default is the chart appVersion.
-        tag: 1.3.1
-      podAnnotations: {}
-      resources: {}
-      probes:
-        liveness: true
-        readiness: true
+        tag: 1.3.3
       appConfig:
         DID_REGISTRY_ADDRESS: "0xc15d5a57a8eb0e1dcbe5d88b8f9a82017e5cc4af"
         EVENTS_MAX_PER_SECOND: "50"
@@ -71,40 +67,23 @@ ddhub-client-gateway-api:
         ASSOCIATION_KEYS_CRON_ENABLED: "true"
     ui:
       enabled: true
-      replicaCount: 1
       image:
-        repository: aemocontainerregistry.azurecr.io/ddhub-client-gateway-frontend
-        pullPolicy: IfNotPresent
-        # Overrides the image tag whose default is the chart appVersion.
-        tag: 1.3.1
+        tag: 1.3.2
+
   image:
-    # repository: 098061033856.dkr.ecr.us-east-1.amazonaws.com/ew-dos-dsb-ecr
-    repository: aemocontainerregistry.azurecr.io/ddhub-client-gateway-backend
-    pullPolicy: IfNotPresent
-    # version from PR: https://github.com/energywebfoundation/ddhub-client-gateway/pull/262
-    tag: 39edf8bf-34c4-4ee6-bd1e-e0855d496d0b
+    tag: 1.3.3
 
   imagePullSecrets: []
-  nameOverride: "ddhub-gateway-api-dev-2"
-  fullnameOverride: "ddhub-gateway-api-dev-2"
+  nameOverride: "ddhub-gateway-shared-dev-2"
+  fullnameOverride: "ddhub-gateway-shared-dev-2"
 
   config:
     enabled: true
-    secretRefName: ddhub-gateway-api-dev-2-sealedsecret
-    configRefName: ddhub-gateway-api-dev-2-configmap
-
-  podAnnotations: {}
+    secretRefName: ddhub-gateway-shared-dev-2-sealedsecret
+    configRefName: ddhub-gateway-shared-dev-2-configmap
 
   podSecurityContext:
     fsGroup: 2000
-
-  securityContext: {}
-    # capabilities:
-    #   drop:
-    #   - ALL
-    # readOnlyRootFilesystem: true
-    # runAsNonRoot: true
-    # runAsUser: 1000
 
   service:
     type: ClusterIP
@@ -115,42 +94,39 @@ ddhub-client-gateway-api:
     annotations:
       kubernetes.io/ingress.class: nginx
       nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
-      external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
-      cert-manager.io/issuer: prod-issuer
-      cert-manager.io/issuer-kind: OriginIssuer
-      cert-manager.io/issuer-group: cert-manager.k8s.cloudflare.com
+      # kubernetes.io/tls-acme: "true"
     hosts:
-      - host: ddhub-gateway-dev-2.energyweb.org
+      - host: ddhub-gateway-shared-dev-2.energy-web.org
         paths:
         - path: /docs
           pathType: Prefix
           backend:
-            serviceName: ddhub-gateway-api-dev-2
+            serviceName: ddhub-gateway-shared-dev-2
             servicePort: 80
         - path: /api
           pathType: Prefix
           backend:
-            serviceName: ddhub-gateway-api-dev-2
+            serviceName: ddhub-gateway-shared-dev-2
             servicePort: 80
         - path: /docs-json
           pathType: Prefix
           backend:
-            serviceName: ddhub-gateway-api-dev-2
+            serviceName: ddhub-gateway-shared-dev-2
             servicePort: 80
         - path: /events
           pathType: Prefix
           backend:
-            serviceName: ddhub-gateway-api-dev-2
+            serviceName: ddhub-gateway-shared-dev-2
             servicePort: 80
         - path: /
           pathType: Prefix
           backend:
-            serviceName: ddhub-gateway-api-dev-2-ui
+            serviceName: ddhub-gateway-shared-dev-2-ui
             servicePort: 80
     tls:
-      - secretName: ddhub-gateway-dev-tls-secret
+      - secretName: ddhub-gateway-shared-dev-2-tls-secret
         hosts:
-          - ddhub-gateway-dev-2.energyweb.org
+          - ddhub-gateway-shared-dev-2.energy-web.org
 
   resources: {}
     # We usually recommend not to specify default resources and to leave this as a conscious
@@ -164,30 +140,22 @@ ddhub-client-gateway-api:
     #   cpu: 100m
     #   memory: 128Mi
 
-  autoscaling:
-    enabled: false
-    minReplicas: 1
-    maxReplicas: 100
-    targetCPUUtilizationPercentage: 80
-    # targetMemoryUtilizationPercentage: 80
-
   nodeSelector: {}
 
   tolerations: []
 
-  affinity: {}
-
   sealedSecret:
     enabled: true
-    encryptedData: 
-      DB_NAME: AgBVv7weohlxWf82bL8g9+90mtL7kORPaTdv3NONCjDjnYcxayufo6vADIhj3vkVvAC4PO/X27EsemDUS6n6V/L+asUkNnSJM6usSQ1WWOvI09DSwUdV4v7VykkWwtFUlOvp321OlPIpuGTcoKTJkx4uB5EYT0RLC3DLOmos4QcF7nhiPA0pHNlL9sRwGdxD7k5xAkEjVufIYyhpLhF+wyZgPd4uccr93X4PaXi4M5qM4QvpS7ZBy/vSHRUF+f3DsI7CclgS/sUm7H9sLvDYX29HiIAuUIxlyJzXFVqeksd+Xh8zEygbKLVXJaKDBWwCA7DF2MLJDtdHm4zYLhTB2jKB5zjBwMI7DFfAnX3aqDvtS5JvNzpI7QqYCKuUl2KiNWxkkpyoXnPs4w30iFX/BUZuH2smb+mCoO37x/hXXovQSXYp3Ln5CJTEigpPYVpW46FTmai3BtksYUVg7u+O3IVAHqZTGv+l5GzfbHULvGyyGmqWjfeBwwOMDj1H0eFE8YrE3T2MvaGO4pJXmOl7GVnPxW4ygRZRgo09oDsNcuuqO+4T2ug+mVExw2CmyzHIzIFqIVmvDUQv1QnlauUXZ5htQ/SyBJVGW/AT/Zyh63xdLV1mWmlDpwo2EhYM04sHURaA/6NDQeWywcAGuAnZQEfxrSVDh3NmZ6hS+sqV6Mcg7dC2wn+w288XYbnGlGQQUB32HUNTLR5yr11DS4bkwPYV8qRxPmt+5rRFvrg4yIDvTPd4JNoZF5VTe5cbgzQjTEFvUCUhABVwOGIZfdQAqfr52GNH/lww6a5JSN/Pj5mIPFGLQwJi1IPISpVg12NYMKquX5o=
-      VAULT_TOKEN: AgC+tMMF+YzcL5h/l8MdzFYLIUZb9ftu9xAH1l1ijgtIplne9ay4EF7HL6ZIrVAAKB87dOSRoaL2+j+K/e48iQuTFGJbJ7mz2m6Qi/ygXs24iOJLyKVlZsfA/I0QpxHnewC2257YCiUCT2BIramp0oNUA/nmoVnz++ohyD2bn2lCVSKEGNnVSz+SY2nTZOQeAepOhnFotbXcJVkrC6h2j6otfFvZuEm/NOucz3slIf+13oRuKvBvxoAXB7Lbcr3lTfu3iQ/YYfW7hJRtMxs7yY1RqrMWK7Nqz3/Fwpx1H+nFn7OqZ9wdNSlDKDGr1TrbE/86oGVbW1loa6YgACMU4ATApDHGf37c5V+lMtPl3jkE5HDbGvHpBx0DzkJkXaXxEuaMu1X6Zvsa/F0YIQlUSCGmEhYXj5ZNF9HfnbXDehKHgfA6iDQgEVM17Hby2jRKOAEQoT61/4d5Z8bg2Hp/Idarnq8YXUg/z4I8ZGdbV61HmetW6x/8Jz+LwXwDrqA0noPbgHh1LRQNiCZwg75xKw9BJzgSng3NLXElo94J98Wiig/W7tk3kpS9s07YjtgcE2kQ5w5LEU0m2MMAf6FcbAEHllvUFoSzjpBU7iO1BoFcg50G76tQqL17JSmSiczNqBJVipgl1x1IHf9pIawnathDJHolE5Y0T5fpaAaOtbl+pSh0rdx/LM6wlZTN7gvjitZ4qPMgoBfTJOgFQmbMQMZBVJdQb21eC+7qupXr
-      INFURA_PROJECT_ID: AgBXcMtv4yDITbRYcvU6lQSgiPcxVFkr6fa6KBTaJ8KKkY6moi0P40XB/NHFn6lPkHfHOZg4kvdhiC5RHfUtZi55fy5FiO1turEieSCTXXX03AekNHwQSaw1r5CRPi2TPR1Fr3vFGpndEAHoOyeGlbRcU35YdznUThCD+/1WL6BUWioZq4k9yYANLpYVG1UPGwAxZ858hr8x3oRjWCMaY/ynE6DV4rJ6/VDCqtkkpmjhT4SJGDu9OvvHP8wZWdll6To8DwyShrCEsl8ltlyoYGQbc5Np9bckSU9cjIH0S+4n7aJWNvcH3qOx0dfsqglyYZM/VhgSV0SrodBBgd18pwmpQIjoyg6+8blhpkag8SZaN0IxQbXiGL5EBkPbnKwBZu02cWp7S9BCOnVHVjEdeQ85u36/l23/U0B1VN3M7xFNxQdbvXf7HL9nRNzd5qGo8oqBbhFonMAww3TBk1opWqyywuQd6q/FFkitxLiLPLDpgfvTWTtH0HVgZu/ye0YK1tZK1gVuPTxvdgkLfhfVX2WwFS3lY4ouikpMIj8eEbhlgKQVvJIGQsWjcadYrMi/+3I5HWPv7R9qNDn57UIwaz3rabaXJDtsqZWpYP2PxP2IGXhaOQYsUtQ06RWr34fm0cMeroryXlajrh5TVDsjGCneZ8sbh9XljL2WmrDrJ4+6gclA1Sf2xzW4fFEdtZcToCxvTKul6ftio4q39bS7F6lmdshsbLmLraMh+Vg=
-      INFURA_PROJECT_SECRET: AgCKnEI+41Dzq63ouV1kAJygOBeTJLg3CQzwGQAE0Tn5oMnNO9CFTtxnrMN3MSJwR4ui55Y0gwWlefxIaIUW3DEGM5O3yCsU+xlNDsxecRhx0I9m2sDfn7OTbODOrkhJLJXwlaet2DJPcfkG0Lozg75JvPT5oKQy/V7ZjWU4wEslo+n1CxH2RsRNupyl70kzWgyemEZs69kl1Oap6dHDKYBGcKujdmdGGh9e6dv9yp3jjB8aNSqfC+RsbNiXNm3Q4uivbZgRxgOiD2XXftM0BGmiTaobL63o35t1/2wOlm8qnwNsBt/ltV4sPQtpV7IiHBfDwtwjAxGXHVvFMHUhINT9TwC0AovCq7Sf+hgBDx8X+w+IwY35X922amTYFp0qx5jadxht13i/Hkcx9T2HMI38Ewm0WDBVJoOP6WuYYSAFJ5RxTCq4EDQ+1JLe5bRx9oryMYV7CfjUW5bQxiLr+1aQWwA7XvyfR3pplLP6rVw2cEiBh1VxO0aDaMSXR5ee9M9hyLv1sp0Wz3UL1j3sVG47zTjWcVX6AewufD1LLssHVQc7FKOoJJQcLJKZNq09rY+AKMZ192L0u9XF253y0PakglaGH2DCCFRQsI16YEQu2rb4T8D7mSPNYNx3gck9Wtifz5alge05O9XSmAVduz0rRg1smJ/uFFbX88BDjanqqVRFEf+7ed1ojTSwlcR6BGuiwFHfcxeuYdkfhs3/bsMFeN3lFYO8yKXe+uciny23vQ==
+    encryptedData:
+      DB_NAME: AgA5HhQfo5YnKkyBzlpxhhK3Ly1yay7SvJrI4kIlnrtnElGhnRK/lgGl3rO6tiQBKfKZ8sCj60Rh/4qTeIUUZY6VfndPOE5Pp+FQisYQdMupEnAQxyijAr5KrsS9HrC5anoLt0K0Rr/WUwpTA1cEDVm76yH052RqPQRRWdkZRuFKELWm4eZXsvCHgEfU0eAVr6d3ctWNbsKYGCgwgLH5kUl6dyuZUJ4QbRoQoY9f+nprw8VAmsFmZ0TRxr8JBrW9OwzfTjqipgUH4OXoCsy1MCFgFnEG5FKrbSDqIubEoOb+gYBwKR1zU431j1opg1QhCC27pUgnY0YLCLu6BNrsoSqY8ohQR0P4ym5zZYD31mrQ6TeS338nG7hqMw8+me6WHuoAlVVFAVPS53lNyIFfB+x5kBBEzovTGEwjKgjOsuHSQvgaSYwkZQaQerjQZw6fBkoPiFK0SRWxVWn9AhjKC32VceVdH+m8Y/bn34D0DqxPId0Yk2e3fYzy4d29NW5Yu8kMm7ZlLTlaBnEhdUSa+rwX1i33BvV40n6wkkNEPd6ZfDRqTtRnVgoYMBT8gxmoZ0RlyW9Lh6hx22wdM7SmKsLGj7I6rqrMKncziKAG/8iEXjEuNLXzNNkrjRIecKzOdDiEXW+dFPIwhSPXt0G4bJtEm72Q0r6K3ncM3sTFDxVPusNXB1DjIk8uE+PjmEciSQYvR85Uyfah5D2ESaXqSEwPjvmhm4i41KCYrQiQXagMrlFBfF5mpe6sJtP2dhlF3y8khZrACWvqWn/Q4m/qb/ljFpdnQnHLF4At9SvMf2pZb23r0rfYwnxnBXi/4Yqzk13U5+CIRI+/c8vT
+      VAULT_TOKEN: AgCjOJL1wPxzBEpGCYgdjxb5NDSjNzgNbctKBszcylbYzNYAeZ0H05uD3rEnr1LOs3xRgAXVF6mb6xWKesOSM6EnKnWeymkquFflcZ/Q2t0KCpUZp/ZQgetxoYM0lt/MhASJKDe/IQoCmfwFHId3UBqPlWWFT1XdRvE+oxPVoe8EoibadUQ91znbJANadThgXlBkvCRscbHGfdZR5dJtV4wzYCeDFcPA1Y9OBkNcWzDxBi1KR7hAgUCjb6WGRFBQjI2kIR/iPHyr/6FbvMbrioaMtpZZmpEMUd3MVa8Kh4dWiENZnZ9GCH7QBzXWeYku/uk7v5fBcg+xXtBDvOj+aFmptKoQcHKtcyt1x/AW+j2zujJX2cMYREDv6Ex7A7LU6VaXSMltFFUcmwHsCtMeFEahpAKjYEuFqhOowzWKouicAHcDHSq9dAivQsYQXzjGU7Cf2k/FCAHwD0qNvEnjjHNhY7rdhxc/vIc1DwvcYm4OggOEtaQ+8I8CK2r/OCOnXWYA0LZuk33HM2Lz/4T24cOLkT9veWWa+7xMfOcdHfQjzrct+fRkjbf2w2HO+Q6nKqBFCoI1WoZ6gdk41wY58oDauQLS6l+FUwJBv+zK7RvdaWvrpV+Wo6gE6wirfUp34MHptFiHmAgriUQ1O79pNKQ5OFE9LoMBdCedmIFUPzpOOnn3pWNZmIixycF9kBZ7O2OAYWP/tebhJNvsQBTW0jXquU9DW++aPdas9nVN
+      INFURA_PROJECT_ID: AgCFFBxODQPpPcHid8v02vN38Z7WRu5y8ur3QekC1t00Z9iRxFAxMryo5+MUPyplvsJ3rpailjEC4FmWEOmGjnWYnBXU3mqwQM4eisN9EnM212/XMWlVq/JlMgPat63ni/wkhFyfvKCk5ingFbKcp+9qQ7XrhqP2sNT90lx8OYvIvV5oGPMaPLeupMnYf96xCF2UDOS8boFIeYT3mQidMkLlkb187pGkbhPADZVpNZ/Xd21xzi0l1Eu9F5EiAaNUN/I22gVkP4Pm8vvklChO+5124Y7qJ/rOpdL3r2iiTkaS6vExVxQ92xNnF3qiJZ2dJ9O3Y3WBYBAcYdeXaKO9pxDml7uy9z1bo3zWrOLO1HqGx0Q0jc2F0S+spOWr/mnl0Ha/oGopFFL80QV277XfKK6IhNSGm861VRIwV6/NPNb9/TDN2v6vDI56pNrHwHzKSQiFvPvIwLKEYqZTCNzM/MVlUHuZ0+DFcoKi1trKfBycLETm4NR3LpcydOxUb02UhKHGpzAjB5rb24RH337NSYZ6CyjLf2ZETZjAsAR9X2BQIs1O2MKk20chuTFqOyswANsUUH3LQAp2Liv+hap7O1XdDjQuXHpXFliwHy3GhiBezyhBeWGGy/8c7SqsvRKLybYyzjcuexosQZ9iCNCIr7YlcgBSbMn/ZcaadbG/K/TKb0oX4s/hcrb+Xs/C6EcE8RXDfW1L5ATFf46zLG+gf5ftuQc8jIZgglCeS70=
+      INFURA_PROJECT_SECRET: AgBYcIs8n9/cMDOyO/ye5jBTEhoP3YdFYiq6U5S7ToWYqv9/gztG8CCjBRsyJsgVGa7gQIjt4I1KjAdTqBNAQ6jBpJa6dNItCz/DDddA6WwB1twqqJJwzs3MsB4eOhltMHDYi0Rvg+L5VLxFUtwljjAe0SF9NpuC8HSQH2BgfW8OICi8IPXSRaby+l9hm9XnBKnrp02o/xcGFUDGGrEyCJk1GvvS10q19AqlZgEmfgYNGBZqem6xJ0G6A64z8kieEHO4DPYWyb62UlvIzOmaSlc2Hd0MAql8oWsCldDk9l8lc2hu+EoZJrEK9Qwb5x4Z9SSac/cDswJP7V18IdaWHgvudODYuaDLr/YwNVDBvKo05h4TScoqxlW4b/rbcmfOlD5o57DdnUuKvNLhxIjrJza1bUa7WA8LVP3xRJ8PaN/9otaHGBxQvAxxmxfcodcb5rKOyrmCaYbESUJG/Vnpp1shFpLXI5IX0KWcmYmLykzex2GTL+NXJonkJKvsls29smzFlmDFT29FcPgbxDVaZlPRHoWjr/YuC2EPrHdVcEtD4hfEVvPQ8LJHW6gMW44ZnDelpBxtk3MTqCIJBnr6w1dZnL3bHxQNb4LRG63RSzIA/v/2uJF72oDv5FCc+DiODYhnWtCUBWFGh6Ye4aL/YUGe6BMly1PDziHqx5sSni+DqRcwZVGrc7vXF4oEHWl++Hq4+5o2opqIQb5ySJ4Xf6bRMOouhuqKdSXAWR0wqvqrsQ==
+      RPC_URL: AgBTor9G+oDGSE5lnSZEzG2Kt0TjMtW17Nz/AoCcm+KvTKKrV8G3Ra0we1KvXtX7UQZ2qzSyF42K/g9m0lxeV5HMiTdcx4d+pxEr+pRIqhZoZnsQXk9lSr+e8lCTR0ELuONmrbdqZtxwM7OTF2qPTq8w6UitJbhQFy+R6tSDXXd/qp0cON8+olUjUm7Cry3OnRkuGE4BritMdWa/tPeNckJsvsE3oT/0tvbLBY027Tcqh6se7E2bcnCWG8LrgNl0UlK1i+otjQGktGOoQrnLe6bN2VYYNqnI1QzrMfCL35tctud87djkQAqNbcSThfwzAc2HO1ugxJVylg673aKz2krr6YbbIMfLsmq09zoJQgiYW7LVmO856HFKn6RIxcCKmhSsKhY8pqFliJlMaTUFWGviPlIezUx0aKIASD3VNlb/mkp04OtsczUqGoEjUlmEuK0xOVQ0Uos4nBak6Ln+uPNK2aXW7jnCrbR4arRdaTK5f/ab0egTXf9B1w595+aY+3j6IPwU8vEuUhxa5NW6y2VNrr37O5MjdA9lBcRgjRzXyLI5VCgwS7h6X6tz+uOpUR2AldE4fbtb376seQrrOIQbow3Jg5bE7kmfEHakTOUyiAvqclWOB3kAICEY9yHZAs6MPn27R7uvZzQ6bJq1OTs7qLajOulnSx46GGKVn0QTb84egSZWiQu2NYlvGNBLU2wmbGa1q2S80Rm69XrzsWN69yMMuwdFDuvPQJHpjc5lZPB/uWZTKsdCBHP0iWdgxXbO9DFlOA==
 
   probes:
     liveness: true
-    livenessInitialDelay: 100
+    livenessInitialDelay: 90
     livenessPeriodSeconds: 10
     readiness: true
-    readinessInitialDelay: 100
+    readinessInitialDelay: 90
