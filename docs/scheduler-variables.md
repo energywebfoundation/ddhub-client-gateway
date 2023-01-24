@@ -41,6 +41,7 @@
 | DSB_BASE_URL | string | https://dsb-demo.energyweb.org | Message broker URL |  |  |
 | UPLOAD_FILES_DIR | string | ./upload | Directory where we should store temporary files for upload |  |  |
 | DOWNLOAD_FILES_DIR | string | ./download | Directory where we should store downloaded files for limited time |  |  |
+| LOG_LEVEL | string | info | Minimal log level ("fatal" \| "error" | "warn" | "info" | "debug" | "trace" | "silent") | fatal,error,warn,info,debug,trace |  |
 | LOG_PRETTY | boolean | false | Should colorize logs, only use in dev mode |  |  |
 | MTLS_ENABLED | boolean | true | Should enable mTLS |  |  |
 | DB_SYNC | boolean | false | Should generate migrations (dev use only) |  |  |
