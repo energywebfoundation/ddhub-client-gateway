@@ -256,9 +256,10 @@ export class KeysService implements OnModuleInit {
       return recoveredPublicKey === did.publicSignatureKey;
     } catch (e) {
       this.logger.error(
-        `error ocurred while recoverPublicKey in verify signature`,
-        e
+        `error occurred while recoverPublicKey in verify signature`
       );
+      this.logger.error(e);
+
       return false;
     }
   }
@@ -411,7 +412,7 @@ export class KeysService implements OnModuleInit {
 
     if (identity.balance === BalanceState.NONE) {
       this.logger.error(
-        'Not updating keys as balance is none',
+        'Not updating keys as balance is none %s',
         identity.address
       );
 
@@ -474,9 +475,10 @@ export class KeysService implements OnModuleInit {
         }
       } catch (e) {
         this.logger.error(
-          'something is wrong with private RSA key, creating new one',
-          e
+          'something is wrong with private RSA key, creating new one'
         );
+
+        this.logger.error(e);
       }
 
       this.logger.error(

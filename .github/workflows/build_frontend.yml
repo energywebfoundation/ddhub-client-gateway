@@ -46,3 +46,4 @@ jobs:
         env:
           DB_NAME: postgresql://ddhub:ddhub@localhost:5432/ddhub
           SECRETS_ENGINE: vault
+          LOG_LEVEL: error

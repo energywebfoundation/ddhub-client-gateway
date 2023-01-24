@@ -38,6 +38,12 @@ export const BASIC_ENVS = Joi.object({
     .description(
       'Directory where we should store downloaded files for limited time'
     ),
+  LOG_LEVEL: Joi.string()
+    .valid(...['fatal', 'error', 'warn', 'info', 'debug', 'trace'])
+    .default('info')
+    .description(
+      'Minimal log level ("fatal" | "error" | "warn" | "info" | "debug" | "trace" | "silent")'
+    ),
   LOG_PRETTY: Joi.boolean()
     .default(false)
     .description('Should colorize logs, only use in dev mode'),
