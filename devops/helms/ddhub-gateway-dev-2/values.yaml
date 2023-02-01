@@ -40,7 +40,7 @@ ddhub-client-gateway-api:
       parent_namespace: ddhub.apps.energyweb.iam.ewc
       secret_engine: vault
       secret_engine_endpoint: http://vault.ddhub-dev.svc:8200
-      secret_prefix: "ddhubdev2"
+      secret_prefix: "ddhubdev2/"
       node_env: development
       opentelemetry_enabled: false
     scheduler:
@@ -56,13 +56,19 @@ ddhub-client-gateway-api:
         liveness: true
         readiness: true
       appConfig:
-        DID_AUTH_URL: "http://ddhub-messagebroker-proxy-dev.ddhub-dev.svc"
         DID_REGISTRY_ADDRESS: "0xc15d5a57a8eb0e1dcbe5d88b8f9a82017e5cc4af"
         EVENTS_MAX_PER_SECOND: "50"
         NO_COLOR: "true"
         IPFS_HOST: "ipfs.infura.io"
         IPFS_PROTOCOL: "https://"
         IPFS_PORT: "5001"
+        AK_FQCN: "ak.enc.pub"
+        AK_TOPIC_NAME: "associationKey"
+        AK_TOPIC_OWNER: "ddhub.apps.energyweb.iam.ewc"
+        AK_TOPIC_VERSION: "1.0.0"
+        AK_SHARE_CRON_ENABLED: "true"
+        AK_SHARE_CRON_SCHEDULE: "*/1 * * * *"
+        ASSOCIATION_KEYS_CRON_ENABLED: "true"
     ui:
       enabled: true
       replicaCount: 1

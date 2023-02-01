@@ -24,6 +24,7 @@ import { storage, Store } from 'nestjs-pino/storage.js';
 import { v4 as uuidv4 } from 'uuid';
 import type { queue } from 'fastq';
 import * as fastq from 'fastq';
+import { ClientsService } from '@dsb-client-gateway/ddhub-client-gateway-clients';
 
 export interface Task {
   id: string;
@@ -47,7 +48,8 @@ export class DsbMessagePoolingService implements OnApplicationBootstrap {
     protected readonly gateway: EventsGateway,
     protected readonly wsClient: WsClientService,
     protected readonly acksWrapperRepository: AcksWrapperRepository,
-    protected readonly pinoLogger: PinoLogger
+    protected readonly pinoLogger: PinoLogger,
+    protected readonly clientsService: ClientsService
   ) {}
 
   public async onApplicationBootstrap(): Promise<void> {
@@ -259,6 +261,10 @@ export class DsbMessagePoolingService implements OnApplicationBootstrap {
       client.request?.url.split('?')[1]
     ).get('clientId');
 
+    const validClientId = _clientId ? _clientId : clientId;
+
+    await this.clientsService.upsert(validClientId);
+
     let msgCount = 0;
     for (const subscription of subscriptions) {
       try {
@@ -270,7 +276,7 @@ export class DsbMessagePoolingService implements OnApplicationBootstrap {
               amount: messagesAmount,
               topicName: undefined,
               topicOwner: undefined,
-              clientId: _clientId ? _clientId : clientId,
+              clientId: validClientId,
             },
             false
           );
@@ -348,6 +354,7 @@ export class DsbMessagePoolingService implements OnApplicationBootstrap {
         )
         .catch((e) => {
           this.logger.warn(`[WS][sendMessagesToSubscribers][sendAckBy] ${e}`);
+          this.logger.warn(e);
           return {
             acked: [],
             notFound: [],
@@ -379,7 +386,8 @@ export class DsbMessagePoolingService implements OnApplicationBootstrap {
         });
       }
     } catch (e) {
-      this.logger.error(`[WS][sendMessagesToSubscribers] ${e}`);
+      this.logger.error(`[WS][sendMessagesToSubscribers]`);
+      this.logger.error(e);
     }
   }
 }

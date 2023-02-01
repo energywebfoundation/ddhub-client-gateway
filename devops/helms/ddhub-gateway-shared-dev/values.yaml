@@ -9,7 +9,7 @@ ddhub-client-gateway-api:
       # -- Define the port the gateway will run on.
       port: 3333
       # -- Select WebSocket mode depending on architecture (i.e. preference for inbound or outbound connections). By default, the gateway will run a WebSocket server on /events. However, it can also operate as a client with additional configuration (see below). Alternatively, this functionality can be turned off. Options: SERVER, CLIENT, NONE
-      websocket: SERVER
+      websocket: NONE
       # -- Sets the URL of the WebSocket server the client should try to connect to. Required if WEBSOCKET is set to CLIENT.
       websocket_url: ""
       # -- Sets the protocol the WebSocket client should request access to. Acceptable protocols are defined by the WebSocket server, however, this can also be left undefined. Note that if WEBSOCKET is set to SERVER this variable is ignored. The server will only accept connection requests on the dsb-messages protocol.
@@ -27,7 +27,7 @@ ddhub-client-gateway-api:
       # -- Defines how many events should be pushed per second, regardless of mode chosen (see above).
       events_max_per_second: 50
       # -- The URL of the DSB Message Broker you want to connect to. Trailing / allowed.
-      dsb_base_url: http://ddhub-messagebroker-proxy-dev.ddhub-dev.svc
+      dsb_base_url: http://ddhub-messagebroker-proxy-shared-dev.ddhub-shared.svc
       # -- Sets the chain ID of the blockchain network. Options: 73799 (Volta), 246 (EWC)
       chain_id: 73799
       # -- Sets the blockchain RPC node to connect to retreive state from and submit transactions to. Should match the network given in CHAIN_ID.
@@ -40,20 +40,17 @@ ddhub-client-gateway-api:
       parent_namespace: ddhub.apps.energyweb.iam.ewc
       secret_engine: vault
       secret_engine_endpoint: http://vault.ddhub-dev.svc:8200
+      secret_prefix: "ddhubshareddev/"
       node_env: development
       opentelemetry_enabled: false
+      mtls_enabled: false
     scheduler:
       enabled: true
       image:
         repository: aemocontainerregistry.azurecr.io/ddhub-client-gateway-scheduler
         pullPolicy: IfNotPresent
         # Overrides the image tag whose default is the chart appVersion.
-        tag: canary
-      podAnnotations: {}
-      resources: {}
-      probes:
-        liveness: true
-        readiness: true
+        tag: 1.3.3
       appConfig:
         DID_REGISTRY_ADDRESS: "0xc15d5a57a8eb0e1dcbe5d88b8f9a82017e5cc4af"
         EVENTS_MAX_PER_SECOND: "50"
@@ -68,44 +65,25 @@ ddhub-client-gateway-api:
         AK_SHARE_CRON_ENABLED: "true"
         AK_SHARE_CRON_SCHEDULE: "*/1 * * * *"
         ASSOCIATION_KEYS_CRON_ENABLED: "true"
+    ui:
+      enabled: true
+      image:
+        tag: 1.3.3
 
   image:
-    # repository: 098061033856.dkr.ecr.us-east-1.amazonaws.com/ew-dos-dsb-ecr
-    repository: aemocontainerregistry.azurecr.io/ddhub-client-gateway-backend
-    pullPolicy: IfNotPresent
-    # Overrides the image tag whose default is the chart appVersion.
-    tag: canary
+    tag: 1.3.3
 
   imagePullSecrets: []
-  nameOverride: "ddhub-gateway-api-dev"
-  fullnameOverride: "ddhub-gateway-api-dev"
+  nameOverride: "ddhub-gateway-shared-dev"
+  fullnameOverride: "ddhub-gateway-shared-dev"
 
   config:
     enabled: true
-    secretRefName: ddhub-gateway-api-dev-sealedsecret
-    configRefName: ddhub-gateway-api-dev-configmap
-
-  serviceAccount:
-    # Specifies whether a service account should be created
-    create: true
-    # Annotations to add to the service account
-    annotations: {}
-    # The name of the service account to use.
-    # If not set and create is true, a name is generated using the fullname template
-    name: ""
-
-  podAnnotations: {}
+    secretRefName: ddhub-gateway-shared-dev-sealedsecret
+    configRefName: ddhub-gateway-shared-dev-configmap
 
   podSecurityContext:
     fsGroup: 2000
-
-  securityContext: {}
-    # capabilities:
-    #   drop:
-    #   - ALL
-    # readOnlyRootFilesystem: true
-    # runAsNonRoot: true
-    # runAsUser: 1000
 
   service:
     type: ClusterIP
@@ -118,37 +96,37 @@ ddhub-client-gateway-api:
       nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
       # kubernetes.io/tls-acme: "true"
     hosts:
-      - host: ddhub-gateway-dev.energyweb.org
+      - host: ddhub-gateway-shared-dev.energy-web.org
         paths:
         - path: /docs
           pathType: Prefix
           backend:
-            serviceName: ddhub-gateway-api-dev
+            serviceName: ddhub-gateway-shared-dev
             servicePort: 80
         - path: /api
           pathType: Prefix
           backend:
-            serviceName: ddhub-gateway-api-dev
+            serviceName: ddhub-gateway-shared-dev
             servicePort: 80
         - path: /docs-json
           pathType: Prefix
           backend:
-            serviceName: ddhub-gateway-api-dev
+            serviceName: ddhub-gateway-shared-dev
             servicePort: 80
         - path: /events
           pathType: Prefix
           backend:
-            serviceName: ddhub-gateway-api-dev
+            serviceName: ddhub-gateway-shared-dev
             servicePort: 80
         - path: /
           pathType: Prefix
           backend:
-            serviceName: ddhub-gateway-api-dev-ui
+            serviceName: ddhub-gateway-shared-dev-ui
             servicePort: 80
     tls:
-      - secretName: dsb-tls-secret
+      - secretName: ddhub-gateway-shared-dev-tls-secret
         hosts:
-          - ddhub-gateway-dev.energyweb.org
+          - ddhub-gateway-shared-dev.energy-web.org
 
   resources: {}
     # We usually recommend not to specify default resources and to leave this as a conscious
@@ -162,13 +140,6 @@ ddhub-client-gateway-api:
     #   cpu: 100m
     #   memory: 128Mi
 
-  autoscaling:
-    enabled: false
-    minReplicas: 1
-    maxReplicas: 100
-    targetCPUUtilizationPercentage: 80
-    # targetMemoryUtilizationPercentage: 80
-
   nodeSelector: {}
 
   tolerations: []
@@ -176,19 +147,15 @@ ddhub-client-gateway-api:
   sealedSecret:
     enabled: true
     encryptedData:
-      DB_NAME: AgCH5Sirl/qsMd6SWySQr+79QRL4UxPhEcvQBo/OyEve6ew1R5Yf0Iksll+WFpx4do+w+ZvdygWhIhP9vyOlxvwWHfZdc24rlvnAewdnDZ9W0y9sRD/TUo4acSSDRJcCnTkcoMRLQUoXivfaWHGEy5Fq2Z8+jvuPyL3vByeUD0QeStTH3bwxTKNpu4Qwtof2C1WWo7dmWR9ZXBucWAHKoZG9b5BwXb6VSBgr0NtyU5HuhEM5xZbbJskran45kUbd/ehDOeGjWZCkywdgdHOhyADEHOu+Qjn11WBpZqRnrFxXFOjjL6iEVxWh1RiPLB5CXcNhCARn/MV9ovwBBqfo+bJUsccqVeo3HdqbAcubyN6jswRtTi66/R4B3C+GLBojRem20slZJ+r8nbsN4B6KWyXyjCq6+/WLOPcL9tQf1T1buf8B25nBpiFemYyKsWcN2Ex8o6esIFsQ3e2M3vzSXYxfNhM9YFc0yeWIgAL6ud6z4i4+C6qTbndTAYjg88/fSsJ5pyMzYEATOf2lNY2VbaEIP9ta0BTF36oGBrWfktsF91u6U5Mx+JC27XNCDm/Eyy9/l/+FzkdLBUa/HVCIBm7cXvncQk8kcBYGsp4ciOfOOmcWPOFKEu0DVmRf+/zA4xD2YqCTZjAoa4kK9dcLywWPouAMrG1FFEs15oZ1HMQKyhFKLzFFFXPxiIWys9/7sXUJNASld5n0RKt4Om2qcf4/Oh8ZBxHXLFE7NBYFUjQn6wAaYuI4Dn5uPn+5OUdXNcGHkL5G+sdQw19AS+LTI86AhQxUeXnbfo4WnwReOBrmLB3IRziZBZHlErB4bOe2Rf62pg==
-      VAULT_TOKEN: AgAvrAtM3n21BLfvFIsMHsXNC22uoK/TNhIGZSBxnBHsYWJ1sk91UAF/uDApnFsPk33BJvf6ABg/eFbUvwGETrQsJGx1OlTzgfucxZOA0RcgjS8Om/o+BRMpa7rEsF7oStuSDnKWYgduIyaOQ+Lfw/wtK/9PfEx5xJ7ky7faUp5PjpL1KHbKQlLSLJuojhoJT91Huodxi6v0nYY5+2/AkO2ozDgr825mGrCbiJzelIQhZtvY//CXBqbdTCOaxNeK8AITEnYieRf1tEP8vKItVRsyg7N2Wl+t2QGsaJpnUNo2gFXuw9B/pT7w/h6IEGqcXgWd1jWEFD87IrlRfKonvQvSzb/WGUwuDo5NtSnxyCXJgv2HtGkvN5itwivCdbBNHhjHqits4w/P/NRePTQzwgHTLkH2OLQagCIdSmKvcR3vaQsUaCeECiNADCEqCBUpg+9vduem904CKLBnsX0RPKmnhzxjtaNYzBEMhSY4/QvNDkAA0umrSswMgQ8V7OJQrBYXYE+i3mxu5PuZl1q+SOtti026J3qvhSE8apfZTFOAS0MBwAtIT8rwBd+ZY2vpW2K7Z6BBK3CxXlVHUGDUAMb0/2g0XcIeuPF5Xy8JHXt8N3041UoFXXKfJR8yJqThIkn8w6O1m3j+2O2Cbwic4+WKE6u89/7avA/kO9o+xHHhmsL5YdHjTdkSvUAmufCc29LSw6etKWrNTCoNKUVaxB4cpRA2gIBcZnl5UW+I
-      INFURA_PROJECT_ID: AgB9kdiocH3aWIHoM71YXvQhaKpyxnzID5c7y9K3aC5DK491zKCdGQyIURAn4Fd1Ys0r7Nvxu5LAszUGVIniMR4NgLbzj4kt6+ySqVlWf7S67kRmuUBaCmhYs6/lyudC0Vxko/8hWLeUVt5bKfMJjzw5hZozlv7oJG6m19KdL8334zSB8q0qT1JDWEiHZaVuWSCAcEbWneVSJsv8mnO0fiAHknbNT2ya19WCY74t9Pc+ckwrAKpiQ59R3n6kBMwJIujGbnmxO9qsxyEIOwydXIAjlxIpfA4ulokBI11RV8A8Dk1kxZz6Xk3ADgc9k91aPjkJBGLJ76OyiXEBtEhxARzbUeebdrAXcRRjSEeVir7MnLsNZ1EGKtuxgGrQV0hBT77CJCovKkloJI4RYmO3HSDKU1SmHq9Dl5prqdTzjggW92lSUgMD3aqj8Ia3dJtKWQo8uhSx07EorHEfAE8rjVbrHpDl0OwmNJdAKnq3iygxEu2Lqe9JOO9JWJtpURo+m/FkWzXfHoXQvZj5OAQp1Pw52IXBXdwrkRGJ32+B39d8dlKNcV3n/lJq524g7TqTf1jFVlSLG9O59RNOw6RHYwtJkxHG6BIqs4Wnabc556M4SdLX8u8wefJbUDCNHO8jMM/YANiekgy7qoCF+aA1IA0hN0NwyatO/posZebYjHzBbx/r7UE9pbDK9L8U5qoiraLJ9HkxItEqiqKeFApgazq2KLt4oVx1HAOzEZs=
-      INFURA_PROJECT_SECRET: AgBMc48TSN9ZSK3RKqqIrqNyJZI4p6TkJ+Tw/KVaDF+eD3XgXs18rFRt/+IdJVM1lXkHKHgmdIrPuYvFGfUg/eHtYmQPdpmIZe908wAgiA85dNyTKg7lCj6xZXG+Kv7CcLQOrCH4rBWwFXiAuzb/VXeS2pNKMVeEJtpqykckLLVsJQXCeWRUtlma4lUvcl1digf+DMSIBmmWVad44zqPWRgcFYDAoZ0QndstTHM7UwFBRwaJoshenE8nqXzm95/w25FWB7nuI2BNj0r9MsxsxTE/xebUAAVkoF8oQ4Cb9Zt6hA50m351ai518X+cy9Mq4t8/Tf7Iedha9R2xdmPX3gqdfQ5w9aWM17XPLydDIB46FYEYgi+pDr112QFL5+/r76scse5PWZ5L18U2pZ43Oz4SQ0EGQqs16DlwbP7fQt+sjgDKXQioGCk7rvH+69u0AgVKpP/hCBQnBCQQ5J59sc1rRfM9BmaeJJUGMHSAhgJG5Nm+Jla2KD7rqhD6lZe6gZD+dcR0hNGrLGDmjrklUwm48SWL0BDiyRt0jMHVnhHQ746DpvI61eChOM1fkSz+QZyzgYd0grrf68lmMCgMjhjo3YpdvEVATZpBODCmlejFIYVKMx/vORpMacnsfZnfYYaVDAiY8aKio4YpIZppxx6gka769ZsON9Z3duVpbpPXGdbx1ZBLxZTESSKrSQojvHfeVVPaJycki6ruEPYT6hD3/sN7xS21/SlQW0aj28Z3MQ==
-
-
-  pvc:
-    enabled: true
-    mountPath: /usr/app/data
+      DB_NAME: AgA0osFOQ2aMl2U52xGHUImvrF8mAPDcAGbT2NPvkigM3HpF5nYpJu0QcT5NLMaLLjByCOKxafNBx10NPU+Y9eP4EKozE4ZSoPToJ36W/q3Hcah2bdiBzr/kVPEbRwsspBXf4oT/vHkldhh2AEJb4A5sPU2rxntiEYNzwbZryJoXJ2Ya+oUp8s4PT4W2R+HNqIgNWbuE00ocy7ZRxUGfM3keqE6jv/mnOlz1rNZO6+csVwlWgnvEzRLmNxFUs11oEQPwMqfnllAFUYaZoNi1GXEnQzMUsAvX9d7rpTl8IYs28rH3xE9iUF/TUdJjK7AixYiwzFuxpHuv1SLxoq204YR7b5RDpifMr0uViT3jf/cJKBgEUl7v3s2mdFZt/ey6Lk7DX5GqefjAIwMx17dfc84PPgKH1nW56zEloubKgTRBS47+vv/fCnRwF9K9plFsjp/e0V7IPL4hWpihRd5MrIlo8hJnbov+WoEGsKv6n8QO84tLYLRyPED36qutVX4QPjeqAWoy+RY1drMnBVvILYaQhC1t5RfMVWiyy3tK5HiDll/VSh+AckZa7+mEeyKYNuLYm12kkb/Q/C7261AJGNv38sqOFAkowldDNgtFLbVqTlB0ZL+noQFuVYP1zSUqIUW56l8EZT7+IFNnT9ZAwU4KN1dbv8h8MIh3jGT8Iiw9pPH7Krw63GN72Lq682bIwfMU1YslGbtGo/hNo3m/+pCXlZfv4sUy486F351NL2ITeD3/RdMy9z6MwnqCcbdFD6j+MXjxy/HNF1LMOWkofgxToz43Ao0GTzwG9ghukN3mAnXZpKoQgz0KLfOqlk09qrtTGPJfr7iIo0s=
+      VAULT_TOKEN: AgC0ldAf1JMDQVe5AK8RHEBst4paoZ6PM8cVchB291lWhLhMyyYabREX3hc7s8atAZwAoURkXeOO9qFEOCblVozgZ9hgLiov0PPbp5rYX8vYmw1d6VGewmH6lxjQR3BBTSvtzansW5ekBl/zgKasf8emuyQMegAnNw0dc+xw19cl7CoZI89FwZmWI06RgSDLRqMzjUANd6YJlX/ZfshfJPAUfiEoO24mt/I3KPqNgbgdVVBP/4jpVqY68U4vnG1yLRYvv76m5+epFNYM76KOSBtHt6vTlmS5Jx/aASJNGhYaGv2ee9bKXdJ/HMsu0v1wAzUqlCWAs2ma/nuxSjyXOPTM03Ya0VxMeX1Eg8Qv5PVAoGTReOc7WZiBZGTzGi71f3G8eH0ZSfks0Uu4/AlYOkjl/JVl1HCmuknJJpnkhuVwbdyMlL3KpF/wjs5Kh6e9D8D3w1kuWMcVf8gPYR2JQ3SDNw0EgixD09X8r95ZV9LMid0FCdjUytunRCnccJHHTXFye+62TYf+rNfH3UrenY7w8bru8YDZbFhYls1Az8xjIGzNN+9l2WvDP4m07K1YqSNJBRepvQqE8rI/pqJ18xWEGS0kvtcPjNMisz4VBLmP3m8bEg0CJC8OUNId6m4tHuQ6yN7g3gA0WQXBBh8KLbxbV99tHwmA9N0rg0v4psCd6LCSSNPS3kxng/mvo1qGSaFgcstklMSRIwznPXmFZxyGHQEiXJMVMoxOkXFt
+      INFURA_PROJECT_ID: AgCzq2DVHsCluP4f10xL4VF8Njsg32nN1/wVSsLEz2U57ZPjITasf9MZgQkpU4ZraqV72LMnO73BTXqf59KxOwvSFUpmGtPYoqM94iEfHXB+NC97uiF/Zk233tMQjhy6Zblhg12cncneSvzmo042xOnh0+TXfi52xyPjiefIg0HEsF+r83z78hx021dTuA9zwlFvhXT30grQ17ZCcYcTx+x/OWBUE0wjjinZ01JfceGGHC7XqWsqhpbnx7maOlp51Dwfy+M14243x0rDNB/jQpABIxnxnFyhn3uDuiyqJ1ByZNSCPrLGyys8pJ1cdcIoQkp/d3BsPKWHMuONPUevaTroTUAJX3ESs/pKCqPdYk7Au4ArdqcK8e1qGKZdgOpkmnStUO7441mkrH5iARkcsVS0n3FLL7mAQMmqlsN/NSiKZDe6ppmeH2XQ0/JzBfWpw5mFIdK8Z7HzjWiqGuGJ6tjKAXIZh8aYgHOFgfYSXC1siAC6GtT3glV2eWKFyI27HBD5aDhEGw4VDMMydBd+5/gcxPQxzzXoQjehvCYXHOm+EYkX7lt4Kau2Ds0fi7X0jcilvG0pGxBoApE02o/WzaxntThetr0iwBHKvbBrSyDVtS+6owG7V17s9EJe8vtEjzEsbGBVv0knhZgjg4FnM45pfW9vAhMWPb8IiASq+SEHCkVkTPEY52Yc8zZlMk00iHnD9KVJBytaE4+G7FqFcawMMS9mCm8Lw1oRqfA=
+      INFURA_PROJECT_SECRET: AgBt1/39t0tcmK6JjIoZ63qJabMZzsyIb+3zUIz2hbU3S7YZcFwRvtiEu02fdCk5Q6G1REYcec17qUFKgW3G00q2tDzHZGD6/kM7Hm/Ly02HARHmZ37FM7P0slXVQmDPKD0m4MdgzoJzg3bj5jAJbFAV5kX7ZzGIx064uVdwv3WavO6Car6BQOZWZeOUEBuqSUC96cyDs7NZES6SMRvDJ6uKJhA44KqoGR8LCAQmiG4FD9PqSLzksA0+ognQt69w/3TwCvBrHIN/ATnmGQGbZAc6CwlP+dQ62wH0Yc0iwPnyuJqRcPj7zx+OGTvUFfqZtvofAtoHPrUgTDqJUWRvdkDbhD4tOUVKKH+i8VtVqeK8uaeay5ne+ehJQo/7Oqzs47lNIVjzc69UCjgOZuLhkn2jGfZhPuvKHZHoqcDu3DwAVlrMXo3bV4t0IkGSUTJM5lVE2PpdEJTCNSNTmP/sTfN1X1UAkdofpbcW7B9Kxw58raWUpDHhOp4DNME+DSS+ZgzVrk1LaO0myFJjGvm+JvOQnOm/RtA4+iD0PFWDimsyl36IpzJCaHAEBBzN6XzOQOIJuoJIxtASGJLlJWlHm0TTIRrQqilD+JcjdzfzDCQQvba7JVaa8LFhE09JfBb9yaiqeraRMTBM2SDTVDLdWgz6PERaTlDk9HLKjRIoEmIBjOMPiOq4SZ9OjD933bhOxnhbDnK4gb/BkTTSuKzPJxIlOJLs2DxuxAU9cLVhFP0XTw==
+      RPC_URL: AgAWpFt2ELfXKkZlbHvg+84fgHhw1HvRwtnOPg5zmurntb7coo9fvij1BPhZhSxKMxSlgID8AJoBudclxZPtdIpyt/DWAO9pd1RbVu1FvId0zWo5I0n6JdO0EeNY5EBY1zr06wbLYG4rXHzpvSZ8Q6paNnoESW+w9l725yIpQLiqi6kizcyxPSCuHS68rjDOiNGApmcYfs+y4sznyqpuuQZVv1zB3vjkppFhLyRiB8rznjAqAB0/OKBRlMB4C6iTQoktY2Of0EBB68uOWleL00OWWMGJksfZrgHjfNA1pkZR8FrwlixmqzsfdjwJ0W4SWmYE9Be0Zuo1dNSo14e8kTtFyhKm+m9hkxh6ErsOwEzBNT/pMQpIfJIwFU1+pOoHosrmuDEmuZXe34gGS5Cv2xivsoX9pMEDZyOjf1sLLE5/5zSSkTQ4XW8ukl3UWj+bEF+76A1v6+8TzsWqQZcCYgKIPKzMLQDvjxA3m6AmbHrEBx9i5pQkLmFJUC2h6uxISStYOxTrXVV273fB0tDmwj1jy5PY0Tc2avNSuBXHpW9/mbwz5wH/H/7EFNB+6sWfhXEO91ktpi+oiTRVGsG3uyAiJAJNNWFe0A+vmDGaQT1bNzMMa5sfX3H2NtyR91Sm7TSGS489gARmGT7dmUxCEFIt32A5gJeoQZETG2Vmhadvb4iC8dVJ55Owi7rH3aHw1h4/BOH0UP6d1/7IoLThaIJPOpWJKaQEbqT0NMWeaYqW8iqfHhKIyLt32XFYKPzmBf80iKVnNQ==
 
   probes:
     liveness: true
-    livenessInitialDelay: 120
+    livenessInitialDelay: 90
     livenessPeriodSeconds: 10
     readiness: true
-    readinessInitialDelay: 120
+    readinessInitialDelay: 90
