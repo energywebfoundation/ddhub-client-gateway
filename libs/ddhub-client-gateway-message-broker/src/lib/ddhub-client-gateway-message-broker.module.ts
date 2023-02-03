@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { HttpModule } from '@nestjs/axios';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import {
+  DdhubChannelStreamService,
   DdhubClientsService,
   DdhubConfigService,
   DdhubDidService,
@@ -47,6 +48,7 @@ import { DdhubClientGatewayVersionModule } from '@dsb-client-gateway/ddhub-clien
     DdhubClientGatewayTlsAgentModule,
   ],
   providers: [
+    DdhubChannelStreamService,
     DdhubTopicsService,
     DdhubFilesService,
     DdhubHealthService,
@@ -59,6 +61,7 @@ import { DdhubClientGatewayVersionModule } from '@dsb-client-gateway/ddhub-clien
     DdhubClientsService,
   ],
   exports: [
+    DdhubChannelStreamService,
     DdhubTopicsService,
     DdhubFilesService,
     DdhubHealthService,

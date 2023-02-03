@@ -169,13 +169,19 @@ export class AssociationKeysListener implements OnApplicationBootstrap {
           anonymousRecipient: undefined,
           transactionId: undefined,
         })
-        .catch((e) => retry(e));
+        .then(async () => {
+          return this.associationKeyService
+            .updateKeySharedState(
+              payload.map(({ associationKey }) => associationKey)
+            )
+            .catch((e) => retry(e));
+        })
+        .catch((e) => {
+          this.logger.error('failed when sending association keys');
+          this.logger.error(e);
 
-      await this.associationKeyService
-        .updateKeySharedState(
-          payload.map(({ associationKey }) => associationKey)
-        )
-        .catch((e) => retry(e));
+          return retry(e);
+        });
     }, this.retryConfigService.loginConfig);
   }
 }
