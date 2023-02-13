@@ -111,7 +111,10 @@ export class MessageService {
 
     const qualifiedDids = channel.conditions.qualifiedDids;
 
-    if (qualifiedDids.length === 0) {
+    if (
+      qualifiedDids.length === 0 ||
+      (channel.useAnonymousExtChannel && dto.anonymousRecipient.length > 0)
+    ) {
       throw new RecipientsNotFoundException();
     }
 
@@ -315,9 +318,24 @@ export class MessageService {
     this.logger.log(`attempting to process message ${message.messageId}`);
 
     try {
-      const topic: TopicEntity = await this.topicService.getTopicById(
-        message.topicId
-      );
+      const topic: TopicEntity | undefined =
+        await this.topicService.getTopicById(message.topicId);
+
+      if (!topic) {
+        this.logger.error(
+          `failed to obtain topic for message processing ${message.messageId} topicId: ${message.topicId}`
+        );
+
+        this.logger.error(message);
+
+        return {
+          ...baseMessage,
+          signatureValid: EncryptionStatus.NOT_PERFORMED,
+          decryption: {
+            status: EncryptionStatus.NOT_PERFORMED,
+          },
+        };
+      }
 
       baseMessage = {
         ...baseMessage,
@@ -327,7 +345,9 @@ export class MessageService {
       };
 
       if (useAnonymousExtChannel) {
-        this.logger.log(`message ${message.messageId} comes from anon. ext. channel`);
+        this.logger.log(
+          `message ${message.messageId} comes from anon. ext. channel`
+        );
 
         return {
           ...baseMessage,
