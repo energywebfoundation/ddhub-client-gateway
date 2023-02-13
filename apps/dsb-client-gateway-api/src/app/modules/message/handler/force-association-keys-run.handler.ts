@@ -11,6 +11,6 @@ export class ForceAssociationKeysRunHandler
   ) {}
 
   public async execute(): Promise<void> {
-    await this.associationKeysListener.execute();
+    await this.associationKeysListener.execute(true);
   }
 }
