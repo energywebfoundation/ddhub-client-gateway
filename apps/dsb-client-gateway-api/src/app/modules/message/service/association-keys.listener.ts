@@ -112,13 +112,13 @@ export class AssociationKeysListener implements OnApplicationBootstrap {
       return;
     }
 
-    if (!channel.payloadEncryption) {
-      this.logger.error(
-        `channel with fqcn ${fqcn} must have payloadEncryption set to true`
-      );
-
-      return;
-    }
+    // if (!channel.payloadEncryption) {
+    //   this.logger.error(
+    //     `channel with fqcn ${fqcn} must have payloadEncryption set to true`
+    //   );
+    //
+    //   return;
+    // }
 
     const topic: TopicEntity | null = await this.topicService.getTopic(
       topicName,
