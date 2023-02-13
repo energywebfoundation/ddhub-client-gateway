@@ -68,8 +68,8 @@ export class AssociationKeysListener implements OnApplicationBootstrap {
     cronJob.start();
   }
 
-  public async execute(): Promise<void> {
-    await this.run().catch((e) => {
+  public async execute(forceSameKeys: boolean = false): Promise<void> {
+    await this.run(forceSameKeys).catch((e) => {
       this.logger.error(
         'something went wrong when processing association keys'
       );
@@ -77,7 +77,7 @@ export class AssociationKeysListener implements OnApplicationBootstrap {
     });
   }
 
-  public async run(): Promise<void> {
+  public async run(forceSameKeys: boolean = false): Promise<void> {
     const fqcn: string | undefined = this.configService.get<string>('AK_FQCN');
     const topicName: string | undefined =
       this.configService.get<string>('AK_TOPIC_NAME');
@@ -132,15 +132,19 @@ export class AssociationKeysListener implements OnApplicationBootstrap {
       return;
     }
 
-    await this.sendKeys(channel, topic);
+    await this.sendKeys(channel, topic, forceSameKeys);
   }
 
   private async sendKeys(
     channel: ChannelEntity,
-    topic: TopicEntity
+    topic: TopicEntity,
+    forceSameKeys: boolean = false
   ): Promise<void> {
-    const keysNotSent: AssociationKeyEntity[] =
-      await this.associationKeyService.getNotSharedKeys();
+    const keysNotSent: AssociationKeyEntity[] = forceSameKeys
+      ? await this.associationKeyService.getCurrentAndNext().then((result) => {
+          return [result.current, result.next].filter(Boolean);
+        })
+      : await this.associationKeyService.getNotSharedKeys();
 
     const payload: AssociationKeyPayload = keysNotSent.map(
       (associationKey: AssociationKeyEntity) => ({

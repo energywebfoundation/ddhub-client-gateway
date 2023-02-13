@@ -111,10 +111,7 @@ export class MessageService {
 
     const qualifiedDids = channel.conditions.qualifiedDids;
 
-    if (
-      qualifiedDids.length === 0 ||
-      (channel.useAnonymousExtChannel && dto.anonymousRecipient.length > 0)
-    ) {
+    if (qualifiedDids.length === 0 && !channel.useAnonymousExtChannel) {
       throw new RecipientsNotFoundException();
     }
 
