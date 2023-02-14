@@ -66,6 +66,5 @@ export const useClientIdsEffects = () => {
     actions,
     removeClientIds,
     setSelectedItems,
-    selectedClientIds,
   };
 };

@@ -11,7 +11,6 @@ import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { SchedulerRegistry } from '@nestjs/schedule';
 import moment from 'moment';
-import { Span } from 'nestjs-otel';
 import { In } from 'typeorm';
 import { ChannelType } from '../../channel/channel.const';
 import { ChannelService } from '../../channel/service/channel.service';
@@ -25,11 +24,7 @@ import { storage, Store } from 'nestjs-pino/storage.js';
 import { v4 as uuidv4 } from 'uuid';
 import type { queue } from 'fastq';
 import * as fastq from 'fastq';
-
-enum SCHEDULER_HANDLERS {
-  MESSAGES = 'ws-messages',
-  MESSAGES_HEARTBEAT = 'ws-messages-heartbeat',
-}
+import { ClientsService } from '@dsb-client-gateway/ddhub-client-gateway-clients';
 
 export interface Task {
   id: string;
@@ -53,7 +48,8 @@ export class DsbMessagePoolingService implements OnApplicationBootstrap {
     protected readonly gateway: EventsGateway,
     protected readonly wsClient: WsClientService,
     protected readonly acksWrapperRepository: AcksWrapperRepository,
-    protected readonly pinoLogger: PinoLogger
+    protected readonly pinoLogger: PinoLogger,
+    protected readonly clientsService: ClientsService
   ) {}
 
   public async onApplicationBootstrap(): Promise<void> {
@@ -62,6 +58,10 @@ export class DsbMessagePoolingService implements OnApplicationBootstrap {
 
       return;
     }
+
+    const handler = async (task: Task) => {
+      await this.worker(task);
+    };
 
     this.store = new Store(PinoLogger.root);
     this.queue = fastq.promise(async (task: Task) => {
@@ -85,9 +85,9 @@ export class DsbMessagePoolingService implements OnApplicationBootstrap {
 
   protected async worker(task: Task): Promise<void> {
     try {
-      this.store.logger = PinoLogger.root;
-
       await storage.run(this.store, async () => {
+        this.store.logger = PinoLogger.root;
+
         this.pinoLogger.assign({
           runId: task.id,
         });
@@ -100,7 +100,6 @@ export class DsbMessagePoolingService implements OnApplicationBootstrap {
       this.logger.error(`ws worker failed`);
       this.logger.error(e);
     }
-
     // this.store.logger[Object.getOwnPropertySymbols(this.store.logger)[2]] = '';
 
     this.store.logger = null;
@@ -205,27 +204,6 @@ export class DsbMessagePoolingService implements OnApplicationBootstrap {
     }
   }
 
-  @Span('ws_pool_messages')
-  public async handleInterval(): Promise<void> {
-    const callback = async () => {
-      // handling callback polling msg
-      this.logger.log('[handleInterval] handling callback polling msg');
-      const store = new Store(this.pinoLogger.logger);
-
-      await storage.run(store, async () => {
-        const runId: string = uuidv4();
-
-        this.pinoLogger.assign({
-          runId,
-        });
-
-        this.logger.log(`run id ${runId}`);
-
-        await this.handleInterval();
-      });
-    };
-  }
-
   private async pullMessagesAndEmit(
     subscriptions: ChannelEntity[]
   ): Promise<number> {
@@ -283,6 +261,10 @@ export class DsbMessagePoolingService implements OnApplicationBootstrap {
       client.request?.url.split('?')[1]
     ).get('clientId');
 
+    const validClientId = _clientId ? _clientId : clientId;
+
+    await this.clientsService.upsert(validClientId);
+
     let msgCount = 0;
     for (const subscription of subscriptions) {
       try {
@@ -294,7 +276,7 @@ export class DsbMessagePoolingService implements OnApplicationBootstrap {
               amount: messagesAmount,
               topicName: undefined,
               topicOwner: undefined,
-              clientId: _clientId ? _clientId : clientId,
+              clientId: validClientId,
             },
             false
           );

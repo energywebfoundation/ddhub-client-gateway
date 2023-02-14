@@ -1,6 +1,6 @@
 import { Box } from '@mui/material';
 import { Step } from './Step/Step';
-import { TStep } from './models/types';
+import { TStep } from './Step/stepTypes';
 
 export interface StepsProps {
   activeStep: number;

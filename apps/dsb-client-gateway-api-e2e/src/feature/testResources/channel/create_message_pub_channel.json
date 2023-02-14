@@ -1,0 +1,15 @@
+{
+  "fqcn": "send.message.pub",
+  "payloadEncryption": false,
+  "type": "pub",
+  "conditions": {
+    "dids": ["did:ethr:volta:0x14B9f6D0E00d601D32E02AAf88585505Bb659dC2"],
+    "roles": [],
+    "topics": [
+      {
+        "topicName": "E2E_CHANNEL_TEST_PUB",
+        "owner": "EWTEST.apps.ewaemotest.iam.ewc"
+      }
+    ]
+  }
+}
