@@ -9,7 +9,8 @@ import { ConfigService } from '@nestjs/config';
 import { otelSDK } from '@dsb-client-gateway/ddhub-client-gateway-tracing';
 import { ValidationException } from '@dsb-client-gateway/dsb-client-gateway-errors';
 import { Logger } from 'nestjs-pino';
-
+import * as fs from 'fs';
+import * as Yaml from 'json-to-pretty-yaml';
 /**
  * Have to export this for nx to add it to the package.json
  * See: https://github.com/nrwl/nx/issues/6901
@@ -20,6 +21,17 @@ export * from 'pino-pretty';
 dotenv.config({
   path: '.env',
 });
+
+const generateSchema = async (document) => {
+  if (!document.components.schemas) {
+    document.components.schemas = {};
+  }
+
+  fs.writeFileSync(
+    './libs/dsb-client-gateway-api-client/schema.yaml',
+    Yaml.stringify(document)
+  );
+};
 
 async function bootstrap() {
   if (process.env.OPENTELEMETRY_ENABLED === 'true') {
@@ -87,6 +99,8 @@ async function bootstrap() {
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);
+
+  await generateSchema(document);
 
   const port = configService.get<number>('PORT');
 
