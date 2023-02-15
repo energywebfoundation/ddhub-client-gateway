@@ -15,6 +15,7 @@ import { DdhubClientGatewayEnrolmentModule } from '@dsb-client-gateway/ddhub-cli
 import { DdhubClientGatewayEncryptionModule } from '@dsb-client-gateway/ddhub-client-gateway-encryption';
 import { DdhubClientGatewayUtilsModule } from '@dsb-client-gateway/ddhub-client-gateway-utils';
 import { DdhubClientGatewayAssociationKeysModule } from '@dsb-client-gateway/ddhub-client-gateway-association-keys';
+import { CqrsModule } from '@nestjs/cqrs';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { DdhubClientGatewayAssociationKeysModule } from '@dsb-client-gateway/ddh
     DdhubClientGatewayMessageBrokerModule,
     DdhubClientGatewayEncryptionModule,
     DdhubClientGatewayAssociationKeysModule,
+    CqrsModule,
   ],
   providers: [KeysService, RefreshKeysHandler],
   controllers: [KeysController],
