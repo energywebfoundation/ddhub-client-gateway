@@ -36,7 +36,7 @@
       "executor": "@nrwl/workspace:run-commands",
       "options": {
         "cwd": "libs/dsb-client-gateway-api-client",
-        "command": "rm -rf ./src/lib/client ./schema.yaml"
+        "command": "rm -rf ./src/lib/client"
       }
     },
     "build-all": {
@@ -45,7 +45,6 @@
         "parallel": false,
         "commands": [
           "nx clean dsb-client-gateway-api-client",
-          "nx generate-schema dsb-client-gateway-api-client",
           "nx generate-client dsb-client-gateway-api-client"
         ]
       }
