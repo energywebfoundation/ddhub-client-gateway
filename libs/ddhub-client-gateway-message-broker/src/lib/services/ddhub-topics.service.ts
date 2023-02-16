@@ -41,11 +41,11 @@ export class DdhubTopicsService extends DdhubBaseService {
   }
 
   @Span('ddhub_mb_getTopicById')
-  async getTopicById(
+  async getTopicVersionsById(
     topicId: string
-  ): Promise<PaginatedData<TopicVersion> | null> {
+  ): Promise<PaginatedData<TopicVersion>> {
     try {
-      const { data } = await this.request<PaginatedData<TopicVersion> | null>(
+      const { data } = await this.request<PaginatedData<TopicVersion>>(
         () =>
           this.httpService.get('/topics/' + topicId + '/versions', {
             httpsAgent: this.tlsAgentService.get(),
@@ -61,9 +61,10 @@ export class DdhubTopicsService extends DdhubBaseService {
 
       return data;
     } catch (e) {
-      this.logger.error(`Get topic with topicId: ${topicId} failed`, e);
+      this.logger.error(`Get topic with topicId: ${topicId} failed`);
+      this.logger.error(e);
 
-      return null;
+      throw e;
     }
   }
 
@@ -88,7 +89,8 @@ export class DdhubTopicsService extends DdhubBaseService {
 
       return result.data;
     } catch (e) {
-      this.logger.error(`delete topic failed with id:${id}`, e);
+      this.logger.error(`delete topic failed with id:${id}`);
+      this.logger.error(e);
       throw e;
     }
   }
@@ -122,9 +124,10 @@ export class DdhubTopicsService extends DdhubBaseService {
       return data;
     } catch (e) {
       this.logger.error(
-        `delete topic with id ${id} and version ${version} failed`,
-        e
+        `delete topic with id ${id} and version ${version} failed`
       );
+      this.logger.error(e);
+
       throw e;
     }
   }
@@ -161,9 +164,11 @@ export class DdhubTopicsService extends DdhubBaseService {
       return result.data;
     } catch (e) {
       this.logger.error(
-        `update topics failed with id: ${id} and versionNumber:${versionNumber}`,
-        e
+        `update topics failed with id: ${id} and versionNumber:${versionNumber}`
       );
+
+      this.logger.error(e);
+
       throw e;
     }
   }
@@ -192,7 +197,10 @@ export class DdhubTopicsService extends DdhubBaseService {
 
       return result.data;
     } catch (e) {
-      this.logger.error(`update topics failed with id: ${id}`, e);
+      this.logger.error(`update topics failed with id: ${id}`);
+
+      this.logger.error(e);
+
       throw e;
     }
   }
@@ -219,7 +227,9 @@ export class DdhubTopicsService extends DdhubBaseService {
 
       return data;
     } catch (e) {
-      this.logger.error('post topics failed', e);
+      this.logger.error('post topics failed');
+      this.logger.error(e);
+
       throw e;
     }
   }
@@ -249,9 +259,11 @@ export class DdhubTopicsService extends DdhubBaseService {
       return data;
     } catch (e) {
       this.logger.error(
-        `get topics history with id:${id} and version: ${versionNumber} failed`,
-        e
+        `get topics history with id:${id} and version: ${versionNumber} failed`
       );
+
+      this.logger.error(e);
+
       throw e;
     }
   }
@@ -275,7 +287,10 @@ export class DdhubTopicsService extends DdhubBaseService {
       this.logger.log(`get topics history with id:${id} successful`);
       return data;
     } catch (e) {
-      this.logger.error(`get topics history with id:${id} failed`, e);
+      this.logger.error(`get topics history with id:${id} failed`);
+
+      this.logger.error(e);
+
       throw e;
     }
   }
@@ -315,7 +330,10 @@ export class DdhubTopicsService extends DdhubBaseService {
       this.logger.log(`get topics search with keyword: ${keyword} successful`);
       return result.data;
     } catch (e) {
-      this.logger.error(`get topics search with keyword: ${keyword} failed`, e);
+      this.logger.error(`get topics search with keyword: ${keyword} failed`);
+
+      this.logger.error(e);
+
       throw e;
     }
   }
@@ -351,7 +369,10 @@ export class DdhubTopicsService extends DdhubBaseService {
       this.logger.log(`get topics count with owners: ${owners} successful`);
       return result.data;
     } catch (e) {
-      this.logger.error(`get topics count with owners: ${owners} failed`, e);
+      this.logger.error(`get topics count with owners: ${owners} failed`);
+
+      this.logger.error(e);
+
       throw e;
     }
   }
@@ -382,7 +403,10 @@ export class DdhubTopicsService extends DdhubBaseService {
 
       return result.data;
     } catch (e) {
-      this.logger.error(`get topics monitor failed`, e);
+      this.logger.error(`get topics monitor failed`);
+
+      this.logger.error(e);
+
       throw e;
     }
   }
@@ -410,7 +434,10 @@ export class DdhubTopicsService extends DdhubBaseService {
 
       return result.data;
     } catch (e) {
-      this.logger.error(`get topic versions failed for ${topicId}`, e);
+      this.logger.error(`get topic versions failed for ${topicId}`);
+
+      this.logger.error(e);
+
       throw e;
     }
   }
@@ -448,7 +475,10 @@ export class DdhubTopicsService extends DdhubBaseService {
       this.logger.log(`get topics with owner:${owner} successful`);
       return data;
     } catch (e) {
-      this.logger.error(`get topics with owner:${owner} failed`, e);
+      this.logger.error(`get topics with owner:${owner} failed`);
+
+      this.logger.error(e);
+
       throw e;
     }
   }
@@ -481,6 +511,8 @@ export class DdhubTopicsService extends DdhubBaseService {
       this.logger.log(
         `get topics with owner: ${owner} and name: ${name} failed`
       );
+
+      this.logger.error(e);
 
       throw e;
     }

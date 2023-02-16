@@ -18,11 +18,11 @@ export class DeleteOldTopicsService implements OnApplicationBootstrap {
   ) {}
 
   public async onApplicationBootstrap(): Promise<void> {
-    await this.refreshTopics();
+    await this.deleteMissingTopics();
   }
 
-  @Span('topic_refresh')
-  public async refreshTopics(): Promise<void> {
+  @Span('topic_delete_missing_topics')
+  public async deleteMissingTopics(): Promise<void> {
     try {
       const isInitialized: boolean = this.iamService.isInitialized();
 
@@ -37,16 +37,16 @@ export class DeleteOldTopicsService implements OnApplicationBootstrap {
       const topics: TopicEntity[] = await this.wrapper.topicRepository.find({});
 
       for (const topic of topics) {
-        const topicFromMb = await this.ddhubTopicsService.getTopicById(
-          topic.id
-        );
+        try {
+          await this.ddhubTopicsService.getTopicVersionsById(topic.id);
+        } catch (e) {
+          if (e.additionalDetails.errorCode === '50') {
+            await this.wrapper.topicRepository.delete({
+              id: topic.id,
+            });
 
-        if (!topicFromMb) {
-          await this.wrapper.topicRepository.delete({
-            id: topic.id,
-          });
-
-          this.logger.log(`removed topic ${topic.id}`);
+            this.logger.log(`removed topic ${topic.id}`);
+          }
         }
       }
     } catch (e) {
