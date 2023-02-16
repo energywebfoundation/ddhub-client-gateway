@@ -23,7 +23,6 @@ import { ConfigService } from '@nestjs/config';
 import { CommandBus } from '@nestjs/cqrs';
 import moment from 'moment';
 import { TopicDeletedCommand } from '../../channel/command/topic-deleted.command';
-import { DeleteOldTopicsService } from './delete-old-topics.service';
 
 @Injectable()
 export class TopicRefreshService implements OnApplicationBootstrap {
@@ -38,8 +37,7 @@ export class TopicRefreshService implements OnApplicationBootstrap {
     protected readonly cronWrapper: CronWrapperRepository,
     protected readonly configService: ConfigService,
     protected readonly commandBus: CommandBus,
-    protected readonly topicMonitorWrapper: TopicMonitorRepositoryWrapper,
-    protected readonly deleteOldTopicsService: DeleteOldTopicsService
+    protected readonly topicMonitorWrapper: TopicMonitorRepositoryWrapper
   ) {}
 
   public async onApplicationBootstrap(): Promise<void> {
@@ -78,8 +76,6 @@ export class TopicRefreshService implements OnApplicationBootstrap {
 
         return;
       }
-
-      await this.deleteOldTopicsService.deleteMissingTopics();
 
       this.logger.log('fetching all available applications');
 
