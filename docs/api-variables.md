@@ -2,8 +2,6 @@
 
 | KEY | TYPE | DEFAULT | DESCRIPTION | ALLOWED_VALUES | DEPENDENCY |
 | --- | ---- | ------- | ----------- | -------------- | ---------- |
-| SWAGGER_SCHEMA_PATH | string | ./libs/dsb-client-gateway-api-client/schema.yaml | Path where OpenAPI Document should be generated - use only in development |  |  |
-| GENERATE_SWAGGER | boolean | false | Should generate Swagger document - use only in development |  |  |
 | AK_SHARE_CRON_ENABLED | boolean | false | Should share association keys |  |  |
 | AK_SHARE_CRON_SCHEDULE | string | */1 * * * * | How often should share association keys |  |  |
 | AK_FQCN | string |  | Association keys FQCN |  |  |
