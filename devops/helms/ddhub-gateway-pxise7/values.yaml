@@ -20,9 +20,16 @@ ddhub-client-gateway-api:
         repository: aemocontainerregistry.azurecr.io/ddhub-client-gateway-scheduler
         pullPolicy: IfNotPresent
         # Overrides the image tag whose default is the chart appVersion.
-        tag: 1.3.2
+        tag: 1.4.1
       appConfig:
         NO_COLOR: "true"
+        AK_FQCN: "ak.enc.pub"
+        AK_TOPIC_NAME: "associationKey"
+        AK_TOPIC_OWNER: "edge.apps.aemo.iam.ewc"
+        AK_TOPIC_VERSION: "1.0.0"
+        AK_SHARE_CRON_ENABLED: "true"
+        AK_SHARE_CRON_SCHEDULE: "*/1 * * * *"
+        ASSOCIATION_KEYS_CRON_ENABLED: "true"
     ui:
       enabled: true
       replicaCount: 1
@@ -30,13 +37,13 @@ ddhub-client-gateway-api:
         repository: aemocontainerregistry.azurecr.io/ddhub-client-gateway-frontend
         pullPolicy: IfNotPresent
         # Overrides the image tag whose default is the chart appVersion.
-        tag: 1.3.2
+        tag: 1.4.1
   image:
     # repository: 098061033856.dkr.ecr.us-east-1.amazonaws.com/ew-dos-dsb-ecr
     repository: aemocontainerregistry.azurecr.io/ddhub-client-gateway-backend
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
-    tag: 1.3.2
+    tag: 1.4.1
 
   imagePullSecrets: []
   nameOverride: "ddhub-client-gateway-pxise7"

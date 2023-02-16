@@ -137,7 +137,8 @@
     "typeorm": "^0.2.45",
     "uuid": "^8.3.2",
     "websocket": "^1.0.34",
-    "yup": "^0.32.11"
+    "yup": "^0.32.11",
+    "json-to-pretty-yaml": "^1.2.2"
   },
   "config": {
     "commitizen": {
@@ -208,7 +209,6 @@
     "git-cz": "^4.9.0",
     "husky": "^8.0.1",
     "jest": "27.2.3",
-    "json-to-pretty-yaml": "^1.2.2",
     "miragejs": "^0.1.43",
     "orval": "^6.7.0",
     "prettier": "^2.5.1",
