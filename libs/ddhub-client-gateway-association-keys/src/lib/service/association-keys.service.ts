@@ -62,11 +62,9 @@ export class AssociationKeysService implements OnApplicationBootstrap {
   public async getCurrentAndNext() {
     const currentKey: AssociationKeyEntity | null = await this.getCurrentKey();
 
-    let nextKey: AssociationKeyEntity | null = await this.getForDate(currentKey.validTo);
-
-    if (!nextKey) {
-      nextKey = currentKey;
-    }
+    const nextKey: AssociationKeyEntity | null = currentKey
+      ? await this.getForDate(currentKey.validTo)
+      : null;
 
     return {
       current: currentKey,
@@ -75,7 +73,7 @@ export class AssociationKeysService implements OnApplicationBootstrap {
   }
 
   public async getForDate(forDate: Date): Promise<AssociationKeyEntity | null> {
-    return this.wrapper.repository.get(forDate);
+    return this.wrapper.repository.getNext(forDate);
   }
 
   public async getCurrentKey(): Promise<AssociationKeyEntity | null> {
