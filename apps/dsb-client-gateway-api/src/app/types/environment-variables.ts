@@ -12,6 +12,15 @@ export enum WebSocketImplementation {
 }
 
 export const API_ENVS = Joi.object({
+
+  SWAGGER_SCHEMA_PATH: Joi.string()
+    .default('./schema.yaml')
+    .description(
+      'Path where OpenAPI Document should be generated - use only in development'
+    ),
+  GENERATE_SWAGGER: Joi.boolean()
+    .default(false)
+    .description('Should generate Swagger document - use only in development'),
   AK_SHARE_CRON_ENABLED: Joi.boolean()
     .default(false)
     .description('Should share association keys'),
