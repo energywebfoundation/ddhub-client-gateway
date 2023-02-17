@@ -13,7 +13,7 @@ export enum WebSocketImplementation {
 
 export const API_ENVS = Joi.object({
   SWAGGER_SCHEMA_PATH: Joi.string()
-    .default('./libs/dsb-client-gateway-api-client/schema.yaml')
+    .default('./schema.yaml')
     .description(
       'Path where OpenAPI Document should be generated - use only in development'
     ),
