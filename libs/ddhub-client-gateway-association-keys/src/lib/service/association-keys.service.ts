@@ -62,9 +62,11 @@ export class AssociationKeysService implements OnApplicationBootstrap {
   public async getCurrentAndNext() {
     const currentKey: AssociationKeyEntity | null = await this.getCurrentKey();
 
-    const nextKey: AssociationKeyEntity | null = currentKey
-      ? await this.getForDate(currentKey.validTo)
-      : null;
+    let nextKey: AssociationKeyEntity | null = await this.getForDate(currentKey.validTo);
+
+    if (!nextKey) {
+      nextKey = currentKey;
+    }
 
     return {
       current: currentKey,
