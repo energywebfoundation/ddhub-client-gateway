@@ -12,6 +12,7 @@ export enum WebSocketImplementation {
 }
 
 export const API_ENVS = Joi.object({
+
   SWAGGER_SCHEMA_PATH: Joi.string()
     .default('./schema.yaml')
     .description(
