@@ -68,7 +68,7 @@ export class AssociationKeysService implements OnApplicationBootstrap {
 
     return {
       current: currentKey,
-      next: nextKey,
+      next: nextKey ?? currentKey,
     };
   }
 
