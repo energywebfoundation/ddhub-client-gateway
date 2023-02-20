@@ -68,12 +68,12 @@ export class AssociationKeysService implements OnApplicationBootstrap {
 
     return {
       current: currentKey,
-      next: nextKey,
+      next: nextKey ?? currentKey,
     };
   }
 
   public async getForDate(forDate: Date): Promise<AssociationKeyEntity | null> {
-    return this.wrapper.repository.get(forDate);
+    return this.wrapper.repository.getNext(forDate);
   }
 
   public async getCurrentKey(): Promise<AssociationKeyEntity | null> {
