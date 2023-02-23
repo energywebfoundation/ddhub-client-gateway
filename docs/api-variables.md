@@ -38,6 +38,8 @@
 | SECRET_PREFIX | string | ddhub/ |  |  |  |
 | AWS_REGION | string | ap-southeast-2 | AWS Secrets Manager region |  | SECRETS_ENGINE == aws |
 | AZURE_VAULT_URL | string |  | Azure Vault URL |  | SECRETS_ENGINE == azure |
+| ASSOCIATION_KEY_INTERVAL | number | 24 | Association key interval (hours) |  |  |
+| ASSOCIATION_KEY_OFFSET | number | 144 | Association key validity time (hours) |  |  |
 | REQ_LOCK_TIMEOUT | number | 5 | Maximum request lock lifetime (in seconds) |  |  |
 | VERSION_FILE_PATH | string | ./version.md | Version file path |  |  |
 | IPFS_HOST | string | ipfs.infura.io | IPFS Host |  |  |

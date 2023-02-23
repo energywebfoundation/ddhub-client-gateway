@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { ChangeEvent, useState } from 'react';
 import { fuzzyTextFilterFn } from './filters/fuzzy-text-filter';
 import { textFilter } from './filters/text-filter';
 import {
@@ -29,6 +29,7 @@ export function useTableEffects<T>({
   defaultSortBy = '',
   backendSearch = false,
   setSelectedItems,
+  showCheckbox = false,
 }: TableProps<T>) {
   const [order, setOrder] = useState<Order>(defaultOrder);
   const [orderBy, setOrderBy] = useState(defaultSortBy);
@@ -69,10 +70,21 @@ export function useTableEffects<T>({
     usePagination
   );
 
+  const resetCheckbox = () => {
+    if (!showCheckbox) return;
+
+    setSelected([]);
+
+    if (setSelectedItems) {
+      setSelectedItems([]);
+    }
+  };
+
   const emptyRows: number =
     pageIndex > 0 ? Math.max(0, (1 + pageIndex) * pageSize - rows.length) : 0;
 
   const changePage = (newPage: number, limit: number) => {
+    resetCheckbox();
     if (paginationProps && onPageChange) {
       // page starts at 0 index
       onPageChange(newPage + 1, limit);
@@ -185,6 +197,27 @@ export function useTableEffects<T>({
     }
   };
 
+  const handleSelectAllClick = (event: ChangeEvent<HTMLInputElement>) => {
+    const newSelected: string[] = [];
+
+    if (event.target.checked) {
+      const startIdx = pageIndex * pageSize;
+      const endIdx = startIdx + pageSize;
+
+      for (let i = startIdx; i < endIdx; i++) {
+        if (rows[i]) {
+          newSelected.push(rows[i].cells[0].value);
+        }
+      }
+    }
+
+    setSelected(newSelected);
+
+    if (setSelectedItems) {
+      setSelectedItems(newSelected);
+    }
+  };
+
   const isSelected = (name: string) => selected.indexOf(name) !== -1;
 
   return {
@@ -209,5 +242,7 @@ export function useTableEffects<T>({
     handleChangeRowsPerPage,
     isSelected,
     handleCheckboxClick,
+    handleSelectAllClick,
+    selected,
   };
 }

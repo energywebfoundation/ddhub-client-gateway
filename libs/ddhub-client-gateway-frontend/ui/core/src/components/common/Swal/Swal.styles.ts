@@ -16,7 +16,7 @@ export const useStyles = makeStyles()((theme) => ({
     height: 67,
   },
   title: {
-    paddingTop: 18,
+    padding: '18px 62px 0px 62px'
   },
   popup: {
     paddingBottom: 43,

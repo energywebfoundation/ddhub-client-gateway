@@ -57,7 +57,6 @@ ddhub-client-gateway-api:
         liveness: true
         readiness: true
       appConfig:
-        DID_AUTH_URL: "https://ddhub-demo.energyweb.org"
         DID_REGISTRY_ADDRESS: "0xc15d5a57a8eb0e1dcbe5d88b8f9a82017e5cc4af"
         EVENTS_MAX_PER_SECOND: "50"
         NO_COLOR: "true"
@@ -127,9 +126,7 @@ ddhub-client-gateway-api:
       kubernetes.io/ingress.class: nginx
       nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
       external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
-      cert-manager.io/issuer: prod-issuer
-      cert-manager.io/issuer-kind: OriginIssuer
-      cert-manager.io/issuer-group: cert-manager.k8s.cloudflare.com
+  
     hosts:
       - host: ddhub-gateway-demo.energyweb.org
         paths:

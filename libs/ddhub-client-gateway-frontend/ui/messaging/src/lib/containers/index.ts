@@ -4,3 +4,4 @@ export * from './DataMessagingDownload';
 export * from './Channel';
 export * from './MessagesContainer';
 export * from './LargeMessagesContainer';
+export * from './DataMessagingUploadContainer';

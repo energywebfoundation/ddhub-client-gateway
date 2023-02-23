@@ -1,4 +1,11 @@
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import {
+  ArrayMaxSize,
+  ArrayUnique,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  MaxLength,
+} from 'class-validator';
 import { IsValidChannelName } from '../../../utils/validator/decorators/IsValidChannelName';
 import { ApiProperty } from '@nestjs/swagger';
 
@@ -57,6 +64,23 @@ export class SendMessageDto {
     description: 'Payload to be sent to message',
   })
   payload: string;
+
+  @IsString({
+    each: true,
+  })
+  @IsNotEmpty({
+    each: true,
+  })
+  @ArrayUnique()
+  @ArrayMaxSize(25)
+  @MaxLength(255, {
+    each: true,
+  })
+  @ApiProperty({
+    description: 'List of anonymous keys which will serve as recipients of the message.',
+    type: [String],
+  })
+  anonymousRecipient: string[] = [];
 }
 
 export class uploadMessageBodyDto {

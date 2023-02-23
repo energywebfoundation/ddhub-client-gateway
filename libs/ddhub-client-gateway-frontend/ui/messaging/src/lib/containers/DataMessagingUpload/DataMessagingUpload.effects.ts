@@ -1,11 +1,15 @@
-import { useState } from 'react';
+import { useLayoutEffect, useState } from 'react';
 import { keyBy } from 'lodash';
 import {
+  messageDataService,
   useChannels,
   useTopicVersionHistory,
   useUploadMessage,
 } from '@ddhub-client-gateway-frontend/ui/api-hooks';
-import { UpdateChannelDtoType } from '@dsb-client-gateway/dsb-client-gateway-api-client';
+import {
+  SendMessagelResponseDto,
+  UpdateChannelDtoType,
+} from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { DataMessagingUploadProps } from './DataMessagingUpload';
 import { TFileType } from '../UploadForm/UploadForm.types';
 import { TOption } from './DataMessagingUpload.types';
@@ -15,6 +19,8 @@ import {
   MAX_FILE_SIZE,
   MIN_FILE_SIZE,
 } from './DataMessagingUpload.utils';
+import { ModalActionsEnum, useModalDispatch } from '../../context';
+import { useCustomAlert } from '@ddhub-client-gateway-frontend/ui/core';
 
 export const useDataMessagingUploadEffects = ({
   isLarge = false,
@@ -31,6 +37,8 @@ export const useDataMessagingUploadEffects = ({
     channelsByName,
     isLoading: channelsLoading,
   } = useChannels();
+  const dispatch = useModalDispatch();
+  const Swal = useCustomAlert();
 
   const filteredChannels = channels.filter((channel) =>
     isLarge
@@ -54,6 +62,17 @@ export const useDataMessagingUploadEffects = ({
     value: topic.version,
   }));
 
+  useLayoutEffect(() => {
+    const subscription = messageDataService.getData().subscribe((message: any) => {
+
+      if (message?.value) {
+        uploadMessageSuccess(message.value);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
   const topics = channelsByName[selectedChannel]?.conditions?.topics ?? [];
   const topicsById = keyBy(topics, 'topicId');
   const selectedTopicWithSchema = topicHistoryByVersion[selectedTopicVersion];
@@ -64,13 +83,74 @@ export const useDataMessagingUploadEffects = ({
     ? FileType[selectedTopicWithSchema?.schemaType]
     : ('json' as TFileType);
   const maxFileSize = isLarge ? MAX_FILE_SIZE : MIN_FILE_SIZE;
-  const fileSizeInfo = `Max file size: ${isLarge ? bytesToMegaBytes(MAX_FILE_SIZE) : bytesToMegaBytes(MIN_FILE_SIZE)}mb`;
+  const fileSizeInfo = `Max file size: ${
+    isLarge ? bytesToMegaBytes(MAX_FILE_SIZE) : bytesToMegaBytes(MIN_FILE_SIZE)
+  }mb`;
 
   const topicsOptions =
     topics.map((topic) => ({
       label: topic.topicName,
       value: topic.topicId,
     })) || [];
+
+  const showModal = (data: SendMessagelResponseDto) => {
+    dispatch({
+      type: ModalActionsEnum.SHOW_POST_DETAILS,
+      payload: {
+        open: true,
+        data,
+      },
+    });
+  };
+
+  const uploadMessageSuccess = async (res: SendMessagelResponseDto) => {
+    const recipients = res.recipients;
+
+    if (recipients) {
+      const isFailAll = recipients.failed === recipients.total;
+      const isPartialSuccess = recipients.sent !== recipients.total;
+
+      if (isFailAll) {
+        const result = await Swal.fire({
+          title: `Failed to send to all ${recipients.total} users.`,
+          type: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'View recipients',
+          cancelButtonText: 'Close',
+        });
+
+        if (result.isConfirmed) {
+          showModal(res);
+        }
+      } else {
+        let partialInfo = '';
+
+        if (isPartialSuccess) {
+          partialInfo = `, <span style="color: #2EB67D">${recipients.sent} succeeded</span> and <span style="color: #FD1803">${recipients.failed} failed</span>.`;
+        }
+
+        const result = await Swal.fire({
+          title: `Message sent to ${recipients.total} users${partialInfo}`,
+          type: 'success',
+          showCancelButton: true,
+          confirmButtonText: 'View recipients',
+          cancelButtonText: 'Close',
+        });
+
+        if (result.isConfirmed) {
+          showModal(res);
+        }
+      }
+    } else {
+      const errData = {
+        response: {
+          data: res,
+        },
+      };
+
+      await Swal.httpError(errData);
+    }
+  };
 
   const onFileChange = (acceptedFiles: File[]) => {
     const file = acceptedFiles[0];

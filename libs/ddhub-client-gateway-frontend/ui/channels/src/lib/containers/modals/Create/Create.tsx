@@ -2,6 +2,7 @@ import {
   Dialog,
   DialogSubTitle,
   CloseButton,
+  Steps,
 } from '@ddhub-client-gateway-frontend/ui/core';
 import { DialogTitle, Grid, Box } from '@mui/material';
 import { Details } from './Details/Details';
@@ -10,7 +11,6 @@ import { Topics } from './Topics/Topics';
 import { Summary } from './Summary/Summary';
 import { CREATION_STEPS } from './Steps/models/creationSteps';
 import { useCreateChannelEffects } from './Create.effects';
-import { Steps } from './Steps/Steps';
 import { useStyles } from './Create.styles';
 
 export const Create = () => {
