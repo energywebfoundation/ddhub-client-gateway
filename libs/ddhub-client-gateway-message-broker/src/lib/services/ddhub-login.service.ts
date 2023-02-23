@@ -74,12 +74,12 @@ export class DdhubLoginService {
   }
 
   @Span('ddhub_mb_initExtChannel')
-  public async initExtChannel(dto?: InitExtChannelDto): Promise<void> {
+  public async initExtChannel(dto?: InitExtChannelDto): Promise<any> {
     try {
-      await promiseRetry(async (retry) => {
+      const result = await promiseRetry(async (retry) => {
         await this.tlsAgentService.create();
 
-        await lastValueFrom(
+        const { data } = await lastValueFrom(
           this.httpService.post('/channel/initExtChannel', dto, {
             httpsAgent: this.tlsAgentService.get(),
             headers: {
@@ -87,13 +87,17 @@ export class DdhubLoginService {
             },
           })
         ).catch((e) => retry(e));
+        
+        return data;
       }, this.retryConfigService.config);
 
       this.logger.log('Init ext channel successful');
+      return result;
     } catch (e) {
       this.logger.error('Init ext channel failed');
       this.logger.error(e);
       this.logger.error(e.response.data);
+      return false;
     }
   }
 }
