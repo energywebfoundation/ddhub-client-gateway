@@ -250,7 +250,7 @@ export class AssociationKeysService implements OnApplicationBootstrap {
         `attempting to init ext channel for key ${key.associationKey}, attempt number #${number}`
       );
 
-      await this.ddhubLoginService
+      const result = await this.ddhubLoginService
         .initExtChannel({
           anonymousKeys: [
             {
@@ -259,6 +259,19 @@ export class AssociationKeysService implements OnApplicationBootstrap {
           ],
         })
         .catch((e) => retry(e));
+
+      if ((result && result.status[0].status === 'Fail' && result.status[0].message !== 'Record exists' ) || (!result && result == false)) {
+        this.logger.error(
+          `association key ${key.associationKey} external channel failed`
+        );
+        this.logger.error(result);
+
+        key.isSent = false;
+
+        await this.wrapper.repository.save(key).catch((e) => retry(e));
+
+        return;
+      }
 
       key.isSent = true;
       key.sentDate = new Date();
@@ -291,7 +304,7 @@ export class AssociationKeysService implements OnApplicationBootstrap {
         `attempting to emit key ${key.associationKey}, attempt number #${number}`
       );
 
-      await this.ddhubLoginService
+      const result = await this.ddhubLoginService
         .initExtChannel({
           anonymousKeys: [
             {
@@ -300,6 +313,19 @@ export class AssociationKeysService implements OnApplicationBootstrap {
           ],
         })
         .catch((e) => retry(e));
+
+      if ((result && result.status[0].status === 'Fail' && result.status[0].message !== 'Record exists' ) || (!result && result == false)) {
+        this.logger.error(
+          `association key ${key.associationKey} external channel failed`
+        );
+        this.logger.error(result);
+
+        key.isSent = false;
+
+        await this.wrapper.repository.save(key).catch((e) => retry(e));
+
+        return;
+      }
 
       key.isSent = true;
       key.sentDate = new Date();

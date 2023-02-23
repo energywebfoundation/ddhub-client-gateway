@@ -15,6 +15,8 @@ import {
   whenDeletingOutdatedKeys,
   whenDerivingKeys,
 } from './helpers/association-keys.helper';
+import { DdhubChannelStreamService } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
+import { AssociationKeysWrapperRepository } from '@dsb-client-gateway/dsb-client-gateway-storage';
 
 const feature = loadFeature('../../feature/association-keys.feature', {
   loadRelativePath: true,
@@ -40,6 +42,19 @@ describe('Association Keys Feature', () => {
   beforeEach(async () => {
     testMemory.map = {};
     await clearDatabase(getApp);
+  });
+
+  afterEach(async () => {
+    const nestApp = getApp();
+
+    const associationKeys = await nestApp
+      .get(AssociationKeysWrapperRepository)
+      .repository.find({});
+    const service = nestApp.get(DdhubChannelStreamService);
+
+    for (const key of associationKeys) {
+      await service.deleteStream(key.associationKey);
+    }
   });
 
   defineFeature(feature, (test) => {
