@@ -10,6 +10,7 @@ import { DdhubLoginService } from './ddhub-login.service';
 import 'multer';
 import { SendMessageResponseFile } from '../dto';
 import { IncomingMessage } from 'http';
+import { UploadFailedException } from '../exceptions/upload-failed-exception';
 
 @Injectable()
 export class DdhubFilesService extends DdhubBaseService {
@@ -78,7 +79,7 @@ export class DdhubFilesService extends DdhubBaseService {
 
       const _data = result.data as SendMessageResponseFile;
       if (_data.recipients.failed > 0) {
-        throw new Error(`upload file with file name: ${originalname} failed`);
+        throw new UploadFailedException(`upload file with file name: ${originalname} failed`);
       }
       this.logger.log(`upload file with file name: ${originalname} successful`);
       return result.data;
@@ -106,7 +107,7 @@ export class DdhubFilesService extends DdhubBaseService {
     clientGatewayMessageId: string,
     payloadEncryption: boolean,
     transactionId?: string
-  ): Promise<SendMessageResponseFile> {
+  ): Promise<SendMessageResponseFile | null> {
     try {
       const formData = new FormData();
 
@@ -145,14 +146,15 @@ export class DdhubFilesService extends DdhubBaseService {
           stopOnResponseCodes: ['10'],
         }
       );
-      if (result.data == "") {
+
+      if (!result.data) {
         this.logger.log(`upload chunk ${currentChunkIndex} file with file name: ${originalname}`);
-        return result.data as SendMessageResponseFile;
+        return null;
       }
 
       const _data = result.data as SendMessageResponseFile;
       if (_data.recipients.failed > 0) {
-        throw new Error(`upload file with file name: ${originalname} failed`);
+        throw new UploadFailedException(`upload file with file name: ${originalname} failed`);
       }
       this.logger.log(`upload file with file name: ${originalname} successful`);
       return result.data;

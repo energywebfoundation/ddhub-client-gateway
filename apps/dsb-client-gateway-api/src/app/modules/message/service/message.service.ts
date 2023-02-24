@@ -63,6 +63,8 @@ import {
   AssociationKeysService,
 } from '@dsb-client-gateway/ddhub-client-gateway-association-keys';
 import { buffer } from 'node:stream/consumers';
+import { UploadReaderFailedException } from '../exceptions/upload-reader-failed-exception';
+import { resourceLimits } from 'worker_threads';
 
 export enum EventEmitMode {
   SINGLE = 'SINGLE',
@@ -96,7 +98,7 @@ export class MessageService {
   ) {
     this.uploadPath = configService.get<string>('UPLOAD_FILES_DIR');
     this.downloadPath = configService.get<string>('DOWNLOAD_FILES_DIR');
-    this.chunkSize = configService.get<number>('UPLOAD_CHUNK_SIZE', 2000 * 1024);//2mb
+    this.chunkSize = configService.get<number>('UPLOAD_CHUNK_SIZE', 5000 * 1024);//5mb
     this.enableUploadChunk = configService.get<boolean>('UPLOAD_CHUNK_ENABLE', false);
   }
 
@@ -759,33 +761,20 @@ export class MessageService {
     }
 
     let result: SendMessageResponseFile = null;
-    if (this.enableUploadChunk) {
-      const _file = await buffer(fs.createReadStream(filePath));
-      const chunks = Math.ceil(file.size / this.chunkSize);
-      for (let i = 0; i < chunks; i++) {
-        const from = i * this.chunkSize;
-        const to = from + this.chunkSize;
-        const _buffer = _file.slice(from, to);
-        //uploading file
-        result =
-          await this.ddhubFilesService.uploadFileChunk(
-            _buffer,
-            file.size,
-            this.chunkSize,
-            i,
-            checksum,
-            file.originalname,
-            qualifiedDids,
-            topic.id,
-            topic.version,
-            signature,
-            clientGatewayMessageId,
-            channel.payloadEncryption,
-            dto.transactionId
-          );
-      }
+    if (this.enableUploadChunk && file.size > this.chunkSize) {
+      result = await this.uploadChunks(
+        file,
+        filePath,
+        checksum,
+        qualifiedDids,
+        topic.id,
+        topic.version,
+        signature,
+        clientGatewayMessageId,
+        channel.payloadEncryption,
+        dto.transactionId
+      );
     } else {
-      //uploading file
       result =
         await this.ddhubFilesService.uploadFile(
           fs.createReadStream(filePath),
@@ -799,9 +788,6 @@ export class MessageService {
           dto.transactionId
         );
     }
-
-
-
     try {
       fs.unlinkSync(filePath);
       fs.unlinkSync(file.path);
@@ -809,7 +795,6 @@ export class MessageService {
       this.logger.error('file unlink failed');
       this.logger.error(e);
     }
-
     return result;
   }
 
@@ -1053,5 +1038,66 @@ export class MessageService {
     }
 
     return currentKey.associationKey;
+  }
+
+  private async uploadChunks(
+    file,
+    filePath: string,
+    checksum: string,
+    fqcns: string[],
+    topicId: string,
+    topicVersion: string,
+    signature: string,
+    clientGatewayMessageId: string,
+    payloadEncryption: boolean,
+    transactionId?: string
+  ): Promise<SendMessageResponseFile> {
+    return new Promise((resolve, reject) => {
+      const readStream = fs.createReadStream(filePath, {
+        highWaterMark: this.chunkSize
+      });
+      let result: SendMessageResponseFile = null;
+      let i = 0;
+      const chunks = Math.ceil(file.size / this.chunkSize);
+      readStream.on('data', async (chunk) => {
+        try {
+          if (i < chunks) {
+            readStream.pause();
+          }
+          result =
+            await this.ddhubFilesService.uploadFileChunk(
+              chunk,
+              file.size,
+              this.chunkSize,
+              i++,
+              checksum,
+              file.originalname,
+              fqcns,
+              topicId,
+              topicVersion,
+              signature,
+              clientGatewayMessageId,
+              payloadEncryption,
+              transactionId
+            );
+          if (!result) {
+            readStream.resume();
+          } else {
+            resolve(result);
+          }
+        } catch (e) {
+          readStream.close();
+          reject(e);
+        }
+      }).on('error', () => {
+        try {
+          fs.unlinkSync(filePath);
+          fs.unlinkSync(file.path);
+        } catch (e) {
+          this.logger.error('file unlink failed', e);
+        }
+        reject(new UploadReaderFailedException());
+      });
+    });
   }
 }
