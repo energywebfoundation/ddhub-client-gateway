@@ -44,6 +44,8 @@ export class DdhubChannelStreamService extends DdhubBaseService {
       );
     } catch (e) {
       this.logger.error(`delete stream failed`, e);
+
+      throw e;
     }
   }
 }
