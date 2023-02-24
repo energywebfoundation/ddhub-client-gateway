@@ -39,9 +39,9 @@ export class GatewayController {
     const topicOwner: string | undefined = this.configService.get<string>('AK_TOPIC_OWNER');
     const topicVersion: string | undefined = this.configService.get<string>('AK_TOPIC_VERSION');
 
-    let isAssociationKeysEnable: boolean = true;
+    let isAssociationKeyEnabled: boolean = true;
     if (!fqcn || !topicName || !topicOwner || !topicVersion) {
-      isAssociationKeysEnable = false;
+      isAssociationKeyEnabled = false;
     }
 
     return {
@@ -55,7 +55,7 @@ export class GatewayController {
         ? await this.certificateService.isMTLSConfigured()
         : undefined,
       namespace: this.configService.get<string>('PARENT_NAMESPACE'),
-      isAssociationKeysEnable: isAssociationKeysEnable,
+      isAssociationKeyEnabled: isAssociationKeyEnabled,
     };
   }
 }

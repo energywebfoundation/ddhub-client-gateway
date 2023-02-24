@@ -32,7 +32,7 @@ export class GatewayResponseDto implements GatewayConfig {
     description:
       'Checks if the gateway is configured for associationKeys are enable',
   })
-  isAssociationKeysEnable: boolean;
+  isAssociationKeyEnabled: boolean;
 
   @ApiProperty({
     type: String,
