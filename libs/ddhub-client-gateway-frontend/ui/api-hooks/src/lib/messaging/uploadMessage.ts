@@ -9,10 +9,6 @@ import { Subject } from 'rxjs';
 
 const subject = new Subject();
 
-export interface SendMessageBodyDto extends UploadMessageBodyDto {
-  anonymousRecipient: string[];
-}
-
 export const messageDataService = {
   setData: (d: any) => subject.next({ value: d }),
   getData: () => subject.asObservable(),
@@ -48,20 +44,13 @@ export const useUploadMessage = (isLarge: boolean) => {
     );
   };
 
-  const createMessageHandler = async (
-    values: SendMessageBodyDto,
+  const createMessageHandler = (
+    values: SendMessageDto,
     onUpload: () => void
   ) => {
-    const { file, ...rest } = values;
-    const payload = await file.text();
-    const formattedValues = {
-      ...rest,
-      payload,
-    } as SendMessageDto;
-
     messageCreateMutate(
       {
-        data: formattedValues,
+        data: values,
       },
       {
         onSuccess: (res) => {
@@ -74,12 +63,10 @@ export const useUploadMessage = (isLarge: boolean) => {
   };
 
   const isLoading = messageCreating || messageUploading;
-  const messageSubmitHandler = isLarge
-    ? uploadMessageHandler
-    : createMessageHandler;
 
   return {
     isLoading,
-    messageSubmitHandler,
+    uploadMessageHandler,
+    createMessageHandler,
   };
 };
