@@ -19,7 +19,7 @@ export class GatewayController {
     protected readonly certificateService: CertificateService,
     protected readonly iamService: IamService,
     protected readonly versionService: VersionService
-  ) {}
+  ) { }
 
   @Get()
   @ApiResponse({
@@ -34,6 +34,16 @@ export class GatewayController {
   public async get(): Promise<GatewayResponseDto> {
     const health = await this.healthService.health();
 
+    const fqcn: string | undefined = this.configService.get<string>('AK_FQCN');
+    const topicName: string | undefined = this.configService.get<string>('AK_TOPIC_NAME');
+    const topicOwner: string | undefined = this.configService.get<string>('AK_TOPIC_OWNER');
+    const topicVersion: string | undefined = this.configService.get<string>('AK_TOPIC_VERSION');
+
+    let isAssociationKeysEnable: boolean = true;
+    if (!fqcn || !topicName || !topicOwner || !topicVersion) {
+      isAssociationKeysEnable = false;
+    }
+
     return {
       version: this.versionService.getVersion(),
       did: this.iamService.getDIDAddress(),
@@ -45,6 +55,7 @@ export class GatewayController {
         ? await this.certificateService.isMTLSConfigured()
         : undefined,
       namespace: this.configService.get<string>('PARENT_NAMESPACE'),
+      isAssociationKeysEnable: isAssociationKeysEnable,
     };
   }
 }

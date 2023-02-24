@@ -28,6 +28,13 @@ export class GatewayResponseDto implements GatewayConfig {
   mtlsIsValid?: boolean;
 
   @ApiProperty({
+    type: Boolean,
+    description:
+      'Checks if the gateway is configured for associationKeys are enable',
+  })
+  isAssociationKeysEnable: boolean;
+
+  @ApiProperty({
     type: String,
     description: 'Configured namespace',
     example: 'ddhub.apps.energyweb.iam.ewc',
