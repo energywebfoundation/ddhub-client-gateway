@@ -1,4 +1,4 @@
-import { KeyboardEvent, useEffect } from 'react';
+import { KeyboardEvent, FormEvent, useEffect } from 'react';
 import { FieldValues, useForm } from 'react-hook-form';
 import { RestrictionType } from '../models/restriction-type.enum';
 
@@ -9,6 +9,7 @@ export interface RestrictionSelectEffectsProps {
   handleSaveRestriction: () => void;
   handleUpdateRestriction?: (value: string) => void;
   inputValue?: string;
+  handleClose: () => void;
 }
 
 export const useRestrictionSelectEffects = (
@@ -19,6 +20,7 @@ export const useRestrictionSelectEffects = (
     handleSaveRestriction,
     handleUpdateRestriction,
     inputValue,
+    handleClose,
   }: RestrictionSelectEffectsProps) => {
   const fields = {
     restrictionType: {
@@ -53,12 +55,16 @@ export const useRestrictionSelectEffects = (
     e.stopPropagation();
   };
 
-  const handleSubmitForm = () => {
+  const handleSubmitForm = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
     if (selectedType) {
       handleUpdateRestriction(inputValue);
     } else {
       handleSaveRestriction();
     }
+
+    handleClose();
   };
 
   return {

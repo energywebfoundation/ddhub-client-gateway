@@ -4,7 +4,6 @@ import { FormRadioBox } from '@ddhub-client-gateway-frontend/ui/core';
 import { RestrictionSelectEffectsProps, useRestrictionSelectEffects } from './RestrictionSelect.effects';
 
 export interface RestrictionSelectProps extends RestrictionSelectEffectsProps {
-  handleClose: () => void;
   roleInput: string;
   isRoleValid: boolean;
   didInput: string;
@@ -41,10 +40,11 @@ export const RestrictionSelect = (
     handleSaveRestriction,
     handleUpdateRestriction,
     inputValue,
+    handleClose,
   });
 
   return (
-    <form className={classes.form}>
+    <form className={classes.form} onSubmit={handleSubmitForm}>
       <Grid container direction="column" justifyContent="space-between" onKeyDown={handleKeyDown}>
         <Grid item className={classes.formContent}>
           <FormRadioBox
@@ -75,7 +75,7 @@ export const RestrictionSelect = (
                   Cancel
                 </Typography>
               </Button>
-              <Button variant="contained" className={classes.saveButton} type="submit" onClick={handleSubmitForm} disabled={!isDIDValid || !isRoleValid || (!didInput && !roleInput)}>
+              <Button variant="contained" className={classes.saveButton} type="submit" disabled={!isDIDValid || !isRoleValid || (!didInput && !roleInput)}>
                 <Typography className={classes.buttonTextSave} variant="body2">
                   { selectedType ? 'Update' : 'Save' }
                 </Typography>
