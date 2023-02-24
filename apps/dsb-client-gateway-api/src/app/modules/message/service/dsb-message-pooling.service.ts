@@ -248,7 +248,7 @@ export class DsbMessagePoolingService implements OnApplicationBootstrap {
     subscriptions: ChannelEntity[],
     client
   ): Promise<number> {
-    const clientId: string = this.configService.get<string>(
+    const defaultClientId: string = this.configService.get<string>(
       'CLIENT_ID',
       'WS-CONSUMER'
     );
@@ -257,16 +257,49 @@ export class DsbMessagePoolingService implements OnApplicationBootstrap {
       2
     );
 
-    const _clientId = new URLSearchParams(
+    const urlSearchParams = new URLSearchParams(
       client.request?.url.split('?')[1]
-    ).get('clientId');
+    );
 
-    const validClientId = _clientId ? _clientId : clientId;
+    const validClientId: string =
+      urlSearchParams.get('clientId') ?? defaultClientId;
+
+    this.logger.log(`using client ${validClientId}`);
+
+    const subscribedChannels: string | undefined =
+      urlSearchParams.get('channels');
+
+    const splittedChannels: string[] = subscribedChannels
+      ? subscribedChannels.split(',')
+      : [];
+
+    const channelsToIterate: ChannelEntity[] =
+      splittedChannels.length > 0
+        ? subscriptions.filter((channel: ChannelEntity) =>
+            splittedChannels.includes(channel.fqcn)
+          )
+        : subscriptions;
+
+    this.logger.debug(`using channels`);
+    this.logger.debug(subscribedChannels);
+
+    if (
+      splittedChannels.length !== channelsToIterate.length &&
+      splittedChannels.length > 0
+    ) {
+      this.logger.warn('some passed channels do not exists');
+
+      const invalidChannels: string[] = channelsToIterate
+        .filter((channel) => !splittedChannels.includes(channel.fqcn))
+        .map((channel) => channel.fqcn);
+
+      this.logger.warn(invalidChannels);
+    }
 
     await this.clientsService.upsert(validClientId);
 
     let msgCount = 0;
-    for (const subscription of subscriptions) {
+    for (const subscription of channelsToIterate) {
       try {
         const messages: GetMessageResponse[] =
           await this.messageService.getMessagesWithReqLock(
@@ -282,9 +315,7 @@ export class DsbMessagePoolingService implements OnApplicationBootstrap {
           );
 
         this.logger.log(
-          `Found ${messages.length} in ${subscription.fqcn} for ${
-            _clientId ? _clientId : clientId
-          }`
+          `Found ${messages.length} in ${subscription.fqcn} for ${validClientId}`
         );
 
         if (messages && messages.length > 0) {
@@ -293,7 +324,7 @@ export class DsbMessagePoolingService implements OnApplicationBootstrap {
             messages,
             subscription.fqcn,
             client,
-            `${_clientId ? _clientId : clientId}:${subscription.fqcn}`
+            `${validClientId}:${subscription.fqcn}`
           );
         }
       } catch (e) {
