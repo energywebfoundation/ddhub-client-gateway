@@ -62,6 +62,9 @@ import {
   AssociationKeyNotAvailableException,
   AssociationKeysService,
 } from '@dsb-client-gateway/ddhub-client-gateway-association-keys';
+import { buffer } from 'node:stream/consumers';
+import { UploadReaderFailedException } from '../exceptions/upload-reader-failed-exception';
+import { resourceLimits } from 'worker_threads';
 
 export enum EventEmitMode {
   SINGLE = 'SINGLE',
@@ -73,6 +76,8 @@ export class MessageService {
   protected readonly logger = new Logger(MessageService.name);
   protected readonly uploadPath: string;
   protected readonly downloadPath: string;
+  protected readonly chunkSize: number;
+  protected readonly enableUploadChunk: boolean;
   protected readonly ext: string = '.enc';
 
   constructor(
@@ -93,6 +98,8 @@ export class MessageService {
   ) {
     this.uploadPath = configService.get<string>('UPLOAD_FILES_DIR');
     this.downloadPath = configService.get<string>('DOWNLOAD_FILES_DIR');
+    this.chunkSize = configService.get<number>('UPLOAD_CHUNK_SIZE', 5000 * 1024);//5mb
+    this.enableUploadChunk = configService.get<boolean>('UPLOAD_CHUNK_ENABLE', false);
   }
 
   @Span('message_sendMessage')
@@ -140,10 +147,10 @@ export class MessageService {
 
     const message = shouldEncrypt
       ? this.keyService.encryptMessage(
-          dto.payload,
-          randomKey,
-          EncryptedMessageType['UTF-8']
-        )
+        dto.payload,
+        randomKey,
+        EncryptedMessageType['UTF-8']
+      )
       : dto.payload;
 
     messageLoggerContext.debug('fetching private key');
@@ -715,7 +722,6 @@ export class MessageService {
     const symmetricKey: string = this.keyService.generateRandomKey();
 
     let filePath: string;
-
     if (channel.payloadEncryption) {
       filePath = await this.keyService.encryptMessageStream(
         file.stream,
@@ -745,18 +751,21 @@ export class MessageService {
       privateKey.length === 66 ? privateKey : '0x' + privateKey
     );
 
-    await this.sendSymmetricKeys(
-      this.logger,
-      qualifiedDids,
-      symmetricKey,
-      clientGatewayMessageId
-    );
+    if (channel.payloadEncryption) {
+      await this.sendSymmetricKeys(
+        this.logger,
+        qualifiedDids,
+        symmetricKey,
+        clientGatewayMessageId
+      );
+    }
 
-    //uploading file
-    const result: SendMessageResponseFile =
-      await this.ddhubFilesService.uploadFile(
-        fs.createReadStream(filePath),
-        file.originalname,
+    let result: SendMessageResponseFile = null;
+    if (this.enableUploadChunk && file.size > this.chunkSize) {
+      result = await this.uploadChunks(
+        file,
+        filePath,
+        checksum,
         qualifiedDids,
         topic.id,
         topic.version,
@@ -765,7 +774,20 @@ export class MessageService {
         channel.payloadEncryption,
         dto.transactionId
       );
-
+    } else {
+      result =
+        await this.ddhubFilesService.uploadFile(
+          fs.createReadStream(filePath),
+          file.originalname,
+          qualifiedDids,
+          topic.id,
+          topic.version,
+          signature,
+          clientGatewayMessageId,
+          channel.payloadEncryption,
+          dto.transactionId
+        );
+    }
     try {
       fs.unlinkSync(filePath);
       fs.unlinkSync(file.path);
@@ -773,7 +795,6 @@ export class MessageService {
       this.logger.error('file unlink failed');
       this.logger.error(e);
     }
-
     return result;
   }
 
@@ -1017,5 +1038,67 @@ export class MessageService {
     }
 
     return currentKey.associationKey;
+  }
+
+  private async uploadChunks(
+    file,
+    filePath: string,
+    checksum: string,
+    fqcns: string[],
+    topicId: string,
+    topicVersion: string,
+    signature: string,
+    clientGatewayMessageId: string,
+    payloadEncryption: boolean,
+    transactionId?: string
+  ): Promise<SendMessageResponseFile> {
+    return new Promise((resolve, reject) => {
+      const readStream = fs.createReadStream(filePath, {
+        highWaterMark: this.chunkSize
+      });
+      let result: SendMessageResponseFile = null;
+      const fileStats = fs.statSync(filePath);
+      let i = 0;
+      const chunks = Math.ceil(fileStats.size / this.chunkSize);
+      readStream.on('data', async (chunk) => {
+        try {
+          if (i < chunks) {
+            readStream.pause();
+          }
+          result =
+            await this.ddhubFilesService.uploadFileChunk(
+              chunk,
+              fileStats.size,
+              this.chunkSize,
+              i++,
+              checksum,
+              file.originalname,
+              fqcns,
+              topicId,
+              topicVersion,
+              signature,
+              clientGatewayMessageId,
+              payloadEncryption,
+              transactionId
+            );
+          if (!result) {
+            readStream.resume();
+          } else {
+            resolve(result);
+          }
+        } catch (e) {
+          readStream.close();
+          reject(e);
+        }
+      }).on('error', () => {
+        try {
+          fs.unlinkSync(filePath);
+          fs.unlinkSync(file.path);
+        } catch (e) {
+          this.logger.error('file unlink failed', e);
+        }
+        reject(new UploadReaderFailedException());
+      });
+    });
   }
 }
