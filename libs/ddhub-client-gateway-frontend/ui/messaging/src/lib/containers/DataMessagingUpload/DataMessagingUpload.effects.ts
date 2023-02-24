@@ -7,6 +7,7 @@ import {
   useUploadMessage,
 } from '@ddhub-client-gateway-frontend/ui/api-hooks';
 import {
+  SendMessageDto,
   SendMessagelResponseDto,
   UpdateChannelDtoType,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
@@ -29,8 +30,13 @@ export const useDataMessagingUploadEffects = ({
   const [selectedTopic, setSelectedTopic] = useState<string>('');
   const [selectedTopicVersion, setSelectedTopicVersion] = useState<string>('');
   const [selectedFile, setSelectedFile] = useState<File>();
+  const [open, setOpen] = useState(false);
+  const [anonymousRecipients, setAnonymousRecipients] = useState<string[]>([]);
+  const [recipientInput, setRecipientInput] = useState<string>('');
+  const [recent, setRecent] = useState('');
+  const [toggleUpdate, setToggleUpdate] = useState(false);
 
-  const { messageSubmitHandler, isLoading: isUploading } =
+  const { uploadMessageHandler, createMessageHandler, isLoading: isUploading } =
     useUploadMessage(isLarge);
   const {
     channels,
@@ -76,6 +82,7 @@ export const useDataMessagingUploadEffects = ({
   const topics = channelsByName[selectedChannel]?.conditions?.topics ?? [];
   const topicsById = keyBy(topics, 'topicId');
   const selectedTopicWithSchema = topicHistoryByVersion[selectedTopicVersion];
+  const showAnonymousRecipient = channelsByName[selectedChannel]?.useAnonymousExtChannel && !isLarge;
 
   const topicInputValue = topicsById[selectedTopic]?.topicName ?? '';
   const acceptedFiles = selectedFile ? [selectedFile] : [];
@@ -169,6 +176,7 @@ export const useDataMessagingUploadEffects = ({
 
     setSelectedTopic('');
     setSelectedTopicVersion('');
+    setAnonymousRecipients([]);
   };
 
   const onTopicChange = (
@@ -199,16 +207,80 @@ export const useDataMessagingUploadEffects = ({
   };
 
   const submitHandler = async () => {
-    messageSubmitHandler(
-      {
-        file: selectedFile as Blob,
-        fqcn: selectedChannel,
-        topicName: topicsById[selectedTopic]?.topicName,
-        topicOwner: topicsById[selectedTopic]?.owner,
-        topicVersion: selectedTopicVersion,
-      },
-      onUpload
-    );
+    const sendMessageObj = {
+      fqcn: selectedChannel,
+      topicName: topicsById[selectedTopic]?.topicName,
+      topicOwner: topicsById[selectedTopic]?.owner,
+      topicVersion: selectedTopicVersion,
+      file: selectedFile as Blob,
+    };
+
+    if (isLarge) {
+      uploadMessageHandler(sendMessageObj, onUpload);
+    } else {
+      const { file, ...rest } = sendMessageObj;
+      const payload = await file.text();
+
+      const formattedValues = {
+        ...rest,
+        payload,
+        anonymousRecipient: anonymousRecipients,
+      } as SendMessageDto;
+
+      createMessageHandler(formattedValues, onUpload);
+    }
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const clear = () => {
+    setRecipientInput('');
+  };
+
+  const handleOpen = () => {
+    clear();
+    setOpen(true);
+  };
+
+  const removeRecipient = (value: string) => {
+    setAnonymousRecipients(anonymousRecipients.filter((recipient) => recipient !== value));
+  };
+
+  const addRecipient = (recipient: string) => {
+    if (!anonymousRecipients.includes(recipient)) {
+      const recipientsToSet = [recipient, ...anonymousRecipients];
+      setAnonymousRecipients(recipientsToSet);
+    }
+
+    clear();
+  };
+
+  const handleSaveRecipient = () => {
+    setRecent(recipientInput);
+    addRecipient(recipientInput);
+  };
+
+  const handleUpdateRecipient = (removeInput: string) => {
+    const filteredRecipients = anonymousRecipients.filter((recipient) => recipient !== removeInput);
+
+    if (!filteredRecipients.includes(recipientInput)) {
+      filteredRecipients.unshift(recipientInput);
+
+      setRecent(recipientInput);
+      setAnonymousRecipients(filteredRecipients);
+    }
+
+    clear();
+  };
+
+  const handleOpenForm = (formValue: any) => {
+    setRecipientInput(formValue.selectValue);
+  };
+
+  const handleCloseForm = () => {
+    setToggleUpdate(!toggleUpdate);
   };
 
   const buttonDisabled =
@@ -237,5 +309,20 @@ export const useDataMessagingUploadEffects = ({
     maxFileSize,
     fileSizeInfo,
     topicInputValue,
+    showAnonymousRecipient,
+    open,
+    handleClose,
+    handleOpen,
+    recipientInput,
+    setRecipientInput,
+    handleSaveRecipient,
+    anonymousRecipients,
+    handleUpdateRecipient,
+    removeRecipient,
+    recent,
+    handleOpenForm,
+    clear,
+    handleCloseForm,
+    toggleUpdate,
   };
 };

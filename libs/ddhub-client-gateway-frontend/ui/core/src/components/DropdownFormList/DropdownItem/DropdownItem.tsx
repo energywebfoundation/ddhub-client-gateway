@@ -1,37 +1,47 @@
 import { Box, BoxProps, Grid, IconButton, Typography } from '@mui/material';
-import { RestrictionType } from '../models/restriction-type.enum';
-import { didFormatMinifier } from '@ddhub-client-gateway-frontend/ui/utils';
-import clsx from "clsx";
+import { useStyles } from './DropdownItem.styles';
+import clsx from 'clsx';
 import { Edit3, X as Close } from 'react-feather';
 import { MouseEvent } from 'react';
 import { CopyToClipboard } from '@ddhub-client-gateway-frontend/ui/core';
-import { useStyles } from './RestrictionListView.styles';
+import { didFormatMinifier } from '@ddhub-client-gateway-frontend/ui/utils';
 
-interface RestrictionListViewProps {
+export interface DropdownItemProps {
   item: string;
-  type?: RestrictionType;
   canRemove?: boolean;
   canCopy?: boolean;
+  isDid?: boolean;
   handleOpen?: (event: any) => void;
   remove?: (value: string) => void;
   expanded?: string | boolean;
+  type?: string;
   index: number;
   wrapperProps?: BoxProps;
 }
 
-export const RestrictionListView = (
+export const DropdownItem = (
   {
     item,
     type,
     canRemove = false,
     canCopy = false,
+    isDid = false,
     handleOpen,
     remove,
     expanded,
     index,
     wrapperProps,
-  }: RestrictionListViewProps) => {
+  }: DropdownItemProps) => {
   const { classes } = useStyles();
+  const panelKey = `panel-${type ? type + '-' : ''}${index}`;
+
+  let formattedItem = item;
+
+  if (isDid) {
+    formattedItem = didFormatMinifier(item);
+  } else if (item.length > 30) {
+    formattedItem = `${item.substring(0, 19)}...${item.substring(item.length - 5)}`;
+  }
 
   return (
     <Box {...wrapperProps}>
@@ -47,7 +57,7 @@ export const RestrictionListView = (
             </Box>
           )}
           <Typography noWrap variant="body2" className={classes.itemText} pl='14px'>
-            {type === RestrictionType.DID ? didFormatMinifier(item) : item}
+            {formattedItem}
           </Typography>
         </Grid>
         {canRemove && (
@@ -55,8 +65,8 @@ export const RestrictionListView = (
             <IconButton
               onClick={handleOpen}
               className={clsx(classes.edit, {
-                [classes.editActive]: (expanded && expanded === `panel-${index}`),
-                [classes.editInactive]: (expanded && expanded !== `panel-${index}`),
+                [classes.editActive]: (expanded && expanded === panelKey),
+                [classes.editInactive]: (expanded && expanded !== panelKey),
               })}>
               <Edit3 size={18} />
             </IconButton>
@@ -77,4 +87,5 @@ export const RestrictionListView = (
       </Grid>
     </Box>
   );
-}
+};
+

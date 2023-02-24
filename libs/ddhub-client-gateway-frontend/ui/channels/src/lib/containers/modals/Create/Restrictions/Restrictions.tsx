@@ -7,8 +7,7 @@ import { TActionButtonsProps } from '../ActionButtons/ActionButtons';
 import { useRestrictionsEffects } from './Restrictions.effects';
 import { useStyles } from './Restrictions.styles';
 import { RestrictionSelect } from './RestrictionSelect/RestrictionSelect';
-import { TextField } from '@ddhub-client-gateway-frontend/ui/core';
-import { RestrictionList } from './RestrictionList/RestrictionList';
+import { DropdownFormList, TextField } from '@ddhub-client-gateway-frontend/ui/core';
 import { ConnectionType } from "../Details/models/connection-type.enum";
 import { includes } from 'lodash';
 
@@ -43,9 +42,10 @@ export const Restrictions = ({
     rolesInputChangeHandler,
     didInputChangeHandler,
     restrictionsCount,
-    setRoleInput,
-    setDIDInput,
     recent,
+    handleOpenForm,
+    handleCloseForm,
+    toggleUpdate,
   } = useRestrictionsEffects(restrictions);
   const { classes } = useStyles();
 
@@ -80,31 +80,45 @@ export const Restrictions = ({
   );
 
   const restrictionsTypes = Object.values(RestrictionType);
-  const selectRestriction = restrictionsTypes.map((value, index) => {
+  const selectRestriction = restrictionsTypes.map((restrictionsType, index) => {
     return (
-      <RestrictionList
-        key={value}
-        type={value}
-        list={ value === RestrictionType.Role ? roles : dids}
-        remove={ value === RestrictionType.Role ? removeRole : removeDID }
-        canRemove={true}
-        canCopy={false}
-        setType={setType}
-        handleSaveRestriction={handleSaveRestriction}
-        roleInput={roleInput}
-        isRoleValid={isRoleValid}
-        didInput={didInput}
-        clear={clear}
-        isDIDValid={isDIDValid}
-        setRoleInput={setRoleInput}
-        setDIDInput={setDIDInput}
-        recent={recent}
-        handleUpdateRestriction={handleUpdateRestriction}>
-        <>
-          {selectRoleRestriction}
-          {setDIDRestriction}
+      <>
+        {(restrictionsType === RestrictionType.Role ? roles : dids).map((el, index) => (
+          <DropdownFormList
+            toggleUpdate={toggleUpdate}
+            index={index}
+            value={el}
+            key={index}
+            remove={ restrictionsType === RestrictionType.Role ? removeRole : removeDID }
+            canRemove={true}
+            canCopy={false}
+            handleOpenForm={handleOpenForm}
+            recent={recent}
+            list={ restrictionsType === RestrictionType.Role ? roles : dids}
+            clear={clear}
+            handleUpdateForm={handleUpdateRestriction}
+            isDid={restrictionsType === RestrictionType.DID}
+            type={restrictionsType}>
+            <RestrictionSelect
+              setType={setType}
+              clear={clear}
+              handleClose={handleCloseForm}
+              handleSaveRestriction={handleSaveRestriction}
+              handleUpdateRestriction={handleUpdateRestriction}
+              roleInput={roleInput}
+              isRoleValid={isRoleValid}
+              didInput={didInput}
+              isDIDValid={isDIDValid}
+              selectedType={type}
+              inputValue={el}>
+              <>
+                {selectRoleRestriction}
+                {setDIDRestriction}
+              </>
+            </RestrictionSelect>
+          </DropdownFormList>
+          ))}
         </>
-      </RestrictionList>
     );
   });
 

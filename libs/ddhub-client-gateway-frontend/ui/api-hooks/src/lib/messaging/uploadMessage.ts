@@ -44,20 +44,13 @@ export const useUploadMessage = (isLarge: boolean) => {
     );
   };
 
-  const createMessageHandler = async (
-    values: UploadMessageBodyDto,
+  const createMessageHandler = (
+    values: SendMessageDto,
     onUpload: () => void
   ) => {
-    const { file, ...rest } = values;
-    const payload = await file.text();
-    const formattedValues = {
-      ...rest,
-      payload,
-    } as SendMessageDto;
-
     messageCreateMutate(
       {
-        data: formattedValues,
+        data: values,
       },
       {
         onSuccess: (res) => {
@@ -70,12 +63,10 @@ export const useUploadMessage = (isLarge: boolean) => {
   };
 
   const isLoading = messageCreating || messageUploading;
-  const messageSubmitHandler = isLarge
-    ? uploadMessageHandler
-    : createMessageHandler;
 
   return {
     isLoading,
-    messageSubmitHandler,
+    uploadMessageHandler,
+    createMessageHandler,
   };
 };

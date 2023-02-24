@@ -169,7 +169,7 @@ export const getChannelControllerGetByTypeMock = () => [
     fqcn: 'channel.name.2',
     payloadEncryption: false,
     type: 'pub',
-    useAnonymousExtChannel: false,
+    useAnonymousExtChannel: true,
     conditions: {
       dids: ['did:ethr:volta:0x09Df5d33f1242E1b8aA5E0E0F6BfA687E6846993'],
       roles: ['marketoperator.roles'],
@@ -318,7 +318,7 @@ export const getGatewayMock = () => {
     "messageBrokerStatus": "OK",
     "mtlsIsValid": true,
     "namespace": "ddhub.apps.energyweb.iam.ewc",
-    "version": "v15.15.0"
+    "version": "389dcd70-b0f5-4ea6-9d7c-7621b7d3171b"
   };
 };
 

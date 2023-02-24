@@ -29,8 +29,9 @@ export const useRestrictionsEffects = (restrictions: ChannelConditionsDto) => {
     setRoleInput,
     updateRole,
   } = useRolesRestrictionEffects(restrictions.roles ?? []);
-  const [type, setType] = useState<RestrictionType>(RestrictionType.DID);
+  const [type, setType] = useState(RestrictionType.DID);
   const [open, setOpen] = useState(false);
+  const [toggleUpdate, setToggleUpdate] = useState(false);
   const [recent, setRecent] = useState('');
 
   const clear = () => {
@@ -58,14 +59,27 @@ export const useRestrictionsEffects = (restrictions: ChannelConditionsDto) => {
       setRecent(roleInput);
       addRole(roleInput);
     }
-
-    handleClose();
   };
 
   const handleUpdateRestriction = (removeInput: string) => {
     setRecent(roleInput || didInput);
     updateRole(type, removeInput, roleInput);
     updateDID(type, removeInput, didInput);
+  };
+
+  const handleOpenForm = (formValue: any) => {
+    const selectType = formValue.selectType;
+    setType(selectType);
+
+    if (selectType === RestrictionType.DID) {
+      setDIDInput(formValue.selectValue);
+    } else {
+      setRoleInput(formValue.selectValue);
+    }
+  };
+
+  const handleCloseForm = () => {
+    setToggleUpdate(!toggleUpdate);
   };
 
   const restrictionsCount = dids.length + roles.length;
@@ -90,8 +104,9 @@ export const useRestrictionsEffects = (restrictions: ChannelConditionsDto) => {
     clear,
     rolesInputChangeHandler,
     didInputChangeHandler,
-    setRoleInput,
-    setDIDInput,
     recent,
+    handleOpenForm,
+    handleCloseForm,
+    toggleUpdate,
   };
 };

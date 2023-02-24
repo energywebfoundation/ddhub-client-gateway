@@ -8,9 +8,9 @@ import { useSummaryEffects } from './Summary.effects';
 import { useStyles } from './Summary.styles';
 import { Check, X } from 'react-feather';
 import React from 'react';
-import { RestrictionListView } from '../Restrictions/RestrictionListView/RestrictionListView';
 import { clone } from 'lodash';
 import { ConnectionType } from '../Details/models/connection-type.enum';
+import { DropdownItem } from '@ddhub-client-gateway-frontend/ui/core';
 
 export interface SummaryProps {
   channelValues: ICreateChannel;
@@ -40,18 +40,19 @@ export const Summary = ({
           )}
 
           {restrictionRoles.sort().map((el, index) => (
-            <RestrictionListView
+            <DropdownItem
               wrapperProps={{
                 className: classes.restrictionBox
               }}
               key={index}
               item={el}
               type={RestrictionType.Role}
-              index={index}/>
+              index={index}
+            />
           ))}
 
           {channelValues.conditions.dids?.map((el, index) => (
-            <RestrictionListView
+            <DropdownItem
               wrapperProps={{
                 className: classes.restrictionBox
               }}
@@ -75,7 +76,7 @@ export const Summary = ({
             </Box>
           )}
           {channelValues.conditions.topics?.map((el, index) => (
-            <RestrictionListView
+            <DropdownItem
               wrapperProps={{
                 className: classes.restrictionBox
               }}
