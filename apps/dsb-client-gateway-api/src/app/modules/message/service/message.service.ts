@@ -1052,7 +1052,7 @@ export class MessageService {
     payloadEncryption: boolean,
     transactionId?: string
   ): Promise<SendMessageResponseFile> {
-    return new Promise(async (resolve, reject) => {
+    return new Promise((resolve, reject) => {
       const readStream = fs.createReadStream(filePath, {
         highWaterMark: this.chunkSize
       });
