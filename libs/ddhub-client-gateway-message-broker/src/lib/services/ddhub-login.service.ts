@@ -11,6 +11,7 @@ import { IamService } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
 import { lastValueFrom } from 'rxjs';
 import { UnableToLoginException } from '../exceptions';
 import { EnrolmentService } from '@dsb-client-gateway/ddhub-client-gateway-enrolment';
+import { InitExtChannelDto } from '../dto/init-ext-channel.dto';
 
 @Injectable()
 export class DdhubLoginService {
@@ -73,28 +74,30 @@ export class DdhubLoginService {
   }
 
   @Span('ddhub_mb_initExtChannel')
-  protected async initExtChannel(): Promise<void> {
+  public async initExtChannel(dto?: InitExtChannelDto): Promise<any> {
     try {
-      await promiseRetry(async (retry) => {
+      const result = await promiseRetry(async (retry) => {
         await this.tlsAgentService.create();
 
-        await lastValueFrom(
-          this.httpService.post(
-            '/channel/initExtChannel',
-            {},
-            {
-              httpsAgent: this.tlsAgentService.get(),
-              headers: {
-                Authorization: `Bearer ${this.didAuthService.getToken()}`,
-              },
-            }
-          )
+        const { data } = await lastValueFrom(
+          this.httpService.post('/channel/initExtChannel', dto, {
+            httpsAgent: this.tlsAgentService.get(),
+            headers: {
+              Authorization: `Bearer ${this.didAuthService.getToken()}`,
+            },
+          })
         ).catch((e) => retry(e));
+        
+        return data;
       }, this.retryConfigService.config);
 
       this.logger.log('Init ext channel successful');
+      return result;
     } catch (e) {
-      this.logger.error('Init ext channel failed', e);
+      this.logger.error('Init ext channel failed');
+      this.logger.error(e);
+      this.logger.error(e.response.data);
+      return false;
     }
   }
 }

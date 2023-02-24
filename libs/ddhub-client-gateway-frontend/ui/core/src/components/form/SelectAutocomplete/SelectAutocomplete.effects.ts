@@ -10,14 +10,16 @@ export const useSelectAutocompleteEffects = (
   const [textValue, setTextValue] = useState<string>('');
 
   const add = (value: any) => {
-    const isDuplicate = currentValue?.indexOf(value) !== -1;
+    if (value) {
+      const isDuplicate = currentValue?.indexOf(value) !== -1;
 
-    if (isDuplicate) {
+      if (isDuplicate) {
+        setTextValue('');
+        return;
+      }
+      onChange([...currentValue, value] as FormSelectOption[]);
       setTextValue('');
-      return;
     }
-    onChange([...currentValue, value] as FormSelectOption[]);
-    setTextValue('');
   };
 
   const changeHandler = (
@@ -41,7 +43,7 @@ export const useSelectAutocompleteEffects = (
   };
 
   const onBlur = (event: any) => {
-    event.target.value && add(event.target.value);
+    add(event.target.value);
   };
 
   const options = field.options || [];

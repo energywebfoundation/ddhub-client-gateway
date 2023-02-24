@@ -5,6 +5,7 @@ import request from 'supertest';
 import { DsbClientGatewayErrors } from '@dsb-client-gateway/dsb-client-gateway-errors';
 import { IamService } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
 import { setupApp } from './helpers/app.helper';
+import { MemoryHelper } from './helpers/memory.helper';
 
 const feature = loadFeature('../../feature/identity.feature', {
   loadRelativePath: true,
@@ -28,14 +29,15 @@ const roleExists = (
 describe('Identity Feature', () => {
   defineFeature(feature, (test) => {
     let app: INestApplication;
-    let response;
 
     beforeAll(async () => {
       app = await setupApp();
     });
 
+    const testMemory = new MemoryHelper();
+
     beforeEach(async () => {
-      response = null;
+      testMemory.map = {};
     });
 
     afterAll(async () => {
@@ -43,8 +45,6 @@ describe('Identity Feature', () => {
     });
 
     test('Invalid private key', ({ given, when, then }) => {
-      let response;
-
       given('The system has no identity set', async () => {
         await clearSecrets(app);
       });
@@ -56,14 +56,14 @@ describe('Identity Feature', () => {
             privateKey: invalidPrivateKey,
           })
           .expect(({ body }) => {
-            response = body;
+            testMemory.map.INVALID_PRIVATE_KEY_RESPONSE_BODY = body;
           });
       });
 
       then('I should get validation error', () => {
-        expect(response.err.code).toBe('ID::INVALID_PRIVATE_KEY');
-
-        response = null;
+        expect(testMemory.map.INVALID_PRIVATE_KEY_RESPONSE_BODY.err.code).toBe(
+          'ID::INVALID_PRIVATE_KEY'
+        );
       });
     });
 
@@ -101,12 +101,14 @@ describe('Identity Feature', () => {
           })
           .expect(HttpStatus.OK)
           .expect(({ body }) => {
-            response = body;
+            testMemory.map.VALID_PRIVATE_KEY_RESPONSE_BODY = body;
           });
       });
 
       then(/^I should get in POST response (.*)$/, (address) => {
-        expect(response.address).toEqual(address);
+        expect(testMemory.map.VALID_PRIVATE_KEY_RESPONSE_BODY.address).toEqual(
+          address
+        );
       });
 
       then(

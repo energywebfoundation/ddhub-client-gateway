@@ -97,6 +97,9 @@ jobs:
           ONEPASSWORD_VAULT_ID: ${{ secrets.ONEPASSWORD_VAULT_ID }}
           ONEPASSWORD_HOST: ${{ secrets.ONEPASSWORD_HOST }}
           ONEPASSWORD_TOKEN: ${{ secrets.ONEPASSWORD_TOKEN }}
+          RETRY_FACTOR: 1
+          MAX_RETRIES: 2
+          TIMEOUT: 100
         run: npm run test:e2e:api
       - name: Stop containers
         if: always()

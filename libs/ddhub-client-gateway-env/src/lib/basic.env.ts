@@ -1,6 +1,14 @@
 import * as Joi from 'joi';
 
 export const BASIC_ENVS = Joi.object({
+  ASSOCIATION_KEY_INTERVAL: Joi.number()
+    .positive()
+    .description('Association key interval (hours)')
+    .default(24),
+  ASSOCIATION_KEY_OFFSET: Joi.number()
+    .positive()
+    .description('Association key validity time (hours)')
+    .default(144),
   REQ_LOCK_TIMEOUT: Joi.number()
     .positive()
     .description('Maximum request lock lifetime (in seconds)')

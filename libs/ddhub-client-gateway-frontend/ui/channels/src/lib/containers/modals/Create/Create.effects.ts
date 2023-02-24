@@ -31,6 +31,7 @@ const initialState = {
   },
   channelType: '',
   connectionType: '',
+  useAnonymousExtChannel: false,
 };
 
 export const useCreateChannelEffects = () => {
@@ -96,6 +97,7 @@ export const useCreateChannelEffects = () => {
     connectionType: ConnectionType;
     channelType: ChannelType;
     payloadEncryption: boolean;
+    useAnonymousExtChannel: boolean;
   }) => {
     if (validateFqcn(data.fqcn)) {
       const detailsData = data;
@@ -169,6 +171,7 @@ export const useCreateChannelEffects = () => {
         topics: topicsData,
       },
       payloadEncryption: values.payloadEncryption,
+      useAnonymousExtChannel: values.useAnonymousExtChannel,
     };
 
     createChannelHandler(channelCreateValues, onCreate);
