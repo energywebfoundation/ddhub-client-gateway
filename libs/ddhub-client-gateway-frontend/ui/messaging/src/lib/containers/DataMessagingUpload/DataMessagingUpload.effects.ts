@@ -7,6 +7,7 @@ import {
   useUploadMessage,
 } from '@ddhub-client-gateway-frontend/ui/api-hooks';
 import {
+  SendMessageDto,
   SendMessagelResponseDto,
   UpdateChannelDtoType,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
@@ -35,7 +36,7 @@ export const useDataMessagingUploadEffects = ({
   const [recent, setRecent] = useState('');
   const [toggleUpdate, setToggleUpdate] = useState(false);
 
-  const { messageSubmitHandler, isLoading: isUploading } =
+  const { uploadMessageHandler, createMessageHandler, isLoading: isUploading } =
     useUploadMessage(isLarge);
   const {
     channels,
@@ -206,17 +207,28 @@ export const useDataMessagingUploadEffects = ({
   };
 
   const submitHandler = async () => {
-    messageSubmitHandler(
-      {
-        file: selectedFile as Blob,
-        fqcn: selectedChannel,
-        topicName: topicsById[selectedTopic]?.topicName,
-        topicOwner: topicsById[selectedTopic]?.owner,
-        topicVersion: selectedTopicVersion,
+    const sendMessageObj = {
+      fqcn: selectedChannel,
+      topicName: topicsById[selectedTopic]?.topicName,
+      topicOwner: topicsById[selectedTopic]?.owner,
+      topicVersion: selectedTopicVersion,
+      file: selectedFile as Blob,
+    };
+
+    if (isLarge) {
+      uploadMessageHandler(sendMessageObj, onUpload);
+    } else {
+      const { file, ...rest } = sendMessageObj;
+      const payload = await file.text();
+
+      const formattedValues = {
+        ...rest,
+        payload,
         anonymousRecipient: anonymousRecipients,
-      },
-      onUpload
-    );
+      } as SendMessageDto;
+
+      createMessageHandler(formattedValues, onUpload);
+    }
   };
 
   const handleClose = () => {
