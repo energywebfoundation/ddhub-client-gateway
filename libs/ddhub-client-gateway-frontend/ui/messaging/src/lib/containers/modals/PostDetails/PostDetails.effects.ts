@@ -11,7 +11,7 @@ import { didFormatMinifier } from '@ddhub-client-gateway-frontend/ui/utils';
 
 export const SUCCESS_MODAL_HEADERS = [
   {
-    Header: 'DID',
+    Header: 'Recipient',
     accessor: 'formattedDid',
     color: '#fff',
     isSortable: true,
@@ -26,7 +26,7 @@ export const SUCCESS_MODAL_HEADERS = [
 
 export const FAIL_MODAL_HEADERS = [
   {
-    Header: 'DID',
+    Header: 'Recipient',
     accessor: 'formattedDid',
     color: '#fff',
     isSortable: true,

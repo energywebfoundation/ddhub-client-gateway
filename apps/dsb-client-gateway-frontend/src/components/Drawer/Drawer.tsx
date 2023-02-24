@@ -24,7 +24,7 @@ export const Drawer = () => {
   return (
     <div>
       <Box className={classes.logoWrapper}>
-        <img src="/ew-main-logo.svg" alt="logo" className={classes.logo} />
+        <img src="/ew-client-gateway.svg" alt="logo" className={classes.logo} />
       </Box>
       <List>
         <MenuItem

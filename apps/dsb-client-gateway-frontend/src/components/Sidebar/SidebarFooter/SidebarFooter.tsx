@@ -10,7 +10,7 @@ function SidebarFooter() {
   return (
     <div className={classes.footerDiv}>
       <Box display="flex" flexDirection="column">
-        <Box display="flex" alignItems="center">
+        <Box display="flex" alignItems="center" justifyContent="center">
           <Typography variant="body2" className={classes.label}>
             Powered by
           </Typography>
