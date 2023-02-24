@@ -23,19 +23,14 @@ dotenv.config({
 });
 
 const generateSchema = async (document) => {
-  if (!process.env.GENERATE_SWAGGER) {
-    return;
-  }
-
   if (!document.components.schemas) {
     document.components.schemas = {};
   }
 
-  const docsPath =
-    process.env.SWAGGER_SCHEMA_PATH ||
-    './libs/dsb-client-gateway-api-client/schema.yaml';
-
-  fs.writeFileSync(docsPath, Yaml.stringify(document));
+  fs.writeFileSync(
+    './libs/dsb-client-gateway-api-client/schema.yaml',
+    Yaml.stringify(document)
+  );
 };
 
 async function bootstrap() {
