@@ -10,6 +10,7 @@ export const useStyles = makeStyles()((theme) => ({
     background: '#283046',
     display: 'flex',
     flexDirection: 'column',
+    maxWidth: '466px',
   },
   uploadWrapper: {
     height: 209,
