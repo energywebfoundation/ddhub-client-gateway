@@ -3,7 +3,6 @@ import { Injectable } from '@nestjs/common';
 import { BigNumber, providers, utils, Wallet } from 'ethers';
 import { parseEther } from 'ethers/lib/utils';
 import { Span } from 'nestjs-otel';
-import base64url from 'base64url'
 import { InvalidPrivateKeyException } from '../exceptions/invalid-private-key.exception';
 
 @Injectable()
@@ -21,7 +20,9 @@ export class EthersService {
       alg: 'ES256',
       typ: 'JWT',
     };
-    const encodedHeader = base64url(JSON.stringify(header));
+    const encodedHeader = utils.base64.encode(
+      Buffer.from(JSON.stringify(header))
+    );
 
     const payload = {
       iss: did,
@@ -30,12 +31,14 @@ export class EthersService {
       },
     };
 
-    const encodedPayload = base64url(JSON.stringify(payload));
+    const encodedPayload = utils.base64.encode(
+      Buffer.from(JSON.stringify(payload))
+    );
     const message = utils.arrayify(
       utils.keccak256(Buffer.from(`${encodedHeader}.${encodedPayload}`))
     );
     const sig = await signer.signMessage(message);
-    const encodedSig = base64url(sig);
+    const encodedSig = utils.base64.encode(Buffer.from(sig));
 
     return `${encodedHeader}.${encodedPayload}.${encodedSig}`;
   }

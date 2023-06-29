@@ -83,7 +83,6 @@
     "ajv": "^8.11.0",
     "ajv-formats": "^2.1.1",
     "babel-plugin-styled-components": "^2.0.2",
-    "base64url": "^3.0.1",
     "better-sqlite3": "^7.5.1",
     "bip39": "^3.0.4",
     "bn.js": "^5.2.0",
@@ -99,7 +98,6 @@
     "highland": "^2.13.5",
     "iam-client-lib": "^6.0.0",
     "jest-cucumber": "^3.0.1",
-    "json-to-pretty-yaml": "^1.2.2",
     "json2md": "^1.12.0",
     "lokijs": "^1.5.12",
     "luxon": "^2.4.0",
@@ -139,7 +137,8 @@
     "typeorm": "^0.2.45",
     "uuid": "^8.3.2",
     "websocket": "^1.0.34",
-    "yup": "^0.32.11"
+    "yup": "^0.32.11",
+    "json-to-pretty-yaml": "^1.2.2"
   },
   "config": {
     "commitizen": {
