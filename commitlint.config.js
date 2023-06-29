@@ -17,5 +17,6 @@ module.exports = {
         'devops',
       ],
     ],
+    "header-max-length": [1, "always", 120],
   },
 };
