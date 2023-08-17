@@ -13,7 +13,12 @@ import {
   FileMetadataEntity,
   IdentityEntity,
   PendingAcksEntity,
+  ReceivedMessageEntity,
+  ReceivedMessageMappingEntity,
+  ReceivedMessageReadStatusEntity,
   ReqLockEntity,
+  SentMessageEntity,
+  SentMessageRecipientEntity,
   SymmetricKeysEntity,
   TopicEntity,
   TopicMonitorEntity,
@@ -37,6 +42,11 @@ const ENTITIES = [
   TopicMonitorEntity,
   ReqLockEntity,
   AssociationKeyEntity,
+  ReceivedMessageEntity,
+  ReceivedMessageMappingEntity,
+  ReceivedMessageReadStatusEntity,
+  SentMessageEntity,
+  SentMessageRecipientEntity,
 ];
 
 @Module({

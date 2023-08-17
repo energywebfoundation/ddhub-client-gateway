@@ -13,3 +13,4 @@ export * from './topic-monitor';
 export * from './req-lock';
 export * from './clients';
 export * from './association-keys';
+export * from './messages';
