@@ -10,6 +10,7 @@ import { MenuItemText } from '../MenuItemText/MenuItemText';
 export interface SubMenuProps {
   href: string;
   title: string;
+  menuIcon?: React.ReactNode;
 }
 
 export interface CollapsableListItemProps {
@@ -46,7 +47,7 @@ export const CollapsableMenu = ({
                 key={item.href}
                 href={item.href}
                 title={item.title}
-                icon={<Circle className={classes.subMenuIcon} size={10} />}
+                icon={item.menuIcon ?? <Circle className={classes.subMenuIcon} size={10} />}
               />
             );
           })}
