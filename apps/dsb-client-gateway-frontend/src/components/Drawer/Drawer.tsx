@@ -7,6 +7,8 @@ import {
   Home,
   Layers,
   Settings,
+  Inbox,
+  Edit3
 } from 'react-feather';
 import { ClientSubscriptionIcon } from '@ddhub-client-gateway-frontend/ui/core';
 import { routerConst } from '@ddhub-client-gateway-frontend/ui/utils';
@@ -109,6 +111,24 @@ export const Drawer = () => {
             },
           ].filter((menu) => displayedRoutes.has(menu.href))}
           menuIcon={<Database className={classes.icon} size={18} />}
+        />
+
+        {/*todo: change href*/}
+        <CollapsableMenu
+          menuTitle="Message Box"
+          subMenu={[
+            { title: 'New message', href: routerConst.DataMessagingFileUpload,
+            menuIcon: (<Edit3 style={{margin: '0 10px 0 4px'}} size={16} />)},
+            {
+              title: 'My messages',
+              href: routerConst.DataMessagingFileUpload,
+            },
+            {
+              title: 'Sent',
+              href: routerConst.DataMessagingFileUpload,
+            },
+          ].filter((menu) => displayedRoutes.has(menu.href))}
+          menuIcon={<Inbox className={classes.icon} size={18} />}
         />
       </List>
     </div>
