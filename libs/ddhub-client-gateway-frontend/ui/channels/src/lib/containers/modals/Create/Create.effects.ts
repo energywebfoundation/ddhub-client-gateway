@@ -1,19 +1,23 @@
-import { useState } from "react";
-import { useQueryClient } from "react-query";
+import { useState } from 'react';
+import { useQueryClient } from 'react-query';
 import {
   ChannelTopic,
   CreateChannelDto,
   CreateChannelDtoType,
-  getChannelControllerGetByTypeQueryKey
-} from "@dsb-client-gateway/dsb-client-gateway-api-client";
-import { useCustomAlert } from "@ddhub-client-gateway-frontend/ui/core";
-import { ModalActionsEnum, useModalDispatch, useModalStore } from "../../../context";
-import { useCreateChannel } from "@ddhub-client-gateway-frontend/ui/api-hooks";
-import { Topic } from "./Topics/Topics.effects";
-import { TActionButtonsProps } from "./ActionButtons/ActionButtons";
-import { ICreateChannel } from "../models/create-channel.interface";
-import { ChannelType } from "../../../models/channel-type.enum";
-import { ConnectionType } from "./Details/models/connection-type.enum";
+  getChannelControllerGetByTypeQueryKey,
+} from '@dsb-client-gateway/dsb-client-gateway-api-client';
+import { useCustomAlert } from '@ddhub-client-gateway-frontend/ui/core';
+import {
+  ModalActionsEnum,
+  useModalDispatch,
+  useModalStore,
+} from '../../../context';
+import { useCreateChannel } from '@ddhub-client-gateway-frontend/ui/api-hooks';
+import { Topic } from './Topics/Topics.effects';
+import { TActionButtonsProps } from './ActionButtons/ActionButtons';
+import { ICreateChannel } from '../models/create-channel.interface';
+import { ChannelType } from '../../../models/channel-type.enum';
+import { ConnectionType } from './Details/models/connection-type.enum';
 import { pick } from 'lodash';
 
 type TGetActionButtonsProps = TActionButtonsProps['nextClickButtonProps'] & {
@@ -32,6 +36,7 @@ const initialState = {
   channelType: '',
   connectionType: '',
   useAnonymousExtChannel: false,
+  enableMessageForm: false,
 };
 
 export const useCreateChannelEffects = () => {
@@ -90,7 +95,7 @@ export const useCreateChannelEffects = () => {
 
     setValidFqcn(isValid);
     return isValid;
-  }
+  };
 
   const setDetails = (data: {
     fqcn: string;
@@ -98,12 +103,17 @@ export const useCreateChannelEffects = () => {
     channelType: ChannelType;
     payloadEncryption: boolean;
     useAnonymousExtChannel: boolean;
+    enableMessageForm: boolean;
   }) => {
     if (validateFqcn(data.fqcn)) {
       const detailsData = data;
 
       if (detailsData.connectionType !== ConnectionType.Publish) {
         detailsData.payloadEncryption = false;
+      }
+
+      if (detailsData.channelType !== ChannelType.Messaging) {
+        detailsData.enableMessageForm = false;
       }
 
       setActiveStep(activeStep + 1);
@@ -159,7 +169,9 @@ export const useCreateChannelEffects = () => {
 
   const channelSubmitHandler = () => {
     const values = channelValues;
-    const topicsData = values.conditions.topics.map(topic => pick(topic, ['owner', 'topicName']));
+    const topicsData = values.conditions.topics.map((topic) =>
+      pick(topic, ['owner', 'topicName'])
+    );
     const rolesData = values.conditions.roles.sort();
 
     const channelCreateValues: CreateChannelDto = {
@@ -172,6 +184,7 @@ export const useCreateChannelEffects = () => {
       },
       payloadEncryption: values.payloadEncryption,
       useAnonymousExtChannel: values.useAnonymousExtChannel,
+      // enableMessageForm: values.enableMessageForm, // todo: uncomment
     };
 
     createChannelHandler(channelCreateValues, onCreate);
