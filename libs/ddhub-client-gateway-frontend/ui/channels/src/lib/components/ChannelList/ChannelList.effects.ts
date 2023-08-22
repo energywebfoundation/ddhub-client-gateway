@@ -55,9 +55,16 @@ export const useChannelListEffects = () => {
       label: 'Remove',
       color: theme.palette.error.main,
       onClick: (channel: GetChannelResponseDto) =>
-        removeChannelHandler(channel.fqcn),
+        removeChannelHandler(channel.fqcn, true), // todo: check for flag enabled
     },
   ];
 
-  return { channels, isLoading, onCreateHandler, actions, channelsLoaded, openChannelDetails };
+  return {
+    channels,
+    isLoading,
+    onCreateHandler,
+    actions,
+    channelsLoaded,
+    openChannelDetails,
+  };
 };
