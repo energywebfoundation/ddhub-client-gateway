@@ -23,6 +23,13 @@ import {
 import { ChannelInvalidTopicException } from '../exceptions/channel-invalid-topic.exception';
 import { differenceBy } from 'lodash';
 
+export interface QueryChannels {
+  type: ChannelType;
+  useAnonymousExtChannel: boolean;
+  payloadEncryption: boolean;
+  messageForms: boolean;
+}
+
 @Injectable()
 export class ChannelService {
   protected readonly logger = new Logger(ChannelService.name);
@@ -251,7 +258,29 @@ export class ChannelService {
   }
 
   @Span('channels_getChannelsByType')
-  public async getChannelsByType(type?: ChannelType): Promise<ChannelEntity[]> {
-    return this.wrapperRepository.channelRepository.getChannelsByType(type);
+  public async queryChannels(query: QueryChannels): Promise<ChannelEntity[]> {
+    const { type, useAnonymousExtChannel, payloadEncryption, messageForms } =
+      query;
+    const conditions: Partial<QueryChannels> = {};
+
+    if (type) {
+      conditions.type = type;
+    }
+
+    if (useAnonymousExtChannel !== undefined) {
+      conditions.useAnonymousExtChannel = useAnonymousExtChannel;
+    }
+
+    if (payloadEncryption !== undefined) {
+      conditions.payloadEncryption = payloadEncryption;
+    }
+
+    if (messageForms !== undefined) {
+      conditions.messageForms = messageForms;
+    }
+
+    return this.wrapperRepository.channelRepository.find({
+      where: conditions,
+    });
   }
 }

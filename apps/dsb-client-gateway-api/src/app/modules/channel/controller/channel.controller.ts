@@ -135,9 +135,17 @@ export class ChannelController {
   ): Promise<GetChannelResponseDto[]> {
     this.logger.assign({
       type: query.type,
+      useAnonymousExtChannel: query.useAnonymousExtChannel,
+      messageForms: query.messageForms,
+      payloadEncryption: query.payloadEncryption,
     });
 
-    return this.channelService.getChannelsByType(query.type);
+    return this.channelService.queryChannels({
+      type: query.type,
+      useAnonymousExtChannel: query.useAnonymousExtChannel,
+      messageForms: query.messageForms,
+      payloadEncryption: query.payloadEncryption,
+    });
   }
 
   @Delete('/:fqcn')
