@@ -1,9 +1,8 @@
-import {MigrationInterface, QueryRunner} from "typeorm";
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class messages1692260242937 implements MigrationInterface {
-
-    public async up(queryRunner: QueryRunner): Promise<void> {
-      await queryRunner.query(`
+  public async up(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(`
         ALTER TABLE topic
           ADD CONSTRAINT "UC_topics_id_version" UNIQUE (id, version);
 
@@ -65,10 +64,10 @@ CREATE TABLE sent_messages_recipients (
     createdDate DATE DEFAULT CURRENT_DATE,
     updatedDate DATE DEFAULT CURRENT_DATE
 );
-      `)
-    }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {
-    }
+        ALTER TABLE channels ADD COLUMN "messageForms" boolean DEFAULT false;
+      `);
+  }
 
+  public async down(queryRunner: QueryRunner): Promise<void> {}
 }

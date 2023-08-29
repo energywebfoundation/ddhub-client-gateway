@@ -26,6 +26,26 @@ export class SendMessageDto {
   @IsString()
   @IsNotEmpty()
   @ApiProperty({
+    description: 'Initiating message id',
+    type: String,
+    example: '507f1f77bcf86cd799439011',
+    required: false,
+  })
+  initiatingMessageId?: string;
+
+  @IsString()
+  @IsOptional()
+  @ApiProperty({
+    description: 'Initiating transaction id',
+    type: String,
+    example: '8ac55aa7-7d6d-438a-98bd-376079903c7b',
+    required: false,
+  })
+  initiatingTransactionId?: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({
     type: String,
     description: 'Topic name',
   })
@@ -77,7 +97,8 @@ export class SendMessageDto {
     each: true,
   })
   @ApiProperty({
-    description: 'List of anonymous keys which will serve as recipients of the message.',
+    description:
+      'List of anonymous keys which will serve as recipients of the message.',
     type: [String],
   })
   anonymousRecipient: string[] = [];

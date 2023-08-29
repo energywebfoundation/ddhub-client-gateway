@@ -66,6 +66,13 @@ export class GetChannelResponseDto {
   fqcn: string;
 
   @ApiProperty({
+    description: 'Message forms',
+    example: false,
+    default: false,
+  })
+  messageForms: boolean;
+
+  @ApiProperty({
     description: 'Channel encryption',
     type: Boolean,
     example: true,

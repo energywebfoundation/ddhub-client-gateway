@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { ReceivedMessageMappingRepository } from '../repository';
+import { ReceivedMessageRepository } from '../repository';
 
 @Injectable()
 export class ReceivedMessageRepositoryWrapper {
-  constructor(public readonly repository: ReceivedMessageMappingRepository) {}
+  constructor(public readonly repository: ReceivedMessageRepository) {}
 }

@@ -62,6 +62,7 @@ import {
   AssociationKeyNotAvailableException,
   AssociationKeysService,
 } from '@dsb-client-gateway/ddhub-client-gateway-association-keys';
+import { MessageStoreService } from './message-store.service';
 
 export enum EventEmitMode {
   SINGLE = 'SINGLE',
@@ -89,7 +90,8 @@ export class MessageService {
     protected readonly fileMetadataWrapper: FileMetadataWrapperRepository,
     protected readonly reqLockService: ReqLockService,
     protected readonly pendingAcksWrapperRepository: PendingAcksWrapperRepository,
-    protected readonly associationKeysService: AssociationKeysService
+    protected readonly associationKeysService: AssociationKeysService,
+    protected readonly messageStoreService: MessageStoreService
   ) {
     this.uploadPath = configService.get<string>('UPLOAD_FILES_DIR');
     this.downloadPath = configService.get<string>('DOWNLOAD_FILES_DIR');
@@ -178,7 +180,9 @@ export class MessageService {
         clientGatewayMessageId,
         shouldEncrypt,
         dto.anonymousRecipient ?? [],
-        dto.transactionId
+        dto.transactionId,
+        dto.initiatingMessageId,
+        dto.initiatingTransactionId
       );
 
     for (const res of result.status) {
@@ -187,6 +191,33 @@ export class MessageService {
           `message sent with id ${detail.messageId} to ${detail.did} with status code ${detail.statusCode}`
         );
       }
+    }
+
+    if (channel.messageForms) {
+      this.logger.debug(`attempting to store sent messages`);
+
+      await this.messageStoreService
+        .storeSentMessage([
+          {
+            initiatingMessageId: 'TODO',
+            payload: dto.payload,
+            topic,
+            clientGatewayMessageId: clientGatewayMessageId,
+            isFile: false,
+            signature: signature,
+            transactionId: dto.transactionId,
+            payloadEncryption: shouldEncrypt,
+            senderDid: 'todo',
+            timestampNanos: new Date(),
+            totalFailed: result.recipients.failed,
+            totalSent: result.recipients.sent,
+            totalRecipients: result.recipients.total,
+          },
+        ])
+        .catch((e) => {
+          this.logger.error(`failed to store sent message`);
+          this.logger.error(e);
+        });
     }
 
     return result;
@@ -310,6 +341,11 @@ export class MessageService {
         sender: message.senderDid,
         timestampNanos: message.timestampNanos,
         transactionId: message.transactionId,
+        initiatingMessageId: message.initiatingMessageId,
+        initiatingTransactionId: message.initiatingTransactionId,
+        payloadEncryption: message.payloadEncryption,
+        clientGatewayMessageId: message.clientGatewayMessageId,
+        topicId: message.topicId,
       };
 
     this.logger.log(`attempting to process message ${message.messageId}`);
@@ -610,6 +646,7 @@ export class MessageService {
     const rejected = messageResponses.filter(
       (value) => value.status === 'rejected'
     );
+
     if (rejected.length > 0) {
       messageLoggerContext.error(
         '[getMessages] Error while processing messages'
@@ -665,6 +702,46 @@ export class MessageService {
           idsPendingAck
         );
       }
+    }
+
+    if (channel.messageForms) {
+      this.logger.debug(`attempting to store received messages`);
+
+      await this.messageStoreService
+        .storeReceivedMessage(
+          await Promise.all(
+            fulfilledMessages.map(
+              async (messageResponse: GetMessageResponse) => {
+                const topic: TopicEntity | undefined =
+                  await this.topicService.getTopicById(messageResponse.topicId);
+
+                return {
+                  topic,
+                  initiatingMessageId: 'TODO',
+                  payload: messageResponse.payload,
+                  transactionId: messageResponse.transactionId,
+                  payloadEncryption: messageResponse.payloadEncryption,
+                  clientGatewayMessageId:
+                    messageResponse.clientGatewayMessageId,
+                  messageId: messageResponse.id,
+                  senderDid: messageResponse.sender,
+                  signature: messageResponse.signature,
+                  isFile: false,
+                  timestampNanos: moment(
+                    messageResponse.timestampNanos / (1000 * 1000)
+                  )
+                    .utc()
+                    .toDate(),
+                  topicVersion: topic.version,
+                };
+              }
+            )
+          )
+        )
+        .catch((e) => {
+          this.logger.error(`failed to store received messages`);
+          this.logger.error(e);
+        });
     }
 
     return fulfilledMessages.sort((a, b) => {

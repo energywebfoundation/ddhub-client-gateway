@@ -63,6 +63,7 @@ export class ChannelService {
     await this.wrapperRepository.channelRepository.save({
       fqcn: payload.fqcn,
       type: payload.type,
+      messageForms: payload.messageForms,
       useAnonymousExtChannel: payload.useAnonymousExtChannel,
       payloadEncryption: payload.payloadEncryption,
       conditions: {

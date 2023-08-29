@@ -12,6 +12,8 @@ export interface SearchMessageResponseDto {
   timestampNanos: number;
   isFile: boolean;
   clientGatewayMessageId: string;
+  initiatingMessageId?: string;
+  initiatingTransactionId?: string;
 }
 
 export interface SendMessageData {

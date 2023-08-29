@@ -207,7 +207,9 @@ export class DdhubMessagesService extends DdhubBaseService {
     clientGatewayMessageId: string,
     payloadEncryption: boolean,
     anonymousRecipient: string[],
-    transactionId?: string
+    transactionId?: string,
+    initiatingMessageId?: string,
+    initiatingTransactionId?: string
   ): Promise<SendMessageResponse> {
     const messageData: SendMessageData = {
       fqcns,

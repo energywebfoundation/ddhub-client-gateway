@@ -96,6 +96,16 @@ export class CreateChannelDto {
   useAnonymousExtChannel: boolean;
 
   @ApiProperty({
+    description: 'Use anonymous external channels',
+    example: true,
+    required: false,
+    default: false,
+  })
+  @IsBoolean()
+  @IsOptional()
+  messageForms: boolean;
+
+  @ApiProperty({
     description: 'Channel encryption',
     type: Boolean,
     example: true,
