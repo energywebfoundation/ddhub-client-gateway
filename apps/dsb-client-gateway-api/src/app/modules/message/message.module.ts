@@ -30,6 +30,8 @@ import { DdhubClientGatewayAssociationKeysModule } from '@dsb-client-gateway/ddh
 import { AssociationKeysListener } from './service/association-keys.listener';
 import { DdhubClientGatewayUtilsModule } from '@dsb-client-gateway/ddhub-client-gateway-utils';
 import { ForceAssociationKeysRunHandler } from './handler/force-association-keys-run.handler';
+import { MessageListenerService } from './service/message-listener.service';
+import { MessageStoreService } from './service/message-store.service';
 
 @Module({
   imports: [
@@ -76,6 +78,8 @@ import { ForceAssociationKeysRunHandler } from './handler/force-association-keys
     AssociationKeysListener,
     ReqLockService,
     ForceAssociationKeysRunHandler,
+    MessageListenerService,
+    MessageStoreService,
   ],
   exports: [MessageService],
   controllers: [MessageControlller],
