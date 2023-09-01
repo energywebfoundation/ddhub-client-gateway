@@ -6,6 +6,11 @@ import {
   SentMessageRepositoryWrapper,
   TopicEntity,
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
+import {
+  ConfigDto,
+  DdhubConfigService,
+} from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
+import moment from 'moment/moment';
 
 interface StoreSentMessage {
   initiatingMessageId?: string | null;
@@ -44,8 +49,45 @@ export class MessageStoreService {
 
   constructor(
     protected readonly receivedMessageRepositoryWrapper: ReceivedMessageRepositoryWrapper,
-    protected readonly sentMessageRepositoryWrapper: SentMessageRepositoryWrapper
+    protected readonly sentMessageRepositoryWrapper: SentMessageRepositoryWrapper,
+    protected readonly ddhubConfigService: DdhubConfigService
   ) {}
+
+  public async deleteExpiredMessages(): Promise<void> {
+    const config: ConfigDto = await this.ddhubConfigService.getConfig();
+
+    const expiresOn = moment().add(config.msgExpired, 'seconds').utc().toDate();
+
+    try {
+      this.logger.log('attempting to delete expired received messages');
+
+      await this.receivedMessageRepositoryWrapper.repository
+        .createQueryBuilder('message')
+        .delete()
+        .where('message.createdDate <= :expiresOn', { expiresOn })
+        .execute();
+
+      this.logger.log('deleted expired received messages');
+    } catch (e) {
+      this.logger.error('failed to delete expired received messages ');
+      this.logger.error(e);
+    }
+
+    try {
+      this.logger.log('attempting to delete expired sent messages');
+
+      await this.sentMessageRepositoryWrapper.repository
+        .createQueryBuilder('message')
+        .delete()
+        .where('message.createdDate <= :expiresOn', { expiresOn })
+        .execute();
+
+      this.logger.log('deleted sent messages');
+    } catch (e) {
+      this.logger.error('failed to delete sent messages');
+      this.logger.error(e);
+    }
+  }
 
   public async storeReceivedMessage(
     payload: StoreReceivedMessage[]

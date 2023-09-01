@@ -38,7 +38,7 @@ export class MessageListenerService implements OnApplicationBootstrap {
     );
 
     if (!isCronEnabled) {
-      this.logger.warn(`Refresh roles cron job is disabled`);
+      this.logger.warn(`Fetch messages cron job is disabled`);
 
       return;
     }

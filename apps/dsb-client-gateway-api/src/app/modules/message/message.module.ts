@@ -32,6 +32,7 @@ import { DdhubClientGatewayUtilsModule } from '@dsb-client-gateway/ddhub-client-
 import { ForceAssociationKeysRunHandler } from './handler/force-association-keys-run.handler';
 import { MessageListenerService } from './service/message-listener.service';
 import { MessageStoreService } from './service/message-store.service';
+import { MessagesCleanupService } from './service/messages-cleanup.service';
 
 @Module({
   imports: [
@@ -79,6 +80,7 @@ import { MessageStoreService } from './service/message-store.service';
     ReqLockService,
     ForceAssociationKeysRunHandler,
     MessageListenerService,
+    MessagesCleanupService,
     MessageStoreService,
   ],
   exports: [MessageService],
