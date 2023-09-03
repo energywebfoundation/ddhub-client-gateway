@@ -7,7 +7,10 @@ export class SentMessageEntity {
   clientGatewayMessageId: string;
 
   @Column({ nullable: true })
-  initiatingMessageId: string;
+  initiatingMessageId?: string;
+
+  @Column({ nullable: true })
+  initiatingTransactionId?: string;
 
   @ManyToOne(() => TopicEntity, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'topicId' })

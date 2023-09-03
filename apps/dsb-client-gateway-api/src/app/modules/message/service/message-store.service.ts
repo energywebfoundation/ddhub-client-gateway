@@ -14,6 +14,7 @@ import moment from 'moment/moment';
 
 interface StoreSentMessage {
   initiatingMessageId?: string | null;
+  initiatingTransactionId?: string | null;
   clientGatewayMessageId: string;
   topic: TopicEntity;
   transactionId: string | null;
@@ -30,7 +31,8 @@ interface StoreSentMessage {
 
 interface StoreReceivedMessage {
   messageId: string;
-  initiatingMessageId: string;
+  initiatingMessageId?: string | null;
+  initiatingTransactionId?: string | null;
   clientGatewayMessageId: string;
   topic: TopicEntity; // You would need to define the TopicEntity interface
   topicVersion: string;
@@ -100,6 +102,7 @@ export class MessageStoreService {
         entity.payload = item.payload;
         entity.signature = item.signature;
         entity.senderDid = item.senderDid;
+        entity.initiatingTransactionId = item.initiatingMessageId;
         entity.initiatingMessageId = item.initiatingMessageId;
         entity.clientGatewayMessageId = item.clientGatewayMessageId;
         entity.isFile = false;
@@ -122,6 +125,7 @@ export class MessageStoreService {
 
         entity.clientGatewayMessageId = item.clientGatewayMessageId;
         entity.initiatingMessageId = item.initiatingMessageId ?? null;
+        entity.initiatingTransactionId = item.initiatingTransactionId ?? null;
         entity.topic = item.topic;
         entity.topicVersion = item.topic.version;
         entity.transactionId = item.transactionId;

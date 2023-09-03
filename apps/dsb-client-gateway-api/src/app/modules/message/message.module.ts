@@ -10,9 +10,13 @@ import { SecretsEngineModule } from '@dsb-client-gateway/dsb-client-gateway-secr
 import { StorageModule } from '../storage/storage.module';
 import {
   AcksRepositoryModule,
+  ChannelRepositoryModule,
   CronRepositoryModule,
   FileMetadataRepositoryModule,
+  MessagesRepositoryModule,
+  ReceivedMessageRepositoryWrapper,
   ReqLockRepositoryModule,
+  SentMessageRepositoryWrapper,
   SymmetricKeysRepositoryModule,
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
 import { DdhubClientGatewayMessageBrokerModule } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
@@ -45,6 +49,7 @@ import { MessagesCleanupService } from './service/messages-cleanup.service';
     StorageModule,
     KeysModule,
     SymmetricKeysRepositoryModule,
+    ChannelRepositoryModule,
     MulterModule.registerAsync({
       useFactory: (configService: ConfigService) => {
         return {
@@ -70,6 +75,7 @@ import { MessagesCleanupService } from './service/messages-cleanup.service';
     DdhubClientGatewayAssociationKeysModule,
     CronRepositoryModule,
     DdhubClientGatewayUtilsModule,
+    MessagesRepositoryModule,
   ],
   providers: [
     EventsGateway,

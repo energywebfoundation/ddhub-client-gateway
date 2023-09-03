@@ -14,7 +14,10 @@ export class ReceivedMessageEntity {
   messageId: string;
 
   @Column({ nullable: true })
-  initiatingMessageId: string;
+  initiatingMessageId?: string;
+
+  @Column({ nullable: true })
+  initiatingTransactionId?: string;
 
   @Column()
   clientGatewayMessageId: string;

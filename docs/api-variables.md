@@ -31,6 +31,10 @@
 | MULTER_UPLOADS_PATH | string | uploads | Multer temporary file storage path |  |  |
 | APPLICATION_NAMESPACE_REGULAR_EXPRESSION | string | \w.apps.*\w.iam.ewc | Filter for application namespaces |  |  |
 | REQUEST_BODY_SIZE | string | 50mb | Maximum request size |  |  |
+| FETCH_MESSAGES_CRON_ENABLED | boolean | false | Enable fetch messages cron |  |  |
+| CLEANUP_MESSAGES_CRON_ENABLED | boolean | false | Enable cleanup cron |  |  |
+| FETCH_MESSAGES_CRON_SCHEDULE | string | */5 * * * * | CRON Expression for fetch messages |  |  |
+| CLEANUP_MESSAGES_CRON_SCHEDULE | string | */5 * * * * | CRON Expression for cleanup messages |  |  |
 | USE_CACHE | boolean | true | Should use cache |  |  |
 | SECRETS_ENGINE | string |  | Secrets engine to use | aws,vault,azure |  |
 | VAULT_ENDPOINT | string |  | Vault path |  | SECRETS_ENGINE == vault |

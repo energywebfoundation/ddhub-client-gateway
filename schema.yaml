@@ -119,7 +119,7 @@ paths:
       operationId: "ChannelController_getByType"
       parameters:
         - name: "type"
-          required: true
+          required: false
           in: "query"
           description: "Channel type"
           example: "sub"
@@ -130,6 +130,24 @@ paths:
               - "download"
               - "upload"
             type: "string"
+        - name: "useAnonymousExtChannel"
+          required: false
+          in: "query"
+          example: true
+          schema:
+            type: "boolean"
+        - name: "payloadEncryption"
+          required: false
+          in: "query"
+          example: true
+          schema:
+            type: "boolean"
+        - name: "messageForms"
+          required: false
+          in: "query"
+          example: true
+          schema:
+            type: "boolean"
       responses:
         200:
           description: "Gives channels based on type from query"
@@ -1180,6 +1198,11 @@ components:
           type: "boolean"
           description: "Use anonymous external channels"
           example: true
+        messageForms:
+          type: "boolean"
+          description: "Use anonymous external channels"
+          example: true
+          default: false
         payloadEncryption:
           type: "boolean"
           description: "Channel encryption"
@@ -1266,6 +1289,11 @@ components:
           type: "string"
           description: "Channel type"
           example: "channel.name"
+        messageForms:
+          type: "boolean"
+          description: "Message forms"
+          example: false
+          default: false
         payloadEncryption:
           type: "boolean"
           description: "Channel encryption"
@@ -1290,6 +1318,7 @@ components:
             - $ref: "#/components/schemas/ChannelConditions"
       required:
         - "fqcn"
+        - "messageForms"
         - "payloadEncryption"
         - "type"
         - "useAnonymousExtChannel"
@@ -1423,6 +1452,14 @@ components:
           type: "string"
           description: "Channel Name"
           example: "channel.name"
+        initiatingMessageId:
+          type: "string"
+          description: "Initiating message id"
+          example: "507f1f77bcf86cd799439011"
+        initiatingTransactionId:
+          type: "string"
+          description: "Initiating transaction id"
+          example: "8ac55aa7-7d6d-438a-98bd-376079903c7b"
         topicName:
           type: "string"
           description: "Topic name"
@@ -2038,6 +2075,8 @@ components:
             - "MESSAGE_CLEANER"
             - "CLIENTS"
             - "ASSOCIATION_KEYS_SHARE"
+            - "MESSAGES_FETCH"
+            - "CLEANUP_MESSAGES"
         latestStatus:
           type: "string"
           description: "CRON job status"
