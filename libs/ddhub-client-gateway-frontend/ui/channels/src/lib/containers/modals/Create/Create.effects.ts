@@ -114,6 +114,12 @@ export const useCreateChannelEffects = () => {
 
       if (detailsData.channelType !== ChannelType.Messaging) {
         detailsData.enableMessageForm = false;
+        delete channelValues.conditions.responseTopics;
+      } else if (
+        detailsData.channelType === ChannelType.Messaging &&
+        detailsData.connectionType === ConnectionType.Subscribe
+      ) {
+        delete channelValues.conditions.responseTopics;
       }
 
       setActiveStep(activeStep + 1);
@@ -125,13 +131,14 @@ export const useCreateChannelEffects = () => {
     }
   };
 
-  const setTopics = (data: Topic[]) => {
+  const setTopics = (data: any) => {
     setActiveStep(activeStep + 1);
     setChannelValues({
       ...channelValues,
       conditions: {
         ...channelValues.conditions,
-        topics: data,
+        topics: data.topics,
+        responseTopics: data.responseTopics,
       },
     });
   };
@@ -169,9 +176,20 @@ export const useCreateChannelEffects = () => {
 
   const channelSubmitHandler = () => {
     const values = channelValues;
-    const topicsData = values.conditions.topics.map((topic) =>
-      pick(topic, ['owner', 'topicName'])
-    );
+    const responseTopicsData: any = {};
+
+    const topicsData = values.conditions.topics.map((topic: Topic) => {
+      const respTopics = values.conditions.responseTopics[topic.id];
+
+      if (respTopics) {
+        responseTopicsData[topic.id] = respTopics.map((resTopic: Topic) =>
+          pick(resTopic, ['owner', 'topicName'])
+        );
+      }
+
+      return pick(topic, ['owner', 'topicName']);
+    });
+
     const rolesData = values.conditions.roles.sort();
 
     const channelCreateValues: CreateChannelDto = {
@@ -181,10 +199,11 @@ export const useCreateChannelEffects = () => {
         ...values.conditions,
         roles: rolesData,
         topics: topicsData,
+        responseTopics: responseTopicsData,
       },
       payloadEncryption: values.payloadEncryption,
       useAnonymousExtChannel: values.useAnonymousExtChannel,
-      // enableMessageForm: values.enableMessageForm, // todo: uncomment
+      enableMessageForm: values.enableMessageForm,
     };
 
     createChannelHandler(channelCreateValues, onCreate);

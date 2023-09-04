@@ -128,6 +128,8 @@ export const useDetailsEffects = (channelValues: ICreateChannel) => {
         setIsUseAnonExtChnl(!!value);
       } else if (name === FieldName.EnableMessageForm) {
         setIsEnableMsgForm(!!value);
+      } else if (name === FieldName.ChannelType) {
+        setShowMsgForm(value === ChannelType.Messaging);
       }
     });
     triggerValidation();

@@ -1,6 +1,6 @@
 import { Box } from '@mui/material';
 import { SelectedTopic } from '../SelectedTopic/SelectedTopic';
-import { Topic} from '../Topics.effects';
+import { Topic } from '../Topics.effects';
 import { useStyles } from './SelectedTopicList.styles';
 import { useSelectedTopicListEffects } from './SelectedTopicList.effects';
 
@@ -12,6 +12,9 @@ export interface SelectedTopicListProps {
   edit?: (oldTopic: Topic, newTopic: Topic) => void;
   filters: any[];
   recent: string;
+  showTopicResponse: boolean;
+  saveResponse?: (topics: Topic[], selectedTopicId: string) => void;
+  responseTopics?: any;
 }
 
 export const SelectedTopicList = ({
@@ -22,6 +25,9 @@ export const SelectedTopicList = ({
   filters,
   edit,
   recent,
+  showTopicResponse,
+  saveResponse,
+  responseTopics,
 }: SelectedTopicListProps) => {
   const { classes } = useStyles();
   const {
@@ -29,6 +35,7 @@ export const SelectedTopicList = ({
     selectedApplication,
     setSelectedApplication,
     topicsLoading,
+    filteredTopics,
   } = useSelectedTopicListEffects({
     filters,
     selectedTopics,
@@ -39,7 +46,8 @@ export const SelectedTopicList = ({
       {selectedTopics.map((topic, index) => (
         <SelectedTopic
           key={topic.topicName}
-          topicsList={availableTopics}
+          availableTopics={availableTopics}
+          topicsList={filteredTopics}
           selectedApplication={selectedApplication}
           setSelectedApplication={setSelectedApplication}
           topic={topic}
@@ -49,6 +57,9 @@ export const SelectedTopicList = ({
           topicsLoading={topicsLoading}
           canCopy={canCopy}
           edit={edit}
+          showTopicResponse={showTopicResponse}
+          saveResponse={saveResponse}
+          responseTopics={responseTopics[topic.id]}
           remove={() => {
             if (remove) {
               remove(topic);

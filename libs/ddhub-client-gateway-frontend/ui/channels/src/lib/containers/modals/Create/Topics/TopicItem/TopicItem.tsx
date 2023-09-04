@@ -12,7 +12,7 @@ export interface TopicItemProps {
 export const TopicItem = ({ listProps, option }: TopicItemProps) => {
   const { classes } = useStyles();
   return (
-    <Box component="li" {...listProps}>
+    <Box component="li" {...listProps} flexGrow={1}>
       <Grid container justifyContent="space-between" wrap="nowrap">
         <Grid item sx={{ width: '100%', maxWidth: 150 }}>
           <Typography noWrap className={classes.name}>

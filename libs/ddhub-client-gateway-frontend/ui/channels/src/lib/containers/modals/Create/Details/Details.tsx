@@ -12,7 +12,7 @@ import { useDetailsEffects } from './Details.effects';
 import { useStyles, CheckSwitch } from './Details.styles';
 
 export interface DetailsProps {
-  nextClick: (data) => void;
+  nextClick: (data: any) => void;
   channelValues: ICreateChannel;
   validFqcn: boolean;
 }

@@ -8,34 +8,6 @@ export const useStyles = makeStyles()((theme) => ({
     fontSize: 12,
     lineHeight: '18px',
   },
-  nameSecondary: {
-    color: theme.palette.common.white,
-    lineHeight: '21px',
-  },
-  owner: {
-    color: theme.palette.grey[300],
-    fontSize: 12,
-    lineHeight: '14px',
-    fontWeight: 405,
-    fontFamily: theme.typography.body2.fontFamily,
-    marginTop: 1.5,
-  },
-  close: {
-    width: 20,
-    height: 20,
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 0,
-    '& svg': {
-      stroke: theme.palette.warning.main,
-    },
-  },
-  copy: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   icon: {
     top: 8,
     right: 13,
@@ -79,38 +51,6 @@ export const useStyles = makeStyles()((theme) => ({
       borderRadius: 5,
     },
   },
-  appBox: {
-    border: '1px solid #373C4D',
-    borderRadius: 4,
-    background: '#343559',
-  },
-  appName: {
-    color: theme.palette.common.white,
-    fontSize: 12,
-    lineHeight: '18px',
-    fontWeight: 405,
-    fontFamily: theme.typography.body2.fontFamily,
-    padding: '3px 8px 5px 10px',
-  },
-  edit: {
-    padding: 0,
-    marginRight: 13,
-    width: 20,
-    height: 20,
-    '& svg': {
-      stroke: theme.palette.primary.main,
-    },
-  },
-  editInactive: {
-    '& svg': {
-      stroke: theme.palette.grey[500],
-    },
-  },
-  editActive: {
-    '& svg': {
-      stroke: theme.palette.text.secondary,
-    },
-  },
   optionTitle: {
     fontSize: 12,
     lineHeight: '14px',
@@ -120,6 +60,7 @@ export const useStyles = makeStyles()((theme) => ({
     fontWeight: 405,
   },
   topic: {
+    display: 'flex',
     padding: '8px 18px 14px 18px',
     borderBottom: '1px solid #404656',
     cursor: 'pointer',
@@ -130,7 +71,6 @@ export const useStyles = makeStyles()((theme) => ({
     '&:hover .MuiTypography-root': {
       color: theme.palette.primary.main,
     },
-
   },
   cancelButton: {
     height: 37,
@@ -143,7 +83,7 @@ export const useStyles = makeStyles()((theme) => ({
     '&:hover': {
       backgroundColor: alpha(theme.palette.primary.main, 0.04),
       border: `1px solid ${theme.palette.primary.main}`,
-    }
+    },
   },
   buttonText: {
     fontSize: 14,

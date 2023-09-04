@@ -59,6 +59,8 @@ export const Update = () => {
             channelValues={{
               topics: channelValues.conditions?.topics || [],
               channelType: channelValues.type,
+              responseTopics: channelValues.conditions?.responseTopics || {},
+              enableMessageForm: channelValues.enableMessageForm,
             }}
           />
         );

@@ -16,6 +16,8 @@ import { RestrictionListView } from '../Restrictions/RestrictionListView/Restric
 import { clone } from 'lodash';
 import { ConnectionType } from '../Details/models/connection-type.enum';
 import { ChannelType } from '../../../../models';
+import { Topic } from '../Topics/Topics.effects';
+import { SelectedTopicView } from '../Topics/SelectedTopicView/SelectedTopicView';
 
 export interface SummaryProps {
   channelValues: ICreateChannel;
@@ -81,14 +83,17 @@ export const Summary = ({
               </Typography>
             </Box>
           )}
-          {channelValues.conditions.topics?.map((el, index) => (
-            <RestrictionListView
-              wrapperProps={{
-                className: classes.restrictionBox,
-              }}
-              key={index}
-              item={el.topicName}
+
+          {channelValues.conditions.topics?.map((el: Topic, index) => (
+            <SelectedTopicView
+              topic={el}
+              canRemove={false}
+              isSummary={true}
               index={index}
+              showTopicResponse={
+                channelValues.type === 'pub' && channelValues.enableMessageForm
+              }
+              responseTopics={channelValues.conditions.responseTopics[el.id]}
             />
           ))}
         </Box>
@@ -169,9 +174,7 @@ export const Summary = ({
             </Typography>
             <Box display="flex">
               <Typography className={classes.encryptionValue} variant="body2">
-                {/*todo: uncomment*/}
-                {channelValues?.useAnonymousExtChannel ? (
-                  // {channelValues?.enableMessageForm ? (
+                {channelValues?.enableMessageForm ? (
                   <Check className={classes.iconCheck} />
                 ) : (
                   <X className={classes.iconX} />
