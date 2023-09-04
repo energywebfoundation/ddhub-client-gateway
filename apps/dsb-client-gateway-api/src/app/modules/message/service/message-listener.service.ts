@@ -112,6 +112,7 @@ export class MessageListenerService implements OnApplicationBootstrap {
 
                   return {
                     topic,
+                    fqcn: channel.fqcn,
                     initiatingMessageId: 'TODO',
                     payload: messageResponse.payload,
                     transactionId: messageResponse.transactionId,

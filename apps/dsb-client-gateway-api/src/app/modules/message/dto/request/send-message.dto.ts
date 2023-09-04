@@ -24,7 +24,7 @@ export class SendMessageDto {
   fqcn: string;
 
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   @ApiProperty({
     description: 'Initiating message id',
     type: String,

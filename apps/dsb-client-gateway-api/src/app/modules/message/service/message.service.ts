@@ -190,6 +190,14 @@ export class MessageService {
         messageLoggerContext.log(
           `message sent with id ${detail.messageId} to ${detail.did} with status code ${detail.statusCode}`
         );
+
+        await this.messageStoreService.storeRecipients(
+          detail.did,
+          detail.messageId,
+          'todo',
+          detail.statusCode ?? 200,
+          clientGatewayMessageId
+        );
       }
     }
 
@@ -717,6 +725,7 @@ export class MessageService {
 
                 return {
                   topic,
+                  fqcn,
                   initiatingMessageId: 'TODO',
                   payload: messageResponse.payload,
                   transactionId: messageResponse.transactionId,

@@ -15,6 +15,7 @@ import {
   SentMessageRepository,
 } from './repository';
 import {
+  ReceivedMessageMappingRepositoryWrapper,
   ReceivedMessageReadStatusRepositoryWrapper,
   ReceivedMessageRepositoryWrapper,
   SentMessageRecipientRepositoryWrapper,
@@ -41,14 +42,14 @@ import {
     SentMessageRecipientRepositoryWrapper,
     SentMessageRepositoryWrapper,
     ReceivedMessageRepositoryWrapper,
-    ReceivedMessageReadStatusRepositoryWrapper,
+    ReceivedMessageMappingRepositoryWrapper,
   ],
   exports: [
     ReceivedMessageReadStatusRepositoryWrapper,
     SentMessageRecipientRepositoryWrapper,
     SentMessageRepositoryWrapper,
     ReceivedMessageRepositoryWrapper,
-    ReceivedMessageReadStatusRepositoryWrapper,
+    ReceivedMessageMappingRepositoryWrapper,
   ],
 })
 export class MessagesRepositoryModule {}

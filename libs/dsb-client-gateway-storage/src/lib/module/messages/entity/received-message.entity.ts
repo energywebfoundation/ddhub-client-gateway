@@ -22,9 +22,8 @@ export class ReceivedMessageEntity {
   @Column()
   clientGatewayMessageId: string;
 
-  @ManyToOne(() => TopicEntity, { onDelete: 'SET NULL' })
-  @JoinColumn({ name: 'topicId' })
-  topic: TopicEntity;
+  @Column({ nullable: false })
+  topicId: string;
 
   @Column()
   topicVersion: string;

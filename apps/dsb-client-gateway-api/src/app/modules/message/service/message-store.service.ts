@@ -1,8 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 import {
   ReceivedMessageEntity,
+  ReceivedMessageMappingRepositoryWrapper,
   ReceivedMessageRepositoryWrapper,
   SentMessageEntity,
+  SentMessageRecipientRepositoryWrapper,
   SentMessageRepositoryWrapper,
   TopicEntity,
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
@@ -40,6 +42,7 @@ interface StoreReceivedMessage {
   signature: string;
   senderDid: string;
   payloadEncryption: boolean;
+  fqcn: string;
   payload: string;
   timestampNanos: Date;
   isFile: boolean;
@@ -52,7 +55,9 @@ export class MessageStoreService {
   constructor(
     protected readonly receivedMessageRepositoryWrapper: ReceivedMessageRepositoryWrapper,
     protected readonly sentMessageRepositoryWrapper: SentMessageRepositoryWrapper,
-    protected readonly ddhubConfigService: DdhubConfigService
+    protected readonly ddhubConfigService: DdhubConfigService,
+    protected readonly sentMessageRecipientsRepositoryWrapper: SentMessageRecipientRepositoryWrapper,
+    protected readonly receivedMessageMappingRepositoryWrapper: ReceivedMessageMappingRepositoryWrapper
   ) {}
 
   public async deleteExpiredMessages(): Promise<void> {
@@ -94,28 +99,61 @@ export class MessageStoreService {
   public async storeReceivedMessage(
     payload: StoreReceivedMessage[]
   ): Promise<void> {
-    const entities: ReceivedMessageEntity[] = await Promise.all(
-      payload.map(async (item: StoreReceivedMessage) => {
-        const entity = new ReceivedMessageEntity();
+    const entities: Array<{ entity: ReceivedMessageEntity; fqcn: string }> =
+      await Promise.all(
+        payload.map(async (item: StoreReceivedMessage) => {
+          const entity = new ReceivedMessageEntity();
 
-        entity.messageId = item.messageId;
-        entity.payload = item.payload;
-        entity.signature = item.signature;
-        entity.senderDid = item.senderDid;
-        entity.initiatingTransactionId = item.initiatingMessageId;
-        entity.initiatingMessageId = item.initiatingMessageId;
-        entity.clientGatewayMessageId = item.clientGatewayMessageId;
-        entity.isFile = false;
-        entity.payloadEncryption = item.payloadEncryption;
-        entity.topic = item.topic;
-        entity.transactionId = item.transactionId;
-        entity.topicVersion = item.topic.version;
+          entity.messageId = item.messageId;
+          entity.payload = item.payload;
+          entity.signature = item.signature;
+          entity.senderDid = item.senderDid;
+          entity.initiatingTransactionId = item.initiatingMessageId;
+          entity.initiatingMessageId = item.initiatingMessageId;
+          entity.clientGatewayMessageId = item.clientGatewayMessageId;
+          entity.isFile = false;
+          entity.payloadEncryption = item.payloadEncryption;
+          entity.transactionId = item.transactionId;
+          entity.topicId = item.topic.id;
+          entity.topicVersion = item.topic.version;
 
-        return entity;
-      })
+          return { entity, fqcn: item.fqcn };
+        })
+      );
+
+    await this.receivedMessageRepositoryWrapper.repository.save(
+      entities.map((entity) => entity.entity)
     );
 
-    await this.receivedMessageRepositoryWrapper.repository.save(entities);
+    for (const entity of entities) {
+      await this.receivedMessageMappingRepositoryWrapper.repository.save({
+        message: entity.entity,
+        fqcn: entity.fqcn,
+      });
+    }
+  }
+
+  public async storeRecipients(
+    did: string,
+    messageId: string,
+    status: string,
+    statusCode: string | number,
+    clientGatewayMessageId: string
+  ): Promise<void> {
+    await this.sentMessageRecipientsRepositoryWrapper.repository
+      .save({
+        messageId,
+        recipientDid: did,
+        status: status,
+        statusCode: +statusCode,
+        clientGatewayMessageId,
+      })
+      .catch((e) => {
+        this.logger.error(
+          `failed to store recipient messageId: ${messageId}, did: ${did}`
+        );
+        this.logger.error(e);
+      });
   }
 
   public async storeSentMessage(payload: StoreSentMessage[]): Promise<void> {
@@ -126,10 +164,10 @@ export class MessageStoreService {
         entity.clientGatewayMessageId = item.clientGatewayMessageId;
         entity.initiatingMessageId = item.initiatingMessageId ?? null;
         entity.initiatingTransactionId = item.initiatingTransactionId ?? null;
-        entity.topic = item.topic;
-        entity.topicVersion = item.topic.version;
         entity.transactionId = item.transactionId;
         entity.signature = item.signature;
+        entity.topicVersion = item.topic.version;
+        entity.topicId = item.topic.id;
         entity.payloadEncryption = item.payloadEncryption;
         entity.payload = item.payload;
         entity.timestampNanos = item.timestampNanos;

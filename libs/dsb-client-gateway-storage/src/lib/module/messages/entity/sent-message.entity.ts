@@ -1,5 +1,5 @@
 import { Entity, PrimaryColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
-import { TopicEntity } from '@dsb-client-gateway/dsb-client-gateway-storage';
+import { TopicEntity } from '../../topic';
 
 @Entity('sent_messages')
 export class SentMessageEntity {
@@ -12,9 +12,8 @@ export class SentMessageEntity {
   @Column({ nullable: true })
   initiatingTransactionId?: string;
 
-  @ManyToOne(() => TopicEntity, { onDelete: 'SET NULL' })
-  @JoinColumn({ name: 'topicId' })
-  topic: TopicEntity;
+  @Column({ nullable: false })
+  topicId: string;
 
   @Column()
   topicVersion: string;
