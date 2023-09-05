@@ -59,7 +59,7 @@ export const SelectedTopicList = ({
           edit={edit}
           showTopicResponse={showTopicResponse}
           saveResponse={saveResponse}
-          responseTopics={responseTopics[topic.id]}
+          responseTopics={responseTopics[topic.id ?? topic.topicId]}
           remove={() => {
             if (remove) {
               remove(topic);

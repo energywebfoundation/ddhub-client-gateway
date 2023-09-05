@@ -157,29 +157,26 @@ export const Update = () => {
                 </Stack>
               )}
               {getChannelType(channel.type) === ChannelType.Messaging && (
-                <>
-                  {/*todo: update values*/}
-                  <Stack direction="row" mt={0.5}>
+                <Stack direction="row" mt={0.5}>
+                  <Typography
+                    className={classes.encryptionLabel}
+                    variant="body2"
+                  >
+                    Enable Message Form:
+                  </Typography>
+                  <Box display="flex">
                     <Typography
-                      className={classes.encryptionLabel}
+                      className={classes.encryptionValue}
                       variant="body2"
                     >
-                      Enable Message Form:
+                      {channelValues?.enableMessageForm ? (
+                        <Check className={classes.iconCheck} />
+                      ) : (
+                        <X className={classes.iconX} />
+                      )}
                     </Typography>
-                    <Box display="flex">
-                      <Typography
-                        className={classes.encryptionValue}
-                        variant="body2"
-                      >
-                        {channelValues?.useAnonymousExtChannel ? (
-                          <Check className={classes.iconCheck} />
-                        ) : (
-                          <X className={classes.iconX} />
-                        )}
-                      </Typography>
-                    </Box>
-                  </Stack>
-                </>
+                  </Box>
+                </Stack>
               )}
             </Box>
           )}

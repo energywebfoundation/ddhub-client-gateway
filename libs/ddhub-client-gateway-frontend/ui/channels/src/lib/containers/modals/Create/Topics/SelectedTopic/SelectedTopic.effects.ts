@@ -78,7 +78,8 @@ export const useSelectedTopicEffects = ({
 
   const handleSubmitForm = () => {
     if (isResponse) {
-      saveResponse(selected, editTopic.id);
+      const selectedTopicId = editTopic.id ?? editTopic.topicId;
+      saveResponse(selected, selectedTopicId);
     } else {
       edit(editTopic, updatedTopic);
     }
