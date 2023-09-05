@@ -1,6 +1,6 @@
 import { ChannelType, Restrictions, RestrictionsProps } from '../components';
 import { didFormatMinifier } from '@ddhub-client-gateway-frontend/ui/utils';
-import { ChannelConfig } from '../components/ChannelConfig';
+import { ChannelConfig, ChannelConfigProps } from '../components/ChannelConfig';
 
 export const CHANNELS_HEADERS = [
   {
@@ -17,10 +17,8 @@ export const CHANNELS_HEADERS = [
   },
   {
     Header: 'ENABLED CONFIG',
-    accessor: 'conditions.topics',
-    Cell: ({ value }: Omit<RestrictionsProps, 'type'>) => (
-      <ChannelConfig value={value} />
-    ),
+    accessor: 'enabledConfigs',
+    Cell: ({ value }: ChannelConfigProps) => <ChannelConfig value={value} />,
   },
   {
     Header: 'RESTRICTIONS DID',
