@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import {
   AcksEntity,
+  AddressBookEntity,
   ApplicationEntity,
   AssociationKeyEntity,
   ChannelEntity,
@@ -47,6 +48,7 @@ const ENTITIES = [
   ReceivedMessageReadStatusEntity,
   SentMessageEntity,
   SentMessageRecipientEntity,
+  AddressBookEntity,
 ];
 
 @Module({
