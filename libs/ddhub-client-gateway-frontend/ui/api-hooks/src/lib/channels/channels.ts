@@ -20,7 +20,21 @@ export const useChannels = (params?: ChannelControllerGetByTypeParams) => {
     }
   );
 
-  const channels: GetChannelResponseDto[] = data ?? [];
+  let channels = [] as GetChannelResponseDto[];
+
+  if (data) {
+    channels = data.map((channel) => {
+      return {
+        ...channel,
+        enabledConfigs: {
+          payloadEncryption: channel.payloadEncryption,
+          useAnonymousExtChannel: channel.useAnonymousExtChannel,
+          enableMessageForm: channel.enableMessageForm,
+        },
+      };
+    });
+  }
+
   const channelsByName = keyBy(channels, 'fqcn');
   const channelsLoaded = data !== undefined && isSuccess && !isError;
 
