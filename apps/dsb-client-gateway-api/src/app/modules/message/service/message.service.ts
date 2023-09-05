@@ -63,6 +63,7 @@ import {
   AssociationKeysService,
 } from '@dsb-client-gateway/ddhub-client-gateway-association-keys';
 import { MessageStoreService } from './message-store.service';
+import { OfflineMessagesService } from './offline-messages.service';
 
 export enum EventEmitMode {
   SINGLE = 'SINGLE',
@@ -91,7 +92,8 @@ export class MessageService {
     protected readonly reqLockService: ReqLockService,
     protected readonly pendingAcksWrapperRepository: PendingAcksWrapperRepository,
     protected readonly associationKeysService: AssociationKeysService,
-    protected readonly messageStoreService: MessageStoreService
+    protected readonly messageStoreService: MessageStoreService,
+    protected readonly offlineMessagesService: OfflineMessagesService
   ) {
     this.uploadPath = configService.get<string>('UPLOAD_FILES_DIR');
     this.downloadPath = configService.get<string>('DOWNLOAD_FILES_DIR');
@@ -566,11 +568,21 @@ export class MessageService {
     }
   }
 
+  @Span('message_getOfflineMessages')
+  public async getOfflineMessages(
+    dto: GetMessagesDto
+  ): Promise<GetMessageResponse[]> {
+    return this.offlineMessagesService.getOfflineMessages(dto);
+  }
+
   @Span('message_getMessages')
   public async getMessages(
-    { fqcn, from, amount, topicName, topicOwner, clientId }: GetMessagesDto,
+    getMessagesDto: GetMessagesDto,
     ack: boolean | undefined = true
   ): Promise<GetMessageResponse[]> {
+    const { fqcn, from, amount, topicName, topicOwner, clientId } =
+      getMessagesDto;
+
     const loggerContextKey: string = `${MessageService.name}_${fqcn}_${topicName}_${topicOwner}_${clientId};`;
 
     const messageLoggerContext = new Logger(loggerContextKey);
@@ -580,6 +592,12 @@ export class MessageService {
     const channel: ChannelEntity = await this.channelService.getChannelOrThrow(
       fqcn
     );
+
+    if (channel.messageForms) {
+      this.logger.log('handling message forms channel');
+
+      return this.getOfflineMessages(getMessagesDto);
+    }
 
     const topicsIds: string[] = await this.getTopicsIds(
       channel,

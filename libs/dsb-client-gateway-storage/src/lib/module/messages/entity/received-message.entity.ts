@@ -25,6 +25,17 @@ export class ReceivedMessageEntity {
   @Column({ nullable: false })
   topicId: string;
 
+  @Column({ nullable: false })
+  fqcn: string;
+
+  @Column({ nullable: false })
+  topicName: string;
+
+  @Column({
+    nullable: false,
+  })
+  topicOwner: string;
+
   @Column()
   topicVersion: string;
 

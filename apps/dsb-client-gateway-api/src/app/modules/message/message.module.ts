@@ -37,6 +37,7 @@ import { ForceAssociationKeysRunHandler } from './handler/force-association-keys
 import { MessageListenerService } from './service/message-listener.service';
 import { MessageStoreService } from './service/message-store.service';
 import { MessagesCleanupService } from './service/messages-cleanup.service';
+import { OfflineMessagesService } from './service/offline-messages.service';
 
 @Module({
   imports: [
@@ -88,6 +89,7 @@ import { MessagesCleanupService } from './service/messages-cleanup.service';
     MessageListenerService,
     MessagesCleanupService,
     MessageStoreService,
+    OfflineMessagesService,
   ],
   exports: [MessageService],
   controllers: [MessageControlller],
