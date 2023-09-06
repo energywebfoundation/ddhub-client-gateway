@@ -23,6 +23,7 @@ import { useStyles } from './Details.styles';
 import { VIEW_STEPS } from '../Create/Steps/models/viewSteps';
 import { includes } from 'lodash';
 import { ChannelType } from '../../../models';
+import { CreateChannelDtoType } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 
 export const Details: FC = () => {
   const { classes } = useStyles();
@@ -66,9 +67,14 @@ export const Details: FC = () => {
         );
       case 1:
         return (
-          <Box>
-            <Topics topics={channel.conditions?.topics} />
-          </Box>
+          <Topics
+            topics={channel.conditions?.topics}
+            responseTopics={channel.conditions?.responseTopics}
+            showResponseTopics={
+              channel.type === CreateChannelDtoType.pub &&
+              channel.enableMessageForm
+            }
+          />
         );
       default:
         return null;

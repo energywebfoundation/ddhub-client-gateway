@@ -10,6 +10,7 @@ export const useStyles = makeStyles()((theme) => ({
   },
   topic: {
     display: 'flex',
+    flexDirection: 'column',
     cursor: 'pointer',
     padding: '4px 16px 7px 12px',
     justifyContent: 'space-between',
@@ -18,6 +19,18 @@ export const useStyles = makeStyles()((theme) => ({
     },
     '&:hover': {
       backgroundColor: alpha(theme.palette.primary.main, 0.12),
+    },
+    borderRadius: '6px',
+    border: '1px solid #404656',
+    marginBottom: '9px',
+  },
+  accordion: {
+    padding: 0,
+    width: 20,
+    height: 20,
+    alignSelf: 'center',
+    '& svg': {
+      stroke: theme.palette.text.secondary,
     },
   },
   topicLabel: {
@@ -60,5 +73,5 @@ export const useStyles = makeStyles()((theme) => ({
   },
   paginationRoot: {
     borderBottom: 'none',
-  }
+  },
 }));

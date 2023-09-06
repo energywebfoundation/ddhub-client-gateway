@@ -1,13 +1,4 @@
-import {
-  Grid,
-  Typography,
-  IconButton,
-  Box,
-  Tooltip,
-  Collapse,
-  Chip,
-  Stack,
-} from '@mui/material';
+import { Grid, Typography, IconButton, Box, Tooltip } from '@mui/material';
 import {
   Edit3,
   X as Close,
@@ -21,6 +12,7 @@ import clsx from 'clsx';
 import { useStyles } from '../SelectedTopicView/SelectedTopicView.styles';
 import { Topic } from '../Topics.effects';
 import { useSelectedTopicViewEffects } from './SelectedTopicView.effects';
+import { SelectedTopicsCollapse } from './ResponseTopicsCollapse/ResponseTopicsCollapse';
 
 export interface SelectedTopicViewProps {
   topic: Topic;
@@ -159,31 +151,10 @@ export const SelectedTopicView = ({
           )}
         </Grid>
       </Grid>
-      <Collapse in={expandResponse}>
-        <Grid item width="100%" ml="2px" mt="8px">
-          <Stack direction="row" spacing="6px">
-            {(!responseTopics || !responseTopics.length) && (
-              <Box className={classes.noRecord}>
-                <Typography className={classes.noRecordLabel}>
-                  No response topic added
-                </Typography>
-              </Box>
-            )}
-            {responseTopics &&
-              responseTopics.map((item, index) => (
-                <Chip
-                  key={index}
-                  color="primary"
-                  label={item.topicName}
-                  className={classes.chip}
-                  classes={{
-                    label: classes.chipLabel,
-                  }}
-                />
-              ))}
-          </Stack>
-        </Grid>
-      </Collapse>
+      <SelectedTopicsCollapse
+        responseTopics={responseTopics}
+        expandResponse={expandResponse}
+      />
     </Grid>
   );
 };

@@ -82,28 +82,4 @@ export const useStyles = makeStyles()((theme) => ({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  noRecord: {
-    background: alpha(theme.palette.info.main, 0.12),
-    borderRadius: 4,
-    marginTop: 9,
-  },
-  noRecordLabel: {
-    fontFamily: theme.typography.body2.fontFamily,
-    fontSize: 12,
-    lineHeight: '21px',
-    color: theme.palette.info.main,
-    padding: '9px 14px 10px 14px',
-  },
-  chip: {
-    background: theme.palette.primary.main,
-    height: 20,
-    borderRadius: 4,
-  },
-  chipLabel: {
-    fontSize: 10,
-    lineHeight: '18px',
-    fontWeight: 405,
-    color: theme.palette.common.white,
-    fontFamily: theme.typography.body2.fontFamily,
-  },
 }));
