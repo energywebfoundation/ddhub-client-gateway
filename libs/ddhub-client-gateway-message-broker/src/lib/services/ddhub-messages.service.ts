@@ -220,6 +220,8 @@ export class DdhubMessagesService extends DdhubBaseService {
       signature,
       clientGatewayMessageId,
       payloadEncryption,
+      initiatingMessageId,
+      initiatingTransactionId,
       anonymousRecipient: anonymousRecipient.length
         ? anonymousRecipient
         : undefined,

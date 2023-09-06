@@ -108,6 +108,7 @@ export class MessageStoreService {
           entity.payload = item.payload;
           entity.signature = item.signature;
           entity.senderDid = item.senderDid;
+          entity.fqcn = item.fqcn;
           entity.initiatingTransactionId = item.initiatingMessageId;
           entity.initiatingMessageId = item.initiatingMessageId;
           entity.clientGatewayMessageId = item.clientGatewayMessageId;
@@ -164,6 +165,7 @@ export class MessageStoreService {
         entity.clientGatewayMessageId = item.clientGatewayMessageId;
         entity.initiatingMessageId = item.initiatingMessageId ?? null;
         entity.initiatingTransactionId = item.initiatingTransactionId ?? null;
+        entity.senderDid = item.senderDid;
         entity.transactionId = item.transactionId;
         entity.signature = item.signature;
         entity.topicVersion = item.topic.version;

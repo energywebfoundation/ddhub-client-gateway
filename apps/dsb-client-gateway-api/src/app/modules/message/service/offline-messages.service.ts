@@ -14,14 +14,24 @@ import { KeysService } from '../../keys/service/keys.service';
 @Injectable()
 export class OfflineMessagesService {
   constructor(
-    protected readonly receivedMessagesService: ReceivedMessageRepositoryWrapper,
+    protected readonly receivedMessageRepositoryWrapper: ReceivedMessageRepositoryWrapper,
     protected readonly keysService: KeysService
   ) {}
 
   public async getOfflineMessages(
-    dto: GetMessagesDto
+    dto: Partial<GetMessagesDto>
   ): Promise<GetMessageResponse[]> {
-    const { fqcn, from, amount, topicName, topicOwner, clientId } = dto;
+    const {
+      initiatingTransactionId,
+      initiatingMessageId,
+      fqcn,
+      from,
+      amount,
+      topicName,
+      topicOwner,
+      clientId,
+      messageId,
+    } = dto;
 
     const whereQuery: FindConditions<ReceivedMessageEntity> = {};
 
@@ -41,13 +51,26 @@ export class OfflineMessagesService {
       whereQuery.topicName = topicName;
     }
 
-    const messages = await this.receivedMessagesService.repository.find({
-      where: whereQuery,
-      order: {
-        timestampNanos: 'DESC',
-      },
-      take: amount ?? 3,
-    });
+    if (initiatingMessageId) {
+      whereQuery.initiatingMessageId = initiatingMessageId;
+    }
+
+    if (initiatingTransactionId) {
+      whereQuery.initiatingTransactionId = initiatingTransactionId;
+    }
+
+    if (messageId) {
+      whereQuery.messageId = messageId;
+    }
+
+    const messages =
+      await this.receivedMessageRepositoryWrapper.repository.find({
+        where: whereQuery,
+        order: {
+          timestampNanos: 'DESC',
+        },
+        take: amount ?? 3,
+      });
 
     // @TODO - apply read status, exclude read messages from above query
     // do we need to respect clientId?
@@ -68,6 +91,21 @@ export class OfflineMessagesService {
             message.payload,
             prefetchedSignatureKeys[message.senderDid]
           );
+
+        const relatedMessages =
+          await this.receivedMessageRepositoryWrapper.repository
+            .createQueryBuilder('m')
+            .where(
+              'm.initiatingMessageId = :initiatingMessageId AND m.initiatingTransactionId = :initiatingTransactionId',
+              {
+                initiatingMessageId: message.initiatingMessageId,
+                initiatingTransactionId: message.initiatingMessageId,
+              }
+            )
+            .andWhere('m.messageId != :messageId', {
+              messageId: message.messageId,
+            })
+            .getMany();
 
         return {
           topicOwner: message.topicOwner,

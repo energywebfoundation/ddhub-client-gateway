@@ -33,6 +33,9 @@ export class SentMessageEntity {
   @Column()
   timestampNanos: Date;
 
+  @Column()
+  senderDid: string;
+
   @Column({ default: false })
   isFile: boolean;
 

@@ -64,6 +64,8 @@ import {
 } from '@dsb-client-gateway/ddhub-client-gateway-association-keys';
 import { MessageStoreService } from './message-store.service';
 import { OfflineMessagesService } from './offline-messages.service';
+import { IdentityService } from '@dsb-client-gateway/ddhub-client-gateway-identity';
+import { IamService } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
 
 export enum EventEmitMode {
   SINGLE = 'SINGLE',
@@ -93,7 +95,8 @@ export class MessageService {
     protected readonly pendingAcksWrapperRepository: PendingAcksWrapperRepository,
     protected readonly associationKeysService: AssociationKeysService,
     protected readonly messageStoreService: MessageStoreService,
-    protected readonly offlineMessagesService: OfflineMessagesService
+    protected readonly offlineMessagesService: OfflineMessagesService,
+    protected readonly iamService: IamService
   ) {
     this.uploadPath = configService.get<string>('UPLOAD_FILES_DIR');
     this.downloadPath = configService.get<string>('DOWNLOAD_FILES_DIR');
@@ -209,7 +212,8 @@ export class MessageService {
       await this.messageStoreService
         .storeSentMessage([
           {
-            initiatingMessageId: 'TODO',
+            initiatingMessageId: dto.initiatingMessageId,
+            initiatingTransactionId: dto.initiatingTransactionId,
             payload: dto.payload,
             topic,
             clientGatewayMessageId: clientGatewayMessageId,
@@ -217,7 +221,7 @@ export class MessageService {
             signature: signature,
             transactionId: dto.transactionId,
             payloadEncryption: shouldEncrypt,
-            senderDid: 'todo',
+            senderDid: this.iamService.getDIDAddress(),
             timestampNanos: new Date(),
             totalFailed: result.recipients.failed,
             totalSent: result.recipients.sent,
@@ -531,7 +535,14 @@ export class MessageService {
 
   @Span('message_getMessages_reqLock')
   public async getMessagesWithReqLock(
-    { fqcn, from, amount, topicName, topicOwner, clientId }: GetMessagesDto,
+    {
+      fqcn,
+      from,
+      amount,
+      topicName,
+      topicOwner,
+      clientId,
+    }: Partial<GetMessagesDto>,
     ack: boolean | undefined = true
   ): Promise<GetMessageResponse[]> {
     const usableClientId: string = clientId ? clientId : 'DEFAULT';
@@ -570,15 +581,16 @@ export class MessageService {
 
   @Span('message_getOfflineMessages')
   public async getOfflineMessages(
-    dto: GetMessagesDto
+    dto: Partial<GetMessagesDto>
   ): Promise<GetMessageResponse[]> {
     return this.offlineMessagesService.getOfflineMessages(dto);
   }
 
   @Span('message_getMessages')
   public async getMessages(
-    getMessagesDto: GetMessagesDto,
-    ack: boolean | undefined = true
+    getMessagesDto: Partial<GetMessagesDto>,
+    ack: boolean | undefined = true,
+    cronMode: boolean = false
   ): Promise<GetMessageResponse[]> {
     const { fqcn, from, amount, topicName, topicOwner, clientId } =
       getMessagesDto;
@@ -593,7 +605,10 @@ export class MessageService {
       fqcn
     );
 
-    if (channel.messageForms) {
+    const shouldFetchOffline: boolean =
+      cronMode === false ? channel.messageForms : false;
+
+    if (shouldFetchOffline) {
       this.logger.log('handling message forms channel');
 
       return this.getOfflineMessages(getMessagesDto);
@@ -744,7 +759,9 @@ export class MessageService {
                 return {
                   topic,
                   fqcn,
-                  initiatingMessageId: 'TODO',
+                  initiatingMessageId: messageResponse.initiatingMessageId,
+                  initiatingTransactionId:
+                    messageResponse.initiatingTransactionId,
                   payload: messageResponse.payload,
                   transactionId: messageResponse.transactionId,
                   payloadEncryption: messageResponse.payloadEncryption,

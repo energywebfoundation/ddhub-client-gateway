@@ -87,14 +87,18 @@ export class MessageListenerService implements OnApplicationBootstrap {
       for (const channel of applicableChannels) {
         for (const channelTopic of channel.conditions.topics) {
           const messages: GetMessageResponse[] =
-            await this.messageService.getMessages({
-              amount: messagesToFetch,
-              fqcn: channel.fqcn,
-              clientId,
-              topicName: channelTopic.topicName,
-              topicOwner: channelTopic.owner,
-              from: undefined,
-            });
+            await this.messageService.getMessages(
+              {
+                amount: messagesToFetch,
+                fqcn: channel.fqcn,
+                clientId,
+                topicName: channelTopic.topicName,
+                topicOwner: channelTopic.owner,
+                from: undefined,
+              },
+              true,
+              true
+            );
 
           this.logger.log(
             `received ${messages.length} messages for channel ${channel.fqcn} and topic ${channelTopic.topicName}.${channelTopic.owner}`
@@ -113,7 +117,9 @@ export class MessageListenerService implements OnApplicationBootstrap {
                   return {
                     topic,
                     fqcn: channel.fqcn,
-                    initiatingMessageId: 'TODO',
+                    initiatingMessageId: messageResponse.initiatingMessageId,
+                    initiatingTransactionId:
+                      messageResponse.initiatingTransactionId,
                     payload: messageResponse.payload,
                     transactionId: messageResponse.transactionId,
                     payloadEncryption: messageResponse.payloadEncryption,

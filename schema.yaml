@@ -312,6 +312,27 @@ paths:
           description: "cursor for pointing to messages"
           schema:
             type: "string"
+        - name: "initiatingMessageId"
+          required: false
+          in: "query"
+          example: "507f191e810c19729de860ea"
+          description: "Initiating message id"
+          schema:
+            type: "string"
+        - name: "initiatingTransactionId"
+          required: false
+          in: "query"
+          example: "45d5a89f-7c2c-48b0-ae9a-54f4128e818f"
+          description: "Initiating transaction id"
+          schema:
+            type: "string"
+        - name: "messageId"
+          required: false
+          in: "query"
+          example: "507f191e810c19729de860ea"
+          description: "Message id"
+          schema:
+            type: "string"
       responses:
         200:
           description: "Message received successfully"
