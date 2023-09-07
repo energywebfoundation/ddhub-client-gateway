@@ -4,7 +4,10 @@ import {
 } from '@ddhub-client-gateway-frontend/ui/api-hooks';
 import { TTableComponentAction } from '@ddhub-client-gateway-frontend/ui/core';
 import { theme } from '@ddhub-client-gateway-frontend/ui/utils';
-import { GetChannelResponseDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
+import {
+  GetChannelResponseDto,
+  GetChannelResponseDtoType,
+} from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { ModalActionsEnum, useModalDispatch } from '../../context';
 
 export const useChannelListEffects = () => {
@@ -55,7 +58,11 @@ export const useChannelListEffects = () => {
       label: 'Remove',
       color: theme.palette.error.main,
       onClick: (channel: GetChannelResponseDto) =>
-        removeChannelHandler(channel.fqcn, true), // todo: check for flag enabled
+        removeChannelHandler(
+          channel.fqcn,
+          channel.enableMessageForm &&
+            channel.type === GetChannelResponseDtoType.pub
+        ),
     },
   ];
 
