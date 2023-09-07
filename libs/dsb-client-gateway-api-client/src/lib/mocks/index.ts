@@ -187,15 +187,6 @@ export const getChannelControllerGetByTypeMock = () => [
           topicId: '622fed6e4258501225095046',
         },
       ],
-      responseTopics: {
-        '622fed6e4258501225095046': [
-          {
-            topicName: 'operatorEnvelope',
-            owner: 'ddhub.apps.energyweb.iam.ewc',
-            topicId: '622fed6e4258501225095046',
-          },
-        ],
-      },
     },
   },
   {
