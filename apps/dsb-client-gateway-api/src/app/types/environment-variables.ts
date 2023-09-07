@@ -124,4 +124,16 @@ export const API_ENVS = Joi.object({
   REQUEST_BODY_SIZE: Joi.string()
     .default('50mb')
     .description('Maximum request size'),
+  FETCH_MESSAGES_CRON_ENABLED: Joi.boolean()
+    .default(false)
+    .description('Enable fetch messages cron'),
+  CLEANUP_MESSAGES_CRON_ENABLED: Joi.boolean()
+    .default(false)
+    .description('Enable cleanup cron'),
+  FETCH_MESSAGES_CRON_SCHEDULE: Joi.string()
+    .default('*/5 * * * *')
+    .description('CRON Expression for fetch messages'),
+  CLEANUP_MESSAGES_CRON_SCHEDULE: Joi.string()
+    .default('*/5 * * * *')
+    .description('CRON Expression for cleanup messages'),
 });

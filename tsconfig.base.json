@@ -56,6 +56,9 @@
       "@ddhub-client-gateway/identity/models": [
         "libs/ddhub-client-gateway-frontend/identity/models/src/index.ts"
       ],
+      "@dsb-client-gateway/ddhub-client-gateway-address-book": [
+        "libs/ddhub-client-gateway-address-book/src/index.ts"
+      ],
       "@dsb-client-gateway/ddhub-client-gateway-association-keys": [
         "libs/ddhub-client-gateway-association-keys/src/index.ts"
       ],

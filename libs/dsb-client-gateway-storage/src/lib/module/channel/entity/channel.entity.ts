@@ -51,6 +51,11 @@ export class ChannelEntity {
   })
   useAnonymousExtChannel: boolean;
 
+  @Column({
+    default: false,
+  })
+  messageForms: boolean;
+
   @IsEnum(ChannelType)
   @Column({
     enum: [

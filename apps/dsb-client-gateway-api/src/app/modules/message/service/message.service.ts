@@ -62,6 +62,10 @@ import {
   AssociationKeyNotAvailableException,
   AssociationKeysService,
 } from '@dsb-client-gateway/ddhub-client-gateway-association-keys';
+import { MessageStoreService } from './message-store.service';
+import { OfflineMessagesService } from './offline-messages.service';
+import { IdentityService } from '@dsb-client-gateway/ddhub-client-gateway-identity';
+import { IamService } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
 
 export enum EventEmitMode {
   SINGLE = 'SINGLE',
@@ -89,7 +93,10 @@ export class MessageService {
     protected readonly fileMetadataWrapper: FileMetadataWrapperRepository,
     protected readonly reqLockService: ReqLockService,
     protected readonly pendingAcksWrapperRepository: PendingAcksWrapperRepository,
-    protected readonly associationKeysService: AssociationKeysService
+    protected readonly associationKeysService: AssociationKeysService,
+    protected readonly messageStoreService: MessageStoreService,
+    protected readonly offlineMessagesService: OfflineMessagesService,
+    protected readonly iamService: IamService
   ) {
     this.uploadPath = configService.get<string>('UPLOAD_FILES_DIR');
     this.downloadPath = configService.get<string>('DOWNLOAD_FILES_DIR');
@@ -178,7 +185,9 @@ export class MessageService {
         clientGatewayMessageId,
         shouldEncrypt,
         dto.anonymousRecipient ?? [],
-        dto.transactionId
+        dto.transactionId,
+        dto.initiatingMessageId,
+        dto.initiatingTransactionId
       );
 
     for (const res of result.status) {
@@ -186,7 +195,43 @@ export class MessageService {
         messageLoggerContext.log(
           `message sent with id ${detail.messageId} to ${detail.did} with status code ${detail.statusCode}`
         );
+
+        await this.messageStoreService.storeRecipients(
+          detail.did,
+          detail.messageId,
+          'todo',
+          detail.statusCode ?? 200,
+          clientGatewayMessageId
+        );
       }
+    }
+
+    if (channel.messageForms) {
+      this.logger.debug(`attempting to store sent messages`);
+
+      await this.messageStoreService
+        .storeSentMessage([
+          {
+            initiatingMessageId: dto.initiatingMessageId,
+            initiatingTransactionId: dto.initiatingTransactionId,
+            payload: dto.payload,
+            topic,
+            clientGatewayMessageId: clientGatewayMessageId,
+            isFile: false,
+            signature: signature,
+            transactionId: dto.transactionId,
+            payloadEncryption: shouldEncrypt,
+            senderDid: this.iamService.getDIDAddress(),
+            timestampNanos: new Date(),
+            totalFailed: result.recipients.failed,
+            totalSent: result.recipients.sent,
+            totalRecipients: result.recipients.total,
+          },
+        ])
+        .catch((e) => {
+          this.logger.error(`failed to store sent message`);
+          this.logger.error(e);
+        });
     }
 
     return result;
@@ -310,6 +355,11 @@ export class MessageService {
         sender: message.senderDid,
         timestampNanos: message.timestampNanos,
         transactionId: message.transactionId,
+        initiatingMessageId: message.initiatingMessageId,
+        initiatingTransactionId: message.initiatingTransactionId,
+        payloadEncryption: message.payloadEncryption,
+        clientGatewayMessageId: message.clientGatewayMessageId,
+        topicId: message.topicId,
       };
 
     this.logger.log(`attempting to process message ${message.messageId}`);
@@ -485,7 +535,14 @@ export class MessageService {
 
   @Span('message_getMessages_reqLock')
   public async getMessagesWithReqLock(
-    { fqcn, from, amount, topicName, topicOwner, clientId }: GetMessagesDto,
+    {
+      fqcn,
+      from,
+      amount,
+      topicName,
+      topicOwner,
+      clientId,
+    }: Partial<GetMessagesDto>,
     ack: boolean | undefined = true
   ): Promise<GetMessageResponse[]> {
     const usableClientId: string = clientId ? clientId : 'DEFAULT';
@@ -522,11 +579,22 @@ export class MessageService {
     }
   }
 
+  @Span('message_getOfflineMessages')
+  public async getOfflineMessages(
+    dto: Partial<GetMessagesDto>
+  ): Promise<GetMessageResponse[]> {
+    return this.offlineMessagesService.getOfflineMessages(dto);
+  }
+
   @Span('message_getMessages')
   public async getMessages(
-    { fqcn, from, amount, topicName, topicOwner, clientId }: GetMessagesDto,
-    ack: boolean | undefined = true
+    getMessagesDto: Partial<GetMessagesDto>,
+    ack: boolean | undefined = true,
+    cronMode: boolean = false
   ): Promise<GetMessageResponse[]> {
+    const { fqcn, from, amount, topicName, topicOwner, clientId } =
+      getMessagesDto;
+
     const loggerContextKey: string = `${MessageService.name}_${fqcn}_${topicName}_${topicOwner}_${clientId};`;
 
     const messageLoggerContext = new Logger(loggerContextKey);
@@ -536,6 +604,15 @@ export class MessageService {
     const channel: ChannelEntity = await this.channelService.getChannelOrThrow(
       fqcn
     );
+
+    const shouldFetchOffline: boolean =
+      cronMode === false ? channel.messageForms : false;
+
+    if (shouldFetchOffline) {
+      this.logger.log('handling message forms channel');
+
+      return this.getOfflineMessages(getMessagesDto);
+    }
 
     const topicsIds: string[] = await this.getTopicsIds(
       channel,
@@ -610,6 +687,7 @@ export class MessageService {
     const rejected = messageResponses.filter(
       (value) => value.status === 'rejected'
     );
+
     if (rejected.length > 0) {
       messageLoggerContext.error(
         '[getMessages] Error while processing messages'
@@ -665,6 +743,49 @@ export class MessageService {
           idsPendingAck
         );
       }
+    }
+
+    if (channel.messageForms) {
+      this.logger.debug(`attempting to store received messages`);
+
+      await this.messageStoreService
+        .storeReceivedMessage(
+          await Promise.all(
+            fulfilledMessages.map(
+              async (messageResponse: GetMessageResponse) => {
+                const topic: TopicEntity | undefined =
+                  await this.topicService.getTopicById(messageResponse.topicId);
+
+                return {
+                  topic,
+                  fqcn,
+                  initiatingMessageId: messageResponse.initiatingMessageId,
+                  initiatingTransactionId:
+                    messageResponse.initiatingTransactionId,
+                  payload: messageResponse.payload,
+                  transactionId: messageResponse.transactionId,
+                  payloadEncryption: messageResponse.payloadEncryption,
+                  clientGatewayMessageId:
+                    messageResponse.clientGatewayMessageId,
+                  messageId: messageResponse.id,
+                  senderDid: messageResponse.sender,
+                  signature: messageResponse.signature,
+                  isFile: false,
+                  timestampNanos: moment(
+                    messageResponse.timestampNanos / (1000 * 1000)
+                  )
+                    .utc()
+                    .toDate(),
+                  topicVersion: topic.version,
+                };
+              }
+            )
+          )
+        )
+        .catch((e) => {
+          this.logger.error(`failed to store received messages`);
+          this.logger.error(e);
+        });
     }
 
     return fulfilledMessages.sort((a, b) => {

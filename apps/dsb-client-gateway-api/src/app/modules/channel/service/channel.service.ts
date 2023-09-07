@@ -13,6 +13,7 @@ import { Span } from 'nestjs-otel';
 import {
   ChannelEntity,
   ChannelWrapperRepository,
+  QueryChannels,
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
 import { TopicNotFoundException } from '../exceptions/topic-not-found.exception';
 import {
@@ -63,6 +64,7 @@ export class ChannelService {
     await this.wrapperRepository.channelRepository.save({
       fqcn: payload.fqcn,
       type: payload.type,
+      messageForms: payload.messageForms,
       useAnonymousExtChannel: payload.useAnonymousExtChannel,
       payloadEncryption: payload.payloadEncryption,
       conditions: {
@@ -250,7 +252,7 @@ export class ChannelService {
   }
 
   @Span('channels_getChannelsByType')
-  public async getChannelsByType(type?: ChannelType): Promise<ChannelEntity[]> {
-    return this.wrapperRepository.channelRepository.getChannelsByType(type);
+  public async queryChannels(query: QueryChannels): Promise<ChannelEntity[]> {
+    return this.wrapperRepository.fetch(query);
   }
 }
