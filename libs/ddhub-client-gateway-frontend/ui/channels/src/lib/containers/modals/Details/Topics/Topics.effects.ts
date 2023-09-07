@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
-import { ChannelTopic, GetTopicSearchDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
+import {
+  ChannelTopic,
+  GetTopicSearchDto,
+} from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { ModalActionsEnum, useModalDispatch } from '../../../../context';
 import { useApplications } from '@ddhub-client-gateway-frontend/ui/api-hooks';
 
@@ -7,6 +10,9 @@ export const useTopicsEffects = () => {
   const dispatch = useModalDispatch();
   const { applicationsByNamespace } = useApplications('user');
   const [page, setPage] = useState(0);
+  const [expandResponse, setExpandResponse] = useState<{
+    [index: string]: boolean;
+  }>({});
 
   const hideModal = () => {
     dispatch({
@@ -27,7 +33,7 @@ export const useTopicsEffects = () => {
         data: {
           topic: data,
           application,
-          versions: [] as GetTopicSearchDto[]
+          versions: [] as GetTopicSearchDto[],
         },
       },
     });
@@ -35,7 +41,7 @@ export const useTopicsEffects = () => {
 
   const handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
-    newPage: number,
+    newPage: number
   ) => {
     setPage(newPage);
   };
@@ -44,5 +50,7 @@ export const useTopicsEffects = () => {
     openTopicDetails,
     page,
     handleChangePage,
+    expandResponse,
+    setExpandResponse,
   };
 };

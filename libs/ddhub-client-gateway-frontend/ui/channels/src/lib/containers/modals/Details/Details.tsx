@@ -8,7 +8,11 @@ import {
   Grid,
   Stack,
 } from '@mui/material';
-import { CloseButton, Dialog, Steps } from '@ddhub-client-gateway-frontend/ui/core';
+import {
+  CloseButton,
+  Dialog,
+  Steps,
+} from '@ddhub-client-gateway-frontend/ui/core';
 import { didFormatMinifier } from '@ddhub-client-gateway-frontend/ui/utils';
 import { ChannelConnectionType } from '../../../models/channel-connection-type.enum';
 import { getChannelType } from '../../../utils';
@@ -18,6 +22,8 @@ import { useDetailsEffects } from './Details.effects';
 import { useStyles } from './Details.styles';
 import { VIEW_STEPS } from '../Create/Steps/models/viewSteps';
 import { includes } from 'lodash';
+import { ChannelType } from '../../../models';
+import { CreateChannelDtoType } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 
 export const Details: FC = () => {
   const { classes } = useStyles();
@@ -61,9 +67,14 @@ export const Details: FC = () => {
         );
       case 1:
         return (
-          <Box>
-            <Topics topics={channel.conditions?.topics} />
-          </Box>
+          <Topics
+            topics={channel.conditions?.topics}
+            responseTopics={channel.conditions?.responseTopics}
+            showResponseTopics={
+              channel.type === CreateChannelDtoType.pub &&
+              channel.enableMessageForm
+            }
+          />
         );
       default:
         return null;
@@ -103,7 +114,11 @@ export const Details: FC = () => {
                     Namespace
                   </Typography>
                   <Box display="flex">
-                    <Typography className={classes.value} variant="body2" noWrap>
+                    <Typography
+                      className={classes.value}
+                      variant="body2"
+                      noWrap
+                    >
                       {channel.fqcn}
                     </Typography>
                   </Box>
@@ -119,35 +134,82 @@ export const Details: FC = () => {
                   </Box>
                 </Stack>
                 <Stack direction="row" mt={1.5}>
-                  <Typography className={classes.encryptionLabel} variant="body2">
+                  <Typography
+                    className={classes.encryptionLabel}
+                    variant="body2"
+                  >
                     Use anonymous external channel:
                   </Typography>
                   <Box display="flex">
-                    <Typography className={classes.encryptionValue} variant="body2">
-                      { channel?.useAnonymousExtChannel ? <Check className={classes.iconCheck} /> : <X className={classes.iconX}/>}
+                    <Typography
+                      className={classes.encryptionValue}
+                      variant="body2"
+                    >
+                      {channel?.useAnonymousExtChannel ? (
+                        <Check className={classes.iconCheck} />
+                      ) : (
+                        <X className={classes.iconX} />
+                      )}
                     </Typography>
                   </Box>
                 </Stack>
-                {
-                  (includes([ChannelConnectionType.pub, ChannelConnectionType.upload], ChannelConnectionType[channel.type])) && (
+                {includes(
+                  [ChannelConnectionType.pub, ChannelConnectionType.upload],
+                  ChannelConnectionType[channel.type]
+                ) && (
                   <Stack direction="row" mt={0.5}>
-                    <Typography className={classes.encryptionLabel} variant="body2">
+                    <Typography
+                      className={classes.encryptionLabel}
+                      variant="body2"
+                    >
                       Payload encryption:
                     </Typography>
                     <Box display="flex">
-                      <Typography className={classes.encryptionValue} variant="body2">
-                        { channel?.payloadEncryption ? <Check className={classes.iconCheck} /> : <X className={classes.iconX}/>}
+                      <Typography
+                        className={classes.encryptionValue}
+                        variant="body2"
+                      >
+                        {channel?.payloadEncryption ? (
+                          <Check className={classes.iconCheck} />
+                        ) : (
+                          <X className={classes.iconX} />
+                        )}
                       </Typography>
                     </Box>
                   </Stack>
-                  )
-                }
+                )}
+                {getChannelType(channel.type) === ChannelType.Messaging && (
+                  <Stack direction="row" mt={0.5}>
+                    <Typography
+                      className={classes.encryptionLabel}
+                      variant="body2"
+                    >
+                      Enable Message Form:
+                    </Typography>
+                    <Box display="flex">
+                      <Typography
+                        className={classes.encryptionValue}
+                        variant="body2"
+                      >
+                        {channel?.enableMessageForm ? (
+                          <Check className={classes.iconCheck} />
+                        ) : (
+                          <X className={classes.iconX} />
+                        )}
+                      </Typography>
+                    </Box>
+                  </Stack>
+                )}
               </Box>
 
               <Box className={classes.divider} />
-              <Steps steps={VIEW_STEPS} activeStep={activeStep} setActiveStep={navigateToStep} />
+              <Steps
+                steps={VIEW_STEPS}
+                activeStep={activeStep}
+                setActiveStep={navigateToStep}
+              />
             </>
-            )}
+          )}
         </Grid>
         <Grid item className={classes.contentWrapper} xs={8}>
           {channel && formPart(activeStep)}

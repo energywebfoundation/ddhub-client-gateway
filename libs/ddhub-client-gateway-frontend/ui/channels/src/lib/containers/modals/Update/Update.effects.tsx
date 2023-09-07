@@ -12,9 +12,13 @@ import {
   useModalStore,
 } from '../../../context';
 import { TActionButtonsProps } from '../Create/ActionButtons/ActionButtons';
-import { useApplications, useUpdateChannel } from '@ddhub-client-gateway-frontend/ui/api-hooks';
+import {
+  useApplications,
+  useUpdateChannel,
+} from '@ddhub-client-gateway-frontend/ui/api-hooks';
 import { ChannelTopic } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { Topic } from '../Create/Topics/Topics.effects';
+import { pick } from 'lodash';
 
 type TGetActionButtonsProps = TActionButtonsProps['nextClickButtonProps'] & {
   canGoBack: boolean;
@@ -24,6 +28,7 @@ const initialState = {
   type: '' as UpdateChannelDtoType,
   payloadEncryption: false,
   useAnonymousExtChannel: false,
+  enableMessageForm: false,
   conditions: {
     roles: [] as string[],
     dids: [] as string[],
@@ -42,7 +47,9 @@ export const useUpdateChannelEffects = () => {
   const { applications } = useApplications('user');
   const applicationMap = new Map();
 
-  applications.forEach(application => applicationMap.set(application.namespace, application.appName));
+  applications.forEach((application) =>
+    applicationMap.set(application.namespace, application.appName)
+  );
 
   const { updateChannelHandler, isLoading: isUpdating } = useUpdateChannel();
 
@@ -55,7 +62,7 @@ export const useUpdateChannelEffects = () => {
         return {
           ...topic,
           appName: applicationMap.get(topic.owner),
-        }
+        };
       });
 
       setChannelValues({
@@ -66,6 +73,7 @@ export const useUpdateChannelEffects = () => {
         },
         payloadEncryption: channel.payloadEncryption,
         useAnonymousExtChannel: channel.useAnonymousExtChannel,
+        enableMessageForm: channel.enableMessageForm,
       });
     } else {
       resetToInitialState();
@@ -106,22 +114,35 @@ export const useUpdateChannelEffects = () => {
     });
   };
 
-  const channelUpdateHandler = (topics: Topic[]) => {
-    const data = {
+  const channelUpdateHandler = (data: any) => {
+    const responseTopicsData: any = {};
+
+    data.topics.map((topic: Topic) => {
+      const topicId = topic.id ?? topic.topicId;
+      const respTopics = data.responseTopics[topicId];
+
+      if (respTopics) {
+        responseTopicsData[topicId] = respTopics.map((resTopic: Topic) =>
+          pick(resTopic, ['owner', 'topicName'])
+        );
+      }
+    });
+
+    const updateData = {
       fqcn: channel.fqcn,
       type: channelValues.type,
       payloadEncryption: channelValues.payloadEncryption,
       useAnonymousExtChannel: channelValues.useAnonymousExtChannel,
       conditions: {
         ...channelValues.conditions,
-        topics,
+        topics: data.topics,
+        responseTopics: responseTopicsData,
       },
     };
-    updateChannelHandler(data, onUpdate);
+    updateChannelHandler(updateData, onUpdate);
   };
 
   const openCancelModal = async () => {
-
     const result = await Swal.warning({
       text: 'Your changes will be lost!',
     });

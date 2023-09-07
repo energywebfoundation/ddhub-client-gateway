@@ -37,7 +37,13 @@ export const Create = () => {
   const formPart = (id: number) => {
     switch (id) {
       case 0:
-        return <Details nextClick={setDetails} channelValues={channelValues} validFqcn={validFqcn} />;
+        return (
+          <Details
+            nextClick={setDetails}
+            channelValues={channelValues}
+            validFqcn={validFqcn}
+          />
+        );
       case 1:
         return (
           <Restrictions
@@ -57,7 +63,9 @@ export const Create = () => {
               onClick: setTopics,
             })}
             channelValues={{
+              enableMessageForm: channelValues.enableMessageForm,
               topics: channelValues.conditions?.topics || [],
+              responseTopics: channelValues.conditions?.responseTopics || {},
               channelType: channelValues.type,
             }}
           />
@@ -81,7 +89,11 @@ export const Create = () => {
   };
 
   return (
-    <Dialog open={open} onClose={openCancelModal} paperClassName={classes.paper}>
+    <Dialog
+      open={open}
+      onClose={openCancelModal}
+      paperClassName={classes.paper}
+    >
       <DialogTitle className={classes.title}>Create Channel</DialogTitle>
       <DialogSubTitle>{subTitle}</DialogSubTitle>
       <Grid container className={classes.content}>
