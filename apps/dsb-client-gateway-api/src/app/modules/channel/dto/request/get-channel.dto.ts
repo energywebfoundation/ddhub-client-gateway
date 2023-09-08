@@ -1,4 +1,4 @@
-import { IsEnum, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsEnum, IsOptional, IsString } from 'class-validator';
 import { IsValidChannelName } from '../../../utils/validator/decorators/IsValidChannelName';
 import { ApiProperty } from '@nestjs/swagger';
 import { ChannelType } from '../../channel.const';
@@ -42,7 +42,32 @@ export class GetChannelByTypeQueryDto {
       ChannelType.UPLOAD,
     ],
     example: 'sub',
+    required: false,
   })
   @IsOptional()
   type: ChannelType;
+
+  @IsBoolean()
+  @ApiProperty({
+    example: true,
+    required: false,
+  })
+  @IsOptional()
+  useAnonymousExtChannel: boolean;
+
+  @IsBoolean()
+  @ApiProperty({
+    example: true,
+    required: false,
+  })
+  @IsOptional()
+  payloadEncryption: boolean;
+
+  @IsBoolean()
+  @ApiProperty({
+    example: true,
+    required: false,
+  })
+  @IsOptional()
+  messageForms: boolean;
 }

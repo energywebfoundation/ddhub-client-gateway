@@ -1,6 +1,7 @@
 {
   "version": 2,
   "projects": {
+    "ddhub-client-gateway-address-book": "libs/ddhub-client-gateway-address-book",
     "ddhub-client-gateway-association-keys": "libs/ddhub-client-gateway-association-keys",
     "ddhub-client-gateway-clients": "libs/ddhub-client-gateway-clients",
     "ddhub-client-gateway-did-auth": "libs/ddhub-client-gateway-did-auth",

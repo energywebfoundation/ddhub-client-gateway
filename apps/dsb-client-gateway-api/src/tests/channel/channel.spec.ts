@@ -89,6 +89,7 @@ describe('ChannelService (SPEC)', () => {
         fqcn: 'test',
         useAnonymousExtChannel: false,
         type: ChannelType.PUB,
+        messageForms: true,
         conditions: {
           topics: [
             {
@@ -155,6 +156,7 @@ describe('ChannelService (SPEC)', () => {
         fqcn: 'test',
         type: ChannelType.DOWNLOAD,
         useAnonymousExtChannel: false,
+        messageForms: false,
         conditions: {
           topics: [
             {
@@ -192,6 +194,7 @@ describe('ChannelService (SPEC)', () => {
           dids: [],
           qualifiedDids: [],
         },
+        messageForms: false,
         payloadEncryption: true,
         createdDate: new Date(),
         updatedDate: new Date(),
@@ -208,6 +211,7 @@ describe('ChannelService (SPEC)', () => {
           useAnonymousExtChannel: false,
           payloadEncryption: channelEntity.payloadEncryption,
           conditions: channelEntity.conditions,
+          messageForms: false,
         });
       } catch (e) {
         expect(e).toBeInstanceOf(ChannelAlreadyExistsException);

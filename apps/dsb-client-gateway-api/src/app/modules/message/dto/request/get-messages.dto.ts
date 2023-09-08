@@ -59,4 +59,34 @@ export class GetMessagesDto {
   })
   @IsOptional()
   clientId: string;
+
+  @ApiProperty({
+    type: String,
+    required: false,
+    example: '507f191e810c19729de860ea',
+    description: 'Initiating message id',
+  })
+  @IsOptional()
+  @IsString()
+  initiatingMessageId: string;
+
+  @ApiProperty({
+    type: String,
+    required: false,
+    example: '45d5a89f-7c2c-48b0-ae9a-54f4128e818f',
+    description: 'Initiating transaction id',
+  })
+  @IsOptional()
+  @IsString()
+  initiatingTransactionId: string;
+
+  @ApiProperty({
+    type: String,
+    required: false,
+    example: '507f191e810c19729de860ea',
+    description: 'Message id',
+  })
+  @IsOptional()
+  @IsString()
+  messageId: string;
 }
