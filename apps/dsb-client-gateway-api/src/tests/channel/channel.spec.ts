@@ -91,6 +91,7 @@ describe('ChannelService (SPEC)', () => {
         type: ChannelType.PUB,
         messageForms: true,
         conditions: {
+          responseTopics: {},
           topics: [
             {
               owner: obj.records[0].owner,
@@ -164,6 +165,7 @@ describe('ChannelService (SPEC)', () => {
               topicName: obj.records[0].name,
             },
           ],
+          responseTopics: {},
           roles: [],
           dids: [],
         },
@@ -212,7 +214,7 @@ describe('ChannelService (SPEC)', () => {
           payloadEncryption: channelEntity.payloadEncryption,
           conditions: channelEntity.conditions,
           messageForms: false,
-        });
+        } as any);
       } catch (e) {
         expect(e).toBeInstanceOf(ChannelAlreadyExistsException);
         expect(

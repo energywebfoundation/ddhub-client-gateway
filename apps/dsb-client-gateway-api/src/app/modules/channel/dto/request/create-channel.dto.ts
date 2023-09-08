@@ -70,6 +70,23 @@ export class ChannelConditionsDto {
     type: () => [TopicDto],
   })
   topics: TopicDto[];
+
+  @ApiProperty({
+    example: {
+      '622fed6e4258501225095045': [
+        {
+          topicName: 'operatorEnvelopeAck',
+          owner: 'aemo.edge',
+          topicId: '622fed6e4258501225095046',
+        },
+      ],
+    },
+    description: 'Response topics mapping.',
+  })
+  responseTopics: Record<
+    string,
+    { topicName: string; owner: string; topicId: string }[]
+  >;
 }
 
 export class CreateChannelDto {
@@ -96,7 +113,7 @@ export class CreateChannelDto {
   useAnonymousExtChannel: boolean;
 
   @ApiProperty({
-    description: 'Use anonymous external channels',
+    description: 'Create message forms',
     example: true,
     required: false,
     default: false,
