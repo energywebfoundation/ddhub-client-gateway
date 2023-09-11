@@ -38,6 +38,7 @@ export const useStyles = makeStyles()((theme) => ({
     fontFamily: theme.typography.body2.fontFamily,
   },
   label: {
+    position: 'relative',
     fontSize: 12,
     lineHeight: '14px',
     fontWeight: 400,
@@ -45,6 +46,7 @@ export const useStyles = makeStyles()((theme) => ({
     color: theme.palette.common.white,
     fontFamily: theme.typography.body2.fontFamily,
     marginBottom: 10,
+    transform: 'unset',
   },
   menuItem: {
     fontSize: 12,

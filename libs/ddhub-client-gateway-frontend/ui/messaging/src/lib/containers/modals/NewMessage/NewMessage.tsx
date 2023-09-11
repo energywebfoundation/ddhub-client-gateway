@@ -12,15 +12,14 @@ import {
   Dialog,
   DialogSubTitle,
   EditorView,
-  FormInput,
   FormSelect,
+  JSONSchemaForm,
   Steps,
 } from '@ddhub-client-gateway-frontend/ui/core';
 import { useNewMessageEffects } from './NewMessage.effects';
 import { useStyles } from './NewMessage.styles';
 import { ActionButtons } from './ActionButtons';
 import validator from '@rjsf/validator-ajv8';
-import Form from '@rjsf/mui';
 
 export const NewMessage: FC = () => {
   const { classes } = useStyles();
@@ -31,8 +30,8 @@ export const NewMessage: FC = () => {
     control,
     selectedChannel,
     selectedTopic,
-    selectedVersion,
     channelsLoaded,
+    formContext,
     fields,
     activeStep,
     navigateToStep,
@@ -84,7 +83,7 @@ export const NewMessage: FC = () => {
         <Box>
           <Grid container className={classes.content} flexDirection="row">
             <Grid item xs={4}>
-              <Box className={classes.infoWrapper}>
+              <Box className={classes.stepsWrapper}>
                 <Steps
                   steps={modalSteps}
                   activeStep={activeStep}
@@ -129,20 +128,26 @@ export const NewMessage: FC = () => {
                 </Grid>
               )}
               {activeStep === 1 && (
-                <>
-                  <FormInput
-                    field={fields['transactionId']}
-                    register={register}
-                  />
-                  <Form
-                    schema={JSON.parse(newMessageValues.schema)}
-                    validator={validator}
-                    liveValidate
-                    children={<></>}
-                    formData={formData}
-                    onChange={(e) => setFormData(e.formData)}
-                  />
-                </>
+                <JSONSchemaForm
+                  schema={JSON.parse(newMessageValues.schema)}
+                  uiSchema={
+                    newMessageValues.uiSchema
+                      ? JSON.parse(newMessageValues.uiSchema)
+                      : {}
+                  }
+                  validator={validator}
+                  liveValidate
+                  formData={formData}
+                  formContext={formContext}
+                  showErrorList={false}
+                  onChange={(data, id) => {
+                    console.log('onChange', id);
+                    console.log(data);
+                    if (id !== undefined) {
+                      setFormData(data.formData);
+                    }
+                  }}
+                />
               )}
               {activeStep === 2 && (
                 <>

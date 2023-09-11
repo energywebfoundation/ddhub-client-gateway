@@ -31,15 +31,4 @@ export const fields: { [name: string]: GenericFormField } = {
       placeholder: 'Select version',
     },
   },
-  transactionId: {
-    name: 'Transaction ID',
-    label: 'Transaction ID',
-    required: true,
-    formInputsWrapperProps: {
-      margin: '23px 15px 0 0',
-    },
-    inputProps: {
-      placeholder: 'Enter value',
-    },
-  },
 };

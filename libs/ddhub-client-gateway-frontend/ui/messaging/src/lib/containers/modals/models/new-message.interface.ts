@@ -5,5 +5,6 @@ export interface INewMessage {
   topicOwner: string;
   version: string;
   schema: string;
+  uiSchema: string;
   message: any;
 }

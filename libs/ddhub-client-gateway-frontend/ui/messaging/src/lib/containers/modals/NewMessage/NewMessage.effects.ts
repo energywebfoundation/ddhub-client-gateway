@@ -30,6 +30,7 @@ const initialState: INewMessage = {
   topicOwner: undefined,
   version: undefined,
   schema: undefined,
+  uiSchema: undefined,
   message: undefined,
 };
 
@@ -81,6 +82,11 @@ export const useNewMessageEffects = () => {
     );
   };
 
+  const formContext = useForm<FieldValues>({
+    defaultValues: initialFieldState,
+    resolver: yupResolver(validationSchema),
+    mode: 'onChange',
+  });
   const {
     register,
     control,
@@ -89,11 +95,7 @@ export const useNewMessageEffects = () => {
     reset,
     resetField,
     getValues,
-  } = useForm<FieldValues>({
-    defaultValues: initialFieldState,
-    resolver: yupResolver(validationSchema),
-    mode: 'onChange',
-  });
+  } = formContext;
 
   const selectedChannel = useWatch({ name: 'Channel', control });
   const selectedTopic = useWatch({ name: 'Topic Name', control });
@@ -228,10 +230,42 @@ export const useNewMessageEffects = () => {
 
   useEffect(() => {
     if (topicWithSchemaLoaded) {
-      setNewMessageValues((prev) => ({
-        ...prev,
-        schema: topicWithSchema.schema,
-      }));
+      if (topicWithSchema.schema) {
+        const schema = JSON.parse(topicWithSchema.schema);
+        if (schema.required && Array.isArray(schema.required)) {
+          schema.required.unshift('transactionId');
+        } else {
+          schema.required = ['transactionId'];
+        }
+        if (schema.properties && !schema.properties.transactionId) {
+          schema.properties.transactionId = {
+            type: 'string',
+            title: 'Transaction ID',
+          };
+        }
+        let uiSchema = {
+          'ui:order': ['transactionId', '*'],
+        };
+        if (schema.uiSchema) {
+          const embeddedSchema = schema.uiSchema;
+          if (embeddedSchema['ui:order']) {
+            embeddedSchema['ui:order'] = [
+              'transactionId',
+              ...embeddedSchema['ui:order'],
+              '*',
+            ];
+          }
+          uiSchema = {
+            ...uiSchema,
+            ...embeddedSchema,
+          };
+        }
+        setNewMessageValues((prev) => ({
+          ...prev,
+          schema: JSON.stringify(schema),
+          uiSchema: JSON.stringify(uiSchema),
+        }));
+      }
     }
   }, [topicWithSchemaLoaded, topicWithSchema]);
 
@@ -374,6 +408,7 @@ export const useNewMessageEffects = () => {
     channels,
     isLoading,
     channelsLoaded,
+    formContext,
     register,
     control,
     activeStep,

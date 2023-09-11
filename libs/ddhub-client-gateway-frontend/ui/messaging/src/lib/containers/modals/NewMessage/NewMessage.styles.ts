@@ -17,10 +17,11 @@ export const useStyles = makeStyles()((theme) => ({
     // paddingTop: 48,
     flexGrow: 1,
   },
-  infoWrapper: {
+  stepsWrapper: {
     display: 'flex',
     placeItems: 'start',
     flexDirection: 'column',
+    paddingRight: 16,
   },
   title: {
     fontSize: 28,

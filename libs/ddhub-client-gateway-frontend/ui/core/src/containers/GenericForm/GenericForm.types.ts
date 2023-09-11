@@ -1,5 +1,5 @@
 import * as yup from 'yup';
-import { ReactNode, FormEventHandler } from 'react';
+import { ReactNode, FormEventHandler, HTMLInputTypeAttribute } from 'react';
 import {
   DeepMap,
   FieldError,
@@ -21,7 +21,7 @@ import { FormSelectOption, FormInputProps } from '../../components/form';
 export type GenericFormField = {
   name: string;
   label?: string;
-  type?: 'text' | 'password' | 'number';
+  type?: HTMLInputTypeAttribute;
   placeholder?: string;
   required?: boolean;
   select?: boolean;
@@ -49,7 +49,7 @@ export interface GenericFormProps<FormValues = any> {
   hideSubmitButton?: boolean;
   submitHandler: (
     values: FormValues,
-    resetForm: UseFormReset<FormValues>
+    resetForm: UseFormReset<FieldValues>
   ) => void;
   validationSchema: yup.AnyObjectSchema;
   initialValues: FormValues;
