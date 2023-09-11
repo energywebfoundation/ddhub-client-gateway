@@ -59,6 +59,22 @@ export const useStyles = makeStyles()((theme) => ({
   valueFailed: {
     color: `${theme.palette.error.main} !important`,
   },
+  detailsInfoLabel: {
+    fontSize: 12,
+    lineHeight: '21px',
+    fontWeight: 400,
+    color: theme.palette.grey[300],
+    marginRight: 20,
+    fontFamily: theme.typography.body2.fontFamily,
+  },
+  detailsInfoValue: {
+    fontSize: 12,
+    lineHeight: '21px',
+    fontWeight: 400,
+    color: theme.palette.common.white,
+    marginRight: 20,
+    fontFamily: theme.typography.body2.fontFamily,
+  },
   closeButtonWrapper: {
     position: 'absolute',
     top: 17,

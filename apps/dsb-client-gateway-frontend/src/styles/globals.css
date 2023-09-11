@@ -1,12 +1,12 @@
 :root {
-  --primary-color: #A466FF;
-  --primary-light-color: #CC98FF;
-  --primary-dark-color : #652CA1;
-  --secondary-color: #F6AFAF;
+  --primary-color: #a466ff;
+  --primary-light-color: #cc98ff;
+  --primary-dark-color: #652ca1;
+  --secondary-color: #f6afaf;
   --background-color: #293145;
   --background-default-color: #283046;
-  --background-dark-color: #161D31;
-  --text-color: #FFFFFF;
+  --background-dark-color: #161d31;
+  --text-color: #ffffff;
   --secondary-text-color: #939393;
 }
 
@@ -37,7 +37,7 @@ a {
   box-shadow: 0 0 10px #a567ff, 0 0 5px #a567ff;
 }
 
-[color="primary"] {
+[color='primary'] {
   color: var(--primary-color) !important;
 }
 
@@ -129,7 +129,7 @@ body.swal2-height-auto.swal2-height-auto {
   box-shadow: none !important;
 }
 
-.monaco-scrollable-element>.invisible.vertical {
+.monaco-scrollable-element > .invisible.vertical {
   width: 5px !important;
 }
 
@@ -151,7 +151,9 @@ body.swal2-height-auto.swal2-height-auto {
 
 /* asyncapi */
 
-.aui-root *, .aui-root ::before, .aui-root ::after{
+.aui-root *,
+.aui-root ::before,
+.aui-root ::after {
   border-color: rgba(203, 213, 224, 0.25);
 }
 
@@ -168,18 +170,24 @@ body.swal2-height-auto.swal2-height-auto {
 }
 
 .aui-root .bg-gray-800 {
-  background-color: #242B3E;
+  background-color: #242b3e;
 }
 
-.aui-root .text-4xl, .text-3xl {
+.aui-root .text-4xl,
+.text-3xl {
   font-family: Bw Gradual, sans-serif !important;
 }
 
-.aui-root a, p, span, .font-mono, .text-xs, .text-sm, .text-lg {
+.aui-root a,
+p,
+.text-xs,
+.text-sm,
+.text-lg {
   font-family: Sequel Sans, sans-serif !important;
 }
 
-.aui-root .prose, .text-gray-700 {
+.aui-root .prose,
+.text-gray-700 {
   color: var(--text-color) !important;
 }
 
@@ -187,7 +195,7 @@ body.swal2-height-auto.swal2-height-auto {
   fill: var(--text-color) !important;
 }
 
-.aui-root .-mx-8{
+.aui-root .-mx-8 {
   margin-left: 0;
   margin-right: 0;
 }

@@ -8,9 +8,7 @@ export const fields: { [name: string]: GenericFormField } = {
     name: 'Channel',
     label: 'Channel',
     options: [] as FormSelectOption[],
-    formInputsWrapperProps: {
-      margin: '23px 15px 0 0',
-    },
+    required: true,
     inputProps: {
       placeholder: 'Select channel',
     },
@@ -19,10 +17,7 @@ export const fields: { [name: string]: GenericFormField } = {
     name: 'Topic Name',
     label: 'Topic Name',
     options: [] as FormSelectOption[],
-    formInputsWrapperProps: {
-      margin: '23px 15px 0 0',
-      flexGrow: 1,
-    },
+    required: true,
     inputProps: {
       placeholder: 'Select topic',
     },
@@ -31,12 +26,20 @@ export const fields: { [name: string]: GenericFormField } = {
     name: 'Version',
     label: 'Topic Version',
     options: [] as FormSelectOption[],
-    formInputsWrapperProps: {
-      margin: '23px 15px 0 0',
-      width: '40%',
-    },
+    required: true,
     inputProps: {
       placeholder: 'Select version',
+    },
+  },
+  transactionId: {
+    name: 'Transaction ID',
+    label: 'Transaction ID',
+    required: true,
+    formInputsWrapperProps: {
+      margin: '23px 15px 0 0',
+    },
+    inputProps: {
+      placeholder: 'Enter value',
     },
   },
 };

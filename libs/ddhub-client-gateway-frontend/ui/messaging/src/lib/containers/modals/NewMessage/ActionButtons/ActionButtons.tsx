@@ -18,7 +18,11 @@ export const ActionButtons: FC<TActionButtonsProps> = ({
   const { text, ...nextButtonProps } = nextClickButtonProps;
 
   return (
-    <Box display="flex" justifyContent="space-between" width="100%">
+    <Box
+      display="flex"
+      justifyContent={goBack || onCancel ? 'space-between' : 'flex-end'}
+      width="100%"
+    >
       {goBack && <BackButton onClick={goBack} color="secondary" />}
       {onCancel && <CancelButton onClick={onCancel} />}
       <ActionButton {...nextButtonProps}>

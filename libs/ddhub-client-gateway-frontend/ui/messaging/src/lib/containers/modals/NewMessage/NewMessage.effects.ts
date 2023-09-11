@@ -27,6 +27,7 @@ const initialState: INewMessage = {
   fqcn: undefined,
   topicId: undefined,
   topicName: undefined,
+  topicOwner: undefined,
   version: undefined,
   schema: undefined,
   message: undefined,
@@ -62,6 +63,23 @@ export const useNewMessageEffects = () => {
     topicLoaded: topicWithSchemaLoaded,
   } = useTopicVersion(newMessageValues.topicId, newMessageValues.version);
   const { sendNewMessageHandler, isLoading: isSending } = useSendNewMessage();
+
+  const sendMessage = () => {
+    sendNewMessageHandler(
+      {
+        fqcn: newMessageValues.fqcn,
+        topicName: newMessageValues.topicName,
+        topicVersion: newMessageValues.version,
+        topicOwner: newMessageValues.topicOwner,
+        transactionId: getValues('Transaction ID'),
+        payload: JSON.stringify(newMessageValues.message),
+        anonymousRecipient: [],
+      },
+      () => {
+        closeModal();
+      }
+    );
+  };
 
   const {
     register,
@@ -176,6 +194,7 @@ export const useNewMessageEffects = () => {
         ...prev,
         topicId: topic.topicId,
         topicName: topic.topicName,
+        topicOwner: topic.owner,
       }));
     }
   }, [selectedTopic]);
@@ -365,7 +384,7 @@ export const useNewMessageEffects = () => {
     newMessageValues,
     setMessageValue,
     openNewMessageModal,
-    sendNewMessageHandler,
+    sendMessage,
     isSending,
     selectedChannel,
     selectedTopic,

@@ -117,6 +117,7 @@ export class MessageService {
     this.validateTopic(topic, channel);
 
     const qualifiedDids = channel.conditions.qualifiedDids;
+    this.logger.log('Qualified DIDs', { qualifiedDids });
 
     if (qualifiedDids.length === 0 && !channel.useAnonymousExtChannel) {
       throw new RecipientsNotFoundException();

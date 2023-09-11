@@ -36,13 +36,14 @@ export const useEditorEffects = ({ showPlaceholder }: TUseEditorEffects) => {
     monacoRef.current && monacoRef.current?.focus();
   };
 
-  const options = {
+  const options: monaco.editor.IStandaloneEditorConstructionOptions = {
     minimap: {
       enabled: false,
     },
     scrollbar: {
       vertical: 'auto',
     },
+    fontFamily: 'Source Code Pro',
     automaticLayout: true,
     wordBasedSuggestions: false,
     quickSuggestions: false,
@@ -55,8 +56,9 @@ export const useEditorEffects = ({ showPlaceholder }: TUseEditorEffects) => {
     fontSize: 12,
     lineNumbersMinChars: 3,
     lineDecorationsWidth: 3,
+    tabSize: 2,
     suggestOnTriggerCharacters: false,
-  } as monaco.editor.IStandaloneEditorConstructionOptions;
+  };
 
   const formatValue = (value: object | string) => {
     return parseJson(value);
