@@ -33,7 +33,7 @@ import { GetMessageResponse } from '../message.interface';
 @Controller('messages')
 @UseGuards(MtlsGuard)
 @ApiTags('Messaging')
-export class MessageControlller {
+export class MessageController {
   private readonly logger = new Logger();
   constructor(
     protected readonly messageService: MessageService,

@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { EventsGateway } from './gateway/events.gateway';
 import { MessageService } from './service/message.service';
 import { UtilsModule } from '../utils/utils.module';
-import { MessageControlller } from './controller/message.controller';
+import { MessageController } from './controller/message.controller';
 import { ChannelModule } from '../channel/channel.module';
 import { CqrsModule } from '@nestjs/cqrs';
 import { KeysModule } from '../keys/keys.module';
@@ -92,6 +92,6 @@ import { OfflineMessagesService } from './service/offline-messages.service';
     OfflineMessagesService,
   ],
   exports: [MessageService],
-  controllers: [MessageControlller],
+  controllers: [MessageController],
 })
 export class MessageModule {}

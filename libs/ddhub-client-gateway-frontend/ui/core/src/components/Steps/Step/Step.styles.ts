@@ -49,5 +49,9 @@ export const useStyles = makeStyles()((theme) => ({
         color: theme.palette.primary.main,
       },
     },
-  }
+  },
+  disabled: {
+    cursor: 'not-allowed',
+    opacity: 0.5,
+  },
 }));

@@ -80,6 +80,7 @@
     "@opentelemetry/sdk-trace-base": "^1.0.1",
     "@opentelemetry/tracing": "^0.24.0",
     "@rjsf/core": "^5.12.1",
+    "@rjsf/mui": "^5.12.1",
     "@rjsf/utils": "^5.12.1",
     "@rjsf/validator-ajv8": "^5.12.1",
     "@sentry/nextjs": "^6.17.9",

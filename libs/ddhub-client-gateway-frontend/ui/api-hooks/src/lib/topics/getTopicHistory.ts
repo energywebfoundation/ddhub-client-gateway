@@ -8,39 +8,42 @@ import {
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { useCustomAlert } from '@ddhub-client-gateway-frontend/ui/core';
 
-interface useTopicVersionHistoryProps extends TopicsControllerGetTopicsHistoryByIdParams {
+interface useTopicVersionHistoryProps
+  extends TopicsControllerGetTopicsHistoryByIdParams {
   id: string;
 }
 
-export const useTopicVersionHistory = (
-  {
-    id,
-    page = 1,
-    limit = 0,
-  }: useTopicVersionHistoryProps) => {
+export const useTopicVersionHistory = ({
+  id,
+  page = 1,
+  limit = 0,
+}: useTopicVersionHistoryProps) => {
   const Swal = useCustomAlert();
   const [params, setParams] = useState({ page, limit });
 
-  const { data, isLoading, isSuccess, isError } =
-    useTopicsControllerGetTopicsHistoryById(id,
-      { page: params.page, limit: params.limit },{
-      query: {
-        enabled: !!id,
-        onError: (err: any) => {
-          console.error(err);
-          Swal.httpError(err);
+  const { data, isLoading, isSuccess, isError, refetch } =
+    useTopicsControllerGetTopicsHistoryById(
+      id,
+      { page: params.page, limit: params.limit },
+      {
+        query: {
+          enabled: !!id,
+          onError: (err: any) => {
+            console.error(err);
+            Swal.httpError(err);
+          },
         },
-      },
-    });
+      }
+    );
   const paginated = data ?? ({} as PaginatedResponse);
   const topicHistory: GetTopicSearchDto[] = paginated?.records ?? [];
   const topicHistoryByVersion = keyBy(topicHistory, 'version');
   const topicHistoryLoaded = isSuccess && data !== undefined && !isError;
 
   const getTopicHistory = async ({
-                             page = 1,
-                             limit = 10,
-                           }: TopicsControllerGetTopicsHistoryByIdParams) => {
+    page = 1,
+    limit = 10,
+  }: TopicsControllerGetTopicsHistoryByIdParams) => {
     setParams({ page, limit });
   };
 
@@ -57,5 +60,6 @@ export const useTopicVersionHistory = (
     topicHistoryLoaded,
     getTopicHistory,
     pagination,
+    refetch,
   };
 };

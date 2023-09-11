@@ -8,17 +8,15 @@ import { useCustomAlert } from '@ddhub-client-gateway-frontend/ui/core';
 
 export const useChannels = (params?: ChannelControllerGetByTypeParams) => {
   const Swal = useCustomAlert();
-  const { data, isLoading, isSuccess, isError } = useChannelControllerGetByType(
-    params,
-    {
+  const { data, isLoading, isSuccess, isError, refetch } =
+    useChannelControllerGetByType(params, {
       query: {
         onError: (err: any) => {
           console.error(err);
           Swal.httpError(err);
         },
       },
-    }
-  );
+    });
 
   let channels = [] as GetChannelResponseDto[];
 
@@ -43,5 +41,6 @@ export const useChannels = (params?: ChannelControllerGetByTypeParams) => {
     isLoading,
     channelsLoaded,
     channelsByName,
+    refetch,
   };
 };

@@ -1,67 +1,162 @@
-import { FC } from 'react';
+import { FC, useEffect, useState } from 'react';
 import {
   DialogContent,
   DialogActions,
   Typography,
   Box,
   Grid,
-  Stack,
+  DialogTitle,
 } from '@mui/material';
 import {
   CloseButton,
   Dialog,
-  GenericTable,
+  DialogSubTitle,
+  FormSelect,
   Steps,
 } from '@ddhub-client-gateway-frontend/ui/core';
 import { useNewMessageEffects } from './NewMessage.effects';
 import { useStyles } from './NewMessage.styles';
+import { ActionButtons } from './ActionButtons';
+import validator from '@rjsf/validator-ajv8';
+import Form from '@rjsf/mui';
 
 export const NewMessage: FC = () => {
   const { classes } = useStyles();
-  const { open, closeModal, details, activeStep, navigateToStep, modalSteps } =
-    useNewMessageEffects();
+  const {
+    open,
+    closeModal,
+    register,
+    control,
+    selectedChannel,
+    selectedTopic,
+    selectedVersion,
+    channelsLoaded,
+    fields,
+    activeStep,
+    navigateToStep,
+    modalSteps,
+    newMessageValues,
+    setMessageValue,
+    getActionButtonsProps,
+  } = useNewMessageEffects();
+
+  const [formData, setFormData] = useState(null);
+
+  useEffect(() => {
+    if (formData) {
+      setMessageValue(formData);
+    }
+  }, [formData]);
+
   return (
     <Dialog open={open} onClose={closeModal} paperClassName={classes.paper}>
-      <DialogContent sx={{ padding: 0 }}>
+      <DialogTitle className={classes.title}>New Message</DialogTitle>
+      <DialogSubTitle>Provide data with this form</DialogSubTitle>
+      <DialogContent sx={{ marginTop: '34px' }}>
         <Box>
           <Grid container className={classes.content} flexDirection={'row'}>
             <Grid item xs={4}>
               <Box className={classes.infoWrapper}>
-                <Box display="flex" alignItems="center" mt={3} mb={1.375}>
-                  <Typography className={classes.infoTitle}>
-                    Recipients
-                  </Typography>
-                </Box>
-
-                <Stack direction="column">
-                  {/* <Typography className={classes.label} variant="body2">
-                    Client Gateway Message ID
-                  </Typography>
-                  <Box display="flex">
-                    <Typography
-                      className={classes.value}
-                      variant="body2"
-                      noWrap
-                    >
-                      {details?.clientGatewayMessageId}
-                    </Typography>
-                  </Box> */}
-
-                  <Box className={classes.divider} />
-                  <Steps
-                    steps={modalSteps}
-                    activeStep={activeStep}
-                    setActiveStep={navigateToStep}
-                  />
-                </Stack>
+                <Steps
+                  steps={modalSteps}
+                  activeStep={activeStep}
+                  setActiveStep={navigateToStep}
+                />
               </Box>
             </Grid>
             <Grid item className={classes.contentWrapper} xs={8}>
               {activeStep === 0 && (
-                <Typography>Add Channel and Topic</Typography>
+                <>
+                  <FormSelect
+                    field={fields['channel']}
+                    register={register}
+                    control={control}
+                    variant="outlined"
+                    disabled={!channelsLoaded}
+                  />
+                  <Box display="flex" mb={2.7}>
+                    <FormSelect
+                      field={fields['topic']}
+                      register={register}
+                      control={control}
+                      variant="outlined"
+                      disabled={!selectedChannel}
+                    />
+                    <FormSelect
+                      field={fields['version']}
+                      register={register}
+                      control={control}
+                      variant="outlined"
+                      disabled={!selectedTopic}
+                    />
+                  </Box>
+                  <Grid
+                    item
+                    alignSelf="flex-end"
+                    width="100%"
+                    sx={{ padding: '22px 7px 27px 0px' }}
+                  >
+                    <ActionButtons
+                      {...getActionButtonsProps({
+                        canGoBack: false,
+                        onClick: () => navigateToStep(1),
+                        disabled: modalSteps[1].disabled,
+                      })}
+                    />
+                  </Grid>
+                </>
               )}
-              {activeStep === 1 && <Typography>Add Message</Typography>}
-              {activeStep === 2 && <Typography>Review</Typography>}
+              {activeStep === 1 && (
+                <>
+                  <Box>
+                    <Form
+                      schema={JSON.parse(newMessageValues.schema)}
+                      validator={validator}
+                      liveValidate
+                      children={<></>}
+                      formData={formData}
+                      onChange={(e) => setFormData(e.formData)}
+                    />
+                  </Box>
+                  <Grid
+                    item
+                    alignSelf="flex-end"
+                    width="100%"
+                    sx={{ padding: '22px 7px 27px 0px' }}
+                  >
+                    <ActionButtons
+                      {...getActionButtonsProps({
+                        canGoBack: activeStep > 0,
+                        disabled: modalSteps[2].disabled,
+                      })}
+                    />
+                  </Grid>
+                </>
+              )}
+              {activeStep === 2 && (
+                <>
+                  <Box>
+                    <Typography>Channel: {newMessageValues.fqcn}</Typography>
+                    <Typography>Topic: {newMessageValues.topicName}</Typography>
+                    <Typography>Version: {newMessageValues.version}</Typography>
+                  </Box>
+                  <Grid
+                    item
+                    alignSelf="flex-end"
+                    width="100%"
+                    sx={{ padding: '22px 7px 27px 0px' }}
+                  >
+                    <ActionButtons
+                      {...getActionButtonsProps({
+                        canGoBack: activeStep > 0,
+                        onClick: () => console.log('send message'),
+                        disabled: modalSteps[2].disabled,
+                        text: 'Send Message',
+                      })}
+                    />
+                  </Grid>
+                </>
+              )}
             </Grid>
           </Grid>
         </Box>

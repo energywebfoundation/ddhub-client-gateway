@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useMessageControlllerDownloadMessage } from '@dsb-client-gateway/dsb-client-gateway-api-client';
+import { useMessageControllerDownloadMessage } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { useCustomAlert } from '@ddhub-client-gateway-frontend/ui/core';
 import { downloadFile } from '@ddhub-client-gateway-frontend/ui/utils';
 
@@ -23,7 +23,7 @@ export const useDownloadMessage = () => {
     Swal.httpError(err);
   };
 
-  const { isLoading } = useMessageControlllerDownloadMessage(
+  const { isLoading } = useMessageControllerDownloadMessage(
     {
       fileId: fileData.fileId,
     },
@@ -48,7 +48,7 @@ export const useDownloadMessage = () => {
 
   const downloadMessageHandler = async (data: TDownloadData) => {
     if (!data?.fileId) {
-      downloadMessageError({message: 'Error while dowloading the message'});
+      downloadMessageError({ message: 'Error while dowloading the message' });
     } else {
       setFileData(data);
     }

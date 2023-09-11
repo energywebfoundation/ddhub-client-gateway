@@ -6,7 +6,7 @@ import { useCustomAlert } from '@ddhub-client-gateway-frontend/ui/core';
 
 export const useTopicVersion = (id: string, version: string) => {
   const Swal = useCustomAlert();
-  const { data, isLoading, isSuccess, isError, remove } =
+  const { data, isLoading, isSuccess, isError, remove, refetch } =
     useTopicsControllerGetTopicHistoryByIdAndVersion(id, version, {
       query: {
         enabled: id !== undefined && version !== undefined,
@@ -25,5 +25,6 @@ export const useTopicVersion = (id: string, version: string) => {
     isSuccess,
     topicLoaded,
     remove,
+    refetch,
   };
 };

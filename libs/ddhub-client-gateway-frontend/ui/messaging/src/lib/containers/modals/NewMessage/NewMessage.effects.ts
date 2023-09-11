@@ -1,21 +1,220 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   useModalStore,
   useModalDispatch,
   ModalActionsEnum,
 } from '../../../context';
 import { MODAL_STEPS } from './modalSteps';
-import { useStyles } from './NewMessage.styles';
-import { fields } from './NewMessage.utils';
+import { fields as initialFieldState } from './NewMessage.utils';
+import { INewMessage } from '../models';
+import { useSendNewMessage } from './SendNewMessage.effects';
+import {
+  useChannels,
+  useTopicVersion,
+  useTopicVersionHistory,
+} from '@ddhub-client-gateway-frontend/ui/api-hooks';
+import { FieldValues, useForm, useWatch } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { validationSchema } from '../models/validationSchema';
+import { GetChannelResponseDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
+import { TActionButtonsProps } from './ActionButtons';
+
+type TGetActionButtonsProps = TActionButtonsProps['nextClickButtonProps'] & {
+  canGoBack: boolean;
+};
+
+const initialState: INewMessage = {
+  fqcn: undefined,
+  topicId: undefined,
+  topicName: undefined,
+  version: undefined,
+  schema: undefined,
+  message: undefined,
+};
 
 export const useNewMessageEffects = () => {
-  const [activeStep, setActiveStep] = useState(0);
-  const modalSteps = MODAL_STEPS;
-  // const { classes } = useStyles();
+  const dispatch = useModalDispatch();
   const {
     newMessage: { open },
   } = useModalStore();
-  const dispatch = useModalDispatch();
+  const [newMessageValues, setNewMessageValues] =
+    useState<INewMessage>(initialState);
+  const [activeStep, setActiveStep] = useState(0);
+  const [modalSteps, setModalSteps] = useState(MODAL_STEPS);
+  const [fields, setFields] = useState(initialFieldState);
+
+  const {
+    channels,
+    isLoading,
+    channelsLoaded,
+    refetch: refreshChannels,
+  } = useChannels({
+    type: 'pub',
+  });
+  const {
+    topicHistory,
+    isLoading: topicHistoryLoading,
+    topicHistoryLoaded,
+  } = useTopicVersionHistory({ id: newMessageValues.topicId });
+  const {
+    topic: topicWithSchema,
+    isLoading: topicWithSchemaLoading,
+    topicLoaded: topicWithSchemaLoaded,
+  } = useTopicVersion(newMessageValues.topicId, newMessageValues.version);
+  const { sendNewMessageHandler, isLoading: isSending } = useSendNewMessage();
+
+  const {
+    register,
+    control,
+    handleSubmit,
+    formState: { isValid },
+    reset,
+    resetField,
+    getValues,
+  } = useForm<FieldValues>({
+    defaultValues: initialFieldState,
+    resolver: yupResolver(validationSchema),
+    mode: 'onChange',
+  });
+
+  const selectedChannel = useWatch({ name: 'Channel', control });
+  const selectedTopic = useWatch({ name: 'Topic Name', control });
+  const selectedVersion = useWatch({ name: 'Version', control });
+
+  const buttons = ['test'];
+
+  const resetFormSelectOptions = (field?: 'channel' | 'topic' | 'version') => {
+    if (field) {
+      resetField(field);
+      setNewMessageValues((prev) => ({
+        ...prev,
+        [field]: undefined,
+      }));
+      setFields((prev) => ({
+        ...prev,
+        [field]: {
+          ...prev[field],
+          options: [],
+        },
+      }));
+    } else {
+      resetToInitialState();
+      setFields((prev) => ({
+        ...prev,
+        channel: {
+          ...prev['channel'],
+          options: [],
+        },
+        topic: {
+          ...prev['topic'],
+          options: [],
+        },
+        version: {
+          ...prev['version'],
+          options: [],
+        },
+      }));
+    }
+  };
+
+  useEffect(() => {
+    if (open) {
+      resetToInitialState();
+      refreshChannels();
+    }
+  }, [open]);
+
+  useEffect(() => {
+    if (channelsLoaded) {
+      setFields((prev) => ({
+        ...prev,
+        channel: {
+          ...prev['channel'],
+          options: channels.map((channel) => ({
+            label: channel.fqcn,
+            value: JSON.stringify(channel),
+          })),
+        },
+      }));
+    }
+  }, [channelsLoaded, channels]);
+
+  useEffect(() => {
+    resetFormSelectOptions('topic');
+    if (selectedChannel) {
+      console.log(selectedChannel);
+
+      const channel: GetChannelResponseDto = JSON.parse(selectedChannel);
+      console.log(channel);
+      setNewMessageValues({
+        ...initialState,
+        fqcn: channel.fqcn,
+      });
+
+      setFields((prev) => ({
+        ...prev,
+        topic: {
+          ...prev['topic'],
+          options: channel.conditions.topics.map((topic) => ({
+            label: topic.topicName,
+            subLabel: topic.owner,
+            value: JSON.stringify(topic),
+          })),
+        },
+      }));
+    }
+  }, [selectedChannel]);
+
+  useEffect(() => {
+    resetFormSelectOptions('version');
+    if (selectedTopic) {
+      console.log(selectedTopic);
+      const topic = JSON.parse(selectedTopic);
+      console.log(topic);
+
+      setNewMessageValues((prev) => ({
+        ...prev,
+        topicId: topic.topicId,
+        topicName: topic.topicName,
+      }));
+    }
+  }, [selectedTopic]);
+
+  useEffect(() => {
+    if (topicHistoryLoaded) {
+      setFields((prev) => ({
+        ...prev,
+        version: {
+          ...prev['version'],
+          options: topicHistory.map((version) => ({
+            label: version.version,
+            value: JSON.stringify(version),
+          })),
+        },
+      }));
+    }
+  }, [topicHistory, topicHistoryLoaded]);
+
+  useEffect(() => {
+    if (selectedVersion) {
+      const version = JSON.parse(selectedVersion);
+      console.log(version);
+
+      setNewMessageValues((prev) => ({
+        ...prev,
+        version: version.version,
+      }));
+    }
+  }, [selectedVersion]);
+
+  useEffect(() => {
+    if (topicWithSchemaLoaded) {
+      setNewMessageValues((prev) => ({
+        ...prev,
+        schema: topicWithSchema.schema,
+      }));
+    }
+  }, [topicWithSchemaLoaded, topicWithSchema]);
 
   const openNewMessageModal = () => {
     dispatch({
@@ -35,11 +234,14 @@ export const useNewMessageEffects = () => {
         data: undefined,
       },
     });
+    resetToInitialState();
   };
 
-  const buttons = ['test'];
-
-  const details = {};
+  const resetToInitialState = () => {
+    setNewMessageValues(initialState);
+    setActiveStep(0);
+    reset();
+  };
 
   const navigateToStep = (index: number) => {
     if (index !== activeStep) {
@@ -47,15 +249,127 @@ export const useNewMessageEffects = () => {
     }
   };
 
+  const validateStep = (index: number): boolean => {
+    switch (index) {
+      case 0: {
+        return (
+          !!newMessageValues.fqcn &&
+          !!newMessageValues.topicId &&
+          !!newMessageValues.topicName &&
+          !!newMessageValues.version &&
+          !!newMessageValues.schema
+        );
+      }
+      case 1: {
+        if (!newMessageValues.schema) {
+          return false;
+        }
+        const schema = JSON.parse(newMessageValues.schema);
+        const hasRequiredFields = schema.required
+          ? schema.required.length
+          : false;
+        const { message } = newMessageValues;
+        let messageKeys: string[] = [];
+        if (message) {
+          messageKeys = Object.keys(message).filter(
+            (key) =>
+              message[key] !== '' &&
+              message[key] !== null &&
+              message[key] !== undefined
+          );
+        }
+        return (
+          validateStep(0) &&
+          message &&
+          (hasRequiredFields
+            ? schema.required.every((requiredField: string) =>
+                messageKeys.includes(requiredField)
+              )
+            : true)
+        );
+      }
+      case 2:
+        return isValid;
+      default:
+        return false;
+    }
+  };
+
+  useEffect(() => {
+    console.log(newMessageValues);
+    setModalSteps((prev) =>
+      prev.map((step, index) => {
+        if (index === 0) {
+          return {
+            ...step,
+            disabled: false,
+          };
+        } else {
+          return {
+            ...step,
+            disabled: !validateStep(index - 1),
+          };
+        }
+      })
+    );
+  }, [newMessageValues]);
+
+  const goBack = () => {
+    setActiveStep(activeStep - 1);
+  };
+
+  const goNext = () => {
+    if (validateStep(activeStep)) {
+      setActiveStep(activeStep + 1);
+    }
+  };
+
+  const getActionButtonsProps = ({
+    onClick,
+    text = 'Next',
+    showArrowIcon = true,
+    loading = false,
+    canGoBack = false,
+    disabled = false,
+  }: TGetActionButtonsProps): TActionButtonsProps => ({
+    nextClickButtonProps: {
+      onClick: onClick ?? goNext,
+      text,
+      showArrowIcon,
+      loading,
+      disabled,
+    },
+    ...(canGoBack && { goBack }),
+  });
+
+  const setMessageValue = (value: any) => {
+    setNewMessageValues((prev) => ({
+      ...prev,
+      message: value,
+    }));
+  };
+
   return {
     open,
     closeModal,
-    details,
+    channels,
+    isLoading,
+    channelsLoaded,
+    register,
+    control,
     activeStep,
     navigateToStep,
     modalSteps,
     buttons,
     fields,
+    newMessageValues,
+    setMessageValue,
     openNewMessageModal,
+    sendNewMessageHandler,
+    isSending,
+    selectedChannel,
+    selectedTopic,
+    selectedVersion,
+    getActionButtonsProps,
   };
 };

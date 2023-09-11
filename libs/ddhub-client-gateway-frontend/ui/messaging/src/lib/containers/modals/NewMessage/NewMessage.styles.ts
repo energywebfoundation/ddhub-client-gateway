@@ -14,13 +14,21 @@ export const useStyles = makeStyles()((theme) => ({
     flexWrap: 'nowrap',
   },
   contentWrapper: {
-    paddingTop: 48,
+    // paddingTop: 48,
     flexGrow: 1,
   },
   infoWrapper: {
     display: 'flex',
     placeItems: 'start',
     flexDirection: 'column',
+  },
+  title: {
+    fontSize: 28,
+    lineHeight: '34px',
+    fontWeight: 400,
+    fontFamily: theme.typography.h2.fontFamily,
+    color: theme.palette.common.white,
+    marginBottom: 8,
   },
   infoTitle: {
     fontSize: 18,

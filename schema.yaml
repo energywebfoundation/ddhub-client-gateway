@@ -268,7 +268,7 @@ paths:
         - 'Channels'
   /api/v2/messages:
     get:
-      operationId: 'MessageControlller_getMessage'
+      operationId: 'MessageController_getMessage'
       parameters:
         - name: 'fqcn'
           required: true
@@ -351,7 +351,7 @@ paths:
       tags:
         - 'Messaging'
     post:
-      operationId: 'MessageControlller_create'
+      operationId: 'MessageController_create'
       parameters: []
       requestBody:
         required: true
@@ -376,7 +376,7 @@ paths:
         - 'Messaging'
   /api/v2/messages/download:
     get:
-      operationId: 'MessageControlller_downloadMessage'
+      operationId: 'MessageController_downloadMessage'
       parameters:
         - name: 'fileId'
           required: true
@@ -396,7 +396,7 @@ paths:
         - 'Messaging'
   /api/v2/messages/upload:
     post:
-      operationId: 'MessageControlller_uploadFile'
+      operationId: 'MessageController_uploadFile'
       parameters: []
       requestBody:
         required: true
