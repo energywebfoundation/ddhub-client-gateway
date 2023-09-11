@@ -11,28 +11,15 @@ import {
   CloseButton,
   Dialog,
   GenericTable,
-  RolesIcon,
   Steps,
 } from '@ddhub-client-gateway-frontend/ui/core';
-import {
-  SUCCESS_MODAL_HEADERS,
-  FAIL_MODAL_HEADERS,
-  useNewMessageEffects,
-} from './NewMessage.effects';
+import { useNewMessageEffects } from './NewMessage.effects';
 import { useStyles } from './NewMessage.styles';
 
 export const NewMessage: FC = () => {
   const { classes } = useStyles();
-  const {
-    open,
-    closeModal,
-    details,
-    activeStep,
-    navigateToStep,
-    successDids,
-    failedDids,
-    modalSteps,
-  } = useNewMessageEffects();
+  const { open, closeModal, details, activeStep, navigateToStep, modalSteps } =
+    useNewMessageEffects();
   return (
     <Dialog open={open} onClose={closeModal} paperClassName={classes.paper}>
       <DialogContent sx={{ padding: 0 }}>
@@ -71,55 +58,10 @@ export const NewMessage: FC = () => {
             </Grid>
             <Grid item className={classes.contentWrapper} xs={8}>
               {activeStep === 0 && (
-                <>
-                  <Box display="flex" mb={1.25}>
-                    <Typography
-                      className={`${classes.value} ${classes.valueSuccess}`}
-                      variant="body2"
-                      noWrap
-                    >
-                      {successDids.length} Succeeded
-                    </Typography>
-                  </Box>
-                  <GenericTable
-                    headers={SUCCESS_MODAL_HEADERS}
-                    tableRows={successDids}
-                    showFooter={true}
-                    showSearch={false}
-                    containerProps={{ style: { boxShadow: 'none' } }}
-                    stripedTable={true}
-                    defaultSortBy="did"
-                    defaultOrder="asc"
-                    customStyle={{ tableMinWidth: 'auto' }}
-                    rowsPerPageOptions={[]}
-                  />
-                </>
+                <Typography>Add Channel and Topic</Typography>
               )}
-              {activeStep !== 0 && (
-                <>
-                  <Box display="flex" mb={1.25}>
-                    <Typography
-                      className={`${classes.value} ${classes.valueFailed}`}
-                      variant="body2"
-                      noWrap
-                    >
-                      {failedDids.length} Failed
-                    </Typography>
-                  </Box>
-                  <GenericTable
-                    headers={FAIL_MODAL_HEADERS}
-                    tableRows={failedDids}
-                    showFooter={true}
-                    showSearch={false}
-                    containerProps={{ style: { boxShadow: 'none' } }}
-                    stripedTable={true}
-                    defaultSortBy="did"
-                    defaultOrder="asc"
-                    customStyle={{ tableMinWidth: 'auto' }}
-                    rowsPerPageOptions={[]}
-                  />
-                </>
-              )}
+              {activeStep === 1 && <Typography>Add Message</Typography>}
+              {activeStep === 2 && <Typography>Review</Typography>}
             </Grid>
           </Grid>
         </Box>

@@ -5,4 +5,5 @@ export * from './Channel';
 export * from './MessagesContainer';
 export * from './LargeMessagesContainer';
 export * from './DataMessagingUploadContainer';
-export * from './NewMessage';
+export * from './NewMessageContainer';
+export * from './modals';

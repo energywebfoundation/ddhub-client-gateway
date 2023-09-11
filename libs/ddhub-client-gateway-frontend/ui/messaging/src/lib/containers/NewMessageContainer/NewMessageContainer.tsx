@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { ModalsCenter } from '../modals/ModalsCenter';
 
-export const NewMessage: FC = () => {
+export const NewMessageContainer: FC = () => {
   return <ModalsCenter />;
 };

@@ -16,7 +16,7 @@ import { useStyles } from './Drawer.styles';
 import { CollapsableMenu } from './CollapsableMenu/CollapsableMenu';
 import { MenuItem } from './MenuItem/MenuItem';
 import { useSetUserDataEffect } from '@ddhub-client-gateway-frontend/ui/login';
-import { useNewMessageEffects } from 'libs/ddhub-client-gateway-frontend/ui/messaging/src/lib/components';
+import { useNewMessageEffects } from '@ddhub-client-gateway-frontend/ui/messaging';
 import { NewMessage } from '@ddhub-client-gateway-frontend/ui/messaging';
 
 export const Drawer = () => {
