@@ -11,18 +11,19 @@ import {
   CustomArrayFieldItemTemplate,
   CustomArrayFieldTemplate,
   TextFieldInputTemplate,
-  FieldTemplate,
+  CustomFieldTemplate,
 } from '../templates';
 import { Ref, useRef } from 'react';
 import { useStyles } from './Form.styles';
 
-const { ArrayFieldItemTemplate } = Templates;
+const { FieldTemplate, ArrayFieldTemplate, ArrayFieldItemTemplate } = Templates;
 
+// recast imported templates back to original type as it doesn't like custom props
 const customTemplates = {
-  FieldTemplate: FieldTemplate,
-  ArrayFieldTemplate: CustomArrayFieldTemplate,
+  FieldTemplate: CustomFieldTemplate as typeof FieldTemplate,
+  ArrayFieldTemplate: CustomArrayFieldTemplate as typeof ArrayFieldTemplate,
   ArrayFieldItemTemplate:
-    CustomArrayFieldItemTemplate as typeof ArrayFieldItemTemplate, // recast back to original type as it doesn't like the custom props
+    CustomArrayFieldItemTemplate as typeof ArrayFieldItemTemplate,
   BaseInputTemplate: TextFieldInputTemplate,
 };
 

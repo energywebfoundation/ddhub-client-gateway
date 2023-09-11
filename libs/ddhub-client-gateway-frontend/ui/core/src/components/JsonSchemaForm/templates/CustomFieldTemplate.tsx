@@ -1,25 +1,12 @@
 import { FormControl, Typography } from '@mui/material';
-import {
-  FieldTemplateProps,
-  FormContextType,
-  RJSFSchema,
-  StrictRJSFSchema,
-  getTemplate,
-  getUiOptions,
-} from '@rjsf/utils';
+import { FieldTemplateProps, getTemplate, getUiOptions } from '@rjsf/utils';
 
 /** The `FieldTemplate` component is the template used by `SchemaField` to render any field. It renders the field
  * content, (label, description, children, errors and help) inside of a `WrapIfAdditional` component.
  *
  * @param props - The `FieldTemplateProps` for this component
  */
-export const FieldTemplate = <
-  T = any,
-  S extends StrictRJSFSchema = RJSFSchema,
-  F extends FormContextType = any
->(
-  props: FieldTemplateProps<T, S, F>
-) => {
+export const CustomFieldTemplate = (props: FieldTemplateProps) => {
   const {
     id,
     children,
@@ -42,13 +29,12 @@ export const FieldTemplate = <
     uiSchema,
     registry,
   } = props;
-  const uiOptions = getUiOptions<T, S, F>(uiSchema);
-  const WrapIfAdditionalTemplate = getTemplate<
+  const uiOptions = getUiOptions(uiSchema);
+  const WrapIfAdditionalTemplate = getTemplate(
     'WrapIfAdditionalTemplate',
-    T,
-    S,
-    F
-  >('WrapIfAdditionalTemplate', registry, uiOptions);
+    registry,
+    uiOptions
+  );
 
   if (hidden) {
     return <div style={{ display: 'none' }}>{children}</div>;
