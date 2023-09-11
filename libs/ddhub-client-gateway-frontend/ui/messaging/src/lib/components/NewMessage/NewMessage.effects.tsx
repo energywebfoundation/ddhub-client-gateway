@@ -4,7 +4,7 @@ export const useNewMessageEffects = () => {
   const dispatch = useModalDispatch();
   const openNewMessageModal = () => {
     dispatch({
-      type: ModalActionsEnum.NEW_MESSAGE,
+      type: ModalActionsEnum.SHOW_NEW_MESSAGE,
       payload: {
         open: true,
         data: {},

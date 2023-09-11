@@ -1,15 +1,21 @@
 import { Check } from 'react-feather';
-import { AlertIcon, TStep } from '@ddhub-client-gateway-frontend/ui/core';
+import { TStep } from '@ddhub-client-gateway-frontend/ui/core';
+import { SmsOutlined, TextSnippetOutlined } from '@mui/icons-material';
 
 export const MODAL_STEPS: TStep[] = [
   {
-    title: 'Sent',
-    subtitle: 'Successfully sent message',
-    icon: <Check size={21} />,
+    title: 'Select channel and topic',
+    subtitle: 'Reference - channel - topic',
+    icon: <TextSnippetOutlined />,
   },
   {
-    title: 'Failed',
-    subtitle: 'Message not sent',
-    icon: <AlertIcon />,
+    title: 'New message',
+    subtitle: 'Create new message',
+    icon: <SmsOutlined />,
+  },
+  {
+    title: 'Review',
+    subtitle: 'Review details for submission',
+    icon: <Check size={21} />,
   },
 ];

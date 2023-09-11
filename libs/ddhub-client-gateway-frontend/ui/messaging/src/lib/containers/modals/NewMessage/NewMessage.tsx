@@ -40,10 +40,6 @@ export const NewMessage: FC = () => {
           <Grid container className={classes.content} flexDirection={'row'}>
             <Grid item xs={4}>
               <Box className={classes.infoWrapper}>
-                <Box width={31} height={31}>
-                  <RolesIcon />
-                </Box>
-
                 <Box display="flex" alignItems="center" mt={3} mb={1.375}>
                   <Typography className={classes.infoTitle}>
                     Recipients
@@ -51,7 +47,7 @@ export const NewMessage: FC = () => {
                 </Box>
 
                 <Stack direction="column">
-                  <Typography className={classes.label} variant="body2">
+                  {/* <Typography className={classes.label} variant="body2">
                     Client Gateway Message ID
                   </Typography>
                   <Box display="flex">
@@ -62,7 +58,7 @@ export const NewMessage: FC = () => {
                     >
                       {details?.clientGatewayMessageId}
                     </Typography>
-                  </Box>
+                  </Box> */}
 
                   <Box className={classes.divider} />
                   <Steps

@@ -3,7 +3,7 @@ import { IModalStore, TModalAction } from './types';
 export enum ModalActionsEnum {
   SHOW_DETAILS = 'SHOW_DETAILS',
   SHOW_POST_DETAILS = 'SHOW_POST_DETAILS',
-  NEW_MESSAGE = 'NEW_MESSAGE',
+  SHOW_NEW_MESSAGE = 'SHOW_NEW_MESSAGE',
 }
 
 export const modalInitialState: IModalStore = {
@@ -30,7 +30,7 @@ export const modalsReducer = (
       return { ...state, details: action.payload };
     case ModalActionsEnum.SHOW_POST_DETAILS:
       return { ...state, postDetails: action.payload };
-    case ModalActionsEnum.NEW_MESSAGE:
+    case ModalActionsEnum.SHOW_NEW_MESSAGE:
       return { ...state, newMessage: action.payload };
   }
 };

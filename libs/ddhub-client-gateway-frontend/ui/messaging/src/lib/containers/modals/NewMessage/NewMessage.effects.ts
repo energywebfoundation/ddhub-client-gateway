@@ -47,35 +47,33 @@ export const useNewMessageEffects = () => {
   let modalSteps = MODAL_STEPS;
 
   const {
-    postDetails: { open, data: details },
+    newMessage: { open, data: details },
   } = useModalStore();
 
   if (details) {
-    details.status.forEach((status) => {
-      const details = status.details.map((item) => {
-        return {
-          ...item,
-          formattedDid: didFormatMinifier(item.did),
-        };
-      });
-
-      if (status.name === 'SENT') {
-        successDids = details;
-      } else if (status.name === 'FAILED') {
-        failedDids = details;
-      }
-    });
-
-    if (!failedDids.length) {
-      modalSteps = [MODAL_STEPS[0]];
-    } else if (!successDids.length) {
-      modalSteps = [MODAL_STEPS[1]];
-    }
+    // details.status.forEach((status) => {
+    //   const details = status.details.map((item) => {
+    //     return {
+    //       ...item,
+    //       formattedDid: didFormatMinifier(item.did),
+    //     };
+    //   });
+    //   if (status.name === 'SENT') {
+    //     successDids = details;
+    //   } else if (status.name === 'FAILED') {
+    //     failedDids = details;
+    //   }
+    // });
+    // if (!failedDids.length) {
+    //   modalSteps = [MODAL_STEPS[0]];
+    // } else if (!successDids.length) {
+    //   modalSteps = [MODAL_STEPS[1]];
+    // }
   }
 
   const closeModal = () => {
     dispatch({
-      type: ModalActionsEnum.SHOW_POST_DETAILS,
+      type: ModalActionsEnum.SHOW_NEW_MESSAGE,
       payload: {
         open: false,
         data: undefined,

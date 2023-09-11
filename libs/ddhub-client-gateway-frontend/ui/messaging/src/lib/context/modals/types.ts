@@ -39,7 +39,7 @@ interface IShowPostDetailsAction {
 }
 
 interface IShowNewMessageAction {
-  type: ModalActionsEnum.NEW_MESSAGE;
+  type: ModalActionsEnum.SHOW_NEW_MESSAGE;
   payload: TNewMessage;
 }
 

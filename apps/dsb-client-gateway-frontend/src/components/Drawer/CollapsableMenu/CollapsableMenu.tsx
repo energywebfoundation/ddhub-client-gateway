@@ -47,7 +47,7 @@ export const CollapsableMenu = ({
           {subMenu.map((item) => {
             return (
               <MenuItem
-                key={item.href}
+                key={item.href ?? item.title.toLowerCase().replace(/ /g, '-')}
                 href={item.href}
                 title={item.title}
                 onClick={item.onClick}

@@ -17,6 +17,7 @@ import { CollapsableMenu } from './CollapsableMenu/CollapsableMenu';
 import { MenuItem } from './MenuItem/MenuItem';
 import { useSetUserDataEffect } from '@ddhub-client-gateway-frontend/ui/login';
 import { useNewMessageEffects } from 'libs/ddhub-client-gateway-frontend/ui/messaging/src/lib/components';
+import { NewMessage } from '@ddhub-client-gateway-frontend/ui/messaging';
 
 export const Drawer = () => {
   const {
@@ -110,7 +111,10 @@ export const Drawer = () => {
         <CollapsableMenu
           menuTitle="Data Messaging"
           subMenu={[
-            { title: 'File upload', href: routerConst.DataMessagingFileUpload },
+            {
+              title: 'File upload',
+              href: routerConst.DataMessagingFileUpload,
+            },
             {
               title: 'File download',
               href: routerConst.DataMessagingFileDownload,
@@ -140,6 +144,7 @@ export const Drawer = () => {
           menuIcon={<Inbox className={classes.icon} size={18} />}
         />
       </List>
+      <NewMessage />
     </div>
   );
 };
