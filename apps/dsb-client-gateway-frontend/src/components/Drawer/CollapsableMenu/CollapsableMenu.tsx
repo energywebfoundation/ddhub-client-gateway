@@ -8,7 +8,8 @@ import { MenuItem } from '../MenuItem/MenuItem';
 import { MenuItemText } from '../MenuItemText/MenuItemText';
 
 export interface SubMenuProps {
-  href: string;
+  href?: string;
+  onClick?: () => void;
   title: string;
   menuIcon?: React.ReactNode;
 }
@@ -28,16 +29,18 @@ export const CollapsableMenu = ({
   const { isOpen, handleOpening } = useCollapsableListItemEffects();
   return (
     <>
-      {subMenu.length > 0 && <ListItem className={classes.navLink} onClick={handleOpening}>
-        {menuIcon}
-        <MenuItemText title={menuTitle} />
-        <ChevronRight
-          size={16}
-          className={clsx(classes.menuIcon, {
-            [classes.menuIconActive]: isOpen,
-          })}
-        />
-      </ListItem> }
+      {subMenu.length > 0 && (
+        <ListItem className={classes.navLink} onClick={handleOpening}>
+          {menuIcon}
+          <MenuItemText title={menuTitle} />
+          <ChevronRight
+            size={16}
+            className={clsx(classes.menuIcon, {
+              [classes.menuIconActive]: isOpen,
+            })}
+          />
+        </ListItem>
+      )}
 
       <Collapse in={isOpen} timeout="auto" unmountOnExit>
         <List component="div" disablePadding>
@@ -47,7 +50,12 @@ export const CollapsableMenu = ({
                 key={item.href}
                 href={item.href}
                 title={item.title}
-                icon={item.menuIcon ?? <Circle className={classes.subMenuIcon} size={10} />}
+                onClick={item.onClick}
+                icon={
+                  item.menuIcon ?? (
+                    <Circle className={classes.subMenuIcon} size={10} />
+                  )
+                }
               />
             );
           })}

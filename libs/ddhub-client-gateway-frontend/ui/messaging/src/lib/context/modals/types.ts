@@ -9,7 +9,7 @@ type TDetails = {
     topicName: string;
     topicVersion: string;
     payload: string;
-  }
+  };
 };
 
 type TPostDetails = {
@@ -17,9 +17,15 @@ type TPostDetails = {
   data: SendMessagelResponseDto;
 };
 
+type TNewMessage = {
+  open: boolean;
+  data: any;
+};
+
 export interface IModalStore {
   details: TDetails;
   postDetails: TPostDetails;
+  newMessage: TNewMessage;
 }
 
 interface IShowDetailsAction {
@@ -32,4 +38,12 @@ interface IShowPostDetailsAction {
   payload: TPostDetails;
 }
 
-export type TModalAction = IShowDetailsAction | IShowPostDetailsAction;
+interface IShowNewMessageAction {
+  type: ModalActionsEnum.NEW_MESSAGE;
+  payload: TNewMessage;
+}
+
+export type TModalAction =
+  | IShowDetailsAction
+  | IShowPostDetailsAction
+  | IShowNewMessageAction;
