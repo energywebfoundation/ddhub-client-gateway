@@ -152,7 +152,7 @@ export const getChannelControllerGetByTypeMock = () => [
     payloadEncryption: false,
     type: 'sub',
     useAnonymousExtChannel: true,
-    enableMessageForm: false,
+    messageForms: false,
     conditions: {
       dids: ['did:ethr:volta:0x09Df5d33f1242E1b8aA5E0E0F6BfA687E6846993'],
       roles: [
@@ -176,7 +176,7 @@ export const getChannelControllerGetByTypeMock = () => [
     payloadEncryption: false,
     type: 'pub',
     useAnonymousExtChannel: false,
-    enableMessageForm: true,
+    messageForms: true,
     conditions: {
       dids: ['did:ethr:volta:0x09Df5d33f1242E1b8aA5E0E0F6BfA687E6846993'],
       roles: ['marketoperator.roles'],
@@ -203,7 +203,7 @@ export const getChannelControllerGetByTypeMock = () => [
     payloadEncryption: true,
     type: 'upload',
     useAnonymousExtChannel: true,
-    enableMessageForm: false,
+    messageForms: false,
     conditions: {
       dids: ['did:ethr:volta:0x09Df5d33f1242E1b8aA5E0E0F6BfA687E6846993'],
       roles: ['marketoperator.roles'],
@@ -221,7 +221,7 @@ export const getChannelControllerGetByTypeMock = () => [
     payloadEncryption: false,
     type: 'download',
     useAnonymousExtChannel: false,
-    enableMessageForm: false,
+    messageForms: false,
     conditions: {
       dids: ['did:ethr:volta:0x09Df5d33f1242E1b8aA5E0E0F6BfA687E6846993'],
       roles: ['marketoperator.roles'],
