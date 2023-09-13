@@ -29,7 +29,7 @@ export const useChannels = (params?: ChannelControllerGetByTypeParams) => {
         enabledConfigs: {
           payloadEncryption: channel.payloadEncryption,
           useAnonymousExtChannel: channel.useAnonymousExtChannel,
-          enableMessageForm: channel.enableMessageForm,
+          messageForms: channel.messageForms,
         },
       };
     });
