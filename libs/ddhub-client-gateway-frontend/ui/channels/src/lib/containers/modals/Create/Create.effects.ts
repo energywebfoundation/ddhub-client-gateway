@@ -36,7 +36,7 @@ const initialState = {
   channelType: '',
   connectionType: '',
   useAnonymousExtChannel: false,
-  enableMessageForm: false,
+  messageForms: false,
 };
 
 export const useCreateChannelEffects = () => {
@@ -103,7 +103,7 @@ export const useCreateChannelEffects = () => {
     channelType: ChannelType;
     payloadEncryption: boolean;
     useAnonymousExtChannel: boolean;
-    enableMessageForm: boolean;
+    messageForms: boolean;
   }) => {
     if (validateFqcn(data.fqcn)) {
       const detailsData = data;
@@ -113,7 +113,7 @@ export const useCreateChannelEffects = () => {
       }
 
       if (detailsData.channelType !== ChannelType.Messaging) {
-        detailsData.enableMessageForm = false;
+        detailsData.messageForms = false;
         delete channelValues.conditions.responseTopics;
       } else if (
         detailsData.channelType === ChannelType.Messaging &&
@@ -183,7 +183,7 @@ export const useCreateChannelEffects = () => {
 
       if (respTopics) {
         responseTopicsData[topic.id] = respTopics.map((resTopic: Topic) =>
-          pick(resTopic, ['owner', 'topicName'])
+          pick(resTopic, ['owner', 'topicName', 'topicId'])
         );
       }
 
@@ -203,7 +203,7 @@ export const useCreateChannelEffects = () => {
       },
       payloadEncryption: values.payloadEncryption,
       useAnonymousExtChannel: values.useAnonymousExtChannel,
-      enableMessageForm: values.enableMessageForm,
+      messageForms: values.messageForms,
     };
 
     createChannelHandler(channelCreateValues, onCreate);

@@ -28,7 +28,7 @@ const initialState = {
   type: '' as UpdateChannelDtoType,
   payloadEncryption: false,
   useAnonymousExtChannel: false,
-  enableMessageForm: false,
+  messageForms: false,
   conditions: {
     roles: [] as string[],
     dids: [] as string[],
@@ -46,6 +46,7 @@ export const useUpdateChannelEffects = () => {
   const [activeStep, setActiveStep] = useState(0);
   const { applications } = useApplications('user');
   const applicationMap = new Map();
+  const messageForms = channel.messageForms;
 
   applications.forEach((application) =>
     applicationMap.set(application.namespace, application.appName)
@@ -73,7 +74,6 @@ export const useUpdateChannelEffects = () => {
         },
         payloadEncryption: channel.payloadEncryption,
         useAnonymousExtChannel: channel.useAnonymousExtChannel,
-        enableMessageForm: channel.enableMessageForm,
       });
     } else {
       resetToInitialState();
@@ -123,7 +123,7 @@ export const useUpdateChannelEffects = () => {
 
       if (respTopics) {
         responseTopicsData[topicId] = respTopics.map((resTopic: Topic) =>
-          pick(resTopic, ['owner', 'topicName'])
+          pick(resTopic, ['owner', 'topicName', 'topicId'])
         );
       }
     });
@@ -183,5 +183,6 @@ export const useUpdateChannelEffects = () => {
     channelUpdateHandler,
     isUpdating,
     getActionButtonsProps,
+    messageForms,
   };
 };

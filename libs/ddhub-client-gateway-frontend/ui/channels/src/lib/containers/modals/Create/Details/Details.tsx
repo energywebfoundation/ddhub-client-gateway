@@ -135,22 +135,22 @@ export const Details = ({
                   className={classes.switchLabel}
                   control={
                     <CheckSwitch
-                      id={fields.enableMessageForm.name}
+                      id={fields.messageForms.name}
                       checked={isEnableMsgForm}
-                      name={fields.enableMessageForm.name}
+                      name={fields.messageForms.name}
                       onChange={enableMsgFormOnChange}
                       color="primary"
                     />
                   }
                   labelPlacement="start"
-                  id={fields.enableMessageForm.name}
-                  name={fields.enableMessageForm.name}
-                  label={fields.enableMessageForm.label}
-                  {...register(fields.enableMessageForm.name)}
+                  id={fields.messageForms.name}
+                  name={fields.messageForms.name}
+                  label={fields.messageForms.label}
+                  {...register(fields.messageForms.name)}
                 />
               </Box>
               <Typography className={classes.switchDesc}>
-                {fields.enableMessageForm.description}
+                {fields.messageForms.description}
               </Typography>
             </Box>
           )}

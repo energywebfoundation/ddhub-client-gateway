@@ -13,7 +13,7 @@ enum FieldName {
   Fqcn = 'fqcn',
   ChannelType = 'channelType',
   AnonymousExtChannel = 'useAnonymousExtChannel',
-  EnableMessageForm = 'enableMessageForm',
+  EnableMessageForm = 'messageForms',
 }
 
 const validationSchema = yup
@@ -23,7 +23,7 @@ const validationSchema = yup
     connectionType: yup.string().required(),
     payloadEncryption: yup.boolean().optional(),
     useAnonymousExtChannel: yup.boolean().optional(),
-    enableMessageForm: yup.boolean().optional(),
+    messageForms: yup.boolean().optional(),
   })
   .required();
 
@@ -68,7 +68,7 @@ const fields = {
     description:
       'Encrypts message payloads before sending them. Encrypted message size exponentially increase and might exceed payload limit of 6MB. Please enable only for small-sized messages.',
   },
-  enableMessageForm: {
+  messageForms: {
     name: FieldName.EnableMessageForm,
     label: 'Enable Message Form',
     description:
@@ -89,7 +89,7 @@ export const useDetailsEffects = (channelValues: ICreateChannel) => {
     connectionType: '',
     payloadEncryption: false,
     useAnonymousExtChannel: false,
-    enableMessageForm: false,
+    messageForms: false,
   };
 
   const {

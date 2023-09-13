@@ -71,8 +71,7 @@ export const Details: FC = () => {
             topics={channel.conditions?.topics}
             responseTopics={channel.conditions?.responseTopics}
             showResponseTopics={
-              channel.type === CreateChannelDtoType.pub &&
-              channel.enableMessageForm
+              channel.type === CreateChannelDtoType.pub && channel.messageForms
             }
           />
         );
@@ -191,7 +190,7 @@ export const Details: FC = () => {
                         className={classes.encryptionValue}
                         variant="body2"
                       >
-                        {channel?.enableMessageForm ? (
+                        {channel?.messageForms ? (
                           <Check className={classes.iconCheck} />
                         ) : (
                           <X className={classes.iconX} />

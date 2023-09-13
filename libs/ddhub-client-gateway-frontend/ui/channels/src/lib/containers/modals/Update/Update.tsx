@@ -28,6 +28,7 @@ export const Update = () => {
     channelUpdateHandler,
     isUpdating,
     getActionButtonsProps,
+    messageForms,
   } = useUpdateChannelEffects();
   const { classes } = useStyles();
 
@@ -60,7 +61,6 @@ export const Update = () => {
               topics: channelValues.conditions?.topics || [],
               channelType: channelValues.type,
               responseTopics: channelValues.conditions?.responseTopics || {},
-              enableMessageForm: channelValues.enableMessageForm,
             }}
           />
         );
@@ -169,7 +169,7 @@ export const Update = () => {
                       className={classes.encryptionValue}
                       variant="body2"
                     >
-                      {channelValues?.enableMessageForm ? (
+                      {messageForms ? (
                         <Check className={classes.iconCheck} />
                       ) : (
                         <X className={classes.iconX} />
