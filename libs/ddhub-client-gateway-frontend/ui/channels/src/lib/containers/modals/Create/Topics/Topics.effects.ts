@@ -48,9 +48,9 @@ export const useTopicsEffects = (
   const [selectedTopics, setSelectedTopics] = useState<Topic[]>(
     channelValues.topics
   );
-  const [responseTopics, setResponseTopics] = useState(
-    channelValues.responseTopics
-  );
+  // const [responseTopics, setResponseTopics] = useState(
+  //   channelValues.responseTopics
+  // );
   const { applications, isLoading: isLoadingApplications } =
     useApplications('user');
   const [recent, setRecent] = useState('');
@@ -105,7 +105,7 @@ export const useTopicsEffects = (
   };
 
   const resetResponseTopics = (topicId: string) => {
-    setResponseTopics(omit(responseTopics, [topicId]));
+    // setResponseTopics(omit(responseTopics, [topicId]));
   };
 
   const removeSelectedTopic = (data: Topic) => {
@@ -132,7 +132,7 @@ export const useTopicsEffects = (
 
   const saveTopicResponse = (topics: Topic[], selectedTopicId: string) => {
     if (topics.length) {
-      setResponseTopics({ ...responseTopics, [selectedTopicId]: topics });
+      // setResponseTopics({ ...responseTopics, [selectedTopicId]: topics });
     } else {
       resetResponseTopics(selectedTopicId);
     }
@@ -194,6 +194,6 @@ export const useTopicsEffects = (
     setTopicInputValue,
     topicValue,
     saveTopicResponse,
-    responseTopics,
+    // responseTopics,
   };
 };

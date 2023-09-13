@@ -28,7 +28,7 @@ const initialState = {
   type: '' as UpdateChannelDtoType,
   payloadEncryption: false,
   useAnonymousExtChannel: false,
-  enableMessageForm: false,
+  messageForms: false,
   conditions: {
     roles: [] as string[],
     dids: [] as string[],
@@ -73,7 +73,7 @@ export const useUpdateChannelEffects = () => {
         },
         payloadEncryption: channel.payloadEncryption,
         useAnonymousExtChannel: channel.useAnonymousExtChannel,
-        enableMessageForm: channel.enableMessageForm,
+        messageForms: channel.messageForms,
       });
     } else {
       resetToInitialState();
@@ -117,16 +117,16 @@ export const useUpdateChannelEffects = () => {
   const channelUpdateHandler = (data: any) => {
     const responseTopicsData: any = {};
 
-    data.topics.map((topic: Topic) => {
-      const topicId = topic.id ?? topic.topicId;
-      const respTopics = data.responseTopics[topicId];
+    // data.topics.map((topic: Topic) => {
+    //   const topicId = topic.id ?? topic.topicId;
+    //   const respTopics = data.responseTopics[topicId];
 
-      if (respTopics) {
-        responseTopicsData[topicId] = respTopics.map((resTopic: Topic) =>
-          pick(resTopic, ['owner', 'topicName'])
-        );
-      }
-    });
+    //   if (respTopics) {
+    //     responseTopicsData[topicId] = respTopics.map((resTopic: Topic) =>
+    //       pick(resTopic, ['owner', 'topicName'])
+    //     );
+    //   }
+    // });
 
     const updateData = {
       fqcn: channel.fqcn,
@@ -136,7 +136,7 @@ export const useUpdateChannelEffects = () => {
       conditions: {
         ...channelValues.conditions,
         topics: data.topics,
-        responseTopics: responseTopicsData,
+        // responseTopics: responseTopicsData,
       },
     };
     updateChannelHandler(updateData, onUpdate);

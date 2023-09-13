@@ -41,10 +41,7 @@ export class MessagesCleanupService implements OnApplicationBootstrap {
       }
     );
 
-    await this.schedulerRegistry.addCronJob(
-      CronJobType.CLEANUP_MESSAGES,
-      cronJob
-    );
+    this.schedulerRegistry.addCronJob(CronJobType.CLEANUP_MESSAGES, cronJob);
 
     cronJob.start();
   }

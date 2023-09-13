@@ -63,9 +63,9 @@ export const Create = () => {
               onClick: setTopics,
             })}
             channelValues={{
-              enableMessageForm: channelValues.enableMessageForm,
+              messageForms: channelValues.messageForms,
               topics: channelValues.conditions?.topics || [],
-              responseTopics: channelValues.conditions?.responseTopics || {},
+              // responseTopics: channelValues.conditions?.responseTopics || {},
               channelType: channelValues.type,
             }}
           />

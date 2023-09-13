@@ -16,7 +16,7 @@ export interface TopicsProps {
   channelValues: {
     topics: Topic[];
     channelType: GetChannelResponseDtoType;
-    enableMessageForm: boolean;
+    messageForms?: boolean;
     responseTopics?: any;
   };
   actionButtonsProps: TActionButtonsProps;
@@ -42,7 +42,7 @@ export const Topics = ({ channelValues, actionButtonsProps }: TopicsProps) => {
     setTopicInputValue,
     topicValue,
     saveTopicResponse,
-    responseTopics,
+    // responseTopics,
   } = useTopicsEffects(channelValues);
 
   return (
@@ -129,11 +129,11 @@ export const Topics = ({ channelValues, actionButtonsProps }: TopicsProps) => {
           remove={removeSelectedTopic}
           edit={updateSelectedTopic}
           showTopicResponse={
-            channelValues.enableMessageForm &&
+            channelValues.messageForms &&
             channelValues.channelType === CreateChannelDtoType.pub
           }
           saveResponse={saveTopicResponse}
-          responseTopics={responseTopics}
+          // responseTopics={responseTopics}
           filters={filters}
           recent={recent}
         />
@@ -151,7 +151,7 @@ export const Topics = ({ channelValues, actionButtonsProps }: TopicsProps) => {
             onClick: () =>
               actionButtonsProps.nextClickButtonProps.onClick({
                 topics: selectedTopics,
-                responseTopics,
+                // responseTopics,
               }),
           }}
         />

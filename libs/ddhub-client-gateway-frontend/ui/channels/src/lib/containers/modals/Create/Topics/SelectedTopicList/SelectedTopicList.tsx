@@ -27,8 +27,8 @@ export const SelectedTopicList = ({
   recent,
   showTopicResponse,
   saveResponse,
-  responseTopics,
-}: SelectedTopicListProps) => {
+}: // responseTopics,
+SelectedTopicListProps) => {
   const { classes } = useStyles();
   const {
     availableTopics,
@@ -59,7 +59,7 @@ export const SelectedTopicList = ({
           edit={edit}
           showTopicResponse={showTopicResponse}
           saveResponse={saveResponse}
-          responseTopics={responseTopics[topic.id ?? topic.topicId]}
+          // responseTopics={responseTopics[topic.id ?? topic.topicId]}
           remove={() => {
             if (remove) {
               remove(topic);

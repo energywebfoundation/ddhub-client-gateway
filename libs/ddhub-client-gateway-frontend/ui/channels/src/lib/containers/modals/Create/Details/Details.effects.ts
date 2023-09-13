@@ -13,7 +13,7 @@ enum FieldName {
   Fqcn = 'fqcn',
   ChannelType = 'channelType',
   AnonymousExtChannel = 'useAnonymousExtChannel',
-  EnableMessageForm = 'enableMessageForm',
+  MessageForms = 'messageForms',
 }
 
 const validationSchema = yup
@@ -23,7 +23,7 @@ const validationSchema = yup
     connectionType: yup.string().required(),
     payloadEncryption: yup.boolean().optional(),
     useAnonymousExtChannel: yup.boolean().optional(),
-    enableMessageForm: yup.boolean().optional(),
+    messageForms: yup.boolean().optional(),
   })
   .required();
 
@@ -68,8 +68,8 @@ const fields = {
     description:
       'Encrypts message payloads before sending them. Encrypted message size exponentially increase and might exceed payload limit of 6MB. Please enable only for small-sized messages.',
   },
-  enableMessageForm: {
-    name: FieldName.EnableMessageForm,
+  messageForms: {
+    name: FieldName.MessageForms,
     label: 'Enable Message Form',
     description:
       'By default, channels are used mainly for API-based communications. This toggle flags the channel to auto-generate message input forms based on topic JSON schema definition. The forms will be used by users to easily construct and send messages with a user interface. Messages sent and received in this channel will be stored in this Client GW.',
@@ -89,7 +89,7 @@ export const useDetailsEffects = (channelValues: ICreateChannel) => {
     connectionType: '',
     payloadEncryption: false,
     useAnonymousExtChannel: false,
-    enableMessageForm: false,
+    messageForms: false,
   };
 
   const {
@@ -114,7 +114,7 @@ export const useDetailsEffects = (channelValues: ICreateChannel) => {
       FieldName.Fqcn,
       FieldName.PayloadEncryption,
       FieldName.AnonymousExtChannel,
-      FieldName.EnableMessageForm,
+      FieldName.MessageForms,
     ]);
     Object.entries(details).forEach(([name, value]) => {
       setValue(name, value);
@@ -126,7 +126,7 @@ export const useDetailsEffects = (channelValues: ICreateChannel) => {
         setIsEncrypt(!!value);
       } else if (name === FieldName.AnonymousExtChannel) {
         setIsUseAnonExtChnl(!!value);
-      } else if (name === FieldName.EnableMessageForm) {
+      } else if (name === FieldName.MessageForms) {
         setIsEnableMsgForm(!!value);
       } else if (name === FieldName.ChannelType) {
         setShowMsgForm(value === ChannelType.Messaging);

@@ -39,8 +39,8 @@ export const SelectedTopicView = ({
   handleOpenEdit,
   remove,
   canCopy,
-  responseTopics,
-}: SelectedTopicViewProps) => {
+}: // responseTopics,
+SelectedTopicViewProps) => {
   const { classes, theme } = useStyles();
   const { expandResponse, setExpandResponse } = useSelectedTopicViewEffects();
 
@@ -152,7 +152,7 @@ export const SelectedTopicView = ({
         </Grid>
       </Grid>
       <SelectedTopicsCollapse
-        responseTopics={responseTopics}
+        // responseTopics={responseTopics}
         expandResponse={expandResponse}
       />
     </Grid>

@@ -90,10 +90,10 @@ export const Summary = ({
               canRemove={false}
               isSummary={true}
               index={index}
-              showTopicResponse={
-                channelValues.type === 'pub' && channelValues.enableMessageForm
-              }
-              responseTopics={channelValues.conditions.responseTopics[el.id]}
+              // showTopicResponse={
+              //   channelValues.type === 'pub' && channelValues.messageForms
+              // }
+              // responseTopics={channelValues.conditions.responseTopics[el.id]}
             />
           ))}
         </Box>
@@ -174,7 +174,7 @@ export const Summary = ({
             </Typography>
             <Box display="flex">
               <Typography className={classes.encryptionValue} variant="body2">
-                {channelValues?.enableMessageForm ? (
+                {channelValues?.messageForms ? (
                   <Check className={classes.iconCheck} />
                 ) : (
                   <X className={classes.iconX} />

@@ -197,13 +197,15 @@ export class MessageService {
           `message sent with id ${detail.messageId} to ${detail.did} with status code ${detail.statusCode}`
         );
 
-        await this.messageStoreService.storeRecipients(
-          detail.did,
-          detail.messageId,
-          'todo',
-          detail.statusCode ?? 200,
-          clientGatewayMessageId
-        );
+        if (detail.messageId) {
+          await this.messageStoreService.storeRecipients(
+            detail.did,
+            detail.messageId,
+            'todo',
+            detail.statusCode ?? 200,
+            clientGatewayMessageId
+          );
+        }
       }
     }
 

@@ -87,12 +87,12 @@ export const Topics: FC<TopicsProps> = ({
         </Stack>
       </Box>
 
-      {showResponseTopics && (
+      {/* {showResponseTopics && (
         <SelectedTopicsCollapse
           responseTopics={responseTopics[topic.topicId]}
           expandResponse={expandResponse[topic.topicId]}
         />
-      )}
+      )} */}
     </Box>
   ));
 

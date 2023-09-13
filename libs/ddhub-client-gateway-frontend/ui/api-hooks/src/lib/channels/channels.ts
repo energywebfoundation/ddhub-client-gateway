@@ -11,15 +11,14 @@ export const useChannels = (params?: ChannelControllerGetByTypeParams) => {
   const { data, isLoading, isSuccess, isError, refetch } =
     useChannelControllerGetByType(params, {
       query: {
-        onError: (err: any) => {
+        onError: (err: unknown) => {
           console.error(err);
           Swal.httpError(err);
         },
       },
     });
 
-  let channels = [] as GetChannelResponseDto[];
-
+  let channels: ChannelDto[] = [];
   if (data) {
     channels = data.map((channel) => {
       return {
@@ -27,7 +26,7 @@ export const useChannels = (params?: ChannelControllerGetByTypeParams) => {
         enabledConfigs: {
           payloadEncryption: channel.payloadEncryption,
           useAnonymousExtChannel: channel.useAnonymousExtChannel,
-          enableMessageForm: channel.enableMessageForm,
+          messageForms: channel.messageForms,
         },
       };
     });
@@ -44,3 +43,11 @@ export const useChannels = (params?: ChannelControllerGetByTypeParams) => {
     refetch,
   };
 };
+
+export interface ChannelDto extends GetChannelResponseDto {
+  enabledConfigs: {
+    payloadEncryption: boolean;
+    useAnonymousExtChannel: boolean;
+    messageForms: boolean;
+  };
+}

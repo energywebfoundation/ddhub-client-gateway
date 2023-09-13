@@ -27,7 +27,7 @@ export class SentMessageEntity {
   @Column({ default: false })
   payloadEncryption: boolean;
 
-  @Column()
+  @Column({ type: 'text' })
   payload: string;
 
   @Column()

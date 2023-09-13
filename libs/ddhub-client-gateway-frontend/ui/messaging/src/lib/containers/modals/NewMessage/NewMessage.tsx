@@ -25,6 +25,7 @@ export const NewMessage: FC = () => {
   const { classes } = useStyles();
   const {
     open,
+    openCancelModal,
     closeModal,
     register,
     control,
@@ -40,6 +41,7 @@ export const NewMessage: FC = () => {
     setMessageValue,
     getActionButtonsProps,
     sendMessage,
+    isSending,
   } = useNewMessageEffects();
 
   const [formData, setFormData] = useState(null);
@@ -67,16 +69,21 @@ export const NewMessage: FC = () => {
         return getActionButtonsProps({
           canGoBack: activeStep > 0,
           onClick: () => sendMessage(),
-          disabled: modalSteps[2].disabled,
+          loading: isSending,
+          disabled: modalSteps[2].disabled || isSending,
           text: 'Send Message',
         });
       default:
-        break;
+        return;
     }
   };
 
   return (
-    <Dialog open={open} onClose={closeModal} paperClassName={classes.paper}>
+    <Dialog
+      open={open}
+      onClose={openCancelModal}
+      paperClassName={classes.paper}
+    >
       <DialogTitle className={classes.title}>New Message</DialogTitle>
       <DialogSubTitle>Provide data with this form</DialogSubTitle>
       <DialogContent>
@@ -197,7 +204,7 @@ export const NewMessage: FC = () => {
       </DialogContent>
       <DialogActions className={classes.actions}>
         <Box className={classes.closeButtonWrapper}>
-          <CloseButton onClose={closeModal} />
+          <CloseButton onClose={openCancelModal} />
         </Box>
         <ActionButtons {...buildStepActionButtons()} />
       </DialogActions>

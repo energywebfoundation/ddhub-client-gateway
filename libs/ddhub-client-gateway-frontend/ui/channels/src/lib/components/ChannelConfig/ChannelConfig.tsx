@@ -7,7 +7,7 @@ export interface ChannelConfigProps {
   value: {
     payloadEncryption: boolean;
     useAnonymousExtChannel: boolean;
-    enableMessageForm: boolean;
+    messageForms: boolean;
   };
 }
 
@@ -42,7 +42,7 @@ export const ChannelConfig: FC<ChannelConfigProps> = ({ value }) => {
 
       {value.payloadEncryption && <ConfigBox configText="Payload encryption" />}
 
-      {value.enableMessageForm && <ConfigBox configText="Message forms" />}
+      {value.messageForms && <ConfigBox configText="Message forms" />}
     </Box>
   );
 };

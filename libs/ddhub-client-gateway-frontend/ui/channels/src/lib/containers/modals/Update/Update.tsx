@@ -59,8 +59,8 @@ export const Update = () => {
             channelValues={{
               topics: channelValues.conditions?.topics || [],
               channelType: channelValues.type,
-              responseTopics: channelValues.conditions?.responseTopics || {},
-              enableMessageForm: channelValues.enableMessageForm,
+              // responseTopics: channelValues.conditions?.responseTopics || {},
+              messageForms: channelValues.messageForms,
             }}
           />
         );
@@ -169,7 +169,7 @@ export const Update = () => {
                       className={classes.encryptionValue}
                       variant="body2"
                     >
-                      {channelValues?.enableMessageForm ? (
+                      {channelValues?.messageForms ? (
                         <Check className={classes.iconCheck} />
                       ) : (
                         <X className={classes.iconX} />

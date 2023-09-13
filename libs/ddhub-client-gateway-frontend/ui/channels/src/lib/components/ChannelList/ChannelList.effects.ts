@@ -60,8 +60,7 @@ export const useChannelListEffects = () => {
       onClick: (channel: GetChannelResponseDto) =>
         removeChannelHandler(
           channel.fqcn,
-          channel.enableMessageForm &&
-            channel.type === GetChannelResponseDtoType.pub
+          channel.messageForms && channel.type === GetChannelResponseDtoType.pub
         ),
     },
   ];

@@ -32,11 +32,12 @@ const initialState = {
     roles: [] as string[],
     dids: [] as string[],
     topics: [] as ChannelTopic[],
+    // responseTopics: [] as ChannelTopic[],
   },
   channelType: '',
   connectionType: '',
   useAnonymousExtChannel: false,
-  enableMessageForm: false,
+  messageForms: false,
 };
 
 export const useCreateChannelEffects = () => {
@@ -103,7 +104,7 @@ export const useCreateChannelEffects = () => {
     channelType: ChannelType;
     payloadEncryption: boolean;
     useAnonymousExtChannel: boolean;
-    enableMessageForm: boolean;
+    messageForms: boolean;
   }) => {
     if (validateFqcn(data.fqcn)) {
       const detailsData = data;
@@ -113,13 +114,13 @@ export const useCreateChannelEffects = () => {
       }
 
       if (detailsData.channelType !== ChannelType.Messaging) {
-        detailsData.enableMessageForm = false;
-        delete channelValues.conditions.responseTopics;
+        detailsData.messageForms = false;
+        // delete channelValues.conditions.responseTopics;
       } else if (
         detailsData.channelType === ChannelType.Messaging &&
         detailsData.connectionType === ConnectionType.Subscribe
       ) {
-        delete channelValues.conditions.responseTopics;
+        // delete channelValues.conditions.responseTopics;
       }
 
       setActiveStep(activeStep + 1);
@@ -138,7 +139,7 @@ export const useCreateChannelEffects = () => {
       conditions: {
         ...channelValues.conditions,
         topics: data.topics,
-        responseTopics: data.responseTopics,
+        // responseTopics: data.responseTopics,
       },
     });
   };
@@ -176,16 +177,19 @@ export const useCreateChannelEffects = () => {
 
   const channelSubmitHandler = () => {
     const values = channelValues;
-    const responseTopicsData: any = {};
+    // const responseTopicsData: any = {};
 
     const topicsData = values.conditions.topics.map((topic: Topic) => {
-      const respTopics = values.conditions.responseTopics[topic.id];
+      // TODO: fix responseTopic types
+      /* const respTopics = values.conditions.responseTopics.filter(
+        (respTopic: any) => respTopic.topicId === topic.topicId
+      );
 
       if (respTopics) {
-        responseTopicsData[topic.id] = respTopics.map((resTopic: Topic) =>
+        responseTopicsData = respTopics.map((resTopic: Topic) =>
           pick(resTopic, ['owner', 'topicName'])
         );
-      }
+      } */
 
       return pick(topic, ['owner', 'topicName']);
     });
@@ -199,11 +203,11 @@ export const useCreateChannelEffects = () => {
         ...values.conditions,
         roles: rolesData,
         topics: topicsData,
-        responseTopics: responseTopicsData,
+        // responseTopics: responseTopicsData,
       },
       payloadEncryption: values.payloadEncryption,
       useAnonymousExtChannel: values.useAnonymousExtChannel,
-      enableMessageForm: values.enableMessageForm,
+      messageForms: values.messageForms,
     };
 
     createChannelHandler(channelCreateValues, onCreate);

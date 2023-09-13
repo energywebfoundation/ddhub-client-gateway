@@ -10,8 +10,8 @@ interface SelectedTopicsCollapseProps {
 
 export const SelectedTopicsCollapse = ({
   expandResponse,
-  responseTopics,
-}: SelectedTopicsCollapseProps) => {
+}: // responseTopics,
+SelectedTopicsCollapseProps) => {
   const { classes } = useStyles();
 
   return (
@@ -22,7 +22,7 @@ export const SelectedTopicsCollapse = ({
         </Typography>
 
         <Stack direction="row" spacing="6px">
-          {(!responseTopics || !responseTopics.length) && (
+          {/* {(!responseTopics || !responseTopics.length) && (
             <Box className={classes.noRecord}>
               <Typography className={classes.noRecordLabel}>
                 No response topic added
@@ -40,7 +40,7 @@ export const SelectedTopicsCollapse = ({
                   label: classes.chipLabel,
                 }}
               />
-            ))}
+            ))} */}
         </Stack>
       </Grid>
     </Collapse>

@@ -18,6 +18,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { validationSchema } from '../models/validationSchema';
 import { GetChannelResponseDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { TActionButtonsProps } from './ActionButtons';
+import { useCustomAlert } from '@ddhub-client-gateway-frontend/ui/core';
 
 type TGetActionButtonsProps = TActionButtonsProps['nextClickButtonProps'] & {
   canGoBack: boolean;
@@ -35,10 +36,12 @@ const initialState: INewMessage = {
 };
 
 export const useNewMessageEffects = () => {
+  const Swal = useCustomAlert();
   const dispatch = useModalDispatch();
   const {
     newMessage: { open },
   } = useModalStore();
+  const [firstLoad, setFirstLoad] = useState(true);
   const [newMessageValues, setNewMessageValues] =
     useState<INewMessage>(initialState);
   const [activeStep, setActiveStep] = useState(0);
@@ -66,6 +69,17 @@ export const useNewMessageEffects = () => {
   const { sendNewMessageHandler, isLoading: isSending } = useSendNewMessage();
 
   const sendMessage = () => {
+    /* const { message } = newMessageValues;
+    const definedValues = Object.keys(newMessageValues.message).filter(
+      (key) =>
+        message[key] !== '' &&
+        message[key] !== null &&
+        message[key] !== undefined &&
+        !(Array.isArray(message[key]) && message[key].length === 0)
+    );
+    console.log('definedValues', definedValues);
+    const payload = JSON.stringify(pick(message, definedValues));
+    console.log('payload', payload); */
     sendNewMessageHandler(
       {
         fqcn: newMessageValues.fqcn,
@@ -78,8 +92,21 @@ export const useNewMessageEffects = () => {
       },
       () => {
         closeModal();
+        Swal.success({
+          text: 'Message successfully sent',
+        });
       }
     );
+  };
+
+  const openCancelModal = async () => {
+    const result = await Swal.warning({
+      text: 'You will lose your data if you close the form.',
+    });
+
+    if (result.isConfirmed) {
+      closeModal();
+    }
   };
 
   const formContext = useForm<FieldValues>({
@@ -141,11 +168,20 @@ export const useNewMessageEffects = () => {
     if (open) {
       resetToInitialState();
       refreshChannels();
+    } else {
+      resetToInitialState();
+      setFirstLoad(true);
     }
   }, [open]);
 
   useEffect(() => {
     if (channelsLoaded) {
+      setFirstLoad(false);
+    }
+  }, [channelsLoaded]);
+
+  useEffect(() => {
+    if (channels && channels.length && !firstLoad) {
       setFields((prev) => ({
         ...prev,
         channel: {
@@ -157,12 +193,11 @@ export const useNewMessageEffects = () => {
         },
       }));
     }
-  }, [channelsLoaded, channels]);
+  }, [firstLoad]);
 
   useEffect(() => {
-    resetFormSelectOptions('topic');
     if (selectedChannel) {
-      console.log(selectedChannel);
+      resetFormSelectOptions('topic');
 
       const channel: GetChannelResponseDto = JSON.parse(selectedChannel);
       console.log(channel);
@@ -186,8 +221,9 @@ export const useNewMessageEffects = () => {
   }, [selectedChannel]);
 
   useEffect(() => {
-    resetFormSelectOptions('version');
     if (selectedTopic) {
+      resetFormSelectOptions('version');
+      console.log('selectedTopic', selectedTopic);
       console.log(selectedTopic);
       const topic = JSON.parse(selectedTopic);
       console.log(topic);
@@ -203,6 +239,7 @@ export const useNewMessageEffects = () => {
 
   useEffect(() => {
     if (topicHistoryLoaded) {
+      console.log('topicHistory', topicHistory);
       setFields((prev) => ({
         ...prev,
         version: {
@@ -218,6 +255,7 @@ export const useNewMessageEffects = () => {
 
   useEffect(() => {
     if (selectedVersion) {
+      console.log('selectedVersion', selectedVersion);
       const version = JSON.parse(selectedVersion);
       console.log(version);
 
@@ -230,6 +268,7 @@ export const useNewMessageEffects = () => {
 
   useEffect(() => {
     if (topicWithSchemaLoaded) {
+      console.log('topicWithSchema', topicWithSchema);
       if (topicWithSchema.schema) {
         const schema = JSON.parse(topicWithSchema.schema);
         if (schema.required && Array.isArray(schema.required)) {
@@ -318,9 +357,7 @@ export const useNewMessageEffects = () => {
           return false;
         }
         const schema = JSON.parse(newMessageValues.schema);
-        const hasRequiredFields = schema.required
-          ? schema.required.length
-          : false;
+        const hasRequiredFields = schema?.required?.length ?? false;
         const { message } = newMessageValues;
         let messageKeys: string[] = [];
         if (message) {
@@ -328,7 +365,8 @@ export const useNewMessageEffects = () => {
             (key) =>
               message[key] !== '' &&
               message[key] !== null &&
-              message[key] !== undefined
+              message[key] !== undefined &&
+              !(Array.isArray(message[key]) && message[key].length === 0)
           );
         }
         return (
@@ -349,7 +387,6 @@ export const useNewMessageEffects = () => {
   };
 
   useEffect(() => {
-    console.log(newMessageValues);
     setModalSteps((prev) =>
       prev.map((step, index) => {
         if (index === 0) {
@@ -404,6 +441,7 @@ export const useNewMessageEffects = () => {
 
   return {
     open,
+    openCancelModal,
     closeModal,
     channels,
     isLoading,

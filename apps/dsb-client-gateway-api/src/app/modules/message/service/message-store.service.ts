@@ -63,15 +63,18 @@ export class MessageStoreService {
   public async deleteExpiredMessages(): Promise<void> {
     const config: ConfigDto = await this.ddhubConfigService.getConfig();
 
-    const expiresOn = moment().add(config.msgExpired, 'seconds').utc().toDate();
+    const expiresOn = moment()
+      .subtract(config.msgExpired, 'milliseconds')
+      .utc()
+      .toDate();
 
     try {
       this.logger.log('attempting to delete expired received messages');
 
       await this.receivedMessageRepositoryWrapper.repository
-        .createQueryBuilder('message')
+        .createQueryBuilder()
         .delete()
-        .where('message.createdDate <= :expiresOn', { expiresOn })
+        .where('createdDate <= :expiresOn', { expiresOn })
         .execute();
 
       this.logger.log('deleted expired received messages');
@@ -84,9 +87,9 @@ export class MessageStoreService {
       this.logger.log('attempting to delete expired sent messages');
 
       await this.sentMessageRepositoryWrapper.repository
-        .createQueryBuilder('message')
+        .createQueryBuilder()
         .delete()
-        .where('message.createdDate <= :expiresOn', { expiresOn })
+        .where('createdDate <= :expiresOn', { expiresOn })
         .execute();
 
       this.logger.log('deleted sent messages');
