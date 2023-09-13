@@ -30,6 +30,32 @@ export class TopicDto {
   owner: string;
 }
 
+export class ResponseTopicDto {
+  @IsString()
+  @ApiProperty({
+    type: String,
+    description: 'Topic name',
+    example: 'operatorEnvelope',
+  })
+  topicName: string;
+
+  @IsString()
+  @ApiProperty({
+    type: String,
+    example: 'aemo.edge',
+    description: 'Owner name',
+  })
+  owner: string;
+
+  @IsString()
+  @ApiProperty({
+    type: String,
+    example: 'id',
+    description: 'Response topic id',
+  })
+  responseTopicId: string;
+}
+
 export class ChannelConditionsDto {
   @IsOptional()
   @IsDID({
@@ -71,22 +97,17 @@ export class ChannelConditionsDto {
   })
   topics: TopicDto[];
 
-  @ApiProperty({
-    example: {
-      '622fed6e4258501225095045': [
-        {
-          topicName: 'operatorEnvelopeAck',
-          owner: 'aemo.edge',
-          topicId: '622fed6e4258501225095046',
-        },
-      ],
-    },
-    description: 'Response topics mapping.',
+  @ValidateNested({
+    each: true,
   })
-  responseTopics: Record<
-    string,
-    { topicName: string; owner: string; topicId: string }[]
-  >;
+  @IsOptional()
+  @ArrayUnique((o) => `${o.topicName}_${o.owner}`)
+  @Type(() => ResponseTopicDto)
+  @ApiProperty({
+    description: 'Array of response topics',
+    type: () => [ResponseTopicDto],
+  })
+  responseTopics: ResponseTopicDto[];
 }
 
 export class CreateChannelDto {

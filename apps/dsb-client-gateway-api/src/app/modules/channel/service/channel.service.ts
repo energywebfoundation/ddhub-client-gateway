@@ -55,6 +55,10 @@ export class ChannelService {
       payload.conditions.topics
     );
 
+    const responseTopicsWithIds: ChannelTopic[] = await this.getTopicsWithIds(
+      payload.conditions.responseTopics
+    );
+
     await this.validateTopics(topicsWithIds, payload.type);
 
     if (payload.conditions.topics.length && !topicsWithIds.length) {
@@ -72,6 +76,7 @@ export class ChannelService {
         dids: payload.conditions.dids,
         roles: payload.conditions.roles,
         qualifiedDids: [],
+        responseTopics: responseTopicsWithIds,
       },
     });
 

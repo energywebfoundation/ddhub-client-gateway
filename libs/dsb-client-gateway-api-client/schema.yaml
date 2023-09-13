@@ -1248,6 +1248,25 @@ components:
       required:
         - "topicName"
         - "owner"
+    ResponseTopicDto:
+      type: "object"
+      properties:
+        topicName:
+          type: "string"
+          description: "Topic name"
+          example: "operatorEnvelope"
+        owner:
+          type: "string"
+          example: "aemo.edge"
+          description: "Owner name"
+        responseTopicId:
+          type: "string"
+          example: "id"
+          description: "Response topic id"
+      required:
+        - "topicName"
+        - "owner"
+        - "responseTopicId"
     ChannelConditionsDto:
       type: "object"
       properties:
@@ -1271,13 +1290,10 @@ components:
           items:
             $ref: "#/components/schemas/TopicDto"
         responseTopics:
-          type: "object"
-          example:
-            622fed6e4258501225095045:
-              - topicName: "operatorEnvelopeAck"
-                owner: "aemo.edge"
-                topicId: "622fed6e4258501225095046"
-          description: "Response topics mapping."
+          description: "Array of response topics"
+          type: "array"
+          items:
+            $ref: "#/components/schemas/ResponseTopicDto"
       required:
         - "dids"
         - "roles"
