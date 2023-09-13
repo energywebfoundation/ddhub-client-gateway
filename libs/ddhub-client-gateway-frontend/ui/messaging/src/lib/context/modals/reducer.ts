@@ -4,6 +4,7 @@ export enum ModalActionsEnum {
   SHOW_DETAILS = 'SHOW_DETAILS',
   SHOW_POST_DETAILS = 'SHOW_POST_DETAILS',
   SHOW_NEW_MESSAGE = 'SHOW_NEW_MESSAGE',
+  SHOW_VIEW_MESSAGE = 'SHOW_VIEW_MESSAGE',
 }
 
 export const modalInitialState: IModalStore = {
@@ -16,6 +17,10 @@ export const modalInitialState: IModalStore = {
     data: undefined,
   },
   newMessage: {
+    open: false,
+    data: undefined,
+  },
+  viewMessage: {
     open: false,
     data: undefined,
   },
@@ -32,5 +37,7 @@ export const modalsReducer = (
       return { ...state, postDetails: action.payload };
     case ModalActionsEnum.SHOW_NEW_MESSAGE:
       return { ...state, newMessage: action.payload };
+    case ModalActionsEnum.SHOW_VIEW_MESSAGE:
+      return { ...state, viewMessage: action.payload };
   }
 };

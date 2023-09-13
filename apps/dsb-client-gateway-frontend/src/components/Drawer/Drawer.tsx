@@ -16,8 +16,12 @@ import { useStyles } from './Drawer.styles';
 import { CollapsableMenu } from './CollapsableMenu/CollapsableMenu';
 import { MenuItem } from './MenuItem/MenuItem';
 import { useSetUserDataEffect } from '@ddhub-client-gateway-frontend/ui/login';
-import { useNewMessageEffects } from '@ddhub-client-gateway-frontend/ui/messaging';
-import { NewMessage } from '@ddhub-client-gateway-frontend/ui/messaging';
+import {
+  NewMessage,
+  ViewMessage,
+  useNewMessageEffects,
+  useViewMessageEffects,
+} from '@ddhub-client-gateway-frontend/ui/messaging';
 
 export const Drawer = () => {
   const {
@@ -25,6 +29,7 @@ export const Drawer = () => {
   } = useSetUserDataEffect();
   const { classes } = useStyles();
   const { openNewMessageModal } = useNewMessageEffects();
+  const { openViewMessageModal } = useViewMessageEffects();
 
   return (
     <div>
@@ -133,7 +138,8 @@ export const Drawer = () => {
             },
             {
               title: 'My messages',
-              href: routerConst.MyMessages,
+              onClick: openViewMessageModal,
+              // href: routerConst.MyMessages,
             },
             {
               title: 'Sent',
@@ -145,6 +151,7 @@ export const Drawer = () => {
         />
       </List>
       <NewMessage />
+      <ViewMessage />
     </div>
   );
 };

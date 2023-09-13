@@ -26,7 +26,6 @@ export const NewMessage: FC = () => {
   const {
     open,
     openCancelModal,
-    closeModal,
     register,
     control,
     selectedChannel,

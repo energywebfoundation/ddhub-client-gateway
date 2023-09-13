@@ -22,10 +22,16 @@ type TNewMessage = {
   data: any;
 };
 
+type TViewMessage = {
+  open: boolean;
+  data: any;
+};
+
 export interface IModalStore {
   details: TDetails;
   postDetails: TPostDetails;
   newMessage: TNewMessage;
+  viewMessage: TViewMessage;
 }
 
 interface IShowDetailsAction {
@@ -43,7 +49,13 @@ interface IShowNewMessageAction {
   payload: TNewMessage;
 }
 
+interface IShowViewMessageAction {
+  type: ModalActionsEnum.SHOW_VIEW_MESSAGE;
+  payload: TViewMessage;
+}
+
 export type TModalAction =
   | IShowDetailsAction
   | IShowPostDetailsAction
-  | IShowNewMessageAction;
+  | IShowNewMessageAction
+  | IShowViewMessageAction;
