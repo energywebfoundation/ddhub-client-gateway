@@ -71,3 +71,31 @@ export class GetChannelByTypeQueryDto {
   @IsOptional()
   messageForms: boolean;
 }
+
+export class CountChannelMessagesQueryDto {
+  @IsEnum(ChannelType)
+  @ApiProperty({
+    description: 'Channel type',
+    enum: [ChannelType.SUB, ChannelType.PUB],
+    example: ChannelType.SUB,
+    required: false,
+  })
+  @IsOptional()
+  type: ChannelType;
+
+  @IsBoolean()
+  @ApiProperty({
+    example: true,
+    required: false,
+  })
+  @IsOptional()
+  useAnonymousExtChannel: boolean;
+
+  @IsBoolean()
+  @ApiProperty({
+    example: true,
+    required: false,
+  })
+  @IsOptional()
+  payloadEncryption: boolean;
+}

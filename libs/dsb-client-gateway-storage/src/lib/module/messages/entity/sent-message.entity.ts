@@ -1,5 +1,4 @@
-import { Entity, PrimaryColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
-import { TopicEntity } from '../../topic';
+import { Entity, PrimaryColumn, Column } from 'typeorm';
 
 @Entity('sent_messages')
 export class SentMessageEntity {
@@ -35,6 +34,9 @@ export class SentMessageEntity {
 
   @Column()
   senderDid: string;
+
+  @Column()
+  fqcn: string;
 
   @Column({ default: false })
   isFile: boolean;

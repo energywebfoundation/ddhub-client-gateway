@@ -92,6 +92,63 @@ paths:
           description: "Unauthorized"
       tags:
         - "Gateway Configuration"
+  /api/v2/channels/messages/count:
+    get:
+      operationId: "ChannelController_getCountOfChannels"
+      parameters:
+        - name: "type"
+          required: false
+          in: "query"
+          description: "Channel type"
+          example: "sub"
+          schema:
+            enum:
+              - "sub"
+              - "pub"
+            type: "string"
+        - name: "useAnonymousExtChannel"
+          required: false
+          in: "query"
+          example: true
+          schema:
+            type: "boolean"
+        - name: "payloadEncryption"
+          required: false
+          in: "query"
+          example: true
+          schema:
+            type: "boolean"
+      responses:
+        200:
+          description: "Channel messages count returned successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/"
+        400:
+          description: "Invalid request"
+      tags:
+        - "Channels"
+  /api/v2/channels/messages/count/{fqcn}:
+    get:
+      operationId: "ChannelController_getCount"
+      parameters:
+        - name: "fqcn"
+          required: true
+          in: "path"
+          schema:
+            type: "string"
+      responses:
+        200:
+          description: "Channel messages count returned successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetChannelMessagesCountDto"
+        400:
+          description: "Invalid request"
+      tags:
+        - "Channels"
   /api/v2/channels:
     post:
       operationId: "ChannelController_create"
@@ -1234,6 +1291,15 @@ components:
       required:
         - "certificate"
         - "privateKey"
+    GetChannelMessagesCountDto:
+      type: "object"
+      properties:
+        count:
+          type: "number"
+          description: "Count of total messages"
+          example: 5
+      required:
+        - "count"
     TopicDto:
       type: "object"
       properties:
