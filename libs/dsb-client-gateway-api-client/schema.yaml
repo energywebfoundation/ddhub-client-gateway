@@ -124,7 +124,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/"
+                $ref: "#/components/schemas/GetChannelsMessagesCountDto"
         400:
           description: "Invalid request"
       tags:
@@ -1300,6 +1300,20 @@ components:
           example: 5
       required:
         - "count"
+    GetChannelsMessagesCountDto:
+      type: "object"
+      properties:
+        count:
+          type: "number"
+          description: "Count of total messages"
+          example: 5
+        fqcn:
+          type: "string"
+          description: "Channel Name"
+          example: "channel.name"
+      required:
+        - "count"
+        - "fqcn"
     TopicDto:
       type: "object"
       properties:
