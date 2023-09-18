@@ -1,19 +1,24 @@
-import { useState } from "react";
-import { useQueryClient } from "react-query";
+import { useState } from 'react';
+import { useQueryClient } from 'react-query';
 import {
   ChannelTopic,
   CreateChannelDto,
   CreateChannelDtoType,
-  getChannelControllerGetByTypeQueryKey
-} from "@dsb-client-gateway/dsb-client-gateway-api-client";
-import { useCustomAlert } from "@ddhub-client-gateway-frontend/ui/core";
-import { ModalActionsEnum, useModalDispatch, useModalStore } from "../../../context";
-import { useCreateChannel } from "@ddhub-client-gateway-frontend/ui/api-hooks";
-import { Topic } from "./Topics/Topics.effects";
-import { TActionButtonsProps } from "./ActionButtons/ActionButtons";
-import { ICreateChannel } from "../models/create-channel.interface";
-import { ChannelType } from "../../../models/channel-type.enum";
-import { ConnectionType } from "./Details/models/connection-type.enum";
+  getChannelControllerGetByTypeQueryKey,
+  ResponseTopicDto,
+} from '@dsb-client-gateway/dsb-client-gateway-api-client';
+import { useCustomAlert } from '@ddhub-client-gateway-frontend/ui/core';
+import {
+  ModalActionsEnum,
+  useModalDispatch,
+  useModalStore,
+} from '../../../context';
+import { useCreateChannel } from '@ddhub-client-gateway-frontend/ui/api-hooks';
+import { Topic } from './Topics/Topics.effects';
+import { TActionButtonsProps } from './ActionButtons/ActionButtons';
+import { ICreateChannel } from '../models/create-channel.interface';
+import { ChannelType } from '../../../models/channel-type.enum';
+import { ConnectionType } from './Details/models/connection-type.enum';
 import { pick } from 'lodash';
 
 type TGetActionButtonsProps = TActionButtonsProps['nextClickButtonProps'] & {
@@ -28,6 +33,7 @@ const initialState = {
     roles: [] as string[],
     dids: [] as string[],
     topics: [] as ChannelTopic[],
+    responseTopics: [] as ResponseTopicDto[],
   },
   channelType: '',
   connectionType: '',
@@ -90,7 +96,7 @@ export const useCreateChannelEffects = () => {
 
     setValidFqcn(isValid);
     return isValid;
-  }
+  };
 
   const setDetails = (data: {
     fqcn: string;
@@ -159,7 +165,9 @@ export const useCreateChannelEffects = () => {
 
   const channelSubmitHandler = () => {
     const values = channelValues;
-    const topicsData = values.conditions.topics.map(topic => pick(topic, ['owner', 'topicName']));
+    const topicsData = values.conditions.topics.map((topic) =>
+      pick(topic, ['owner', 'topicName'])
+    );
     const rolesData = values.conditions.roles.sort();
 
     const channelCreateValues: CreateChannelDto = {
