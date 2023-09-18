@@ -1099,7 +1099,6 @@ paths:
           description: "Contact created successfully"
       tags:
         - "Address Book"
-        - "Contacts"
     get:
       operationId: "AddressBookController_getAllContacts"
       parameters: []
@@ -1114,7 +1113,6 @@ paths:
                   $ref: "#/components/schemas/GetAllContactsResponseDto"
       tags:
         - "Address Book"
-        - "Contacts"
   /api/v2/contacts/{did}:
     delete:
       operationId: "AddressBookController_deleteContact"
@@ -1129,7 +1127,6 @@ paths:
           description: "Contact deleted successfully"
       tags:
         - "Address Book"
-        - "Contacts"
     put:
       operationId: "AddressBookController_updateContact"
       parameters:
@@ -1149,7 +1146,6 @@ paths:
           description: "Contact modified successfully"
       tags:
         - "Address Book"
-        - "Contacts"
 info:
   title: "DDHub Client Gateway"
   description: "DDHub Client Gateway"
