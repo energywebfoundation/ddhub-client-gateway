@@ -7,6 +7,7 @@ import {
   OneToMany,
 } from 'typeorm';
 import { TopicEntity } from '../../topic/entity/topic.entity';
+import { ReceivedMessageReadStatusEntity } from './received-message-read-status.entity';
 
 @Entity('received_messages')
 export class ReceivedMessageEntity {
@@ -50,6 +51,9 @@ export class ReceivedMessageEntity {
 
   @Column({ default: false })
   payloadEncryption: boolean;
+
+  @OneToMany(() => ReceivedMessageReadStatusEntity, (rms) => rms.message)
+  receivedMessagesReadStatus: ReceivedMessageReadStatusEntity[];
 
   @Column()
   payload: string;

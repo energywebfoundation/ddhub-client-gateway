@@ -21,6 +21,7 @@ interface StoreSentMessage {
   topic: TopicEntity;
   transactionId: string | null;
   signature: string;
+  fqcn: string;
   senderDid: string;
   payloadEncryption: boolean;
   payload: string;
@@ -170,6 +171,7 @@ export class MessageStoreService {
         entity.signature = item.signature;
         entity.topicVersion = item.topic.version;
         entity.topicId = item.topic.id;
+        entity.fqcn = item.fqcn;
         entity.payloadEncryption = item.payloadEncryption;
         entity.payload = item.payload;
         entity.timestampNanos = item.timestampNanos;

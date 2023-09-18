@@ -14,6 +14,8 @@ import {
   ChannelEntity,
   ChannelWrapperRepository,
   QueryChannels,
+  ReceivedMessageRepositoryWrapper,
+  SentMessageRepositoryWrapper,
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
 import { TopicNotFoundException } from '../exceptions/topic-not-found.exception';
 import {
@@ -23,6 +25,8 @@ import {
 } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
 import { ChannelInvalidTopicException } from '../exceptions/channel-invalid-topic.exception';
 import { differenceBy } from 'lodash';
+import { ChannelMessageFormsOnlyException } from '../exceptions/channel-message-forms-only.exception';
+import { GetChannelsMessagesCountDto } from '../dto/request/get-channel-messages-count.dto';
 
 @Injectable()
 export class ChannelService {
@@ -31,8 +35,53 @@ export class ChannelService {
   constructor(
     protected readonly wrapperRepository: ChannelWrapperRepository,
     protected readonly ddhubTopicsService: DdhubTopicsService,
-    protected readonly commandBus: CommandBus
+    protected readonly commandBus: CommandBus,
+    protected readonly sentMessagesRepositoryWrapper: SentMessageRepositoryWrapper,
+    protected readonly receivedMessagesRepositoryWrapper: ReceivedMessageRepositoryWrapper
   ) {}
+
+  @Span('channels_multipleMessageCount')
+  public async getMultipleChannelsMessageCount(
+    query: QueryChannels
+  ): Promise<GetChannelsMessagesCountDto[]> {
+    const channels: ChannelEntity[] = await this.queryChannels(query);
+
+    const result: GetChannelsMessagesCountDto[] = [];
+
+    for (const channel of channels) {
+      const dataToPush: GetChannelsMessagesCountDto = {
+        count: await this.getChannelMessageCount(channel.fqcn),
+        fqcn: channel.fqcn,
+      };
+
+      result.push(dataToPush);
+    }
+
+    return result;
+  }
+
+  @Span('channels_messageCount')
+  public async getChannelMessageCount(fqcn: string): Promise<number> {
+    const channel: ChannelEntity = await this.getChannelOrThrow(fqcn);
+
+    if (!channel.messageForms) {
+      throw new ChannelMessageFormsOnlyException(fqcn);
+    }
+
+    if (channel.type === ChannelType.PUB) {
+      return this.sentMessagesRepositoryWrapper.repository.count({
+        where: {
+          fqcn,
+        },
+      });
+    } else {
+      return this.receivedMessagesRepositoryWrapper.repository.count({
+        where: {
+          fqcn,
+        },
+      });
+    }
+  }
 
   @Span('channels_getChannels')
   public async getChannels(): Promise<ChannelEntity[]> {
@@ -55,6 +104,10 @@ export class ChannelService {
       payload.conditions.topics
     );
 
+    const responseTopicsWithIds: ChannelTopic[] = await this.getTopicsWithIds(
+      payload.conditions.responseTopics
+    );
+
     await this.validateTopics(topicsWithIds, payload.type);
 
     if (payload.conditions.topics.length && !topicsWithIds.length) {
@@ -72,6 +125,7 @@ export class ChannelService {
         dids: payload.conditions.dids,
         roles: payload.conditions.roles,
         qualifiedDids: [],
+        responseTopics: responseTopicsWithIds,
       },
     });
 

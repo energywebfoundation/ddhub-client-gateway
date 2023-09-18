@@ -92,6 +92,63 @@ paths:
           description: "Unauthorized"
       tags:
         - "Gateway Configuration"
+  /api/v2/channels/messages/count:
+    get:
+      operationId: "ChannelController_getCountOfChannels"
+      parameters:
+        - name: "type"
+          required: false
+          in: "query"
+          description: "Channel type"
+          example: "sub"
+          schema:
+            enum:
+              - "sub"
+              - "pub"
+            type: "string"
+        - name: "useAnonymousExtChannel"
+          required: false
+          in: "query"
+          example: true
+          schema:
+            type: "boolean"
+        - name: "payloadEncryption"
+          required: false
+          in: "query"
+          example: true
+          schema:
+            type: "boolean"
+      responses:
+        200:
+          description: "Channel messages count returned successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetChannelsMessagesCountDto"
+        400:
+          description: "Invalid request"
+      tags:
+        - "Channels"
+  /api/v2/channels/messages/count/{fqcn}:
+    get:
+      operationId: "ChannelController_getCount"
+      parameters:
+        - name: "fqcn"
+          required: true
+          in: "path"
+          schema:
+            type: "string"
+      responses:
+        200:
+          description: "Channel messages count returned successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetChannelMessagesCountDto"
+        400:
+          description: "Invalid request"
+      tags:
+        - "Channels"
   /api/v2/channels:
     post:
       operationId: "ChannelController_create"
@@ -119,7 +176,7 @@ paths:
       operationId: "ChannelController_getByType"
       parameters:
         - name: "type"
-          required: true
+          required: false
           in: "query"
           description: "Channel type"
           example: "sub"
@@ -130,6 +187,24 @@ paths:
               - "download"
               - "upload"
             type: "string"
+        - name: "useAnonymousExtChannel"
+          required: false
+          in: "query"
+          example: true
+          schema:
+            type: "boolean"
+        - name: "payloadEncryption"
+          required: false
+          in: "query"
+          example: true
+          schema:
+            type: "boolean"
+        - name: "messageForms"
+          required: false
+          in: "query"
+          example: true
+          schema:
+            type: "boolean"
       responses:
         200:
           description: "Gives channels based on type from query"
@@ -292,6 +367,27 @@ paths:
           in: "query"
           example: "test2"
           description: "cursor for pointing to messages"
+          schema:
+            type: "string"
+        - name: "initiatingMessageId"
+          required: false
+          in: "query"
+          example: "507f191e810c19729de860ea"
+          description: "Initiating message id"
+          schema:
+            type: "string"
+        - name: "initiatingTransactionId"
+          required: false
+          in: "query"
+          example: "45d5a89f-7c2c-48b0-ae9a-54f4128e818f"
+          description: "Initiating transaction id"
+          schema:
+            type: "string"
+        - name: "messageId"
+          required: false
+          in: "query"
+          example: "507f191e810c19729de860ea"
+          description: "Message id"
           schema:
             type: "string"
       responses:
@@ -988,6 +1084,68 @@ paths:
           description: "Client deleted"
       tags:
         - "Clients"
+  /api/v2/contacts:
+    post:
+      operationId: "AddressBookController_storeContact"
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateContactDto"
+      responses:
+        204:
+          description: "Contact created successfully"
+      tags:
+        - "Address Book"
+    get:
+      operationId: "AddressBookController_getAllContacts"
+      parameters: []
+      responses:
+        200:
+          description: "List of contacts"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/GetAllContactsResponseDto"
+      tags:
+        - "Address Book"
+  /api/v2/contacts/{did}:
+    delete:
+      operationId: "AddressBookController_deleteContact"
+      parameters:
+        - name: "did"
+          required: true
+          in: "path"
+          schema:
+            type: "string"
+      responses:
+        204:
+          description: "Contact deleted successfully"
+      tags:
+        - "Address Book"
+    put:
+      operationId: "AddressBookController_updateContact"
+      parameters:
+        - name: "did"
+          required: true
+          in: "path"
+          schema:
+            type: "string"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateContactRequestDto"
+      responses:
+        204:
+          description: "Contact modified successfully"
+      tags:
+        - "Address Book"
 info:
   title: "DDHub Client Gateway"
   description: "DDHub Client Gateway"
@@ -1129,6 +1287,29 @@ components:
       required:
         - "certificate"
         - "privateKey"
+    GetChannelMessagesCountDto:
+      type: "object"
+      properties:
+        count:
+          type: "number"
+          description: "Count of total messages"
+          example: 5
+      required:
+        - "count"
+    GetChannelsMessagesCountDto:
+      type: "object"
+      properties:
+        count:
+          type: "number"
+          description: "Count of total messages"
+          example: 5
+        fqcn:
+          type: "string"
+          description: "Channel Name"
+          example: "channel.name"
+      required:
+        - "count"
+        - "fqcn"
     TopicDto:
       type: "object"
       properties:
@@ -1143,6 +1324,25 @@ components:
       required:
         - "topicName"
         - "owner"
+    ResponseTopicDto:
+      type: "object"
+      properties:
+        topicName:
+          type: "string"
+          description: "Topic name"
+          example: "operatorEnvelope"
+        owner:
+          type: "string"
+          example: "aemo.edge"
+          description: "Owner name"
+        responseTopicId:
+          type: "string"
+          example: "id"
+          description: "Response topic id"
+      required:
+        - "topicName"
+        - "owner"
+        - "responseTopicId"
     ChannelConditionsDto:
       type: "object"
       properties:
@@ -1165,10 +1365,16 @@ components:
           type: "array"
           items:
             $ref: "#/components/schemas/TopicDto"
+        responseTopics:
+          description: "Array of response topics"
+          type: "array"
+          items:
+            $ref: "#/components/schemas/ResponseTopicDto"
       required:
         - "dids"
         - "roles"
         - "topics"
+        - "responseTopics"
     CreateChannelDto:
       type: "object"
       properties:
@@ -1180,6 +1386,11 @@ components:
           type: "boolean"
           description: "Use anonymous external channels"
           example: true
+        messageForms:
+          type: "boolean"
+          description: "Create message forms"
+          example: true
+          default: false
         payloadEncryption:
           type: "boolean"
           description: "Channel encryption"
@@ -1266,6 +1477,11 @@ components:
           type: "string"
           description: "Channel type"
           example: "channel.name"
+        messageForms:
+          type: "boolean"
+          description: "Message forms"
+          example: false
+          default: false
         payloadEncryption:
           type: "boolean"
           description: "Channel encryption"
@@ -1290,6 +1506,7 @@ components:
             - $ref: "#/components/schemas/ChannelConditions"
       required:
         - "fqcn"
+        - "messageForms"
         - "payloadEncryption"
         - "type"
         - "useAnonymousExtChannel"
@@ -1423,6 +1640,14 @@ components:
           type: "string"
           description: "Channel Name"
           example: "channel.name"
+        initiatingMessageId:
+          type: "string"
+          description: "Initiating message id"
+          example: "507f1f77bcf86cd799439011"
+        initiatingTransactionId:
+          type: "string"
+          description: "Initiating transaction id"
+          example: "8ac55aa7-7d6d-438a-98bd-376079903c7b"
         topicName:
           type: "string"
           description: "Topic name"
@@ -2038,6 +2263,8 @@ components:
             - "MESSAGE_CLEANER"
             - "CLIENTS"
             - "ASSOCIATION_KEYS_SHARE"
+            - "MESSAGES_FETCH"
+            - "CLEANUP_MESSAGES"
         latestStatus:
           type: "string"
           description: "CRON job status"
@@ -2116,6 +2343,26 @@ components:
             type: "string"
       required:
         - "clientsIds"
+    CreateContactDto:
+      type: "object"
+      properties: {}
+    UpdateContactRequestDto:
+      type: "object"
+      properties: {}
+    GetAllContactsResponseDto:
+      type: "object"
+      properties:
+        did:
+          type: "string"
+          description: "DID"
+          example: "did:ethr:volta:0x782aB0383Bfc807439d8EE29516937B47815d697"
+        alias:
+          type: "string"
+          description: "Alias"
+          example: "Krzysztof Szostak"
+      required:
+        - "did"
+        - "alias"
 externalDocs:
   description: "Postman Collection"
   url: "/docs-json"

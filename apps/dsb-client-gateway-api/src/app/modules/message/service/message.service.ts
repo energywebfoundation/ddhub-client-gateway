@@ -218,6 +218,7 @@ export class MessageService {
             topic,
             clientGatewayMessageId: clientGatewayMessageId,
             isFile: false,
+            fqcn: channel.fqcn,
             signature: signature,
             transactionId: dto.transactionId,
             payloadEncryption: shouldEncrypt,

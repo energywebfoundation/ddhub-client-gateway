@@ -4,6 +4,7 @@ import {
   UpdateChannelDto,
   UpdateChannelDtoType,
   getChannelControllerGetByTypeQueryKey,
+  ResponseTopicDto,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { useCustomAlert } from '@ddhub-client-gateway-frontend/ui/core';
 import {
@@ -12,7 +13,10 @@ import {
   useModalStore,
 } from '../../../context';
 import { TActionButtonsProps } from '../Create/ActionButtons/ActionButtons';
-import { useApplications, useUpdateChannel } from '@ddhub-client-gateway-frontend/ui/api-hooks';
+import {
+  useApplications,
+  useUpdateChannel,
+} from '@ddhub-client-gateway-frontend/ui/api-hooks';
 import { ChannelTopic } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { Topic } from '../Create/Topics/Topics.effects';
 
@@ -28,6 +32,7 @@ const initialState = {
     roles: [] as string[],
     dids: [] as string[],
     topics: [] as ChannelTopic[],
+    responseTopics: [] as ResponseTopicDto[],
   },
 };
 
@@ -42,7 +47,9 @@ export const useUpdateChannelEffects = () => {
   const { applications } = useApplications('user');
   const applicationMap = new Map();
 
-  applications.forEach(application => applicationMap.set(application.namespace, application.appName));
+  applications.forEach((application) =>
+    applicationMap.set(application.namespace, application.appName)
+  );
 
   const { updateChannelHandler, isLoading: isUpdating } = useUpdateChannel();
 
@@ -55,7 +62,7 @@ export const useUpdateChannelEffects = () => {
         return {
           ...topic,
           appName: applicationMap.get(topic.owner),
-        }
+        };
       });
 
       setChannelValues({
@@ -63,6 +70,7 @@ export const useUpdateChannelEffects = () => {
         conditions: {
           ...channel.conditions,
           topics,
+          responseTopics: [], // temp fix
         },
         payloadEncryption: channel.payloadEncryption,
         useAnonymousExtChannel: channel.useAnonymousExtChannel,
@@ -121,7 +129,6 @@ export const useUpdateChannelEffects = () => {
   };
 
   const openCancelModal = async () => {
-
     const result = await Swal.warning({
       text: 'Your changes will be lost!',
     });

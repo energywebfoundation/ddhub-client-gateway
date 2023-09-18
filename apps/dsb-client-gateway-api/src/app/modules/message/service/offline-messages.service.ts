@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { GetMessagesDto } from '../dto/request/get-messages.dto';
 import { GetMessageResponse } from '../message.interface';
 import {
   DidEntity,
   ReceivedMessageEntity,
+  ReceivedMessageReadStatusRepositoryWrapper,
   ReceivedMessageRepositoryWrapper,
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
 import { FindConditions } from 'typeorm/find-options/FindConditions';
@@ -13,8 +14,11 @@ import { KeysService } from '../../keys/service/keys.service';
 
 @Injectable()
 export class OfflineMessagesService {
+  protected readonly logger = new Logger(OfflineMessagesService.name);
+
   constructor(
     protected readonly receivedMessageRepositoryWrapper: ReceivedMessageRepositoryWrapper,
+    protected readonly receivedMessageReadStatusRepositoryWrapper: ReceivedMessageReadStatusRepositoryWrapper,
     protected readonly keysService: KeysService
   ) {}
 
@@ -33,47 +37,58 @@ export class OfflineMessagesService {
       messageId,
     } = dto;
 
-    const whereQuery: FindConditions<ReceivedMessageEntity> = {};
+    const rm = 'rm';
+    const rms = 'rms';
 
-    if (fqcn) {
-      whereQuery.fqcn = fqcn;
-    }
+    const query = this.receivedMessageRepositoryWrapper.repository
+      .createQueryBuilder(rm)
+      .leftJoinAndSelect(`${rm}.receivedMessagesReadStatus`, rms)
+      .where((qb) => {
+        qb.where(`${rms}.messageId IS NULL`);
 
-    if (from) {
-      whereQuery.timestampNanos = moment(from).utc().toDate();
-    }
+        if (fqcn) {
+          qb.andWhere(`${rm}.fqcn = :fqcn`, { fqcn });
+        }
 
-    if (topicOwner) {
-      whereQuery.topicOwner = topicOwner;
-    }
+        if (from) {
+          qb.andWhere(`${rm}.timestampNanos = :from`, {
+            from: moment(from).utc().toDate(),
+          });
+        }
 
-    if (topicName) {
-      whereQuery.topicName = topicName;
-    }
+        if (topicOwner) {
+          qb.andWhere(`${rm}.topicOwner = :topicOwner`, { topicOwner });
+        }
 
-    if (initiatingMessageId) {
-      whereQuery.initiatingMessageId = initiatingMessageId;
-    }
+        if (topicName) {
+          qb.andWhere(`${rm}.topicName = :topicName`, { topicName });
+        }
 
-    if (initiatingTransactionId) {
-      whereQuery.initiatingTransactionId = initiatingTransactionId;
-    }
+        if (initiatingMessageId) {
+          qb.andWhere(`${rm}.initiatingMessageId = :initiatingMessageId`, {
+            initiatingMessageId,
+          });
+        }
 
-    if (messageId) {
-      whereQuery.messageId = messageId;
-    }
+        if (initiatingTransactionId) {
+          qb.andWhere(
+            `${rm}.initiatingTransactionId = :initiatingTransactionId`,
+            { initiatingTransactionId }
+          );
+        }
 
-    const messages =
-      await this.receivedMessageRepositoryWrapper.repository.find({
-        where: whereQuery,
-        order: {
-          timestampNanos: 'DESC',
-        },
-        take: amount ?? 3,
-      });
+        if (messageId) {
+          qb.andWhere(`${rm}.messageId = :messageId`, { messageId });
+        }
 
-    // @TODO - apply read status, exclude read messages from above query
-    // do we need to respect clientId?
+        if (clientId) {
+          qb.andWhere(`${rm}.clientId = :clientId`, { clientId });
+        }
+      })
+      .orderBy(`${rm}.timestampNanos`, 'DESC')
+      .take(amount || 3);
+
+    const messages: ReceivedMessageEntity[] = await query.getMany();
 
     const uniqueSenderDids: string[] = [
       ...new Set(messages.map(({ senderDid }) => senderDid)),
@@ -82,7 +97,7 @@ export class OfflineMessagesService {
     const prefetchedSignatureKeys: Record<string, DidEntity | null> =
       await this.keysService.prefetchSignatureKeys(uniqueSenderDids);
 
-    return await Promise.all(
+    const receivedMessages: GetMessageResponse[] = await Promise.all(
       messages.map(async (message: ReceivedMessageEntity) => {
         const isSignatureValid: boolean =
           await this.keysService.verifySignature(
@@ -133,5 +148,23 @@ export class OfflineMessagesService {
         };
       })
     );
+
+    await this.ackMessages(receivedMessages);
+
+    return receivedMessages;
+  }
+
+  protected async ackMessages(messages: GetMessageResponse[]): Promise<void> {
+    for (const message of messages) {
+      try {
+        await this.receivedMessageReadStatusRepositoryWrapper.repository.save({
+          messageId: message.id,
+          recipientUser: '@TODO LATER',
+        });
+      } catch (e) {
+        this.logger.error(`failed to mark message as read ${message.id}`);
+        this.logger.error(e);
+      }
+    }
   }
 }
