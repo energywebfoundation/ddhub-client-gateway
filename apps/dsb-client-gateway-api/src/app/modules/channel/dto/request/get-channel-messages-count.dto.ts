@@ -19,7 +19,7 @@ export class GetChannelsMessagesCountDto {
 
   @ApiProperty({
     description: 'Channel name',
-    type: Number,
+    type: String,
     example: 'szostak.pub',
   })
   fqcn: string;
