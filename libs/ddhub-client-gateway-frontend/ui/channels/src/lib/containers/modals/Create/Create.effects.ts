@@ -32,6 +32,7 @@ const initialState = {
     roles: [] as string[],
     dids: [] as string[],
     topics: [] as ChannelTopic[],
+    responseTopics: [] as ResponseTopicDto[],
   },
   channelType: '',
   connectionType: '',

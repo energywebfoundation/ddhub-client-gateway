@@ -1287,7 +1287,7 @@ components:
           example: true
         messageForms:
           type: "boolean"
-          description: "Use anonymous external channels"
+          description: "Create message forms"
           example: true
           default: false
         payloadEncryption:

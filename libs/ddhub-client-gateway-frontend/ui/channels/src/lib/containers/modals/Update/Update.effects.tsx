@@ -4,6 +4,7 @@ import {
   UpdateChannelDto,
   UpdateChannelDtoType,
   getChannelControllerGetByTypeQueryKey,
+  ResponseTopicDto,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { useCustomAlert } from '@ddhub-client-gateway-frontend/ui/core';
 import {
@@ -33,6 +34,7 @@ const initialState = {
     roles: [] as string[],
     dids: [] as string[],
     topics: [] as ChannelTopic[],
+    responseTopics: [] as ResponseTopicDto[],
   },
 };
 
@@ -71,6 +73,7 @@ export const useUpdateChannelEffects = () => {
         conditions: {
           ...channel.conditions,
           topics,
+          responseTopics: [], // temp fix
         },
         payloadEncryption: channel.payloadEncryption,
         useAnonymousExtChannel: channel.useAnonymousExtChannel,

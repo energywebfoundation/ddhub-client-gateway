@@ -14,29 +14,18 @@ export class ChannelTopic {
   topicId: string;
 }
 
+export class ChannelResponseTopic {
+  topicName: string;
+  topicOwner: string;
+  topicId: string;
+  responseTopicId: string;
+}
+
 export class ChannelConditions {
-  @IsOptional()
-  @IsString({
-    each: true,
-  })
   dids: string[] = [];
-
-  @IsString({
-    each: true,
-  })
-  @IsOptional()
   roles: string[] = [];
-
-  @IsOptional()
-  @IsString({
-    each: true,
-  })
   topics: ChannelTopic[] = [];
-
-  @IsOptional()
-  @IsString({
-    each: true,
-  })
+  responseTopics: ChannelResponseTopic[] = [];
   qualifiedDids: string[];
 }
 
