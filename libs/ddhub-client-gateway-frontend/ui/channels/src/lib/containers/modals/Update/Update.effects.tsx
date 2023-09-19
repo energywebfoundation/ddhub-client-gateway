@@ -19,7 +19,6 @@ import {
 } from '@ddhub-client-gateway-frontend/ui/api-hooks';
 import { ChannelTopic } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { Topic } from '../Create/Topics/Topics.effects';
-import { pick } from 'lodash';
 
 type TGetActionButtonsProps = TActionButtonsProps['nextClickButtonProps'] & {
   canGoBack: boolean;
@@ -29,7 +28,6 @@ const initialState = {
   type: '' as UpdateChannelDtoType,
   payloadEncryption: false,
   useAnonymousExtChannel: false,
-  messageForms: false,
   conditions: {
     roles: [] as string[],
     dids: [] as string[],
@@ -48,7 +46,8 @@ export const useUpdateChannelEffects = () => {
   const [activeStep, setActiveStep] = useState(0);
   const { applications } = useApplications('user');
   const applicationMap = new Map();
-  const messageForms = channel.messageForms;
+  // const messageForms = channel.messageForms;
+  const messageForms = false; // todo
 
   applications.forEach((application) =>
     applicationMap.set(application.namespace, application.appName)
@@ -68,12 +67,20 @@ export const useUpdateChannelEffects = () => {
         };
       });
 
+      const responseTopics = channel.conditions.responseTopics.map((topic) => {
+        return {
+          topicName: topic.topicName,
+          owner: topic.owner,
+          responseTopicId: topic.responseTopicId,
+        };
+      });
+
       setChannelValues({
         type: channel.type,
         conditions: {
           ...channel.conditions,
           topics,
-          responseTopics: [], // temp fix
+          responseTopics,
         },
         payloadEncryption: channel.payloadEncryption,
         useAnonymousExtChannel: channel.useAnonymousExtChannel,
@@ -118,16 +125,16 @@ export const useUpdateChannelEffects = () => {
   };
 
   const channelUpdateHandler = (data: any) => {
-    const responseTopicsData: any = {};
+    let responseTopicsData: ResponseTopicDto[] = [];
 
     data.topics.map((topic: Topic) => {
       const topicId = topic.id ?? topic.topicId;
-      const respTopics = data.responseTopics[topicId];
+      const respTopics = data.responseTopics.filter(
+        (item: ResponseTopicDto) => item.responseTopicId === topicId
+      );
 
-      if (respTopics) {
-        responseTopicsData[topicId] = respTopics.map((resTopic: Topic) =>
-          pick(resTopic, ['owner', 'topicName', 'topicId'])
-        );
+      if (respTopics.length) {
+        responseTopicsData = responseTopicsData.concat(respTopics);
       }
     });
 

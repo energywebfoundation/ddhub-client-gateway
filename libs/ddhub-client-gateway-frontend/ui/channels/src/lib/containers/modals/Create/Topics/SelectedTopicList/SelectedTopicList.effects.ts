@@ -2,16 +2,21 @@ import { useState } from 'react';
 import { useTopics } from '@ddhub-client-gateway-frontend/ui/api-hooks';
 import { Topic } from '../Topics.effects';
 import { differenceBy } from 'lodash';
-import { GetTopicDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
+import {
+  GetTopicDto,
+  ResponseTopicDto,
+} from '@dsb-client-gateway/dsb-client-gateway-api-client';
 
 export interface SelectedTopicListEffectsProps {
   filters: any[];
   selectedTopics: Topic[];
+  responseTopics?: ResponseTopicDto[];
 }
 
 export const useSelectedTopicListEffects = ({
   filters,
   selectedTopics,
+  responseTopics = [],
 }: SelectedTopicListEffectsProps) => {
   const [selectedApplication, setSelectedApplication] = useState('');
 
@@ -35,11 +40,20 @@ export const useSelectedTopicListEffects = ({
     'id'
   );
 
+  const getSelectedResponseTopics = (selectedTopicId: string) => {
+    const selectedResponseTopics = responseTopics.filter(
+      (topic) => topic.responseTopicId === selectedTopicId
+    );
+
+    return selectedResponseTopics;
+  };
+
   return {
     setSelectedApplication,
     availableTopics,
     selectedApplication,
     topicsLoading,
     filteredTopics,
+    getSelectedResponseTopics,
   };
 };

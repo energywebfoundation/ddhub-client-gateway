@@ -2,6 +2,7 @@ import { Grid, Typography, Box } from '@mui/material';
 import {
   CreateChannelDtoType,
   GetChannelResponseDtoType,
+  ResponseTopicDto,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { SelectedTopicList } from './SelectedTopicList/SelectedTopicList';
 import { Autocomplete } from '@ddhub-client-gateway-frontend/ui/core';
@@ -17,7 +18,7 @@ export interface TopicsProps {
     topics: Topic[];
     channelType: GetChannelResponseDtoType;
     messageForms?: boolean;
-    responseTopics?: any;
+    responseTopics?: ResponseTopicDto[];
   };
   actionButtonsProps: TActionButtonsProps;
 }

@@ -29,7 +29,9 @@ export const Summary = ({
   actionButtonsProps,
 }: SummaryProps) => {
   const { classes } = useStyles();
-  const { countRestrictions } = useSummaryEffects();
+  const { countRestrictions, getSelectedResponseTopics } = useSummaryEffects(
+    channelValues.conditions?.responseTopics || []
+  );
   const restrictionCount = countRestrictions(channelValues?.conditions);
   const restrictionRoles = clone(channelValues.conditions.roles);
 
@@ -86,6 +88,7 @@ export const Summary = ({
 
           {channelValues.conditions.topics?.map((el: Topic, index) => (
             <SelectedTopicView
+              key={index}
               topic={el}
               canRemove={false}
               isSummary={true}
@@ -93,7 +96,7 @@ export const Summary = ({
               showTopicResponse={
                 channelValues.type === 'pub' && channelValues.messageForms
               }
-              responseTopics={channelValues.conditions.responseTopics[el.id]}
+              responseTopics={getSelectedResponseTopics(el.id)}
             />
           ))}
         </Box>

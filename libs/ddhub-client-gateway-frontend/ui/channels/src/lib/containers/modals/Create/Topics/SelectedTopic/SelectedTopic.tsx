@@ -15,6 +15,7 @@ import React from 'react';
 import { TopicItem } from '../TopicItem/TopicItem';
 import { SelectedTopicView } from '../SelectedTopicView/SelectedTopicView';
 import { useSelectedTopicEffects } from './SelectedTopic.effects';
+import { ResponseTopicDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 
 export interface SelectedTopicProps {
   topic: Topic;
@@ -31,7 +32,7 @@ export interface SelectedTopicProps {
   topicsLoading: boolean;
   showTopicResponse: boolean;
   saveResponse?: (topics: Topic[], selectedTopicId: string) => void;
-  responseTopics?: Topic[];
+  responseTopics?: ResponseTopicDto[];
 }
 
 export const SelectedTopic = ({

@@ -13,6 +13,7 @@ import { useStyles } from '../SelectedTopicView/SelectedTopicView.styles';
 import { Topic } from '../Topics.effects';
 import { useSelectedTopicViewEffects } from './SelectedTopicView.effects';
 import { SelectedTopicsCollapse } from './ResponseTopicsCollapse/ResponseTopicsCollapse';
+import { ResponseTopicDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 
 export interface SelectedTopicViewProps {
   topic: Topic;
@@ -25,7 +26,7 @@ export interface SelectedTopicViewProps {
   expanded?: string | false;
   remove?: () => void;
   canCopy?: boolean;
-  responseTopics?: Topic[];
+  responseTopics?: ResponseTopicDto[];
 }
 
 export const SelectedTopicView = ({

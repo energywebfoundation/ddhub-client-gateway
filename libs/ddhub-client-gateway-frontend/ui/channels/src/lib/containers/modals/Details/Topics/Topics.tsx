@@ -6,7 +6,10 @@ import {
   TablePagination,
   IconButton,
 } from '@mui/material';
-import { ChannelTopic } from '@dsb-client-gateway/dsb-client-gateway-api-client';
+import {
+  ChannelTopic,
+  ResponseTopic,
+} from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import {
   CopyToClipboard,
   TablePaginationActions,
@@ -18,13 +21,13 @@ import { SelectedTopicsCollapse } from '../../Create/Topics/SelectedTopicView/Re
 
 interface TopicsProps {
   topics: ChannelTopic[];
-  responseTopics?: any;
+  responseTopics?: ResponseTopic[];
   showResponseTopics?: boolean;
 }
 
 export const Topics: FC<TopicsProps> = ({
   topics,
-  responseTopics = {},
+  responseTopics = [],
   showResponseTopics = false,
 }) => {
   const { classes } = useStyles();
@@ -34,7 +37,8 @@ export const Topics: FC<TopicsProps> = ({
     handleChangePage,
     expandResponse,
     setExpandResponse,
-  } = useTopicsEffects();
+    getSelectedResponseTopics,
+  } = useTopicsEffects(responseTopics);
   const rowsPerPage = 50;
   const startIdx = page !== 0 ? rowsPerPage * page : 0;
   let endIdx = startIdx + rowsPerPage;
@@ -89,7 +93,7 @@ export const Topics: FC<TopicsProps> = ({
 
       {showResponseTopics && (
         <SelectedTopicsCollapse
-          responseTopics={responseTopics[topic.topicId]}
+          responseTopics={getSelectedResponseTopics(topic.topicId)}
           expandResponse={expandResponse[topic.topicId]}
         />
       )}

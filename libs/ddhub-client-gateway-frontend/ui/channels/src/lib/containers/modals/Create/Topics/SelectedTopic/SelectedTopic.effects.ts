@@ -2,6 +2,7 @@ import { KeyboardEvent, useState, useEffect, ChangeEvent } from 'react';
 import { Topic } from '../Topics.effects';
 import { FieldValues, useForm } from 'react-hook-form';
 import { useAsyncDebounce } from 'react-table';
+import { ResponseTopicDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 
 const initialState = {
   owner: '',
@@ -17,7 +18,7 @@ export interface SelectedTopicEffectsProps {
   topicsList: Topic[];
   availableTopics: Topic[];
   saveResponse?: (topics: Topic[], selectedTopicId: string) => void;
-  responseTopics?: Topic[];
+  responseTopics?: ResponseTopicDto[];
 }
 
 export const useSelectedTopicEffects = ({

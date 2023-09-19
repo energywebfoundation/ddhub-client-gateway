@@ -3,10 +3,11 @@ import {
   useTopics,
 } from '@ddhub-client-gateway-frontend/ui/api-hooks';
 import { useState, useEffect } from 'react';
-import { differenceBy, omit } from 'lodash';
+import { differenceBy } from 'lodash';
 import {
   GetTopicDto,
   GetTopicDtoSchemaType,
+  ResponseTopicDto,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { ChannelType } from '../../../../models';
 import { getChannelType } from '../../../../utils';
@@ -48,7 +49,7 @@ export const useTopicsEffects = (
   const [selectedTopics, setSelectedTopics] = useState<Topic[]>(
     channelValues.topics
   );
-  const [responseTopics, setResponseTopics] = useState(
+  const [responseTopics, setResponseTopics] = useState<ResponseTopicDto[]>(
     channelValues.responseTopics
   );
   const { applications, isLoading: isLoadingApplications } =
@@ -104,8 +105,18 @@ export const useTopicsEffects = (
     return filteredTopic;
   };
 
+  const filterResponseTopics = (topicId: string) => {
+    const respTopics = responseTopics.filter((resp) => {
+      return resp.responseTopicId !== topicId;
+    });
+
+    return respTopics;
+  };
+
   const resetResponseTopics = (topicId: string) => {
-    setResponseTopics(omit(responseTopics, [topicId]));
+    const respTopics = filterResponseTopics(topicId);
+
+    setResponseTopics(respTopics);
   };
 
   const removeSelectedTopic = (data: Topic) => {
@@ -132,7 +143,16 @@ export const useTopicsEffects = (
 
   const saveTopicResponse = (topics: Topic[], selectedTopicId: string) => {
     if (topics.length) {
-      setResponseTopics({ ...responseTopics, [selectedTopicId]: topics });
+      const respTopics = filterResponseTopics(selectedTopicId);
+
+      const newRespTopics = topics.map((item) => {
+        return {
+          topicName: item.topicName,
+          owner: item.owner,
+          responseTopicId: selectedTopicId,
+        };
+      });
+      setResponseTopics(respTopics.concat(newRespTopics));
     } else {
       resetResponseTopics(selectedTopicId);
     }

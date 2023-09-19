@@ -65,7 +65,7 @@ export const Create = () => {
             channelValues={{
               messageForms: channelValues.messageForms,
               topics: channelValues.conditions?.topics || [],
-              responseTopics: channelValues.conditions?.responseTopics || {},
+              responseTopics: channelValues.conditions?.responseTopics || [],
               channelType: channelValues.type,
             }}
           />

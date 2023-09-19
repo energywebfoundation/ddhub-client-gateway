@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import {
   ChannelTopic,
   GetTopicSearchDto,
+  ResponseTopic,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { ModalActionsEnum, useModalDispatch } from '../../../../context';
 import { useApplications } from '@ddhub-client-gateway-frontend/ui/api-hooks';
 
-export const useTopicsEffects = () => {
+export const useTopicsEffects = (responseTopics: ResponseTopic[]) => {
   const dispatch = useModalDispatch();
   const { applicationsByNamespace } = useApplications('user');
   const [page, setPage] = useState(0);
@@ -46,11 +47,20 @@ export const useTopicsEffects = () => {
     setPage(newPage);
   };
 
+  const getSelectedResponseTopics = (selectedTopicId: string) => {
+    const selectedResponseTopics = responseTopics.filter(
+      (topic) => topic.responseTopicId === selectedTopicId
+    );
+
+    return selectedResponseTopics;
+  };
+
   return {
     openTopicDetails,
     page,
     handleChangePage,
     expandResponse,
     setExpandResponse,
+    getSelectedResponseTopics,
   };
 };

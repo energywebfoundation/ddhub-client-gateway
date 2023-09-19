@@ -5,6 +5,7 @@ import {
   CreateChannelDto,
   CreateChannelDtoType,
   getChannelControllerGetByTypeQueryKey,
+  ResponseTopicDto,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { useCustomAlert } from '@ddhub-client-gateway-frontend/ui/core';
 import {
@@ -115,12 +116,13 @@ export const useCreateChannelEffects = () => {
 
       if (detailsData.channelType !== ChannelType.Messaging) {
         detailsData.messageForms = false;
-        delete channelValues.conditions.responseTopics;
+        channelValues.conditions.responseTopics = [];
       } else if (
         detailsData.channelType === ChannelType.Messaging &&
-        detailsData.connectionType === ConnectionType.Subscribe
+        (detailsData.connectionType === ConnectionType.Subscribe ||
+          !detailsData.messageForms)
       ) {
-        delete channelValues.conditions.responseTopics;
+        channelValues.conditions.responseTopics = [];
       }
 
       setActiveStep(activeStep + 1);
@@ -177,15 +179,15 @@ export const useCreateChannelEffects = () => {
 
   const channelSubmitHandler = () => {
     const values = channelValues;
-    const responseTopicsData: any = {};
+    let responseTopicsData: ResponseTopicDto[] = [];
 
     const topicsData = values.conditions.topics.map((topic: Topic) => {
-      const respTopics = values.conditions.responseTopics[topic.id];
+      const respTopics = values.conditions.responseTopics.filter(
+        (item: ResponseTopicDto) => item.responseTopicId === topic.id
+      );
 
-      if (respTopics) {
-        responseTopicsData[topic.id] = respTopics.map((resTopic: Topic) =>
-          pick(resTopic, ['owner', 'topicName', 'topicId'])
-        );
+      if (respTopics.length) {
+        responseTopicsData = responseTopicsData.concat(respTopics);
       }
 
       return pick(topic, ['owner', 'topicName']);

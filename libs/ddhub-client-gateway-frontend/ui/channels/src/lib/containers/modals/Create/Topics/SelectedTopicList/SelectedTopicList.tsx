@@ -3,6 +3,7 @@ import { SelectedTopic } from '../SelectedTopic/SelectedTopic';
 import { Topic } from '../Topics.effects';
 import { useStyles } from './SelectedTopicList.styles';
 import { useSelectedTopicListEffects } from './SelectedTopicList.effects';
+import { ResponseTopicDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 
 export interface SelectedTopicListProps {
   selectedTopics: Topic[];
@@ -14,7 +15,7 @@ export interface SelectedTopicListProps {
   recent: string;
   showTopicResponse: boolean;
   saveResponse?: (topics: Topic[], selectedTopicId: string) => void;
-  responseTopics?: any;
+  responseTopics?: ResponseTopicDto[];
 }
 
 export const SelectedTopicList = ({
@@ -36,9 +37,11 @@ export const SelectedTopicList = ({
     setSelectedApplication,
     topicsLoading,
     filteredTopics,
+    getSelectedResponseTopics,
   } = useSelectedTopicListEffects({
     filters,
     selectedTopics,
+    responseTopics,
   });
 
   return (
@@ -59,7 +62,7 @@ export const SelectedTopicList = ({
           edit={edit}
           showTopicResponse={showTopicResponse}
           saveResponse={saveResponse}
-          responseTopics={responseTopics[topic.id ?? topic.topicId]}
+          responseTopics={getSelectedResponseTopics(topic.id ?? topic.topicId)}
           remove={() => {
             if (remove) {
               remove(topic);

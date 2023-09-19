@@ -60,7 +60,7 @@ export const Update = () => {
             channelValues={{
               topics: channelValues.conditions?.topics || [],
               channelType: channelValues.type,
-              responseTopics: channelValues.conditions?.responseTopics || {},
+              responseTopics: channelValues.conditions?.responseTopics || [],
             }}
           />
         );

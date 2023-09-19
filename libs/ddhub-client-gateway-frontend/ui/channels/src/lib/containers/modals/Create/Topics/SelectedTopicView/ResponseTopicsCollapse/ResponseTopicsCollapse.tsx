@@ -1,11 +1,11 @@
 import { Box, Chip, Collapse, Grid, Stack, Typography } from '@mui/material';
 import React from 'react';
 import { useStyles } from './ResponseTopicsCollapse.styles';
-import { Topic } from '../../Topics.effects';
+import { ResponseTopic } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 
 interface SelectedTopicsCollapseProps {
   expandResponse: boolean;
-  responseTopics: Topic[];
+  responseTopics: ResponseTopic[];
 }
 
 export const SelectedTopicsCollapse = ({
