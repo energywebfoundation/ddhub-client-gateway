@@ -3,7 +3,7 @@ export enum Queries {
   Owner = 'owner',
   TopicId = 'topicId',
   FQCN = 'fqcn',
-  PrivateKey = 'privateKey'
+  PrivateKey = 'privateKey',
 }
 
 export const routerConst = {
@@ -30,5 +30,9 @@ export const routerConst = {
   VersionHistory: `/applications/[${Queries.Namespace}]/[${Queries.TopicId}]/version-history`,
   ChannelTopicVersionHistory: `/channels/applications/[${Queries.Namespace}]/[${Queries.TopicId}]/version-history`,
   WS: '/integration/ws',
-  RestApiDocs: '/docs'
+  RestApiDocs: '/docs',
+  MessageInbox: '/messages/inbox',
+  MessageInboxChannel: `/messages/inbox/[${Queries.FQCN}]`,
+  MessageOutbox: '/messages/outbox',
+  MessageOutboxChannel: `/messages/outbox/[${Queries.FQCN}]`,
 };
