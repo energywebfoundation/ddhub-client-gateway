@@ -60,12 +60,18 @@ export const mapUrlToBreadcrumbs = new Map<string, Breadcrumb[]>()
   ])
   .set(routerConst.LargeFileDownloadChannel, [
     { title: 'Large data messaging file download' },
-    { title: 'Large data messaging file download', path: routerConst.LargeDataMessagingFileDownload },
+    {
+      title: 'Large data messaging file download',
+      path: routerConst.LargeDataMessagingFileDownload,
+    },
     { title: 'Channel topics' },
   ])
   .set(routerConst.LargeFileDownloadChannelTopic, [
     { title: 'Large data messaging file download' },
-    { title: 'Large data messaging file download', path: routerConst.LargeDataMessagingFileDownload },
+    {
+      title: 'Large data messaging file download',
+      path: routerConst.LargeDataMessagingFileDownload,
+    },
     { title: 'Channel topics', path: routerConst.LargeFileDownloadChannel },
     { title: 'Messages' },
   ])
@@ -83,12 +89,18 @@ export const mapUrlToBreadcrumbs = new Map<string, Breadcrumb[]>()
   ])
   .set(routerConst.FileDownloadChannel, [
     { title: 'Data messaging file upload' },
-    { title: 'Data messaging file upload', path: routerConst.DataMessagingFileDownload },
+    {
+      title: 'Data messaging file upload',
+      path: routerConst.DataMessagingFileDownload,
+    },
     { title: 'Channel topics' },
   ])
   .set(routerConst.FileDownloadChannelTopic, [
     { title: 'Data messaging file upload' },
-    { title: 'Data messaging file upload', path: routerConst.DataMessagingFileDownload },
+    {
+      title: 'Data messaging file upload',
+      path: routerConst.DataMessagingFileDownload,
+    },
     { title: 'Channel topics', path: routerConst.FileDownloadChannel },
     { title: 'Messages' },
   ])
@@ -100,4 +112,8 @@ export const mapUrlToBreadcrumbs = new Map<string, Breadcrumb[]>()
   .set(routerConst.ClientIds, [
     { title: 'Client Subscriptions' },
     { title: 'Client Subscriptions' },
+  ])
+  .set(routerConst.MessageInbox, [
+    { title: 'Message Box' },
+    { title: 'Channel List' },
   ]);
