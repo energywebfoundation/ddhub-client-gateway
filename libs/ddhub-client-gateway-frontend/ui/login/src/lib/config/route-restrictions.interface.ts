@@ -14,4 +14,6 @@ export class RouteRestrictions {
   largeFileDownload: RouteRestriction = new RouteRestriction();
   fileUpload: RouteRestriction = new RouteRestriction();
   fileDownload: RouteRestriction = new RouteRestriction();
+  messageInbox: RouteRestriction = new RouteRestriction();
+  messageOutbox: RouteRestriction = new RouteRestriction();
 }
