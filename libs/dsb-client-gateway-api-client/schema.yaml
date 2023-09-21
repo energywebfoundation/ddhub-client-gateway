@@ -124,7 +124,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/GetChannelsMessagesCountDto"
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/GetChannelsMessagesCountDto"
         400:
           description: "Invalid request"
       tags:
