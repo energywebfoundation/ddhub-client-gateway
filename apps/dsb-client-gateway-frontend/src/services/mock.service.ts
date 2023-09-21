@@ -15,6 +15,8 @@ import {
   getGatewayMock,
   getClientsMock,
   postMessageMock,
+  getChannelMessagesCount,
+  getChannelMessagesCountByFqcn,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 
 export function makeServer({ environment = 'development' }) {
@@ -64,6 +66,14 @@ export function makeServer({ environment = 'development' }) {
 
       this.delete('/channels/:fqcn', () => {
         return {};
+      });
+
+      this.get('/channels/messages/count', () => {
+        return getChannelMessagesCount();
+      });
+
+      this.get('/channels/messages/count/:fqcn', () => {
+        return getChannelMessagesCountByFqcn();
       });
 
       this.post('/topics', (_schema, request) => {
@@ -136,7 +146,7 @@ export function makeServer({ environment = 'development' }) {
 
       this.get('cron', () => {
         return getCronMock();
-      })
+      });
     },
   });
 }
