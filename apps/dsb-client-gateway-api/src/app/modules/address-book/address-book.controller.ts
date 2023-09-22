@@ -17,7 +17,7 @@ import { CreateContactDto } from './dto/request/create-contact-request.dto';
 import { UpdateContactRequestDto } from './dto/request/update-contact-request.dto';
 
 @Controller('contacts')
-@ApiTags('Address Book', 'Contacts')
+@ApiTags('Address Book')
 export class AddressBookController {
   constructor(protected readonly addressBookService: AddressBookService) {}
 

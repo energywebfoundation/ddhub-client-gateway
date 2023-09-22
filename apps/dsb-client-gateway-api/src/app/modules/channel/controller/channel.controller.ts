@@ -53,7 +53,8 @@ export class ChannelController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Channel messages count returned successfully',
-    type: () => [GetChannelMessagesCountDto],
+    type: () => GetChannelMessagesCountDto,
+    isArray: true,
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,

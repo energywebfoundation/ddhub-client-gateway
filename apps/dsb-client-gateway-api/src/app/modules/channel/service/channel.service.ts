@@ -12,10 +12,12 @@ import { ChannelAlreadyExistsException } from '../exceptions/channel-already-exi
 import { Span } from 'nestjs-otel';
 import {
   ChannelEntity,
+  ChannelResponseTopic,
   ChannelWrapperRepository,
   QueryChannels,
   ReceivedMessageRepositoryWrapper,
   SentMessageRepositoryWrapper,
+  TopicRepositoryWrapper,
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
 import { TopicNotFoundException } from '../exceptions/topic-not-found.exception';
 import {
@@ -27,6 +29,7 @@ import { ChannelInvalidTopicException } from '../exceptions/channel-invalid-topi
 import { differenceBy } from 'lodash';
 import { ChannelMessageFormsOnlyException } from '../exceptions/channel-message-forms-only.exception';
 import { GetChannelsMessagesCountDto } from '../dto/request/get-channel-messages-count.dto';
+import { In } from 'typeorm';
 
 @Injectable()
 export class ChannelService {
@@ -37,7 +40,8 @@ export class ChannelService {
     protected readonly ddhubTopicsService: DdhubTopicsService,
     protected readonly commandBus: CommandBus,
     protected readonly sentMessagesRepositoryWrapper: SentMessageRepositoryWrapper,
-    protected readonly receivedMessagesRepositoryWrapper: ReceivedMessageRepositoryWrapper
+    protected readonly receivedMessagesRepositoryWrapper: ReceivedMessageRepositoryWrapper,
+    protected readonly topicRepository: TopicRepositoryWrapper
   ) {}
 
   @Span('channels_multipleMessageCount')
@@ -108,6 +112,45 @@ export class ChannelService {
       payload.conditions.responseTopics
     );
 
+    const uniqueResponseTopicsIds: string[] = [
+      ...new Set(
+        payload.conditions.responseTopics.map(
+          ({ responseTopicId }) => responseTopicId
+        )
+      ),
+    ];
+
+    const responseTopicsCount = await this.getTopicsCountByIds(
+      uniqueResponseTopicsIds
+    );
+
+    if (responseTopicsCount !== uniqueResponseTopicsIds.length) {
+      throw new TopicNotFoundException(
+        `found ${responseTopicsCount} topics expected ${uniqueResponseTopicsIds}`
+      );
+    }
+
+    const responseTopicsWithChannels: ChannelResponseTopic[] =
+      payload.conditions.responseTopics.map(
+        ({ topicName, owner, responseTopicId }) => {
+          const validTopic: ChannelTopic | undefined =
+            responseTopicsWithIds.find(
+              (topic) => topic.topicName === topicName && topic.owner === owner
+            );
+
+          if (!validTopic) {
+            throw new TopicNotFoundException(validTopic.topicId);
+          }
+
+          return {
+            topicOwner: owner,
+            responseTopicId: responseTopicId,
+            topicId: validTopic.topicId,
+            topicName: topicName,
+          };
+        }
+      );
+
     await this.validateTopics(topicsWithIds, payload.type);
 
     if (payload.conditions.topics.length && !topicsWithIds.length) {
@@ -125,7 +168,7 @@ export class ChannelService {
         dids: payload.conditions.dids,
         roles: payload.conditions.roles,
         qualifiedDids: [],
-        responseTopics: responseTopicsWithIds,
+        responseTopics: responseTopicsWithChannels,
       },
     });
 
@@ -254,6 +297,14 @@ export class ChannelService {
         }
       }
     }
+  }
+
+  protected async getTopicsCountByIds(topicIds: string[]): Promise<number> {
+    return this.topicRepository.topicRepository.count({
+      where: {
+        id: In(topicIds),
+      },
+    });
   }
 
   @Span('channels_getTopicsWithIds')
