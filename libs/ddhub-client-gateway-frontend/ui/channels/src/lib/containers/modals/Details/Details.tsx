@@ -34,6 +34,7 @@ export const Details: FC = () => {
     openUpdateChannel,
     activeStep,
     navigateToStep,
+    responseTopics,
   } = useDetailsEffects();
 
   const formPart = (id: number) => {
@@ -69,7 +70,7 @@ export const Details: FC = () => {
         return (
           <Topics
             topics={channel.conditions?.topics}
-            responseTopics={channel.conditions?.responseTopics}
+            responseTopics={responseTopics}
             showResponseTopics={
               channel.type === CreateChannelDtoType.pub && channel.messageForms
             }
