@@ -1,6 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ChannelTopic } from '../entity/channel.entity';
-import { CreateChannelDto, TopicDto } from '../dto/request/create-channel.dto';
+import {
+  CreateChannelDto,
+  ResponseTopicDto,
+  TopicDto,
+} from '../dto/request/create-channel.dto';
 import { ChannelNotFoundException } from '../exceptions/channel-not-found.exception';
 import { ChannelUpdateRestrictedFieldsException } from '../exceptions/channel-update-restricted-fields.exception';
 import { CommandBus } from '@nestjs/cqrs';
@@ -124,32 +128,12 @@ export class ChannelService {
       uniqueResponseTopicsIds
     );
 
-    if (responseTopicsCount !== uniqueResponseTopicsIds.length) {
-      throw new TopicNotFoundException(
-        `found ${responseTopicsCount} topics expected ${uniqueResponseTopicsIds}`
-      );
-    }
-
-    const responseTopicsWithChannels: ChannelResponseTopic[] =
-      payload.conditions.responseTopics.map(
-        ({ topicName, owner, responseTopicId }) => {
-          const validTopic: ChannelTopic | undefined =
-            responseTopicsWithIds.find(
-              (topic) => topic.topicName === topicName && topic.owner === owner
-            );
-
-          if (!validTopic) {
-            throw new TopicNotFoundException(validTopic.topicId);
-          }
-
-          return {
-            topicOwner: owner,
-            responseTopicId: responseTopicId,
-            topicId: validTopic.topicId,
-            topicName: topicName,
-          };
-        }
-      );
+    const responseTopicsWithChannels = this.verifyResponseTopics(
+      responseTopicsCount,
+      uniqueResponseTopicsIds,
+      payload.conditions.responseTopics,
+      responseTopicsWithIds
+    );
 
     await this.validateTopics(topicsWithIds, payload.type);
 
@@ -177,6 +161,38 @@ export class ChannelService {
     await this.commandBus.execute(
       new RefreshChannelCacheDataCommand(payload.fqcn)
     );
+  }
+
+  private verifyResponseTopics(
+    responseTopicsCount: number,
+    uniqueResponseTopicsIds: string[],
+    responseTopics: ResponseTopicDto[],
+    responseTopicsWithIds: ChannelTopic[]
+  ) {
+    if (responseTopicsCount !== uniqueResponseTopicsIds.length) {
+      throw new TopicNotFoundException(
+        `found ${responseTopicsCount} topics expected ${uniqueResponseTopicsIds}`
+      );
+    }
+
+    const responseTopicsWithChannels: ChannelResponseTopic[] =
+      responseTopics.map(({ topicName, owner, responseTopicId }) => {
+        const validTopic: ChannelTopic | undefined = responseTopicsWithIds.find(
+          (topic) => topic.topicName === topicName && topic.owner === owner
+        );
+
+        if (!validTopic) {
+          throw new TopicNotFoundException(validTopic.topicId);
+        }
+
+        return {
+          topicOwner: owner,
+          responseTopicId: responseTopicId,
+          topicId: validTopic.topicId,
+          topicName: topicName,
+        };
+      });
+    return responseTopicsWithChannels;
   }
 
   @Span('channels_updateQualifiedDids')
@@ -263,6 +279,29 @@ export class ChannelService {
       dto.conditions.topics
     );
 
+    const responseTopicsWithIds: ChannelTopic[] = await this.getTopicsWithIds(
+      dto.conditions.responseTopics
+    );
+
+    const uniqueResponseTopicsIds: string[] = [
+      ...new Set(
+        dto.conditions.responseTopics.map(
+          ({ responseTopicId }) => responseTopicId
+        )
+      ),
+    ];
+
+    const responseTopicsCount = await this.getTopicsCountByIds(
+      uniqueResponseTopicsIds
+    );
+
+    const responseTopicsWithChannels = this.verifyResponseTopics(
+      responseTopicsCount,
+      uniqueResponseTopicsIds,
+      dto.conditions.responseTopics,
+      responseTopicsWithIds
+    );
+
     await this.validateTopics(topicsWithIds, channel.type);
 
     channel.payloadEncryption =
@@ -273,6 +312,7 @@ export class ChannelService {
       dids: dto.conditions.dids,
       roles: dto.conditions.roles,
       topics: topicsWithIds,
+      responseTopics: responseTopicsWithChannels,
     };
 
     await this.wrapperRepository.channelRepository.save(channel);
