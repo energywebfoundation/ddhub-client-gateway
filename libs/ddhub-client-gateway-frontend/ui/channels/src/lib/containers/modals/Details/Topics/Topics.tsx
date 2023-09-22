@@ -8,7 +8,7 @@ import {
 } from '@mui/material';
 import {
   ChannelTopic,
-  ResponseTopic,
+  ResponseTopicDto,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import {
   CopyToClipboard,
@@ -21,7 +21,7 @@ import { SelectedTopicsCollapse } from '../../Create/Topics/SelectedTopicView/Re
 
 interface TopicsProps {
   topics: ChannelTopic[];
-  responseTopics?: ResponseTopic[];
+  responseTopics?: ResponseTopicDto[];
   showResponseTopics?: boolean;
 }
 

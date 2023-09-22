@@ -2,12 +2,12 @@ import React, { useState } from 'react';
 import {
   ChannelTopic,
   GetTopicSearchDto,
-  ResponseTopic,
+  ResponseTopicDto,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { ModalActionsEnum, useModalDispatch } from '../../../../context';
 import { useApplications } from '@ddhub-client-gateway-frontend/ui/api-hooks';
 
-export const useTopicsEffects = (responseTopics: ResponseTopic[]) => {
+export const useTopicsEffects = (responseTopics: ResponseTopicDto[]) => {
   const dispatch = useModalDispatch();
   const { applicationsByNamespace } = useApplications('user');
   const [page, setPage] = useState(0);
