@@ -14,7 +14,7 @@ export interface SelectedTopicListProps {
   filters: any[];
   recent: string;
   showTopicResponse: boolean;
-  saveResponse?: (topics: Topic[], selectedTopicId: string) => void;
+  saveResponse?: (topics: ResponseTopicDto[], selectedTopicId: string) => void;
   responseTopics?: ResponseTopicDto[];
 }
 

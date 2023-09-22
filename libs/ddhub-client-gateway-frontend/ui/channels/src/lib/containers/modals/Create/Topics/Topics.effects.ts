@@ -141,18 +141,14 @@ export const useTopicsEffects = (
     resetResponseTopics(oldTopic.id);
   };
 
-  const saveTopicResponse = (topics: Topic[], selectedTopicId: string) => {
+  const saveTopicResponse = (
+    topics: ResponseTopicDto[],
+    selectedTopicId: string
+  ) => {
     if (topics.length) {
       const respTopics = filterResponseTopics(selectedTopicId);
 
-      const newRespTopics = topics.map((item) => {
-        return {
-          topicName: item.topicName,
-          owner: item.owner,
-          responseTopicId: selectedTopicId,
-        };
-      });
-      setResponseTopics(respTopics.concat(newRespTopics));
+      setResponseTopics(respTopics.concat(topics));
     } else {
       resetResponseTopics(selectedTopicId);
     }

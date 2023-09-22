@@ -17,7 +17,7 @@ export interface SelectedTopicEffectsProps {
   topic: Topic;
   topicsList: Topic[];
   availableTopics: Topic[];
-  saveResponse?: (topics: Topic[], selectedTopicId: string) => void;
+  saveResponse?: (topics: ResponseTopicDto[], selectedTopicId: string) => void;
   responseTopics?: ResponseTopicDto[];
 }
 
@@ -35,7 +35,7 @@ export const useSelectedTopicEffects = ({
   const [editTopic, setEditTopic] = useState<Topic>(initialState);
   const [filteredTopics, setFilteredTopics] = useState<Topic[]>([]);
   const [isResponse, setIsResponse] = useState<boolean>(false);
-  const [selected, setSelected] = useState<Topic[]>([]);
+  const [selected, setSelected] = useState<ResponseTopicDto[]>([]);
 
   useEffect(() => {
     if (Array.isArray(availableTopics)) {
@@ -92,18 +92,26 @@ export const useSelectedTopicEffects = ({
     setUpdatedTopic(topic);
   };
 
-  const selectedIndex = (topicId: string) => {
-    return selected.findIndex((topicItem) => topicItem.id === topicId);
+  const selectedIndex = (topicName: string) => {
+    return selected.findIndex((topicItem) => topicItem.topicName === topicName);
   };
 
   const handleClickTopicCheckbox = (
     event: ChangeEvent<HTMLInputElement>,
     topic: Topic
   ) => {
-    const selectedIdx = selectedIndex(topic.id);
+    const selectedIdx = selectedIndex(topic.topicName);
 
     if (event.target.checked && selectedIdx === -1) {
-      setSelected([...selected, topic]);
+      const selectedTopicId = editTopic.id ?? editTopic.topicId;
+
+      const respTopic = {
+        topicName: topic.topicName,
+        owner: topic.owner,
+        responseTopicId: selectedTopicId,
+      };
+
+      setSelected([...selected, respTopic]);
     } else if (!event.target.checked && selectedIdx > -1) {
       const copy = [...selected];
       copy.splice(selectedIdx, 1);

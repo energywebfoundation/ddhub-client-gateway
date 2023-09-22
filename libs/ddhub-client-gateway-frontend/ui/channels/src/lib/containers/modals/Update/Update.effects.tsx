@@ -28,6 +28,7 @@ const initialState = {
   type: '' as UpdateChannelDtoType,
   payloadEncryption: false,
   useAnonymousExtChannel: false,
+  messageForms: false,
   conditions: {
     roles: [] as string[],
     dids: [] as string[],
@@ -44,10 +45,9 @@ export const useUpdateChannelEffects = () => {
   const dispatch = useModalDispatch();
   const Swal = useCustomAlert();
   const [activeStep, setActiveStep] = useState(0);
+  const [messageForms, setMessageForms] = useState(false);
   const { applications } = useApplications('user');
   const applicationMap = new Map();
-  // const messageForms = channel.messageForms;
-  const messageForms = false; // todo
 
   applications.forEach((application) =>
     applicationMap.set(application.namespace, application.appName)
@@ -70,7 +70,7 @@ export const useUpdateChannelEffects = () => {
       const responseTopics = channel.conditions.responseTopics.map((topic) => {
         return {
           topicName: topic.topicName,
-          owner: topic.owner,
+          owner: topic.topicOwner,
           responseTopicId: topic.responseTopicId,
         };
       });
@@ -85,6 +85,8 @@ export const useUpdateChannelEffects = () => {
         payloadEncryption: channel.payloadEncryption,
         useAnonymousExtChannel: channel.useAnonymousExtChannel,
       });
+
+      setMessageForms(channel.messageForms);
     } else {
       resetToInitialState();
     }

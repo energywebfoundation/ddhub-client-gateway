@@ -31,7 +31,7 @@ export interface SelectedTopicProps {
   recent: string;
   topicsLoading: boolean;
   showTopicResponse: boolean;
-  saveResponse?: (topics: Topic[], selectedTopicId: string) => void;
+  saveResponse?: (topics: ResponseTopicDto[], selectedTopicId: string) => void;
   responseTopics?: ResponseTopicDto[];
 }
 
@@ -184,7 +184,7 @@ export const SelectedTopic = ({
                 )}
                 {filteredTopics?.map((option, index) => {
                   const isItemSelected = isResponse
-                    ? selectedIndex(option.id) > -1
+                    ? selectedIndex(option.topicName) > -1
                     : false;
                   const labelId = `response-checkbox-${index}`;
 
