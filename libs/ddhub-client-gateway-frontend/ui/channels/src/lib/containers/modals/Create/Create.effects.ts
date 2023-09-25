@@ -38,6 +38,7 @@ const initialState = {
   channelType: '',
   connectionType: '',
   useAnonymousExtChannel: false,
+  messageForms: false,
 };
 
 export const useCreateChannelEffects = () => {
@@ -104,12 +105,24 @@ export const useCreateChannelEffects = () => {
     channelType: ChannelType;
     payloadEncryption: boolean;
     useAnonymousExtChannel: boolean;
+    messageForms: boolean;
   }) => {
     if (validateFqcn(data.fqcn)) {
       const detailsData = data;
 
       if (detailsData.connectionType !== ConnectionType.Publish) {
         detailsData.payloadEncryption = false;
+      }
+
+      if (detailsData.channelType !== ChannelType.Messaging) {
+        detailsData.messageForms = false;
+        channelValues.conditions.responseTopics = [];
+      } else if (
+        detailsData.channelType === ChannelType.Messaging &&
+        (detailsData.connectionType === ConnectionType.Subscribe ||
+          !detailsData.messageForms)
+      ) {
+        channelValues.conditions.responseTopics = [];
       }
 
       setActiveStep(activeStep + 1);
@@ -121,13 +134,14 @@ export const useCreateChannelEffects = () => {
     }
   };
 
-  const setTopics = (data: Topic[]) => {
+  const setTopics = (data: any) => {
     setActiveStep(activeStep + 1);
     setChannelValues({
       ...channelValues,
       conditions: {
         ...channelValues.conditions,
-        topics: data,
+        topics: data.topics,
+        responseTopics: data.responseTopics,
       },
     });
   };
@@ -165,9 +179,20 @@ export const useCreateChannelEffects = () => {
 
   const channelSubmitHandler = () => {
     const values = channelValues;
-    const topicsData = values.conditions.topics.map((topic) =>
-      pick(topic, ['owner', 'topicName'])
-    );
+    let responseTopicsData: ResponseTopicDto[] = [];
+
+    const topicsData = values.conditions.topics.map((topic: Topic) => {
+      const respTopics = values.conditions.responseTopics.filter(
+        (item: ResponseTopicDto) => item.responseTopicId === topic.id
+      );
+
+      if (respTopics.length) {
+        responseTopicsData = responseTopicsData.concat(respTopics);
+      }
+
+      return pick(topic, ['owner', 'topicName']);
+    });
+
     const rolesData = values.conditions.roles.sort();
 
     const channelCreateValues: CreateChannelDto = {
@@ -177,9 +202,11 @@ export const useCreateChannelEffects = () => {
         ...values.conditions,
         roles: rolesData,
         topics: topicsData,
+        responseTopics: responseTopicsData,
       },
       payloadEncryption: values.payloadEncryption,
       useAnonymousExtChannel: values.useAnonymousExtChannel,
+      messageForms: values.messageForms,
     };
 
     createChannelHandler(channelCreateValues, onCreate);

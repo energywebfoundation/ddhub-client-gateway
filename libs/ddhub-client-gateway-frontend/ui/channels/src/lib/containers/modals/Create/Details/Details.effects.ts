@@ -1,18 +1,19 @@
-import { useEffect, useState, ChangeEvent } from "react";
-import { FieldValues, useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
-import { ConnectionType } from "./models/connection-type.enum";
-import { ChannelType } from "../../../../models/channel-type.enum";
-import { ICreateChannel } from "../../models/create-channel.interface";
-import { pick } from "lodash";
+import { useEffect, useState, ChangeEvent } from 'react';
+import { FieldValues, useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
+import { ConnectionType } from './models/connection-type.enum';
+import { ChannelType } from '../../../../models/channel-type.enum';
+import { ICreateChannel } from '../../models/create-channel.interface';
+import { pick } from 'lodash';
 
 enum FieldName {
   ConnectionType = 'connectionType',
   PayloadEncryption = 'payloadEncryption',
   Fqcn = 'fqcn',
   ChannelType = 'channelType',
-  AnonymousExtChannel = 'useAnonymousExtChannel'
+  AnonymousExtChannel = 'useAnonymousExtChannel',
+  EnableMessageForm = 'messageForms',
 }
 
 const validationSchema = yup
@@ -20,7 +21,9 @@ const validationSchema = yup
     fqcn: yup.string().required(),
     channelType: yup.string().required(),
     connectionType: yup.string().required(),
-    payloadEncryption: yup.boolean().optional()
+    payloadEncryption: yup.boolean().optional(),
+    useAnonymousExtChannel: yup.boolean().optional(),
+    messageForms: yup.boolean().optional(),
   })
   .required();
 
@@ -55,18 +58,30 @@ const fields = {
   },
   useAnonymousExtChannel: {
     name: FieldName.AnonymousExtChannel,
-    label: 'Use Anonymous External Channel'
+    label: 'Use Anonymous External Channel',
+    description:
+      'Receive messages using anonymized channels. Senders to these channels will not be able to associate the data with a definite, known recipient.',
   },
   payloadEncryption: {
     name: FieldName.PayloadEncryption,
-    label: 'Payload Encryption'
-  }
+    label: 'Payload Encryption',
+    description:
+      'Encrypts message payloads before sending them. Encrypted message size exponentially increase and might exceed payload limit of 6MB. Please enable only for small-sized messages.',
+  },
+  messageForms: {
+    name: FieldName.EnableMessageForm,
+    label: 'Enable Message Form',
+    description:
+      'By default, channels are used mainly for API-based communications. This toggle flags the channel to auto-generate message input forms based on topic JSON schema definition. The forms will be used by users to easily construct and send messages with a user interface. Messages sent and received in this channel will be stored in this Client GW.',
+  },
 };
 
 export const useDetailsEffects = (channelValues: ICreateChannel) => {
   const [showEncryption, setShowEncryption] = useState(false);
+  const [showMsgForm, setShowMsgForm] = useState(false);
   const [isEncrypt, setIsEncrypt] = useState(false);
   const [isUseAnonExtChnl, setIsUseAnonExtChnl] = useState(false);
+  const [isEnableMsgForm, setIsEnableMsgForm] = useState(false);
 
   const initialValues = {
     fqcn: '',
@@ -74,6 +89,7 @@ export const useDetailsEffects = (channelValues: ICreateChannel) => {
     connectionType: '',
     payloadEncryption: false,
     useAnonymousExtChannel: false,
+    messageForms: false,
   };
 
   const {
@@ -98,6 +114,7 @@ export const useDetailsEffects = (channelValues: ICreateChannel) => {
       FieldName.Fqcn,
       FieldName.PayloadEncryption,
       FieldName.AnonymousExtChannel,
+      FieldName.EnableMessageForm,
     ]);
     Object.entries(details).forEach(([name, value]) => {
       setValue(name, value);
@@ -109,6 +126,10 @@ export const useDetailsEffects = (channelValues: ICreateChannel) => {
         setIsEncrypt(!!value);
       } else if (name === FieldName.AnonymousExtChannel) {
         setIsUseAnonExtChnl(!!value);
+      } else if (name === FieldName.EnableMessageForm) {
+        setIsEnableMsgForm(!!value);
+      } else if (name === FieldName.ChannelType) {
+        setShowMsgForm(value === ChannelType.Messaging);
       }
     });
     triggerValidation();
@@ -120,12 +141,21 @@ export const useDetailsEffects = (channelValues: ICreateChannel) => {
     setShowEncryption(isPublish);
   };
 
+  const channelTypeOnChange = (event: any) => {
+    const isMessaging = event.target.value === ChannelType.Messaging;
+    setShowMsgForm(isMessaging);
+  };
+
   const encryptionOnChange = (event: ChangeEvent<HTMLInputElement>) => {
     setIsEncrypt(event.target.checked);
   };
 
   const useAnonExtChnlOnChange = (event: ChangeEvent<HTMLInputElement>) => {
     setIsUseAnonExtChnl(event.target.checked);
+  };
+
+  const enableMsgFormOnChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setIsEnableMsgForm(event.target.checked);
   };
 
   return {
@@ -137,8 +167,12 @@ export const useDetailsEffects = (channelValues: ICreateChannel) => {
     connectionOnChange,
     showEncryption,
     encryptionOnChange,
+    showMsgForm,
+    channelTypeOnChange,
     isEncrypt,
     isUseAnonExtChnl,
-    useAnonExtChnlOnChange
+    isEnableMsgForm,
+    useAnonExtChnlOnChange,
+    enableMsgFormOnChange,
   };
 };
