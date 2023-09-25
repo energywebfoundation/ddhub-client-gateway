@@ -126,7 +126,7 @@ paths:
               schema:
                 type: "array"
                 items:
-                  $ref: "#/components/schemas/GetChannelsMessagesCountDto"
+                  $ref: "#/components/schemas/GetChannelMessagesCountDto"
         400:
           description: "Invalid request"
       tags:
@@ -1298,20 +1298,6 @@ components:
           example: 5
       required:
         - "count"
-    GetChannelsMessagesCountDto:
-      type: "object"
-      properties:
-        count:
-          type: "number"
-          description: "Count of total messages"
-          example: 5
-        fqcn:
-          type: "string"
-          description: "Channel Name"
-          example: "channel.name"
-      required:
-        - "count"
-        - "fqcn"
     TopicDto:
       type: "object"
       properties:
@@ -1437,6 +1423,30 @@ components:
         - "topicName"
         - "owner"
         - "topicId"
+    ChannelResponseTopic:
+      type: "object"
+      properties:
+        topicName:
+          type: "string"
+          description: "Topic name"
+          example: "operatorEnvelope"
+        topicOwner:
+          type: "string"
+          example: "aemo.edge"
+          description: "Owner name"
+        topicId:
+          type: "string"
+          example: "622fed6e4258501225095045"
+          description: "Topic ID from Message Broker"
+        responseTopicId:
+          type: "string"
+          example: "622fed6e4258501225095045"
+          description: "Response Topic ID from Message Broker"
+      required:
+        - "topicName"
+        - "topicOwner"
+        - "topicId"
+        - "responseTopicId"
     ChannelConditions:
       type: "object"
       properties:
@@ -1467,11 +1477,17 @@ components:
           type: "array"
           items:
             $ref: "#/components/schemas/ChannelTopic"
+        responseTopics:
+          description: "Array of response topics"
+          type: "array"
+          items:
+            $ref: "#/components/schemas/ChannelResponseTopic"
       required:
         - "dids"
         - "roles"
         - "qualifiedDids"
         - "topics"
+        - "responseTopics"
     GetChannelResponseDto:
       type: "object"
       properties:
@@ -2365,6 +2381,20 @@ components:
       required:
         - "did"
         - "alias"
+    GetChannelsMessagesCountDto:
+      type: "object"
+      properties:
+        count:
+          type: "number"
+          description: "Count of total messages"
+          example: 5
+        fqcn:
+          type: "string"
+          description: "Channel name"
+          example: "szostak.pub"
+      required:
+        - "count"
+        - "fqcn"
 externalDocs:
   description: "Postman Collection"
   url: "/docs-json"
