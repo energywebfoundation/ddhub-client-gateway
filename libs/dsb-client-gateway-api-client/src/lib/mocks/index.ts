@@ -44,12 +44,6 @@ export const getFrontendConfigMock = () => ({
   fileDownload: {
     allowedRoles: ['user'],
   },
-  messageInbox: {
-    allowedRoles: ['user'],
-  },
-  messageOutbox: {
-    allowedRoles: ['user'],
-  },
 });
 
 export const getApplicationsControllerGetApplicationsMock = () => [
@@ -158,6 +152,7 @@ export const getChannelControllerGetByTypeMock = () => [
     payloadEncryption: false,
     type: 'sub',
     useAnonymousExtChannel: true,
+    messageForms: false,
     conditions: {
       dids: ['did:ethr:volta:0x09Df5d33f1242E1b8aA5E0E0F6BfA687E6846993'],
       roles: [
@@ -181,6 +176,7 @@ export const getChannelControllerGetByTypeMock = () => [
     payloadEncryption: false,
     type: 'pub',
     useAnonymousExtChannel: false,
+    messageForms: true,
     conditions: {
       dids: ['did:ethr:volta:0x09Df5d33f1242E1b8aA5E0E0F6BfA687E6846993'],
       roles: ['marketoperator.roles'],
@@ -191,6 +187,20 @@ export const getChannelControllerGetByTypeMock = () => [
           topicId: '622fed6e4258501225095046',
         },
       ],
+      responseTopics: [
+        {
+          topicName: 'operatorEnvelope',
+          owner: 'ddhub.apps.energyweb.iam.ewc',
+          topicId: '622fed6e4258501225095046',
+          schemaType: 'JSD7',
+        },
+        {
+          topicName: 'operatorEnvelope 2',
+          owner: 'ddhub.apps.energyweb.iam.ewc',
+          topicId: '622fed6e4258501225095046',
+          schemaType: 'JSD7',
+        },
+      ],
     },
   },
   {
@@ -198,6 +208,7 @@ export const getChannelControllerGetByTypeMock = () => [
     payloadEncryption: true,
     type: 'upload',
     useAnonymousExtChannel: true,
+    messageForms: false,
     conditions: {
       dids: ['did:ethr:volta:0x09Df5d33f1242E1b8aA5E0E0F6BfA687E6846993'],
       roles: ['marketoperator.roles'],
@@ -215,6 +226,7 @@ export const getChannelControllerGetByTypeMock = () => [
     payloadEncryption: false,
     type: 'download',
     useAnonymousExtChannel: false,
+    messageForms: false,
     conditions: {
       dids: ['did:ethr:volta:0x09Df5d33f1242E1b8aA5E0E0F6BfA687E6846993'],
       roles: ['marketoperator.roles'],

@@ -1,7 +1,8 @@
-import { KeyboardEvent, useState, useEffect } from 'react';
+import { KeyboardEvent, useState, useEffect, ChangeEvent } from 'react';
 import { Topic } from '../Topics.effects';
 import { FieldValues, useForm } from 'react-hook-form';
 import { useAsyncDebounce } from 'react-table';
+import { ResponseTopicDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 
 const initialState = {
   owner: '',
@@ -15,26 +16,32 @@ export interface SelectedTopicEffectsProps {
   edit?: (oldTopic: Topic, newTopic: Topic) => void;
   topic: Topic;
   topicsList: Topic[];
+  availableTopics: Topic[];
+  saveResponse?: (topics: ResponseTopicDto[], selectedTopicId: string) => void;
+  responseTopics?: ResponseTopicDto[];
 }
 
-export const useSelectedTopicEffects = (
-  {
-    setSelectedApplication,
-    topic,
-    edit,
-    topicsList,
-  }: SelectedTopicEffectsProps
-) => {
+export const useSelectedTopicEffects = ({
+  setSelectedApplication,
+  topic,
+  edit,
+  topicsList,
+  availableTopics,
+  saveResponse,
+  responseTopics = [],
+}: SelectedTopicEffectsProps) => {
   const [expanded, setExpanded] = useState<string | false>(false);
   const [updatedTopic, setUpdatedTopic] = useState<Topic>(initialState);
   const [editTopic, setEditTopic] = useState<Topic>(initialState);
   const [filteredTopics, setFilteredTopics] = useState<Topic[]>([]);
+  const [isResponse, setIsResponse] = useState<boolean>(false);
+  const [selected, setSelected] = useState<ResponseTopicDto[]>([]);
 
   useEffect(() => {
-    if (Array.isArray(topicsList)) {
-      setFilteredTopics(topicsList);
+    if (Array.isArray(availableTopics)) {
+      setFilteredTopics(availableTopics);
     }
-  }, [topicsList]);
+  }, [availableTopics]);
 
   const { register, reset, watch } = useForm<FieldValues>({
     mode: 'onChange',
@@ -47,22 +54,37 @@ export const useSelectedTopicEffects = (
   };
 
   const handleClose = () => {
+    setIsResponse(false);
     setExpanded(false);
     handleReset();
   };
 
   const handleOpen = (event: any) => {
-    const selectId = event.currentTarget.id;
     setSelectedApplication(topic.owner);
-
-    setUpdatedTopic(initialState);
+    setExpanded(event.currentTarget.id);
     setEditTopic(topic);
-    setExpanded(selectId);
+  };
+
+  const handleOpenEdit = () => {
+    setIsResponse(false);
+    setUpdatedTopic(initialState);
+    setFilteredTopics(availableTopics);
+  };
+
+  const handleOpenResponse = () => {
+    setIsResponse(true);
     setFilteredTopics(topicsList);
+    setSelected(responseTopics);
   };
 
   const handleSubmitForm = () => {
-    edit(editTopic, updatedTopic);
+    if (isResponse) {
+      const selectedTopicId = editTopic.id ?? editTopic.topicId;
+      saveResponse(selected, selectedTopicId);
+    } else {
+      edit(editTopic, updatedTopic);
+    }
+
     handleClose();
   };
 
@@ -70,10 +92,39 @@ export const useSelectedTopicEffects = (
     setUpdatedTopic(topic);
   };
 
+  const selectedIndex = (topicName: string) => {
+    return selected.findIndex((topicItem) => topicItem.topicName === topicName);
+  };
+
+  const handleClickTopicCheckbox = (
+    event: ChangeEvent<HTMLInputElement>,
+    topic: Topic
+  ) => {
+    const selectedIdx = selectedIndex(topic.topicName);
+
+    if (event.target.checked && selectedIdx === -1) {
+      const selectedTopicId = editTopic.id ?? editTopic.topicId;
+
+      const respTopic = {
+        topicName: topic.topicName,
+        owner: topic.owner,
+        responseTopicId: selectedTopicId,
+      };
+
+      setSelected([...selected, respTopic]);
+    } else if (!event.target.checked && selectedIdx > -1) {
+      const copy = [...selected];
+      copy.splice(selectedIdx, 1);
+
+      setSelected(copy);
+    }
+  };
+
   const onFilterChange = useAsyncDebounce((value: string) => {
     const keyword = value.toLowerCase();
+    const listToFilter = isResponse ? topicsList : availableTopics;
 
-    const filtered = topicsList.filter((topicItem) => {
+    const filtered = listToFilter.filter((topicItem) => {
       const topicName = topicItem['topicName'].toLowerCase();
       const matchedTopics = topicName.includes(keyword);
       let matchedTags = -1;
@@ -109,7 +160,6 @@ export const useSelectedTopicEffects = (
     expanded,
     updatedTopic,
     handleClose,
-    handleOpen,
     handleSubmitForm,
     handleClickTopic,
     inputProps,
@@ -119,5 +169,11 @@ export const useSelectedTopicEffects = (
     onFilterChange,
     filteredTopics,
     handleKeyDown,
-  }
+    handleOpen,
+    handleOpenResponse,
+    handleOpenEdit,
+    isResponse,
+    handleClickTopicCheckbox,
+    selectedIndex,
+  };
 };

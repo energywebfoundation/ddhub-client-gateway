@@ -1,8 +1,20 @@
-import { ChannelConditionsDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
+import {
+  ChannelConditionsDto,
+  ResponseTopicDto,
+} from '@dsb-client-gateway/dsb-client-gateway-api-client';
 
-export const useSummaryEffects = () => {
+export const useSummaryEffects = (responseTopics: ResponseTopicDto[]) => {
   const countRestrictions = (conditions: ChannelConditionsDto) => {
     return conditions.dids.length + conditions.roles.length;
   };
-  return { countRestrictions };
+
+  const getSelectedResponseTopics = (selectedTopicId: string) => {
+    const selectedResponseTopics = responseTopics.filter(
+      (topic) => topic.responseTopicId === selectedTopicId
+    );
+
+    return selectedResponseTopics;
+  };
+
+  return { countRestrictions, getSelectedResponseTopics };
 };

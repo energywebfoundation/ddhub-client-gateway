@@ -28,6 +28,7 @@ const initialState = {
   type: '' as UpdateChannelDtoType,
   payloadEncryption: false,
   useAnonymousExtChannel: false,
+  messageForms: false,
   conditions: {
     roles: [] as string[],
     dids: [] as string[],
@@ -44,6 +45,7 @@ export const useUpdateChannelEffects = () => {
   const dispatch = useModalDispatch();
   const Swal = useCustomAlert();
   const [activeStep, setActiveStep] = useState(0);
+  const [messageForms, setMessageForms] = useState(false);
   const { applications } = useApplications('user');
   const applicationMap = new Map();
 
@@ -65,16 +67,26 @@ export const useUpdateChannelEffects = () => {
         };
       });
 
+      const responseTopics = channel.conditions.responseTopics.map((topic) => {
+        return {
+          topicName: topic.topicName,
+          owner: topic.topicOwner,
+          responseTopicId: topic.responseTopicId,
+        };
+      });
+
       setChannelValues({
         type: channel.type,
         conditions: {
           ...channel.conditions,
           topics,
-          responseTopics: [], // temp fix
+          responseTopics,
         },
         payloadEncryption: channel.payloadEncryption,
         useAnonymousExtChannel: channel.useAnonymousExtChannel,
       });
+
+      setMessageForms(channel.messageForms);
     } else {
       resetToInitialState();
     }
@@ -114,18 +126,32 @@ export const useUpdateChannelEffects = () => {
     });
   };
 
-  const channelUpdateHandler = (topics: Topic[]) => {
-    const data = {
+  const channelUpdateHandler = (data: any) => {
+    let responseTopicsData: ResponseTopicDto[] = [];
+
+    data.topics.map((topic: Topic) => {
+      const topicId = topic.id ?? topic.topicId;
+      const respTopics = data.responseTopics.filter(
+        (item: ResponseTopicDto) => item.responseTopicId === topicId
+      );
+
+      if (respTopics.length) {
+        responseTopicsData = responseTopicsData.concat(respTopics);
+      }
+    });
+
+    const updateData = {
       fqcn: channel.fqcn,
       type: channelValues.type,
       payloadEncryption: channelValues.payloadEncryption,
       useAnonymousExtChannel: channelValues.useAnonymousExtChannel,
       conditions: {
         ...channelValues.conditions,
-        topics,
+        topics: data.topics,
+        responseTopics: responseTopicsData,
       },
     };
-    updateChannelHandler(data, onUpdate);
+    updateChannelHandler(updateData, onUpdate);
   };
 
   const openCancelModal = async () => {
@@ -169,5 +195,6 @@ export const useUpdateChannelEffects = () => {
     channelUpdateHandler,
     isUpdating,
     getActionButtonsProps,
+    messageForms,
   };
 };
