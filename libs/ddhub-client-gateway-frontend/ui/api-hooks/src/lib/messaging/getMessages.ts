@@ -6,16 +6,27 @@ import {
 import { keyBy } from 'lodash';
 import { useCustomAlert } from '@ddhub-client-gateway-frontend/ui/core';
 
-export const useMessages = (params?: MessageControlllerGetMessageParams) => {
+export const useMessages = (
+  params?: MessageControlllerGetMessageParams,
+  isMessageBox?: boolean
+) => {
   const Swal = useCustomAlert();
+  let enabled;
+
+  if (isMessageBox) {
+    enabled = !!params?.fqcn && !!params?.clientId;
+  } else {
+    enabled =
+      !!params?.fqcn &&
+      !!params?.topicName &&
+      !!params?.topicOwner &&
+      !!params?.clientId;
+  }
+
   const { data, isLoading, isSuccess, isError } =
     useMessageControlllerGetMessage(params, {
       query: {
-        enabled:
-          !!params?.fqcn &&
-          !!params?.topicName &&
-          !!params?.topicOwner &&
-          !!params?.clientId,
+        enabled,
         onError: (err: any) => {
           console.error(err);
           Swal.httpError(err);
