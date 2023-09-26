@@ -80,10 +80,6 @@ export class OfflineMessagesService {
         if (messageId) {
           qb.andWhere(`${rm}.messageId = :messageId`, { messageId });
         }
-
-        if (clientId) {
-          qb.andWhere(`${rm}.clientId = :clientId`, { clientId });
-        }
       })
       .orderBy(`${rm}.timestampNanos`, 'DESC')
       .take(amount || 3);
