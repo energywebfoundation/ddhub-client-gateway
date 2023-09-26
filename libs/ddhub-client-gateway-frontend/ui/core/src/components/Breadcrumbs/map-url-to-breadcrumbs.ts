@@ -88,17 +88,17 @@ export const mapUrlToBreadcrumbs = new Map<string, Breadcrumb[]>()
     { title: 'Data messaging file upload' },
   ])
   .set(routerConst.FileDownloadChannel, [
-    { title: 'Data messaging file upload' },
+    { title: 'Data messaging file download' },
     {
-      title: 'Data messaging file upload',
+      title: 'Data messaging file download',
       path: routerConst.DataMessagingFileDownload,
     },
     { title: 'Channel topics' },
   ])
   .set(routerConst.FileDownloadChannelTopic, [
-    { title: 'Data messaging file upload' },
+    { title: 'Data messaging file download' },
     {
-      title: 'Data messaging file upload',
+      title: 'Data messaging file download',
       path: routerConst.DataMessagingFileDownload,
     },
     { title: 'Channel topics', path: routerConst.FileDownloadChannel },
@@ -114,6 +114,13 @@ export const mapUrlToBreadcrumbs = new Map<string, Breadcrumb[]>()
     { title: 'Client Subscriptions' },
   ])
   .set(routerConst.MessageInbox, [
-    { title: 'Message Box' },
-    { title: 'Channel List' },
+    { title: 'My messages' },
+    { title: 'Message box' },
+    { title: 'Channel list' },
+  ])
+  .set(routerConst.MessageInboxChannel, [
+    { title: 'My messages' },
+    { title: 'Message box', path: routerConst.MessageInbox },
+    { title: 'Channel list' },
+    { title: 'My messages' },
   ]);
