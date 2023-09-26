@@ -117,7 +117,6 @@ export const Drawer = () => {
           menuIcon={<Database className={classes.icon} size={18} />}
         />
 
-        {/*todo: change href*/}
         <CollapsableMenu
           menuTitle="Message Box"
           subMenu={[
