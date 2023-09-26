@@ -44,6 +44,12 @@ export const getFrontendConfigMock = () => ({
   fileDownload: {
     allowedRoles: ['user'],
   },
+  messageInbox: {
+    allowedRoles: ['user'],
+  },
+  messageOutbox: {
+    allowedRoles: ['user'],
+  },
 });
 
 export const getApplicationsControllerGetApplicationsMock = () => [
@@ -263,6 +269,8 @@ export const getChannelControllerGetMock = () => ({
 export const getChannelMessagesMock = () => [
   {
     id: '6283374fbe281c73d1ba252b',
+    topicName: 'operatingEnvelope',
+    topicOwner: 'ddhub.apps.energyweb.iam.ewc',
     topicVersion: '1.0.0',
     topicSchemaType: 'CSV',
     payload: '{"fileId":"62833e6ebe281c73d1ba2535"}',
@@ -270,14 +278,13 @@ export const getChannelMessagesMock = () => [
       '0xd3a2e04d344261ee648d00baba8477a575030371862ee9f11d339726cff8d47b579321dc99312c84d63ab33e065e752c9639a5615ed5c9bf757a634772c506dc1b',
     sender: 'did:ethr:volta:0x03830466Ce257f9B798B0f27359D7639dFB6457D',
     timestampNanos: 1662428065121000000,
-    transactionId: "''",
+    transactionId: 'TRXS00000001',
     signatureValid: false,
-    decryption: {
-      status: true,
-    },
   },
   {
-    id: '6283374fbe281c73d1ba252b',
+    id: '6283374fbe281c73d1ba252c',
+    topicName: 'srcEvent',
+    topicOwner: 'ddhub.apps.energyweb.iam.ewc',
     topicVersion: '1.0.0',
     topicSchemaType: 'CSV',
     payload: '{"fileId":"62833e6ebe281c73d1ba2535"}',
@@ -285,11 +292,8 @@ export const getChannelMessagesMock = () => [
       '0xd3a2e04d344261ee648d00baba8477a575030371862ee9f11d339726cff8d47b579321dc99312c84d63ab33e065e752c9639a5615ed5c9bf757a634772c506dc1b',
     sender: 'did:ethr:volta:0x03830466Ce257f9B798B0f27359D7639dFB6457D',
     timestampNanos: 1662428065121000000,
-    transactionId: "''",
+    transactionId: 'TRXS000000002',
     signatureValid: true,
-    decryption: {
-      status: true,
-    },
   },
 ];
 
