@@ -125,6 +125,7 @@ export class OfflineMessagesService {
           clientGatewayMessageId: message.clientGatewayMessageId,
           sender: message.senderDid,
           signature: message.signature,
+          relatedMessagesCount: relatedMessages.length,
           initiatingMessageId: message.initiatingMessageId,
           payloadEncryption: message.payloadEncryption,
           decryption: {
