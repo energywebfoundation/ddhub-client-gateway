@@ -6,7 +6,8 @@ import { GetMessagesResponseDto } from '@dsb-client-gateway/dsb-client-gateway-a
 import { CHANNEL_INBOX_HEADERS } from '../../models/channel-inbox-headers';
 
 export function MessageInbox() {
-  const { channel, messages, isLoading } = useMessageInboxEffects();
+  const { channel, messages, isLoading, actions, openDetailsModal } =
+    useMessageInboxEffects();
 
   return (
     <Stack spacing={2} direction="row">
@@ -18,6 +19,8 @@ export function MessageInbox() {
           loading={isLoading}
           showSearch={false}
           loadingRows={2}
+          actions={actions}
+          onRowClick={openDetailsModal}
         />
       </Box>
     </Stack>
