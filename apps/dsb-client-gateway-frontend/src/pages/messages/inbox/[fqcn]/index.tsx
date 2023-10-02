@@ -1,5 +1,5 @@
-import { MessageInbox } from '@ddhub-client-gateway-frontend/ui/messaging';
+import { MessageInboxContainer } from '@ddhub-client-gateway-frontend/ui/messaging';
 
 export default function Index() {
-  return <MessageInbox />;
+  return <MessageInboxContainer />;
 }
