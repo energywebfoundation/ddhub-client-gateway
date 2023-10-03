@@ -1,10 +1,18 @@
+import { FC } from 'react';
 import { useChannelMessageBoxListEffects } from './ChannelMessageBoxList.effects';
 import { GenericTable } from '@ddhub-client-gateway-frontend/ui/core';
 import { CHANNEL_MESSAGE_HEADERS } from '../../models/channel-message-headers';
+import { ChannelControllerGetCountOfChannelsType } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 
-export function ChannelMessageBoxList() {
+interface ChannelMessageBoxListProps {
+  channelType: ChannelControllerGetCountOfChannelsType;
+}
+
+export const ChannelMessageBoxList: FC<ChannelMessageBoxListProps> = ({
+  channelType,
+}: ChannelMessageBoxListProps) => {
   const { channels, isLoading, handleRowClick } =
-    useChannelMessageBoxListEffects();
+    useChannelMessageBoxListEffects(channelType);
 
   return (
     <div>
@@ -16,4 +24,4 @@ export function ChannelMessageBoxList() {
       ></GenericTable>
     </div>
   );
-}
+};
