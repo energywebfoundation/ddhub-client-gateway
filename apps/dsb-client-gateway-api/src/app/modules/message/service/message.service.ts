@@ -190,11 +190,15 @@ export class MessageService {
         dto.initiatingTransactionId
       );
 
+    const messageIds: string[] = [];
+
     for (const res of result.status) {
       for (const detail of res.details) {
         messageLoggerContext.log(
           `message sent with id ${detail.messageId} to ${detail.did} with status code ${detail.statusCode}`
         );
+
+        messageIds.push(detail.messageId);
 
         await this.messageStoreService.storeRecipients(
           detail.did,
@@ -212,6 +216,9 @@ export class MessageService {
       await this.messageStoreService
         .storeSentMessage([
           {
+            topicOwner: topic.owner,
+            topicName: topic.name,
+            messageIds: messageIds,
             initiatingMessageId: dto.initiatingMessageId,
             initiatingTransactionId: dto.initiatingTransactionId,
             payload: dto.payload,
@@ -584,7 +591,7 @@ export class MessageService {
   public async getOfflineMessages(
     dto: Partial<GetMessagesDto>
   ): Promise<GetMessageResponse[]> {
-    return this.offlineMessagesService.getOfflineMessages(dto);
+    return this.offlineMessagesService.getOfflineReceivedMessages(dto);
   }
 
   @Span('message_getMessages')

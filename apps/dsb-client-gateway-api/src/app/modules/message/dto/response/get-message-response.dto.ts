@@ -106,4 +106,14 @@ export class GetMessagesResponseDto {
     example: 'SUCCESS',
   })
   signatureValid: EncryptionStatus;
+
+  @IsNumber()
+  @ApiProperty({
+    description:
+      'Related messages count. Only appears for channels with message forms.',
+    type: Number,
+    example: 5,
+    required: false,
+  })
+  relatedMessagesCount?: number;
 }
