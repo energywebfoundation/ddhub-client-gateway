@@ -29,6 +29,9 @@ import { MtlsGuard } from '../../certificate/guards/mtls.guard';
 import { PinoLogger } from 'nestjs-pino';
 import { ClientsInterceptor } from '@dsb-client-gateway/ddhub-client-gateway-clients';
 import { GetMessageResponse } from '../message.interface';
+import { GetSentMessagesRequestDto } from '../dto/request/get-sent-messages-request.dto';
+import { GetSentMessageResponseDto } from '../dto/response/get-sent-message-response.dto';
+import { OfflineMessagesService } from '../service/offline-messages.service';
 
 @Controller('messages')
 @UseGuards(MtlsGuard)
@@ -37,8 +40,41 @@ export class MessageControlller {
   private readonly logger = new Logger();
   constructor(
     protected readonly messageService: MessageService,
+    protected readonly offlineMessagesService: OfflineMessagesService,
     protected readonly pinoLogger: PinoLogger
   ) {}
+
+  @Get('/sent')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Message received successfully',
+    type: [GetMessagesResponseDto],
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description:
+      'Validation failed or some requirements were not fully satisfied',
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Unauthorized',
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Messages Not found',
+  })
+  @HttpCode(HttpStatus.OK)
+  public async getSentMessages(
+    @Query() dto: GetSentMessagesRequestDto
+  ): Promise<GetSentMessageResponseDto[]> {
+    this.pinoLogger.assign({
+      fqcn: dto.fqcn,
+      topicName: dto.topicName,
+      topicOwner: dto.topicOwner,
+    });
+
+    return this.offlineMessagesService.getOfflineSentMessages(dto);
+  }
 
   @Get('/')
   @ApiResponse({
