@@ -3,7 +3,7 @@ import { ChannelMessageBoxList } from '@ddhub-client-gateway-frontend/ui/messagi
 export default function MessageInbox() {
   return (
     <main>
-      <ChannelMessageBoxList channelType={'sub'} />
+      <ChannelMessageBoxList channelType={'pub'} />
     </main>
   );
 }
