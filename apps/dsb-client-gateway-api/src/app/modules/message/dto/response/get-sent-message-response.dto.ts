@@ -1,6 +1,29 @@
 import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
+export class GetSentMessageRecipientsResponseDto {
+  @ApiProperty({
+    description: 'Recipient did',
+    type: String,
+    example: 'did:ethr:volta:0x782aB0383Bfc807439d8EE29516937B47815d697',
+  })
+  did: string;
+
+  @ApiProperty({
+    description: 'Status',
+    example: false,
+    type: Boolean,
+  })
+  failed: boolean;
+
+  @ApiProperty({
+    description: 'Message id',
+    example: '507f191e810c19729de860ea',
+    type: String,
+  })
+  messageId: string;
+}
+
 export class GetSentMessageResponseDto {
   @ApiProperty({
     type: String,
@@ -165,4 +188,10 @@ export class GetSentMessageResponseDto {
     isArray: true,
   })
   messagesIds: string[];
+
+  @ApiProperty({
+    isArray: true,
+    type: () => GetSentMessageRecipientsResponseDto,
+  })
+  recipients: GetSentMessageRecipientsResponseDto[];
 }

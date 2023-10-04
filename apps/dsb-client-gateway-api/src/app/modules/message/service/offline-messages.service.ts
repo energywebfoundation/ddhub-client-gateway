@@ -7,6 +7,7 @@ import {
   ReceivedMessageReadStatusRepositoryWrapper,
   ReceivedMessageRepositoryWrapper,
   SentMessageEntity,
+  SentMessageRecipientRepositoryWrapper,
   SentMessageRepositoryWrapper,
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
 import { FindConditions } from 'typeorm/find-options/FindConditions';
@@ -24,6 +25,7 @@ export class OfflineMessagesService {
   constructor(
     protected readonly receivedMessageRepositoryWrapper: ReceivedMessageRepositoryWrapper,
     protected readonly sentMessagesRepositoryWrapper: SentMessageRepositoryWrapper,
+    protected readonly sentMessagesRecipientsWrapper: SentMessageRecipientRepositoryWrapper,
     protected readonly receivedMessageReadStatusRepositoryWrapper: ReceivedMessageReadStatusRepositoryWrapper,
     protected readonly keysService: KeysService
   ) {}
@@ -115,7 +117,21 @@ export class OfflineMessagesService {
               )
               .getCount();
 
+          const recipients =
+            await this.sentMessagesRecipientsWrapper.repository.find({
+              where: {
+                clientGatewayMessageId: entity.clientGatewayMessageId,
+              },
+            });
+
           return {
+            recipients: recipients.map((recipient) => {
+              return {
+                messageId: recipient.messageId,
+                did: recipient.recipientDid,
+                failed: +recipient.statusCode !== 200,
+              };
+            }),
             topicOwner: entity.topicOwner,
             topicName: entity.topicName,
             messagesIds: entity.messageIds,
