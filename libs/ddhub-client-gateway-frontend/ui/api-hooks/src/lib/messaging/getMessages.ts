@@ -8,13 +8,17 @@ import { useCustomAlert } from '@ddhub-client-gateway-frontend/ui/core';
 
 export const useMessages = (
   params?: MessageControlllerGetMessageParams,
-  isMessageBox?: boolean
+  isMessageBox?: boolean,
+  isRelatedMessage?: boolean
 ) => {
   const Swal = useCustomAlert();
   let enabled;
 
   if (isMessageBox) {
     enabled = !!params?.fqcn && !!params?.clientId;
+  } else if (isRelatedMessage) {
+    enabled =
+      !!params?.fqcn && !!params?.clientId && !!params?.initiatingMessageId;
   } else {
     enabled =
       !!params?.fqcn &&
