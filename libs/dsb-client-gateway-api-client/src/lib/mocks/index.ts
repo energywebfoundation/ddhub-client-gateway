@@ -314,6 +314,42 @@ export const getChannelMessagesMock = () => [
 
 export const getDownloadMessageMock = () => 'text';
 
+export const getMessagesSentMock = () => {
+  return [
+    {
+      id: '110',
+      topicName: 'getOperatingEnvelope',
+      topicOwner: 'torta.apps.eggplant.vege.iam.ewc',
+      topicVersion: '1.0.0',
+      topicSchemaType: 'JSD7',
+      payload: '{"fileId":"624bfd4f4c6cf04abfc20041"}',
+      signature:
+        '0x0abc6026b01856a756de47ec6f44d9c14fe69009bbf3b9b6cf522d8d783a1c654425848381affca5dab9284d8715fa2f9e34155374bafd923d75c219496cbe161c',
+      sender: 'did:ethr:volta:0x03830466Ce257f9B798B0f27359D7639dFB6457D',
+      timestampNanos: 1649147198388,
+      transactionId: '1649147198388',
+      signatureValid: 'SUCCESS',
+      relatedMessagesCount: 5,
+    },
+    {
+      id: '111',
+      topicName: 'responseTopicSample',
+      topicOwner: 'torta.apps.eggplant.vege.iam.ewc',
+      topicVersion: '1.0.0',
+      topicSchemaType: 'JSD7',
+      payload:
+        '{"nssContractId":"1056","services":[{"facilityCode":"A001","feederDxtxId":"12423300","nssProvisionMW":45,"nssProvisionEndDate":"2023-10-01","nssProvisionStartDate":"2023-09-01","dispatchIntervalTo":10,"nssServiceId":"908","dispatchIntervalFrom":1,"nssServiceType":"FEEDER_FWD"}],"tni":"tnidesc"}',
+      signature:
+        '0x0abc6026b01856a756de47ec6f44d9c14fe69009bbf3b9b6cf522d8d783a1c654425848381affca5dab9284d8715fa2f9e34155374bafd923d75c219496cbe161c',
+      sender: 'did:ethr:volta:0x03830466Ce257f9B798B0f27359D7639dFB6457D',
+      timestampNanos: 1649147198388,
+      transactionId: '1649147198388',
+      signatureValid: 'SUCCESS',
+      relatedMessagesCount: 2,
+    },
+  ];
+};
+
 export const getCronMock = () => {
   return [
     {
