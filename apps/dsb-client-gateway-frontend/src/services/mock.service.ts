@@ -17,6 +17,7 @@ import {
   postMessageMock,
   getChannelMessagesCount,
   getChannelMessagesCountByFqcn,
+  getMessagesSentMock,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 
 export function makeServer({ environment = 'development' }) {
@@ -118,6 +119,10 @@ export function makeServer({ environment = 'development' }) {
 
       this.get('messages/download', () => {
         return getDownloadMessageMock();
+      });
+
+      this.get('messages/sent', () => {
+        return getMessagesSentMock();
       });
 
       this.post('messages', () => {
