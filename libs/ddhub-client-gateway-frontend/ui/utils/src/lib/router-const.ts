@@ -4,6 +4,7 @@ export enum Queries {
   TopicId = 'topicId',
   FQCN = 'fqcn',
   PrivateKey = 'privateKey',
+  MessageId = 'messageId',
 }
 
 export const routerConst = {
@@ -35,4 +36,5 @@ export const routerConst = {
   MessageInboxChannel: `/messages/inbox/[${Queries.FQCN}]`,
   MessageOutbox: '/messages/outbox',
   MessageOutboxChannel: `/messages/outbox/[${Queries.FQCN}]`,
+  MessageOutboxRelated: `/messages/outbox/[${Queries.FQCN}]/[${Queries.MessageId}]`,
 };
