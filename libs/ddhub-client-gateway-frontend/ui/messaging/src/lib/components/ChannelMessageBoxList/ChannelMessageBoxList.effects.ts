@@ -10,14 +10,23 @@ export const useChannelMessageBoxListEffects = (
   channelType: ChannelControllerGetCountOfChannelsType
 ) => {
   const router = useRouter();
-  const channelUrl = routerConst.MessageInboxChannel;
+  const inboxUrl = routerConst.MessageInboxChannel;
+  const outboxUrl = routerConst.MessageOutboxChannel;
 
   const { channels, isLoading } = useChannelMessagesCount({
     type: channelType,
   });
 
   const handleRowClick = (data: GetChannelsMessagesCountDto) => {
-    router.push(channelUrl.replace('[fqcn]', data.fqcn));
+    let replaceUrl = '';
+
+    if (channelType === 'sub') {
+      replaceUrl = inboxUrl.replace('[fqcn]', data.fqcn);
+    } else if (channelType === 'pub') {
+      replaceUrl = outboxUrl.replace('[fqcn]', data.fqcn);
+    }
+
+    router.push(replaceUrl);
   };
 
   return { channels, isLoading, handleRowClick };

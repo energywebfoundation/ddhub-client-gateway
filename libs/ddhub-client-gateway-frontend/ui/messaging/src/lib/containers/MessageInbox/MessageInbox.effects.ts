@@ -9,8 +9,9 @@ import getConfig from 'next/config';
 import { TTableComponentAction } from '@ddhub-client-gateway-frontend/ui/core';
 import { GetMessagesResponseDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { ModalActionsEnum, useModalDispatch } from '../../context';
+import { split } from 'lodash';
 
-export const useMessageInboxEffects = () => {
+export const useMessageInboxEffects = (isRelatedMessages?: boolean) => {
   const router = useRouter();
   const dispatch = useModalDispatch();
 
@@ -20,16 +21,39 @@ export const useMessageInboxEffects = () => {
   const currentDate = moment().seconds(0).milliseconds(0);
   const fromDate = currentDate.subtract(Number(messagingOffset), 'minutes');
 
+  const params = {
+    fqcn: router.query[Queries.FQCN] as string,
+    clientId: 'cgui',
+    from: fromDate.toISOString(),
+    amount: Number(messagingAmount),
+    initiatingMessageId: '',
+    initiatingTransactionId: '',
+  };
+
+  if (isRelatedMessages) {
+    const messageIdParam = router.query[Queries.MessageId] as string;
+    const urlParams = split(messageIdParam, '&transactionId=', 2);
+
+    if (urlParams[0]) {
+      params.initiatingMessageId = urlParams[0];
+    }
+
+    if (urlParams[1]) {
+      params.initiatingTransactionId = urlParams[1];
+    } else {
+      delete params.initiatingTransactionId;
+    }
+  } else {
+    delete params.initiatingMessageId;
+    delete params.initiatingTransactionId;
+  }
+
   const { channel } = useChannel(router.query[Queries.FQCN] as string);
 
   const { messages, messagesLoaded } = useMessages(
-    {
-      fqcn: router.query[Queries.FQCN] as string,
-      clientId: 'cgui',
-      from: fromDate.toISOString(),
-      amount: Number(messagingAmount),
-    },
-    true
+    params,
+    !isRelatedMessages,
+    isRelatedMessages
   );
   const openDetailsModal = (data: GetMessagesResponseDto) => {
     dispatch({
@@ -55,7 +79,7 @@ export const useMessageInboxEffects = () => {
     console.log(data); // todo
   };
 
-  const actions: TTableComponentAction<GetMessagesResponseDto>[] = [
+  const actionsList: TTableComponentAction<GetMessagesResponseDto>[] = [
     {
       label: 'View message',
       onClick: (message: GetMessagesResponseDto) => openDetailsModal(message),
@@ -70,7 +94,7 @@ export const useMessageInboxEffects = () => {
     channel,
     isLoading: !messagesLoaded,
     messages,
-    actions,
+    actions: isRelatedMessages ? [actionsList[0]] : actionsList,
     openDetailsModal,
   };
 };
