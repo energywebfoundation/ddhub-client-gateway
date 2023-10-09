@@ -191,7 +191,7 @@ export class GetSentMessageResponseDto {
 
   @ApiProperty({
     isArray: true,
-    type: () => GetSentMessageRecipientsResponseDto,
+    type: GetSentMessageRecipientsResponseDto,
   })
   recipients: GetSentMessageRecipientsResponseDto[];
 }
