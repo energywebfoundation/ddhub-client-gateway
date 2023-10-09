@@ -17,7 +17,7 @@ export function MessageInbox() {
           headers={CHANNEL_INBOX_HEADERS}
           tableRows={messages}
           loading={isLoading}
-          showSearch={false}
+          showSearch={true}
           loadingRows={2}
           actions={actions}
           onRowClick={openDetailsModal}

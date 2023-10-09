@@ -56,7 +56,7 @@ export function MessageOutbox() {
           headers={CHANNEL_OUTBOX_HEADERS}
           tableRows={messages}
           loading={isLoading}
-          showSearch={false}
+          showSearch={true}
           loadingRows={2}
           actions={actions}
           onRowClick={openDetailsModal}
