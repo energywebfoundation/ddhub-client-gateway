@@ -317,7 +317,7 @@ export const getDownloadMessageMock = () => 'text';
 export const getMessagesSentMock = () => {
   return [
     {
-      id: '110',
+      clientGatewayMessageId: '110',
       topicName: 'getOperatingEnvelope',
       topicOwner: 'torta.apps.eggplant.vege.iam.ewc',
       topicVersion: '1.0.0',
@@ -330,9 +330,16 @@ export const getMessagesSentMock = () => {
       transactionId: '1649147198388',
       signatureValid: 'SUCCESS',
       relatedMessagesCount: 5,
+      recipients: [
+        {
+          did: 'did:ethr:volta:0x03830466Ce257f9B798B0f27359D7639dFB6457D',
+          failed: false,
+          messageId: '123',
+        },
+      ],
     },
     {
-      id: '111',
+      clientGatewayMessageId: '111',
       topicName: 'responseTopicSample',
       topicOwner: 'torta.apps.eggplant.vege.iam.ewc',
       topicVersion: '1.0.0',
@@ -346,6 +353,18 @@ export const getMessagesSentMock = () => {
       transactionId: '1649147198388',
       signatureValid: 'SUCCESS',
       relatedMessagesCount: 2,
+      recipients: [
+        {
+          did: 'did:ethr:volta:0x03830466Ce257f9B798B0f27359D7639dFB6457D',
+          failed: false,
+          messageId: '123',
+        },
+        {
+          did: 'did:ethr:volta:0x03830466Ce257f9B798B0f27359D7639dFB6457F',
+          failed: false,
+          messageId: '124',
+        },
+      ],
     },
   ];
 };
