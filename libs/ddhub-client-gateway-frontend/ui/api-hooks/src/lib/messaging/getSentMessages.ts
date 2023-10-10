@@ -1,7 +1,7 @@
 import {
-  GetMessagesResponseDto,
   useMessageControlllerGetSentMessages,
   MessageControlllerGetSentMessagesParams,
+  GetSentMessageResponseDto,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { useCustomAlert } from '@ddhub-client-gateway-frontend/ui/core';
 
@@ -29,15 +29,16 @@ export const useSentMessages = (
       },
     });
 
-  let messages = [] as GetMessagesResponseDto[];
+  let messages = [] as GetSentMessageResponseDto[];
 
   if (data) {
     messages = data.map((message) => {
       return {
         ...message,
+        id: message.clientGatewayMessageId,
         relatedMessageItems: {
           relatedMessagesCount: message.relatedMessagesCount,
-          messageId: message.id,
+          messageId: message.clientGatewayMessageId,
           transactionId: message.transactionId,
         },
       };
