@@ -2,7 +2,7 @@ import { Box, Stack } from '@mui/material';
 import { ChannelInfo } from '@ddhub-client-gateway-frontend/ui/channels';
 import { GenericTable } from '@ddhub-client-gateway-frontend/ui/core';
 import { useMessageOutboxEffects } from './MessageOutbox.effects';
-import { GetMessagesResponseDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
+import { GetSentMessageResponseDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { CHANNEL_OUTBOX_HEADERS } from '../../models/channel-outbox-headers';
 import { Queries } from '@ddhub-client-gateway-frontend/ui/utils';
 import { useRouter } from 'next/router';
@@ -52,7 +52,7 @@ export function MessageOutbox() {
     <Stack spacing={2} direction="row">
       <ChannelInfo channel={channel} />
       <Box flexGrow={1}>
-        <GenericTable<GetMessagesResponseDto>
+        <GenericTable<GetSentMessageResponseDto>
           headers={CHANNEL_OUTBOX_HEADERS}
           tableRows={messages}
           loading={isLoading}

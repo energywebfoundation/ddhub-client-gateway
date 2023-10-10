@@ -1,10 +1,10 @@
 import { FC } from 'react';
 import { CardContent, Paper, Typography, Box } from '@mui/material';
 import { useStyles } from './MessageInfo.styles';
-import { GetMessagesResponseDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
+import { GetSentMessageResponseDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 
 interface MessageInfoProps {
-  messageInfo: GetMessagesResponseDto;
+  messageInfo: GetSentMessageResponseDto;
 }
 
 export const MessageInfo: FC<MessageInfoProps> = ({
@@ -53,8 +53,14 @@ export const MessageInfo: FC<MessageInfoProps> = ({
               </Typography>
               <Box display="flex" alignItems="center">
                 <Typography className={classes.subTitle} noWrap>
-                  {/*todo*/}
-                  {messageInfo.sender}
+                  {messageInfo.recipients?.map(
+                    (recipient: any, index: number) => {
+                      if (index !== messageInfo.recipients.length - 1) {
+                        return recipient.did + ', ';
+                      }
+                      return recipient.did;
+                    }
+                  )}
                 </Typography>
               </Box>
             </Box>
@@ -64,7 +70,7 @@ export const MessageInfo: FC<MessageInfoProps> = ({
               </Typography>
               <Box display="flex" alignItems="center">
                 <Typography className={classes.subTitle} noWrap>
-                  {messageInfo.id}
+                  {messageInfo.clientGatewayMessageId}
                 </Typography>
               </Box>
             </Box>

@@ -2,7 +2,7 @@ import { useSentMessages } from '@ddhub-client-gateway-frontend/ui/api-hooks';
 import { Queries } from '@ddhub-client-gateway-frontend/ui/utils';
 import { useRouter } from 'next/router';
 import { split } from 'lodash';
-import { GetMessagesResponseDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
+import { GetSentMessageResponseDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 
 export const useRelatedMessageOutboxEffects = () => {
   const router = useRouter();
@@ -26,7 +26,7 @@ export const useRelatedMessageOutboxEffects = () => {
 
   const messageInfo = messages.length
     ? messages[0]
-    : ({} as GetMessagesResponseDto);
+    : ({} as GetSentMessageResponseDto);
 
   return {
     messageInfo,

@@ -5,7 +5,7 @@ import {
 import { Queries } from '@ddhub-client-gateway-frontend/ui/utils';
 import { useRouter } from 'next/router';
 import { TTableComponentAction } from '@ddhub-client-gateway-frontend/ui/core';
-import { GetMessagesResponseDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
+import { GetSentMessageResponseDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { ModalActionsEnum, useModalDispatch } from '../../context';
 
 export const useMessageOutboxEffects = () => {
@@ -17,7 +17,7 @@ export const useMessageOutboxEffects = () => {
   const { messages, messagesLoaded } = useSentMessages({
     fqcn: router.query[Queries.FQCN] as string,
   });
-  const openDetailsModal = (data: GetMessagesResponseDto) => {
+  const openDetailsModal = (data: GetSentMessageResponseDto) => {
     dispatch({
       type: ModalActionsEnum.SHOW_MESSAGE_INBOX_DETAILS,
       payload: {
@@ -28,7 +28,7 @@ export const useMessageOutboxEffects = () => {
           transactionId: data.transactionId,
           // instructionId: 'data.instructionId',
           // instructionCreateDt: 'data.instructionCreateDt',
-          messageId: data.id,
+          messageId: data.clientGatewayMessageId,
           topicOwner: data.topicOwner,
           topicName: data.topicName,
           topicVersion: data.topicVersion,
@@ -37,10 +37,11 @@ export const useMessageOutboxEffects = () => {
     });
   };
 
-  const actions: TTableComponentAction<GetMessagesResponseDto>[] = [
+  const actions: TTableComponentAction<GetSentMessageResponseDto>[] = [
     {
       label: 'View message',
-      onClick: (message: GetMessagesResponseDto) => openDetailsModal(message),
+      onClick: (message: GetSentMessageResponseDto) =>
+        openDetailsModal(message),
     },
   ];
 

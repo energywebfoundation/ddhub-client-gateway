@@ -25,12 +25,22 @@ export const CHANNEL_OUTBOX_HEADERS = [
   },
   {
     Header: 'TO',
-    accessor: 'sender', // todo: change to recipients
-    isSortable: true,
+    accessor: 'recipients',
+    Cell: (props: any) => {
+      return props?.value.map((recipient: any, index: number) => {
+        let cellText = recipient.did;
+
+        if (index !== props.value.length - 1) {
+          cellText += ', ';
+        }
+
+        return cellText;
+      });
+    },
   },
   {
     Header: 'MESSAGE ID',
-    accessor: 'id',
+    accessor: 'clientGatewayMessageId',
     isSortable: true,
   },
   {
