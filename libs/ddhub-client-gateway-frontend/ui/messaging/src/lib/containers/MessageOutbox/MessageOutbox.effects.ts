@@ -26,8 +26,6 @@ export const useMessageOutboxEffects = () => {
           payload: data.payload,
           channelName: channel?.fqcn,
           transactionId: data.transactionId,
-          // instructionId: 'data.instructionId',
-          // instructionCreateDt: 'data.instructionCreateDt',
           messageId: data.clientGatewayMessageId,
           topicOwner: data.topicOwner,
           topicName: data.topicName,

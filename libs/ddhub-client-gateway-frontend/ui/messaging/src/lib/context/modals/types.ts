@@ -17,8 +17,6 @@ type TInboxDetails = {
   data: {
     channelName: string;
     transactionId: string;
-    // instructionId: string; // todo: check var name
-    // instructionCreateDt: string; // todo: check var name
     messageId: string;
     topicOwner: string;
     topicName: string;

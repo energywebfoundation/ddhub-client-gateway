@@ -68,21 +68,17 @@ export const MessageInfo: FC<MessageInfoProps> = ({
               <Typography className={classes.title} variant="h4">
                 Message ID
               </Typography>
-              <Box display="flex" alignItems="center">
-                <Typography className={classes.subTitle} noWrap>
-                  {messageInfo.clientGatewayMessageId}
-                </Typography>
-              </Box>
+              <Typography className={classes.subTitle} noWrap>
+                {messageInfo.clientGatewayMessageId}
+              </Typography>
             </Box>
             <Box className={classes.row}>
               <Typography className={classes.title} variant="h4">
                 Transaction ID
               </Typography>
-              <Box display="flex" alignItems="center">
-                <Typography className={classes.subTitle} noWrap>
-                  {messageInfo.transactionId}
-                </Typography>
-              </Box>
+              <Typography className={classes.subTitle} noWrap>
+                {messageInfo.transactionId}
+              </Typography>
             </Box>
           </>
         )}

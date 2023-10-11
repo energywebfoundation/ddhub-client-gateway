@@ -43,6 +43,13 @@ export const useStyles = makeStyles()((theme) => ({
     color: theme.palette.grey[400],
     fontFamily: theme.typography.body2.fontFamily,
   },
+  entryText: {
+    fontSize: 12,
+    lineHeight: '24px',
+    fontWeight: 500,
+    color: '#D0D2D6',
+    fontFamily: theme.typography.body2.fontFamily,
+  },
   tabBox: {
     maxHeight: '559px',
     overflow: 'auto',
@@ -65,5 +72,14 @@ export const useStyles = makeStyles()((theme) => ({
     padding: '40px',
     borderRadius: '6px',
     border: '1px #404656 solid',
+  },
+  accordion: {
+    padding: 0,
+    marginLeft: 8,
+    width: 20,
+    height: 20,
+    '& svg': {
+      stroke: theme.palette.text.secondary,
+    },
   },
 }));

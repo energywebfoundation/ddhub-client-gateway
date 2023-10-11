@@ -10,6 +10,7 @@ import {
 import { useMessageInboxDetailsEffects } from './MessageInboxDetails.effects';
 import { useStyles } from './MessageInboxDetails.styles';
 import { MessageDetail } from './MessageDetail';
+import { MessageEntryView } from './MessageEntryView';
 
 export const MessageInboxDetails: FC = () => {
   const { classes } = useStyles();
@@ -51,32 +52,16 @@ export const MessageInboxDetails: FC = () => {
               copy: true,
             }}
           />
-          {/*todo: instruction*/}
-          {/*<MessageDetail*/}
-          {/*  field={{*/}
-          {/*    label: 'Instruction ID',*/}
-          {/*    value: inboxDetails?.instructionId,*/}
-          {/*    isEntryView: true,*/}
-          {/*    copy: true,*/}
-          {/*  }}*/}
-          {/*/>*/}
-          {/*<MessageDetail*/}
-          {/*  field={{*/}
-          {/*    label: 'Instruction create date and time',*/}
-          {/*    value: inboxDetails?.instructionCreateDt,*/}
-          {/*    isEntryView: true,*/}
-          {/*  }}*/}
-          {/*/>*/}
 
-          {parsedDetails.map((item, index) => (
-            <MessageDetail key={index} field={item} />
+          {parsedDetails.map((items, idx) => (
+            <MessageEntryView index={idx} items={items} />
           ))}
         </Box>
       ),
     },
     {
       label: 'JSON View',
-      childrenProp: <EditorView value={parsedPayload} />,
+      childrenProp: <EditorView value={parsedPayload} height={434} />,
     },
   ];
 

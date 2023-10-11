@@ -27,6 +27,8 @@ export const CHANNEL_OUTBOX_HEADERS = [
     Header: 'TO',
     accessor: 'recipients',
     Cell: (props: any) => {
+      if (!props?.value) return '';
+
       return props?.value.map((recipient: any, index: number) => {
         let cellText = recipient.did;
 

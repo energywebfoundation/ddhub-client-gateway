@@ -64,8 +64,6 @@ export const useMessageInboxEffects = (isRelatedMessages?: boolean) => {
           payload: data.payload,
           channelName: channel?.fqcn,
           transactionId: data.transactionId,
-          // instructionId: 'data.instructionId',
-          // instructionCreateDt: 'data.instructionCreateDt',
           messageId: data.id,
           topicOwner: data.topicOwner,
           topicName: data.topicName,

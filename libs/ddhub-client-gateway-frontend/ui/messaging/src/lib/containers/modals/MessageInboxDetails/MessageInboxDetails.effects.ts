@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { capitalize } from 'lodash';
+import { capitalize, isObject } from 'lodash';
 import {
   ModalActionsEnum,
   useModalDispatch,
@@ -24,22 +24,18 @@ export const useMessageInboxDetailsEffects = () => {
     const parsed = parsePayload(inboxDetails?.payload);
     setParsedPayload(parsed);
 
-    const parsedArray: any[] = [];
-    Object.entries(parsed).forEach(([name, value]) => {
-      const validValue = typeof value === 'string' || typeof value === 'number';
+    if (Array.isArray(parsed)) {
+      const parsedArray: any[] = [];
 
-      if (validValue) {
-        const formattedKey = camelToFlat(name);
+      parsed.map((item: any) => {
+        const parsedItem = parsePayloadItems(item);
+        parsedArray.push(parsedItem);
+      });
 
-        parsedArray.push({
-          label: capitalize(formattedKey),
-          value: value.toString(),
-          isEntryView: true,
-        });
-      }
-    });
-
-    setParsedDetails(parsedArray);
+      setParsedDetails(parsedArray);
+    } else {
+      setParsedDetails([parsePayloadItems(parsed)]);
+    }
   }, [inboxDetails]);
 
   const closeModal = () => {
@@ -50,6 +46,25 @@ export const useMessageInboxDetailsEffects = () => {
         data: undefined,
       },
     });
+  };
+
+  const parsePayloadItems = (parsed: any) => {
+    const parsedArrayItem: any[] = [];
+
+    Object.entries(parsed).forEach(([name, value]) => {
+      const validValue = typeof value === 'string' || typeof value === 'number';
+      const valueArray = isObject(value) ? value : [];
+      const formattedKey = camelToFlat(name);
+
+      parsedArrayItem.push({
+        label: capitalize(formattedKey),
+        value: validValue ? value.toString() : '',
+        valueArray,
+        isEntryView: true,
+      });
+    });
+
+    return parsedArrayItem;
   };
 
   const camelToFlat = (camel: string) => {
