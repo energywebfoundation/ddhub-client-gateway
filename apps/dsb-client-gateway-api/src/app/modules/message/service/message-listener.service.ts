@@ -69,6 +69,12 @@ export class MessageListenerService implements OnApplicationBootstrap {
         });
 
       if (applicableChannels.length === 0) {
+        await this.cronWrapper.cronRepository.save({
+          jobName: CronJobType.MESSAGES_FETCH,
+          latestStatus: CronStatus.SUCCESS,
+          executedAt: new Date(),
+        });
+
         this.logger.debug(`no applicable channels`);
 
         return;
