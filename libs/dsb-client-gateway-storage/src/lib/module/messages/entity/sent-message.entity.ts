@@ -8,11 +8,25 @@ export class SentMessageEntity {
   @Column({ nullable: true })
   initiatingMessageId?: string;
 
+  @Column({
+    array: true,
+    type: String,
+  })
+  messageIds: string[];
+
   @Column({ nullable: true })
   initiatingTransactionId?: string;
 
   @Column({ nullable: false })
   topicId: string;
+
+  @Column({ nullable: false })
+  topicName: string;
+
+  @Column({
+    nullable: false,
+  })
+  topicOwner: string;
 
   @Column()
   topicVersion: string;

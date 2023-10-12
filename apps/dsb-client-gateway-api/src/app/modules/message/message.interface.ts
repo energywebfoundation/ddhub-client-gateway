@@ -82,6 +82,7 @@ export interface GetMessageResponse {
   payloadEncryption: boolean;
   clientGatewayMessageId: string;
   topicId: string;
+  relatedMessagesCount?: number;
 }
 
 export interface DownloadMessageResponse {

@@ -325,6 +325,92 @@ paths:
           description: "Refreshed cache"
       tags:
         - "Channels"
+  /api/v2/messages/sent:
+    get:
+      operationId: "MessageControlller_getSentMessages"
+      parameters:
+        - name: "limit"
+          required: false
+          in: "query"
+          description: "Limit per request"
+          example: 1
+          schema:
+            default: 0
+            type: "number"
+        - name: "fqcn"
+          required: true
+          in: "query"
+          example: "channel.name"
+          description: "channel name"
+          schema:
+            type: "string"
+        - name: "initiatingMessageId"
+          required: false
+          in: "query"
+          example: "507f191e810c19729de860ea"
+          description: "Initiating message id"
+          schema:
+            type: "string"
+        - name: "initiatingTransactionId"
+          required: false
+          in: "query"
+          example: "45d5a89f-7c2c-48b0-ae9a-54f4128e818f"
+          description: "Initiating transaction id"
+          schema:
+            type: "string"
+        - name: "transactionId"
+          required: false
+          in: "query"
+          example: "45d5a89f-7c2c-48b0-ae9a-54f4128e818f"
+          description: "Transaction id"
+          schema:
+            type: "string"
+        - name: "messageId"
+          required: false
+          in: "query"
+          example: "507f191e810c19729de860ea"
+          description: "Message id"
+          schema:
+            type: "string"
+        - name: "topicName"
+          required: false
+          in: "query"
+          example: "getOperatingEnvelope"
+          description: "topic name"
+          schema:
+            type: "string"
+        - name: "topicOwner"
+          required: false
+          in: "query"
+          example: "torta.apps.eggplant.vege.iam.ewc"
+          description: "application namespace"
+          schema:
+            type: "string"
+        - name: "page"
+          required: false
+          in: "query"
+          description: "Current page"
+          example: 1
+          schema:
+            default: 0
+            type: "number"
+      responses:
+        200:
+          description: "Message received successfully"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/GetSentMessageResponseDto"
+        400:
+          description: "Validation failed or some requirements were not fully satisfied"
+        401:
+          description: "Unauthorized"
+        404:
+          description: "Messages Not found"
+      tags:
+        - "Messaging"
   /api/v2/messages:
     get:
       operationId: "MessageControlller_getMessage"
@@ -379,6 +465,13 @@ paths:
           schema:
             type: "string"
         - name: "initiatingTransactionId"
+          required: false
+          in: "query"
+          example: "45d5a89f-7c2c-48b0-ae9a-54f4128e818f"
+          description: "Initiating transaction id"
+          schema:
+            type: "string"
+        - name: "transactionId"
           required: false
           in: "query"
           example: "45d5a89f-7c2c-48b0-ae9a-54f4128e818f"
@@ -1580,6 +1673,140 @@ components:
         - "type"
         - "payloadEncryption"
         - "conditions"
+    GetSentMessageRecipientsResponseDto:
+      type: "object"
+      properties:
+        did:
+          type: "string"
+          description: "Recipient did"
+          example: "did:ethr:volta:0x782aB0383Bfc807439d8EE29516937B47815d697"
+        failed:
+          type: "boolean"
+          description: "Status"
+          example: false
+        messageId:
+          type: "string"
+          description: "Message id"
+          example: "507f191e810c19729de860ea"
+      required:
+        - "did"
+        - "failed"
+        - "messageId"
+    GetSentMessageResponseDto:
+      type: "object"
+      properties:
+        clientGatewayMessageId:
+          type: "string"
+          example: "f923afb7-e334-419c-a72c-a60b293184ea"
+          description: "Client gateway generated message id"
+        initiatingMessageId:
+          type: "string"
+          example: "507f191e810c19729de860ea"
+          description: "Initating message id"
+        initiatingTransactionId:
+          type: "string"
+          example: "f923afb7-e334-419c-a72c-a60b293184ea"
+          description: "Initating transaction id"
+        topicId:
+          type: "string"
+          example: "507f191e810c19729de860ea"
+          description: "Topic ID"
+        topicName:
+          type: "string"
+          example: "getOperatingEnvelope"
+          description: "topic name"
+        topicOwner:
+          type: "string"
+          example: "torta.apps.eggplant.vege.iam.ewc"
+          description: "application namespace"
+        topicVersion:
+          type: "string"
+          example: "0.0.1"
+          description: "Topic version"
+        transactionId:
+          type: "string"
+          example: "f923afb7-e334-419c-a72c-a60b293184ea"
+          description: "Transaction ID"
+        signature:
+          type: "string"
+          description: "Generated signature"
+        payloadEncryption:
+          type: "boolean"
+          example: false
+          description: "Was payload encrypted"
+        payload:
+          type: "string"
+          description: "Sent payload"
+        timestampNanos:
+          type: "number"
+          description: "timestamp in nano seconds"
+          example: 1649147198388
+        senderDid:
+          type: "string"
+          example: "did:ethr:volta:0x782aB0383Bfc807439d8EE29516937B47815d697"
+          description: "Sender DID"
+        fqcn:
+          type: "string"
+          example: "channel.name"
+          description: "Channel name"
+        relatedMessagesCount:
+          type: "number"
+          example: 1
+          description: "Related messages count"
+        isFile:
+          type: "boolean"
+          example: false
+          description: "Is file"
+        totalRecipients:
+          type: "number"
+          example: 1
+          description: "Total amount of recipients"
+        totalSent:
+          type: "number"
+          example: 1
+          description: "Total sent messages"
+        totalFailed:
+          type: "number"
+          example: 1
+          description: "Total failed messages"
+        createdDate:
+          type: "string"
+          description: "When application got stored in cache"
+          example: "2022-05-18T11:19:07.000Z"
+        updatedDate:
+          type: "string"
+          description: "When application got stored in cache"
+          example: "2022-05-18T11:19:07.000Z"
+        messagesIds:
+          example:
+            - "507f191e810c19729de860ea"
+          description: "Message id"
+          type: "array"
+          items:
+            type: "string"
+        recipients:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/GetSentMessageRecipientsResponseDto"
+      required:
+        - "clientGatewayMessageId"
+        - "topicId"
+        - "topicVersion"
+        - "transactionId"
+        - "signature"
+        - "payloadEncryption"
+        - "payload"
+        - "timestampNanos"
+        - "senderDid"
+        - "fqcn"
+        - "relatedMessagesCount"
+        - "isFile"
+        - "totalRecipients"
+        - "totalSent"
+        - "totalFailed"
+        - "createdDate"
+        - "updatedDate"
+        - "recipients"
     GetMessagesResponseDto:
       type: "object"
       properties:
@@ -1639,6 +1866,10 @@ components:
             - "REQUIRED_NOT_PERFORMED"
             - "SUCCESS"
           example: "SUCCESS"
+        relatedMessagesCount:
+          type: "number"
+          description: "Related messages count. Only appears for channels with message forms."
+          example: 5
       required:
         - "id"
         - "topicName"

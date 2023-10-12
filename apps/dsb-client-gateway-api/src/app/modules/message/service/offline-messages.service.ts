@@ -6,11 +6,17 @@ import {
   ReceivedMessageEntity,
   ReceivedMessageReadStatusRepositoryWrapper,
   ReceivedMessageRepositoryWrapper,
+  SentMessageEntity,
+  SentMessageRecipientRepositoryWrapper,
+  SentMessageRepositoryWrapper,
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
 import { FindConditions } from 'typeorm/find-options/FindConditions';
 import moment from 'moment';
 import { EncryptionStatus } from '../message.const';
 import { KeysService } from '../../keys/service/keys.service';
+import { GetSentMessagesRequestDto } from '../dto/request/get-sent-messages-request.dto';
+import { GetSentMessageResponseDto } from '../dto/response/get-sent-message-response.dto';
+import { In } from 'typeorm';
 
 @Injectable()
 export class OfflineMessagesService {
@@ -18,11 +24,143 @@ export class OfflineMessagesService {
 
   constructor(
     protected readonly receivedMessageRepositoryWrapper: ReceivedMessageRepositoryWrapper,
+    protected readonly sentMessagesRepositoryWrapper: SentMessageRepositoryWrapper,
+    protected readonly sentMessagesRecipientsWrapper: SentMessageRecipientRepositoryWrapper,
     protected readonly receivedMessageReadStatusRepositoryWrapper: ReceivedMessageReadStatusRepositoryWrapper,
     protected readonly keysService: KeysService
   ) {}
 
-  public async getOfflineMessages(
+  public async getOfflineSentMessages(
+    filterParams: GetSentMessagesRequestDto
+  ): Promise<GetSentMessageResponseDto[]> {
+    const queryBuilder =
+      this.sentMessagesRepositoryWrapper.repository.createQueryBuilder(
+        'sent_messages'
+      );
+
+    if (filterParams.transactionId) {
+      queryBuilder.andWhere('sent_messages.transactionId = :transactionId', {
+        transactionId: filterParams.transactionId,
+      });
+    }
+
+    if (filterParams.fqcn) {
+      queryBuilder.andWhere('sent_messages.fqcn = :fqcn', {
+        fqcn: filterParams.fqcn,
+      });
+    }
+
+    if (filterParams.initiatingMessageId) {
+      queryBuilder.andWhere(
+        'sent_messages.initiatingMessageId = :initiatingMessageId',
+        {
+          initiatingMessageId: filterParams.initiatingMessageId,
+        }
+      );
+    }
+
+    if (filterParams.initiatingTransactionId) {
+      queryBuilder.andWhere(
+        'sent_messages.initiatingTransactionId = :initiatingTransactionId',
+        {
+          initiatingTransactionId: filterParams.initiatingTransactionId,
+        }
+      );
+    }
+
+    // :project = ANY ( string_to_array(students.projects, ','))
+
+    if (filterParams.messageId) {
+      queryBuilder.andWhere(
+        ':messageId = ANY(sent_messages."messageIds"::text[])',
+        {
+          messageId: `${filterParams.messageId}`,
+        }
+      );
+    }
+
+    if (filterParams.topicName) {
+      queryBuilder.andWhere('sent_messages.topicName = :topicName', {
+        topicName: filterParams.topicName,
+      });
+    }
+
+    if (filterParams.topicOwner) {
+      queryBuilder.andWhere('sent_messages.topicOwner = :topicOwner', {
+        topicOwner: filterParams.topicOwner,
+      });
+    }
+
+    queryBuilder.orderBy(`sent_messages.timestampNanos`, 'DESC');
+
+    const page = filterParams.page || 1;
+    const limit = filterParams.limit || 5;
+
+    const skip = (page - 1) * limit;
+
+    queryBuilder.take(limit).skip(skip);
+
+    return queryBuilder.getMany().then(async (entities) => {
+      return await Promise.all(
+        entities.map(async (entity: SentMessageEntity) => {
+          const relatedMessagesCount =
+            await this.sentMessagesRepositoryWrapper.repository
+              .createQueryBuilder('sent_messages')
+              .where('sent_messages.initiatingMessageId IN (:...messageIds)', {
+                messageIds: entity.messageIds,
+              })
+              .orWhere(
+                'sent_messages.initiatingTransactionId = :transactionId',
+                {
+                  transactionId: entity.transactionId,
+                }
+              )
+              .getCount();
+
+          const recipients =
+            await this.sentMessagesRecipientsWrapper.repository.find({
+              where: {
+                clientGatewayMessageId: entity.clientGatewayMessageId,
+              },
+            });
+
+          return {
+            recipients: recipients.map((recipient) => {
+              return {
+                messageId: recipient.messageId,
+                did: recipient.recipientDid,
+                failed: +recipient.statusCode !== 200,
+              };
+            }),
+            topicOwner: entity.topicOwner,
+            topicName: entity.topicName,
+            messagesIds: entity.messageIds,
+            clientGatewayMessageId: entity.clientGatewayMessageId,
+            initiatingMessageId: entity.initiatingMessageId,
+            fqcn: entity.fqcn,
+            initiatingTransactionId: entity.initiatingTransactionId,
+            payload: entity.payload,
+            createdDate: entity.createdDate,
+            isFile: entity.isFile,
+            payloadEncryption: entity.payloadEncryption,
+            relatedMessagesCount: relatedMessagesCount,
+            senderDid: entity.senderDid,
+            signature: entity.signature,
+            topicId: entity.topicId,
+            timestampNanos: entity.timestampNanos,
+            topicVersion: entity.topicVersion,
+            totalSent: +entity.totalSent,
+            totalFailed: +entity.totalFailed,
+            transactionId: entity.transactionId,
+            totalRecipients: +entity.totalRecipients,
+            updatedDate: entity.updatedDate,
+          } as GetSentMessageResponseDto;
+        })
+      );
+    });
+  }
+
+  public async getOfflineReceivedMessages(
     dto: Partial<GetMessagesDto>
   ): Promise<GetMessageResponse[]> {
     const {
@@ -80,10 +218,6 @@ export class OfflineMessagesService {
         if (messageId) {
           qb.andWhere(`${rm}.messageId = :messageId`, { messageId });
         }
-
-        if (clientId) {
-          qb.andWhere(`${rm}.clientId = :clientId`, { clientId });
-        }
       })
       .orderBy(`${rm}.timestampNanos`, 'DESC')
       .take(amount || 3);
@@ -111,10 +245,10 @@ export class OfflineMessagesService {
           await this.receivedMessageRepositoryWrapper.repository
             .createQueryBuilder('m')
             .where(
-              'm.initiatingMessageId = :initiatingMessageId AND m.initiatingTransactionId = :initiatingTransactionId',
+              'm.initiatingMessageId = :initiatingMessageId OR m.initiatingTransactionId = :initiatingTransactionId',
               {
                 initiatingMessageId: message.initiatingMessageId,
-                initiatingTransactionId: message.initiatingMessageId,
+                initiatingTransactionId: message.initiatingTransactionId,
               }
             )
             .andWhere('m.messageId != :messageId', {
@@ -129,6 +263,7 @@ export class OfflineMessagesService {
           clientGatewayMessageId: message.clientGatewayMessageId,
           sender: message.senderDid,
           signature: message.signature,
+          relatedMessagesCount: relatedMessages.length,
           initiatingMessageId: message.initiatingMessageId,
           payloadEncryption: message.payloadEncryption,
           decryption: {
