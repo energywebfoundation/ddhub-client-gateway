@@ -91,7 +91,7 @@ const mockMessageStoreService = {
   storeSentMessage: jest.fn(),
 };
 const mockOfflineMessagesService = {
-  getOfflineMessages: jest.fn(),
+  getOfflineReceivedMessages: jest.fn(),
 };
 const mockIamService = {
   getDIDAddress: jest.fn(),
@@ -420,15 +420,15 @@ describe(`${MessageService.name}`, () => {
       });
 
       it('should not call getOfflineMessages', () => {
-        expect(mockOfflineMessagesService.getOfflineMessages).toBeCalledTimes(
-          0
-        );
+        expect(
+          mockOfflineMessagesService.getOfflineReceivedMessages
+        ).toBeCalledTimes(0);
       });
     });
 
     describe('should fetch offline messages because channel message forms is true', () => {
       beforeEach(async () => {
-        mockOfflineMessagesService.getOfflineMessages = jest
+        mockOfflineMessagesService.getOfflineReceivedMessages = jest
           .fn()
           .mockImplementationOnce(async () => []);
 
@@ -462,10 +462,12 @@ describe(`${MessageService.name}`, () => {
       });
 
       it('should call getOfflineMessages', () => {
-        expect(mockOfflineMessagesService.getOfflineMessages).toBeCalledTimes(
-          1
-        );
-        expect(mockOfflineMessagesService.getOfflineMessages).toBeCalledWith({
+        expect(
+          mockOfflineMessagesService.getOfflineReceivedMessages
+        ).toBeCalledTimes(1);
+        expect(
+          mockOfflineMessagesService.getOfflineReceivedMessages
+        ).toBeCalledWith({
           fqcn: 'fqcn',
           topicOwner: 'topicOwner',
           topicName: 'topicName',
@@ -487,7 +489,7 @@ describe(`${MessageService.name}`, () => {
 
     describe('should return offline messages', () => {
       beforeEach(async () => {
-        mockOfflineMessagesService.getOfflineMessages = jest
+        mockOfflineMessagesService.getOfflineReceivedMessages = jest
           .fn()
           .mockImplementationOnce(async () => []);
 
@@ -501,19 +503,23 @@ describe(`${MessageService.name}`, () => {
       });
 
       it('should call getOfflineMessages', () => {
-        expect(mockOfflineMessagesService.getOfflineMessages).toBeCalledTimes(
-          1
-        );
-        expect(mockOfflineMessagesService.getOfflineMessages).toBeCalledWith({
+        expect(
+          mockOfflineMessagesService.getOfflineReceivedMessages
+        ).toBeCalledTimes(1);
+        expect(
+          mockOfflineMessagesService.getOfflineReceivedMessages
+        ).toBeCalledWith({
           fqcn: 'fqcn',
         });
       });
 
       it('should call getOfflineMessages', () => {
-        expect(mockOfflineMessagesService.getOfflineMessages).toBeCalledTimes(
-          1
-        );
-        expect(mockOfflineMessagesService.getOfflineMessages).toBeCalledWith({
+        expect(
+          mockOfflineMessagesService.getOfflineReceivedMessages
+        ).toBeCalledTimes(1);
+        expect(
+          mockOfflineMessagesService.getOfflineReceivedMessages
+        ).toBeCalledWith({
           fqcn: 'fqcn',
         });
       });

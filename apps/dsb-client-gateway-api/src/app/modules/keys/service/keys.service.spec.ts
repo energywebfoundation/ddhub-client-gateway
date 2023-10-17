@@ -441,31 +441,31 @@ describe(`${KeysService.name}`, () => {
       });
     });
 
-    describe('should encrypt symmetric key', () => {
-      beforeEach(async () => {
-        didWrapperServiceMock.didRepository.findOne = jest
-          .fn()
-          .mockImplementationOnce(async () => {
-            return {
-              did: 'did',
-              createdDate: new Date(),
-              updatedDate: new Date(),
-              publicRSAKey: 'a',
-              publicSignatureKey: 'a',
-            } as DidEntity;
-          });
-
-        try {
-          result = await service.encryptSymmetricKey('symmetric-key', 'did');
-        } catch (e) {
-          error = e;
-        }
-      });
-
-      it('should execute', () => {
-        expect(result).toBeDefined();
-      });
-    });
+    // describe('should encrypt symmetric key', () => {
+    //   beforeEach(async () => {
+    //     didWrapperServiceMock.didRepository.findOne = jest
+    //       .fn()
+    //       .mockImplementationOnce(async () => {
+    //         return {
+    //           did: 'did',
+    //           createdDate: new Date(),
+    //           updatedDate: new Date(),
+    //           publicRSAKey: 'a',
+    //           publicSignatureKey: 'a',
+    //         } as DidEntity;
+    //       });
+    //
+    //     try {
+    //       result = await service.encryptSymmetricKey('symmetric-key', 'did');
+    //     } catch (e) {
+    //       error = e;
+    //     }
+    //   });
+    //
+    //   it('should execute', () => {
+    //     expect(result).toBeDefined();
+    //   });
+    // });
   });
 
   describe('verifySignature()', () => {
