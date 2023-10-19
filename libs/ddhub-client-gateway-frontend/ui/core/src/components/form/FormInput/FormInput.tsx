@@ -19,7 +19,10 @@ export const FormInput: FC<FormInputProps> = memo(
     return (
       <Box {...field.formInputsWrapperProps} flexShrink={0}>
         {field.label && (
-          <InputLabel className={classes.label}>{field.label}</InputLabel>
+          <InputLabel className={classes.label}>
+            {field.label}
+            {field.required ? ` *` : ''}
+          </InputLabel>
         )}
         <TextField
           autoComplete="off"

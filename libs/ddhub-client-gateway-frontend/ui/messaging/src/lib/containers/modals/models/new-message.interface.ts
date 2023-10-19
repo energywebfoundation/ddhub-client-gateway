@@ -7,4 +7,5 @@ export interface INewMessage {
   schema: string;
   uiSchema: string;
   message: any;
+  transactionId: string;
 }

@@ -8,14 +8,30 @@ export const useStyles = makeStyles()((theme) => ({
     padding: '51px 46px 35px 49px',
     borderRadius: 0,
   },
+  dialogContent: {
+    height: 'calc(100vh - 693px)',
+    overflow: 'hidden',
+  },
   content: {
     height: '100%',
     flexGrow: 1,
     flexWrap: 'nowrap',
   },
   contentWrapper: {
-    // paddingTop: 48,
-    flexGrow: 1,
+    overflow: 'auto',
+    padding: '0 12px 24px',
+    '&::-webkit-scrollbar': {
+      width: 2,
+    },
+    '&::-webkit-scrollbar-track': {
+      backgroundColor: theme.palette.background.paper,
+      boxSizing: 'border-box',
+      borderRadius: 3,
+    },
+    '&::-webkit-scrollbar-thumb': {
+      backgroundColor: theme.palette.primary.main,
+      borderRadius: 3,
+    },
   },
   stepsWrapper: {
     display: 'flex',

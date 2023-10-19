@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   useModalStore,
   useModalDispatch,
@@ -33,6 +33,7 @@ const initialState: INewMessage = {
   schema: undefined,
   uiSchema: undefined,
   message: undefined,
+  transactionId: undefined,
 };
 
 export const useNewMessageEffects = () => {
@@ -56,38 +57,31 @@ export const useNewMessageEffects = () => {
   } = useChannels({
     type: 'pub',
   });
-  const {
-    topicHistory,
-    isLoading: topicHistoryLoading,
-    topicHistoryLoaded,
-  } = useTopicVersionHistory({ id: newMessageValues.topicId });
-  const {
-    topic: topicWithSchema,
-    isLoading: topicWithSchemaLoading,
-    topicLoaded: topicWithSchemaLoaded,
-  } = useTopicVersion(newMessageValues.topicId, newMessageValues.version);
+  const { topicHistory, topicHistoryLoaded } = useTopicVersionHistory({
+    id: newMessageValues.topicId,
+  });
+  const { topic: topicWithSchema, topicLoaded: topicWithSchemaLoaded } =
+    useTopicVersion(newMessageValues.topicId, newMessageValues.version);
   const { sendNewMessageHandler, isLoading: isSending } = useSendNewMessage();
 
   const sendMessage = () => {
-    /* const { message } = newMessageValues;
-    const definedValues = Object.keys(newMessageValues.message).filter(
-      (key) =>
-        message[key] !== '' &&
-        message[key] !== null &&
-        message[key] !== undefined &&
-        !(Array.isArray(message[key]) && message[key].length === 0)
-    );
-    console.log('definedValues', definedValues);
-    const payload = JSON.stringify(pick(message, definedValues));
-    console.log('payload', payload); */
+    const buildMessagePayload = (message: any): string => {
+      if (message && message['0']) {
+        // Convert to array
+        const messageArray = Object.keys(message).map((key) => message[key]);
+        return JSON.stringify(messageArray);
+      }
+      return JSON.stringify(message);
+    };
+
     sendNewMessageHandler(
       {
         fqcn: newMessageValues.fqcn,
         topicName: newMessageValues.topicName,
         topicVersion: newMessageValues.version,
         topicOwner: newMessageValues.topicOwner,
-        transactionId: getValues('Transaction ID'),
-        payload: JSON.stringify(newMessageValues.message),
+        transactionId: newMessageValues.transactionId,
+        payload: buildMessagePayload(newMessageValues.message),
         anonymousRecipient: [],
       },
       () => {
@@ -117,18 +111,17 @@ export const useNewMessageEffects = () => {
   const {
     register,
     control,
-    handleSubmit,
     formState: { isValid },
     reset,
     resetField,
-    getValues,
   } = formContext;
 
   const selectedChannel = useWatch({ name: 'Channel', control });
   const selectedTopic = useWatch({ name: 'Topic Name', control });
   const selectedVersion = useWatch({ name: 'Version', control });
-
-  const buttons = ['test'];
+  const transactionId = useWatch({ name: 'Transaction ID', control });
+  const message = useWatch({ name: 'Message', control });
+  const formState = useWatch({ control });
 
   const resetFormSelectOptions = (field?: 'channel' | 'topic' | 'version') => {
     if (field) {
@@ -200,7 +193,6 @@ export const useNewMessageEffects = () => {
       resetFormSelectOptions('topic');
 
       const channel: GetChannelResponseDto = JSON.parse(selectedChannel);
-      console.log(channel);
       setNewMessageValues({
         ...initialState,
         fqcn: channel.fqcn,
@@ -223,10 +215,7 @@ export const useNewMessageEffects = () => {
   useEffect(() => {
     if (selectedTopic) {
       resetFormSelectOptions('version');
-      console.log('selectedTopic', selectedTopic);
-      console.log(selectedTopic);
       const topic = JSON.parse(selectedTopic);
-      console.log(topic);
 
       setNewMessageValues((prev) => ({
         ...prev,
@@ -239,7 +228,6 @@ export const useNewMessageEffects = () => {
 
   useEffect(() => {
     if (topicHistoryLoaded) {
-      console.log('topicHistory', topicHistory);
       setFields((prev) => ({
         ...prev,
         version: {
@@ -255,10 +243,7 @@ export const useNewMessageEffects = () => {
 
   useEffect(() => {
     if (selectedVersion) {
-      console.log('selectedVersion', selectedVersion);
       const version = JSON.parse(selectedVersion);
-      console.log(version);
-
       setNewMessageValues((prev) => ({
         ...prev,
         version: version.version,
@@ -268,18 +253,28 @@ export const useNewMessageEffects = () => {
 
   useEffect(() => {
     if (topicWithSchemaLoaded) {
-      console.log('topicWithSchema', topicWithSchema);
       if (topicWithSchema.schema) {
         const schema = JSON.parse(topicWithSchema.schema);
-        if (schema.required && Array.isArray(schema.required)) {
+        /* if (schema.required && Array.isArray(schema.required)) {
           schema.required.unshift('transactionId');
         } else {
           schema.required = ['transactionId'];
         }
+
+        const transactionIdProperty = {
+          transactionId: {
+            type: 'string',
+            title: 'Transaction ID',
+          },
+        };
         if (schema.properties && !schema.properties.transactionId) {
           schema.properties.transactionId = {
             type: 'string',
             title: 'Transaction ID',
+          };
+        } else if (!schema.properties) {
+          schema.properties = {
+            ...transactionIdProperty,
           };
         }
         let uiSchema = {
@@ -298,15 +293,29 @@ export const useNewMessageEffects = () => {
             ...uiSchema,
             ...embeddedSchema,
           };
-        }
+        } */
         setNewMessageValues((prev) => ({
           ...prev,
           schema: JSON.stringify(schema),
-          uiSchema: JSON.stringify(uiSchema),
+          uiSchema: JSON.stringify(schema.uiSchema),
         }));
       }
     }
   }, [topicWithSchemaLoaded, topicWithSchema]);
+
+  useEffect(() => {
+    setNewMessageValues((prev) => ({
+      ...prev,
+      message,
+    }));
+  }, [message]);
+
+  useEffect(() => {
+    setNewMessageValues((prev) => ({
+      ...prev,
+      transactionId,
+    }));
+  }, [transactionId]);
 
   const openNewMessageModal = () => {
     dispatch({
@@ -345,11 +354,9 @@ export const useNewMessageEffects = () => {
     switch (index) {
       case 0: {
         return (
-          !!newMessageValues.fqcn &&
-          !!newMessageValues.topicId &&
-          !!newMessageValues.topicName &&
-          !!newMessageValues.version &&
-          !!newMessageValues.schema
+          !!formState['Channel'] &&
+          !!formState['Topic Name'] &&
+          !!formState['Version']
         );
       }
       case 1: {
@@ -357,26 +364,41 @@ export const useNewMessageEffects = () => {
           return false;
         }
         const schema = JSON.parse(newMessageValues.schema);
-        const hasRequiredFields = schema?.required?.length ?? false;
-        const { message } = newMessageValues;
-        let messageKeys: string[] = [];
-        if (message) {
-          messageKeys = Object.keys(message).filter(
-            (key) =>
-              message[key] !== '' &&
-              message[key] !== null &&
-              message[key] !== undefined &&
-              !(Array.isArray(message[key]) && message[key].length === 0)
-          );
+        const requiredFields: string[] =
+          schema?.required ?? schema?.items?.required;
+        const hasRequiredFields = requiredFields
+          ? requiredFields.length > 0
+          : false;
+
+        const message = formState['Message'];
+        let formIsValid = true;
+        if (message && hasRequiredFields) {
+          const isDefined = ([, value]: [string, unknown]) =>
+            (value !== undefined && value !== '' && value !== null) ||
+            (Array.isArray(value) && value.length > 0);
+
+          formIsValid = Array.isArray(message)
+            ? message.every((element) =>
+                requiredFields.every((key) =>
+                  Object.entries(element)
+                    .filter(isDefined)
+                    .map(([key]) => key)
+                    .includes(key)
+                )
+              )
+            : requiredFields.every((key) =>
+                Object.entries(message)
+                  .filter(isDefined)
+                  .map(([key]) => key)
+                  .includes(key)
+              );
         }
         return (
           validateStep(0) &&
-          message &&
-          (hasRequiredFields
-            ? schema.required.every((requiredField: string) =>
-                messageKeys.includes(requiredField)
-              )
-            : true)
+          !!message &&
+          !!formState['Transaction ID'] &&
+          formIsValid &&
+          isValid
         );
       }
       case 2:
@@ -402,7 +424,7 @@ export const useNewMessageEffects = () => {
         }
       })
     );
-  }, [newMessageValues]);
+  }, [formState]);
 
   const goBack = () => {
     setActiveStep(activeStep - 1);
@@ -452,7 +474,6 @@ export const useNewMessageEffects = () => {
     activeStep,
     navigateToStep,
     modalSteps,
-    buttons,
     fields,
     newMessageValues,
     setMessageValue,

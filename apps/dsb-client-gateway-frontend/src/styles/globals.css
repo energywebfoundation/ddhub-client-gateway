@@ -179,7 +179,7 @@ body.swal2-height-auto.swal2-height-auto {
 }
 
 .aui-root a,
-p,
+p:not(.MuiTypography-root),
 .text-xs,
 .text-sm,
 .text-lg {

@@ -56,5 +56,6 @@ export const useViewMessageEffects = () => {
   return {
     openViewMessageModal,
     closeModal,
+    open,
   };
 };
