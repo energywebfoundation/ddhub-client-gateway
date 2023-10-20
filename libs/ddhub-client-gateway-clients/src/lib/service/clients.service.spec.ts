@@ -263,7 +263,7 @@ describe('ClientsService', () => {
 
         mockClientWrapperRepository.repository.save = jest
           .fn()
-          .mockImplementationOnce(async () => {});
+          .mockImplementationOnce(async () => null);
 
         mockDdhubConfigService.getConfig = jest
           .fn()

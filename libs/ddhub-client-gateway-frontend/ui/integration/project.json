@@ -9,15 +9,15 @@
       "outputs": ["{options.outputFile}"],
       "options": {
         "lintFilePatterns": [
-          "libs/dsb-client-gateway/ui/integration/**/*.{ts,tsx,js,jsx}"
+          "libs/ddhub-client-gateway-frontend/ui/integration/**/*.{ts,tsx,js,jsx}"
         ]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/dsb-client-gateway/ui/integration"],
+      "outputs": ["coverage/libs/ddhub-client-gateway-frontend/ui/integration"],
       "options": {
-        "jestConfig": "libs/dsb-client-gateway/ui/integration/jest.config.js",
+        "jestConfig": "libs/ddhub-client-gateway-frontend/ui/integration/jest.config.js",
         "passWithNoTests": true
       }
     }
