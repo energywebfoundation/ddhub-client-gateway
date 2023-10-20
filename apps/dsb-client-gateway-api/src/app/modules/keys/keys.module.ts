@@ -16,9 +16,11 @@ import { DdhubClientGatewayEncryptionModule } from '@dsb-client-gateway/ddhub-cl
 import { DdhubClientGatewayUtilsModule } from '@dsb-client-gateway/ddhub-client-gateway-utils';
 import { DdhubClientGatewayAssociationKeysModule } from '@dsb-client-gateway/ddhub-client-gateway-association-keys';
 import { CqrsModule } from '@nestjs/cqrs';
+import { DdhubClientGatewayUserRolesModule } from '@dsb-client-gateway/ddhub-client-gateway-user-roles';
 
 @Module({
   imports: [
+    DdhubClientGatewayUserRolesModule,
     DsbClientGatewayStorageModule,
     SecretsEngineModule,
     SymmetricKeysRepositoryModule,

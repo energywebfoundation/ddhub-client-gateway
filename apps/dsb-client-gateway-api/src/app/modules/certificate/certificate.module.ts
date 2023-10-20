@@ -6,9 +6,11 @@ import { DdhubClientGatewayMessageBrokerModule } from '@dsb-client-gateway/ddhub
 import { MtlsGuard } from './guards/mtls.guard';
 import { DdhubClientGatewayEventsModule } from '@dsb-client-gateway/ddhub-client-gateway-events';
 import { DdhubClientGatewayTlsAgentModule } from '@dsb-client-gateway/ddhub-client-gateway-tls-agent';
+import { DdhubClientGatewayUserRolesModule } from '@dsb-client-gateway/ddhub-client-gateway-user-roles';
 
 @Module({
   imports: [
+    DdhubClientGatewayUserRolesModule,
     SecretsEngineModule,
     forwardRef(() => DdhubClientGatewayMessageBrokerModule),
     DdhubClientGatewayEventsModule,

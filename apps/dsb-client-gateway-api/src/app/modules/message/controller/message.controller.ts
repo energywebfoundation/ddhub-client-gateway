@@ -32,9 +32,13 @@ import { GetMessageResponse } from '../message.interface';
 import { GetSentMessagesRequestDto } from '../dto/request/get-sent-messages-request.dto';
 import { GetSentMessageResponseDto } from '../dto/response/get-sent-message-response.dto';
 import { OfflineMessagesService } from '../service/offline-messages.service';
+import {
+  Roles,
+  UserRole,
+} from '@dsb-client-gateway/ddhub-client-gateway-user-roles';
 
 @Controller('messages')
-@UseGuards(MtlsGuard)
+@UseGuards(MtlsGuard, UseGuards)
 @ApiTags('Messaging')
 export class MessageControlller {
   private readonly logger = new Logger();
@@ -64,6 +68,7 @@ export class MessageControlller {
     status: HttpStatus.NOT_FOUND,
     description: 'Messages Not found',
   })
+  @Roles(UserRole.MESSAGING, UserRole.ADMIN)
   @HttpCode(HttpStatus.OK)
   public async getSentMessages(
     @Query() dto: GetSentMessagesRequestDto
@@ -98,6 +103,7 @@ export class MessageControlller {
   })
   @HttpCode(HttpStatus.OK)
   @UseInterceptors(ClientsInterceptor('clientId', 'query', 'fqcn', 'query'))
+  @Roles(UserRole.MESSAGING, UserRole.ADMIN)
   public async getMessage(
     @Query() dto: GetMessagesDto
   ): Promise<GetMessageResponse[]> {
@@ -125,6 +131,7 @@ export class MessageControlller {
     description: 'Unauthorized',
   })
   @HttpCode(HttpStatus.OK)
+  @Roles(UserRole.MESSAGING, UserRole.ADMIN)
   public async downloadMessage(
     @Query() { fileId }: DownloadMessagesDto,
     @Response() res
@@ -174,6 +181,7 @@ export class MessageControlller {
   })
   @UseInterceptors(ClientsInterceptor('clientId', 'body', 'fqcn', 'body'))
   @HttpCode(HttpStatus.OK)
+  @Roles(UserRole.MESSAGING, UserRole.ADMIN)
   public async create(
     @Body() dto: SendMessageDto
   ): Promise<SendMessagelResponseDto> {
@@ -208,6 +216,7 @@ export class MessageControlller {
   @HttpCode(HttpStatus.CREATED)
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('file'))
+  @Roles(UserRole.MESSAGING, UserRole.ADMIN)
   public async uploadFile(
     @UploadedFile('file') file: Express.Multer.File,
     @Body() dto: uploadMessageBodyDto

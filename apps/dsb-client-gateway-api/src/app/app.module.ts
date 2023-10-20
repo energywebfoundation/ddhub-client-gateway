@@ -28,6 +28,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { ClientModule } from './modules/client/client.module';
 import { DdhubClientGatewayVersionModule } from '@dsb-client-gateway/ddhub-client-gateway-version';
 import { AddressBookModule } from './modules/address-book/address-book.module';
+import { UserModule } from './modules/user/user.module';
 
 @Module({})
 export class AppModule {
@@ -84,6 +85,7 @@ export class AppModule {
       HealthModule,
       ClientModule,
       AddressBookModule,
+      UserModule,
     ];
 
     const providers = [

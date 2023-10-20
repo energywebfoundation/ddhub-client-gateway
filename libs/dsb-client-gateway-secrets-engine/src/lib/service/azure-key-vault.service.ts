@@ -4,6 +4,7 @@ import {
   CertificateDetails,
   PATHS,
   SecretsEngineService,
+  UsersList,
 } from '../secrets-engine.interface';
 import { Span } from 'nestjs-otel';
 import { DefaultAzureCredential } from '@azure/identity';
@@ -42,7 +43,25 @@ export class AzureKeyVaultService
   }
 
   setMnemonic(mnemonic: string): Promise<string> {
-    return Promise.resolve('');
+    return Promise.resolve(''); // @TODO
+  }
+
+  @Span('azure_kv_getUserAuthDetails')
+  public async getUserAuthDetails(username: string): Promise<string> {
+    return ''; // @TODO
+  }
+
+  @Span('azure_kv_setUserAuthDetails')
+  public async setUserPassword(
+    username: string,
+    password: string
+  ): Promise<void> {
+    // @TODO - Implement
+    return;
+  }
+
+  public async getAllUsers(): Promise<UsersList> {
+    return [];
   }
 
   @Span('azure_kv_setRSAKey')
