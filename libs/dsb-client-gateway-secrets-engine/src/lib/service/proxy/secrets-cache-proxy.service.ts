@@ -27,7 +27,9 @@ export class SecretsCacheProxyService extends SecretsEngineService {
     super();
   }
 
-  public async onModuleInit(): Promise<void> {}
+  public async onModuleInit(): Promise<void> {
+    this.logger.log('init');
+  }
 
   public async refreshPrivateKey(): Promise<void> {
     this.logger.log('refreshing private key');

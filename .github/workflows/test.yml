@@ -1,9 +1,8 @@
-name: Build Frontend
+name: Run tests
 on: [workflow_call]
-
 jobs:
-  build-fe:
-    name: Build Frontend
+  run-tests:
+    name: Run tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -28,10 +27,7 @@ jobs:
         run: npm install -g nx npm@8.5.0
       - name: Install dependencies
         run: npm ci
-      - name: Build
-        run: npm run export
-        env:
-          DB_NAME: postgresql://ddhub:ddhub@localhost:5432/ddhub
-          SECRETS_ENGINE: vault
-          LOG_LEVEL: error
-          NODE_OPTIONS: "--max-old-space-size=4096"
+      - name: Run tests
+        run: nx run-many --target=test --exclude=dsb-client-gateway-api-e2e,ui-core
+      - name: Run linters
+        run: nx run-many --target=lint --exclude=dsb-client-gateway-api-e2e,ui-core
