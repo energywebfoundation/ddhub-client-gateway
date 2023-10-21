@@ -284,22 +284,17 @@ export class OfflineMessagesService {
       })
     );
 
-    await this.ackMessages(receivedMessages);
-
     return receivedMessages;
   }
 
-  protected async ackMessages(messages: GetMessageResponse[]): Promise<void> {
-    for (const message of messages) {
-      try {
-        await this.receivedMessageReadStatusRepositoryWrapper.repository.save({
-          messageId: message.id,
-          recipientUser: '@TODO LATER',
-        });
-      } catch (e) {
-        this.logger.error(`failed to mark message as read ${message.id}`);
-        this.logger.error(e);
-      }
-    }
+  public async ackMessages(messagesIds: string[]): Promise<void> {
+    await this.receivedMessageReadStatusRepositoryWrapper.repository.save(
+      messagesIds.map((messageId: string) => {
+        return {
+          messageId,
+          recipientUser: '@TODO',
+        };
+      })
+    );
   }
 }
