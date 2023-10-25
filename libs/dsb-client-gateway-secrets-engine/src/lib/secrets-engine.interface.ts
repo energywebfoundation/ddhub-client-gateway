@@ -38,13 +38,18 @@ export abstract class SecretsEngineService implements OnModuleInit {
    *
    * @returns {String|null} user password
    */
-  abstract getUserAuthDetails(username: string): Promise<string | null>;
+  abstract getUserAuthDetails(username: string): Promise<UserDetails>;
 
-  abstract setUserPassword(username: string, password: string): Promise<void>;
   abstract getAllUsers(): Promise<UsersList>;
 }
 
-export type UsersList = Array<{ username: string; password: string }>;
+export interface UserDetails {
+  username: string;
+  password: string;
+  role: string;
+}
+
+export type UsersList = UserDetails[];
 
 export interface CertificateDetails {
   privateKey: string;

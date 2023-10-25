@@ -3,6 +3,7 @@ import {
   CertificateDetails,
   PATHS,
   SecretsEngineService,
+  UserDetails,
   UsersList,
 } from '../../secrets-engine.interface';
 import { ConfigService } from '@nestjs/config';
@@ -39,9 +40,12 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
     const usersToReturn: UsersList = [];
 
     for (const key of keys) {
+      const details = await this.getUserAuthDetails(key);
+
       usersToReturn.push({
         username: key,
-        password: await this.getUserAuthDetails(key),
+        password: details.password,
+        role: details.role,
       });
     }
 
@@ -49,10 +53,10 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
   }
 
   @Span('vault_getUserAuthDetails')
-  public async getUserAuthDetails(username: string): Promise<string> {
+  public async getUserAuthDetails(username: string): Promise<UserDetails> {
     return this.client
       .read(`${this.prefix}${PATHS.USERS}/${username}`)
-      .then(({ data }) => data.password)
+      .then(({ data }) => ({ password: data.password, role: data.role }))
       .catch((err) => {
         this.logger.error(err.message);
 

@@ -411,6 +411,21 @@ paths:
           description: "Messages Not found"
       tags:
         - "Messaging"
+  /api/v2/messages/ack:
+    post:
+      operationId: "MessageControlller_ackMessages"
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AckMessagesRequestDto"
+      responses:
+        204:
+          description: "Messages acked successfully"
+      tags:
+        - "Messaging"
   /api/v2/messages:
     get:
       operationId: "MessageControlller_getMessage"
@@ -1858,6 +1873,19 @@ components:
         - "createdDate"
         - "updatedDate"
         - "recipients"
+    AckMessagesRequestDto:
+      type: "object"
+      properties:
+        messagesIds:
+          example:
+            - "id1"
+            - "id2"
+          description: "Offline messages IDs to acknowledge"
+          type: "array"
+          items:
+            type: "string"
+      required:
+        - "messagesIds"
     GetMessagesResponseDto:
       type: "object"
       properties:
@@ -2702,9 +2730,6 @@ components:
         username:
           type: "string"
           description: "Username"
-          enum:
-            - "admin"
-            - "messaging"
           example: "admin"
         password:
           type: "string"

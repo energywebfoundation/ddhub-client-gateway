@@ -1,5 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { SecretsEngineService } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
+import {
+  SecretsEngineService,
+  UserDetails,
+} from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
 import { ConfigService } from '@nestjs/config';
 import {
   AuthTokens,
@@ -49,21 +52,23 @@ export class UserAuthService {
       throw new Error('Auth not enabled');
     }
 
-    const userPassword: string | null =
+    const userDetails: UserDetails =
       await this.secretsEngineService.getUserAuthDetails(username);
 
-    if (!userPassword) {
+    if (!userDetails.password) {
       throw new Error('User does not exists or password is incorrect');
     }
 
-    if (password === userPassword) {
+    if (password === userDetails.password) {
       const accountType =
-        username === UserRole.ADMIN ? UserRole.ADMIN : UserRole.MESSAGING;
+        userDetails.role === UserRole.ADMIN
+          ? UserRole.ADMIN
+          : UserRole.MESSAGING;
 
       return this.userRolesTokenService.generateTokens(username, accountType);
     }
 
-    this.logger.warn('incorrect password');
+    this.logger.warn('incorrect password attempt');
 
     throw new Error('User does not exists or password is incorrect');
   }

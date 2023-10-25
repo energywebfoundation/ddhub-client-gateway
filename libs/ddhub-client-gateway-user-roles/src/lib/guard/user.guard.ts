@@ -6,8 +6,9 @@ import {
 } from '@nestjs/common';
 import { UserAuthService } from '../service/user-auth.service';
 import { Reflector } from '@nestjs/core';
-import { ROLES_KEY, UserRole } from '../const';
+import { EXCLUDED_ROUTE, ROLES_KEY, UserRole } from '../const';
 import { UserTokenData } from '../service';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class UserGuard implements CanActivate {
@@ -15,7 +16,8 @@ export class UserGuard implements CanActivate {
 
   constructor(
     protected readonly userAuthService: UserAuthService,
-    protected readonly reflector: Reflector
+    protected readonly reflector: Reflector,
+    protected readonly configService: ConfigService
   ) {}
 
   public async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -26,6 +28,15 @@ export class UserGuard implements CanActivate {
     }
 
     const request = context.switchToHttp().getRequest();
+
+    const excludedRoute: boolean = this.reflector.get<boolean>(
+      EXCLUDED_ROUTE,
+      context.getHandler()
+    );
+
+    if (excludedRoute === true) {
+      return true;
+    }
 
     const authHeader = request.headers.authorization;
 

@@ -9,6 +9,7 @@ import {
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import {
   AuthTokens,
+  ExcludeAuthRoute,
   UserAuthService,
 } from '@dsb-client-gateway/ddhub-client-gateway-user-roles';
 import { LoginRequestDto } from './dto/request/login-request.dto';
@@ -28,6 +29,7 @@ export class LoginController {
     description: 'Returns login config',
     type: () => ConfigResponseDto,
   })
+  @ExcludeAuthRoute()
   public isAuthEnabled(): ConfigResponseDto {
     return {
       authEnabled: this.userAuthService.isAuthEnabled(),
@@ -41,6 +43,7 @@ export class LoginController {
     type: () => LoginResponseDto,
     description: 'Successfully refreshed tokens',
   })
+  @ExcludeAuthRoute()
   public async refreshToken(
     @Body() body: RefreshTokenRequestDto
   ): Promise<LoginResponseDto> {
@@ -54,6 +57,7 @@ export class LoginController {
     description: 'Successfully logged in',
     type: () => LoginResponseDto,
   })
+  @ExcludeAuthRoute()
   public async login(@Body() body: LoginRequestDto): Promise<LoginResponseDto> {
     const tokens: AuthTokens = await this.userAuthService.login(
       body.username,

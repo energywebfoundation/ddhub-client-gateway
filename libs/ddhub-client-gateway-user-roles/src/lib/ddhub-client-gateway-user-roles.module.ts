@@ -5,10 +5,21 @@ import {
   UserRolesTokenService,
 } from './service';
 import { SecretsEngineModule } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
+import { UserGuard } from './guard';
 
 @Module({
   imports: [SecretsEngineModule],
-  providers: [UserRolesTokenService, UserAuthService, UserRolesService],
-  exports: [UserRolesTokenService, UserAuthService, UserRolesService],
+  providers: [
+    UserRolesTokenService,
+    UserAuthService,
+    UserRolesService,
+    UserGuard,
+  ],
+  exports: [
+    UserRolesTokenService,
+    UserAuthService,
+    UserRolesService,
+    UserGuard,
+  ],
 })
 export class DdhubClientGatewayUserRolesModule {}

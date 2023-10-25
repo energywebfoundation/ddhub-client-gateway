@@ -6,6 +6,7 @@ import {
   SetCertificateDetailsResponse,
   SetPrivateKeyResponse,
   SetRSAPrivateKeyResponse,
+  UserDetails,
   UsersList,
 } from '../../secrets-engine.interface';
 import { Span } from 'nestjs-otel';
@@ -19,7 +20,7 @@ export class SecretsCacheProxyService extends SecretsEngineService {
     privateKey: string | null;
     rsaPrivateKey: string | null;
     mnemonic: string | null;
-    users: Record<string, string>;
+    users: Record<string, { password: string; role: string }>;
   } = {
     certificate: null,
     rsaPrivateKey: null,
@@ -54,7 +55,8 @@ export class SecretsCacheProxyService extends SecretsEngineService {
     return Object.entries(this.cachedObjects.users).map(([key, value]) => {
       return {
         username: key,
-        password: value,
+        password: value.password,
+        role: value.role,
       };
     });
   }
@@ -63,19 +65,23 @@ export class SecretsCacheProxyService extends SecretsEngineService {
     const users: UsersList = await this.secretsEngineService.getAllUsers();
 
     for (const user of users) {
-      this.cachedObjects.users[user.username] = user.password;
+      this.cachedObjects.users[user.username] = {
+        password: user.password,
+        role: user.role,
+      };
     }
   }
 
-  public async getUserAuthDetails(username: string): Promise<string> {
-    return this.cachedObjects.users[username];
-  }
+  public async getUserAuthDetails(username: string): Promise<UserDetails> {
+    if (this.cachedObjects.users[username]) {
+      return {
+        role: this.cachedObjects.users[username].role,
+        password: this.cachedObjects.users[username].password,
+        username: username,
+      };
+    }
 
-  public async setUserPassword(
-    username: string,
-    password: string
-  ): Promise<void> {
-    this.cachedObjects.users[username] = password;
+    return null;
   }
 
   public async refreshMnemonic(): Promise<void> {

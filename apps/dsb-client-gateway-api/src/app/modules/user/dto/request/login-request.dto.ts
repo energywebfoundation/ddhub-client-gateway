@@ -11,13 +11,13 @@ import {
 export class LoginRequestDto {
   @ApiProperty({
     description: 'Username',
-    enum: UserRole,
-    example: UserRole.ADMIN,
+    example: 'admin',
   })
   @IsString()
   @IsNotEmpty()
-  @IsEnum(UserRole)
-  public username: UserRole;
+  @MinLength(4)
+  @MaxLength(64)
+  public username: string;
 
   @ApiProperty({
     description: 'Password',

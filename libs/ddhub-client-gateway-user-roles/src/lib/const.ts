@@ -15,5 +15,7 @@ export const USER_ROLES_PERMISSION_MAP: Record<UserRole, UserRoleEndpointMap> =
   };
 
 export const ROLES_KEY = 'roles';
+export const EXCLUDED_ROUTE = '__excluded_route';
 
 export const Roles = (...roles: UserRole[]) => SetMetadata(ROLES_KEY, roles);
+export const ExcludeAuthRoute = () => SetMetadata(EXCLUDED_ROUTE, true);

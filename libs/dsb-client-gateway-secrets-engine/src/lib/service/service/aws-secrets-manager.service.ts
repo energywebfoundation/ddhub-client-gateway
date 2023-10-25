@@ -16,6 +16,7 @@ import {
   CertificateDetails,
   PATHS,
   SecretsEngineService,
+  UserDetails,
   UsersList,
 } from '../../secrets-engine.interface';
 import { Span } from 'nestjs-otel';
@@ -59,8 +60,12 @@ export class AwsSecretsManagerService
   }
 
   @Span('aws_ssm_getUserAuthDetails')
-  public async getUserAuthDetails(username: string): Promise<string> {
-    return '';
+  public async getUserAuthDetails(username: string): Promise<UserDetails> {
+    return {
+      role: 'admin',
+      password: 'password',
+      username: 'username',
+    };
   }
 
   @Span('aws_ssm_setUserAuthDetails')
