@@ -16,8 +16,7 @@ export class UserGuard implements CanActivate {
 
   constructor(
     protected readonly userAuthService: UserAuthService,
-    protected readonly reflector: Reflector,
-    protected readonly configService: ConfigService
+    protected readonly reflector: Reflector
   ) {}
 
   public async canActivate(context: ExecutionContext): Promise<boolean> {

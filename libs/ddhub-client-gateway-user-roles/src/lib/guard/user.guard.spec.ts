@@ -26,6 +26,7 @@ const mockContext = {
 };
 
 const mockContextWithoutHeader = {
+  getHandler: jest.fn(),
   switchToHttp: () => ({
     getRequest: () => ({
       headers: {},
@@ -162,7 +163,11 @@ describe('UserGuard', () => {
             } as UserTokenData;
           });
 
-        mockReflector.get = jest.fn().mockImplementationOnce(() => {
+        mockReflector.get = jest.fn().mockImplementation((param) => {
+          if (param === 'EXCLUDED_ROUTE') {
+            return false;
+          }
+
           return [UserRole.MESSAGING];
         });
 
