@@ -55,7 +55,7 @@ export class UserAuthService {
     const userDetails: UserDetails =
       await this.secretsEngineService.getUserAuthDetails(username);
 
-    if (!userDetails.password) {
+    if (!userDetails || !userDetails.password) {
       throw new Error('User does not exists or password is incorrect');
     }
 

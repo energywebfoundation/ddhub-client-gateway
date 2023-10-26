@@ -160,7 +160,10 @@ describe(`${UserAuthService.name}`, () => {
 
         mockSecretsEngineService.getUserAuthDetails = jest
           .fn()
-          .mockImplementationOnce(async () => 'password');
+          .mockImplementationOnce(async () => ({
+            password: 'password',
+            role: UserRole.ADMIN
+          }));
 
         mockUserRolesTokenService.generateTokens = jest
           .fn()
