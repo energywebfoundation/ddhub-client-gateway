@@ -517,3 +517,12 @@ export const postMessageMock = () => {
     ],
   };
 };
+
+export const getContactsMock = () => {
+  return [
+    {
+      did: 'did:ethr:volta:0x782aB0383Bfc807439d8EE29516937B47815d697',
+      alias: 'Krzysztof Szostak',
+    },
+  ];
+};
