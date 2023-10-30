@@ -1,5 +1,8 @@
 import { ModalActionsEnum } from './reducer';
-import { SendMessagelResponseDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
+import {
+  GetAllContactsResponseDto,
+  SendMessagelResponseDto,
+} from '@dsb-client-gateway/dsb-client-gateway-api-client';
 
 type TDetails = {
   open: boolean;
@@ -30,10 +33,21 @@ type TPostDetails = {
   data: SendMessagelResponseDto;
 };
 
+type TAddContact = {
+  open: boolean;
+};
+
+type TUpdateContact = {
+  open: boolean;
+  data: GetAllContactsResponseDto;
+};
+
 export interface IModalStore {
   details: TDetails;
   postDetails: TPostDetails;
   inboxDetails: TInboxDetails;
+  addContact: TAddContact;
+  updateContact: TUpdateContact;
 }
 
 interface IShowDetailsAction {
@@ -51,7 +65,19 @@ interface IShowMessageInboxDetailsAction {
   payload: TInboxDetails;
 }
 
+interface IShowAddContactAction {
+  type: ModalActionsEnum.SHOW_ADD_CONTACT;
+  payload: TAddContact;
+}
+
+interface IShowUpdateContactAction {
+  type: ModalActionsEnum.SHOW_UPDATE_CONTACT;
+  payload: TUpdateContact;
+}
+
 export type TModalAction =
   | IShowDetailsAction
   | IShowPostDetailsAction
-  | IShowMessageInboxDetailsAction;
+  | IShowMessageInboxDetailsAction
+  | IShowAddContactAction
+  | IShowUpdateContactAction;

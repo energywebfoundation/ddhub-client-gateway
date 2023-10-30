@@ -9,3 +9,4 @@ export * from './MessageInboxContainer';
 export * from './MessageOutboxContainer';
 export * from './RelatedMessageOutbox';
 export * from './RelatedMessageOutboxContainer';
+export * from './AddressBookContainer';

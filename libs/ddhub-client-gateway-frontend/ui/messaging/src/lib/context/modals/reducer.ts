@@ -4,6 +4,8 @@ export enum ModalActionsEnum {
   SHOW_DETAILS = 'SHOW_DETAILS',
   SHOW_POST_DETAILS = 'SHOW_POST_DETAILS',
   SHOW_MESSAGE_INBOX_DETAILS = 'SHOW_MESSAGE_INBOX_DETAILS',
+  SHOW_ADD_CONTACT = 'SHOW_ADD_CONTACT',
+  SHOW_UPDATE_CONTACT = 'SHOW_UPDATE_CONTACT',
 }
 
 export const modalInitialState: IModalStore = {
@@ -16,6 +18,13 @@ export const modalInitialState: IModalStore = {
     data: undefined,
   },
   inboxDetails: {
+    open: false,
+    data: undefined,
+  },
+  addContact: {
+    open: false,
+  },
+  updateContact: {
     open: false,
     data: undefined,
   },
@@ -32,5 +41,9 @@ export const modalsReducer = (
       return { ...state, postDetails: action.payload };
     case ModalActionsEnum.SHOW_MESSAGE_INBOX_DETAILS:
       return { ...state, inboxDetails: action.payload };
+    case ModalActionsEnum.SHOW_ADD_CONTACT:
+      return { ...state, addContact: action.payload };
+    case ModalActionsEnum.SHOW_UPDATE_CONTACT:
+      return { ...state, updateContact: action.payload };
   }
 };
