@@ -9,7 +9,20 @@ type TDetails = {
     topicName: string;
     topicVersion: string;
     payload: string;
-  }
+  };
+};
+
+type TInboxDetails = {
+  open: boolean;
+  data: {
+    channelName: string;
+    transactionId: string;
+    messageId: string;
+    topicOwner: string;
+    topicName: string;
+    topicVersion: string;
+    payload: string;
+  };
 };
 
 type TPostDetails = {
@@ -20,6 +33,7 @@ type TPostDetails = {
 export interface IModalStore {
   details: TDetails;
   postDetails: TPostDetails;
+  inboxDetails: TInboxDetails;
 }
 
 interface IShowDetailsAction {
@@ -32,4 +46,12 @@ interface IShowPostDetailsAction {
   payload: TPostDetails;
 }
 
-export type TModalAction = IShowDetailsAction | IShowPostDetailsAction;
+interface IShowMessageInboxDetailsAction {
+  type: ModalActionsEnum.SHOW_MESSAGE_INBOX_DETAILS;
+  payload: TInboxDetails;
+}
+
+export type TModalAction =
+  | IShowDetailsAction
+  | IShowPostDetailsAction
+  | IShowMessageInboxDetailsAction;

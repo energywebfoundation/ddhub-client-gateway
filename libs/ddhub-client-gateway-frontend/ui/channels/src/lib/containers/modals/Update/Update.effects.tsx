@@ -67,7 +67,7 @@ export const useUpdateChannelEffects = () => {
         };
       });
 
-      const responseTopics = channel.conditions.responseTopics.map((topic) => {
+      const responseTopics = channel.conditions.responseTopics?.map((topic) => {
         return {
           topicName: topic.topicName,
           owner: topic.topicOwner,
