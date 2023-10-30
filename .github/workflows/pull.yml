@@ -4,6 +4,9 @@ on:
   pull_request:
 
 jobs:
+  run-chores:
+    needs: lint-commits
+    uses: ./.github/workflows/test.yml
   lint-commits:
     uses: ./.github/workflows/commitlint.yml
   build-api:
