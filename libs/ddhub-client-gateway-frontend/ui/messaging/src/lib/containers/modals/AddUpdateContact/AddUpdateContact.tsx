@@ -5,6 +5,7 @@ import {
   Box,
   DialogTitle,
   InputLabel,
+  Typography,
 } from '@mui/material';
 import {
   Button,
@@ -67,19 +68,24 @@ export const AddUpdateContact: FC = () => {
           </Box>
           <Box>
             <InputLabel className={classes.label}>DID</InputLabel>
-            <TextField
-              autoComplete="off"
-              fullWidth
-              variant={'outlined'}
-              value={didInput}
-              disabled={openUpdate}
-              placeholder="E.g. did:ethr:volta:0x09Df...46993"
-              onChange={(event) => {
-                didInputChangeHandler(event.target.value);
-              }}
-              error={!isValid}
-              helperText={!isValid ? 'DID format is invalid' : ''}
-            />
+            {openUpdate && (
+              <Typography className={classes.label}>{didInput}</Typography>
+            )}
+            {open && (
+              <TextField
+                autoComplete="off"
+                fullWidth
+                variant={'outlined'}
+                value={didInput}
+                disabled={openUpdate}
+                placeholder="E.g. did:ethr:volta:0x09Df...46993"
+                onChange={(event) => {
+                  didInputChangeHandler(event.target.value);
+                }}
+                error={!isValid}
+                helperText={!isValid ? 'DID format is invalid' : ''}
+              />
+            )}
           </Box>
         </Box>
         <Box

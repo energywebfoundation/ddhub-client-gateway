@@ -50,7 +50,7 @@ export const useAddUpdateContactEffects = () => {
     return () => {
       debouncedInput.cancel();
     };
-  }, [debouncedInput, data]);
+  }, [debouncedInput, data, open]);
 
   const closeModal = () => {
     if (openUpdate) {
