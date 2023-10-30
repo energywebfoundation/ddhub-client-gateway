@@ -4,7 +4,7 @@ export enum Queries {
   TopicId = 'topicId',
   FQCN = 'fqcn',
   PrivateKey = 'privateKey',
-  MessageId = 'messageId',,
+  MessageId = 'messageId',
 }
 
 export const routerConst = {
@@ -32,7 +32,7 @@ export const routerConst = {
   ChannelTopicVersionHistory: `/channels/applications/[${Queries.Namespace}]/[${Queries.TopicId}]/version-history`,
   WS: '/integration/ws',
   RestApiDocs: '/docs',
-  AddressBook: '/address-book',,
+  AddressBook: '/address-book',
   MessageInbox: '/messages/inbox',
   MessageInboxChannel: `/messages/inbox/[${Queries.FQCN}]`,
   MessageOutbox: '/messages/outbox',
