@@ -141,4 +141,8 @@ export const mapUrlToBreadcrumbs = new Map<string, Breadcrumb[]>()
     { title: 'Channel list', path: routerConst.MessageOutboxChannel },
     { title: 'Sent' },
     { title: 'Related messages' },
+  ])
+  .set(routerConst.AddressBook, [
+    { title: 'Address book' },
+    { title: 'Address book' },
   ]);
