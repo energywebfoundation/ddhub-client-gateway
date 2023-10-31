@@ -16,15 +16,14 @@ export const useDetailsEffects = () => {
 
   useEffect(() => {
     if (data) {
-      const respTopics: ResponseTopicDto[] = data.conditions.responseTopics.map(
-        (item) => {
+      const respTopics: ResponseTopicDto[] =
+        data.conditions.responseTopics?.map((item) => {
           return {
             topicName: item.topicName,
             owner: item.topicOwner,
             responseTopicId: item.responseTopicId,
           };
-        }
-      );
+        });
 
       setResponseTopics(respTopics);
     }

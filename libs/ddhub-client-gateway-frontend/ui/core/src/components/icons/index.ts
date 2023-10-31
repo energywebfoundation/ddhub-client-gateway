@@ -12,3 +12,5 @@ export * from './FileUploadPartial';
 export * from './ClientSubscriptionIcon';
 export * from './RolesIcon';
 export * from './AlertIcon';
+export * from './ReceivedIcon';
+export * from './AddressBookIcon';

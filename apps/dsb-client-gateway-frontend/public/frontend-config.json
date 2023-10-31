@@ -19,5 +19,11 @@
   },
   "fileDownload": {
     "allowedRoles": ["user"]
+  },
+  "messageInbox": {
+    "allowedRoles": ["user"]
+  },
+  "messageOutbox": {
+    "allowedRoles": ["user"]
   }
 }

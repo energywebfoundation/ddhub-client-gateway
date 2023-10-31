@@ -44,6 +44,12 @@ export const getFrontendConfigMock = () => ({
   fileDownload: {
     allowedRoles: ['user'],
   },
+  messageInbox: {
+    allowedRoles: ['user'],
+  },
+  messageOutbox: {
+    allowedRoles: ['user'],
+  },
 });
 
 export const getApplicationsControllerGetApplicationsMock = () => [
@@ -263,6 +269,8 @@ export const getChannelControllerGetMock = () => ({
 export const getChannelMessagesMock = () => [
   {
     id: '6283374fbe281c73d1ba252b',
+    topicName: 'operatingEnvelope',
+    topicOwner: 'ddhub.apps.energyweb.iam.ewc',
     topicVersion: '1.0.0',
     topicSchemaType: 'CSV',
     payload: '{"fileId":"62833e6ebe281c73d1ba2535"}',
@@ -270,14 +278,13 @@ export const getChannelMessagesMock = () => [
       '0xd3a2e04d344261ee648d00baba8477a575030371862ee9f11d339726cff8d47b579321dc99312c84d63ab33e065e752c9639a5615ed5c9bf757a634772c506dc1b',
     sender: 'did:ethr:volta:0x03830466Ce257f9B798B0f27359D7639dFB6457D',
     timestampNanos: 1662428065121000000,
-    transactionId: "''",
+    transactionId: 'TRXS00000001',
     signatureValid: false,
-    decryption: {
-      status: true,
-    },
   },
   {
-    id: '6283374fbe281c73d1ba252b',
+    id: '6283374fbe281c73d1ba252c',
+    topicName: 'srcEvent',
+    topicOwner: 'ddhub.apps.energyweb.iam.ewc',
     topicVersion: '1.0.0',
     topicSchemaType: 'CSV',
     payload: '{"fileId":"62833e6ebe281c73d1ba2535"}',
@@ -285,15 +292,104 @@ export const getChannelMessagesMock = () => [
       '0xd3a2e04d344261ee648d00baba8477a575030371862ee9f11d339726cff8d47b579321dc99312c84d63ab33e065e752c9639a5615ed5c9bf757a634772c506dc1b',
     sender: 'did:ethr:volta:0x03830466Ce257f9B798B0f27359D7639dFB6457D',
     timestampNanos: 1662428065121000000,
-    transactionId: "''",
+    transactionId: 'TRXS000000002',
     signatureValid: true,
-    decryption: {
-      status: true,
-    },
+  },
+  {
+    id: '6283374fbe281c73d1ba252f',
+    topicName: 'responseTopicSample',
+    topicOwner: 'ddhub.apps.energyweb.iam.ewc',
+    topicVersion: '1.0.0',
+    topicSchemaType: 'JSD7',
+    payload:
+      '{"nssContractId":"1056","services":[{"facilityCode":"A001","feederDxtxId":"12423300","nssProvisionMW":45,"nssProvisionEndDate":"2023-10-01","nssProvisionStartDate":"2023-09-01","dispatchIntervalTo":10,"nssServiceId":"908","dispatchIntervalFrom":1,"nssServiceType":"FEEDER_FWD"}],"tni":"tnidesc"}',
+    signature:
+      '0xd3a2e04d344261ee648d00baba8477a575030371862ee9f11d339726cff8d47b579321dc99312c84d63ab33e065e752c9639a5615ed5c9bf757a634772c506dc1b',
+    sender: 'did:ethr:volta:0x03830466Ce257f9B798B0f27359D7639dFB6457D',
+    timestampNanos: 1662428065121000000,
+    transactionId: 'TRXS00000001',
+    signatureValid: false,
   },
 ];
 
 export const getDownloadMessageMock = () => 'text';
+
+export const getMessagesSentMock = () => {
+  return [
+    {
+      clientGatewayMessageId: '110',
+      topicName: 'getOperatingEnvelope',
+      topicOwner: 'torta.apps.eggplant.vege.iam.ewc',
+      topicVersion: '1.0.0',
+      topicSchemaType: 'JSD7',
+      payload: '{"fileId":"624bfd4f4c6cf04abfc20041"}',
+      signature:
+        '0x0abc6026b01856a756de47ec6f44d9c14fe69009bbf3b9b6cf522d8d783a1c654425848381affca5dab9284d8715fa2f9e34155374bafd923d75c219496cbe161c',
+      sender: 'did:ethr:volta:0x03830466Ce257f9B798B0f27359D7639dFB6457D',
+      timestampNanos: 1649147198388,
+      transactionId: '1649147198388',
+      signatureValid: 'SUCCESS',
+      relatedMessagesCount: 5,
+      recipients: [
+        {
+          did: 'did:ethr:volta:0x03830466Ce257f9B798B0f27359D7639dFB6457D',
+          failed: false,
+          messageId: '123',
+        },
+      ],
+    },
+    {
+      clientGatewayMessageId: '111',
+      topicName: 'responseTopicSample',
+      topicOwner: 'torta.apps.eggplant.vege.iam.ewc',
+      topicVersion: '1.0.0',
+      topicSchemaType: 'JSD7',
+      payload:
+        '{"nssContractId":"1056","services":[{"facilityCode":"A001","feederDxtxId":"12423300","nssProvisionMW":45,"nssProvisionEndDate":"2023-10-01","nssProvisionStartDate":"2023-09-01","dispatchIntervalTo":10,"nssServiceId":"908","dispatchIntervalFrom":1,"nssServiceType":"FEEDER_FWD"}],"tni":"tnidesc"}',
+      signature:
+        '0x0abc6026b01856a756de47ec6f44d9c14fe69009bbf3b9b6cf522d8d783a1c654425848381affca5dab9284d8715fa2f9e34155374bafd923d75c219496cbe161c',
+      sender: 'did:ethr:volta:0x03830466Ce257f9B798B0f27359D7639dFB6457D',
+      timestampNanos: 1649147198388,
+      transactionId: '1649147198388',
+      signatureValid: 'SUCCESS',
+      relatedMessagesCount: 2,
+      recipients: [
+        {
+          did: 'did:ethr:volta:0x03830466Ce257f9B798B0f27359D7639dFB6457D',
+          failed: false,
+          messageId: '123',
+        },
+        {
+          did: 'did:ethr:volta:0x03830466Ce257f9B798B0f27359D7639dFB6457F',
+          failed: false,
+          messageId: '124',
+        },
+      ],
+    },
+    {
+      initiatingMessageId: null,
+      topicName: 'messageWithArray',
+      clientGatewayMessageId: 'ad57cb3e-b542-40d0-9b53-117f9de06b9f',
+      topicId: '64e5b895986aee0cfb658c25',
+      topicVersion: '4.0.0',
+      transactionId: null,
+      signature:
+        '0xf02aa55228961637a42c0d0a05486368f6385825d26eeca6a8a99e6d5937899520e07c23990f6d4dbd7e7fe879ac3e965019c8034697f2ac84bfd4e93fd229751c',
+      payloadEncryption: false,
+      timestampNanos: '2023-09-13 16:32:38.512',
+      isFile: false,
+      totalRecipients: '28',
+      totalSent: '27',
+      totalFailed: '1',
+      createdDate: '2023-09-13',
+      updatedDate: '2023-09-13',
+      initiatingTransactionId: null,
+      senderDid: 'did:ethr:volta:0x552761011ea5b332605Bc1Cc2020A4a4f8C738CD',
+      payload:
+        '[{"firstName":"Bob","checkboxes":[{"name":"New York","lon":74,"lat":40},{"name":"Amsterdam","lon":5,"lat":52}],"options":["Option 1","Option 2"],"moreOptions":["B","C"],"multiSelect":[{"name":"Hong Kong","lon":114,"lat":22},{"name":"Amsterdam","lon":5,"lat":52}],"transactionId":"1234","lastName":"Norris","location":{"name":"Hong Kong","lon":114,"lat":22},"locationRadio":{"name":"Hong Kong","lon":114,"lat":22},"age":21}, {"firstName":"Chuck","checkboxes":[{"name":"New York","lon":74,"lat":40},{"name":"Amsterdam","lon":5,"lat":52}],"options":["Option 1","Option 2"],"moreOptions":["B","C"],"multiSelect":[{"name":"Hong Kong","lon":114,"lat":22},{"name":"Amsterdam","lon":5,"lat":52}],"transactionId":"1234","lastName":"Norris","location":{"name":"Hong Kong","lon":114,"lat":22},"locationRadio":{"name":"Hong Kong","lon":114,"lat":22},"age":21}]',
+    },
+  ];
+};
 
 export const getCronMock = () => {
   return [
@@ -362,6 +458,29 @@ export const getClientsMock = () => {
   ];
 };
 
+export const getChannelMessagesCount = () => {
+  return [
+    {
+      count: 1,
+      fqcn: 'channel.name',
+    },
+    {
+      count: 5,
+      fqcn: 'channel.name2',
+    },
+    {
+      count: 2,
+      fqcn: 'channel.name3',
+    },
+  ];
+};
+
+export const getChannelMessagesCountByFqcn = () => {
+  return {
+    count: 3,
+  };
+};
+
 export const postMessageMock = () => {
   return {
     clientGatewayMessageId: 'a6072307-5d65-4f3a-8e57-9db899b5d853',
@@ -397,4 +516,13 @@ export const postMessageMock = () => {
       },
     ],
   };
+};
+
+export const getContactsMock = () => {
+  return [
+    {
+      did: 'did:ethr:volta:0x782aB0383Bfc807439d8EE29516937B47815d697',
+      alias: 'Krzysztof Szostak',
+    },
+  ];
 };

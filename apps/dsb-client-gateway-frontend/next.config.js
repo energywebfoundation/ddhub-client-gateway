@@ -21,6 +21,7 @@ const moduleExports = {
     messagingOffset: process.env.NEXT_PUBLIC_MESSAGING_OFFSET,
     messagingAmount: process.env.NEXT_PUBLIC_MESSAGING_AMOUNT,
   },
+  staticPageGenerationTimeout: 1000,
 };
 
 const SentryWebpackPluginOptions = {
