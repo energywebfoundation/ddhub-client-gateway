@@ -18,6 +18,7 @@ import {
   getChannelMessagesCount,
   getChannelMessagesCountByFqcn,
   getMessagesSentMock,
+  getContactsMock,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 
 export function makeServer({ environment = 'development' }) {
@@ -151,6 +152,22 @@ export function makeServer({ environment = 'development' }) {
 
       this.get('cron', () => {
         return getCronMock();
+      });
+
+      this.get('contacts', () => {
+        return getContactsMock();
+      });
+
+      this.post('contacts', () => {
+        return {};
+      });
+
+      this.put('/contacts/:did', (_schema, request) => {
+        return { contact: JSON.parse(request.requestBody) };
+      });
+
+      this.delete('contacts/:did', () => {
+        return {};
       });
     },
   });

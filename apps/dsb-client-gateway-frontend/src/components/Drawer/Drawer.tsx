@@ -10,7 +10,10 @@ import {
   Inbox,
   Edit3,
 } from 'react-feather';
-import { ClientSubscriptionIcon } from '@ddhub-client-gateway-frontend/ui/core';
+import {
+  ClientSubscriptionIcon,
+  AddressBookIcon,
+} from '@ddhub-client-gateway-frontend/ui/core';
 import { routerConst } from '@ddhub-client-gateway-frontend/ui/utils';
 import { useStyles } from './Drawer.styles';
 import { CollapsableMenu } from './CollapsableMenu/CollapsableMenu';
@@ -43,8 +46,18 @@ export const Drawer = () => {
       <List>
         <MenuItem
           href={routerConst.GatewaySettings}
-          title="Gateway Settings"
+          title="Gateway settings"
           icon={<Settings className={classes.icon} size={18} />}
+        />
+
+        <MenuItem
+          href={routerConst.AddressBook}
+          title="Address book"
+          icon={
+            <Box className={classes.clientIcon}>
+              <AddressBookIcon />
+            </Box>
+          }
         />
 
         {displayedRoutes.has(routerConst.TopicManagement) && (

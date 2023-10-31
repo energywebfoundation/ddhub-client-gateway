@@ -32,6 +32,7 @@ export const routerConst = {
   ChannelTopicVersionHistory: `/channels/applications/[${Queries.Namespace}]/[${Queries.TopicId}]/version-history`,
   WS: '/integration/ws',
   RestApiDocs: '/docs',
+  AddressBook: '/address-book',
   MessageInbox: '/messages/inbox',
   MessageInboxChannel: `/messages/inbox/[${Queries.FQCN}]`,
   MessageOutbox: '/messages/outbox',
