@@ -16,11 +16,15 @@ import moment from 'moment/moment';
 
 interface StoreSentMessage {
   initiatingMessageId?: string | null;
+  messageIds: string[];
+  topicOwner: string;
+  topicName: string;
   initiatingTransactionId?: string | null;
   clientGatewayMessageId: string;
   topic: TopicEntity;
   transactionId: string | null;
   signature: string;
+  fqcn: string;
   senderDid: string;
   payloadEncryption: boolean;
   payload: string;
@@ -162,6 +166,9 @@ export class MessageStoreService {
       payload.map(async (item: StoreSentMessage) => {
         const entity = new SentMessageEntity();
 
+        entity.topicOwner = item.topicOwner;
+        entity.topicName = item.topicName;
+        entity.messageIds = item.messageIds;
         entity.clientGatewayMessageId = item.clientGatewayMessageId;
         entity.initiatingMessageId = item.initiatingMessageId ?? null;
         entity.initiatingTransactionId = item.initiatingTransactionId ?? null;
@@ -170,6 +177,7 @@ export class MessageStoreService {
         entity.signature = item.signature;
         entity.topicVersion = item.topic.version;
         entity.topicId = item.topic.id;
+        entity.fqcn = item.fqcn;
         entity.payloadEncryption = item.payloadEncryption;
         entity.payload = item.payload;
         entity.timestampNanos = item.timestampNanos;

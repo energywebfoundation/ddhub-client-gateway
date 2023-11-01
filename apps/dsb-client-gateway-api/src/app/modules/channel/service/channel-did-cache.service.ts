@@ -4,6 +4,8 @@ import { ChannelService } from './channel.service';
 import { Span } from 'nestjs-otel';
 import {
   ChannelEntity,
+  ChannelResponseTopic,
+  ChannelTopic,
   TopicRepositoryWrapper,
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
 import {
@@ -64,8 +66,42 @@ export class ChannelDidCacheService {
       uniqueDids
     );
 
-    for (const { topicId, owner, topicName } of internalChannel.conditions
-      .topics) {
+    await this.refreshTopics(internalChannel.conditions.topics);
+    await this.refreshResponseTopics(internalChannel.conditions.responseTopics);
+  }
+
+  protected async refreshResponseTopics(
+    topics: ChannelResponseTopic[]
+  ): Promise<void> {
+    for (const { topicId, topicOwner, topicName } of topics) {
+      const topicVersions: TopicVersionResponse =
+        await this.ddhubTopicService.getTopicVersions(topicId);
+
+      for (const topicVersion of topicVersions.records) {
+        const [major, minor, patch]: string[] = topicVersion.version.split('.');
+
+        await this.wrapper.topicRepository.save({
+          id: topicId,
+          owner: topicOwner,
+          name: topicName,
+          schemaType: topicVersion.schemaType,
+          version: topicVersion.version,
+          schema: topicVersion.schema,
+          tags: topicVersion.tags,
+          majorVersion: major,
+          minorVersion: minor,
+          patchVersion: patch,
+        });
+
+        this.logger.log(
+          `stored topic with name ${topicVersion.name} and owner ${topicVersion.owner} with version ${topicVersion.version}`
+        );
+      }
+    }
+  }
+
+  protected async refreshTopics(topics: ChannelTopic[]): Promise<void> {
+    for (const { topicId, owner, topicName } of topics) {
       const topicVersions: TopicVersionResponse =
         await this.ddhubTopicService.getTopicVersions(topicId);
 

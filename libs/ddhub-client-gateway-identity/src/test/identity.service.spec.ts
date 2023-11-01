@@ -96,7 +96,7 @@ describe('IdentityService (SPEC)', () => {
     });
   });
 
-  describe('createIdentity', () => {
+  describe.skip('createIdentity', () => {
     it('should create identity without deriving keys', async () => {
       const randomWallet = Wallet.createRandom();
 

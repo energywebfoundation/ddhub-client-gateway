@@ -17,6 +17,7 @@ import { CreateChannelDto } from '../dto/request/create-channel.dto';
 import { ChannelValidationPipe } from '../pipes/channel-validation.pipe';
 import { ChannelService } from '../service/channel.service';
 import {
+  CountChannelMessagesQueryDto,
   GetChannelByTypeQueryDto,
   GetChannelParamsDto,
   GetChannelQualifiedDidsParamsDto,
@@ -32,6 +33,10 @@ import { RefreshAllChannelsCacheDataCommand } from '../command/refresh-all-chann
 import { ChannelEntity } from '@dsb-client-gateway/dsb-client-gateway-storage';
 import { MtlsGuard } from '../../certificate/guards/mtls.guard';
 import { PinoLogger } from 'nestjs-pino';
+import {
+  GetChannelMessagesCountDto,
+  GetChannelsMessagesCountDto,
+} from '../dto/request/get-channel-messages-count.dto';
 
 @Controller('channels')
 @ApiTags('Channels')
@@ -43,6 +48,49 @@ export class ChannelController {
     protected readonly commandbus: CommandBus,
     protected readonly logger: PinoLogger
   ) {}
+
+  @Get('/messages/count')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Channel messages count returned successfully',
+    type: () => GetChannelMessagesCountDto,
+    isArray: true,
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Invalid request',
+  })
+  @HttpCode(HttpStatus.OK)
+  public async getCountOfChannels(
+    @Query() query: CountChannelMessagesQueryDto
+  ): Promise<GetChannelsMessagesCountDto[]> {
+    return this.channelService.getMultipleChannelsMessageCount({
+      ...query,
+      messageForms: true,
+    });
+  }
+
+  @Get('/messages/count/:fqcn')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Channel messages count returned successfully',
+    type: () => GetChannelMessagesCountDto,
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Invalid request',
+  })
+  @HttpCode(HttpStatus.OK)
+  public async getCount(
+    @Param('fqcn') fqcn: string
+  ): Promise<GetChannelMessagesCountDto> {
+    const amountOfMessages: number =
+      await this.channelService.getChannelMessageCount(fqcn);
+
+    return {
+      count: amountOfMessages,
+    };
+  }
 
   @Post()
   @ApiResponse({

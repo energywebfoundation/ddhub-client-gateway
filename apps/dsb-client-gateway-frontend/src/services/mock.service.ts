@@ -15,6 +15,10 @@ import {
   getGatewayMock,
   getClientsMock,
   postMessageMock,
+  getChannelMessagesCount,
+  getChannelMessagesCountByFqcn,
+  getMessagesSentMock,
+  getContactsMock,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 
 export function makeServer({ environment = 'development' }) {
@@ -66,6 +70,14 @@ export function makeServer({ environment = 'development' }) {
         return {};
       });
 
+      this.get('/channels/messages/count', () => {
+        return getChannelMessagesCount();
+      });
+
+      this.get('/channels/messages/count/:fqcn', () => {
+        return getChannelMessagesCountByFqcn();
+      });
+
       this.post('/topics', (_schema, request) => {
         return { topic: JSON.parse(request.requestBody) };
       });
@@ -110,6 +122,10 @@ export function makeServer({ environment = 'development' }) {
         return getDownloadMessageMock();
       });
 
+      this.get('messages/sent', () => {
+        return getMessagesSentMock();
+      });
+
       this.post('messages', () => {
         return postMessageMock();
       });
@@ -136,7 +152,23 @@ export function makeServer({ environment = 'development' }) {
 
       this.get('cron', () => {
         return getCronMock();
-      })
+      });
+
+      this.get('contacts', () => {
+        return getContactsMock();
+      });
+
+      this.post('contacts', () => {
+        return {};
+      });
+
+      this.put('/contacts/:did', (_schema, request) => {
+        return { contact: JSON.parse(request.requestBody) };
+      });
+
+      this.delete('contacts/:did', () => {
+        return {};
+      });
     },
   });
 }

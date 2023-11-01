@@ -126,10 +126,6 @@ export class IamService {
     );
   }
 
-  public async getEnrolledDids(roleName: string): Promise<string[]> {
-    return this.cacheClient.getDIDsForRole(roleName);
-  }
-
   @Span('iam_setup')
   public async setup(privateKey: string) {
     await promiseRetry(
@@ -235,17 +231,6 @@ export class IamService {
     return uniqueApplications;
   }
 
-  public getClaimsByRequester(
-    did: string,
-    namespace: string
-  ): Promise<Claim[]> {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    return this.cacheClient.getClaimsByRequester(did, {
-      namespace,
-    });
-  }
-
   public async decodeJWTToken(
     token: string
   ): Promise<{ [key: string]: Claim }> {
@@ -324,8 +309,3 @@ export class IamService {
     return this.signerService.did;
   }
 }
-
-/**
- *
- * can you get list of DIDs based on role/roles - ask Jakub
- */

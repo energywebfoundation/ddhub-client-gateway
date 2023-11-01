@@ -1,5 +1,9 @@
 import { Box, Divider, Grid, Stack, Typography } from '@mui/material';
-import { CopyToClipboard, Tabs, TabsProps } from '@ddhub-client-gateway-frontend/ui/core';
+import {
+  CopyToClipboard,
+  Tabs,
+  TabsProps,
+} from '@ddhub-client-gateway-frontend/ui/core';
 import { ICreateChannel } from '../../models/create-channel.interface';
 import { RestrictionType } from '../Restrictions/models/restriction-type.enum';
 import { ActionButtons } from '../ActionButtons';
@@ -11,6 +15,9 @@ import React from 'react';
 import { RestrictionListView } from '../Restrictions/RestrictionListView/RestrictionListView';
 import { clone } from 'lodash';
 import { ConnectionType } from '../Details/models/connection-type.enum';
+import { ChannelType } from '../../../../models';
+import { Topic } from '../Topics/Topics.effects';
+import { SelectedTopicView } from '../Topics/SelectedTopicView/SelectedTopicView';
 
 export interface SummaryProps {
   channelValues: ICreateChannel;
@@ -22,7 +29,9 @@ export const Summary = ({
   actionButtonsProps,
 }: SummaryProps) => {
   const { classes } = useStyles();
-  const { countRestrictions } = useSummaryEffects();
+  const { countRestrictions, getSelectedResponseTopics } = useSummaryEffects(
+    channelValues.conditions?.responseTopics || []
+  );
   const restrictionCount = countRestrictions(channelValues?.conditions);
   const restrictionRoles = clone(channelValues.conditions.roles);
 
@@ -31,7 +40,7 @@ export const Summary = ({
       label: 'Restrictions',
       childrenProp: (
         <Box className={classes.tabRoot}>
-          { !restrictionCount && (
+          {!restrictionCount && (
             <Box className={classes.noRecord}>
               <Typography className={classes.noRecordLabel}>
                 No restriction added
@@ -42,26 +51,28 @@ export const Summary = ({
           {restrictionRoles.sort().map((el, index) => (
             <RestrictionListView
               wrapperProps={{
-                className: classes.restrictionBox
+                className: classes.restrictionBox,
               }}
               key={index}
               item={el}
               type={RestrictionType.Role}
-              index={index}/>
+              index={index}
+            />
           ))}
 
           {channelValues.conditions.dids?.map((el, index) => (
             <RestrictionListView
               wrapperProps={{
-                className: classes.restrictionBox
+                className: classes.restrictionBox,
               }}
               key={index}
               item={el}
               type={RestrictionType.DID}
-              index={index}/>
+              index={index}
+            />
           ))}
         </Box>
-      )
+      ),
     },
     {
       label: 'Topics',
@@ -74,18 +85,23 @@ export const Summary = ({
               </Typography>
             </Box>
           )}
-          {channelValues.conditions.topics?.map((el, index) => (
-            <RestrictionListView
-              wrapperProps={{
-                className: classes.restrictionBox
-              }}
+
+          {channelValues.conditions.topics?.map((el: Topic, index) => (
+            <SelectedTopicView
               key={index}
-              item={el.topicName}
-              index={index}/>
+              topic={el}
+              canRemove={false}
+              isSummary={true}
+              index={index}
+              showTopicResponse={
+                channelValues.type === 'pub' && channelValues.messageForms
+              }
+              responseTopics={getSelectedResponseTopics(el.id)}
+            />
           ))}
         </Box>
-      )
-    }
+      ),
+    },
   ];
 
   return (
@@ -128,30 +144,63 @@ export const Summary = ({
           </Typography>
           <Box display="flex">
             <Typography className={classes.encryptionValue} variant="body2">
-              {channelValues?.useAnonymousExtChannel ? <Check className={classes.iconCheck} /> : <X className={classes.iconX}/>}
+              {channelValues?.useAnonymousExtChannel ? (
+                <Check className={classes.iconCheck} />
+              ) : (
+                <X className={classes.iconX} />
+              )}
             </Typography>
           </Box>
         </Stack>
 
-        {(channelValues?.connectionType === ConnectionType.Publish) && (
+        {channelValues?.connectionType === ConnectionType.Publish && (
           <Stack direction="row" mt={1}>
             <Typography className={classes.detailsTitle} variant="body2">
               Payload encryption:
             </Typography>
             <Box display="flex">
               <Typography className={classes.encryptionValue} variant="body2">
-                {channelValues?.payloadEncryption ? <Check className={classes.iconCheck} /> : <X className={classes.iconX}/>}
+                {channelValues?.payloadEncryption ? (
+                  <Check className={classes.iconCheck} />
+                ) : (
+                  <X className={classes.iconX} />
+                )}
               </Typography>
             </Box>
           </Stack>
         )}
+
+        {channelValues?.channelType === ChannelType.Messaging && (
+          <Stack direction="row" mt={1}>
+            <Typography className={classes.detailsTitle} variant="body2">
+              Enable Message Form:
+            </Typography>
+            <Box display="flex">
+              <Typography className={classes.encryptionValue} variant="body2">
+                {channelValues?.messageForms ? (
+                  <Check className={classes.iconCheck} />
+                ) : (
+                  <X className={classes.iconX} />
+                )}
+              </Typography>
+            </Box>
+          </Stack>
+        )}
+
         <Divider className={classes.divider} />
-        <Tabs tabProps={tabProps}
-              wrapperProps={{
-                className: classes.tabBox
-              }}/>
+        <Tabs
+          tabProps={tabProps}
+          wrapperProps={{
+            className: classes.tabBox,
+          }}
+        />
       </Grid>
-      <Grid item alignSelf="flex-end" width="100%" sx={{ padding: '22px 7px 27px 0px' }}>
+      <Grid
+        item
+        alignSelf="flex-end"
+        width="100%"
+        sx={{ padding: '22px 7px 27px 0px' }}
+      >
         <ActionButtons {...actionButtonsProps} />
       </Grid>
     </Grid>

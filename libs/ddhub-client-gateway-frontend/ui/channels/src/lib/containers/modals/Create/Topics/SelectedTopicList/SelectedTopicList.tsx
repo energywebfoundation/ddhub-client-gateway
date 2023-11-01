@@ -1,8 +1,9 @@
 import { Box } from '@mui/material';
 import { SelectedTopic } from '../SelectedTopic/SelectedTopic';
-import { Topic} from '../Topics.effects';
+import { Topic } from '../Topics.effects';
 import { useStyles } from './SelectedTopicList.styles';
 import { useSelectedTopicListEffects } from './SelectedTopicList.effects';
+import { ResponseTopicDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 
 export interface SelectedTopicListProps {
   selectedTopics: Topic[];
@@ -12,6 +13,9 @@ export interface SelectedTopicListProps {
   edit?: (oldTopic: Topic, newTopic: Topic) => void;
   filters: any[];
   recent: string;
+  showTopicResponse: boolean;
+  saveResponse?: (topics: ResponseTopicDto[], selectedTopicId: string) => void;
+  responseTopics?: ResponseTopicDto[];
 }
 
 export const SelectedTopicList = ({
@@ -22,6 +26,9 @@ export const SelectedTopicList = ({
   filters,
   edit,
   recent,
+  showTopicResponse,
+  saveResponse,
+  responseTopics,
 }: SelectedTopicListProps) => {
   const { classes } = useStyles();
   const {
@@ -29,9 +36,12 @@ export const SelectedTopicList = ({
     selectedApplication,
     setSelectedApplication,
     topicsLoading,
+    filteredTopics,
+    getSelectedResponseTopics,
   } = useSelectedTopicListEffects({
     filters,
     selectedTopics,
+    responseTopics,
   });
 
   return (
@@ -39,7 +49,8 @@ export const SelectedTopicList = ({
       {selectedTopics.map((topic, index) => (
         <SelectedTopic
           key={topic.topicName}
-          topicsList={availableTopics}
+          availableTopics={availableTopics}
+          topicsList={filteredTopics}
           selectedApplication={selectedApplication}
           setSelectedApplication={setSelectedApplication}
           topic={topic}
@@ -49,6 +60,9 @@ export const SelectedTopicList = ({
           topicsLoading={topicsLoading}
           canCopy={canCopy}
           edit={edit}
+          showTopicResponse={showTopicResponse}
+          saveResponse={saveResponse}
+          responseTopics={getSelectedResponseTopics(topic.id ?? topic.topicId)}
           remove={() => {
             if (remove) {
               remove(topic);

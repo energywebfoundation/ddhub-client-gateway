@@ -8,9 +8,12 @@ import {
   Layers,
   Settings,
   Inbox,
-  Edit3
+  Edit3,
 } from 'react-feather';
-import { ClientSubscriptionIcon } from '@ddhub-client-gateway-frontend/ui/core';
+import {
+  ClientSubscriptionIcon,
+  AddressBookIcon,
+} from '@ddhub-client-gateway-frontend/ui/core';
 import { routerConst } from '@ddhub-client-gateway-frontend/ui/utils';
 import { useStyles } from './Drawer.styles';
 import { CollapsableMenu } from './CollapsableMenu/CollapsableMenu';
@@ -43,8 +46,18 @@ export const Drawer = () => {
       <List>
         <MenuItem
           href={routerConst.GatewaySettings}
-          title="Gateway Settings"
+          title="Gateway settings"
           icon={<Settings className={classes.icon} size={18} />}
+        />
+
+        <MenuItem
+          href={routerConst.AddressBook}
+          title="Address book"
+          icon={
+            <Box className={classes.clientIcon}>
+              <AddressBookIcon />
+            </Box>
+          }
         />
 
         {displayedRoutes.has(routerConst.TopicManagement) && (
@@ -83,7 +96,11 @@ export const Drawer = () => {
         <MenuItem
           href={routerConst.ClientIds}
           title="Client Subscriptions"
-          icon={<Box className={classes.clientIcon}><ClientSubscriptionIcon /></Box>}
+          icon={
+            <Box className={classes.clientIcon}>
+              <ClientSubscriptionIcon />
+            </Box>
+          }
         />
 
         <CollapsableMenu
@@ -113,19 +130,21 @@ export const Drawer = () => {
           menuIcon={<Database className={classes.icon} size={18} />}
         />
 
-        {/*todo: change href*/}
         <CollapsableMenu
           menuTitle="Message Box"
           subMenu={[
-            { title: 'New message', href: routerConst.DataMessagingFileUpload,
-            menuIcon: (<Edit3 style={{margin: '0 10px 0 4px'}} size={16} />)},
+            {
+              title: 'New message',
+              href: routerConst.DataMessagingFileUpload,
+              menuIcon: <Edit3 style={{ margin: '0 10px 0 4px' }} size={16} />,
+            },
             {
               title: 'My messages',
-              href: routerConst.DataMessagingFileUpload,
+              href: routerConst.MessageInbox,
             },
             {
               title: 'Sent',
-              href: routerConst.DataMessagingFileUpload,
+              href: routerConst.MessageOutbox,
             },
           ].filter((menu) => displayedRoutes.has(menu.href))}
           menuIcon={<Inbox className={classes.icon} size={18} />}

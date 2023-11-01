@@ -29,7 +29,9 @@ export const routeRestrictions = new Map<string, string>()
   .set('largeFileUpload', routerConst.LargeDataMessagingFileUpload)
   .set('largeFileDownload', routerConst.LargeDataMessagingFileDownload)
   .set('fileUpload', routerConst.DataMessagingFileUpload)
-  .set('fileDownload', routerConst.DataMessagingFileDownload);
+  .set('fileDownload', routerConst.DataMessagingFileDownload)
+  .set('messageInbox', routerConst.MessageInbox)
+  .set('messageOutbox', routerConst.MessageOutbox);
 
 enum VersionStatus {
   Unavailable = 'Unavailable',
@@ -76,7 +78,9 @@ export const useSetUserDataEffect = () => {
   const { config } = useGatewayConfig();
   const { userData, setUserData } = useContext(UserDataContext);
   const queryClient = useQueryClient();
-  const [routeRestrictionList, setRouteRestrictionList] = useState({} as RouteRestrictions);
+  const [routeRestrictionList, setRouteRestrictionList] = useState(
+    {} as RouteRestrictions
+  );
   const [result, setResult] = useState({} as IdentityWithEnrolment);
   const [version, setVersion] = useState<string>(VersionStatus.Unavailable);
 
@@ -92,7 +96,7 @@ export const useSetUserDataEffect = () => {
         const displayedRoutes = getRoutesToDisplay(
           result.enrolment.roles,
           routeRestrictionList as unknown as IndexableRouteRestrictions,
-          config,
+          config
         );
 
         setUserData({

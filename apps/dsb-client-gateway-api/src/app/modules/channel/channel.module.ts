@@ -9,6 +9,7 @@ import { RefreshChannelCacheDataHandler } from './handlers/refresh-channel-cache
 import {
   ChannelRepositoryModule,
   DsbClientGatewayStorageModule,
+  MessagesRepositoryModule,
   TopicRepositoryModule,
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
 import { DdhubClientGatewayMessageBrokerModule } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
@@ -26,6 +27,7 @@ import { TopicModule } from '../topic/topic.module';
     DdhubClientGatewayMessageBrokerModule,
     CertificateModule,
     TopicModule,
+    MessagesRepositoryModule,
   ],
   providers: [
     ChannelService,

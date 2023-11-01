@@ -1,24 +1,166 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { GetMessagesDto } from '../dto/request/get-messages.dto';
 import { GetMessageResponse } from '../message.interface';
 import {
   DidEntity,
   ReceivedMessageEntity,
+  ReceivedMessageReadStatusRepositoryWrapper,
   ReceivedMessageRepositoryWrapper,
+  SentMessageEntity,
+  SentMessageRecipientRepositoryWrapper,
+  SentMessageRepositoryWrapper,
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
 import { FindConditions } from 'typeorm/find-options/FindConditions';
 import moment from 'moment';
 import { EncryptionStatus } from '../message.const';
 import { KeysService } from '../../keys/service/keys.service';
+import { GetSentMessagesRequestDto } from '../dto/request/get-sent-messages-request.dto';
+import { GetSentMessageResponseDto } from '../dto/response/get-sent-message-response.dto';
+import { In } from 'typeorm';
 
 @Injectable()
 export class OfflineMessagesService {
+  protected readonly logger = new Logger(OfflineMessagesService.name);
+
   constructor(
     protected readonly receivedMessageRepositoryWrapper: ReceivedMessageRepositoryWrapper,
+    protected readonly sentMessagesRepositoryWrapper: SentMessageRepositoryWrapper,
+    protected readonly sentMessagesRecipientsWrapper: SentMessageRecipientRepositoryWrapper,
+    protected readonly receivedMessageReadStatusRepositoryWrapper: ReceivedMessageReadStatusRepositoryWrapper,
     protected readonly keysService: KeysService
   ) {}
 
-  public async getOfflineMessages(
+  public async getOfflineSentMessages(
+    filterParams: GetSentMessagesRequestDto
+  ): Promise<GetSentMessageResponseDto[]> {
+    const queryBuilder =
+      this.sentMessagesRepositoryWrapper.repository.createQueryBuilder(
+        'sent_messages'
+      );
+
+    if (filterParams.transactionId) {
+      queryBuilder.andWhere('sent_messages.transactionId = :transactionId', {
+        transactionId: filterParams.transactionId,
+      });
+    }
+
+    if (filterParams.fqcn) {
+      queryBuilder.andWhere('sent_messages.fqcn = :fqcn', {
+        fqcn: filterParams.fqcn,
+      });
+    }
+
+    if (filterParams.initiatingMessageId) {
+      queryBuilder.andWhere(
+        'sent_messages.initiatingMessageId = :initiatingMessageId',
+        {
+          initiatingMessageId: filterParams.initiatingMessageId,
+        }
+      );
+    }
+
+    if (filterParams.initiatingTransactionId) {
+      queryBuilder.andWhere(
+        'sent_messages.initiatingTransactionId = :initiatingTransactionId',
+        {
+          initiatingTransactionId: filterParams.initiatingTransactionId,
+        }
+      );
+    }
+
+    // :project = ANY ( string_to_array(students.projects, ','))
+
+    if (filterParams.messageId) {
+      queryBuilder.andWhere(
+        ':messageId = ANY(sent_messages."messageIds"::text[])',
+        {
+          messageId: `${filterParams.messageId}`,
+        }
+      );
+    }
+
+    if (filterParams.topicName) {
+      queryBuilder.andWhere('sent_messages.topicName = :topicName', {
+        topicName: filterParams.topicName,
+      });
+    }
+
+    if (filterParams.topicOwner) {
+      queryBuilder.andWhere('sent_messages.topicOwner = :topicOwner', {
+        topicOwner: filterParams.topicOwner,
+      });
+    }
+
+    queryBuilder.orderBy(`sent_messages.timestampNanos`, 'DESC');
+
+    const page = filterParams.page || 1;
+    const limit = filterParams.limit || 5;
+
+    const skip = (page - 1) * limit;
+
+    queryBuilder.take(limit).skip(skip);
+
+    return queryBuilder.getMany().then(async (entities) => {
+      return await Promise.all(
+        entities.map(async (entity: SentMessageEntity) => {
+          const relatedMessagesCount =
+            await this.sentMessagesRepositoryWrapper.repository
+              .createQueryBuilder('sent_messages')
+              .where('sent_messages.initiatingMessageId IN (:...messageIds)', {
+                messageIds: entity.messageIds,
+              })
+              .orWhere(
+                'sent_messages.initiatingTransactionId = :transactionId',
+                {
+                  transactionId: entity.transactionId,
+                }
+              )
+              .getCount();
+
+          const recipients =
+            await this.sentMessagesRecipientsWrapper.repository.find({
+              where: {
+                clientGatewayMessageId: entity.clientGatewayMessageId,
+              },
+            });
+
+          return {
+            recipients: recipients.map((recipient) => {
+              return {
+                messageId: recipient.messageId,
+                did: recipient.recipientDid,
+                failed: +recipient.statusCode !== 200,
+              };
+            }),
+            topicOwner: entity.topicOwner,
+            topicName: entity.topicName,
+            messagesIds: entity.messageIds,
+            clientGatewayMessageId: entity.clientGatewayMessageId,
+            initiatingMessageId: entity.initiatingMessageId,
+            fqcn: entity.fqcn,
+            initiatingTransactionId: entity.initiatingTransactionId,
+            payload: entity.payload,
+            createdDate: entity.createdDate,
+            isFile: entity.isFile,
+            payloadEncryption: entity.payloadEncryption,
+            relatedMessagesCount: relatedMessagesCount,
+            senderDid: entity.senderDid,
+            signature: entity.signature,
+            topicId: entity.topicId,
+            timestampNanos: entity.timestampNanos,
+            topicVersion: entity.topicVersion,
+            totalSent: +entity.totalSent,
+            totalFailed: +entity.totalFailed,
+            transactionId: entity.transactionId,
+            totalRecipients: +entity.totalRecipients,
+            updatedDate: entity.updatedDate,
+          } as GetSentMessageResponseDto;
+        })
+      );
+    });
+  }
+
+  public async getOfflineReceivedMessages(
     dto: Partial<GetMessagesDto>
   ): Promise<GetMessageResponse[]> {
     const {
@@ -33,47 +175,54 @@ export class OfflineMessagesService {
       messageId,
     } = dto;
 
-    const whereQuery: FindConditions<ReceivedMessageEntity> = {};
+    const rm = 'rm';
+    const rms = 'rms';
 
-    if (fqcn) {
-      whereQuery.fqcn = fqcn;
-    }
+    const query = this.receivedMessageRepositoryWrapper.repository
+      .createQueryBuilder(rm)
+      .leftJoinAndSelect(`${rm}.receivedMessagesReadStatus`, rms)
+      .where((qb) => {
+        qb.where(`${rms}.messageId IS NULL`);
 
-    if (from) {
-      whereQuery.timestampNanos = moment(from).utc().toDate();
-    }
+        if (fqcn) {
+          qb.andWhere(`${rm}.fqcn = :fqcn`, { fqcn });
+        }
 
-    if (topicOwner) {
-      whereQuery.topicOwner = topicOwner;
-    }
+        if (from) {
+          qb.andWhere(`${rm}.timestampNanos = :from`, {
+            from: moment(from).utc().toDate(),
+          });
+        }
 
-    if (topicName) {
-      whereQuery.topicName = topicName;
-    }
+        if (topicOwner) {
+          qb.andWhere(`${rm}.topicOwner = :topicOwner`, { topicOwner });
+        }
 
-    if (initiatingMessageId) {
-      whereQuery.initiatingMessageId = initiatingMessageId;
-    }
+        if (topicName) {
+          qb.andWhere(`${rm}.topicName = :topicName`, { topicName });
+        }
 
-    if (initiatingTransactionId) {
-      whereQuery.initiatingTransactionId = initiatingTransactionId;
-    }
+        if (initiatingMessageId) {
+          qb.andWhere(`${rm}.initiatingMessageId = :initiatingMessageId`, {
+            initiatingMessageId,
+          });
+        }
 
-    if (messageId) {
-      whereQuery.messageId = messageId;
-    }
+        if (initiatingTransactionId) {
+          qb.andWhere(
+            `${rm}.initiatingTransactionId = :initiatingTransactionId`,
+            { initiatingTransactionId }
+          );
+        }
 
-    const messages =
-      await this.receivedMessageRepositoryWrapper.repository.find({
-        where: whereQuery,
-        order: {
-          timestampNanos: 'DESC',
-        },
-        take: amount ?? 3,
-      });
+        if (messageId) {
+          qb.andWhere(`${rm}.messageId = :messageId`, { messageId });
+        }
+      })
+      .orderBy(`${rm}.timestampNanos`, 'DESC')
+      .take(amount || 3);
 
-    // @TODO - apply read status, exclude read messages from above query
-    // do we need to respect clientId?
+    const messages: ReceivedMessageEntity[] = await query.getMany();
 
     const uniqueSenderDids: string[] = [
       ...new Set(messages.map(({ senderDid }) => senderDid)),
@@ -82,7 +231,7 @@ export class OfflineMessagesService {
     const prefetchedSignatureKeys: Record<string, DidEntity | null> =
       await this.keysService.prefetchSignatureKeys(uniqueSenderDids);
 
-    return await Promise.all(
+    const receivedMessages: GetMessageResponse[] = await Promise.all(
       messages.map(async (message: ReceivedMessageEntity) => {
         const isSignatureValid: boolean =
           await this.keysService.verifySignature(
@@ -96,10 +245,10 @@ export class OfflineMessagesService {
           await this.receivedMessageRepositoryWrapper.repository
             .createQueryBuilder('m')
             .where(
-              'm.initiatingMessageId = :initiatingMessageId AND m.initiatingTransactionId = :initiatingTransactionId',
+              'm.initiatingMessageId = :initiatingMessageId OR m.initiatingTransactionId = :initiatingTransactionId',
               {
                 initiatingMessageId: message.initiatingMessageId,
-                initiatingTransactionId: message.initiatingMessageId,
+                initiatingTransactionId: message.initiatingTransactionId,
               }
             )
             .andWhere('m.messageId != :messageId', {
@@ -114,6 +263,7 @@ export class OfflineMessagesService {
           clientGatewayMessageId: message.clientGatewayMessageId,
           sender: message.senderDid,
           signature: message.signature,
+          relatedMessagesCount: relatedMessages.length,
           initiatingMessageId: message.initiatingMessageId,
           payloadEncryption: message.payloadEncryption,
           decryption: {
@@ -133,5 +283,23 @@ export class OfflineMessagesService {
         };
       })
     );
+
+    await this.ackMessages(receivedMessages);
+
+    return receivedMessages;
+  }
+
+  protected async ackMessages(messages: GetMessageResponse[]): Promise<void> {
+    for (const message of messages) {
+      try {
+        await this.receivedMessageReadStatusRepositoryWrapper.repository.save({
+          messageId: message.id,
+          recipientUser: '@TODO LATER',
+        });
+      } catch (e) {
+        this.logger.error(`failed to mark message as read ${message.id}`);
+        this.logger.error(e);
+      }
+    }
   }
 }
