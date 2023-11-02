@@ -7,6 +7,7 @@ import { useRouter } from 'next/router';
 import { TTableComponentAction } from '@ddhub-client-gateway-frontend/ui/core';
 import { GetSentMessageResponseDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { ModalActionsEnum, useModalDispatch } from '../../context';
+import { DateTime } from 'luxon';
 
 export const useMessageOutboxEffects = () => {
   const router = useRouter();
@@ -18,6 +19,8 @@ export const useMessageOutboxEffects = () => {
     fqcn: router.query[Queries.FQCN] as string,
   });
   const openDetailsModal = (data: GetSentMessageResponseDto) => {
+    console.log(data);
+    const timestampMillis = Math.round(data?.timestampNanos / 1e6);
     dispatch({
       type: ModalActionsEnum.SHOW_MESSAGE_INBOX_DETAILS,
       payload: {
@@ -30,6 +33,11 @@ export const useMessageOutboxEffects = () => {
           topicOwner: data.topicOwner,
           topicName: data.topicName,
           topicVersion: data.topicVersion,
+          timestamp: DateTime.fromMillis(timestampMillis).toLocaleString(
+            DateTime.DATETIME_MED
+          ),
+          timestampNanos: data.timestampNanos,
+          isSender: true,
         },
       },
     });

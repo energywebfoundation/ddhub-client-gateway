@@ -23,6 +23,7 @@ import '@asyncapi/react-component/styles/default.min.css';
 import 'nprogress/nprogress.css';
 import '../styles/globals.css';
 import { useGatewayIdentityEffects } from 'libs/ddhub-client-gateway-frontend/ui/gateway-settings/src/lib/containers/GatewayIdentity/GatewayIdentity.effects';
+import { ModalProvider } from '@ddhub-client-gateway-frontend/ui/messaging';
 
 if (
   process.env.NODE_ENV !== 'production' &&
@@ -90,10 +91,12 @@ function MyApp(props: MyAppProps) {
         <BackdropContextProvider>
           <UserDataContext.Provider value={userDataValue}>
             <QueryClientProvider client={queryClient}>
-              <InitializeAccountStatus>
-                {getLayout(<Component {...pageProps} />)}
-                <Backdrop />
-              </InitializeAccountStatus>
+              <ModalProvider>
+                <InitializeAccountStatus>
+                  {getLayout(<Component {...pageProps} />)}
+                  <Backdrop />
+                </InitializeAccountStatus>
+              </ModalProvider>
             </QueryClientProvider>
           </UserDataContext.Provider>
         </BackdropContextProvider>

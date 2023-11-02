@@ -5,6 +5,8 @@ export * from './Channel';
 export * from './MessagesContainer';
 export * from './LargeMessagesContainer';
 export * from './DataMessagingUploadContainer';
+export * from './NewMessageContainer';
+export * from './modals';
 export * from './MessageInboxContainer';
 export * from './MessageOutboxContainer';
 export * from './RelatedMessageOutbox';

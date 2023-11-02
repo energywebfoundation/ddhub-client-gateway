@@ -16,7 +16,7 @@ export const useAddressBookEffects = () => {
   const Swal = useCustomAlert();
   const { removeContactHandler } = useRemoveContact();
 
-  const { data, isLoading, isSuccess, isError } =
+  const { data, isLoading, isSuccess, isError, refetch } =
     useAddressBookControllerGetAllContacts({
       query: {
         onError: (err: any) => {

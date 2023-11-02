@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { EventsGateway } from './gateway/events.gateway';
 import { MessageService } from './service/message.service';
 import { UtilsModule } from '../utils/utils.module';
-import { MessageControlller } from './controller/message.controller';
+import { MessageController } from './controller/message.controller';
 import { ChannelModule } from '../channel/channel.module';
 import { CqrsModule } from '@nestjs/cqrs';
 import { KeysModule } from '../keys/keys.module';
@@ -10,6 +10,7 @@ import { SecretsEngineModule } from '@dsb-client-gateway/dsb-client-gateway-secr
 import { StorageModule } from '../storage/storage.module';
 import {
   AcksRepositoryModule,
+  AddressBookRepositoryModule,
   ChannelRepositoryModule,
   CronRepositoryModule,
   FileMetadataRepositoryModule,
@@ -79,6 +80,7 @@ import { DdhubClientGatewayUserRolesModule } from '@dsb-client-gateway/ddhub-cli
     CronRepositoryModule,
     DdhubClientGatewayUtilsModule,
     MessagesRepositoryModule,
+    AddressBookRepositoryModule,
   ],
   providers: [
     EventsGateway,
@@ -94,6 +96,6 @@ import { DdhubClientGatewayUserRolesModule } from '@dsb-client-gateway/ddhub-cli
     OfflineMessagesService,
   ],
   exports: [MessageService],
-  controllers: [MessageControlller],
+  controllers: [MessageController],
 })
 export class MessageModule {}

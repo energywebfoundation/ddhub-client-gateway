@@ -27,7 +27,7 @@ export const useRemoveContact = () => {
 
   const removeContactHandler = async (did: string) => {
     const { isDismissed } = await Swal.warning({
-      text: 'You will delete or remove the contact',
+      text: 'You will delete the contact',
     });
     if (isDismissed) {
       return;

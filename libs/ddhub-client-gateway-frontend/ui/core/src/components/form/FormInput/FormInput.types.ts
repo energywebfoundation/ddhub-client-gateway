@@ -6,6 +6,7 @@ import {
   Control,
 } from 'react-hook-form';
 import { GenericFormField } from '../../../containers/GenericForm';
+import { HTMLInputTypeAttribute } from 'react';
 
 export interface FormInputProps {
   field: GenericFormField;
@@ -18,4 +19,5 @@ export interface FormInputProps {
   trigger?: UseFormTrigger<FieldValues>;
   clearErrors?: UseFormClearErrors<FieldValues>;
   variant?: 'standard' | 'outlined' | 'filled';
+  type?: HTMLInputTypeAttribute;
 }

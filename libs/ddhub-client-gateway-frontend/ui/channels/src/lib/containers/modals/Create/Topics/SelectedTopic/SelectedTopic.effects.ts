@@ -28,8 +28,8 @@ export const useSelectedTopicEffects = ({
   topicsList,
   availableTopics,
   saveResponse,
-  responseTopics = [],
-}: SelectedTopicEffectsProps) => {
+}: // responseTopics = [],
+SelectedTopicEffectsProps) => {
   const [expanded, setExpanded] = useState<string | false>(false);
   const [updatedTopic, setUpdatedTopic] = useState<Topic>(initialState);
   const [editTopic, setEditTopic] = useState<Topic>(initialState);
@@ -74,7 +74,7 @@ export const useSelectedTopicEffects = ({
   const handleOpenResponse = () => {
     setIsResponse(true);
     setFilteredTopics(topicsList);
-    setSelected(responseTopics);
+    // setSelected(responseTopics);
   };
 
   const handleSubmitForm = () => {

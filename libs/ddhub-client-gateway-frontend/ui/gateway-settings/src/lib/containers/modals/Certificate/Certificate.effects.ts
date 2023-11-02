@@ -70,7 +70,7 @@ export const useCertificateEffects = () => {
   const openCancelModal = async () => {
     closeModal();
     const result = await Swal.warning({
-      text: 'you will close configure certificate form',
+      text: 'You will close the configure certificate form',
     });
 
     if (result.isConfirmed) {
