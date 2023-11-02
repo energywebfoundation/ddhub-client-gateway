@@ -2,6 +2,8 @@
 
 | KEY | TYPE | DEFAULT | DESCRIPTION | ALLOWED_VALUES | DEPENDENCY |
 | --- | ---- | ------- | ----------- | -------------- | ---------- |
+| USER_AUTH_ENABLED | boolean | false | Should user auth be enabled |  |  |
+| JWT_USER_PRIVATE_KEY | string | default-private-key | JWT User Private Key |  |  |
 | SWAGGER_SCHEMA_PATH | string | ./schema.yaml | Path where OpenAPI Document should be generated - use only in development |  |  |
 | GENERATE_SWAGGER | boolean | false | Should generate Swagger document - use only in development |  |  |
 | AK_SHARE_CRON_ENABLED | boolean | false | Should share association keys |  |  |

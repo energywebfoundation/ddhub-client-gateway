@@ -5,15 +5,22 @@ import {
   HttpStatus,
   Post,
   UploadedFiles,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { CertificateService } from './service/certificate.service';
 import { ApiConsumes, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UploadCertificateBodyDto } from './dto/request/upload-certificates-body.dto';
+import {
+  Roles,
+  UserGuard,
+  UserRole,
+} from '@dsb-client-gateway/ddhub-client-gateway-user-roles';
 
 @Controller('certificate')
 @ApiTags('Gateway Configuration')
+@UseGuards(UserGuard)
 export class CertificateController {
   constructor(protected readonly certificateService: CertificateService) {}
 
@@ -50,6 +57,7 @@ export class CertificateController {
       },
     ])
   )
+  @Roles(UserRole.ADMIN)
   public async save(
     @UploadedFiles()
     {

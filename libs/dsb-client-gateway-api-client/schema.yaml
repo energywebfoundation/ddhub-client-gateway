@@ -411,6 +411,21 @@ paths:
           description: "Messages Not found"
       tags:
         - "Messaging"
+  /api/v2/messages/ack:
+    post:
+      operationId: "MessageControlller_ackMessages"
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AckMessagesRequestDto"
+      responses:
+        204:
+          description: "Messages acked successfully"
+      tags:
+        - "Messaging"
   /api/v2/messages:
     get:
       operationId: "MessageControlller_getMessage"
@@ -1241,6 +1256,57 @@ paths:
           description: "Contact modified successfully"
       tags:
         - "Address Book"
+  /api/v2/login/config:
+    get:
+      operationId: "LoginController_isAuthEnabled"
+      parameters: []
+      responses:
+        200:
+          description: "Returns login config"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConfigResponseDto"
+      tags:
+        - "Login"
+  /api/v2/login/refresh-token:
+    post:
+      operationId: "LoginController_refreshToken"
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RefreshTokenRequestDto"
+      responses:
+        200:
+          description: "Successfully refreshed tokens"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponseDto"
+      tags:
+        - "Login"
+  /api/v2/login:
+    post:
+      operationId: "LoginController_login"
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequestDto"
+      responses:
+        200:
+          description: "Successfully logged in"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponseDto"
+      tags:
+        - "Login"
 info:
   title: "DDHub Client Gateway"
   description: "DDHub Client Gateway"
@@ -1807,6 +1873,19 @@ components:
         - "createdDate"
         - "updatedDate"
         - "recipients"
+    AckMessagesRequestDto:
+      type: "object"
+      properties:
+        messagesIds:
+          example:
+            - "id1"
+            - "id2"
+          description: "Offline messages IDs to acknowledge"
+          type: "array"
+          items:
+            type: "string"
+      required:
+        - "messagesIds"
     GetMessagesResponseDto:
       type: "object"
       properties:
@@ -2537,6 +2616,9 @@ components:
         did:
           type: "string"
           description: "Configured DID"
+        authEnabled:
+          type: "boolean"
+          description: "User auth enabled"
         messageBrokerStatus:
           type: "string"
           enum:
@@ -2556,6 +2638,7 @@ components:
           example: "v15.15.0"
       required:
         - "did"
+        - "authEnabled"
         - "messageBrokerStatus"
         - "mtlsIsValid"
         - "namespace"
@@ -2612,6 +2695,49 @@ components:
       required:
         - "did"
         - "alias"
+    ConfigResponseDto:
+      type: "object"
+      properties:
+        authEnabled:
+          type: "boolean"
+          description: "Is auth enabled"
+          example: true
+      required:
+        - "authEnabled"
+    RefreshTokenRequestDto:
+      type: "object"
+      properties:
+        refreshToken:
+          type: "string"
+          description: "Refresh token"
+      required:
+        - "refreshToken"
+    LoginResponseDto:
+      type: "object"
+      properties:
+        accessToken:
+          type: "string"
+          description: "Access token"
+        refreshToken:
+          type: "string"
+          description: "Refresh token"
+      required:
+        - "accessToken"
+        - "refreshToken"
+    LoginRequestDto:
+      type: "object"
+      properties:
+        username:
+          type: "string"
+          description: "Username"
+          example: "admin"
+        password:
+          type: "string"
+          description: "Password"
+          example: "password"
+      required:
+        - "username"
+        - "password"
     GetChannelsMessagesCountDto:
       type: "object"
       properties:

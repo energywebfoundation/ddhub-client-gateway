@@ -95,6 +95,9 @@
       "@dsb-client-gateway/ddhub-client-gateway-tracing": [
         "libs/ddhub-client-gateway-tracing/src/index.ts"
       ],
+      "@dsb-client-gateway/ddhub-client-gateway-user-roles": [
+        "libs/ddhub-client-gateway-user-roles/src/index.ts"
+      ],
       "@dsb-client-gateway/ddhub-client-gateway-utils": [
         "libs/ddhub-client-gateway-utils/src/index.ts"
       ],

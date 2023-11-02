@@ -38,10 +38,12 @@ import { MessageListenerService } from './service/message-listener.service';
 import { MessageStoreService } from './service/message-store.service';
 import { MessagesCleanupService } from './service/messages-cleanup.service';
 import { OfflineMessagesService } from './service/offline-messages.service';
+import { DdhubClientGatewayUserRolesModule } from '@dsb-client-gateway/ddhub-client-gateway-user-roles';
 
 @Module({
   imports: [
     CqrsModule,
+    DdhubClientGatewayUserRolesModule,
     UtilsModule,
     ChannelModule,
     DdhubClientGatewayIdentityModule,

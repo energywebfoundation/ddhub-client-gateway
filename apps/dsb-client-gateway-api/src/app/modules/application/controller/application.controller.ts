@@ -1,13 +1,26 @@
-import { Controller, Get, HttpStatus, Param, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  HttpStatus,
+  Param,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { PinoLogger } from 'nestjs-pino';
 
 import { ApplicationDTO, GetApplicationsQueryDto } from '../dto';
 import { ApplicationsService } from '../service/applications.service';
 import { GetApplicationsByNamespaceDto } from '../dto/get-by-namespace.dto';
+import {
+  Roles,
+  UserGuard,
+  UserRole,
+} from '@dsb-client-gateway/ddhub-client-gateway-user-roles';
 
 @Controller('applications')
 @ApiTags('Applications')
+@UseGuards(UserGuard)
 export class ApplicationsController {
   constructor(
     protected readonly applicationsService: ApplicationsService,
@@ -23,6 +36,7 @@ export class ApplicationsController {
     type: [ApplicationDTO],
     description: 'List of applications',
   })
+  @Roles(UserRole.ADMIN, UserRole.MESSAGING)
   public async getApplications(
     @Query() { roleName }: GetApplicationsQueryDto
   ): Promise<ApplicationDTO[]> {
@@ -42,6 +56,7 @@ export class ApplicationsController {
     description: 'List of applications filtered by namespace',
   })
   @Get('/:namespace')
+  @Roles(UserRole.ADMIN, UserRole.MESSAGING)
   public async getApplicationsByNamespace(
     @Param() { namespace }: GetApplicationsByNamespaceDto
   ): Promise<ApplicationDTO[]> {
