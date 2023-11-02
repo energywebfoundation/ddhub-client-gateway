@@ -32,6 +32,9 @@ export const getFrontendConfigMock = () => ({
   channelManagement: {
     allowedRoles: ['user'],
   },
+  newMessage: {
+    allowedRoles: ['user'],
+  },
   largeFileUpload: {
     allowedRoles: ['user'],
   },

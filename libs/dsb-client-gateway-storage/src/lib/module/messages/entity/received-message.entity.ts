@@ -55,7 +55,7 @@ export class ReceivedMessageEntity {
   @OneToMany(() => ReceivedMessageReadStatusEntity, (rms) => rms.message)
   receivedMessagesReadStatus: ReceivedMessageReadStatusEntity[];
 
-  @Column()
+  @Column({ type: 'text' })
   payload: string;
 
   @Column()

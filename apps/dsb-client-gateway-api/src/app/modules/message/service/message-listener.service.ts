@@ -52,10 +52,7 @@ export class MessageListenerService implements OnApplicationBootstrap {
       }
     );
 
-    await this.schedulerRegistry.addCronJob(
-      CronJobType.MESSAGES_FETCH,
-      cronJob
-    );
+    this.schedulerRegistry.addCronJob(CronJobType.MESSAGES_FETCH, cronJob);
 
     cronJob.start();
   }
@@ -114,10 +111,14 @@ export class MessageListenerService implements OnApplicationBootstrap {
             .storeReceivedMessage(
               await Promise.all(
                 messages.map(async (messageResponse: GetMessageResponse) => {
+                  this.logger.log('messageResponse');
+                  this.logger.log(messageResponse);
+
                   const topic: TopicEntity | undefined =
                     await this.topicService.getTopic(
                       channelTopic.topicName,
-                      channelTopic.owner
+                      channelTopic.owner,
+                      messageResponse.topicVersion
                     );
 
                   return {

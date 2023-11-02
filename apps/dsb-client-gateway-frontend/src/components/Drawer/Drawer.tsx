@@ -19,12 +19,19 @@ import { useStyles } from './Drawer.styles';
 import { CollapsableMenu } from './CollapsableMenu/CollapsableMenu';
 import { MenuItem } from './MenuItem/MenuItem';
 import { useSetUserDataEffect } from '@ddhub-client-gateway-frontend/ui/login';
+import {
+  NewMessage,
+  ViewMessage,
+  useNewMessageEffects,
+  useViewMessageEffects,
+} from '@ddhub-client-gateway-frontend/ui/messaging';
 
 export const Drawer = () => {
   const {
     userData: { displayedRoutes },
   } = useSetUserDataEffect();
   const { classes } = useStyles();
+  const { openNewMessageModal } = useNewMessageEffects();
 
   return (
     <div>
@@ -121,7 +128,10 @@ export const Drawer = () => {
         <CollapsableMenu
           menuTitle="Data Messaging"
           subMenu={[
-            { title: 'File upload', href: routerConst.DataMessagingFileUpload },
+            {
+              title: 'File upload',
+              href: routerConst.DataMessagingFileUpload,
+            },
             {
               title: 'File download',
               href: routerConst.DataMessagingFileDownload,
@@ -135,7 +145,7 @@ export const Drawer = () => {
           subMenu={[
             {
               title: 'New message',
-              href: routerConst.DataMessagingFileUpload,
+              onClick: openNewMessageModal,
               menuIcon: <Edit3 style={{ margin: '0 10px 0 4px' }} size={16} />,
             },
             {
@@ -146,10 +156,12 @@ export const Drawer = () => {
               title: 'Sent',
               href: routerConst.MessageOutbox,
             },
-          ].filter((menu) => displayedRoutes.has(menu.href))}
+          ]}
+          // .filter((menu) => displayedRoutes.has(menu.href))
           menuIcon={<Inbox className={classes.icon} size={18} />}
         />
       </List>
+      <NewMessage />
     </div>
   );
 };

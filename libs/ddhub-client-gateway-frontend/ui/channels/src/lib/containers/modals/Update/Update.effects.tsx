@@ -84,6 +84,7 @@ export const useUpdateChannelEffects = () => {
         },
         payloadEncryption: channel.payloadEncryption,
         useAnonymousExtChannel: channel.useAnonymousExtChannel,
+        messageForms: channel.messageForms,
       });
 
       setMessageForms(channel.messageForms);
@@ -148,7 +149,7 @@ export const useUpdateChannelEffects = () => {
       conditions: {
         ...channelValues.conditions,
         topics: data.topics,
-        responseTopics: responseTopicsData,
+        // responseTopics: responseTopicsData,
       },
     };
     updateChannelHandler(updateData, onUpdate);

@@ -33,10 +33,7 @@ import { RefreshAllChannelsCacheDataCommand } from '../command/refresh-all-chann
 import { ChannelEntity } from '@dsb-client-gateway/dsb-client-gateway-storage';
 import { MtlsGuard } from '../../certificate/guards/mtls.guard';
 import { PinoLogger } from 'nestjs-pino';
-import {
-  GetChannelMessagesCountDto,
-  GetChannelsMessagesCountDto,
-} from '../dto/request/get-channel-messages-count.dto';
+import { GetChannelMessagesCountDto } from '../dto/request/get-channel-messages-count.dto';
 import {
   Roles,
   UserGuard,
@@ -69,7 +66,7 @@ export class ChannelController {
   @HttpCode(HttpStatus.OK)
   public async getCountOfChannels(
     @Query() query: CountChannelMessagesQueryDto
-  ): Promise<GetChannelsMessagesCountDto[]> {
+  ): Promise<GetChannelMessagesCountDto[]> {
     return this.channelService.getMultipleChannelsMessageCount({
       ...query,
       messageForms: true,
@@ -96,6 +93,7 @@ export class ChannelController {
 
     return {
       count: amountOfMessages,
+      fqcn: fqcn,
     };
   }
 

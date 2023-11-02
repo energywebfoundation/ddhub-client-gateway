@@ -66,6 +66,7 @@ import { MessageStoreService } from './message-store.service';
 import { OfflineMessagesService } from './offline-messages.service';
 import { IdentityService } from '@dsb-client-gateway/ddhub-client-gateway-identity';
 import { IamService } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
+import { DateTime } from 'luxon';
 
 export enum EventEmitMode {
   SINGLE = 'SINGLE',
@@ -117,6 +118,7 @@ export class MessageService {
     this.validateTopic(topic, channel);
 
     const qualifiedDids = channel.conditions.qualifiedDids;
+    this.logger.log('Qualified DIDs', { qualifiedDids });
 
     if (qualifiedDids.length === 0 && !channel.useAnonymousExtChannel) {
       throw new RecipientsNotFoundException();
@@ -198,15 +200,17 @@ export class MessageService {
           `message sent with id ${detail.messageId} to ${detail.did} with status code ${detail.statusCode}`
         );
 
-        messageIds.push(detail.messageId);
+        if (detail.messageId) {
+          messageIds.push(detail.messageId);
 
-        await this.messageStoreService.storeRecipients(
-          detail.did,
-          detail.messageId,
-          'todo',
-          detail.statusCode ?? 200,
-          clientGatewayMessageId
-        );
+          await this.messageStoreService.storeRecipients(
+            detail.did,
+            detail.messageId,
+            'todo',
+            detail.statusCode ?? 200,
+            clientGatewayMessageId
+          );
+        }
       }
     }
 
@@ -362,6 +366,7 @@ export class MessageService {
         signature: message.signature,
         sender: message.senderDid,
         timestampNanos: message.timestampNanos,
+        timestampISO: DateTime.fromMillis(message.timestampNanos / 1e6).toISO(),
         transactionId: message.transactionId,
         initiatingMessageId: message.initiatingMessageId,
         initiatingTransactionId: message.initiatingTransactionId,
@@ -762,7 +767,11 @@ export class MessageService {
             fulfilledMessages.map(
               async (messageResponse: GetMessageResponse) => {
                 const topic: TopicEntity | undefined =
-                  await this.topicService.getTopicById(messageResponse.topicId);
+                  await this.topicService.getTopic(
+                    messageResponse.topicName,
+                    topicOwner,
+                    messageResponse.topicVersion
+                  );
 
                 return {
                   topic,

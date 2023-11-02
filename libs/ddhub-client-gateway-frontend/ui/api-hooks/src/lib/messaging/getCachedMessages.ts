@@ -2,16 +2,16 @@ import { keyBy } from 'lodash';
 import { useQueryClient } from 'react-query';
 import {
   GetMessagesResponseDto,
-  MessageControlllerGetMessageParams,
-  getMessageControlllerGetMessageQueryKey,
+  MessageControllerGetMessageParams,
+  getMessageControllerGetMessageQueryKey,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 
 export const useCachedMessages = (
-  params?: MessageControlllerGetMessageParams
+  params?: MessageControllerGetMessageParams
 ) => {
   const queryClient = useQueryClient();
   const cachedMessages: GetMessagesResponseDto[] | undefined =
-    queryClient.getQueryData(getMessageControlllerGetMessageQueryKey(params));
+    queryClient.getQueryData(getMessageControllerGetMessageQueryKey(params));
 
   const messagesById = keyBy(cachedMessages, 'id');
 

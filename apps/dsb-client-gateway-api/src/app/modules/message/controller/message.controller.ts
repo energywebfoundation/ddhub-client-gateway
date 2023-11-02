@@ -20,7 +20,7 @@ import {
 import { GetMessagesDto } from '../dto/request/get-messages.dto';
 import { DownloadMessagesDto } from '../dto/request/download-file.dto';
 import { MessageService } from '../service/message.service';
-import { SendMessagelResponseDto } from '../dto/response/send-message.dto';
+import { SendMessageResponseDto } from '../dto/response/send-message.dto';
 import { GetMessagesResponseDto } from '../dto/response/get-message-response.dto';
 import { DownloadMessageResponse } from '../entity/message.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -41,7 +41,7 @@ import { AckMessagesRequestDto } from '../dto/request/ack-messages-request.dto';
 @Controller('messages')
 @UseGuards(MtlsGuard, UseGuards)
 @ApiTags('Messaging')
-export class MessageControlller {
+export class MessageController {
   private readonly logger = new Logger();
   constructor(
     protected readonly messageService: MessageService,
@@ -175,7 +175,7 @@ export class MessageControlller {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Message sent successfully',
-    type: () => SendMessagelResponseDto,
+    type: () => SendMessageResponseDto,
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
@@ -195,7 +195,7 @@ export class MessageControlller {
   @Roles(UserRole.MESSAGING, UserRole.ADMIN)
   public async create(
     @Body() dto: SendMessageDto
-  ): Promise<SendMessagelResponseDto> {
+  ): Promise<SendMessageResponseDto> {
     this.pinoLogger.assign({
       fqcn: dto.fqcn,
       topicName: dto.topicName,
@@ -209,7 +209,7 @@ export class MessageControlller {
   @ApiResponse({
     status: HttpStatus.CREATED,
     description: 'File Upload Successfully',
-    type: () => SendMessagelResponseDto,
+    type: () => SendMessageResponseDto,
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
@@ -231,7 +231,7 @@ export class MessageControlller {
   public async uploadFile(
     @UploadedFile('file') file: Express.Multer.File,
     @Body() dto: uploadMessageBodyDto
-  ): Promise<SendMessagelResponseDto> {
+  ): Promise<SendMessageResponseDto> {
     this.pinoLogger.assign({
       fqcn: dto.fqcn,
       topicName: dto.topicName,

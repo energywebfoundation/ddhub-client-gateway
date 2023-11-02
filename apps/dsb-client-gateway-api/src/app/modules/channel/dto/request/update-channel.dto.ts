@@ -135,6 +135,16 @@ export class UpdateChannelDto {
   useAnonymousExtChannel: boolean;
 
   @ApiProperty({
+    description: 'Enable message forms',
+    type: Boolean,
+    example: true,
+    required: false,
+  })
+  @IsBoolean()
+  @IsOptional()
+  messageForms: boolean;
+
+  @ApiProperty({
     description: 'Channel encryption',
     type: Boolean,
     example: true,

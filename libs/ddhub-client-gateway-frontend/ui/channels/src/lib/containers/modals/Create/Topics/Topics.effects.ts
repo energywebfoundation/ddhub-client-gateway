@@ -210,6 +210,6 @@ export const useTopicsEffects = (
     setTopicInputValue,
     topicValue,
     saveTopicResponse,
-    responseTopics,
+    // responseTopics,
   };
 };

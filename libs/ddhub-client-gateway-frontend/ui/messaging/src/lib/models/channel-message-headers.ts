@@ -5,7 +5,7 @@ export const CHANNEL_MESSAGE_HEADERS = [
     isSortable: true,
   },
   {
-    Header: 'NEW MESSAGES',
+    Header: 'MESSAGE COUNT',
     accessor: 'count',
     isSortable: true,
   },

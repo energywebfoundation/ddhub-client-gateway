@@ -43,7 +43,7 @@ export const Topics = ({ channelValues, actionButtonsProps }: TopicsProps) => {
     setTopicInputValue,
     topicValue,
     saveTopicResponse,
-    responseTopics,
+    // responseTopics,
   } = useTopicsEffects(channelValues);
 
   return (
@@ -134,7 +134,7 @@ export const Topics = ({ channelValues, actionButtonsProps }: TopicsProps) => {
             channelValues.channelType === CreateChannelDtoType.pub
           }
           saveResponse={saveTopicResponse}
-          responseTopics={responseTopics}
+          // responseTopics={responseTopics}
           filters={filters}
           recent={recent}
         />
@@ -152,7 +152,7 @@ export const Topics = ({ channelValues, actionButtonsProps }: TopicsProps) => {
             onClick: () =>
               actionButtonsProps.nextClickButtonProps.onClick({
                 topics: selectedTopics,
-                responseTopics,
+                // responseTopics,
               }),
           }}
         />

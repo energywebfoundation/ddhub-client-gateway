@@ -21,6 +21,7 @@ import {
   SentMessageRecipientRepositoryWrapper,
   SentMessageRepositoryWrapper,
 } from './wrapper';
+import { AddressBookRepositoryModule } from '../address-book';
 
 @Module({
   imports: [

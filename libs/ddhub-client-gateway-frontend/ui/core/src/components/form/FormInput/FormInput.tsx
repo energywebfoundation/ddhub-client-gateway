@@ -10,6 +10,7 @@ export const FormInput: FC<FormInputProps> = memo(
     errorExists = false,
     errorText = '',
     variant = 'standard',
+    type = 'text',
     disabled = false,
   }) => {
     const { classes } = useStyles();
@@ -18,7 +19,10 @@ export const FormInput: FC<FormInputProps> = memo(
     return (
       <Box {...field.formInputsWrapperProps} flexShrink={0}>
         {field.label && (
-          <InputLabel className={classes.label}>{field.label}</InputLabel>
+          <InputLabel className={classes.label}>
+            {field.label}
+            {field.required ? ` *` : ''}
+          </InputLabel>
         )}
         <TextField
           autoComplete="off"
@@ -27,7 +31,7 @@ export const FormInput: FC<FormInputProps> = memo(
           margin="normal"
           name={name ?? ''}
           disabled={disabled}
-          type={field.type ?? 'text'}
+          type={field.type ? field.type : type}
           inputRef={ref}
           error={errorExists}
           helperText={errorText}
