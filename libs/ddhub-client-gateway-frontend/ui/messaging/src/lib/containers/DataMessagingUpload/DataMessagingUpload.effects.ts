@@ -149,7 +149,7 @@ export const useDataMessagingUploadEffects = ({
         },
       };
 
-      await Swal.httpError(errData);
+      Swal.httpError(errData);
     }
   };
 

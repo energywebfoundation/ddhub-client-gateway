@@ -3,6 +3,8 @@ import {
   CertificateDetails,
   PATHS,
   SecretsEngineService,
+  SetPrivateKeyResponse,
+  SetRSAPrivateKeyResponse,
   UserDetails,
   UsersList,
 } from '../../secrets-engine.interface';
@@ -33,7 +35,17 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
   }
 
   public async getAllUsers(): Promise<UsersList> {
-    const res = await this.client.list(`${this.prefix}/${PATHS.USERS}`);
+    const res = await this.client
+      .list(`${this.prefix}/${PATHS.USERS}`)
+      .catch((err) => {
+        this.logger.error(err.message);
+        this.logger.error(err);
+        return null;
+      });
+
+    if (!res) {
+      return [];
+    }
 
     const keys: string[] = res.data.keys;
 
@@ -59,9 +71,7 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
       .then(({ data }) => ({ password: data.password, role: data.role }))
       .catch((err) => {
         this.logger.error(err.message);
-
         this.logger.error(err);
-
         return null;
       });
   }
@@ -107,7 +117,7 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
     this.logger.log('VAULT connection initialized');
   }
 
-  public async getCertificateDetails(): Promise<CertificateDetails> {
+  public async getCertificateDetails(): Promise<CertificateDetails | null> {
     this.logger.log('Retrieving certificate');
 
     return this.client
@@ -115,12 +125,12 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
       .then(({ data }) => data)
       .catch((err) => {
         this.logger.error(err.message);
-
+        this.logger.error(err);
         return null;
       });
   }
 
-  getMnemonic(): Promise<string | null> {
+  public async getMnemonic(): Promise<string | null> {
     this.logger.log('Retrieving mnemonic');
 
     if (!this.client) {
@@ -134,14 +144,12 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
       .then(({ data }) => data.mnemonic)
       .catch((err) => {
         this.logger.error(err.message);
-
         this.logger.error(err);
-
         return null;
       });
   }
 
-  public async setMnemonic(mnemonic: string): Promise<string> {
+  public async setMnemonic(mnemonic: string): Promise<null> {
     this.logger.log('Attempting to write mnemonic');
 
     await this.client.write(`${this.prefix}${PATHS.MNEMONIC}`, { mnemonic });
@@ -151,7 +159,7 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
   }
 
   @Span('vault_getPrivateKey')
-  public async getPrivateKey(): Promise<string> {
+  public async getPrivateKey(): Promise<string | null> {
     this.logger.log('Retrieving private key');
 
     if (!this.client) {
@@ -165,15 +173,15 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
       .then(({ data }) => data.key)
       .catch((err) => {
         this.logger.error(err.message);
-
         this.logger.error(err);
-
         return null;
       });
   }
 
   @Span('vault_setRSAKey')
-  public async setRSAPrivateKey(privateKey: string): Promise<null> {
+  public async setRSAPrivateKey(
+    privateKey: string
+  ): Promise<SetRSAPrivateKeyResponse> {
     this.logger.log('Attempting to write private RSA key');
 
     await this.client.write(`${this.prefix}${PATHS.RSA_KEY}`, { privateKey });
@@ -197,9 +205,7 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
       .then(({ data }) => data.privateKey)
       .catch((err) => {
         this.logger.error(err.message);
-
         this.logger.error(err);
-
         return null;
       });
   }
@@ -218,7 +224,7 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
   }
 
   @Span('vault_setPrivateKey')
-  public async setPrivateKey(key: string): Promise<null> {
+  public async setPrivateKey(key: string): Promise<SetPrivateKeyResponse> {
     this.logger.log('Attempting to write private key');
 
     await this.client.write(`${this.prefix}${PATHS.IDENTITY_PRIVATE_KEY}`, {

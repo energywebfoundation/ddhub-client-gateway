@@ -1,45 +1,28 @@
 import { LoginFormProps } from './LoginForm';
-import { useGatewayConfig } from '@ddhub-client-gateway-frontend/ui/api-hooks';
-import { useEffect, useState } from 'react';
-import { usePrivateKeyLoginEffects } from './PrivateKeyLogin.effects';
+import { usePrivateKeyLoginFormEffects } from './PrivateKeyLogin.effects';
 import { useUserLoginFormEffects } from './UserLogin.effects';
 
-export const useLoginFormEffects = ({ onPrivateKeySubmit }: LoginFormProps) => {
-  const privateKeyForm = usePrivateKeyLoginEffects((...data) => {
-    console.log(data);
+export const useLoginFormEffects = ({
+  submitHandler,
+  authEnabled,
+}: LoginFormProps) => {
+  const privateKeyForm = usePrivateKeyLoginFormEffects({
+    onSubmitHandler: submitHandler,
   });
-  const userLoginForm = useUserLoginFormEffects((...data) => {
-    console.log(data);
+  const userLoginForm = useUserLoginFormEffects({
+    onSubmitHandler: submitHandler,
   });
-  const { isLoading, config } = useGatewayConfig();
-  const [authEnabled, setAuthEnabled] = useState(false);
 
-  useEffect(() => {
-    if (!isLoading) {
-      if (config?.authEnabled) {
-        setAuthEnabled(true);
+  const buttonDisabled = authEnabled
+    ? !userLoginForm.isValid
+    : !privateKeyForm.isValid;
+  return authEnabled
+    ? {
+        ...userLoginForm,
+        buttonDisabled,
       }
-    }
-  }, [isLoading, config]);
-
-  if (isLoading) {
-    return {
-      isLoading,
-    };
-  } else {
-    const buttonDisabled = authEnabled
-      ? !userLoginForm.isValid
-      : !privateKeyForm.isValid;
-    return authEnabled
-      ? {
-          ...userLoginForm,
-          buttonDisabled,
-          isLoading,
-        }
-      : {
-          ...privateKeyForm,
-          buttonDisabled,
-          isLoading,
-        };
-  }
+    : {
+        ...privateKeyForm,
+        buttonDisabled,
+      };
 };

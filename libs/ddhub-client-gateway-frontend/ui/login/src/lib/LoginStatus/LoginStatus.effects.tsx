@@ -1,4 +1,4 @@
-import { usePrivateKeyEffects } from '../Login.effects';
+import { useLoginEffects } from '../Login.effects';
 import { AccountStatusEnum } from '../check-account-status/CheckAccountStatus';
 import LoginForm from '../LoginForm/LoginForm';
 import InsufficientFund from './InsufficientFund/InsufficientFund';
@@ -14,12 +14,14 @@ import { useEffect, useState } from 'react';
 
 export const useLoginStatusEffects = () => {
   const [isFirstLogin, setIsFirstLogin] = useState(false);
-  const { isLoading, submit, status, errorMessage, userData } =
-    usePrivateKeyEffects();
-
-  const privateKeyHandler = (privateKey: string) => {
-    submit(privateKey);
-  };
+  const {
+    authEnabled,
+    isLoading,
+    submitHandler,
+    status,
+    errorMessage,
+    userData,
+  } = useLoginEffects();
 
   const checkingIdentity = () => (
     <LoadingInfo mt={2}>
@@ -34,7 +36,13 @@ export const useLoginStatusEffects = () => {
     if (isLoading) {
       return checkingIdentity();
     } else {
-      return <LoginForm onPrivateKeySubmit={privateKeyHandler} />;
+      return (
+        <LoginForm
+          submitHandler={submitHandler}
+          authEnabled={authEnabled}
+          isLoading={isLoading}
+        />
+      );
     }
   };
 

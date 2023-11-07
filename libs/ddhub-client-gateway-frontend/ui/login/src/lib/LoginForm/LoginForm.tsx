@@ -2,16 +2,25 @@ import { Button, Typography, Box, CircularProgress } from '@mui/material';
 import { FormInput } from '@ddhub-client-gateway-frontend/ui/core';
 import { useLoginFormEffects } from './LoginForm.effects';
 import { useStyles } from '../Login.styles';
+import {
+  CreateIdentityDto,
+  LoginRequestDto,
+} from '@dsb-client-gateway/dsb-client-gateway-api-client';
 
 export interface LoginFormProps {
-  onPrivateKeySubmit: (privateKey: string) => void;
+  authEnabled: boolean;
+  submitHandler:
+    | ((data: CreateIdentityDto) => void)
+    | ((data: LoginRequestDto) => void);
+  isLoading: boolean;
 }
 
 export function LoginForm(props: LoginFormProps) {
+  const { isLoading } = props;
   const loginForm = useLoginFormEffects(props);
   const { theme, classes } = useStyles();
 
-  return loginForm.isLoading ? (
+  return isLoading ? (
     <Box
       width="100%"
       display="flex"

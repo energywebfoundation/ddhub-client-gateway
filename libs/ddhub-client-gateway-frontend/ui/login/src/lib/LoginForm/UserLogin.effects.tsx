@@ -1,11 +1,18 @@
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { FieldValues, useForm } from 'react-hook-form';
+import { LoginRequestDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
+
+interface UserLoginFormProps {
+  onSubmitHandler: (data: LoginRequestDto) => void;
+}
 
 export const USERNAME_FIELD = 'username';
 export const PASSWORD_FIELD = 'password';
 
-export const useUserLoginFormEffects = ({ onFormSubmit }: any) => {
+export const useUserLoginFormEffects = ({
+  onSubmitHandler,
+}: UserLoginFormProps) => {
   const validationSchema = Yup.object().shape({
     [USERNAME_FIELD]: Yup.string().max(64, 'Maximum length is 64').required(),
     [PASSWORD_FIELD]: Yup.string().max(64, 'Maximum length is 64').required(),
@@ -39,9 +46,26 @@ export const useUserLoginFormEffects = ({ onFormSubmit }: any) => {
       },
     },
   ];
-  const onSubmit = handleSubmit((data: FieldValues) =>
-    onFormSubmit(data[USERNAME_FIELD], data[PASSWORD_FIELD])
-  );
+
+  const isValidUserLoginData = (data: unknown): data is LoginRequestDto => {
+    return (
+      typeof data === 'object' &&
+      data !== null &&
+      USERNAME_FIELD in data &&
+      PASSWORD_FIELD in data &&
+      !!data[USERNAME_FIELD] &&
+      !!data[PASSWORD_FIELD]
+    );
+  };
+
+  const onSubmit = handleSubmit((data: FieldValues) => {
+    if (!isValidUserLoginData(data)) {
+      // TODO: display error
+      return;
+    }
+
+    onSubmitHandler(data);
+  });
 
   return {
     fields,

@@ -73,7 +73,6 @@ export const getRoutesToDisplay = (
 };
 
 export const useSetUserDataEffect = () => {
-  const Swal = useCustomAlert();
   const router = useRouter();
   const { config } = useGatewayConfig();
   const { userData, setUserData } = useContext(UserDataContext);
@@ -141,7 +140,7 @@ export const useSetUserDataEffect = () => {
     redirect(accountStatus).catch(console.error);
   };
 
-  const setDataOnError = (error: any, displayError = true) => {
+  const setDataOnError = (error: Error, displayError = true) => {
     setUserData({
       ...userData,
       accountStatus: AccountStatusEnum.ErrorOccur,
@@ -149,9 +148,6 @@ export const useSetUserDataEffect = () => {
       errorMessage: error.message,
     });
     router.push(routerConst.InitialPage);
-    if (displayError) {
-      Swal.httpError(error);
-    }
   };
 
   const setIsChecking = (value: boolean) => {
