@@ -3,20 +3,23 @@ import { usePrivateKeyLoginFormEffects } from './PrivateKeyLogin.effects';
 import { useUserLoginFormEffects } from './UserLogin.effects';
 
 export const useLoginFormEffects = ({
-  submitHandler,
+  privateKeySubmitHandler,
+  userLoginSubmitHandler,
   authEnabled,
+  userIsAuthenticated,
 }: LoginFormProps) => {
   const privateKeyForm = usePrivateKeyLoginFormEffects({
-    onSubmitHandler: submitHandler,
+    onSubmitHandler: privateKeySubmitHandler,
   });
   const userLoginForm = useUserLoginFormEffects({
-    onSubmitHandler: submitHandler,
+    onSubmitHandler: userLoginSubmitHandler,
   });
 
-  const buttonDisabled = authEnabled
-    ? !userLoginForm.isValid
-    : !privateKeyForm.isValid;
-  return authEnabled
+  const buttonDisabled =
+    authEnabled && !userIsAuthenticated
+      ? !userLoginForm.isValid
+      : !privateKeyForm.isValid;
+  return authEnabled && !userIsAuthenticated
     ? {
         ...userLoginForm,
         buttonDisabled,

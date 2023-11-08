@@ -2,6 +2,7 @@ import { IdentityWithEnrolment } from '@ddhub-client-gateway/identity/models';
 import {
   CreateIdentityDto,
   LoginRequestDto,
+  LoginResponseDto,
   useIdentityControllerPost,
   useLoginControllerLogin,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
@@ -19,7 +20,7 @@ interface PrivateKeyEffects {
 
 interface UserLoginEffects {
   setIsChecking: (isChecking: boolean) => void;
-  setUserData: (userData: IdentityWithEnrolment) => void;
+  setUserAuth: (userAuthData: LoginResponseDto) => void;
   setDataOnError: (error: Error) => void;
   notifyOnError?: (error: Error) => void;
 }
@@ -40,6 +41,7 @@ const usePrivateKeyEffects = ({
         }
         setDataOnError(error);
       },
+      onSettled: () => setIsChecking(false),
     },
   });
 
@@ -50,20 +52,21 @@ const usePrivateKeyEffects = ({
 
 const useUserLoginEffects = ({
   setIsChecking,
-  setUserData,
+  setUserAuth,
   setDataOnError,
   notifyOnError,
 }: UserLoginEffects) => {
   const { mutate, isLoading } = useLoginControllerLogin({
     mutation: {
       onMutate: () => setIsChecking(true),
-      onSuccess: (res) => console.log(res),
+      onSuccess: (res) => setUserAuth(res),
       onError: (error: Error) => {
         if (notifyOnError) {
           notifyOnError(error);
         }
         setDataOnError(error);
       },
+      onSettled: () => setIsChecking(false),
     },
   });
 
@@ -90,27 +93,37 @@ export const useLoginEffects = () => {
     Swal.httpError(err);
   };
 
-  const { setUserData, userData, setIsChecking, setDataOnError } =
-    useSetUserDataEffect();
-  const privateKeyLogin = usePrivateKeyEffects({
-    setIsChecking,
+  const {
     setUserData,
-    setDataOnError,
+    setUserAuth,
+    userData,
+    userAuth,
+    setIsCheckingIdentity,
+    setIsCheckingAuth,
+    setUserDataOnError,
+    setUserAuthOnError,
+  } = useSetUserDataEffect();
+  const privateKeyLogin = usePrivateKeyEffects({
+    setIsChecking: setIsCheckingIdentity,
+    setUserData,
+    setDataOnError: setUserDataOnError,
     notifyOnError: onError,
   });
   const userLogin = useUserLoginEffects({
-    setIsChecking,
-    setUserData,
-    setDataOnError,
+    setIsChecking: setIsCheckingAuth,
+    setUserAuth,
+    setDataOnError: setUserAuthOnError,
     notifyOnError: onError,
   });
 
   return {
     authEnabled,
-    isLoading: isConfigLoading || userData.isChecking,
-    submitHandler: authEnabled ? userLogin.onSubmit : privateKeyLogin.onSubmit,
+    isLoading: isConfigLoading || userData.isChecking || userAuth.isChecking,
+    privateKeySubmitHandler: privateKeyLogin.onSubmit,
+    userLoginSubmitHandler: userLogin.onSubmit,
     status: userData.accountStatus,
     userData,
-    errorMessage: userData.errorMessage,
+    userAuth,
+    errorMessage: userData.errorMessage || userAuth.errorMessage,
   };
 };

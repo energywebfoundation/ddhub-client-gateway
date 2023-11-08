@@ -15,9 +15,23 @@ export const useCheckAccountStatusEffects = (
   withBackdrop = true
 ) => {
   const queryClient = useQueryClient();
-  const { setUserData, setIsChecking } = useSetUserDataEffect();
+  const { setUserData, setIsCheckingIdentity } = useSetUserDataEffect();
   const { setIsLoading } = useBackdropContext();
   const [checking, setChecking] = useState(triggerQuery);
+
+  const isValidIdentityData = (
+    data: unknown
+  ): data is {
+    identityData: IdentityWithEnrolment;
+    routeRestrictions: RouteRestrictions;
+  } => {
+    return (
+      typeof data === 'object' &&
+      data !== null &&
+      'identityData' in data &&
+      'routeRestrictions' in data
+    );
+  };
 
   const getIdentityData = async () => {
     const queryParam = `t=${new Date(Date.now()).getTime()}`;
@@ -34,23 +48,23 @@ export const useCheckAccountStatusEffects = (
         identityControllerGet
       );
       return { identityData, routeRestrictions };
-    } catch (e: any) {
+    } catch (e: unknown) {
       return e;
     }
   };
 
   useEffect(() => {
     if (checking) {
-      setIsChecking(true);
+      setIsCheckingIdentity(true);
       getIdentityData().then((res) => {
-        setUserData(
-          res.identityData as IdentityWithEnrolment,
-          res.routeRestrictions
-        );
+        if (isValidIdentityData(res)) {
+          setUserData(res.identityData, res.routeRestrictions);
+        }
         if (withBackdrop) {
           setIsLoading(false);
         }
         setChecking(false);
+        setIsCheckingIdentity(false);
       });
     }
   }, [checking]);

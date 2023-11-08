@@ -15,6 +15,7 @@ import { BackdropContextProvider } from '@ddhub-client-gateway-frontend/ui/conte
 import { Backdrop } from '@ddhub-client-gateway-frontend/ui/core';
 import {
   useCheckAccountStatusEffects,
+  UserAuthContext,
   UserDataContext,
   useUserData,
 } from '@ddhub-client-gateway-frontend/ui/login';
@@ -50,7 +51,7 @@ function InitializeAccountStatus(props) {
 
 function MyApp(props: MyAppProps) {
   const { Component, pageProps } = props;
-  const { userDataValue } = useUserData();
+  const { userDataValue, userAuthValue } = useUserData();
   const [queryClient] = React.useState(
     () =>
       new QueryClient({
@@ -77,6 +78,27 @@ function MyApp(props: MyAppProps) {
     };
   }, []);
 
+  // useEffect(() => {
+  //   console.log('userAuth', userAuthValue.userAuth);
+  //   if (userAuthValue.userAuth.authenticated) {
+  //     const interceptorId = Axios.interceptors.request.use((config) => {
+  //       return {
+  //         ...config,
+  //         headers: userAuthValue.userAuth.accessToken
+  //           ? {
+  //               ...config.headers,
+  //               Authorization: `Bearer ${userAuthValue.userAuth.accessToken}`,
+  //             }
+  //           : config.headers,
+  //       };
+  //     });
+
+  //     return () => {
+  //       Axios.interceptors.request.eject(interceptorId);
+  //     };
+  //   }
+  // }, [userAuthValue.userAuth.accessToken]);
+
   return (
     <CacheProvider value={muiCache ?? createMuiCache()}>
       <Head>
@@ -90,14 +112,16 @@ function MyApp(props: MyAppProps) {
         <CssBaseline />
         <BackdropContextProvider>
           <UserDataContext.Provider value={userDataValue}>
-            <QueryClientProvider client={queryClient}>
-              <ModalProvider>
-                <InitializeAccountStatus>
-                  {getLayout(<Component {...pageProps} />)}
-                  <Backdrop />
-                </InitializeAccountStatus>
-              </ModalProvider>
-            </QueryClientProvider>
+            <UserAuthContext.Provider value={userAuthValue}>
+              <QueryClientProvider client={queryClient}>
+                <ModalProvider>
+                  <InitializeAccountStatus>
+                    {getLayout(<Component {...pageProps} />)}
+                    <Backdrop />
+                  </InitializeAccountStatus>
+                </ModalProvider>
+              </QueryClientProvider>
+            </UserAuthContext.Provider>
           </UserDataContext.Provider>
         </BackdropContextProvider>
       </DDHubThemeProvider>

@@ -9,16 +9,16 @@ import {
 
 export interface LoginFormProps {
   authEnabled: boolean;
-  submitHandler:
-    | ((data: CreateIdentityDto) => void)
-    | ((data: LoginRequestDto) => void);
+  userIsAuthenticated: boolean;
+  privateKeySubmitHandler: (data: CreateIdentityDto) => void;
+  userLoginSubmitHandler: (data: LoginRequestDto) => void;
   isLoading: boolean;
 }
 
 export function LoginForm(props: LoginFormProps) {
   const { isLoading } = props;
-  const loginForm = useLoginFormEffects(props);
   const { theme, classes } = useStyles();
+  const loginForm = useLoginFormEffects(props);
 
   return isLoading ? (
     <Box

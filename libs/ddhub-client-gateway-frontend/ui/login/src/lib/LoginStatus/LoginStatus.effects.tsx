@@ -17,10 +17,12 @@ export const useLoginStatusEffects = () => {
   const {
     authEnabled,
     isLoading,
-    submitHandler,
+    privateKeySubmitHandler,
+    userLoginSubmitHandler,
     status,
     errorMessage,
     userData,
+    userAuth,
   } = useLoginEffects();
 
   const checkingIdentity = () => (
@@ -38,7 +40,9 @@ export const useLoginStatusEffects = () => {
     } else {
       return (
         <LoginForm
-          submitHandler={submitHandler}
+          userIsAuthenticated={userAuth.authenticated}
+          privateKeySubmitHandler={privateKeySubmitHandler}
+          userLoginSubmitHandler={userLoginSubmitHandler}
           authEnabled={authEnabled}
           isLoading={isLoading}
         />
@@ -47,18 +51,18 @@ export const useLoginStatusEffects = () => {
   };
 
   useEffect(() => {
-    if (status === AccountStatusEnum.FirstLogin) {
+    if (status === AccountStatusEnum.FIRST_LOGIN) {
       setIsFirstLogin(true);
     }
   }, [status]);
 
   const statusFactory = () => {
     switch (status) {
-      case AccountStatusEnum.FirstLogin:
+      case AccountStatusEnum.FIRST_LOGIN:
         return showLoginForm();
-      case AccountStatusEnum.NotSetPrivateKey:
+      case AccountStatusEnum.NO_PRIVATE_KEY:
         return showLoginForm();
-      case AccountStatusEnum.ErrorOccur:
+      case AccountStatusEnum.ERROR:
         return (
           <>
             <Typography variant={'body2'}>
@@ -67,7 +71,7 @@ export const useLoginStatusEffects = () => {
             <ResetPrivateKey />
           </>
         );
-      case AccountStatusEnum.InsufficientFund:
+      case AccountStatusEnum.INSUFFICIENT_FUNDS:
         return <InsufficientFund />;
       case RoleStatus.NOT_ENROLLED:
         return <EnrolForRoleContainer />;
