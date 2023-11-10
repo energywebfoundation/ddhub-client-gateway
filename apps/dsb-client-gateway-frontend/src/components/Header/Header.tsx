@@ -1,11 +1,13 @@
 import { Typography } from '@mui/material';
 import { didFormatMinifier } from '@ddhub-client-gateway-frontend/ui/utils';
 import { useStyles } from './Header.styles';
-import { useHeaderEffects } from './Header.effects';
+import { useGatewayConfig } from '@ddhub-client-gateway-frontend/ui/api-hooks';
 
 export function Header() {
   const { classes } = useStyles();
-  const { did } = useHeaderEffects();
+  const {
+    config: { did },
+  } = useGatewayConfig();
 
   return (
     <div className={classes.root}>

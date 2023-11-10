@@ -47,7 +47,14 @@ export class LoginController {
   public async refreshToken(
     @Body() body: RefreshTokenRequestDto
   ): Promise<LoginResponseDto> {
-    return this.userAuthService.refreshToken(body.refreshToken);
+    const tokens = this.userAuthService.refreshToken(body.refreshToken);
+    const decodedToken = this.userAuthService.verifyToken(tokens.accessToken);
+
+    return {
+      ...tokens,
+      role: decodedToken.accountType,
+      username: decodedToken.username,
+    };
   }
 
   @Post()
@@ -63,7 +70,12 @@ export class LoginController {
       body.username,
       body.password
     );
+    const decodedToken = this.userAuthService.verifyToken(tokens.accessToken);
 
-    return tokens;
+    return {
+      ...tokens,
+      role: decodedToken.accountType,
+      username: decodedToken.username,
+    };
   }
 }

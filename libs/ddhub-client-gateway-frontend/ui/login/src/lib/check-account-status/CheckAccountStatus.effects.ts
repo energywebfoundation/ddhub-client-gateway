@@ -5,17 +5,19 @@ import {
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { useEffect, useState } from 'react';
 import { useQueryClient } from 'react-query';
-import { useSetUserDataEffect } from '../SetUserData.effects';
+import { useUserDataEffects } from '../UserData.effects';
 import axios from 'axios';
 import { RouteRestrictions } from '../config/route-restrictions.interface';
 import { useBackdropContext } from '@ddhub-client-gateway-frontend/ui/context';
+import { useIdentity } from '@ddhub-client-gateway-frontend/ui/api-hooks';
 
-export const useCheckAccountStatusEffects = (
+export const useCheckAccountStatus = (
   triggerQuery = true,
   withBackdrop = true
 ) => {
   const queryClient = useQueryClient();
-  const { setUserData, setIsCheckingIdentity } = useSetUserDataEffect();
+  const { setUserData, setIsCheckingIdentity, refreshIdentity } =
+    useUserDataEffects();
   const { setIsLoading } = useBackdropContext();
   const [checking, setChecking] = useState(triggerQuery);
 
@@ -54,7 +56,7 @@ export const useCheckAccountStatusEffects = (
   };
 
   useEffect(() => {
-    if (checking) {
+    if (checking || refreshIdentity) {
       setIsCheckingIdentity(true);
       getIdentityData().then((res) => {
         if (isValidIdentityData(res)) {
@@ -67,7 +69,7 @@ export const useCheckAccountStatusEffects = (
         setIsCheckingIdentity(false);
       });
     }
-  }, [checking]);
+  }, [checking, refreshIdentity]);
 
   return { checking, setChecking };
 };

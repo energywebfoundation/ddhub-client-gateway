@@ -1,7 +1,7 @@
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { FieldValues, useForm } from 'react-hook-form';
-import { useSetUserDataEffect } from '../SetUserData.effects';
+import { useUserDataEffects } from '../UserData.effects';
 import {
   CreateIdentityDto,
   useIdentityControllerPost,

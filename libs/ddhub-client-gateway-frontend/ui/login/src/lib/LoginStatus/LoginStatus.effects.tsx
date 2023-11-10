@@ -11,6 +11,8 @@ import ResetPrivateKey from '../ResetPrivateKey/ResetPrivateKey';
 import LoadingInfo from '../LoadingInfo/LoadingInfo';
 import { Stack, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
+import { UserRole } from '../UserDataContext';
+import NonAdminUser from './NonAdminUser/NonAdminUser';
 
 export const useLoginStatusEffects = () => {
   const [isFirstLogin, setIsFirstLogin] = useState(false);
@@ -57,6 +59,18 @@ export const useLoginStatusEffects = () => {
   }, [status]);
 
   const statusFactory = () => {
+    if (
+      userAuth.authenticated &&
+      userAuth.role !== UserRole.ADMIN &&
+      status !== RoleStatus.SYNCED
+    ) {
+      return <NonAdminUser />;
+    }
+
+    if (authEnabled && !userAuth.authenticated) {
+      return showLoginForm();
+    }
+
     switch (status) {
       case AccountStatusEnum.FIRST_LOGIN:
         return showLoginForm();

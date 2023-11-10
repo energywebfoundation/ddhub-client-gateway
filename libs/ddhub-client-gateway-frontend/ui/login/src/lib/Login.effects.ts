@@ -3,10 +3,12 @@ import {
   CreateIdentityDto,
   LoginRequestDto,
   LoginResponseDto,
+  RefreshTokenRequestDto,
   useIdentityControllerPost,
   useLoginControllerLogin,
+  useLoginControllerRefreshToken,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
-import { useSetUserDataEffect } from './SetUserData.effects';
+import { useUserDataEffects } from './UserData.effects';
 import { useCustomAlert } from '@ddhub-client-gateway-frontend/ui/core';
 import { useGatewayConfig } from '@ddhub-client-gateway-frontend/ui/api-hooks';
 import { useEffect, useState } from 'react';
@@ -40,6 +42,7 @@ const usePrivateKeyEffects = ({
           notifyOnError(error);
         }
         setDataOnError(error);
+        setIsChecking(false);
       },
       onSettled: () => setIsChecking(false),
     },
@@ -65,6 +68,7 @@ const useUserLoginEffects = ({
           notifyOnError(error);
         }
         setDataOnError(error);
+        setIsChecking(false);
       },
       onSettled: () => setIsChecking(false),
     },
@@ -80,14 +84,6 @@ export const useLoginEffects = () => {
   const { isLoading: isConfigLoading, config } = useGatewayConfig();
   const [authEnabled, setAuthEnabled] = useState(false);
 
-  useEffect(() => {
-    if (!isConfigLoading) {
-      if (config?.authEnabled) {
-        setAuthEnabled(true);
-      }
-    }
-  }, [isConfigLoading, config]);
-
   const onError = (err: any) => {
     console.error(err);
     Swal.httpError(err);
@@ -102,7 +98,7 @@ export const useLoginEffects = () => {
     setIsCheckingAuth,
     setUserDataOnError,
     setUserAuthOnError,
-  } = useSetUserDataEffect();
+  } = useUserDataEffects();
   const privateKeyLogin = usePrivateKeyEffects({
     setIsChecking: setIsCheckingIdentity,
     setUserData,
@@ -115,6 +111,12 @@ export const useLoginEffects = () => {
     setDataOnError: setUserAuthOnError,
     notifyOnError: onError,
   });
+
+  useEffect(() => {
+    if (!isConfigLoading && config?.authEnabled) {
+      setAuthEnabled(true);
+    }
+  }, [isConfigLoading, config]);
 
   return {
     authEnabled,

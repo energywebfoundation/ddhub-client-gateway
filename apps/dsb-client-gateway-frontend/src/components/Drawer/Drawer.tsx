@@ -18,7 +18,7 @@ import { routerConst } from '@ddhub-client-gateway-frontend/ui/utils';
 import { useStyles } from './Drawer.styles';
 import { CollapsableMenu } from './CollapsableMenu/CollapsableMenu';
 import { MenuItem } from './MenuItem/MenuItem';
-import { useSetUserDataEffect } from '@ddhub-client-gateway-frontend/ui/login';
+import { useUserDataEffects } from '@ddhub-client-gateway-frontend/ui/login';
 import {
   NewMessage,
   ViewMessage,
@@ -29,7 +29,7 @@ import {
 export const Drawer = () => {
   const {
     userData: { displayedRoutes },
-  } = useSetUserDataEffect();
+  } = useUserDataEffects();
   const { classes } = useStyles();
   const { openNewMessageModal } = useNewMessageEffects();
 

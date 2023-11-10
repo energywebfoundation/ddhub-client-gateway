@@ -3,13 +3,13 @@ import {
   useIdentity,
   useGatewayConfig,
 } from '@ddhub-client-gateway-frontend/ui/api-hooks';
-import { useSetUserDataEffect } from '@ddhub-client-gateway-frontend/ui/login';
+import { useUserDataEffects } from '@ddhub-client-gateway-frontend/ui/login';
 import { ModalActionsEnum, useModalDispatch } from '../../context';
 
 export const useGatewayIdentityEffects = () => {
   const { config } = useGatewayConfig();
-  const { userData, setUserData } = useSetUserDataEffect();
-  const { identity } = useIdentity();
+  const { userData, setUserData, refreshIdentity } = useUserDataEffects();
+  const { identity } = useIdentity(refreshIdentity);
   const Swal = useCustomAlert();
   const dispatch = useModalDispatch();
   const namespace = config?.namespace ?? 'ddhub.apps.energyweb.iam.ewc';
@@ -24,7 +24,6 @@ export const useGatewayIdentityEffects = () => {
       setUserData(null);
     }
   };
-
 
   const openRolesModal = () => {
     dispatch({

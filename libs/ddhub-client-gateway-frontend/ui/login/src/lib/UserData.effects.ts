@@ -15,7 +15,7 @@ import {
 import { routerConst } from '@ddhub-client-gateway-frontend/ui/utils';
 import { useRouter } from 'next/router';
 import { useContext, useEffect, useState } from 'react';
-import { UserAuthContext, UserDataContext, UserRole } from './UserDataContext';
+import { UserContext, UserRole } from './UserDataContext';
 import { useQueryClient } from 'react-query';
 import { isEmpty } from 'lodash';
 import {
@@ -40,7 +40,7 @@ export const messageOnlyRestrictions = new Map<string, string>()
   .set('messageOutbox', routerConst.MessageOutbox);
 
 enum VersionStatus {
-  Unavailable = 'Unavailable',
+  UNAVAILABLE = 'Unavailable',
   NOT_DETECTED = 'NOT_DETECTED',
 }
 
@@ -78,17 +78,30 @@ export const getRoutesToDisplay = (
   return new Set(allowedRoutes.filter((value) => value !== '') as string[]);
 };
 
-export const useSetUserDataEffect = () => {
+export const useUserDataEffects = () => {
+  const userContext = useContext(UserContext);
+  if (!userContext) {
+    throw new Error(
+      'useUserDataEffects must be used within a UserContext provider'
+    );
+  }
+
   const router = useRouter();
   const { config } = useGatewayConfig();
-  const { userData, setUserData } = useContext(UserDataContext);
-  const { userAuth, setUserAuth } = useContext(UserAuthContext);
+  const {
+    userData,
+    setUserData,
+    userAuth,
+    setUserAuth,
+    resetAuthData,
+    refreshIdentity,
+  } = userContext;
   const queryClient = useQueryClient();
   const [routeRestrictionList, setRouteRestrictionList] = useState(
     {} as RouteRestrictions
   );
   const [result, setResult] = useState({} as IdentityWithEnrolment);
-  const [version, setVersion] = useState<string>(VersionStatus.Unavailable);
+  const [version, setVersion] = useState<string>(VersionStatus.UNAVAILABLE);
 
   useEffect(() => {
     if (!isEmpty(config)) {
@@ -105,33 +118,35 @@ export const useSetUserDataEffect = () => {
           config
         );
 
-        setUserData({
-          ...userData,
+        setUserData((prevValue) => ({
+          ...prevValue,
           accountStatus,
           roles: result.enrolment.roles,
           isChecking: false,
           routeRestrictions: routeRestrictionList,
           displayedRoutes,
           did: result.enrolment.did,
-        });
+        }));
       }
     }
   }, [config, result, routeRestrictionList]);
 
   useEffect(() => {
-    if (userAuth) {
-      let displayedRoutes = new Set<string>();
-      if (userAuth.role === UserRole.MESSAGING) {
-        displayedRoutes = new Set(messageOnlyRestrictions.values());
-      } else if (userAuth.role === UserRole.ADMIN) {
-        displayedRoutes = new Set(routeRestrictions.values());
+    if (userAuth && userAuth.authenticated) {
+      if (!userAuth.displayedRoutes.size) {
+        let displayedRoutes = new Set<string>();
+        if (userAuth.role === UserRole.MESSAGING) {
+          displayedRoutes = new Set(messageOnlyRestrictions.values());
+        } else if (userAuth.role === UserRole.ADMIN) {
+          displayedRoutes = new Set(routeRestrictions.values());
+        }
+        setUserAuth((prevValue) => ({
+          ...prevValue,
+          displayedRoutes,
+        }));
       }
-      setUserAuth({
-        ...userAuth,
-        displayedRoutes,
-      });
     }
-  }, [userAuth, userData]);
+  }, [userAuth]);
 
   const setData = (
     res: IdentityWithEnrolment,
@@ -149,12 +164,12 @@ export const useSetUserDataEffect = () => {
     setRouteRestrictionList(routeRestrictions);
 
     if (!res?.enrolment?.roles) {
-      setUserData({
-        ...userData,
+      setUserData((prevValue) => ({
+        ...prevValue,
         accountStatus,
         isChecking: false,
         routeRestrictions,
-      });
+      }));
     }
 
     queryClient.setQueryData(getIdentityControllerGetQueryKey(), res);
@@ -163,55 +178,55 @@ export const useSetUserDataEffect = () => {
   };
 
   const setAuthData = (res: LoginResponseDto) => {
-    const { accessToken, refreshToken } = res;
-    setUserAuth({
-      ...userAuth,
-      username: '',
-      role: UserRole.MESSAGING,
+    const { accessToken, refreshToken, username, role } = res;
+    setUserAuth((prevValue) => ({
+      ...prevValue,
+      username,
+      role,
       accessToken,
       refreshToken,
       isChecking: false,
       authenticated: true,
-    });
+    }));
   };
 
   const setUserDataOnError = (error: Error) => {
-    setUserData({
-      ...userData,
+    setUserData((prevValue) => ({
+      ...prevValue,
       accountStatus: AccountStatusEnum.ERROR,
       isChecking: false,
       errorMessage: error.message,
-    });
+    }));
     router.push(routerConst.InitialPage);
+  };
+
+  const userAuthLogout = () => {
+    resetAuthData();
   };
 
   const setUserAuthOnError = (error: Error) => {
-    setUserAuth({
-      ...userAuth,
-      errorMessage: error.message,
-    });
-    router.push(routerConst.InitialPage);
+    resetAuthData(error.message);
   };
 
   const setIsCheckingIdentity = (value: boolean) => {
-    setUserData({
-      ...userData,
+    setUserData((prevValue) => ({
+      ...prevValue,
       isChecking: value,
-    });
+    }));
   };
 
   const setIsCheckingAuth = (value: boolean) => {
-    setUserAuth({
-      ...userAuth,
+    setUserAuth((prevValue) => ({
+      ...prevValue,
       isChecking: value,
-    });
+    }));
   };
 
   const setRestrictions = (routeRestrictions: RouteRestrictions) => {
-    setUserData({
-      ...userData,
+    setUserData((prevValue) => ({
+      ...prevValue,
       routeRestrictions,
-    });
+    }));
   };
 
   return {
@@ -219,11 +234,13 @@ export const useSetUserDataEffect = () => {
     userData,
     setUserAuth: setAuthData,
     userAuth,
+    refreshIdentity,
     setIsCheckingIdentity,
     setIsCheckingAuth,
     setUserDataOnError,
     setUserAuthOnError,
     setRestrictions,
     version,
+    userAuthLogout,
   };
 };

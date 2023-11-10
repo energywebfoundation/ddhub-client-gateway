@@ -14,16 +14,15 @@ import { queryClientOptions } from '../utils';
 import { BackdropContextProvider } from '@ddhub-client-gateway-frontend/ui/context';
 import { Backdrop } from '@ddhub-client-gateway-frontend/ui/core';
 import {
-  useCheckAccountStatusEffects,
-  UserAuthContext,
-  UserDataContext,
+  useUserAuthHeaders,
+  useCheckAccountStatus,
+  UserContext,
   useUserData,
 } from '@ddhub-client-gateway-frontend/ui/login';
 import { makeServer } from '../services/mock.service';
 import '@asyncapi/react-component/styles/default.min.css';
 import 'nprogress/nprogress.css';
 import '../styles/globals.css';
-import { useGatewayIdentityEffects } from 'libs/ddhub-client-gateway-frontend/ui/gateway-settings/src/lib/containers/GatewayIdentity/GatewayIdentity.effects';
 import { ModalProvider } from '@ddhub-client-gateway-frontend/ui/messaging';
 
 if (
@@ -44,20 +43,32 @@ export interface MyAppProps extends AppProps {
 }
 
 function InitializeAccountStatus(props) {
-  useGatewayIdentityEffects();
-  useCheckAccountStatusEffects();
+  useCheckAccountStatus(false);
+  useUserAuthHeaders();
   return <>{props.children}</>;
 }
 
 function MyApp(props: MyAppProps) {
   const { Component, pageProps } = props;
-  const { userDataValue, userAuthValue } = useUserData();
   const [queryClient] = React.useState(
     () =>
       new QueryClient({
-        defaultOptions: queryClientOptions,
+        defaultOptions: {
+          queries: {
+            ...queryClientOptions.queries,
+            enabled: false,
+          },
+        },
       })
   );
+  const {
+    userDataValue,
+    userAuthValue,
+    refreshIdentityValue,
+    authenticatedValue,
+    resetAuthData,
+    refreshToken,
+  } = useUserData(queryClient);
 
   const getLayout =
     (Component as any).getLayout || ((page) => <Layout>{page}</Layout>);
@@ -78,27 +89,6 @@ function MyApp(props: MyAppProps) {
     };
   }, []);
 
-  // useEffect(() => {
-  //   console.log('userAuth', userAuthValue.userAuth);
-  //   if (userAuthValue.userAuth.authenticated) {
-  //     const interceptorId = Axios.interceptors.request.use((config) => {
-  //       return {
-  //         ...config,
-  //         headers: userAuthValue.userAuth.accessToken
-  //           ? {
-  //               ...config.headers,
-  //               Authorization: `Bearer ${userAuthValue.userAuth.accessToken}`,
-  //             }
-  //           : config.headers,
-  //       };
-  //     });
-
-  //     return () => {
-  //       Axios.interceptors.request.eject(interceptorId);
-  //     };
-  //   }
-  // }, [userAuthValue.userAuth.accessToken]);
-
   return (
     <CacheProvider value={muiCache ?? createMuiCache()}>
       <Head>
@@ -111,18 +101,27 @@ function MyApp(props: MyAppProps) {
       <DDHubThemeProvider>
         <CssBaseline />
         <BackdropContextProvider>
-          <UserDataContext.Provider value={userDataValue}>
-            <UserAuthContext.Provider value={userAuthValue}>
-              <QueryClientProvider client={queryClient}>
-                <ModalProvider>
-                  <InitializeAccountStatus>
+          <QueryClientProvider client={queryClient}>
+            <UserContext.Provider
+              value={{
+                ...userDataValue,
+                ...userAuthValue,
+                ...refreshIdentityValue,
+                ...authenticatedValue,
+                resetAuthData,
+                refreshToken,
+              }}
+            >
+              <ModalProvider>
+                <InitializeAccountStatus>
+                  <>
                     {getLayout(<Component {...pageProps} />)}
                     <Backdrop />
-                  </InitializeAccountStatus>
-                </ModalProvider>
-              </QueryClientProvider>
-            </UserAuthContext.Provider>
-          </UserDataContext.Provider>
+                  </>
+                </InitializeAccountStatus>
+              </ModalProvider>
+            </UserContext.Provider>
+          </QueryClientProvider>
         </BackdropContextProvider>
       </DDHubThemeProvider>
     </CacheProvider>
