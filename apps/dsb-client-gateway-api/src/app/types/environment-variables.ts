@@ -12,6 +12,12 @@ export enum WebSocketImplementation {
 }
 
 export const API_ENVS = Joi.object({
+  USER_AUTH_ENABLED: Joi.boolean()
+    .default(false)
+    .description('Should user auth be enabled'),
+  JWT_USER_PRIVATE_KEY: Joi.string()
+    .default('default-private-key')
+    .description('JWT User Private Key'),
   SWAGGER_SCHEMA_PATH: Joi.string()
     .default('./schema.yaml')
     .description(

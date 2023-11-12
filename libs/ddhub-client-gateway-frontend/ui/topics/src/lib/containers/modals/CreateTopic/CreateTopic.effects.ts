@@ -85,7 +85,9 @@ export const useCreateTopicEffects = () => {
 
   const onCreateTopic = () => {
     if (isSearch) {
-      queryClient.invalidateQueries(getTopicsControllerGetTopicsBySearchQueryKey());
+      queryClient.invalidateQueries(
+        getTopicsControllerGetTopicsBySearchQueryKey()
+      );
     } else {
       queryClient.invalidateQueries(getTopicsControllerGetTopicsQueryKey());
     }
@@ -112,7 +114,7 @@ export const useCreateTopicEffects = () => {
     hideModal();
     const result = await Swal.fire({
       title: 'Are you sure you want to proceed?',
-      text: 'you will close create topic form',
+      text: 'You will close the create topic form',
       type: 'warning',
       showCancelButton: true,
     });

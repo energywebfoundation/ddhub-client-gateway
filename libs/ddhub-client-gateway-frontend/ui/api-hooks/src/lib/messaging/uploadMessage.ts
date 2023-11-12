@@ -1,6 +1,6 @@
 import {
-  useMessageControlllerUploadFile,
-  useMessageControlllerCreate,
+  useMessageControllerUploadFile,
+  useMessageControllerCreate,
   UploadMessageBodyDto,
   SendMessageDto,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
@@ -17,9 +17,9 @@ export const messageDataService = {
 export const useUploadMessage = (isLarge: boolean) => {
   const Swal = useCustomAlert();
   const { mutate: messageCreateMutate, isLoading: messageCreating } =
-    useMessageControlllerCreate();
+    useMessageControllerCreate();
   const { mutate: messageUploadMutate, isLoading: messageUploading } =
-    useMessageControlllerUploadFile();
+    useMessageControllerUploadFile();
 
   const uploadMessageError = async (err: any) => {
     console.error(err);

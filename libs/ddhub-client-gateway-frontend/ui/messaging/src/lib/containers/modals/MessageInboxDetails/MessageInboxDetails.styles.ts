@@ -50,7 +50,10 @@ export const useStyles = makeStyles()((theme) => ({
     color: '#D0D2D6',
     fontFamily: theme.typography.body2.fontFamily,
   },
-  tabBox: {
+  tabHeaderWrapper: {
+    padding: '0 12px',
+  },
+  tabContentWrapper: {
     maxHeight: '559px',
     overflow: 'auto',
     '&::-webkit-scrollbar': {
@@ -68,8 +71,6 @@ export const useStyles = makeStyles()((theme) => ({
   },
   entryBox: {
     backgroundColor: '#262B3F',
-    paddingTop: '-26px',
-    padding: '40px',
     borderRadius: '6px',
     border: '1px #404656 solid',
   },
@@ -81,5 +82,13 @@ export const useStyles = makeStyles()((theme) => ({
     '& svg': {
       stroke: theme.palette.text.secondary,
     },
+  },
+  actions: {
+    padding: 0,
+  },
+  closeButtonWrapper: {
+    position: 'absolute',
+    top: 17,
+    right: 18,
   },
 }));

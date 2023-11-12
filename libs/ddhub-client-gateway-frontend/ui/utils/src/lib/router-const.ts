@@ -28,6 +28,8 @@ export const routerConst = {
   FileDownloadChannelTopic: `/messages/file-download/[${Queries.FQCN}]/[${Queries.TopicId}]`,
   DataMessagingFileUpload: '/messages/file-upload',
   DataMessagingFileDownload: '/messages/file-download',
+  MyMessages: '/messages',
+  SentMessages: '/messages/sent',
   VersionHistory: `/applications/[${Queries.Namespace}]/[${Queries.TopicId}]/version-history`,
   ChannelTopicVersionHistory: `/channels/applications/[${Queries.Namespace}]/[${Queries.TopicId}]/version-history`,
   WS: '/integration/ws',

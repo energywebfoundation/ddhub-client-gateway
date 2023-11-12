@@ -1,12 +1,12 @@
 import {
-  useMessageControlllerGetSentMessages,
-  MessageControlllerGetSentMessagesParams,
+  useMessageControllerGetSentMessages,
+  MessageControllerGetSentMessagesParams,
   GetSentMessageResponseDto,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { useCustomAlert } from '@ddhub-client-gateway-frontend/ui/core';
 
 export const useSentMessages = (
-  params?: MessageControlllerGetSentMessagesParams,
+  params?: MessageControllerGetSentMessagesParams,
   isRelatedMessage?: boolean
 ) => {
   const Swal = useCustomAlert();
@@ -19,7 +19,7 @@ export const useSentMessages = (
   }
 
   const { data, isLoading, isSuccess, isError } =
-    useMessageControlllerGetSentMessages(params, {
+    useMessageControllerGetSentMessages(params, {
       query: {
         enabled,
         onError: (err: any) => {

@@ -3,6 +3,8 @@ import {
   CertificateDetails,
   PATHS,
   SecretsEngineService,
+  UserDetails,
+  UsersList,
 } from '../../secrets-engine.interface';
 import { ConfigService } from '@nestjs/config';
 import nv from 'node-vault';
@@ -28,6 +30,55 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
         await this.client.delete(`${this.prefix}${path}`);
       })
     );
+  }
+
+  public async getAllUsers(): Promise<UsersList> {
+    const res = await this.client.list(`${this.prefix}/${PATHS.USERS}`);
+
+    const keys: string[] = res.data.keys;
+
+    const usersToReturn: UsersList = [];
+
+    for (const key of keys) {
+      const details = await this.getUserAuthDetails(key);
+
+      usersToReturn.push({
+        username: key,
+        password: details.password,
+        role: details.role,
+      });
+    }
+
+    return usersToReturn;
+  }
+
+  @Span('vault_getUserAuthDetails')
+  public async getUserAuthDetails(username: string): Promise<UserDetails> {
+    return this.client
+      .read(`${this.prefix}${PATHS.USERS}/${username}`)
+      .then(({ data }) => ({ password: data.password, role: data.role }))
+      .catch((err) => {
+        this.logger.error(err.message);
+
+        this.logger.error(err);
+
+        return null;
+      });
+  }
+
+  @Span('vault_setUserAuthDetails')
+  public async setUserPassword(
+    username: string,
+    password: string
+  ): Promise<void> {
+    this.logger.log('Attempting to write user');
+
+    await this.client.write(`${this.prefix}${PATHS.USERS}/${username}`, {
+      password,
+      username,
+    });
+
+    this.logger.log('Writing mnemonic');
   }
 
   @Span('vault_onModuleInit')

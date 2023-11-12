@@ -40,7 +40,7 @@ interface StoreReceivedMessage {
   initiatingMessageId?: string | null;
   initiatingTransactionId?: string | null;
   clientGatewayMessageId: string;
-  topic: TopicEntity; // You would need to define the TopicEntity interface
+  topic: TopicEntity;
   topicVersion: string;
   transactionId: string;
   signature: string;
@@ -67,15 +67,18 @@ export class MessageStoreService {
   public async deleteExpiredMessages(): Promise<void> {
     const config: ConfigDto = await this.ddhubConfigService.getConfig();
 
-    const expiresOn = moment().add(config.msgExpired, 'seconds').utc().toDate();
+    const expiresOn = moment()
+      .subtract(config.msgExpired, 'milliseconds')
+      .utc()
+      .toDate();
 
     try {
       this.logger.log('attempting to delete expired received messages');
 
       await this.receivedMessageRepositoryWrapper.repository
-        .createQueryBuilder('message')
+        .createQueryBuilder()
         .delete()
-        .where('message.createdDate <= :expiresOn', { expiresOn })
+        .where('createdDate <= :expiresOn', { expiresOn })
         .execute();
 
       this.logger.log('deleted expired received messages');
@@ -88,9 +91,9 @@ export class MessageStoreService {
       this.logger.log('attempting to delete expired sent messages');
 
       await this.sentMessageRepositoryWrapper.repository
-        .createQueryBuilder('message')
+        .createQueryBuilder()
         .delete()
-        .where('message.createdDate <= :expiresOn', { expiresOn })
+        .where('createdDate <= :expiresOn', { expiresOn })
         .execute();
 
       this.logger.log('deleted sent messages');
@@ -120,7 +123,10 @@ export class MessageStoreService {
           entity.payloadEncryption = item.payloadEncryption;
           entity.transactionId = item.transactionId;
           entity.topicId = item.topic.id;
-          entity.topicVersion = item.topic.version;
+          entity.topicName = item.topic.name;
+          entity.topicOwner = item.topic.owner;
+          entity.topicVersion = item.topicVersion;
+          entity.timestampNanos = item.timestampNanos;
 
           return { entity, fqcn: item.fqcn };
         })

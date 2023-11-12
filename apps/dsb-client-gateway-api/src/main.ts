@@ -11,10 +11,7 @@ import { ValidationException } from '@dsb-client-gateway/dsb-client-gateway-erro
 import { Logger } from 'nestjs-pino';
 import * as fs from 'fs';
 import * as Yaml from 'json-to-pretty-yaml';
-import {
-  GetChannelMessagesCountDto,
-  GetChannelsMessagesCountDto,
-} from './app/modules/channel/dto/request/get-channel-messages-count.dto';
+import { GetChannelMessagesCountDto } from './app/modules/channel/dto/request/get-channel-messages-count.dto';
 /**
  * Have to export this for nx to add it to the package.json
  * See: https://github.com/nrwl/nx/issues/6901
@@ -107,7 +104,7 @@ async function bootstrap() {
   app.useWebSocketAdapter(new WsAdapter(app));
 
   const document = SwaggerModule.createDocument(app, config, {
-    extraModels: [GetChannelsMessagesCountDto, GetChannelMessagesCountDto],
+    extraModels: [GetChannelMessagesCountDto, GetChannelMessagesCountDto],
   });
   SwaggerModule.setup('docs', app, document);
 

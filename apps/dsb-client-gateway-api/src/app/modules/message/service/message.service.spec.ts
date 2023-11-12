@@ -10,14 +10,12 @@ import {
   AckResponse,
   DdhubFilesService,
   DdhubMessagesService,
-  DdhubTopicsService,
 } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
 import {
   ChannelType,
   DidEntity,
   FileMetadataWrapperRepository,
   PendingAcksWrapperRepository,
-  TopicEntity,
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
 import { ReqLockService } from './req-lock.service';
 import { AssociationKeysService } from '@dsb-client-gateway/ddhub-client-gateway-association-keys';
@@ -35,13 +33,13 @@ import { TopicService } from '../../channel/service/topic.service';
 import { RecipientsNotFoundException } from '../exceptions/recipients-not-found-exception';
 import { ChannelTypeNotPubException } from '../exceptions/channel-type-not-pub.exception';
 import { TopicNotRelatedToChannelException } from '../exceptions/topic-not-related-to-channel.exception';
-import { SchemaNotValidException } from '../exceptions/schema-not-valid.exception';
 import {
   EncryptedMessageType,
   EncryptionStatus,
   SchemaType,
 } from '../message.const';
 import { MalformedJSONException } from '../exceptions/malformed-json.exception';
+import { DateTime } from 'luxon';
 
 const mockSecretsEngineService = {
   getPrivateKey: jest.fn(),
@@ -199,6 +197,9 @@ describe(`${MessageService.name}`, () => {
     );
 
     describe('should fetch messages', () => {
+      const timestampNanos = DateTime.now().toMillis() * 1e6;
+      const timestampISO = DateTime.fromMillis(timestampNanos / 1e6).toISO();
+
       beforeEach(async () => {
         mockTopicService.getTopic = jest
           .fn()
@@ -244,7 +245,7 @@ describe(`${MessageService.name}`, () => {
                 transactionId: 'transactionId',
                 senderDid: 'senderDid',
                 signature: 'signature',
-                timestampNanos: 1,
+                timestampNanos,
               },
             ] as Array<SearchMessageResponseDto>;
           });
@@ -326,7 +327,8 @@ describe(`${MessageService.name}`, () => {
           payload: 'decrypted-message',
           signature: 'signature',
           sender: 'senderDid',
-          timestampNanos: 1,
+          timestampNanos,
+          timestampISO,
           transactionId: 'transactionId',
           signatureValid: EncryptionStatus.SUCCESS,
           decryption: {

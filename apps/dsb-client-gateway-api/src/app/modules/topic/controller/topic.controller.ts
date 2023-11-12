@@ -33,9 +33,14 @@ import {
 import { DdhubTopicsService } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
 import { TopicService } from '../service/topic.service';
 import { MtlsGuard } from '../../certificate/guards/mtls.guard';
+import {
+  Roles,
+  UserGuard,
+  UserRole,
+} from '@dsb-client-gateway/ddhub-client-gateway-user-roles';
 
 @Controller('topics')
-@UseGuards(MtlsGuard)
+@UseGuards(MtlsGuard, UserGuard)
 @ApiTags('Topics')
 export class TopicsController {
   constructor(
@@ -53,6 +58,7 @@ export class TopicsController {
     status: HttpStatus.UNAUTHORIZED,
     description: 'Unauthorized',
   })
+  @Roles(UserRole.ADMIN, UserRole.MESSAGING)
   public async getTopics(
     @Query() { name, owner, tags, limit, page }: GetTopicsQueryDto
   ) {
@@ -75,6 +81,7 @@ export class TopicsController {
     status: HttpStatus.UNAUTHORIZED,
     description: 'Unauthorized',
   })
+  @Roles(UserRole.ADMIN, UserRole.MESSAGING)
   public async getTopicsHistoryById(
     @Param() { id }: GetTopicsParamsDto,
     @Query() { limit, page }: GetTopicsWithLimitParamsDto
@@ -92,6 +99,7 @@ export class TopicsController {
     status: HttpStatus.UNAUTHORIZED,
     description: 'Unauthorized',
   })
+  @Roles(UserRole.ADMIN, UserRole.MESSAGING)
   public async getTopicHistoryByIdAndVersion(
     @Param() { id, versionNumber }: TopicsByIdAndVersionParamsDto
   ): Promise<PostTopicDto> {
@@ -104,6 +112,7 @@ export class TopicsController {
     description: 'Get Topics Count by Owner',
     type: [TopicCountDto],
   })
+  @Roles(UserRole.ADMIN, UserRole.MESSAGING)
   public async getTopicsCountByOwner(
     @Query() { owner }: GetTopicsCountQueryDto
   ): Promise<TopicCountDto[]> {
@@ -116,6 +125,7 @@ export class TopicsController {
     description: 'Get Topics by Search',
     type: () => PaginatedResponse,
   })
+  @Roles(UserRole.ADMIN, UserRole.MESSAGING)
   public async getTopicsBySearch(
     @Query() { keyword, owner, limit, page }: GetTopicsSearchQueryDto
   ) {
@@ -141,6 +151,7 @@ export class TopicsController {
     description: 'Unauthorized',
   })
   @HttpCode(HttpStatus.CREATED)
+  @Roles(UserRole.ADMIN)
   public async postTopics(
     @Body() data: PostTopicBodyDto
   ): Promise<PostTopicDto> {
@@ -172,6 +183,7 @@ export class TopicsController {
     description: 'Topic not found',
   })
   @HttpCode(HttpStatus.OK)
+  @Roles(UserRole.ADMIN)
   public async updateTopicsByIdAndVersion(
     @Param() { id, versionNumber }: TopicsByIdAndVersionParamsDto,
     @Body() data: UpdateTopicHistoryBodyDto
@@ -204,6 +216,7 @@ export class TopicsController {
     description: 'Topic not found',
   })
   @HttpCode(HttpStatus.OK)
+  @Roles(UserRole.ADMIN)
   public async updateTopics(
     @Param() { id }: GetTopicsParamsDto,
     @Body() data: UpdateTopicBodyDto
@@ -236,6 +249,7 @@ export class TopicsController {
     description: 'Topic not found',
   })
   @HttpCode(HttpStatus.OK)
+  @Roles(UserRole.ADMIN)
   public async deleteTopics(
     @Param() { id }: GetTopicsParamsDto
   ): Promise<DeleteTopic> {
@@ -267,6 +281,7 @@ export class TopicsController {
     description: 'Topic not found',
   })
   @HttpCode(HttpStatus.OK)
+  @Roles(UserRole.ADMIN)
   public async deleteTopicsByVersion(
     @Param() { id, versionNumber }: DeleteTopicsVersionParamsDto
   ): Promise<DeleteTopic> {

@@ -8,9 +8,11 @@ import {
 import { DdhubClientGatewayMessageBrokerModule } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
 import { TopicService } from './service/topic.service';
 import { CertificateModule } from '../certificate/certificate.module';
+import { DdhubClientGatewayUserRolesModule } from '@dsb-client-gateway/ddhub-client-gateway-user-roles';
 
 @Module({
   imports: [
+    DdhubClientGatewayUserRolesModule,
     DsbClientGatewayStorageModule,
     TopicRepositoryModule,
     ApplicationRepositoryModule,

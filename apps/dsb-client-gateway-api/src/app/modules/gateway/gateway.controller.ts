@@ -35,6 +35,7 @@ export class GatewayController {
     const health = await this.healthService.health();
 
     return {
+      authEnabled: this.configService.get('USER_AUTH_ENABLED', false),
       version: this.versionService.getVersion(),
       did: this.iamService.getDIDAddress(),
       messageBrokerStatus:

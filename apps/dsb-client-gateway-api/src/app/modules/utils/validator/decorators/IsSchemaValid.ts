@@ -20,6 +20,7 @@ export function IsSchemaValid(
 
 function validateJSONSchema(schema: object, payload: string) {
   const ajv = new Ajv({ allErrors: true, multipleOfPrecision: 1 });
+  ajv.addVocabulary(['uiSchema', 'enumNames']);
 
   addFormats(ajv, {
     mode: 'fast',

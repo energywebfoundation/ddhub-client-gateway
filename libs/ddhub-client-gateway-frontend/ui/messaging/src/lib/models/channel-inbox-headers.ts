@@ -1,12 +1,13 @@
-import dayjs from 'dayjs';
+import { DateTime } from 'luxon';
 
 export const CHANNEL_INBOX_HEADERS = [
   {
     Header: 'DATE & TIME',
     accessor: 'timestampNanos',
     Cell: (props: any) => {
-      const timestampMillis = Math.round(props?.value / 1e6);
-      return dayjs(timestampMillis).format('MM/DD/YYYY HH:mm:ssA');
+      return DateTime.fromISO(props?.value).toLocaleString(
+        DateTime.DATETIME_MED
+      );
     },
   },
   {
@@ -33,5 +34,13 @@ export const CHANNEL_INBOX_HEADERS = [
     Header: 'TRANSACTION ID',
     accessor: 'transactionId',
     isSortable: true,
+  },
+  {
+    Header: 'READ',
+    accessor: 'isRead',
+    isSortable: true,
+    Cell: (props: any) => {
+      return props?.value ? 'Read' : 'Unread';
+    },
   },
 ];

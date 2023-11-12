@@ -49,8 +49,8 @@ export const SelectedTopic = ({
   topicsLoading = false,
   showTopicResponse = false,
   saveResponse,
-  responseTopics,
-}: SelectedTopicProps) => {
+}: // responseTopics,
+SelectedTopicProps) => {
   const { classes } = useStyles();
   const {
     expanded,
@@ -78,7 +78,7 @@ export const SelectedTopic = ({
     topicsList,
     availableTopics,
     saveResponse,
-    responseTopics,
+    // responseTopics,
   });
 
   return (
@@ -109,7 +109,7 @@ export const SelectedTopic = ({
           expanded={expanded}
           index={index}
           remove={remove}
-          responseTopics={responseTopics}
+          // responseTopics={responseTopics}
         />
       )}
     >

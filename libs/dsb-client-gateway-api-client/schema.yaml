@@ -1,2631 +1,2752 @@
-openapi: "3.0.0"
+openapi: '3.0.0'
 paths:
   /api/v2/identity:
     get:
-      operationId: "IdentityController_get"
+      operationId: 'IdentityController_get'
       parameters: []
       responses:
         200:
-          description: "Identity data"
+          description: 'Identity data'
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/IdentityResponseDto"
+                $ref: '#/components/schemas/IdentityResponseDto'
         400:
-          description: "Validation failed or some requirements were not fully satisfied"
+          description: 'Validation failed or some requirements were not fully satisfied'
         401:
-          description: "Unauthorized"
+          description: 'Unauthorized'
       tags:
-        - "Identity"
+        - 'Identity'
     post:
-      operationId: "IdentityController_post"
+      operationId: 'IdentityController_post'
       parameters: []
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CreateIdentityDto"
+              $ref: '#/components/schemas/CreateIdentityDto'
       responses:
         200:
-          description: "Identity successfully created"
+          description: 'Identity successfully created'
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/IdentityResponseDto"
+                $ref: '#/components/schemas/IdentityResponseDto'
         400:
-          description: "Validation failed or some requirements were not fully satisfied"
+          description: 'Validation failed or some requirements were not fully satisfied'
         401:
-          description: "Unauthorized"
+          description: 'Unauthorized'
       tags:
-        - "Identity"
+        - 'Identity'
   /api/v2/identity/claims:
     get:
-      operationId: "IdentityController_getClaims"
+      operationId: 'IdentityController_getClaims'
       parameters: []
       responses:
         200:
-          description: "Claims data"
+          description: 'Claims data'
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ClaimsResponseDto"
+                $ref: '#/components/schemas/ClaimsResponseDto'
         400:
-          description: "Validation failed or some requirements were not fully satisfied"
+          description: 'Validation failed or some requirements were not fully satisfied'
         401:
-          description: "Unauthorized"
+          description: 'Unauthorized'
       tags:
-        - "Identity"
+        - 'Identity'
   /api/v2/enrol:
     get:
-      operationId: "EnrolmentController_get"
+      operationId: 'EnrolmentController_get'
       parameters: []
       responses:
         200:
-          description: ""
+          description: ''
       tags:
-        - "Enrolment"
+        - 'Enrolment'
     post:
-      operationId: "EnrolmentController_init"
+      operationId: 'EnrolmentController_init'
       parameters: []
       responses:
         201:
-          description: ""
+          description: ''
       tags:
-        - "Enrolment"
+        - 'Enrolment'
   /api/v2/certificate:
     post:
-      operationId: "CertificateController_save"
+      operationId: 'CertificateController_save'
       parameters: []
       requestBody:
         required: true
         content:
           multipart/form-data:
             schema:
-              $ref: "#/components/schemas/UploadCertificateBodyDto"
+              $ref: '#/components/schemas/UploadCertificateBodyDto'
       responses:
         200:
-          description: "Certificates Uploaded Successfully"
+          description: 'Certificates Uploaded Successfully'
         400:
-          description: "Validation failed or some requirements were not fully satisfied"
+          description: 'Validation failed or some requirements were not fully satisfied'
         401:
-          description: "Unauthorized"
+          description: 'Unauthorized'
       tags:
-        - "Gateway Configuration"
+        - 'Gateway Configuration'
   /api/v2/channels/messages/count:
     get:
-      operationId: "ChannelController_getCountOfChannels"
+      operationId: 'ChannelController_getCountOfChannels'
       parameters:
-        - name: "type"
+        - name: 'type'
           required: false
-          in: "query"
-          description: "Channel type"
-          example: "sub"
+          in: 'query'
+          description: 'Channel type'
+          example: 'sub'
           schema:
             enum:
-              - "sub"
-              - "pub"
-            type: "string"
-        - name: "useAnonymousExtChannel"
+              - 'sub'
+              - 'pub'
+            type: 'string'
+        - name: 'useAnonymousExtChannel'
           required: false
-          in: "query"
+          in: 'query'
           example: true
           schema:
-            type: "boolean"
-        - name: "payloadEncryption"
+            type: 'boolean'
+        - name: 'payloadEncryption'
           required: false
-          in: "query"
+          in: 'query'
           example: true
           schema:
-            type: "boolean"
+            type: 'boolean'
       responses:
         200:
-          description: "Channel messages count returned successfully"
+          description: 'Channel messages count returned successfully'
           content:
             application/json:
               schema:
-                type: "array"
+                type: 'array'
                 items:
-                  $ref: "#/components/schemas/GetChannelsMessagesCountDto"
+                  $ref: '#/components/schemas/GetChannelMessagesCountDto'
         400:
-          description: "Invalid request"
+          description: 'Invalid request'
       tags:
-        - "Channels"
+        - 'Channels'
   /api/v2/channels/messages/count/{fqcn}:
     get:
-      operationId: "ChannelController_getCount"
+      operationId: 'ChannelController_getCount'
       parameters:
-        - name: "fqcn"
+        - name: 'fqcn'
           required: true
-          in: "path"
+          in: 'path'
           schema:
-            type: "string"
+            type: 'string'
       responses:
         200:
-          description: "Channel messages count returned successfully"
+          description: 'Channel messages count returned successfully'
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/GetChannelMessagesCountDto"
+                $ref: '#/components/schemas/GetChannelMessagesCountDto'
         400:
-          description: "Invalid request"
+          description: 'Invalid request'
       tags:
-        - "Channels"
+        - 'Channels'
   /api/v2/channels:
     post:
-      operationId: "ChannelController_create"
+      operationId: 'ChannelController_create'
       parameters: []
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CreateChannelDto"
+              $ref: '#/components/schemas/CreateChannelDto'
       responses:
         201:
-          description: "Channel successfully created"
+          description: 'Channel successfully created'
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ChannelEntity"
+                $ref: '#/components/schemas/ChannelEntity'
         400:
-          description: "Validation failed or some requirements were not fully satisfied"
+          description: 'Validation failed or some requirements were not fully satisfied'
         401:
-          description: "Unauthorized"
+          description: 'Unauthorized'
       tags:
-        - "Channels"
+        - 'Channels'
     get:
-      operationId: "ChannelController_getByType"
+      operationId: 'ChannelController_getByType'
       parameters:
-        - name: "type"
+        - name: 'type'
           required: false
-          in: "query"
-          description: "Channel type"
-          example: "sub"
+          in: 'query'
+          description: 'Channel type'
+          example: 'sub'
           schema:
             enum:
-              - "sub"
-              - "pub"
-              - "download"
-              - "upload"
-            type: "string"
-        - name: "useAnonymousExtChannel"
+              - 'sub'
+              - 'pub'
+              - 'download'
+              - 'upload'
+            type: 'string'
+        - name: 'useAnonymousExtChannel'
           required: false
-          in: "query"
+          in: 'query'
           example: true
           schema:
-            type: "boolean"
-        - name: "payloadEncryption"
+            type: 'boolean'
+        - name: 'payloadEncryption'
           required: false
-          in: "query"
+          in: 'query'
           example: true
           schema:
-            type: "boolean"
-        - name: "messageForms"
+            type: 'boolean'
+        - name: 'messageForms'
           required: false
-          in: "query"
+          in: 'query'
           example: true
           schema:
-            type: "boolean"
+            type: 'boolean'
       responses:
         200:
-          description: "Gives channels based on type from query"
+          description: 'Gives channels based on type from query'
           content:
             application/json:
               schema:
-                type: "array"
+                type: 'array'
                 items:
-                  $ref: "#/components/schemas/GetChannelResponseDto"
+                  $ref: '#/components/schemas/GetChannelResponseDto'
         401:
-          description: "Unauthorized"
+          description: 'Unauthorized'
       tags:
-        - "Channels"
+        - 'Channels'
   /api/v2/channels/{fqcn}:
     get:
-      operationId: "ChannelController_get"
+      operationId: 'ChannelController_get'
       parameters:
-        - name: "fqcn"
+        - name: 'fqcn'
           required: true
-          in: "path"
-          description: "Channel type"
-          example: "channel.name"
+          in: 'path'
+          description: 'Channel type'
+          example: 'channel.name'
           schema:
-            type: "string"
+            type: 'string'
       responses:
         200:
-          description: "Channel details"
+          description: 'Channel details'
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/GetChannelResponseDto"
+                $ref: '#/components/schemas/GetChannelResponseDto'
         401:
-          description: "Unauthorized"
+          description: 'Unauthorized'
         404:
-          description: "Channel not found"
+          description: 'Channel not found'
       tags:
-        - "Channels"
+        - 'Channels'
     delete:
-      operationId: "ChannelController_delete"
+      operationId: 'ChannelController_delete'
       parameters:
-        - name: "fqcn"
+        - name: 'fqcn'
           required: true
-          in: "path"
-          description: "Channel type"
-          example: "channel.name"
+          in: 'path'
+          description: 'Channel type'
+          example: 'channel.name'
           schema:
-            type: "string"
+            type: 'string'
       responses:
         204:
-          description: "Channel deleted"
+          description: 'Channel deleted'
         401:
-          description: "Unauthorized"
+          description: 'Unauthorized'
         404:
-          description: "Channel not found"
+          description: 'Channel not found'
       tags:
-        - "Channels"
+        - 'Channels'
     put:
-      operationId: "ChannelController_update"
+      operationId: 'ChannelController_update'
       parameters:
-        - name: "fqcn"
+        - name: 'fqcn'
           required: true
-          in: "path"
-          description: "Channel type"
-          example: "channel.name"
+          in: 'path'
+          description: 'Channel type'
+          example: 'channel.name'
           schema:
-            type: "string"
+            type: 'string'
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UpdateChannelDto"
+              $ref: '#/components/schemas/UpdateChannelDto'
       responses:
         200:
-          description: "Channel successfully updated"
+          description: 'Channel successfully updated'
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ChannelEntity"
+                $ref: '#/components/schemas/ChannelEntity'
         400:
-          description: "Validation failed or some requirements were not fully satisfied"
+          description: 'Validation failed or some requirements were not fully satisfied'
         401:
-          description: "Unauthorized"
+          description: 'Unauthorized'
       tags:
-        - "Channels"
+        - 'Channels'
   /api/v2/channels/{fqcn}/qualifiedDids:
     get:
-      operationId: "ChannelController_getQualifiedDids"
+      operationId: 'ChannelController_getQualifiedDids'
       parameters:
-        - name: "fqcn"
+        - name: 'fqcn'
           required: true
-          in: "path"
-          description: "Channel type"
-          example: "channel.name"
+          in: 'path'
+          description: 'Channel type'
+          example: 'channel.name'
           schema:
-            type: "string"
+            type: 'string'
       responses:
         200:
-          description: "Channel qualified dids"
+          description: 'Channel qualified dids'
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/GetChannelQualifiedDidsDto"
+                $ref: '#/components/schemas/GetChannelQualifiedDidsDto'
         401:
-          description: "Unauthorized"
+          description: 'Unauthorized'
         404:
-          description: "Channel not found"
+          description: 'Channel not found'
       tags:
-        - "Channels"
+        - 'Channels'
   /api/v2/channels/refresh:
     post:
-      operationId: "ChannelController_refreshDID"
+      operationId: 'ChannelController_refreshDID'
       parameters: []
       responses:
         200:
-          description: "Refreshed cache"
+          description: 'Refreshed cache'
       tags:
-        - "Channels"
+        - 'Channels'
   /api/v2/messages/sent:
     get:
-      operationId: "MessageControlller_getSentMessages"
+      operationId: 'MessageController_getSentMessages'
       parameters:
-        - name: "limit"
+        - name: 'limit'
           required: false
-          in: "query"
-          description: "Limit per request"
+          in: 'query'
+          description: 'Limit per request'
           example: 1
           schema:
             default: 0
-            type: "number"
-        - name: "fqcn"
+            type: 'number'
+        - name: 'fqcn'
           required: true
-          in: "query"
-          example: "channel.name"
-          description: "channel name"
+          in: 'query'
+          example: 'channel.name'
+          description: 'channel name'
           schema:
-            type: "string"
-        - name: "initiatingMessageId"
+            type: 'string'
+        - name: 'initiatingMessageId'
           required: false
-          in: "query"
-          example: "507f191e810c19729de860ea"
-          description: "Initiating message id"
+          in: 'query'
+          example: '507f191e810c19729de860ea'
+          description: 'Initiating message id'
           schema:
-            type: "string"
-        - name: "initiatingTransactionId"
+            type: 'string'
+        - name: 'initiatingTransactionId'
           required: false
-          in: "query"
-          example: "45d5a89f-7c2c-48b0-ae9a-54f4128e818f"
-          description: "Initiating transaction id"
+          in: 'query'
+          example: '45d5a89f-7c2c-48b0-ae9a-54f4128e818f'
+          description: 'Initiating transaction id'
           schema:
-            type: "string"
-        - name: "transactionId"
+            type: 'string'
+        - name: 'transactionId'
           required: false
-          in: "query"
-          example: "45d5a89f-7c2c-48b0-ae9a-54f4128e818f"
-          description: "Transaction id"
+          in: 'query'
+          example: '45d5a89f-7c2c-48b0-ae9a-54f4128e818f'
+          description: 'Transaction id'
           schema:
-            type: "string"
-        - name: "messageId"
+            type: 'string'
+        - name: 'messageId'
           required: false
-          in: "query"
-          example: "507f191e810c19729de860ea"
-          description: "Message id"
+          in: 'query'
+          example: '507f191e810c19729de860ea'
+          description: 'Message id'
           schema:
-            type: "string"
-        - name: "topicName"
+            type: 'string'
+        - name: 'topicName'
           required: false
-          in: "query"
-          example: "getOperatingEnvelope"
-          description: "topic name"
+          in: 'query'
+          example: 'getOperatingEnvelope'
+          description: 'topic name'
           schema:
-            type: "string"
-        - name: "topicOwner"
+            type: 'string'
+        - name: 'topicOwner'
           required: false
-          in: "query"
-          example: "torta.apps.eggplant.vege.iam.ewc"
-          description: "application namespace"
+          in: 'query'
+          example: 'torta.apps.eggplant.vege.iam.ewc'
+          description: 'application namespace'
           schema:
-            type: "string"
-        - name: "page"
+            type: 'string'
+        - name: 'page'
           required: false
-          in: "query"
-          description: "Current page"
+          in: 'query'
+          description: 'Current page'
           example: 1
           schema:
             default: 0
-            type: "number"
+            type: 'number'
       responses:
         200:
-          description: "Message received successfully"
+          description: 'Message received successfully'
           content:
             application/json:
               schema:
-                type: "array"
+                type: 'array'
                 items:
-                  $ref: "#/components/schemas/GetSentMessageResponseDto"
+                  $ref: '#/components/schemas/GetSentMessageResponseDto'
         400:
-          description: "Validation failed or some requirements were not fully satisfied"
+          description: 'Validation failed or some requirements were not fully satisfied'
         401:
-          description: "Unauthorized"
+          description: 'Unauthorized'
         404:
-          description: "Messages Not found"
+          description: 'Messages Not found'
       tags:
-        - "Messaging"
-  /api/v2/messages:
-    get:
-      operationId: "MessageControlller_getMessage"
-      parameters:
-        - name: "fqcn"
-          required: true
-          in: "query"
-          example: "channel.name"
-          description: "channel name"
-          schema:
-            type: "string"
-        - name: "from"
-          required: false
-          in: "query"
-          description: "date from which messages to be fetched"
-          example: "2022-03-31T09:48:44.357Z"
-          schema:
-            type: "string"
-        - name: "amount"
-          required: false
-          in: "query"
-          example: 1
-          description: "Latest amount of messages to be fetched"
-          schema:
-            type: "number"
-        - name: "topicName"
-          required: false
-          in: "query"
-          example: "getOperatingEnvelope"
-          description: "topic name"
-          schema:
-            type: "string"
-        - name: "topicOwner"
-          required: false
-          in: "query"
-          example: "torta.apps.eggplant.vege.iam.ewc"
-          description: "application namespace"
-          schema:
-            type: "string"
-        - name: "clientId"
-          required: false
-          in: "query"
-          example: "test2"
-          description: "cursor for pointing to messages"
-          schema:
-            type: "string"
-        - name: "initiatingMessageId"
-          required: false
-          in: "query"
-          example: "507f191e810c19729de860ea"
-          description: "Initiating message id"
-          schema:
-            type: "string"
-        - name: "initiatingTransactionId"
-          required: false
-          in: "query"
-          example: "45d5a89f-7c2c-48b0-ae9a-54f4128e818f"
-          description: "Initiating transaction id"
-          schema:
-            type: "string"
-        - name: "transactionId"
-          required: false
-          in: "query"
-          example: "45d5a89f-7c2c-48b0-ae9a-54f4128e818f"
-          description: "Initiating transaction id"
-          schema:
-            type: "string"
-        - name: "messageId"
-          required: false
-          in: "query"
-          example: "507f191e810c19729de860ea"
-          description: "Message id"
-          schema:
-            type: "string"
-      responses:
-        200:
-          description: "Message received successfully"
-          content:
-            application/json:
-              schema:
-                type: "array"
-                items:
-                  $ref: "#/components/schemas/GetMessagesResponseDto"
-        400:
-          description: "Validation failed or some requirements were not fully satisfied"
-        401:
-          description: "Unauthorized"
-        404:
-          description: "Messages Not found"
-      tags:
-        - "Messaging"
+        - 'Messaging'
+  /api/v2/messages/ack:
     post:
-      operationId: "MessageControlller_create"
+      operationId: 'MessageControlller_ackMessages'
       parameters: []
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/SendMessageDto"
+              $ref: '#/components/schemas/AckMessagesRequestDto'
+      responses:
+        204:
+          description: 'Messages acked successfully'
+      tags:
+        - 'Messaging'
+  /api/v2/messages:
+    get:
+      operationId: 'MessageController_getMessage'
+      parameters:
+        - name: 'fqcn'
+          required: true
+          in: 'query'
+          example: 'channel.name'
+          description: 'channel name'
+          schema:
+            type: 'string'
+        - name: 'from'
+          required: false
+          in: 'query'
+          description: 'date from which messages to be fetched'
+          example: '2022-03-31T09:48:44.357Z'
+          schema:
+            type: 'string'
+        - name: 'amount'
+          required: false
+          in: 'query'
+          example: 1
+          description: 'Latest amount of messages to be fetched'
+          schema:
+            type: 'number'
+        - name: 'topicName'
+          required: false
+          in: 'query'
+          example: 'getOperatingEnvelope'
+          description: 'topic name'
+          schema:
+            type: 'string'
+        - name: 'topicOwner'
+          required: false
+          in: 'query'
+          example: 'torta.apps.eggplant.vege.iam.ewc'
+          description: 'application namespace'
+          schema:
+            type: 'string'
+        - name: 'clientId'
+          required: false
+          in: 'query'
+          example: 'test2'
+          description: 'cursor for pointing to messages'
+          schema:
+            type: 'string'
+        - name: 'initiatingMessageId'
+          required: false
+          in: 'query'
+          example: '507f191e810c19729de860ea'
+          description: 'Initiating message id'
+          schema:
+            type: 'string'
+        - name: 'initiatingTransactionId'
+          required: false
+          in: 'query'
+          example: '45d5a89f-7c2c-48b0-ae9a-54f4128e818f'
+          description: 'Initiating transaction id'
+          schema:
+            type: 'string'
+        - name: 'transactionId'
+          required: false
+          in: 'query'
+          example: '45d5a89f-7c2c-48b0-ae9a-54f4128e818f'
+          description: 'Initiating transaction id'
+          schema:
+            type: 'string'
+        - name: 'messageId'
+          required: false
+          in: 'query'
+          example: '507f191e810c19729de860ea'
+          description: 'Message id'
+          schema:
+            type: 'string'
       responses:
         200:
-          description: "Message sent successfully"
+          description: 'Message received successfully'
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SendMessagelResponseDto"
+                type: 'array'
+                items:
+                  $ref: '#/components/schemas/GetMessagesResponseDto'
         400:
-          description: "Validation failed or some requirements were not fully satisfied"
+          description: 'Validation failed or some requirements were not fully satisfied'
         401:
-          description: "Unauthorized"
+          description: 'Unauthorized'
         404:
-          description: "Channel not found or Topic not found"
+          description: 'Messages Not found'
       tags:
-        - "Messaging"
-  /api/v2/messages/download:
-    get:
-      operationId: "MessageControlller_downloadMessage"
-      parameters:
-        - name: "fileId"
-          required: true
-          in: "query"
-          description: "file Id for which file will be downloaded"
-          example: "bb2686d2-97be-436b-8869"
-          schema:
-            type: "string"
+        - 'Messaging'
+    post:
+      operationId: 'MessageController_create'
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendMessageDto'
       responses:
         200:
-          description: "Message download successfully"
+          description: 'Message sent successfully'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SendMessageResponseDto'
         400:
-          description: "Validation failed or some requirements were not fully satisfied"
+          description: 'Validation failed or some requirements were not fully satisfied'
         401:
-          description: "Unauthorized"
+          description: 'Unauthorized'
+        404:
+          description: 'Channel not found or Topic not found'
       tags:
-        - "Messaging"
+        - 'Messaging'
+  /api/v2/messages/download:
+    get:
+      operationId: 'MessageController_downloadMessage'
+      parameters:
+        - name: 'fileId'
+          required: true
+          in: 'query'
+          description: 'file Id for which file will be downloaded'
+          example: 'bb2686d2-97be-436b-8869'
+          schema:
+            type: 'string'
+      responses:
+        200:
+          description: 'Message download successfully'
+        400:
+          description: 'Validation failed or some requirements were not fully satisfied'
+        401:
+          description: 'Unauthorized'
+      tags:
+        - 'Messaging'
   /api/v2/messages/upload:
     post:
-      operationId: "MessageControlller_uploadFile"
+      operationId: 'MessageController_uploadFile'
       parameters: []
       requestBody:
         required: true
         content:
           multipart/form-data:
             schema:
-              $ref: "#/components/schemas/uploadMessageBodyDto"
+              $ref: '#/components/schemas/uploadMessageBodyDto'
       responses:
         201:
-          description: "File Upload Successfully"
+          description: 'File Upload Successfully'
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SendMessagelResponseDto"
+                $ref: '#/components/schemas/SendMessageResponseDto'
         400:
-          description: "Validation failed or some requirements were not fully satisfied"
+          description: 'Validation failed or some requirements were not fully satisfied'
         401:
-          description: "Unauthorized"
+          description: 'Unauthorized'
         404:
-          description: "Channel not found or Topic not found"
+          description: 'Channel not found or Topic not found'
       tags:
-        - "Messaging"
+        - 'Messaging'
   /api/v2/keys/association:
     post:
-      operationId: "KeysController_forceGeneration"
+      operationId: 'KeysController_forceGeneration'
       parameters: []
       responses:
         204:
-          description: "Successfully created association keys"
+          description: 'Successfully created association keys'
       tags:
-        - "Keys configuration"
+        - 'Keys configuration'
     get:
-      operationId: "KeysController_getAssociationKeys"
+      operationId: 'KeysController_getAssociationKeys'
       parameters: []
       responses:
         200:
-          description: "List of association keys"
+          description: 'List of association keys'
           content:
             application/json:
               schema:
-                type: "array"
+                type: 'array'
                 items:
-                  $ref: "#/components/schemas/GetAssociationKeysDto"
+                  $ref: '#/components/schemas/GetAssociationKeysDto'
       tags:
-        - "Keys configuration"
+        - 'Keys configuration'
   /api/v2/keys/association/init:
     post:
-      operationId: "KeysController_initAssociationKeys"
+      operationId: 'KeysController_initAssociationKeys'
       parameters: []
       responses:
         204:
-          description: "Force initialization of external channel for current association keys"
+          description: 'Force initialization of external channel for current association keys'
       tags:
-        - "Keys configuration"
+        - 'Keys configuration'
   /api/v2/keys/association/send:
     post:
-      operationId: "KeysController_sendAssociationKeys"
+      operationId: 'KeysController_sendAssociationKeys'
       parameters: []
       responses:
         204:
-          description: "Force sharing association keys"
+          description: 'Force sharing association keys'
       tags:
-        - "Keys configuration"
+        - 'Keys configuration'
   /api/v2/keys/association/current:
     get:
-      operationId: "KeysController_getCurrentAssociationKey"
+      operationId: 'KeysController_getCurrentAssociationKey'
       parameters: []
       responses:
         200:
-          description: "List of current and future association key"
+          description: 'List of current and future association key'
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/GetCurrentKeyDto"
+                $ref: '#/components/schemas/GetCurrentKeyDto'
       tags:
-        - "Keys configuration"
+        - 'Keys configuration'
   /api/v2/applications:
     get:
-      operationId: "ApplicationsController_getApplications"
-      summary: ""
-      description: "Gets Applications"
+      operationId: 'ApplicationsController_getApplications'
+      summary: ''
+      description: 'Gets Applications'
       parameters:
-        - name: "roleName"
+        - name: 'roleName'
           required: true
-          in: "query"
-          example: "topiccreator"
+          in: 'query'
+          example: 'topiccreator'
           schema:
-            type: "string"
+            type: 'string'
       responses:
         200:
-          description: "List of applications"
+          description: 'List of applications'
           content:
             application/json:
               schema:
-                type: "array"
+                type: 'array'
                 items:
-                  $ref: "#/components/schemas/ApplicationDTO"
+                  $ref: '#/components/schemas/ApplicationDTO'
       tags:
-        - "Applications"
+        - 'Applications'
   /api/v2/applications/{namespace}:
     get:
-      operationId: "ApplicationsController_getApplicationsByNamespace"
-      summary: ""
-      description: "Gets applications for specified namespace"
+      operationId: 'ApplicationsController_getApplicationsByNamespace'
+      summary: ''
+      description: 'Gets applications for specified namespace'
       parameters:
-        - name: "namespace"
+        - name: 'namespace'
           required: true
-          in: "path"
-          example: "ddhub.apps.energyweb.iam.ewc"
+          in: 'path'
+          example: 'ddhub.apps.energyweb.iam.ewc'
           schema:
-            type: "string"
+            type: 'string'
       responses:
         200:
-          description: "List of applications filtered by namespace"
+          description: 'List of applications filtered by namespace'
           content:
             application/json:
               schema:
-                type: "array"
+                type: 'array'
                 items:
-                  $ref: "#/components/schemas/ApplicationDTO"
+                  $ref: '#/components/schemas/ApplicationDTO'
       tags:
-        - "Applications"
+        - 'Applications'
   /api/v2/topics:
     get:
-      operationId: "TopicsController_getTopics"
+      operationId: 'TopicsController_getTopics'
       parameters:
-        - name: "limit"
+        - name: 'limit'
           required: false
-          in: "query"
+          in: 'query'
           example: 1
           schema:
             default: 0
-            type: "number"
-        - name: "page"
+            type: 'number'
+        - name: 'page'
           required: false
-          in: "query"
+          in: 'query'
           example: 1
           schema:
             default: 0
-            type: "number"
-        - name: "name"
+            type: 'number'
+        - name: 'name'
           required: false
-          in: "query"
-          example: "topic name"
+          in: 'query'
+          example: 'topic name'
           schema:
-            default: ""
-            type: "string"
-        - name: "owner"
+            default: ''
+            type: 'string'
+        - name: 'owner'
           required: true
-          in: "query"
-          example: "ddhub.apps.energyweb.iam.ewc"
+          in: 'query'
+          example: 'ddhub.apps.energyweb.iam.ewc'
           schema:
-            type: "string"
-        - name: "tags"
+            type: 'string'
+        - name: 'tags'
           required: false
-          in: "query"
+          in: 'query'
           example:
-            - "aggregator"
+            - 'aggregator'
           schema:
             default: []
-            type: "array"
+            type: 'array'
             items:
-              type: "string"
+              type: 'string'
       responses:
         200:
-          description: "Get Topics List"
+          description: 'Get Topics List'
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PaginatedResponse"
+                $ref: '#/components/schemas/PaginatedResponse'
         401:
-          description: "Unauthorized"
+          description: 'Unauthorized'
       tags:
-        - "Topics"
+        - 'Topics'
     post:
-      operationId: "TopicsController_postTopics"
+      operationId: 'TopicsController_postTopics'
       parameters: []
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/PostTopicBodyDto"
+              $ref: '#/components/schemas/PostTopicBodyDto'
       responses:
         201:
-          description: "Topic successfully created"
+          description: 'Topic successfully created'
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PostTopicDto"
+                $ref: '#/components/schemas/PostTopicDto'
         400:
-          description: "Validation failed or some requirements were not fully satisfied"
+          description: 'Validation failed or some requirements were not fully satisfied'
         401:
-          description: "Unauthorized"
+          description: 'Unauthorized'
       tags:
-        - "Topics"
+        - 'Topics'
   /api/v2/topics/{id}/versions:
     get:
-      operationId: "TopicsController_getTopicsHistoryById"
+      operationId: 'TopicsController_getTopicsHistoryById'
       parameters:
-        - name: "id"
+        - name: 'id'
           required: true
-          in: "path"
-          description: "id of the topic"
-          example: "62545547fe37f174d7715ff3"
+          in: 'path'
+          description: 'id of the topic'
+          example: '62545547fe37f174d7715ff3'
           schema:
-            type: "string"
-        - name: "limit"
+            type: 'string'
+        - name: 'limit'
           required: false
-          in: "query"
+          in: 'query'
           example: 1
           schema:
             default: 0
-            type: "number"
-        - name: "page"
+            type: 'number'
+        - name: 'page'
           required: false
-          in: "query"
+          in: 'query'
           example: 1
           schema:
             default: 0
-            type: "number"
+            type: 'number'
       responses:
         200:
-          description: "Get Topics List with same Id and different versions"
+          description: 'Get Topics List with same Id and different versions'
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PaginatedTopicResponse"
+                $ref: '#/components/schemas/PaginatedTopicResponse'
         401:
-          description: "Unauthorized"
+          description: 'Unauthorized'
       tags:
-        - "Topics"
+        - 'Topics'
   /api/v2/topics/{id}/versions/{versionNumber}:
     get:
-      operationId: "TopicsController_getTopicHistoryByIdAndVersion"
+      operationId: 'TopicsController_getTopicHistoryByIdAndVersion'
       parameters:
-        - name: "id"
+        - name: 'id'
           required: true
-          in: "path"
-          description: "id of the topic"
-          example: "62545547fe37f174d7715ff3"
+          in: 'path'
+          description: 'id of the topic'
+          example: '62545547fe37f174d7715ff3'
           schema:
-            type: "string"
-        - name: "versionNumber"
+            type: 'string'
+        - name: 'versionNumber'
           required: true
-          in: "path"
-          description: "version of the topic"
-          example: "1.0.9"
+          in: 'path'
+          description: 'version of the topic'
+          example: '1.0.9'
           schema:
-            type: "string"
+            type: 'string'
       responses:
         200:
-          description: "Get Topics History by Id and version"
+          description: 'Get Topics History by Id and version'
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PostTopicDto"
+                $ref: '#/components/schemas/PostTopicDto'
         401:
-          description: "Unauthorized"
+          description: 'Unauthorized'
       tags:
-        - "Topics"
+        - 'Topics'
     put:
-      operationId: "TopicsController_updateTopicsByIdAndVersion"
+      operationId: 'TopicsController_updateTopicsByIdAndVersion'
       parameters:
-        - name: "id"
+        - name: 'id'
           required: true
-          in: "path"
-          description: "id of the topic"
-          example: "62545547fe37f174d7715ff3"
+          in: 'path'
+          description: 'id of the topic'
+          example: '62545547fe37f174d7715ff3'
           schema:
-            type: "string"
-        - name: "versionNumber"
+            type: 'string'
+        - name: 'versionNumber'
           required: true
-          in: "path"
-          description: "version of the topic"
-          example: "1.0.9"
+          in: 'path'
+          description: 'version of the topic'
+          example: '1.0.9'
           schema:
-            type: "string"
+            type: 'string'
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UpdateTopicHistoryBodyDto"
+              $ref: '#/components/schemas/UpdateTopicHistoryBodyDto'
       responses:
         200:
-          description: "Topic updated successfully"
+          description: 'Topic updated successfully'
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PostTopicDto"
+                $ref: '#/components/schemas/PostTopicDto'
         400:
-          description: "Validation failed or some requirements were not fully satisfied"
+          description: 'Validation failed or some requirements were not fully satisfied'
         401:
-          description: "Unauthorized"
+          description: 'Unauthorized'
         404:
-          description: "Topic not found"
+          description: 'Topic not found'
       tags:
-        - "Topics"
+        - 'Topics'
     delete:
-      operationId: "TopicsController_deleteTopicsByVersion"
+      operationId: 'TopicsController_deleteTopicsByVersion'
       parameters:
-        - name: "id"
+        - name: 'id'
           required: true
-          in: "path"
-          description: "id of the topic"
-          example: "62545547fe37f174d7715ff3"
+          in: 'path'
+          description: 'id of the topic'
+          example: '62545547fe37f174d7715ff3'
           schema:
-            type: "string"
-        - name: "versionNumber"
+            type: 'string'
+        - name: 'versionNumber'
           required: true
-          in: "path"
-          description: "version of the topic"
-          example: "1.0.9"
+          in: 'path'
+          description: 'version of the topic'
+          example: '1.0.9'
           schema:
-            type: "string"
+            type: 'string'
       responses:
         200:
-          description: "Topic deleted successfully"
+          description: 'Topic deleted successfully'
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/DeleteTopic"
+                $ref: '#/components/schemas/DeleteTopic'
         400:
-          description: "Validation failed or some requirements were not fully satisfied"
+          description: 'Validation failed or some requirements were not fully satisfied'
         401:
-          description: "Unauthorized"
+          description: 'Unauthorized'
         404:
-          description: "Topic not found"
+          description: 'Topic not found'
       tags:
-        - "Topics"
+        - 'Topics'
   /api/v2/topics/count:
     get:
-      operationId: "TopicsController_getTopicsCountByOwner"
+      operationId: 'TopicsController_getTopicsCountByOwner'
       parameters:
-        - name: "owner"
+        - name: 'owner'
           required: true
-          in: "query"
+          in: 'query'
           example:
-            - "torta.apps.eggplant.vege.iam.ewc"
-            - "mini.apps.sliced.carrot.vege.iam.ewc"
+            - 'torta.apps.eggplant.vege.iam.ewc'
+            - 'mini.apps.sliced.carrot.vege.iam.ewc'
           schema:
-            type: "array"
+            type: 'array'
             items:
-              type: "string"
+              type: 'string'
       responses:
         200:
-          description: "Get Topics Count by Owner"
+          description: 'Get Topics Count by Owner'
           content:
             application/json:
               schema:
-                type: "array"
+                type: 'array'
                 items:
-                  $ref: "#/components/schemas/TopicCountDto"
+                  $ref: '#/components/schemas/TopicCountDto'
       tags:
-        - "Topics"
+        - 'Topics'
   /api/v2/topics/search:
     get:
-      operationId: "TopicsController_getTopicsBySearch"
+      operationId: 'TopicsController_getTopicsBySearch'
       parameters:
-        - name: "keyword"
+        - name: 'keyword'
           required: true
-          in: "query"
-          example: "Topic_JSON_V12"
+          in: 'query'
+          example: 'Topic_JSON_V12'
           schema:
-            type: "string"
-        - name: "owner"
+            type: 'string'
+        - name: 'owner'
           required: false
-          in: "query"
-          example: "ddhub.apps.energyweb.iam.ewc"
+          in: 'query'
+          example: 'ddhub.apps.energyweb.iam.ewc'
           schema:
-            type: "string"
-        - name: "limit"
+            type: 'string'
+        - name: 'limit'
           required: false
-          in: "query"
+          in: 'query'
           example: 1
           schema:
             default: 5
-            type: "number"
-        - name: "page"
+            type: 'number'
+        - name: 'page'
           required: false
-          in: "query"
+          in: 'query'
           example: 1
           schema:
             default: 1
-            type: "number"
+            type: 'number'
       responses:
         200:
-          description: "Get Topics by Search"
+          description: 'Get Topics by Search'
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PaginatedResponse"
+                $ref: '#/components/schemas/PaginatedResponse'
       tags:
-        - "Topics"
+        - 'Topics'
   /api/v2/topics/{id}:
     put:
-      operationId: "TopicsController_updateTopics"
+      operationId: 'TopicsController_updateTopics'
       parameters:
-        - name: "id"
+        - name: 'id'
           required: true
-          in: "path"
-          description: "id of the topic"
-          example: "62545547fe37f174d7715ff3"
+          in: 'path'
+          description: 'id of the topic'
+          example: '62545547fe37f174d7715ff3'
           schema:
-            type: "string"
+            type: 'string'
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UpdateTopicBodyDto"
+              $ref: '#/components/schemas/UpdateTopicBodyDto'
       responses:
         200:
-          description: "Topic updated successfully"
+          description: 'Topic updated successfully'
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PutTopicDto"
+                $ref: '#/components/schemas/PutTopicDto'
         400:
-          description: "Validation failed or some requirements were not fully satisfied"
+          description: 'Validation failed or some requirements were not fully satisfied'
         401:
-          description: "Unauthorized"
+          description: 'Unauthorized'
         404:
-          description: "Topic not found"
+          description: 'Topic not found'
       tags:
-        - "Topics"
+        - 'Topics'
     delete:
-      operationId: "TopicsController_deleteTopics"
+      operationId: 'TopicsController_deleteTopics'
       parameters:
-        - name: "id"
+        - name: 'id'
           required: true
-          in: "path"
-          description: "id of the topic"
-          example: "62545547fe37f174d7715ff3"
+          in: 'path'
+          description: 'id of the topic'
+          example: '62545547fe37f174d7715ff3'
           schema:
-            type: "string"
+            type: 'string'
       responses:
         200:
-          description: "Topic deleted successfully"
+          description: 'Topic deleted successfully'
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/DeleteTopic"
+                $ref: '#/components/schemas/DeleteTopic'
         400:
-          description: "Validation failed or some requirements were not fully satisfied"
+          description: 'Validation failed or some requirements were not fully satisfied'
         401:
-          description: "Unauthorized"
+          description: 'Unauthorized'
         404:
-          description: "Topic not found"
+          description: 'Topic not found'
       tags:
-        - "Topics"
+        - 'Topics'
   /api/v2/cron:
     get:
-      operationId: "CronController_getJobsResults"
+      operationId: 'CronController_getJobsResults'
       parameters: []
       responses:
         200:
-          description: "List of CRON jobs results"
+          description: 'List of CRON jobs results'
           content:
             application/json:
               schema:
-                type: "array"
+                type: 'array'
                 items:
-                  $ref: "#/components/schemas/CronResponseDto"
+                  $ref: '#/components/schemas/CronResponseDto'
   /api/v2/gateway:
     get:
-      operationId: "GatewayController_get"
+      operationId: 'GatewayController_get'
       parameters: []
       responses:
         200:
-          description: "Gateway data"
+          description: 'Gateway data'
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/GatewayResponseDto"
+                $ref: '#/components/schemas/GatewayResponseDto'
         401:
-          description: "Unauthorized"
+          description: 'Unauthorized'
       tags:
-        - "Gateway"
+        - 'Gateway'
   /api/v2/health:
     get:
-      operationId: "HealthController_check"
+      operationId: 'HealthController_check'
       parameters: []
       responses:
         200:
-          description: "The Health Check is successful"
+          description: 'The Health Check is successful'
           content:
             application/json:
               schema:
-                type: "object"
+                type: 'object'
                 properties:
                   status:
-                    type: "string"
-                    example: "ok"
+                    type: 'string'
+                    example: 'ok'
                   info:
-                    type: "object"
+                    type: 'object'
                     example:
                       database:
-                        status: "up"
+                        status: 'up'
                     additionalProperties:
-                      type: "object"
+                      type: 'object'
                       properties:
                         status:
-                          type: "string"
+                          type: 'string'
                       additionalProperties:
-                        type: "string"
+                        type: 'string'
                     nullable: true
                   error:
-                    type: "object"
+                    type: 'object'
                     example: {}
                     additionalProperties:
-                      type: "object"
+                      type: 'object'
                       properties:
                         status:
-                          type: "string"
+                          type: 'string'
                       additionalProperties:
-                        type: "string"
+                        type: 'string'
                     nullable: true
                   details:
-                    type: "object"
+                    type: 'object'
                     example:
                       database:
-                        status: "up"
+                        status: 'up'
                     additionalProperties:
-                      type: "object"
+                      type: 'object'
                       properties:
                         status:
-                          type: "string"
+                          type: 'string'
                       additionalProperties:
-                        type: "string"
+                        type: 'string'
         503:
-          description: "The Health Check is not successful"
+          description: 'The Health Check is not successful'
           content:
             application/json:
               schema:
-                type: "object"
+                type: 'object'
                 properties:
                   status:
-                    type: "string"
-                    example: "error"
+                    type: 'string'
+                    example: 'error'
                   info:
-                    type: "object"
+                    type: 'object'
                     example:
                       database:
-                        status: "up"
+                        status: 'up'
                     additionalProperties:
-                      type: "object"
+                      type: 'object'
                       properties:
                         status:
-                          type: "string"
+                          type: 'string'
                       additionalProperties:
-                        type: "string"
+                        type: 'string'
                     nullable: true
                   error:
-                    type: "object"
+                    type: 'object'
                     example:
                       redis:
-                        status: "down"
-                        message: "Could not connect"
+                        status: 'down'
+                        message: 'Could not connect'
                     additionalProperties:
-                      type: "object"
+                      type: 'object'
                       properties:
                         status:
-                          type: "string"
+                          type: 'string'
                       additionalProperties:
-                        type: "string"
+                        type: 'string'
                     nullable: true
                   details:
-                    type: "object"
+                    type: 'object'
                     example:
                       database:
-                        status: "up"
+                        status: 'up'
                       redis:
-                        status: "down"
-                        message: "Could not connect"
+                        status: 'down'
+                        message: 'Could not connect'
                     additionalProperties:
-                      type: "object"
+                      type: 'object'
                       properties:
                         status:
-                          type: "string"
+                          type: 'string'
                       additionalProperties:
-                        type: "string"
+                        type: 'string'
       tags:
-        - "Health"
+        - 'Health'
   /api/v2/clients:
     get:
-      operationId: "ClientController_getAll"
+      operationId: 'ClientController_getAll'
       parameters: []
       responses:
         200:
-          description: "List of clients"
+          description: 'List of clients'
           content:
             application/json:
               schema:
-                type: "array"
+                type: 'array'
                 items:
-                  $ref: "#/components/schemas/GetAllClientsResponseDto"
+                  $ref: '#/components/schemas/GetAllClientsResponseDto'
       tags:
-        - "Clients"
+        - 'Clients'
     delete:
-      operationId: "ClientController_deleteAll"
+      operationId: 'ClientController_deleteAll'
       parameters: []
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/DeleteManyClientsBodyDto"
+              $ref: '#/components/schemas/DeleteManyClientsBodyDto'
       responses:
         204:
-          description: "Clients deleted"
+          description: 'Clients deleted'
       tags:
-        - "Clients"
+        - 'Clients'
   /api/v2/clients/{clientId}:
     delete:
-      operationId: "ClientController_delete"
+      operationId: 'ClientController_delete'
       parameters:
-        - name: "clientId"
+        - name: 'clientId'
           required: true
-          in: "path"
-          description: "Client ID"
-          example: "test.cursor"
+          in: 'path'
+          description: 'Client ID'
+          example: 'test.cursor'
           schema:
-            type: "string"
+            type: 'string'
       responses:
         204:
-          description: "Client deleted"
+          description: 'Client deleted'
       tags:
-        - "Clients"
+        - 'Clients'
   /api/v2/contacts:
     post:
-      operationId: "AddressBookController_storeContact"
+      operationId: 'AddressBookController_storeContact'
       parameters: []
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CreateContactDto"
+              $ref: '#/components/schemas/CreateContactDto'
       responses:
         204:
-          description: "Contact created successfully"
+          description: 'Contact created successfully'
       tags:
-        - "Address Book"
+        - 'Address Book'
     get:
-      operationId: "AddressBookController_getAllContacts"
+      operationId: 'AddressBookController_getAllContacts'
       parameters: []
       responses:
         200:
-          description: "List of contacts"
+          description: 'List of contacts'
           content:
             application/json:
               schema:
-                type: "array"
+                type: 'array'
                 items:
-                  $ref: "#/components/schemas/GetAllContactsResponseDto"
+                  $ref: '#/components/schemas/GetAllContactsResponseDto'
       tags:
-        - "Address Book"
+        - 'Address Book'
   /api/v2/contacts/{did}:
     delete:
-      operationId: "AddressBookController_deleteContact"
+      operationId: 'AddressBookController_deleteContact'
       parameters:
-        - name: "did"
+        - name: 'did'
           required: true
-          in: "path"
+          in: 'path'
           schema:
-            type: "string"
+            type: 'string'
       responses:
         204:
-          description: "Contact deleted successfully"
+          description: 'Contact deleted successfully'
       tags:
-        - "Address Book"
+        - 'Address Book'
     put:
-      operationId: "AddressBookController_updateContact"
+      operationId: 'AddressBookController_updateContact'
       parameters:
-        - name: "did"
+        - name: 'did'
           required: true
-          in: "path"
+          in: 'path'
           schema:
-            type: "string"
+            type: 'string'
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UpdateContactRequestDto"
+              $ref: '#/components/schemas/UpdateContactRequestDto'
       responses:
         204:
-          description: "Contact modified successfully"
+          description: 'Contact modified successfully'
       tags:
-        - "Address Book"
+        - 'Address Book'
+  /api/v2/login/config:
+    get:
+      operationId: 'LoginController_isAuthEnabled'
+      parameters: []
+      responses:
+        200:
+          description: 'Returns login config'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfigResponseDto'
+      tags:
+        - 'Login'
+  /api/v2/login/refresh-token:
+    post:
+      operationId: 'LoginController_refreshToken'
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshTokenRequestDto'
+      responses:
+        200:
+          description: 'Successfully refreshed tokens'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponseDto'
+      tags:
+        - 'Login'
+  /api/v2/login:
+    post:
+      operationId: 'LoginController_login'
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequestDto'
+      responses:
+        200:
+          description: 'Successfully logged in'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponseDto'
+      tags:
+        - 'Login'
 info:
-  title: "DDHub Client Gateway"
-  description: "DDHub Client Gateway"
-  version: "2.0"
+  title: 'DDHub Client Gateway'
+  description: 'DDHub Client Gateway'
+  version: '2.0'
   contact: {}
 tags: []
 servers: []
 components:
   schemas:
     RoleDto:
-      type: "object"
+      type: 'object'
       properties:
         namespace:
-          type: "string"
-          description: "Namespace"
-          example: "user.roles.ddhub.apps.szostak.iam.ewc"
+          type: 'string'
+          description: 'Namespace'
+          example: 'user.roles.ddhub.apps.szostak.iam.ewc'
         required:
-          type: "boolean"
-          description: "Describes if role is required for basic usage"
+          type: 'boolean'
+          description: 'Describes if role is required for basic usage'
           example: true
         status:
-          type: "string"
+          type: 'string'
           enum:
-            - "NOT_ENROLLED"
-            - "AWAITING_APPROVAL"
-            - "APPROVED"
-            - "REJECTED"
-            - "SYNCED"
-          description: "Role status"
-          example: "APPROVED"
+            - 'NOT_ENROLLED'
+            - 'AWAITING_APPROVAL'
+            - 'APPROVED'
+            - 'REJECTED'
+            - 'SYNCED'
+          description: 'Role status'
+          example: 'APPROVED'
       required:
-        - "namespace"
-        - "required"
-        - "status"
+        - 'namespace'
+        - 'required'
+        - 'status'
     EnrolmentDto:
-      type: "object"
+      type: 'object'
       properties:
         did:
-          type: "string"
-          description: "DID address"
-          example: "did:ethr:volta:0xfeFBb03EFc1054Cc4e3Fbf36362689cc1F5924a8"
+          type: 'string'
+          description: 'DID address'
+          example: 'did:ethr:volta:0xfeFBb03EFc1054Cc4e3Fbf36362689cc1F5924a8'
         roles:
-          description: "Array of roles"
-          type: "array"
+          description: 'Array of roles'
+          type: 'array'
           items:
-            $ref: "#/components/schemas/RoleDto"
+            $ref: '#/components/schemas/RoleDto'
       required:
-        - "did"
-        - "roles"
+        - 'did'
+        - 'roles'
     IdentityResponseDto:
-      type: "object"
+      type: 'object'
       properties:
         address:
-          type: "string"
-          description: "Wallet address"
-          example: "0xfeFBb03EFc1054Cc4e3Fbf36362689cc1F5924a8"
+          type: 'string'
+          description: 'Wallet address'
+          example: '0xfeFBb03EFc1054Cc4e3Fbf36362689cc1F5924a8'
         balance:
-          type: "string"
+          type: 'string'
           enum:
-            - "LOW"
-            - "OK"
-            - "NONE"
-          description: "User balance"
-          example: "OK"
+            - 'LOW'
+            - 'OK'
+            - 'NONE'
+          description: 'User balance'
+          example: 'OK'
         enrolment:
-          description: "Enrolment response"
+          description: 'Enrolment response'
           allOf:
-            - $ref: "#/components/schemas/EnrolmentDto"
+            - $ref: '#/components/schemas/EnrolmentDto'
         publicKey:
-          type: "string"
-          description: "Public key"
-          example: "0x04341da2f081cef1a9c19557551b9c9f10ce135eeec9e45a41f3750db8ef2d34e990b27ee730c6643d1862f5899dccbdf011e8a33fd8cd7de42442b0c7570540db"
+          type: 'string'
+          description: 'Public key'
+          example: '0x04341da2f081cef1a9c19557551b9c9f10ce135eeec9e45a41f3750db8ef2d34e990b27ee730c6643d1862f5899dccbdf011e8a33fd8cd7de42442b0c7570540db'
       required:
-        - "address"
-        - "balance"
-        - "enrolment"
-        - "publicKey"
+        - 'address'
+        - 'balance'
+        - 'enrolment'
+        - 'publicKey'
     ClaimResponseDto:
-      type: "object"
+      type: 'object'
       properties:
         namespace:
-          type: "string"
-          description: "Namespace"
-          example: "user.roles.ddhub.apps.szostak.iam.ewc"
+          type: 'string'
+          description: 'Namespace'
+          example: 'user.roles.ddhub.apps.szostak.iam.ewc'
         status:
-          type: "string"
+          type: 'string'
           enum:
-            - "NOT_ENROLLED"
-            - "AWAITING_APPROVAL"
-            - "APPROVED"
-            - "REJECTED"
-            - "SYNCED"
-          description: "Role status"
-          example: "APPROVED"
+            - 'NOT_ENROLLED'
+            - 'AWAITING_APPROVAL'
+            - 'APPROVED'
+            - 'REJECTED'
+            - 'SYNCED'
+          description: 'Role status'
+          example: 'APPROVED'
         syncedToDidDoc:
-          type: "boolean"
-          description: "Role enrolment status on DID document"
+          type: 'boolean'
+          description: 'Role enrolment status on DID document'
           example: true
       required:
-        - "namespace"
-        - "status"
-        - "syncedToDidDoc"
+        - 'namespace'
+        - 'status'
+        - 'syncedToDidDoc'
     ClaimsResponseDto:
-      type: "object"
+      type: 'object'
       properties:
         did:
-          type: "string"
-          description: "DID address"
-          example: "did:ethr:volta:0xfeFBb03EFc1054Cc4e3Fbf36362689cc1F5924a8"
+          type: 'string'
+          description: 'DID address'
+          example: 'did:ethr:volta:0xfeFBb03EFc1054Cc4e3Fbf36362689cc1F5924a8'
         claims:
-          description: "Array of claims"
-          type: "array"
+          description: 'Array of claims'
+          type: 'array'
           items:
-            $ref: "#/components/schemas/ClaimResponseDto"
+            $ref: '#/components/schemas/ClaimResponseDto'
       required:
-        - "did"
-        - "claims"
+        - 'did'
+        - 'claims'
     CreateIdentityDto:
-      type: "object"
+      type: 'object'
       properties:
         privateKey:
-          type: "string"
-          description: "Private key starting with 0x. If not passed then keys will be generated"
+          type: 'string'
+          description: 'Private key starting with 0x. If not passed then keys will be generated'
     UploadCertificateBodyDto:
-      type: "object"
+      type: 'object'
       properties:
         certificate:
-          type: "string"
-          format: "binary"
-          description: "certificate to be uploaded"
+          type: 'string'
+          format: 'binary'
+          description: 'certificate to be uploaded'
         privateKey:
-          type: "string"
-          format: "binary"
-          description: "privateKey to be uploaded"
+          type: 'string'
+          format: 'binary'
+          description: 'privateKey to be uploaded'
         caCertificate:
-          type: "string"
-          format: "binary"
-          description: "caCertificate to be uploaded"
+          type: 'string'
+          format: 'binary'
+          description: 'caCertificate to be uploaded'
       required:
-        - "certificate"
-        - "privateKey"
+        - 'certificate'
+        - 'privateKey'
     GetChannelMessagesCountDto:
-      type: "object"
+      type: 'object'
       properties:
         count:
-          type: "number"
-          description: "Count of total messages"
+          type: 'number'
+          description: 'Count of total messages'
           example: 5
+        fqcn:
+          type: 'string'
+          description: 'Channel name'
+          example: 'szostak.pub'
       required:
-        - "count"
+        - 'count'
+        - 'fqcn'
     TopicDto:
-      type: "object"
+      type: 'object'
       properties:
         topicName:
-          type: "string"
-          description: "Topic name"
-          example: "operatorEnvelope"
+          type: 'string'
+          description: 'Topic name'
+          example: 'operatorEnvelope'
         owner:
-          type: "string"
-          example: "aemo.edge"
-          description: "Owner name"
+          type: 'string'
+          example: 'aemo.edge'
+          description: 'Owner name'
       required:
-        - "topicName"
-        - "owner"
+        - 'topicName'
+        - 'owner'
     ResponseTopicDto:
-      type: "object"
+      type: 'object'
       properties:
         topicName:
-          type: "string"
-          description: "Topic name"
-          example: "operatorEnvelope"
+          type: 'string'
+          description: 'Topic name'
+          example: 'operatorEnvelope'
         owner:
-          type: "string"
-          example: "aemo.edge"
-          description: "Owner name"
+          type: 'string'
+          example: 'aemo.edge'
+          description: 'Owner name'
         responseTopicId:
-          type: "string"
-          example: "id"
-          description: "Response topic id"
+          type: 'string'
+          example: 'id'
+          description: 'Response topic id'
       required:
-        - "topicName"
-        - "owner"
-        - "responseTopicId"
+        - 'topicName'
+        - 'owner'
+        - 'responseTopicId'
     ChannelConditionsDto:
-      type: "object"
+      type: 'object'
       properties:
         dids:
-          description: "Array of DIDS"
+          description: 'Array of DIDS'
           example:
-            - "did:ethr:volta:0x09Df5d33f1242E1b8aA5E0E0F6BfA687E6846993"
-          type: "array"
+            - 'did:ethr:volta:0x09Df5d33f1242E1b8aA5E0E0F6BfA687E6846993'
+          type: 'array'
           items:
-            type: "string"
+            type: 'string'
         roles:
-          description: "Array of roles"
+          description: 'Array of roles'
           example:
-            - "marketoperator.roles"
-          type: "array"
+            - 'marketoperator.roles'
+          type: 'array'
           items:
-            type: "string"
+            type: 'string'
         topics:
-          description: "Array of topics"
-          type: "array"
+          description: 'Array of topics'
+          type: 'array'
           items:
-            $ref: "#/components/schemas/TopicDto"
+            $ref: '#/components/schemas/TopicDto'
         responseTopics:
-          description: "Array of response topics"
-          type: "array"
+          description: 'Array of response topics'
+          type: 'array'
           items:
-            $ref: "#/components/schemas/ResponseTopicDto"
+            $ref: '#/components/schemas/ResponseTopicDto'
       required:
-        - "dids"
-        - "roles"
-        - "topics"
-        - "responseTopics"
+        - 'dids'
+        - 'roles'
+        - 'topics'
+        - 'responseTopics'
     CreateChannelDto:
-      type: "object"
+      type: 'object'
       properties:
         fqcn:
-          type: "string"
-          description: "Channel type"
-          example: "channel.name"
+          type: 'string'
+          description: 'Channel type'
+          example: 'channel.name'
         useAnonymousExtChannel:
-          type: "boolean"
-          description: "Use anonymous external channels"
+          type: 'boolean'
+          description: 'Use anonymous external channels'
           example: true
         messageForms:
-          type: "boolean"
-          description: "Create message forms"
+          type: 'boolean'
+          description: 'Create message forms'
           example: true
           default: false
         payloadEncryption:
-          type: "boolean"
-          description: "Channel encryption"
+          type: 'boolean'
+          description: 'Channel encryption'
           example: true
         type:
-          type: "string"
-          description: "Channel type"
+          type: 'string'
+          description: 'Channel type'
           enum:
-            - "sub"
-            - "pub"
-            - "download"
-            - "upload"
-          example: "sub"
+            - 'sub'
+            - 'pub'
+            - 'download'
+            - 'upload'
+          example: 'sub'
         conditions:
-          description: "Channel conditions"
+          description: 'Channel conditions'
           allOf:
-            - $ref: "#/components/schemas/ChannelConditionsDto"
+            - $ref: '#/components/schemas/ChannelConditionsDto'
       required:
-        - "fqcn"
-        - "payloadEncryption"
-        - "type"
-        - "conditions"
+        - 'fqcn'
+        - 'payloadEncryption'
+        - 'type'
+        - 'conditions'
     ChannelEntity:
-      type: "object"
+      type: 'object'
       properties: {}
     ChannelTopic:
-      type: "object"
+      type: 'object'
       properties:
         topicName:
-          type: "string"
-          description: "Topic name"
-          example: "operatorEnvelope"
+          type: 'string'
+          description: 'Topic name'
+          example: 'operatorEnvelope'
         owner:
-          type: "string"
-          example: "aemo.edge"
-          description: "Owner name"
+          type: 'string'
+          example: 'aemo.edge'
+          description: 'Owner name'
         topicId:
-          type: "string"
-          example: "622fed6e4258501225095045"
-          description: "Topic ID from Message Broker"
+          type: 'string'
+          example: '622fed6e4258501225095045'
+          description: 'Topic ID from Message Broker'
       required:
-        - "topicName"
-        - "owner"
-        - "topicId"
+        - 'topicName'
+        - 'owner'
+        - 'topicId'
     ChannelResponseTopic:
-      type: "object"
+      type: 'object'
       properties:
         topicName:
-          type: "string"
-          description: "Topic name"
-          example: "operatorEnvelope"
+          type: 'string'
+          description: 'Topic name'
+          example: 'operatorEnvelope'
         topicOwner:
-          type: "string"
-          example: "aemo.edge"
-          description: "Owner name"
+          type: 'string'
+          example: 'aemo.edge'
+          description: 'Owner name'
         topicId:
-          type: "string"
-          example: "622fed6e4258501225095045"
-          description: "Topic ID from Message Broker"
+          type: 'string'
+          example: '622fed6e4258501225095045'
+          description: 'Topic ID from Message Broker'
         responseTopicId:
-          type: "string"
-          example: "622fed6e4258501225095045"
-          description: "Response Topic ID from Message Broker"
+          type: 'string'
+          example: '622fed6e4258501225095045'
+          description: 'Response Topic ID from Message Broker'
       required:
-        - "topicName"
-        - "topicOwner"
-        - "topicId"
-        - "responseTopicId"
+        - 'topicName'
+        - 'topicOwner'
+        - 'topicId'
+        - 'responseTopicId'
     ChannelConditions:
-      type: "object"
+      type: 'object'
       properties:
         dids:
-          description: "Array of DIDS"
+          description: 'Array of DIDS'
           example:
-            - "did:ethr:volta:0x09Df5d33f1242E1b8aA5E0E0F6BfA687E6846993"
-          type: "array"
+            - 'did:ethr:volta:0x09Df5d33f1242E1b8aA5E0E0F6BfA687E6846993'
+          type: 'array'
           items:
-            type: "string"
+            type: 'string'
         roles:
-          description: "Array of roles"
+          description: 'Array of roles'
           example:
-            - "marketoperator.roles"
-          type: "array"
+            - 'marketoperator.roles'
+          type: 'array'
           items:
-            type: "string"
+            type: 'string'
         qualifiedDids:
-          description: "List of qualified dids"
+          description: 'List of qualified dids'
           example:
-            - "did:ethr:volta:0x09Df5d33f1242E1b8aA5E0E0F6BfA687E6846993"
-            - "did:ethr:volta:0x3Ce3B60427b4Bf0Ce366d9963BeC5ef3CBD06ad5"
-          type: "array"
+            - 'did:ethr:volta:0x09Df5d33f1242E1b8aA5E0E0F6BfA687E6846993'
+            - 'did:ethr:volta:0x3Ce3B60427b4Bf0Ce366d9963BeC5ef3CBD06ad5'
+          type: 'array'
           items:
-            type: "string"
+            type: 'string'
         topics:
-          description: "Array of topics"
-          type: "array"
+          description: 'Array of topics'
+          type: 'array'
           items:
-            $ref: "#/components/schemas/ChannelTopic"
+            $ref: '#/components/schemas/ChannelTopic'
         responseTopics:
-          description: "Array of response topics"
-          type: "array"
+          description: 'Array of response topics'
+          type: 'array'
           items:
-            $ref: "#/components/schemas/ChannelResponseTopic"
+            $ref: '#/components/schemas/ChannelResponseTopic'
       required:
-        - "dids"
-        - "roles"
-        - "qualifiedDids"
-        - "topics"
-        - "responseTopics"
+        - 'dids'
+        - 'roles'
+        - 'qualifiedDids'
+        - 'topics'
+        - 'responseTopics'
     GetChannelResponseDto:
-      type: "object"
+      type: 'object'
       properties:
         fqcn:
-          type: "string"
-          description: "Channel type"
-          example: "channel.name"
+          type: 'string'
+          description: 'Channel type'
+          example: 'channel.name'
         messageForms:
-          type: "boolean"
-          description: "Message forms"
+          type: 'boolean'
+          description: 'Message forms'
           example: false
           default: false
         payloadEncryption:
-          type: "boolean"
-          description: "Channel encryption"
+          type: 'boolean'
+          description: 'Channel encryption'
           example: true
         type:
-          type: "string"
-          description: "Channel type"
+          type: 'string'
+          description: 'Channel type'
           enum:
-            - "sub"
-            - "pub"
-            - "download"
-            - "upload"
-          example: "sub"
+            - 'sub'
+            - 'pub'
+            - 'download'
+            - 'upload'
+          example: 'sub'
         useAnonymousExtChannel:
-          type: "boolean"
-          description: "Use anonymous external channel"
+          type: 'boolean'
+          description: 'Use anonymous external channel'
           default: false
           example: false
         conditions:
-          description: "Channel conditions"
+          description: 'Channel conditions'
           allOf:
-            - $ref: "#/components/schemas/ChannelConditions"
+            - $ref: '#/components/schemas/ChannelConditions'
       required:
-        - "fqcn"
-        - "messageForms"
-        - "payloadEncryption"
-        - "type"
-        - "useAnonymousExtChannel"
-        - "conditions"
+        - 'fqcn'
+        - 'messageForms'
+        - 'payloadEncryption'
+        - 'type'
+        - 'useAnonymousExtChannel'
+        - 'conditions'
     GetChannelQualifiedDidsDto:
-      type: "object"
+      type: 'object'
       properties:
         fqcn:
-          type: "string"
-          description: "Channel name / fqcn"
-          example: "channel.name"
+          type: 'string'
+          description: 'Channel name / fqcn'
+          example: 'channel.name'
         qualifiedDids:
-          description: "List of qualified dids"
+          description: 'List of qualified dids'
           example:
-            - "did:ethr:volta:0x09Df5d33f1242E1b8aA5E0E0F6BfA687E6846993"
-            - "did:ethr:volta:0x3Ce3B60427b4Bf0Ce366d9963BeC5ef3CBD06ad5"
-          type: "array"
+            - 'did:ethr:volta:0x09Df5d33f1242E1b8aA5E0E0F6BfA687E6846993'
+            - 'did:ethr:volta:0x3Ce3B60427b4Bf0Ce366d9963BeC5ef3CBD06ad5'
+          type: 'array'
           items:
-            type: "string"
+            type: 'string'
         updatedAt:
-          type: "string"
-          description: "Last update time"
-          example: "2022-03-22T14:27:00.027Z"
+          type: 'string'
+          description: 'Last update time'
+          example: '2022-03-22T14:27:00.027Z'
       required:
-        - "fqcn"
-        - "qualifiedDids"
-        - "updatedAt"
+        - 'fqcn'
+        - 'qualifiedDids'
+        - 'updatedAt'
     UpdateChannelDto:
-      type: "object"
+      type: 'object'
       properties:
         type:
-          type: "string"
-          description: "Channel type"
+          type: 'string'
+          description: 'Channel type'
           enum:
-            - "sub"
-            - "pub"
-            - "download"
-            - "upload"
-          example: "sub"
+            - 'sub'
+            - 'pub'
+            - 'download'
+            - 'upload'
+          example: 'sub'
         useAnonymousExtChannel:
-          type: "boolean"
-          description: "Use anonymous external channels"
+          type: 'boolean'
+          description: 'Use anonymous external channels'
+          example: true
+        messageForms:
+          type: 'boolean'
+          description: 'Enable message forms'
           example: true
         payloadEncryption:
-          type: "boolean"
-          description: "Channel encryption"
+          type: 'boolean'
+          description: 'Channel encryption'
           example: true
         conditions:
-          description: "Channel conditions"
+          description: 'Channel conditions'
           allOf:
-            - $ref: "#/components/schemas/ChannelConditionsDto"
+            - $ref: '#/components/schemas/ChannelConditionsDto'
       required:
-        - "type"
-        - "payloadEncryption"
-        - "conditions"
+        - 'type'
+        - 'payloadEncryption'
+        - 'conditions'
     GetSentMessageRecipientsResponseDto:
-      type: "object"
+      type: 'object'
       properties:
         did:
-          type: "string"
-          description: "Recipient did"
-          example: "did:ethr:volta:0x782aB0383Bfc807439d8EE29516937B47815d697"
+          type: 'string'
+          description: 'Recipient did'
+          example: 'did:ethr:volta:0x782aB0383Bfc807439d8EE29516937B47815d697'
         failed:
-          type: "boolean"
-          description: "Status"
+          type: 'boolean'
+          description: 'Status'
           example: false
         messageId:
-          type: "string"
-          description: "Message id"
-          example: "507f191e810c19729de860ea"
+          type: 'string'
+          description: 'Message id'
+          example: '507f191e810c19729de860ea'
       required:
-        - "did"
-        - "failed"
-        - "messageId"
+        - 'did'
+        - 'failed'
+        - 'messageId'
     GetSentMessageResponseDto:
-      type: "object"
+      type: 'object'
       properties:
         clientGatewayMessageId:
-          type: "string"
-          example: "f923afb7-e334-419c-a72c-a60b293184ea"
-          description: "Client gateway generated message id"
+          type: 'string'
+          example: 'f923afb7-e334-419c-a72c-a60b293184ea'
+          description: 'Client gateway generated message id'
         initiatingMessageId:
-          type: "string"
-          example: "507f191e810c19729de860ea"
-          description: "Initating message id"
+          type: 'string'
+          example: '507f191e810c19729de860ea'
+          description: 'Initating message id'
         initiatingTransactionId:
-          type: "string"
-          example: "f923afb7-e334-419c-a72c-a60b293184ea"
-          description: "Initating transaction id"
+          type: 'string'
+          example: 'f923afb7-e334-419c-a72c-a60b293184ea'
+          description: 'Initating transaction id'
         topicId:
-          type: "string"
-          example: "507f191e810c19729de860ea"
-          description: "Topic ID"
+          type: 'string'
+          example: '507f191e810c19729de860ea'
+          description: 'Topic ID'
         topicName:
-          type: "string"
-          example: "getOperatingEnvelope"
-          description: "topic name"
+          type: 'string'
+          example: 'getOperatingEnvelope'
+          description: 'topic name'
         topicOwner:
-          type: "string"
-          example: "torta.apps.eggplant.vege.iam.ewc"
-          description: "application namespace"
+          type: 'string'
+          example: 'torta.apps.eggplant.vege.iam.ewc'
+          description: 'application namespace'
         topicVersion:
-          type: "string"
-          example: "0.0.1"
-          description: "Topic version"
+          type: 'string'
+          example: '0.0.1'
+          description: 'Topic version'
         transactionId:
-          type: "string"
-          example: "f923afb7-e334-419c-a72c-a60b293184ea"
-          description: "Transaction ID"
+          type: 'string'
+          example: 'f923afb7-e334-419c-a72c-a60b293184ea'
+          description: 'Transaction ID'
         signature:
-          type: "string"
-          description: "Generated signature"
+          type: 'string'
+          description: 'Generated signature'
         payloadEncryption:
-          type: "boolean"
+          type: 'boolean'
           example: false
-          description: "Was payload encrypted"
+          description: 'Was payload encrypted'
         payload:
-          type: "string"
-          description: "Sent payload"
+          type: 'string'
+          description: 'Sent payload'
         timestampNanos:
-          type: "number"
-          description: "timestamp in nano seconds"
+          type: 'number'
+          description: 'timestamp in nano seconds'
           example: 1649147198388
         senderDid:
-          type: "string"
-          example: "did:ethr:volta:0x782aB0383Bfc807439d8EE29516937B47815d697"
-          description: "Sender DID"
+          type: 'string'
+          example: 'did:ethr:volta:0x782aB0383Bfc807439d8EE29516937B47815d697'
+          description: 'Sender DID'
         fqcn:
-          type: "string"
-          example: "channel.name"
-          description: "Channel name"
+          type: 'string'
+          example: 'channel.name'
+          description: 'Channel name'
         relatedMessagesCount:
-          type: "number"
+          type: 'number'
           example: 1
-          description: "Related messages count"
+          description: 'Related messages count'
         isFile:
-          type: "boolean"
+          type: 'boolean'
           example: false
-          description: "Is file"
+          description: 'Is file'
         totalRecipients:
-          type: "number"
+          type: 'number'
           example: 1
-          description: "Total amount of recipients"
+          description: 'Total amount of recipients'
         totalSent:
-          type: "number"
+          type: 'number'
           example: 1
-          description: "Total sent messages"
+          description: 'Total sent messages'
         totalFailed:
-          type: "number"
+          type: 'number'
           example: 1
-          description: "Total failed messages"
+          description: 'Total failed messages'
         createdDate:
-          type: "string"
-          description: "When application got stored in cache"
-          example: "2022-05-18T11:19:07.000Z"
+          type: 'string'
+          description: 'When application got stored in cache'
+          example: '2022-05-18T11:19:07.000Z'
         updatedDate:
-          type: "string"
-          description: "When application got stored in cache"
-          example: "2022-05-18T11:19:07.000Z"
+          type: 'string'
+          description: 'When application got stored in cache'
+          example: '2022-05-18T11:19:07.000Z'
         messagesIds:
           example:
-            - "507f191e810c19729de860ea"
-          description: "Message id"
-          type: "array"
+            - '507f191e810c19729de860ea'
+          description: 'Message id'
+          type: 'array'
           items:
-            type: "string"
+            type: 'string'
         recipients:
-          type: "array"
+          type: 'array'
           items:
-            $ref: "#/components/schemas/GetSentMessageRecipientsResponseDto"
+            $ref: '#/components/schemas/GetSentMessageRecipientsResponseDto'
       required:
-        - "clientGatewayMessageId"
-        - "topicId"
-        - "topicVersion"
-        - "transactionId"
-        - "signature"
-        - "payloadEncryption"
-        - "payload"
-        - "timestampNanos"
-        - "senderDid"
-        - "fqcn"
-        - "relatedMessagesCount"
-        - "isFile"
-        - "totalRecipients"
-        - "totalSent"
-        - "totalFailed"
-        - "createdDate"
-        - "updatedDate"
-        - "recipients"
+        - 'clientGatewayMessageId'
+        - 'topicId'
+        - 'topicVersion'
+        - 'transactionId'
+        - 'signature'
+        - 'payloadEncryption'
+        - 'payload'
+        - 'timestampNanos'
+        - 'senderDid'
+        - 'fqcn'
+        - 'relatedMessagesCount'
+        - 'isFile'
+        - 'totalRecipients'
+        - 'totalSent'
+        - 'totalFailed'
+        - 'createdDate'
+        - 'updatedDate'
+        - 'recipients'
+    AckMessagesRequestDto:
+      type: 'object'
+      properties:
+        messagesIds:
+          example:
+            - 'id1'
+            - 'id2'
+          description: 'Offline messages IDs to acknowledge'
+          type: 'array'
+          items:
+            type: 'string'
+      required:
+        - 'messagesIds'
     GetMessagesResponseDto:
-      type: "object"
+      type: 'object'
       properties:
         id:
-          type: "string"
-          description: "message id"
-          example: "110"
+          type: 'string'
+          description: 'message id'
+          example: '110'
         topicName:
-          type: "string"
-          description: "topic Name"
-          example: "getOperatingEnvelope"
+          type: 'string'
+          description: 'topic Name'
+          example: 'getOperatingEnvelope'
         topicOwner:
-          type: "string"
-          description: "application namespace"
-          example: "torta.apps.eggplant.vege.iam.ewc"
+          type: 'string'
+          description: 'application namespace'
+          example: 'torta.apps.eggplant.vege.iam.ewc'
         topicVersion:
-          type: "string"
-          description: "Topic Version"
-          example: "1.0.0"
+          type: 'string'
+          description: 'Topic Version'
+          example: '1.0.0'
         topicSchemaType:
-          type: "string"
-          description: "schema type of the topic"
+          type: 'string'
+          description: 'schema type of the topic'
           enum:
-            - "JSD7"
-            - "XML"
-            - "XSD6"
-            - "CSV"
-            - "TSV"
-          example: "JSD7"
+            - 'JSD7'
+            - 'XML'
+            - 'XSD6'
+            - 'CSV'
+            - 'TSV'
+          example: 'JSD7'
         payload:
-          type: "string"
-          description: "Payload sent to message"
-          example: "{\"fileId\":\"624bfd4f4c6cf04abfc20041\"}"
+          type: 'string'
+          description: 'Payload sent to message'
+          example: '{"fileId":"624bfd4f4c6cf04abfc20041"}'
         signature:
-          type: "string"
-          description: "signature sent to message"
-          example: "0x0abc6026b01856a756de47ec6f44d9c14fe69009bbf3b9b6cf522d8d783a1c654425848381affca5dab9284d8715fa2f9e34155374bafd923d75c219496cbe161c"
+          type: 'string'
+          description: 'signature sent to message'
+          example: '0x0abc6026b01856a756de47ec6f44d9c14fe69009bbf3b9b6cf522d8d783a1c654425848381affca5dab9284d8715fa2f9e34155374bafd923d75c219496cbe161c'
         sender:
-          type: "string"
-          description: "message sender"
-          example: "did:ethr:volta:0x03830466Ce257f9B798B0f27359D7639dFB6457D"
+          type: 'string'
+          description: 'message sender'
+          example: 'did:ethr:volta:0x03830466Ce257f9B798B0f27359D7639dFB6457D'
         timestampNanos:
-          type: "number"
-          description: "timestamp in nano seconds"
+          type: 'number'
+          description: 'timestamp in nano seconds'
           example: 1649147198388
         transactionId:
-          type: "string"
-          description: "transactionId sent to message for idempotency"
-          example: "1649147198388"
+          type: 'string'
+          description: 'transactionId sent to message for idempotency'
+          example: '1649147198388'
         signatureValid:
-          type: "string"
-          description: "Signature validation status for a message"
+          type: 'string'
+          description: 'Signature validation status for a message'
           enum:
-            - "FAILED"
-            - "NOT_PERFORMED"
-            - "NOT_REQUIRED"
-            - "REQUIRED_NOT_PERFORMED"
-            - "SUCCESS"
-          example: "SUCCESS"
+            - 'FAILED'
+            - 'NOT_PERFORMED'
+            - 'NOT_REQUIRED'
+            - 'REQUIRED_NOT_PERFORMED'
+            - 'SUCCESS'
+          example: 'SUCCESS'
         relatedMessagesCount:
-          type: "number"
-          description: "Related messages count. Only appears for channels with message forms."
+          type: 'number'
+          description: 'Related messages count. Only appears for channels with message forms.'
           example: 5
       required:
-        - "id"
-        - "topicName"
-        - "topicOwner"
-        - "topicVersion"
-        - "topicSchemaType"
-        - "payload"
-        - "signature"
-        - "sender"
-        - "timestampNanos"
-        - "transactionId"
-        - "signatureValid"
+        - 'id'
+        - 'topicName'
+        - 'topicOwner'
+        - 'topicVersion'
+        - 'topicSchemaType'
+        - 'payload'
+        - 'signature'
+        - 'sender'
+        - 'timestampNanos'
+        - 'transactionId'
+        - 'signatureValid'
     SendMessageDto:
-      type: "object"
+      type: 'object'
       properties:
         fqcn:
-          type: "string"
-          description: "Channel Name"
-          example: "channel.name"
+          type: 'string'
+          description: 'Channel Name'
+          example: 'channel.name'
         initiatingMessageId:
-          type: "string"
-          description: "Initiating message id"
-          example: "507f1f77bcf86cd799439011"
+          type: 'string'
+          description: 'Initiating message id'
+          example: '507f1f77bcf86cd799439011'
         initiatingTransactionId:
-          type: "string"
-          description: "Initiating transaction id"
-          example: "8ac55aa7-7d6d-438a-98bd-376079903c7b"
+          type: 'string'
+          description: 'Initiating transaction id'
+          example: '8ac55aa7-7d6d-438a-98bd-376079903c7b'
         topicName:
-          type: "string"
-          description: "Topic name"
+          type: 'string'
+          description: 'Topic name'
         topicVersion:
-          type: "string"
-          example: "1.0.0"
-          description: "Topic Version"
+          type: 'string'
+          example: '1.0.0'
+          description: 'Topic Version'
         topicOwner:
-          type: "string"
-          example: "aemo.edge"
-          description: "Topic Owner"
+          type: 'string'
+          example: 'aemo.edge'
+          description: 'Topic Owner'
         transactionId:
-          type: "string"
-          description: "Transaction Id used to check Idempotency"
+          type: 'string'
+          description: 'Transaction Id used to check Idempotency'
         payload:
-          type: "string"
-          example: "{ data: 49 }"
-          description: "Payload to be sent to message"
+          type: 'string'
+          example: '{ data: 49 }'
+          description: 'Payload to be sent to message'
         anonymousRecipient:
-          description: "List of anonymous keys which will serve as recipients of the message."
-          type: "array"
+          description: 'List of anonymous keys which will serve as recipients of the message.'
+          type: 'array'
           items:
-            type: "string"
+            type: 'string'
       required:
-        - "fqcn"
-        - "topicName"
-        - "topicVersion"
-        - "topicOwner"
-        - "transactionId"
-        - "payload"
-        - "anonymousRecipient"
+        - 'fqcn'
+        - 'topicName'
+        - 'topicVersion'
+        - 'topicOwner'
+        - 'transactionId'
+        - 'payload'
+        - 'anonymousRecipient'
     Recipients:
-      type: "object"
+      type: 'object'
       properties:
         total:
-          type: "number"
-          description: "total number of recipients"
+          type: 'number'
+          description: 'total number of recipients'
           example: 3
         sent:
-          type: "number"
-          description: "total number of recipients for whom message is sent successfully"
+          type: 'number'
+          description: 'total number of recipients for whom message is sent successfully'
           example: 2
         failed:
-          type: "number"
-          description: "total number of recipients for whom message is failed"
+          type: 'number'
+          description: 'total number of recipients for whom message is failed'
           example: 1
       required:
-        - "total"
-        - "sent"
-        - "failed"
+        - 'total'
+        - 'sent'
+        - 'failed'
     Details:
-      type: "object"
+      type: 'object'
       properties:
         did:
-          type: "string"
-          description: "did for which message is successful or failed"
-          example: "did:ethr:volta:0x09Df5d33f1242E1b8aA5E0E0F6BfA687E6846993"
+          type: 'string'
+          description: 'did for which message is successful or failed'
+          example: 'did:ethr:volta:0x09Df5d33f1242E1b8aA5E0E0F6BfA687E6846993'
         messageId:
-          type: "string"
-          description: "message Id returned by message broker"
-          example: "623c875beaa0422bfc19b1ce"
+          type: 'string'
+          description: 'message Id returned by message broker'
+          example: '623c875beaa0422bfc19b1ce'
         statusCode:
-          type: "number"
-          description: "status code returned by message broker"
+          type: 'number'
+          description: 'status code returned by message broker'
           example: 200
       required:
-        - "did"
-        - "messageId"
-        - "statusCode"
+        - 'did'
+        - 'messageId'
+        - 'statusCode'
     Status:
-      type: "object"
+      type: 'object'
       properties:
         details:
-          description: "details of messages sent or failed"
+          description: 'details of messages sent or failed'
           example: "[\n            {\n                \"did\": \"did:ethr:volta:0x09Df5d33f1242E1b8aA5E0E0F6BfA687E6846993\",\n                \"messageId\": \"623c875beaa0422bfc19b1ce\",\n                \"statusCode\": 200\n            }\n        ]"
-          type: "array"
+          type: 'array'
           items:
-            $ref: "#/components/schemas/Details"
+            $ref: '#/components/schemas/Details'
         name:
-          type: "string"
-          description: "name of message sent or failed"
-          example: "SENT or FAILED"
+          type: 'string'
+          description: 'name of message sent or failed'
+          example: 'SENT or FAILED'
       required:
-        - "details"
-        - "name"
-    SendMessagelResponseDto:
-      type: "object"
+        - 'details'
+        - 'name'
+    SendMessageResponseDto:
+      type: 'object'
       properties:
         clientGatewayMessageId:
-          type: "string"
-          description: "client Gateway Message Id"
-          example: "0b271eb8-1e21-4817-95af-7951649360ed"
+          type: 'string'
+          description: 'client Gateway Message Id'
+          example: '0b271eb8-1e21-4817-95af-7951649360ed'
         did:
-          type: "string"
-          description: "did"
-          example: "did: ethr: volta: 0x09Df5d33f1242E1b8aA5E0E0F6BfA687E6846993"
+          type: 'string'
+          description: 'did'
+          example: 'did: ethr: volta: 0x09Df5d33f1242E1b8aA5E0E0F6BfA687E6846993'
         recipients:
-          description: "recipients"
+          description: 'recipients'
           allOf:
-            - $ref: "#/components/schemas/Recipients"
+            - $ref: '#/components/schemas/Recipients'
         status:
-          description: "status of messages sent"
-          type: "array"
+          description: 'status of messages sent'
+          type: 'array'
           items:
-            $ref: "#/components/schemas/Status"
+            $ref: '#/components/schemas/Status'
       required:
-        - "clientGatewayMessageId"
-        - "did"
-        - "recipients"
-        - "status"
+        - 'clientGatewayMessageId'
+        - 'did'
+        - 'recipients'
+        - 'status'
     uploadMessageBodyDto:
-      type: "object"
+      type: 'object'
       properties:
         file:
-          type: "string"
-          format: "binary"
-          description: "File uploaded"
+          type: 'string'
+          format: 'binary'
+          description: 'File uploaded'
         fqcn:
-          type: "string"
-          description: "Channel Name"
-          example: "channel.name"
+          type: 'string'
+          description: 'Channel Name'
+          example: 'channel.name'
         topicName:
-          type: "string"
-          description: "Topic name"
+          type: 'string'
+          description: 'Topic name'
         topicVersion:
-          type: "string"
-          example: "1.0.0"
-          description: "Topic Version"
+          type: 'string'
+          example: '1.0.0'
+          description: 'Topic Version'
         topicOwner:
-          type: "string"
-          example: "aemo.edge"
-          description: "Topic Owner"
+          type: 'string'
+          example: 'aemo.edge'
+          description: 'Topic Owner'
         transactionId:
-          type: "string"
-          description: "Transaction Id used to check Idempotency"
+          type: 'string'
+          description: 'Transaction Id used to check Idempotency'
       required:
-        - "file"
-        - "fqcn"
-        - "topicName"
-        - "topicVersion"
-        - "topicOwner"
+        - 'file'
+        - 'fqcn'
+        - 'topicName'
+        - 'topicVersion'
+        - 'topicOwner'
     GetAssociationKeysDto:
-      type: "object"
+      type: 'object'
       properties:
         associationKey:
-          type: "string"
-          description: "association key"
-          example: "03ced868821e185bc7f2aaa2f68b0b1d4b725259117edd1ef6fbccb08e4a4d2ef1"
+          type: 'string'
+          description: 'association key'
+          example: '03ced868821e185bc7f2aaa2f68b0b1d4b725259117edd1ef6fbccb08e4a4d2ef1'
         validTo:
-          type: "string"
-          description: "timestamp of when key is valid to use"
-          example: "2022-06-08T05:43:15.510Z"
+          type: 'string'
+          description: 'timestamp of when key is valid to use'
+          example: '2022-06-08T05:43:15.510Z'
         validFrom:
-          type: "string"
-          description: "timestamp of when key is valid to use"
-          example: "2022-06-08T05:43:15.510Z"
+          type: 'string'
+          description: 'timestamp of when key is valid to use'
+          example: '2022-06-08T05:43:15.510Z'
         isSent:
-          type: "boolean"
-          description: "was key sent"
+          type: 'boolean'
+          description: 'was key sent'
           example: false
         sentDate:
-          type: "string"
-          description: "when key was sent"
+          type: 'string'
+          description: 'when key was sent'
           nullable: true
-          example: "2022-06-08T05:43:15.510Z"
+          example: '2022-06-08T05:43:15.510Z'
         iteration:
-          type: "number"
-          description: "key iteration"
-          example: "20222222_2222"
+          type: 'number'
+          description: 'key iteration'
+          example: '20222222_2222'
         owner:
-          type: "string"
-          description: "key owner DID"
-          example: "did:ethr:volta:0x09Df5d33f1242E1b8aA5E0E0F6BfA687E6846993"
+          type: 'string'
+          description: 'key owner DID'
+          example: 'did:ethr:volta:0x09Df5d33f1242E1b8aA5E0E0F6BfA687E6846993'
         createdDate:
-          type: "string"
-          description: "timestamp of the key created"
-          example: "2022-06-08T05:43:15.510Z"
+          type: 'string'
+          description: 'timestamp of the key created'
+          example: '2022-06-08T05:43:15.510Z'
         updatedDate:
-          type: "string"
-          description: "timestamp of the key updated"
-          example: "2022-06-08T05:43:15.510Z"
+          type: 'string'
+          description: 'timestamp of the key updated'
+          example: '2022-06-08T05:43:15.510Z'
       required:
-        - "associationKey"
-        - "validTo"
-        - "validFrom"
-        - "isSent"
-        - "sentDate"
-        - "iteration"
-        - "owner"
-        - "createdDate"
-        - "updatedDate"
+        - 'associationKey'
+        - 'validTo'
+        - 'validFrom'
+        - 'isSent'
+        - 'sentDate'
+        - 'iteration'
+        - 'owner'
+        - 'createdDate'
+        - 'updatedDate'
     GetCurrentKeyDto:
-      type: "object"
+      type: 'object'
       properties:
         current:
-          description: "Current association key"
+          description: 'Current association key'
           nullable: true
           allOf:
-            - $ref: "#/components/schemas/GetAssociationKeysDto"
+            - $ref: '#/components/schemas/GetAssociationKeysDto'
         next:
           nullable: true
-          description: "Next association key"
+          description: 'Next association key'
           allOf:
-            - $ref: "#/components/schemas/GetAssociationKeysDto"
+            - $ref: '#/components/schemas/GetAssociationKeysDto'
       required:
-        - "current"
-        - "next"
+        - 'current'
+        - 'next'
     ApplicationDTO:
-      type: "object"
+      type: 'object'
       properties:
         appName:
-          type: "string"
-          description: "app Name"
-          example: "application.something"
+          type: 'string'
+          description: 'app Name'
+          example: 'application.something'
         logoUrl:
-          type: "string"
-          description: "url of the logo"
-          example: "url of the logo"
+          type: 'string'
+          description: 'url of the logo'
+          example: 'url of the logo'
         websiteUrl:
-          type: "string"
-          description: "url of the website"
-          example: "url of the website"
+          type: 'string'
+          description: 'url of the website'
+          example: 'url of the website'
         description:
-          type: "string"
-          description: "description of the app"
-          example: "description"
+          type: 'string'
+          description: 'description of the app'
+          example: 'description'
         createdDate:
-          type: "string"
-          description: "When application got stored in cache"
-          example: "2022-05-18T11:19:07.000Z"
+          type: 'string'
+          description: 'When application got stored in cache'
+          example: '2022-05-18T11:19:07.000Z'
         updatedDate:
-          type: "string"
-          description: "When application got stored in cache"
-          example: "2022-05-18T11:19:07.000Z"
+          type: 'string'
+          description: 'When application got stored in cache'
+          example: '2022-05-18T11:19:07.000Z'
         namespace:
-          type: "string"
-          description: "application namespace"
-          example: "ddhub.apps.energyweb.iam.ewc"
+          type: 'string'
+          description: 'application namespace'
+          example: 'ddhub.apps.energyweb.iam.ewc'
         roles:
-          description: "application assigned roles"
+          description: 'application assigned roles'
           example:
-            - "user"
-            - "topiccreator"
-          type: "array"
+            - 'user'
+            - 'topiccreator'
+          type: 'array'
           items:
-            type: "string"
+            type: 'string'
         topicsCount:
-          type: "number"
-          description: "number of topics"
-          example: "4"
+          type: 'number'
+          description: 'number of topics'
+          example: '4'
       required:
-        - "appName"
-        - "logoUrl"
-        - "websiteUrl"
-        - "description"
-        - "createdDate"
-        - "updatedDate"
-        - "namespace"
-        - "roles"
-        - "topicsCount"
+        - 'appName'
+        - 'logoUrl'
+        - 'websiteUrl'
+        - 'description'
+        - 'createdDate'
+        - 'updatedDate'
+        - 'namespace'
+        - 'roles'
+        - 'topicsCount'
     GetTopicDto:
-      type: "object"
+      type: 'object'
       properties:
         id:
-          type: "string"
-          description: "id of the topic"
-          example: "62545547fe37f174d7715ff3"
+          type: 'string'
+          description: 'id of the topic'
+          example: '62545547fe37f174d7715ff3'
         name:
-          type: "string"
-          description: "name of the topic"
-          example: "Topic_JSON_V12"
+          type: 'string'
+          description: 'name of the topic'
+          example: 'Topic_JSON_V12'
         schemaType:
-          type: "string"
-          description: "schema type of the topic"
+          type: 'string'
+          description: 'schema type of the topic'
           enum:
-            - "JSD7"
-            - "XML"
-            - "XSD6"
-            - "CSV"
-            - "TSV"
-          example: "JSD7"
+            - 'JSD7'
+            - 'XML'
+            - 'XSD6'
+            - 'CSV'
+            - 'TSV'
+          example: 'JSD7'
         schema:
-          type: "string"
-          description: "schema of the topic"
-          example: "{\"type\":\"object\",\"properties\":{\"data\":{\"type\":\"number\"}}}"
+          type: 'string'
+          description: 'schema of the topic'
+          example: '{"type":"object","properties":{"data":{"type":"number"}}}'
         version:
-          type: "string"
-          description: "version of the topic"
-          example: "1.0.9"
+          type: 'string'
+          description: 'version of the topic'
+          example: '1.0.9'
         owner:
-          type: "string"
-          description: "owner of the topic"
-          example: "torta.apps.eggplant.vege.iam.ewc"
+          type: 'string'
+          description: 'owner of the topic'
+          example: 'torta.apps.eggplant.vege.iam.ewc'
         tags:
-          description: "tags of the topic"
-          example: "[\"aggregator\"]"
-          type: "array"
+          description: 'tags of the topic'
+          example: '["aggregator"]'
+          type: 'array'
           items:
-            type: "string"
+            type: 'string'
       required:
-        - "id"
-        - "name"
-        - "schemaType"
-        - "schema"
-        - "version"
-        - "owner"
-        - "tags"
+        - 'id'
+        - 'name'
+        - 'schemaType'
+        - 'schema'
+        - 'version'
+        - 'owner'
+        - 'tags'
     PaginatedResponse:
-      type: "object"
+      type: 'object'
       properties:
         count:
-          type: "number"
-          description: "total number of channels"
+          type: 'number'
+          description: 'total number of channels'
           example: 1
         limit:
-          type: "number"
-          description: "limit of channels"
+          type: 'number'
+          description: 'limit of channels'
           example: 1
           default: 5
         page:
-          type: "number"
+          type: 'number'
           example: 1
           default: 1
         records:
-          description: "Topics records"
-          type: "array"
+          description: 'Topics records'
+          type: 'array'
           items:
-            $ref: "#/components/schemas/GetTopicDto"
+            $ref: '#/components/schemas/GetTopicDto'
       required:
-        - "count"
-        - "records"
+        - 'count'
+        - 'records'
     GetTopicSearchDto:
-      type: "object"
+      type: 'object'
       properties:
         id:
-          type: "string"
-          description: "id of the topic"
-          example: "62545547fe37f174d7715ff3"
+          type: 'string'
+          description: 'id of the topic'
+          example: '62545547fe37f174d7715ff3'
         name:
-          type: "string"
-          description: "name of the topic"
-          example: "Topic_JSON_V12"
+          type: 'string'
+          description: 'name of the topic'
+          example: 'Topic_JSON_V12'
         schemaType:
-          type: "string"
-          description: "schema type of the topic"
+          type: 'string'
+          description: 'schema type of the topic'
           enum:
-            - "JSD7"
-            - "XML"
-            - "XSD6"
-            - "CSV"
-            - "TSV"
-          example: "JSD7"
+            - 'JSD7'
+            - 'XML'
+            - 'XSD6'
+            - 'CSV'
+            - 'TSV'
+          example: 'JSD7'
         owner:
-          type: "string"
-          description: "owner of the topic"
-          example: "torta.apps.eggplant.vege.iam.ewc"
+          type: 'string'
+          description: 'owner of the topic'
+          example: 'torta.apps.eggplant.vege.iam.ewc'
         version:
-          type: "string"
-          description: "version of the topic"
-          example: "1.0.9"
+          type: 'string'
+          description: 'version of the topic'
+          example: '1.0.9'
         tags:
-          description: "tags of the topic"
-          example: "[\"aggregator\"]"
-          type: "array"
+          description: 'tags of the topic'
+          example: '["aggregator"]'
+          type: 'array'
           items:
-            type: "string"
+            type: 'string'
         createdDate:
-          type: "string"
-          description: "timestamp of the topic updated"
-          example: "2022-06-08T05:43:15.510Z"
+          type: 'string'
+          description: 'timestamp of the topic updated'
+          example: '2022-06-08T05:43:15.510Z'
         updatedDate:
-          type: "string"
-          description: "timestamp of the topic updated"
-          example: "2022-06-08T05:43:15.510Z"
+          type: 'string'
+          description: 'timestamp of the topic updated'
+          example: '2022-06-08T05:43:15.510Z'
       required:
-        - "id"
-        - "name"
-        - "schemaType"
-        - "owner"
-        - "version"
-        - "tags"
+        - 'id'
+        - 'name'
+        - 'schemaType'
+        - 'owner'
+        - 'version'
+        - 'tags'
     PaginatedTopicResponse:
-      type: "object"
+      type: 'object'
       properties:
         count:
-          type: "number"
-          description: "total number of channels"
+          type: 'number'
+          description: 'total number of channels'
           example: 1
         limit:
-          type: "number"
+          type: 'number'
           example: 1
           default: 5
-          description: "limit of channels"
+          description: 'limit of channels'
         page:
-          type: "number"
+          type: 'number'
           example: 1
           default: 1
-          description: "page number out of total pages"
+          description: 'page number out of total pages'
         records:
-          description: "Topics records"
-          type: "array"
+          description: 'Topics records'
+          type: 'array'
           items:
-            $ref: "#/components/schemas/GetTopicSearchDto"
+            $ref: '#/components/schemas/GetTopicSearchDto'
       required:
-        - "count"
-        - "records"
+        - 'count'
+        - 'records'
     PostTopicDto:
-      type: "object"
+      type: 'object'
       properties:
         id:
-          type: "string"
-          description: "id of the topic"
-          example: "62545547fe37f174d7715ff3"
+          type: 'string'
+          description: 'id of the topic'
+          example: '62545547fe37f174d7715ff3'
         name:
-          type: "string"
-          description: "name of the topic"
-          example: "Topic_JSON_V12"
+          type: 'string'
+          description: 'name of the topic'
+          example: 'Topic_JSON_V12'
         schemaType:
-          type: "string"
-          description: "schema type of the topic"
+          type: 'string'
+          description: 'schema type of the topic'
           enum:
-            - "JSD7"
-            - "XML"
-            - "XSD6"
-            - "CSV"
-            - "TSV"
-          example: "JSD7"
+            - 'JSD7'
+            - 'XML'
+            - 'XSD6'
+            - 'CSV'
+            - 'TSV'
+          example: 'JSD7'
         schema:
-          type: "string"
-          description: "schema of the topic"
-          example: "{\"type\":\"object\",\"properties\":{\"data\":{\"type\":\"number\"}}}"
+          type: 'string'
+          description: 'schema of the topic'
+          example: '{"type":"object","properties":{"data":{"type":"number"}}}'
         version:
-          type: "string"
-          description: "version of the topic"
-          example: "1.0.9"
+          type: 'string'
+          description: 'version of the topic'
+          example: '1.0.9'
         owner:
-          type: "string"
-          description: "owner of the topic"
-          example: "torta.apps.eggplant.vege.iam.ewc"
+          type: 'string'
+          description: 'owner of the topic'
+          example: 'torta.apps.eggplant.vege.iam.ewc'
         tags:
-          description: "tags of the topic"
-          example: "[\"aggregator\"]"
-          type: "array"
+          description: 'tags of the topic'
+          example: '["aggregator"]'
+          type: 'array'
           items:
-            type: "string"
+            type: 'string'
       required:
-        - "id"
-        - "name"
-        - "schemaType"
-        - "schema"
-        - "version"
-        - "owner"
-        - "tags"
+        - 'id'
+        - 'name'
+        - 'schemaType'
+        - 'schema'
+        - 'version'
+        - 'owner'
+        - 'tags'
     TopicCountDto:
-      type: "object"
+      type: 'object'
       properties:
         count:
-          type: "number"
-          description: "number of topics"
+          type: 'number'
+          description: 'number of topics'
           example: 2
         owner:
-          type: "string"
-          description: "owner name"
-          example: "torta.apps.eggplant.vege.iam.ewc"
+          type: 'string'
+          description: 'owner name'
+          example: 'torta.apps.eggplant.vege.iam.ewc'
       required:
-        - "count"
-        - "owner"
+        - 'count'
+        - 'owner'
     PostTopicBodyDto:
-      type: "object"
+      type: 'object'
       properties:
         name:
-          type: "string"
-          description: "name of the topic"
-          example: "Topic_JSON_V12"
+          type: 'string'
+          description: 'name of the topic'
+          example: 'Topic_JSON_V12'
         schemaType:
-          type: "string"
-          description: "schema type of the topic"
+          type: 'string'
+          description: 'schema type of the topic'
           enum:
-            - "JSD7"
-            - "XML"
-            - "XSD6"
-            - "CSV"
-            - "TSV"
-          example: "JSD7"
+            - 'JSD7'
+            - 'XML'
+            - 'XSD6'
+            - 'CSV'
+            - 'TSV'
+          example: 'JSD7'
         schema:
-          type: "string"
-          description: "schema of the topic"
-          example: "{\"type\":\"object\",\"properties\":{\"data\":{\"type\":\"number\"}}}"
+          type: 'string'
+          description: 'schema of the topic'
+          example: '{"type":"object","properties":{"data":{"type":"number"}}}'
         version:
-          type: "string"
-          description: "version of the topic"
-          example: "1.0.9"
+          type: 'string'
+          description: 'version of the topic'
+          example: '1.0.9'
         owner:
-          type: "string"
-          description: "owner of the topic"
-          example: "torta.apps.eggplant.vege.iam.ewc"
+          type: 'string'
+          description: 'owner of the topic'
+          example: 'torta.apps.eggplant.vege.iam.ewc'
         tags:
-          description: "tags of the topic"
-          example: "[\"aggregator\"]"
-          type: "array"
+          description: 'tags of the topic'
+          example: '["aggregator"]'
+          type: 'array'
           items:
-            type: "string"
+            type: 'string'
       required:
-        - "name"
-        - "schemaType"
-        - "schema"
-        - "version"
-        - "owner"
-        - "tags"
+        - 'name'
+        - 'schemaType'
+        - 'schema'
+        - 'version'
+        - 'owner'
+        - 'tags'
     UpdateTopicHistoryBodyDto:
-      type: "object"
+      type: 'object'
       properties:
         schema:
-          type: "string"
-          description: "schema of the topic"
-          example: "{\"type\":\"object\",\"properties\":{\"data\":{\"type\":\"number\"}}}"
+          type: 'string'
+          description: 'schema of the topic'
+          example: '{"type":"object","properties":{"data":{"type":"number"}}}'
       required:
-        - "schema"
+        - 'schema'
     UpdateTopicBodyDto:
-      type: "object"
+      type: 'object'
       properties:
         tags:
-          description: "tags of the topic"
-          example: "[\"aggregator\"]"
-          type: "array"
+          description: 'tags of the topic'
+          example: '["aggregator"]'
+          type: 'array'
           items:
-            type: "string"
+            type: 'string'
       required:
-        - "tags"
+        - 'tags'
     PutTopicDto:
-      type: "object"
+      type: 'object'
       properties:
         id:
-          type: "string"
-          description: "id of the topic"
-          example: "62545547fe37f174d7715ff3"
+          type: 'string'
+          description: 'id of the topic'
+          example: '62545547fe37f174d7715ff3'
         name:
-          type: "string"
-          description: "name of the topic"
-          example: "Topic_JSON_V12"
+          type: 'string'
+          description: 'name of the topic'
+          example: 'Topic_JSON_V12'
         schemaType:
-          type: "string"
-          description: "schema type of the topic"
+          type: 'string'
+          description: 'schema type of the topic'
           enum:
-            - "JSD7"
-            - "XML"
-            - "XSD6"
-            - "CSV"
-            - "TSV"
-          example: "JSD7"
+            - 'JSD7'
+            - 'XML'
+            - 'XSD6'
+            - 'CSV'
+            - 'TSV'
+          example: 'JSD7'
         owner:
-          type: "string"
-          description: "owner of the topic"
-          example: "torta.apps.eggplant.vege.iam.ewc"
+          type: 'string'
+          description: 'owner of the topic'
+          example: 'torta.apps.eggplant.vege.iam.ewc'
         tags:
-          description: "tags of the topic"
-          example: "[\"aggregator\"]"
-          type: "array"
+          description: 'tags of the topic'
+          example: '["aggregator"]'
+          type: 'array'
           items:
-            type: "string"
+            type: 'string'
       required:
-        - "id"
-        - "name"
-        - "schemaType"
-        - "owner"
-        - "tags"
+        - 'id'
+        - 'name'
+        - 'schemaType'
+        - 'owner'
+        - 'tags'
     DeleteTopic:
-      type: "object"
+      type: 'object'
       properties:
         timestamp:
-          type: "string"
-          description: "timestamp of the topic updated"
-          example: "2022-04-12"
+          type: 'string'
+          description: 'timestamp of the topic updated'
+          example: '2022-04-12'
         returnCode:
-          type: "string"
-          description: "returnCode from MB"
-          example: "200"
+          type: 'string'
+          description: 'returnCode from MB'
+          example: '200'
         returnMessage:
-          type: "string"
-          description: "returnMessage from MB"
-          example: "Success"
+          type: 'string'
+          description: 'returnMessage from MB'
+          example: 'Success'
       required:
-        - "timestamp"
-        - "returnCode"
-        - "returnMessage"
+        - 'timestamp'
+        - 'returnCode'
+        - 'returnMessage'
     CronResponseDto:
-      type: "object"
+      type: 'object'
       properties:
         createdDate:
-          type: "string"
-          description: "Date when CRON job started to run"
-          example: "2022-05-15T11:50:02.000Z"
+          type: 'string'
+          description: 'Date when CRON job started to run'
+          example: '2022-05-15T11:50:02.000Z'
         executedAt:
-          type: "string"
-          description: "Date when cron job finished execution"
-          example: "2022-05-15T12:03:09.236Z"
+          type: 'string'
+          description: 'Date when cron job finished execution'
+          example: '2022-05-15T12:03:09.236Z'
         jobName:
-          type: "string"
-          description: "CRON job name"
-          example: "DID_LISTENER"
+          type: 'string'
+          description: 'CRON job name'
+          example: 'DID_LISTENER'
           enum:
-            - "DID_LISTENER"
-            - "CHANNEL_ROLES"
-            - "TOPIC_REFRESH"
-            - "SYMMETRIC_KEYS"
-            - "ASSOCIATION_KEYS"
-            - "PRIVATE_KEY"
-            - "APPLICATIONS_REFRESH"
-            - "HEARTBEAT"
-            - "FILE_CLEANER"
-            - "EVENTS"
-            - "ROLES_REFRESH"
-            - "MESSAGE_CLEANER"
-            - "CLIENTS"
-            - "ASSOCIATION_KEYS_SHARE"
-            - "MESSAGES_FETCH"
-            - "CLEANUP_MESSAGES"
+            - 'DID_LISTENER'
+            - 'CHANNEL_ROLES'
+            - 'TOPIC_REFRESH'
+            - 'SYMMETRIC_KEYS'
+            - 'ASSOCIATION_KEYS'
+            - 'PRIVATE_KEY'
+            - 'APPLICATIONS_REFRESH'
+            - 'HEARTBEAT'
+            - 'FILE_CLEANER'
+            - 'EVENTS'
+            - 'ROLES_REFRESH'
+            - 'MESSAGE_CLEANER'
+            - 'CLIENTS'
+            - 'ASSOCIATION_KEYS_SHARE'
+            - 'MESSAGES_FETCH'
+            - 'CLEANUP_MESSAGES'
         latestStatus:
-          type: "string"
-          description: "CRON job status"
-          example: "FAILED"
+          type: 'string'
+          description: 'CRON job status'
+          example: 'FAILED'
           enum:
-            - "SUCCESS"
-            - "FAILED"
+            - 'SUCCESS'
+            - 'FAILED'
         updatedDate:
-          type: "string"
-          description: "Date when CRON job was updated (it will usually match executedAt)"
-          example: "2022-05-15T12:03:09.000Z"
+          type: 'string'
+          description: 'Date when CRON job was updated (it will usually match executedAt)'
+          example: '2022-05-15T12:03:09.000Z'
       required:
-        - "createdDate"
-        - "executedAt"
-        - "jobName"
-        - "latestStatus"
-        - "updatedDate"
+        - 'createdDate'
+        - 'executedAt'
+        - 'jobName'
+        - 'latestStatus'
+        - 'updatedDate'
     GatewayResponseDto:
-      type: "object"
+      type: 'object'
       properties:
         did:
-          type: "string"
-          description: "Configured DID"
+          type: 'string'
+          description: 'Configured DID'
+        authEnabled:
+          type: 'boolean'
+          description: 'User auth enabled'
         messageBrokerStatus:
-          type: "string"
+          type: 'string'
           enum:
-            - "OK"
-            - "ERROR"
-          description: "Checks if the message broker is configured and running correctly"
+            - 'OK'
+            - 'ERROR'
+          description: 'Checks if the message broker is configured and running correctly'
         mtlsIsValid:
-          type: "boolean"
-          description: "Checks if the gateway is configured correctly to use mTLS (if mTLS is enabled)"
+          type: 'boolean'
+          description: 'Checks if the gateway is configured correctly to use mTLS (if mTLS is enabled)'
         namespace:
-          type: "string"
-          description: "Configured namespace"
-          example: "ddhub.apps.energyweb.iam.ewc"
+          type: 'string'
+          description: 'Configured namespace'
+          example: 'ddhub.apps.energyweb.iam.ewc'
         version:
-          type: "string"
-          description: "Application version"
-          example: "v15.15.0"
+          type: 'string'
+          description: 'Application version'
+          example: 'v15.15.0'
       required:
-        - "did"
-        - "messageBrokerStatus"
-        - "mtlsIsValid"
-        - "namespace"
-        - "version"
+        - 'did'
+        - 'authEnabled'
+        - 'messageBrokerStatus'
+        - 'mtlsIsValid'
+        - 'namespace'
+        - 'version'
     GetAllClientsResponseDto:
-      type: "object"
+      type: 'object'
       properties:
         clientId:
-          type: "string"
-          example: "test.cursor"
-          description: "Client id"
+          type: 'string'
+          example: 'test.cursor'
+          description: 'Client id'
         createdDate:
-          type: "string"
-          example: "2022-09-21 08:04:06.020037"
-          description: "Created date"
+          type: 'string'
+          example: '2022-09-21 08:04:06.020037'
+          description: 'Created date'
         updatedDate:
-          type: "string"
-          example: "2022-09-21 08:04:06.020037"
-          description: "Updated date"
+          type: 'string'
+          example: '2022-09-21 08:04:06.020037'
+          description: 'Updated date'
       required:
-        - "clientId"
-        - "createdDate"
-        - "updatedDate"
+        - 'clientId'
+        - 'createdDate'
+        - 'updatedDate'
     DeleteManyClientsBodyDto:
-      type: "object"
+      type: 'object'
       properties:
         clientsIds:
-          description: "Clients ids"
+          description: 'Clients ids'
           example:
-            - "test.cursor"
+            - 'test.cursor'
           uniqueItems: true
-          type: "array"
+          type: 'array'
           items:
-            type: "string"
+            type: 'string'
       required:
-        - "clientsIds"
+        - 'clientsIds'
     CreateContactDto:
-      type: "object"
+      type: 'object'
       properties: {}
     UpdateContactRequestDto:
-      type: "object"
+      type: 'object'
       properties: {}
     GetAllContactsResponseDto:
-      type: "object"
+      type: 'object'
       properties:
         did:
-          type: "string"
-          description: "DID"
-          example: "did:ethr:volta:0x782aB0383Bfc807439d8EE29516937B47815d697"
+          type: 'string'
+          description: 'DID'
+          example: 'did:ethr:volta:0x782aB0383Bfc807439d8EE29516937B47815d697'
         alias:
-          type: "string"
-          description: "Alias"
-          example: "Krzysztof Szostak"
+          type: 'string'
+          description: 'Alias'
+          example: 'Krzysztof Szostak'
       required:
-        - "did"
-        - "alias"
-    GetChannelsMessagesCountDto:
-      type: "object"
+        - 'did'
+        - 'alias'
+    ConfigResponseDto:
+      type: 'object'
       properties:
-        count:
-          type: "number"
-          description: "Count of total messages"
-          example: 5
-        fqcn:
-          type: "string"
-          description: "Channel name"
-          example: "szostak.pub"
+        authEnabled:
+          type: 'boolean'
+          description: 'Is auth enabled'
+          example: true
       required:
-        - "count"
-        - "fqcn"
+        - 'authEnabled'
+    RefreshTokenRequestDto:
+      type: 'object'
+      properties:
+        refreshToken:
+          type: 'string'
+          description: 'Refresh token'
+      required:
+        - 'refreshToken'
+    LoginResponseDto:
+      type: 'object'
+      properties:
+        accessToken:
+          type: 'string'
+          description: 'Access token'
+        refreshToken:
+          type: 'string'
+          description: 'Refresh token'
+      required:
+        - 'accessToken'
+        - 'refreshToken'
+    LoginRequestDto:
+      type: 'object'
+      properties:
+        username:
+          type: 'string'
+          description: 'Username'
+          example: 'admin'
+        password:
+          type: 'string'
+          description: 'Password'
+          example: 'password'
+      required:
+        - 'username'
+        - 'password'
 externalDocs:
-  description: "Postman Collection"
-  url: "/docs-json"
+  description: 'Postman Collection'
+  url: '/docs-json'

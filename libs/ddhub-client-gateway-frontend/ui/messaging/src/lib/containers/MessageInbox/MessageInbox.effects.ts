@@ -10,6 +10,7 @@ import { TTableComponentAction } from '@ddhub-client-gateway-frontend/ui/core';
 import { GetMessagesResponseDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { ModalActionsEnum, useModalDispatch } from '../../context';
 import { split } from 'lodash';
+import { DateTime } from 'luxon';
 
 export const useMessageInboxEffects = (isRelatedMessages?: boolean) => {
   const router = useRouter();
@@ -56,6 +57,8 @@ export const useMessageInboxEffects = (isRelatedMessages?: boolean) => {
     isRelatedMessages
   );
   const openDetailsModal = (data: GetMessagesResponseDto) => {
+    console.log(data);
+    const timestampMillis = Math.round(data?.timestampNanos / 1e6);
     dispatch({
       type: ModalActionsEnum.SHOW_MESSAGE_INBOX_DETAILS,
       payload: {
@@ -68,6 +71,11 @@ export const useMessageInboxEffects = (isRelatedMessages?: boolean) => {
           topicOwner: data.topicOwner,
           topicName: data.topicName,
           topicVersion: data.topicVersion,
+          timestamp: DateTime.fromMillis(timestampMillis).toLocaleString(
+            DateTime.DATETIME_MED
+          ),
+          timestampNanos: data.timestampNanos,
+          isSender: false,
         },
       },
     });

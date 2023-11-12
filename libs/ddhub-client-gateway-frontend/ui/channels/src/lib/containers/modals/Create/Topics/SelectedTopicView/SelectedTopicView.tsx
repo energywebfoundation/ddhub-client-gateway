@@ -7,7 +7,7 @@ import {
   ChevronUp,
 } from 'react-feather';
 import { CopyToClipboard } from '@ddhub-client-gateway-frontend/ui/core';
-import React, { MouseEvent } from 'react';
+import { MouseEvent } from 'react';
 import clsx from 'clsx';
 import { useStyles } from '../SelectedTopicView/SelectedTopicView.styles';
 import { Topic } from '../Topics.effects';

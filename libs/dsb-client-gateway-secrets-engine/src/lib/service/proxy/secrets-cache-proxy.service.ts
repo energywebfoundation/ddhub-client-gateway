@@ -1,11 +1,15 @@
 import { Injectable, Logger } from '@nestjs/common';
 import {
   CertificateDetails,
+  PATHS,
   SecretsEngineService,
   SetCertificateDetailsResponse,
   SetPrivateKeyResponse,
   SetRSAPrivateKeyResponse,
+  UserDetails,
+  UsersList,
 } from '../../secrets-engine.interface';
+import { Span } from 'nestjs-otel';
 
 @Injectable()
 export class SecretsCacheProxyService extends SecretsEngineService {
@@ -16,11 +20,13 @@ export class SecretsCacheProxyService extends SecretsEngineService {
     privateKey: string | null;
     rsaPrivateKey: string | null;
     mnemonic: string | null;
+    users: Record<string, { password: string; role: string }>;
   } = {
     certificate: null,
     rsaPrivateKey: null,
     privateKey: null,
     mnemonic: null,
+    users: {},
   };
 
   constructor(protected readonly secretsEngineService: SecretsEngineService) {
@@ -45,6 +51,39 @@ export class SecretsCacheProxyService extends SecretsEngineService {
       await this.secretsEngineService.getRSAPrivateKey();
   }
 
+  public async getAllUsers(): Promise<UsersList> {
+    return Object.entries(this.cachedObjects.users).map(([key, value]) => {
+      return {
+        username: key,
+        password: value.password,
+        role: value.role,
+      };
+    });
+  }
+
+  public async refreshUsersData(): Promise<void> {
+    const users: UsersList = await this.secretsEngineService.getAllUsers();
+
+    for (const user of users) {
+      this.cachedObjects.users[user.username] = {
+        password: user.password,
+        role: user.role,
+      };
+    }
+  }
+
+  public async getUserAuthDetails(username: string): Promise<UserDetails> {
+    if (this.cachedObjects.users[username]) {
+      return {
+        role: this.cachedObjects.users[username].role,
+        password: this.cachedObjects.users[username].password,
+        username: username,
+      };
+    }
+
+    return null;
+  }
+
   public async refreshMnemonic(): Promise<void> {
     this.logger.log('refreshing mnemonic');
 
@@ -64,6 +103,7 @@ export class SecretsCacheProxyService extends SecretsEngineService {
       this.refreshPrivateKey(),
       this.refreshRsaPrivateKey(),
       this.refreshMnemonic(),
+      this.refreshUsersData(),
     ]);
   }
 

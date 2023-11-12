@@ -74,6 +74,7 @@ export interface GetMessageResponse {
   signature: string;
   sender: string;
   timestampNanos: number;
+  timestampISO?: string;
   transactionId: string;
   signatureValid: EncryptionStatus;
   decryption: Decryption;
@@ -83,6 +84,7 @@ export interface GetMessageResponse {
   clientGatewayMessageId: string;
   topicId: string;
   relatedMessagesCount?: number;
+  isRead?: boolean;
 }
 
 export interface DownloadMessageResponse {

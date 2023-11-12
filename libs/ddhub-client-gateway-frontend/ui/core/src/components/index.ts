@@ -8,3 +8,4 @@ export * from './Dialog';
 export * from './icons';
 export * from './Tabs';
 export * from './Steps';
+export * from './JsonSchemaForm';

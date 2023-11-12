@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { GetMessagesDto } from '../dto/request/get-messages.dto';
 import { GetMessageResponse } from '../message.interface';
 import {
+  AddressBookRepositoryWrapper,
   DidEntity,
   ReceivedMessageEntity,
   ReceivedMessageReadStatusRepositoryWrapper,
@@ -10,13 +11,10 @@ import {
   SentMessageRecipientRepositoryWrapper,
   SentMessageRepositoryWrapper,
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
-import { FindConditions } from 'typeorm/find-options/FindConditions';
-import moment from 'moment';
 import { EncryptionStatus } from '../message.const';
 import { KeysService } from '../../keys/service/keys.service';
 import { GetSentMessagesRequestDto } from '../dto/request/get-sent-messages-request.dto';
 import { GetSentMessageResponseDto } from '../dto/response/get-sent-message-response.dto';
-import { In } from 'typeorm';
 
 @Injectable()
 export class OfflineMessagesService {
@@ -27,6 +25,7 @@ export class OfflineMessagesService {
     protected readonly sentMessagesRepositoryWrapper: SentMessageRepositoryWrapper,
     protected readonly sentMessagesRecipientsWrapper: SentMessageRecipientRepositoryWrapper,
     protected readonly receivedMessageReadStatusRepositoryWrapper: ReceivedMessageReadStatusRepositoryWrapper,
+    protected readonly addressBookRepositoryWrapper: AddressBookRepositoryWrapper,
     protected readonly keysService: KeysService
   ) {}
 
@@ -68,8 +67,6 @@ export class OfflineMessagesService {
       );
     }
 
-    // :project = ANY ( string_to_array(students.projects, ','))
-
     if (filterParams.messageId) {
       queryBuilder.andWhere(
         ':messageId = ANY(sent_messages."messageIds"::text[])',
@@ -100,6 +97,8 @@ export class OfflineMessagesService {
 
     queryBuilder.take(limit).skip(skip);
 
+    const addressBook =
+      await this.addressBookRepositoryWrapper.repository.find();
     return queryBuilder.getMany().then(async (entities) => {
       return await Promise.all(
         entities.map(async (entity: SentMessageEntity) => {
@@ -129,6 +128,9 @@ export class OfflineMessagesService {
               return {
                 messageId: recipient.messageId,
                 did: recipient.recipientDid,
+                alias: addressBook.find(
+                  (item) => item.did === recipient.recipientDid
+                )?.name,
                 failed: +recipient.statusCode !== 200,
               };
             }),
@@ -167,32 +169,27 @@ export class OfflineMessagesService {
       initiatingTransactionId,
       initiatingMessageId,
       fqcn,
-      from,
       amount,
       topicName,
       topicOwner,
-      clientId,
       messageId,
     } = dto;
 
     const rm = 'rm';
-    const rms = 'rms';
-
     const query = this.receivedMessageRepositoryWrapper.repository
       .createQueryBuilder(rm)
-      .leftJoinAndSelect(`${rm}.receivedMessagesReadStatus`, rms)
       .where((qb) => {
-        qb.where(`${rms}.messageId IS NULL`);
+        // qb.where(`${rms}.messageId IS NULL`);
 
         if (fqcn) {
           qb.andWhere(`${rm}.fqcn = :fqcn`, { fqcn });
         }
 
-        if (from) {
-          qb.andWhere(`${rm}.timestampNanos = :from`, {
-            from: moment(from).utc().toDate(),
-          });
-        }
+        // if (from) {
+        //   qb.andWhere(`${rm}.timestampNanos = :from`, {
+        //     from: moment(from).utc().toDate(),
+        //   });
+        // }
 
         if (topicOwner) {
           qb.andWhere(`${rm}.topicOwner = :topicOwner`, { topicOwner });
@@ -241,6 +238,14 @@ export class OfflineMessagesService {
             prefetchedSignatureKeys[message.senderDid]
           );
 
+        const isRead: boolean =
+          !!(await this.receivedMessageReadStatusRepositoryWrapper.repository
+            .createQueryBuilder('rms')
+            .where('rms.messageId = :messageId', {
+              messageId: message.messageId,
+            })
+            .getOne());
+
         const relatedMessages =
           await this.receivedMessageRepositoryWrapper.repository
             .createQueryBuilder('m')
@@ -273,33 +278,30 @@ export class OfflineMessagesService {
           initiatingTransactionId: message.initiatingTransactionId,
           transactionId: message.transactionId,
           payload: message.payload,
-          timestampNanos: 1,
+          timestampNanos: message.timestampNanos.getTime() * (1000 * 1000),
+          timestampISO: message.timestampNanos.toISOString(),
           id: message.messageId,
           topicId: message.topicId,
           topicSchemaType: 'JSD7',
           signatureValid: isSignatureValid
             ? EncryptionStatus.SUCCESS
             : EncryptionStatus.FAILED,
+          isRead,
         };
       })
     );
 
-    await this.ackMessages(receivedMessages);
-
     return receivedMessages;
   }
 
-  protected async ackMessages(messages: GetMessageResponse[]): Promise<void> {
-    for (const message of messages) {
-      try {
-        await this.receivedMessageReadStatusRepositoryWrapper.repository.save({
-          messageId: message.id,
-          recipientUser: '@TODO LATER',
-        });
-      } catch (e) {
-        this.logger.error(`failed to mark message as read ${message.id}`);
-        this.logger.error(e);
-      }
-    }
+  public async ackMessages(messagesIds: string[]): Promise<void> {
+    await this.receivedMessageReadStatusRepositoryWrapper.repository.save(
+      messagesIds.map((messageId: string) => {
+        return {
+          messageId,
+          recipientUser: '@TODO',
+        };
+      })
+    );
   }
 }

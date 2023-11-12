@@ -10,9 +10,13 @@ import {
   useContactSave,
   useUpdateContact,
 } from '@ddhub-client-gateway-frontend/ui/api-hooks';
+import { useQueryClient } from 'react-query';
+import { getAddressBookControllerGetAllContactsQueryKey } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 const didRegex = new RegExp(/^did:[a-z0-9]+:([a-z0-9]+:)?(0x[0-9a-fA-F]{40})$/);
 
 export const useAddUpdateContactEffects = () => {
+  const queryClient = useQueryClient();
+
   const [aliasInput, setAliasInput] = useState('');
   const [didInput, setDidInput] = useState('');
   const [isValid, setIsValid] = useState<boolean>(true);
@@ -72,8 +76,13 @@ export const useAddUpdateContactEffects = () => {
   };
 
   const clear = () => {
-    setAliasInput('');
-    setDidInput('');
+    if (openUpdate) {
+      setAliasInput('');
+    } else {
+      setAliasInput('');
+      setDidInput('');
+    }
+
     setIsDirty(false);
     setIsValid(true);
   };
@@ -102,8 +111,14 @@ export const useAddUpdateContactEffects = () => {
 
   const openCancelModal = async () => {
     closeModal();
+    if (!isDirty) {
+      clear();
+      closeModal();
+      return;
+    }
+
     const result = await Swal.warning({
-      text: `you will close ${openUpdate ? 'Update' : 'Add'} DID form`,
+      text: `You will close the ${openUpdate ? 'update' : 'add'} contact form`,
     });
 
     if (result.isConfirmed) {
@@ -131,9 +146,12 @@ export const useAddUpdateContactEffects = () => {
     closeModal();
     Swal.success({
       text: `You have successfully ${
-        openUpdate ? 'updated the' : 'created'
+        openUpdate ? 'updated the' : 'created the'
       } contact.`,
     });
+    queryClient.invalidateQueries(
+      getAddressBookControllerGetAllContactsQueryKey()
+    );
   };
 
   const createUpdateContact = () => {

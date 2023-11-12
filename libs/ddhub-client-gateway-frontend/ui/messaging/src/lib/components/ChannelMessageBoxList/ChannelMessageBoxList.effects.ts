@@ -1,7 +1,7 @@
 import { useChannelMessagesCount } from '@ddhub-client-gateway-frontend/ui/api-hooks';
 import {
   ChannelControllerGetCountOfChannelsType,
-  GetChannelsMessagesCountDto,
+  GetChannelMessagesCountDto,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { useRouter } from 'next/router';
 import { routerConst } from '@ddhub-client-gateway-frontend/ui/utils';
@@ -17,7 +17,7 @@ export const useChannelMessageBoxListEffects = (
     type: channelType,
   });
 
-  const handleRowClick = (data: GetChannelsMessagesCountDto) => {
+  const handleRowClick = (data: GetChannelMessagesCountDto) => {
     let replaceUrl = '';
 
     if (channelType === 'sub') {

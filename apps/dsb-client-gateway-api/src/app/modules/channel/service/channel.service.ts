@@ -32,7 +32,7 @@ import {
 import { ChannelInvalidTopicException } from '../exceptions/channel-invalid-topic.exception';
 import { differenceBy } from 'lodash';
 import { ChannelMessageFormsOnlyException } from '../exceptions/channel-message-forms-only.exception';
-import { GetChannelsMessagesCountDto } from '../dto/request/get-channel-messages-count.dto';
+import { GetChannelMessagesCountDto } from '../dto/request/get-channel-messages-count.dto';
 import { In } from 'typeorm';
 
 @Injectable()
@@ -51,13 +51,13 @@ export class ChannelService {
   @Span('channels_multipleMessageCount')
   public async getMultipleChannelsMessageCount(
     query: QueryChannels
-  ): Promise<GetChannelsMessagesCountDto[]> {
+  ): Promise<GetChannelMessagesCountDto[]> {
     const channels: ChannelEntity[] = await this.queryChannels(query);
 
-    const result: GetChannelsMessagesCountDto[] = [];
+    const result: GetChannelMessagesCountDto[] = [];
 
     for (const channel of channels) {
-      const dataToPush: GetChannelsMessagesCountDto = {
+      const dataToPush: GetChannelMessagesCountDto = {
         count: await this.getChannelMessageCount(channel.fqcn),
         fqcn: channel.fqcn,
       };

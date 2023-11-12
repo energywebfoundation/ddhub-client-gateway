@@ -1,0 +1,22 @@
+{
+  "root": "libs/ddhub-client-gateway-user-roles",
+  "sourceRoot": "libs/ddhub-client-gateway-user-roles/src",
+  "targets": {
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/ddhub-client-gateway-user-roles/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/libs/ddhub-client-gateway-user-roles"],
+      "options": {
+        "jestConfig": "libs/ddhub-client-gateway-user-roles/jest.config.js",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": []
+}
