@@ -61,7 +61,7 @@ export class ApplicationService implements OnApplicationBootstrap {
   }
 
   @Span('applications_refresh')
-  protected async refreshApplications(): Promise<void> {
+  public async refreshApplications(): Promise<void> {
     try {
       const isInitialized: boolean = this.iamService.isInitialized();
 
