@@ -37,7 +37,6 @@ jobs:
           release_branches: master
           pre_release_branches: pre_release
           custom_release_rules: major:major:Major Changes,minor:minor:Minor Changes,chore:patch:Chores
-          dry_run: ${{ github.ref == 'refs/heads/pre_release' }}
 
       - name: Set ArgoCD Variable
         id: configure
@@ -117,19 +116,20 @@ jobs:
           command: login ${{needs.semantic-version.outputs.argocd_url}}
           options: --insecure --password ${{needs.semantic-version.outputs.argocd_pwd}} --username ${{needs.semantic-version.outputs.argocd_username}}
 
-      - name: ArgoCD overwrite ${{needs.semantic-version.outputs.argocd_env}} scheduler image tag
+      - name: ArgoCD overwrite target scheduler image tag
         uses: clowdhaus/argo-cd-action/@v1.12.1
         id: argocd_image_tag_overwrite_target_scheduler
         with:
           command: app set ddhub-gateway-${{needs.semantic-version.outputs.argocd_env}}
           options: -p ddhub-client-gateway-api.clientgateway.scheduler.image.tag=${{needs.semantic-version.outputs.new_version}}
 
-      # - name: ArgoCD overwrite DEMO-1 scheduler image tag
-      #   uses: clowdhaus/argo-cd-action/@v1.12.1
-      #   id: argocd_image_tag_overwrite_demo1_scheduler
-      #   with:
-      #     command: app set ddhub-gateway-demo-1
-      #     options: -p ddhub-client-gateway-api.clientgateway.scheduler.image.tag=${{needs.semantic-version.outputs.new_version}}
+      - name: ArgoCD overwrite target scheduler-1 image tag
+        uses: clowdhaus/argo-cd-action/@v1.12.1
+        if: github.ref == 'refs/heads/pre_release'
+        id: argocd_image_tag_overwrite_target_scheduler1
+        with:
+          command: app set ddhub-gateway-${{needs.semantic-version.outputs.argocd_env}}-1
+          options: -p ddhub-client-gateway-api.clientgateway.scheduler.image.tag=${{needs.semantic-version.outputs.new_version}}
 
 #      - name: ArgoCD overwrite QA image tag
 #        uses: clowdhaus/argo-cd-action/@v1.12.1
@@ -218,19 +218,20 @@ jobs:
           command: login ${{needs.semantic-version.outputs.argocd_url}}
           options: --insecure --password ${{needs.semantic-version.outputs.argocd_pwd}} --username ${{needs.semantic-version.outputs.argocd_username}}
 
-      - name: ArgoCD overwrite ${{needs.semantic-version.outputs.argocd_env}} image tag
+      - name: ArgoCD overwrite target api image tag
         uses: clowdhaus/argo-cd-action/@v1.12.1
         id: argocd_image_tag_overwrite_target_api
         with:
           command: app set ddhub-gateway-${{needs.semantic-version.outputs.argocd_env}}
           options: -p ddhub-client-gateway-api.image.tag=${{needs.semantic-version.outputs.new_version}}
 
-      # - name: ArgoCD overwrite DEMO-1 image tag
-      #   uses: clowdhaus/argo-cd-action/@v1.12.1
-      #   id: argocd_image_tag_overwrite_demo1_api
-      #   with:
-      #     command: app set ddhub-gateway-demo-1
-      #     options: -p ddhub-client-gateway-api.image.tag=${{needs.semantic-version.outputs.new_version}}
+      - name: ArgoCD overwrite target api-1 image tag
+        uses: clowdhaus/argo-cd-action/@v1.12.1
+        if: github.ref == 'refs/heads/pre_release'
+        id: argocd_image_tag_overwrite_target_api_1
+        with:
+          command: app set ddhub-gateway-${{needs.semantic-version.outputs.argocd_env}}-1
+          options: -p ddhub-client-gateway-api.image.tag=${{needs.semantic-version.outputs.new_version}}
 #
 #      - name: ArgoCD overwrite QA image tag
 #        uses: clowdhaus/argo-cd-action/@v1.12.1
@@ -323,19 +324,19 @@ jobs:
           command: login ${{needs.semantic-version.outputs.argocd_url}}
           options: --insecure --password ${{needs.semantic-version.outputs.argocd_pwd}} --username ${{needs.semantic-version.outputs.argocd_username}}
 
-      - name: ArgoCD overwrite ${{needs.semantic-version.outputs.argocd_env}} image tag
+      - name: ArgoCD overwrite target image tag
         uses: clowdhaus/argo-cd-action/@v1.12.1
         id: argocd_image_tag_overwrite_target_ui
         with:
           command: app set ddhub-gateway-${{needs.semantic-version.outputs.argocd_env}}
           options: -p ddhub-client-gateway-api.clientgateway.ui.image.tag=${{needs.semantic-version.outputs.new_version}}
 
-      # - name: ArgoCD overwrite DEMO-1 image tag
-      #   uses: clowdhaus/argo-cd-action/@v1.12.1
-      #   id: argocd_image_tag_overwrite_demo1_ui
-      #   with:
-      #     command: app set ddhub-gateway-demo-1
-      #     options: -p ddhub-client-gateway-api.clientgateway.ui.image.tag=${{needs.semantic-version.outputs.new_version}}
+      - name: ArgoCD overwrite target UI-1 image tag
+        uses: clowdhaus/argo-cd-action/@v1.12.1
+        id: argocd_image_tag_overwrite_target_ui_1
+        with:
+          command: app set ddhub-gateway-${{needs.semantic-version.outputs.argocd_env}}-1
+          options: -p ddhub-client-gateway-api.clientgateway.ui.image.tag=${{needs.semantic-version.outputs.new_version}}
 
 #      - name: ArgoCD overwrite QA image tag
 #        uses: clowdhaus/argo-cd-action/@v1.12.1
