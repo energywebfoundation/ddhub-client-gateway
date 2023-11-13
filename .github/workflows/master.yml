@@ -23,6 +23,8 @@ jobs:
     name: Semantic release
     runs-on: ubuntu-latest
     needs: [cancel-previous]
+    env:
+      GITHUB_OUTPUT: ${{ toJson(outputs) }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -43,23 +45,16 @@ jobs:
         run: |
               echo "Running on branch ${{ github.ref }}"
               if [ "${{ github.ref }}" = "refs/heads/pre_release" ]; then
-                echo "ENVIRONMENT=test" >> $GITHUB_OUTPUT
-                echo "ARGOCD_URL=$ARGOCD_DEV_URL" >> $GITHUB_OUTPUT
-                echo "ARGOCD_USERNAME=$ARGOCD_DEV_USERNAME" >> $GITHUB_OUTPUT
-                echo "ARGOCD_PWD=$ARGOCD_DEV_PWD" >> $GITHUB_OUTPUT
+                echo "ENVIRONMENT=test" >> $GITHUB_ENV
+                echo "ARGOCD_URL=${{ secrets.ARGOCD_DEV_URL }}" >> $GITHUB_ENV
+                echo "ARGOCD_USERNAME=${{ secrets.ARGOCD_DEV_USERNAME }}" >> $GITHUB_ENV
+                echo "ARGOCD_PWD=${{ secrets.ARGOCD_DEV_PASS }}" >> $GITHUB_ENV
               else
-                echo "ENVIRONMENT=demo" >> $GITHUB_OUTPUT
-                echo "ARGOCD_URL=$ARGOCD_STG_URL" >> $GITHUB_OUTPUT
-                echo "ARGOCD_USERNAME=$ARGOCD_STG_USERNAME" >> $GITHUB_OUTPUT
-                echo "ARGOCD_PWD=$ARGOCD_STG_PWD" >> $GITHUB_OUTPUT
+                echo "ENVIRONMENT=demo" >> $GITHUB_ENV
+                echo "ARGOCD_URL=${{ secrets.ARGOCD_STAGING_URL }}" >> $GITHUB_ENV
+                echo "ARGOCD_USERNAME=${{ secrets.ARGOCD_STAGING_USERNAME }}" >> $GITHUB_ENV
+                echo "ARGOCD_PWD=${{ secrets.ARGOCD_STAGING_PASS }}" >> $GITHUB_ENV
               fi
-        env:
-          ARGOCD_DEV_URL: ${{ secrets.ARGOCD_DEV_URL }}
-          ARGOCD_DEV_USERNAME: ${{ secrets.ARGOCD_DEV_USERNAME }}
-          ARGOCD_DEV_PWD: ${{ secrets.ARGOCD_DEV_PASS }}
-          ARGOCD_STG_URL: ${{ secrets.ARGOCD_STAGING_URL }}
-          ARGOCD_STG_USERNAME: ${{ secrets.ARGOCD_STAGING_USERNAME }}
-          ARGOCD_STG_PWD: ${{ secrets.ARGOCD_STAGING_PASS }}
     outputs:
       new_version: ${{ steps.tag_version.outputs.new_version }}
       changelog: ${{ steps.tag_version.outputs.changelog }}
@@ -71,6 +66,7 @@ jobs:
   build-scheduler:
     name: Build scheduler
     runs-on: ubuntu-latest
+    if: false
     needs: [cancel-previous, semantic-version]
     steps:
       - uses: actions/checkout@v2
@@ -163,6 +159,7 @@ jobs:
   build-be:
     name: Build Backend & Release
     runs-on: ubuntu-latest
+    if: false
     needs: [cancel-previous, semantic-version]
     steps:
       - uses: actions/checkout@v2
