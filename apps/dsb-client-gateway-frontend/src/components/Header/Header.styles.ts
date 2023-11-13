@@ -46,4 +46,10 @@ export const useStyles = makeStyles()((theme) => ({
     bottom: 0,
     right: 0,
   },
+  logoutButton: {
+    marginLeft: 12,
+  },
+  logoutButtonIcon: {
+    stroke: theme.palette.primary.main,
+  },
 }));

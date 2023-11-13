@@ -55,8 +55,6 @@ export interface UserAuthContext {
   refreshToken: string;
   isChecking: boolean;
   errorMessage?: string;
-  routeRestrictions: RouteRestrictions;
-  displayedRoutes: Set<string>;
   authenticated: boolean;
 }
 
@@ -76,7 +74,6 @@ const initialUserAuthData = {
   refreshToken: '',
   isChecking: false,
   displayedRoutes: new Set<string>(),
-  routeRestrictions: new RouteRestrictions(),
   authenticated: false,
 };
 
@@ -111,6 +108,7 @@ export const useUserData = (queryClient: QueryClient) => {
       ...initialUserAuthData,
       errorMessage: withErrorMessage ?? '',
     });
+    setAuthenticated(false);
     router.push(routerConst.InitialPage);
   };
 
@@ -124,6 +122,43 @@ export const useUserData = (queryClient: QueryClient) => {
     () => ({ authenticated, setAuthenticated }),
     [authenticated]
   );
+
+  useEffect(() => {
+    fetchGatewayConfig().then((res) => {
+      setConfig(res);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (config) {
+      if (userAuth.authenticated) {
+        setAuthenticated(true);
+      } else {
+        if (config.authEnabled) {
+          refreshToken();
+        } else {
+          setAuthenticated(true);
+        }
+      }
+    }
+  }, [config]);
+
+  useEffect(() => {
+    if (userAuth.authenticated) {
+      updateTokenStorage(userAuth);
+      setRefreshIdentity(true);
+      setAuthenticated(true);
+    }
+  }, [userAuth]);
+
+  useEffect(() => {
+    queryClient.setDefaultOptions({
+      queries: {
+        ...queryClientOptions.queries,
+        enabled: authenticated,
+      },
+    });
+  }, [authenticated]);
 
   const fetchGatewayConfig = async () => {
     return await queryClient.fetchQuery<GatewayResponseDto>(
@@ -158,7 +193,7 @@ export const useUserData = (queryClient: QueryClient) => {
       setUserAuth((prevValue) => ({
         ...prevValue,
         username,
-        role,
+        role: role as unknown as string, // TODO: fix type
         accessToken,
         refreshToken,
         isChecking: false,
@@ -189,43 +224,6 @@ export const useUserData = (queryClient: QueryClient) => {
     localStorage.removeItem('username');
     localStorage.removeItem('role');
   };
-
-  useEffect(() => {
-    queryClient.setDefaultOptions({
-      queries: {
-        ...queryClientOptions.queries,
-        enabled: authenticated,
-      },
-    });
-  }, [authenticated]);
-
-  useEffect(() => {
-    if (userAuth.authenticated) {
-      updateTokenStorage(userAuth);
-      setRefreshIdentity(true);
-      setAuthenticated(true);
-    }
-  }, [userAuth.authenticated]);
-
-  useEffect(() => {
-    fetchGatewayConfig().then((res) => {
-      setConfig(res);
-    });
-  }, []);
-
-  useEffect(() => {
-    if (config) {
-      if (userAuth.authenticated) {
-        setAuthenticated(true);
-      } else {
-        if (config.authEnabled) {
-          refreshToken();
-        } else {
-          setAuthenticated(true);
-        }
-      }
-    }
-  }, [config]);
 
   return {
     userDataValue,

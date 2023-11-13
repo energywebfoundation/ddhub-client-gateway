@@ -15,16 +15,18 @@ import {
 import { routerConst } from '@ddhub-client-gateway-frontend/ui/utils';
 import { useRouter } from 'next/router';
 import { useContext, useEffect, useState } from 'react';
-import { UserContext, UserRole } from './UserDataContext';
+import { UserAuthContext, UserContext, UserRole } from './UserDataContext';
 import { useQueryClient } from 'react-query';
 import { isEmpty } from 'lodash';
 import {
   RouteRestrictions,
   IndexableRouteRestrictions,
+  RouteRestriction,
 } from './config/route-restrictions.interface';
 import { useGatewayConfig } from '@ddhub-client-gateway-frontend/ui/api-hooks';
 
 export const routeRestrictions = new Map<string, string>()
+  .set('gatewaySettings', routerConst.GatewaySettings)
   .set('topicManagement', routerConst.TopicManagement)
   .set('myAppsAndTopics', routerConst.ChannelApps)
   .set('channelManagement', routerConst.ChannelsManagement)
@@ -33,25 +35,61 @@ export const routeRestrictions = new Map<string, string>()
   .set('fileUpload', routerConst.DataMessagingFileUpload)
   .set('fileDownload', routerConst.DataMessagingFileDownload)
   .set('messageInbox', routerConst.MessageInbox)
-  .set('messageOutbox', routerConst.MessageOutbox);
-
-export const messageOnlyRestrictions = new Map<string, string>()
-  .set('messageInbox', routerConst.MessageInbox)
-  .set('messageOutbox', routerConst.MessageOutbox);
+  .set('messageOutbox', routerConst.MessageOutbox)
+  .set('addressBook', routerConst.AddressBook)
+  .set('clientIds', routerConst.ClientIds)
+  .set('integrationApis', routerConst.IntegrationAPIs);
 
 enum VersionStatus {
   UNAVAILABLE = 'Unavailable',
   NOT_DETECTED = 'NOT_DETECTED',
 }
 
+const mapRoleRestrictions = (
+  restrictions: IndexableRouteRestrictions,
+  roleKey: keyof RouteRestriction,
+  role: string | UserRole
+) => {
+  return Object.keys(restrictions)
+    .map((key: string) => {
+      if (
+        restrictions[key][roleKey].some(
+          (allowedAuthRole: string) => allowedAuthRole === role
+        )
+      ) {
+        return routeRestrictions.get(key);
+      }
+    })
+    .filter((value): value is string => value !== '' && value !== undefined);
+};
+
 export const getRoutesToDisplay = (
   accountRoles: Role[],
   restrictions: IndexableRouteRestrictions,
-  config: GatewayConfig
+  config: GatewayConfig,
+  userAuth?: UserAuthContext
 ): Set<string> => {
-  if (!accountRoles) {
-    return new Set();
+  let adminRoutes = new Set<string>();
+  if (config.authEnabled && userAuth) {
+    switch (userAuth.role) {
+      case UserRole.ADMIN:
+        adminRoutes = new Set<string>(
+          mapRoleRestrictions(restrictions, 'allowedAuthRoles', UserRole.ADMIN)
+        );
+        break;
+      case UserRole.MESSAGING: {
+        const allowedRoutes = mapRoleRestrictions(
+          restrictions,
+          'allowedAuthRoles',
+          UserRole.MESSAGING
+        );
+        return new Set(allowedRoutes);
+      }
+      default:
+        return new Set();
+    }
   }
+
   const roles = accountRoles
     .filter(
       (role) =>
@@ -59,23 +97,22 @@ export const getRoutesToDisplay = (
         role.namespace.includes(config?.namespace)
     )
     .map((role) => role.namespace);
+
   if (roles.length === 0) {
     return new Set();
   }
-  const allowedRoutes = Object.keys(restrictions).map((key: string) => {
-    if (
-      restrictions[key].allowedRoles.some(
-        (allowedRole: string) =>
-          roles.filter((role) => role.includes(allowedRole)).length > 0
-      )
-    ) {
-      return routeRestrictions.get(key);
-    } else {
-      return '';
-    }
-  });
 
-  return new Set(allowedRoutes.filter((value) => value !== '') as string[]);
+  let allowedRoutes: string[] = [];
+  for (const role of roles) {
+    allowedRoutes.push(
+      ...mapRoleRestrictions(restrictions, 'allowedRoles', role)
+    );
+  }
+  if (adminRoutes.size) {
+    allowedRoutes = [...allowedRoutes, ...adminRoutes];
+  }
+
+  return new Set(allowedRoutes);
 };
 
 export const useUserDataEffects = () => {
@@ -115,7 +152,8 @@ export const useUserDataEffects = () => {
         const displayedRoutes = getRoutesToDisplay(
           result.enrolment.roles,
           routeRestrictionList as unknown as IndexableRouteRestrictions,
-          config
+          config,
+          config.authEnabled ? userAuth : undefined
         );
 
         setUserData((prevValue) => ({
@@ -130,23 +168,6 @@ export const useUserDataEffects = () => {
       }
     }
   }, [config, result, routeRestrictionList]);
-
-  useEffect(() => {
-    if (userAuth && userAuth.authenticated) {
-      if (!userAuth.displayedRoutes.size) {
-        let displayedRoutes = new Set<string>();
-        if (userAuth.role === UserRole.MESSAGING) {
-          displayedRoutes = new Set(messageOnlyRestrictions.values());
-        } else if (userAuth.role === UserRole.ADMIN) {
-          displayedRoutes = new Set(routeRestrictions.values());
-        }
-        setUserAuth((prevValue) => ({
-          ...prevValue,
-          displayedRoutes,
-        }));
-      }
-    }
-  }, [userAuth]);
 
   const setData = (
     res: IdentityWithEnrolment,

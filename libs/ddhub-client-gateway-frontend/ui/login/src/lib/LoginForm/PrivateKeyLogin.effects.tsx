@@ -1,13 +1,7 @@
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { FieldValues, useForm } from 'react-hook-form';
-import { useUserDataEffects } from '../UserData.effects';
-import {
-  CreateIdentityDto,
-  useIdentityControllerPost,
-} from '@dsb-client-gateway/dsb-client-gateway-api-client';
-import { IdentityWithEnrolment } from '@ddhub-client-gateway/identity/models';
-import { useCustomAlert } from '@ddhub-client-gateway-frontend/ui/core';
+import { CreateIdentityDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 
 interface PrivateKeyLoginFormProps {
   onSubmitHandler: (data: CreateIdentityDto) => void;

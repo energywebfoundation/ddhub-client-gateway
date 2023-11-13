@@ -1,13 +1,35 @@
-import { Typography } from '@mui/material';
+import { IconButton, Typography } from '@mui/material';
 import { didFormatMinifier } from '@ddhub-client-gateway-frontend/ui/utils';
 import { useStyles } from './Header.styles';
 import { useGatewayConfig } from '@ddhub-client-gateway-frontend/ui/api-hooks';
+import { useContext } from 'react';
+import { UserContext } from '@ddhub-client-gateway-frontend/ui/login';
+import { useCustomAlert } from '@ddhub-client-gateway-frontend/ui/core';
+import { LogOut } from 'react-feather';
 
 export function Header() {
+  const Swal = useCustomAlert();
+  const userContext = useContext(UserContext);
+  if (!userContext) {
+    throw new Error('Header must be rendered within a UserContext provider');
+  }
+
   const { classes } = useStyles();
   const {
-    config: { did },
+    config: { did, authEnabled },
   } = useGatewayConfig();
+
+  const openLogoutModal = async () => {
+    const result = await Swal.warning({
+      title: 'Are you sure you want to logout?',
+      text: 'You will be redirected to the login page',
+    });
+
+    if (result.isConfirmed) {
+      userContext.setUserAuth(null);
+      userContext.resetAuthData();
+    }
+  };
 
   return (
     <div className={classes.root}>
@@ -26,6 +48,13 @@ export function Header() {
           className={classes.status}
         />
       </div>
+      {authEnabled && userContext.authenticated && (
+        <div className={classes.logoutButton}>
+          <IconButton onClick={() => openLogoutModal()}>
+            <LogOut className={classes.logoutButtonIcon} />
+          </IconButton>
+        </div>
+      )}
     </div>
   );
 }

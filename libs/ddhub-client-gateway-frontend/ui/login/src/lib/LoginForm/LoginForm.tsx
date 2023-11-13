@@ -20,6 +20,13 @@ export function LoginForm(props: LoginFormProps) {
   const { theme, classes } = useStyles();
   const loginForm = useLoginFormEffects(props);
 
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLFormElement>) => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      loginForm.onSubmit();
+    }
+  };
+
   return isLoading ? (
     <Box
       width="100%"
@@ -30,7 +37,11 @@ export function LoginForm(props: LoginFormProps) {
       <CircularProgress size={17} sx={{ color: theme.palette.common.white }} />
     </Box>
   ) : (
-    <form style={{ minWidth: 342 }} onSubmit={loginForm.onSubmit}>
+    <form
+      style={{ minWidth: 342 }}
+      onKeyDown={handleKeyDown}
+      onSubmit={loginForm.onSubmit}
+    >
       {loginForm.fields.map((field) => (
         <Box key={field.name} className={classes.inputWrapper}>
           <FormInput

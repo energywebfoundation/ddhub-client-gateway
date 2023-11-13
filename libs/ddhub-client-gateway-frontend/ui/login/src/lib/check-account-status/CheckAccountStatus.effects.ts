@@ -9,7 +9,7 @@ import { useUserDataEffects } from '../UserData.effects';
 import axios from 'axios';
 import { RouteRestrictions } from '../config/route-restrictions.interface';
 import { useBackdropContext } from '@ddhub-client-gateway-frontend/ui/context';
-import { useIdentity } from '@ddhub-client-gateway-frontend/ui/api-hooks';
+import { set } from 'react-hook-form';
 
 export const useCheckAccountStatus = (
   triggerQuery = true,
@@ -20,6 +20,7 @@ export const useCheckAccountStatus = (
     useUserDataEffects();
   const { setIsLoading } = useBackdropContext();
   const [checking, setChecking] = useState(triggerQuery);
+  const [error, setError] = useState(null);
 
   const isValidIdentityData = (
     data: unknown
@@ -58,16 +59,23 @@ export const useCheckAccountStatus = (
   useEffect(() => {
     if (checking || refreshIdentity) {
       setIsCheckingIdentity(true);
-      getIdentityData().then((res) => {
-        if (isValidIdentityData(res)) {
-          setUserData(res.identityData, res.routeRestrictions);
-        }
-        if (withBackdrop) {
-          setIsLoading(false);
-        }
-        setChecking(false);
-        setIsCheckingIdentity(false);
-      });
+      getIdentityData()
+        .then((res) => {
+          if (isValidIdentityData(res)) {
+            setUserData(res.identityData, res.routeRestrictions);
+          }
+        })
+        .catch((e) => {
+          setError(e);
+          console.error(e.message);
+        })
+        .finally(() => {
+          if (withBackdrop) {
+            setIsLoading(false);
+          }
+          setChecking(false);
+          setIsCheckingIdentity(false);
+        });
     }
   }, [checking, refreshIdentity]);
 
