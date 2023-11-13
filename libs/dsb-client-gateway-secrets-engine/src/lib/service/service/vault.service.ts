@@ -33,7 +33,18 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
   }
 
   public async getAllUsers(): Promise<UsersList> {
-    const res = await this.client.list(`${this.prefix}/${PATHS.USERS}`);
+    const res = await this.client
+      .list(`${this.prefix}/${PATHS.USERS}`)
+      .catch((e) => {
+        this.logger.error('failed to load list of users');
+        this.logger.error(e);
+
+        return {
+          data: {
+            keys: [],
+          },
+        };
+      });
 
     const keys: string[] = res.data.keys;
 
