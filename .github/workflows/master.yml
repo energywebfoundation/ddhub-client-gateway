@@ -44,15 +44,22 @@ jobs:
               echo "Running on branch ${{ github.ref }}"
               if [ "${{ github.ref }}" = "refs/heads/pre_release" ]; then
                 echo "ENVIRONMENT=test" >> "$GITHUB_OUTPUT"
-                echo "ARGOCD_URL=${{ secrets.ARGOCD_DEV_URL }}" >> "$GITHUB_OUTPUT"
-                echo "ARGOCD_USERNAME=${{ secrets.ARGOCD_DEV_USERNAME }}" >> "$GITHUB_OUTPUT"
-                echo "ARGOCD_PWD=${{ secrets.ARGOCD_DEV_PASS }}" >> "$GITHUB_OUTPUT"
+                echo "ARGOCD_URL=$ARGOCD_DEV_URL" >> "$GITHUB_OUTPUT"
+                echo "ARGOCD_USERNAME=$ARGOCD_DEV_USERNAME" >> "$GITHUB_OUTPUT"
+                echo "ARGOCD_PWD=$ARGOCD_DEV_PWD" >> "$GITHUB_OUTPUT"
               else
                 echo "ENVIRONMENT=demo" >> "$GITHUB_OUTPUT"
-                echo "ARGOCD_URL=${{ secrets.ARGOCD_STAGING_URL }}" >> "$GITHUB_OUTPUT"
-                echo "ARGOCD_USERNAME=${{ secrets.ARGOCD_STAGING_USERNAME }}" >> "$GITHUB_OUTPUT"
-                echo "ARGOCD_PWD=${{ secrets.ARGOCD_STAGING_PASS }}" >> "$GITHUB_OUTPUT"
+                echo "ARGOCD_URL=$ARGOCD_STG_URL" >> "$GITHUB_OUTPUT"
+                echo "ARGOCD_USERNAME=$ARGOCD_STG_USERNAME" >> "$GITHUB_OUTPUT"
+                echo "ARGOCD_PWD=$ARGOCD_STG_PWD" >> "$GITHUB_OUTPUT"
               fi
+        env:
+          ARGOCD_DEV_URL: ${{ secrets.ARGOCD_DEV_URL }}
+          ARGOCD_DEV_USERNAME: ${{ secrets.ARGOCD_DEV_USERNAME }}
+          ARGOCD_DEV_PWD: ${{ secrets.ARGOCD_DEV_PASS }}
+          ARGOCD_STG_URL: ${{ secrets.ARGOCD_STAGING_URL }}
+          ARGOCD_STG_USERNAME: ${{ secrets.ARGOCD_STAGING_USERNAME }}
+          ARGOCD_STG_PWD: ${{ secrets.ARGOCD_STAGING_PASS }}
     outputs:
       new_version: ${{ steps.tag_version.outputs.new_version }}
       changelog: ${{ steps.tag_version.outputs.changelog }}
