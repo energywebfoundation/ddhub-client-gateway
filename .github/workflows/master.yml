@@ -44,23 +44,23 @@ jobs:
               echo "Running on branch ${{ github.ref }}"
               if [ "${{ github.ref }}" = "refs/heads/pre_release" ]; then
                 echo "ENVIRONMENT=test" >> "$GITHUB_OUTPUT"
-                echo "ARGOCD_URL=${{ secrets.ARGOCD_DEV_URL }}" >> "$GITHUB_OUTPUT"
-                echo "ARGOCD_USERNAME=${{ secrets.ARGOCD_DEV_USERNAME }}" >> "$GITHUB_OUTPUT"
-                echo "ARGOCD_PWD=${{ secrets.ARGOCD_DEV_PASS }}" >> "$GITHUB_OUTPUT"
+                echo "ARGOCDURL=${{ secrets.ARGOCD_DEV_URL }}" >> "$GITHUB_OUTPUT"
+                echo "ARGOCDUSERNAME=${{ secrets.ARGOCD_DEV_USERNAME }}" >> "$GITHUB_OUTPUT"
+                echo "ARGOCDPWD=${{ secrets.ARGOCD_DEV_PASS }}" >> "$GITHUB_OUTPUT"
               else
                 echo "ENVIRONMENT=demo" >> "$GITHUB_OUTPUT"
-                echo "ARGOCD_URL=${{ secrets.ARGOCD_STAGING_URL }}" >> "$GITHUB_OUTPUT"
-                echo "ARGOCD_USERNAME=${{ secrets.ARGOCD_STAGING_USERNAME }}" >> "$GITHUB_OUTPUT"
-                echo "ARGOCD_PWD=${{ secrets.ARGOCD_STAGING_PASS }}" >> "$GITHUB_OUTPUT"
+                echo "ARGOCDURL=${{ secrets.ARGOCD_STAGING_URL }}" >> "$GITHUB_OUTPUT"
+                echo "ARGOCDUSERNAME=${{ secrets.ARGOCD_STAGING_USERNAME }}" >> "$GITHUB_OUTPUT"
+                echo "ARGOCDPWD=${{ secrets.ARGOCD_STAGING_PASS }}" >> "$GITHUB_OUTPUT"
               fi
-              echo $GITHUB_OUTPUT
+              cat $GITHUB_OUTPUT
     outputs:
       new_version: ${{ steps.tag_version.outputs.new_version }}
       changelog: ${{ steps.tag_version.outputs.changelog }}
       argocd_env: ${{ steps.configure.outputs.ENVIRONMENT }}
-      argocd_url: ${{ steps.configure.outputs.ARGOCD_URL }}
-      argocd_username: ${{ steps.configure.outputs.ARGOCD_USERNAME }}
-      argocd_pwd: ${{ steps.configure.outputs.ARGOCD_PWD }}
+      argocd_url: ${{ steps.configure.outputs.ARGOCDURL }}
+      argocd_username: ${{ steps.configure.outputs.ARGOCDUSERNAME }}
+      argocd_pwd: ${{ steps.configure.outputs.ARGOCDPWD }}
 
   build-scheduler:
     name: Build scheduler
