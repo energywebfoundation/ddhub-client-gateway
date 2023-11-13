@@ -53,7 +53,7 @@ jobs:
                 echo "ARGOCD_USERNAME=${{ secrets.ARGOCD_STAGING_USERNAME }}" >> "$GITHUB_OUTPUT"
                 echo "ARGOCD_PWD=${{ secrets.ARGOCD_STAGING_PASS }}" >> "$GITHUB_OUTPUT"
               fi
-              cat $GITHUB_OUTPUT
+              echo $GITHUB_OUTPUT
     outputs:
       new_version: ${{ steps.tag_version.outputs.new_version }}
       changelog: ${{ steps.tag_version.outputs.changelog }}
@@ -264,7 +264,6 @@ jobs:
   build-fe:
     name: Build Frontend
     runs-on: ubuntu-latest
-    if: false
     needs: [cancel-previous, semantic-version]
     services:
       postgres:
