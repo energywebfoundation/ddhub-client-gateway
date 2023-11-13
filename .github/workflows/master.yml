@@ -37,30 +37,9 @@ jobs:
           release_branches: master
           pre_release_branches: pre_release
           custom_release_rules: major:major:Major Changes,minor:minor:Minor Changes,chore:patch:Chores
-
-      - name: Set ArgoCD Variable
-        id: configure
-        run: |
-              echo "Running on branch ${{ github.ref }}"
-              if [ "${{ github.ref }}" = "refs/heads/pre_release" ]; then
-                echo "ENVIRONMENT=test" >> "$GITHUB_OUTPUT"
-                echo "ARGOCDURL=${{ secrets.ARGOCD_DEV_URL }}" >> "$GITHUB_OUTPUT"
-                echo "ARGOCDUSERNAME=${{ secrets.ARGOCD_DEV_USERNAME }}" >> "$GITHUB_OUTPUT"
-                echo "ARGOCDPWD=${{ secrets.ARGOCD_DEV_PASS }}" >> "$GITHUB_OUTPUT"
-              else
-                echo "ENVIRONMENT=demo" >> "$GITHUB_OUTPUT"
-                echo "ARGOCDURL=${{ secrets.ARGOCD_STAGING_URL }}" >> "$GITHUB_OUTPUT"
-                echo "ARGOCDUSERNAME=${{ secrets.ARGOCD_STAGING_USERNAME }}" >> "$GITHUB_OUTPUT"
-                echo "ARGOCDPWD=${{ secrets.ARGOCD_STAGING_PASS }}" >> "$GITHUB_OUTPUT"
-              fi
-              cat $GITHUB_OUTPUT
     outputs:
       new_version: ${{ steps.tag_version.outputs.new_version }}
       changelog: ${{ steps.tag_version.outputs.changelog }}
-      argocd_env: ${{ steps.configure.outputs.ENVIRONMENT }}
-      argocd_url: ${{ steps.configure.outputs.ARGOCDURL }}
-      argocd_username: ${{ steps.configure.outputs.ARGOCDUSERNAME }}
-      argocd_pwd: ${{ steps.configure.outputs.ARGOCDPWD }}
 
   build-scheduler:
     name: Build scheduler
@@ -329,16 +308,28 @@ jobs:
       #       docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-frontend:latest
       #     fi
 
-      - name: Debug Outputs
+      - name: Set ArgoCD Variable
+        id: configure
         run: |
-          echo "Outputs: ${{ toJson(needs.semantic-version.outputs) }}"
+              echo "Running on branch ${{ github.ref }}"
+              if [ "${{ github.ref }}" = "refs/heads/pre_release" ]; then
+                echo "ENVIRONMENT=test" >> "$GITHUB_ENV"
+                echo "ARGOCD_URL=${{ secrets.ARGOCD_DEV_URL }}" >> "$GITHUB_ENV"
+                echo "ARGOCD_USERNAME=${{ secrets.ARGOCD_DEV_USERNAME }}" >> "$GITHUB_ENV"
+                echo "ARGOCD_PWD=${{ secrets.ARGOCD_DEV_PASS }}" >> "$GITHUB_ENV"
+              else
+                echo "ENVIRONMENT=demo" >> "$GITHUB_ENV"
+                echo "ARGOCD_URL=${{ secrets.ARGOCD_STAGING_URL }}" >> "$GITHUB_ENV"
+                echo "ARGOCD_USERNAME=${{ secrets.ARGOCD_STAGING_USERNAME }}" >> "$GITHUB_ENV"
+                echo "ARGOCD_PWD=${{ secrets.ARGOCD_STAGING_PASS }}" >> "$GITHUB_ENV"
+              fi
 
       - name: ArgoCD login
         uses: clowdhaus/argo-cd-action/@v1.12.1
         id: argocd_login
         with:
-          command: login ${{needs.semantic-version.outputs.argocd_url}}
-          options: --insecure --password ${{needs.semantic-version.outputs.argocd_pwd}} --username ${{needs.semantic-version.outputs.argocd_username}}
+          command: login $ARGOCD_URL
+          options: --insecure --password $ARGOCD_PWD --username $ARGOCD_USERNAME
 
       # - name: ArgoCD overwrite target image tag
       #   uses: clowdhaus/argo-cd-action/@v1.12.1
