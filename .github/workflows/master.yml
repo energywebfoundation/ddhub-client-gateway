@@ -328,8 +328,8 @@ jobs:
         uses: clowdhaus/argo-cd-action/@v1.12.1
         id: argocd_login
         with:
-          command: login $ARGOCD_URL
-          options: --insecure --password $ARGOCD_PWD --username $ARGOCD_USERNAME
+          command: login ${{ env.ARGOCD_URL }}
+          options: --insecure --password ${{ env.ARGOCD_PWD }} --username ${{ env.ARGOCD_USERNAME }}
 
       # - name: ArgoCD overwrite target image tag
       #   uses: clowdhaus/argo-cd-action/@v1.12.1
