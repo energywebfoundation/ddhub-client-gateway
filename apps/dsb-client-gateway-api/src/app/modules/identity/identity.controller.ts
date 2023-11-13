@@ -85,7 +85,6 @@ export class IdentityController {
   public async post(
     @Body() { privateKey }: CreateIdentityDto
   ): Promise<Identity> {
-    console.log('Creating identity ' + privateKey);
     await this.identityService.createIdentity(privateKey);
 
     return this.identityService.getIdentityWithEnrolment();
