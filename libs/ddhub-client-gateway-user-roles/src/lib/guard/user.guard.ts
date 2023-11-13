@@ -8,7 +8,6 @@ import { UserAuthService } from '../service/user-auth.service';
 import { Reflector } from '@nestjs/core';
 import { EXCLUDED_ROUTE, ROLES_KEY, UserRole } from '../const';
 import { UserTokenData } from '../service';
-import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class UserGuard implements CanActivate {
@@ -18,6 +17,10 @@ export class UserGuard implements CanActivate {
     protected readonly userAuthService: UserAuthService,
     protected readonly reflector: Reflector
   ) {}
+
+  public isAuthEnabled(): boolean {
+    return this.userAuthService.isAuthEnabled();
+  }
 
   public async canActivate(context: ExecutionContext): Promise<boolean> {
     if (!this.userAuthService.isAuthEnabled()) {
@@ -34,13 +37,18 @@ export class UserGuard implements CanActivate {
     );
 
     if (excludedRoute === true) {
+      console.log('excluded route');
       return true;
     }
 
     const authHeader = request.headers.authorization;
 
+    console.log('auth header', authHeader);
+
     if (authHeader) {
       const token = authHeader.split(' ')[1];
+
+      console.log('token', token);
 
       try {
         const decodedToken: UserTokenData =
