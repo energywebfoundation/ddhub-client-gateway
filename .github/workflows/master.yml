@@ -36,6 +36,7 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           release_branches: master
           pre_release_branches: pre_release
+          default_prerelease_bump: preminor
           custom_release_rules: major:major:Major Changes,minor:minor:Minor Changes,chore:patch:Chores
     outputs:
       new_version: ${{ steps.tag_version.outputs.new_version }}
