@@ -44,15 +44,22 @@ jobs:
               echo "Running on branch ${{ github.ref }}"
               if [ "${{ github.ref }}" = "refs/heads/pre_release" ]; then
                 echo "ENVIRONMENT=test" >> $GITHUB_OUTPUT
-                echo "ARGOCD_URL=${{ secrets.ARGOCD_DEV_URL }}" >> $GITHUB_OUTPUT
-                echo "ARGOCD_USERNAME=${{ secrets.ARGOCD_DEV_USERNAME }}" >> $GITHUB_OUTPUT
-                echo "ARGOCD_PWD=${{ secrets.ARGOCD_DEV_PASS }}" >> $GITHUB_OUTPUT
+                echo "ARGOCD_URL=$ARGOCD_DEV_URL" >> $GITHUB_OUTPUT
+                echo "ARGOCD_USERNAME=$ARGOCD_DEV_USERNAME" >> $GITHUB_OUTPUT
+                echo "ARGOCD_PWD=$ARGOCD_DEV_PWD" >> $GITHUB_OUTPUT
               else
                 echo "ENVIRONMENT=demo" >> $GITHUB_OUTPUT
-                echo "ARGOCD_URL=${{ secrets.ARGOCD_STAGING_URL }}" >> $GITHUB_OUTPUT
-                echo "ARGOCD_USERNAME=${{ secrets.ARGOCD_STAGING_USERNAME }}" >> $GITHUB_OUTPUT
-                echo "ARGOCD_PWD=${{ secrets.ARGOCD_STAGING_PASS }}" >> $GITHUB_OUTPUT
+                echo "ARGOCD_URL=$ARGOCD_STG_URL" >> $GITHUB_OUTPUT
+                echo "ARGOCD_USERNAME=$ARGOCD_STG_USERNAME" >> $GITHUB_OUTPUT
+                echo "ARGOCD_PWD=$ARGOCD_STG_PWD" >> $GITHUB_OUTPUT
               fi
+        env:
+          ARGOCD_DEV_URL: ${{ secrets.ARGOCD_DEV_URL }}
+          ARGOCD_DEV_USERNAME: ${{ secrets.ARGOCD_DEV_USERNAME }}
+          ARGOCD_DEV_PWD: ${{ secrets.ARGOCD_DEV_PASS }}
+          ARGOCD_STG_URL: ${{ secrets.ARGOCD_STAGING_URL }}
+          ARGOCD_STG_USERNAME: ${{ secrets.ARGOCD_STAGING_USERNAME }}
+          ARGOCD_STG_PWD: ${{ secrets.ARGOCD_STAGING_PASS }}
     outputs:
       new_version: ${{ steps.tag_version.outputs.new_version }}
       changelog: ${{ steps.tag_version.outputs.changelog }}
@@ -106,8 +113,10 @@ jobs:
           docker build -f ci/Docker/Dockerfile.scheduler -t energyweb/ddhub-client-gateway-scheduler .
           docker tag energyweb/ddhub-client-gateway-scheduler ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-scheduler:${{needs.semantic-version.outputs.new_version}}
           docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-scheduler:${{needs.semantic-version.outputs.new_version}}
-          docker tag energyweb/ddhub-client-gateway-scheduler ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-scheduler:latest
-          docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-scheduler:latest
+          if [ "${{ github.ref }}" = "refs/heads/master" ]; then
+            docker tag energyweb/ddhub-client-gateway-scheduler ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-scheduler:latest
+            docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-scheduler:latest
+          fi
 
       - name: ArgoCD login
         uses: clowdhaus/argo-cd-action/@v1.12.1
@@ -200,8 +209,10 @@ jobs:
           docker build -f ci/Docker/Dockerfile.backend -t energyweb/ddhub-client-gateway-backend .
           docker tag energyweb/ddhub-client-gateway-backend ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-backend:${{needs.semantic-version.outputs.new_version}}
           docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-backend:${{needs.semantic-version.outputs.new_version}}
-          docker tag energyweb/ddhub-client-gateway-backend ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-backend:latest
-          docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-backend:latest
+          if [ "${{ github.ref }}" = "refs/heads/master" ]; then
+            docker tag energyweb/ddhub-client-gateway-backend ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-backend:latest
+            docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-backend:latest
+          fi
 
       - name: Create a GitHub release
         uses: ncipollo/release-action@v1
@@ -314,8 +325,10 @@ jobs:
           docker build -f ci/Docker/Dockerfile.frontend -t energyweb/ddhub-client-gateway-frontend .
           docker tag energyweb/ddhub-client-gateway-frontend ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-frontend:${{needs.semantic-version.outputs.new_version}}
           docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-frontend:${{needs.semantic-version.outputs.new_version}}
-          docker tag energyweb/ddhub-client-gateway-frontend ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-frontend:latest
-          docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-frontend:latest
+          if [ "${{ github.ref }}" = "refs/heads/master" ]; then
+            docker tag energyweb/ddhub-client-gateway-frontend ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-frontend:latest
+            docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-frontend:latest
+          fi
 
       - name: ArgoCD login
         uses: clowdhaus/argo-cd-action/@v1.12.1
