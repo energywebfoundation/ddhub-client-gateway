@@ -4,7 +4,6 @@ import {
   CronStatus,
   CronWrapperRepository,
   FileMetadataWrapperRepository,
-  SentMessageRepositoryWrapper,
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
 import { CronJob } from 'cron';
 import { Span } from 'nestjs-otel';
@@ -27,7 +26,6 @@ export class FileCleanerService implements OnApplicationBootstrap {
     protected readonly configService: ConfigService,
     protected readonly schedulerRegistry: SchedulerRegistry,
     protected readonly ddhubConfigService: DdhubConfigService,
-    protected readonly sentMessagesWrapperRepository: SentMessageRepositoryWrapper,
     protected readonly wrapper: FileMetadataWrapperRepository
   ) {}
 
@@ -110,6 +108,11 @@ export class FileCleanerService implements OnApplicationBootstrap {
       await this.processFiles(
         this.configService.get<string>('DOWNLOAD_FILES_DIR'),
         this.configService.get<number>('DOWNLOAD_FILES_LIFETIME')
+      );
+
+      await this.processFiles(
+        this.configService.get<string>('UPLOAD_FILES_DIR'),
+        this.configService.get<number>('UPLOAD_FILES_LIFETIME')
       );
 
       await this.cronWrapper.cronRepository.save({
