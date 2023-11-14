@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { ListItem } from '@mui/material';
 import clsx from 'clsx';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useStyles } from '../Drawer.styles';
 import { useMenuItemEffects } from './MenuItem.effects';
 import { MenuItemText } from '../MenuItemText/MenuItemText';
@@ -26,6 +26,7 @@ export const MenuItem = ({ href, onClick, title, icon }: MenuItemProps) => {
     </Link>
   ) : (
     <ListItem className={classes.navLink} onClick={onClick}>
+      {icon}
       <MenuItemText title={title} />
     </ListItem>
   );

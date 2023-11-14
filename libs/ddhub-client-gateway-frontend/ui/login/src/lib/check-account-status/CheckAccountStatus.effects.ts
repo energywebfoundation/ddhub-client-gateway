@@ -5,19 +5,36 @@ import {
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { useEffect, useState } from 'react';
 import { useQueryClient } from 'react-query';
-import { useSetUserDataEffect } from '../SetUserData.effects';
+import { useUserDataEffects } from '../UserData.effects';
 import axios from 'axios';
 import { RouteRestrictions } from '../config/route-restrictions.interface';
 import { useBackdropContext } from '@ddhub-client-gateway-frontend/ui/context';
+import { set } from 'react-hook-form';
 
-export const useCheckAccountStatusEffects = (
+export const useCheckAccountStatus = (
   triggerQuery = true,
   withBackdrop = true
 ) => {
   const queryClient = useQueryClient();
-  const { setUserData, setIsChecking } = useSetUserDataEffect();
+  const { setUserData, setIsCheckingIdentity, refreshIdentity } =
+    useUserDataEffects();
   const { setIsLoading } = useBackdropContext();
   const [checking, setChecking] = useState(triggerQuery);
+  const [error, setError] = useState(null);
+
+  const isValidIdentityData = (
+    data: unknown
+  ): data is {
+    identityData: IdentityWithEnrolment;
+    routeRestrictions: RouteRestrictions;
+  } => {
+    return (
+      typeof data === 'object' &&
+      data !== null &&
+      'identityData' in data &&
+      'routeRestrictions' in data
+    );
+  };
 
   const getIdentityData = async () => {
     const queryParam = `t=${new Date(Date.now()).getTime()}`;
@@ -34,26 +51,33 @@ export const useCheckAccountStatusEffects = (
         identityControllerGet
       );
       return { identityData, routeRestrictions };
-    } catch (e: any) {
+    } catch (e: unknown) {
       return e;
     }
   };
 
   useEffect(() => {
-    if (checking) {
-      setIsChecking(true);
-      getIdentityData().then((res) => {
-        setUserData(
-          res.identityData as IdentityWithEnrolment,
-          res.routeRestrictions
-        );
-        if (withBackdrop) {
-          setIsLoading(false);
-        }
-        setChecking(false);
-      });
+    if (checking || refreshIdentity) {
+      setIsCheckingIdentity(true);
+      getIdentityData()
+        .then((res) => {
+          if (isValidIdentityData(res)) {
+            setUserData(res.identityData, res.routeRestrictions);
+          }
+        })
+        .catch((e) => {
+          setError(e);
+          console.error(e.message);
+        })
+        .finally(() => {
+          if (withBackdrop) {
+            setIsLoading(false);
+          }
+          setChecking(false);
+          setIsCheckingIdentity(false);
+        });
     }
-  }, [checking]);
+  }, [checking, refreshIdentity]);
 
   return { checking, setChecking };
 };

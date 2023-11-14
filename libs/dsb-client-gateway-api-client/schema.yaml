@@ -2744,9 +2744,17 @@ components:
         refreshToken:
           type: "string"
           description: "Refresh token"
+        role:
+          type: "string"
+          description: "User role"
+        username:
+          type: "string"
+          description: "Username"
       required:
         - "accessToken"
         - "refreshToken"
+        - "role"
+        - "username"
     LoginRequestDto:
       type: "object"
       properties:

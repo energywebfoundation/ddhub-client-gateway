@@ -1,28 +1,131 @@
 import { IdentityWithEnrolment } from '@ddhub-client-gateway/identity/models';
-import { useIdentityControllerPost } from '@dsb-client-gateway/dsb-client-gateway-api-client';
-import { useSetUserDataEffect } from './SetUserData.effects';
+import {
+  CreateIdentityDto,
+  LoginRequestDto,
+  LoginResponseDto,
+  RefreshTokenRequestDto,
+  useIdentityControllerPost,
+  useLoginControllerLogin,
+  useLoginControllerRefreshToken,
+} from '@dsb-client-gateway/dsb-client-gateway-api-client';
+import { useUserDataEffects } from './UserData.effects';
+import { useCustomAlert } from '@ddhub-client-gateway-frontend/ui/core';
+import { useGatewayConfig } from '@ddhub-client-gateway-frontend/ui/api-hooks';
+import { useEffect, useState } from 'react';
 
-export const usePrivateKeyEffects = () => {
-  const { setUserData, userData, setIsChecking, setDataOnError } =
-    useSetUserDataEffect();
+interface PrivateKeyEffects {
+  setIsChecking: (isChecking: boolean) => void;
+  setUserData: (userData: IdentityWithEnrolment) => void;
+  setDataOnError: (error: Error) => void;
+  notifyOnError?: (error: Error) => void;
+}
 
+interface UserLoginEffects {
+  setIsChecking: (isChecking: boolean) => void;
+  setUserAuth: (userAuthData: LoginResponseDto) => void;
+  setDataOnError: (error: Error) => void;
+  notifyOnError?: (error: Error) => void;
+}
+
+const usePrivateKeyEffects = ({
+  setIsChecking,
+  setUserData,
+  setDataOnError,
+  notifyOnError,
+}: PrivateKeyEffects) => {
   const { mutate, isLoading } = useIdentityControllerPost({
     mutation: {
       onMutate: () => setIsChecking(true),
       onSuccess: (res) => setUserData(res as IdentityWithEnrolment),
-      onError: (error: Error) => setDataOnError(error),
+      onError: (error: Error) => {
+        if (notifyOnError) {
+          notifyOnError(error);
+        }
+        setDataOnError(error);
+        setIsChecking(false);
+      },
+      onSettled: () => setIsChecking(false),
     },
   });
 
-  const submit = (privateKey: string) => {
-    mutate({ data: { privateKey } });
+  const onSubmit = (data: CreateIdentityDto) => mutate({ data });
+
+  return { onSubmit, isLoading };
+};
+
+const useUserLoginEffects = ({
+  setIsChecking,
+  setUserAuth,
+  setDataOnError,
+  notifyOnError,
+}: UserLoginEffects) => {
+  const { mutate, isLoading } = useLoginControllerLogin({
+    mutation: {
+      onMutate: () => setIsChecking(true),
+      onSuccess: (res) => setUserAuth(res),
+      onError: (error: Error) => {
+        if (notifyOnError) {
+          notifyOnError(error);
+        }
+        setDataOnError(error);
+        setIsChecking(false);
+      },
+      onSettled: () => setIsChecking(false),
+    },
+  });
+
+  const onSubmit = (data: LoginRequestDto) => mutate({ data });
+
+  return { onSubmit, isLoading };
+};
+
+export const useLoginEffects = () => {
+  const Swal = useCustomAlert();
+  const { isLoading: isConfigLoading, config } = useGatewayConfig();
+  const [authEnabled, setAuthEnabled] = useState(false);
+
+  const onError = (err: any) => {
+    console.error(err);
+    Swal.httpError(err);
   };
 
+  const {
+    setUserData,
+    setUserAuth,
+    userData,
+    userAuth,
+    setIsCheckingIdentity,
+    setIsCheckingAuth,
+    setUserDataOnError,
+    setUserAuthOnError,
+  } = useUserDataEffects();
+  const privateKeyLogin = usePrivateKeyEffects({
+    setIsChecking: setIsCheckingIdentity,
+    setUserData,
+    setDataOnError: setUserDataOnError,
+    notifyOnError: onError,
+  });
+  const userLogin = useUserLoginEffects({
+    setIsChecking: setIsCheckingAuth,
+    setUserAuth,
+    setDataOnError: setUserAuthOnError,
+    notifyOnError: onError,
+  });
+
+  useEffect(() => {
+    if (!isConfigLoading && config?.authEnabled) {
+      setAuthEnabled(true);
+    }
+  }, [isConfigLoading, config]);
+
   return {
-    isLoading: isLoading || userData.isChecking,
-    submit,
+    authEnabled,
+    isLoading: isConfigLoading || userData.isChecking || userAuth.isChecking,
+    privateKeySubmitHandler: privateKeyLogin.onSubmit,
+    userLoginSubmitHandler: userLogin.onSubmit,
     status: userData.accountStatus,
     userData,
-    errorMessage: userData.errorMessage,
+    userAuth,
+    errorMessage: userData.errorMessage || userAuth.errorMessage,
   };
 };

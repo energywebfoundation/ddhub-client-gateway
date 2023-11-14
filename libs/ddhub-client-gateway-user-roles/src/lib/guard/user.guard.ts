@@ -8,7 +8,6 @@ import { UserAuthService } from '../service/user-auth.service';
 import { Reflector } from '@nestjs/core';
 import { EXCLUDED_ROUTE, ROLES_KEY, UserRole } from '../const';
 import { UserTokenData } from '../service';
-import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class UserGuard implements CanActivate {
