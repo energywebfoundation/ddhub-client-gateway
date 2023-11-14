@@ -36,16 +36,17 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
 
   public async getAllUsers(): Promise<UsersList> {
     const res = await this.client
-      .list(`${this.prefix}${PATHS.USERS}`)
-      .catch((err) => {
-        this.logger.error(err.message);
-        this.logger.error(err);
-        return null;
-      });
+      .list(`${this.prefix}/${PATHS.USERS}`)
+      .catch((e) => {
+        this.logger.error('failed to load list of users');
+        this.logger.error(e);
 
-    if (!res) {
-      return [];
-    }
+        return {
+          data: {
+            keys: [],
+          },
+        };
+      });
 
     const keys: string[] = res.data.keys;
 
@@ -70,6 +71,7 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
       .read(`${this.prefix}${PATHS.USERS}/${username}`)
       .then(({ data }) => ({ password: data.password, role: data.role }))
       .catch((err) => {
+        this.logger.error(`failed to obtain credentails for user ${username}`);
         this.logger.error(err.message);
         this.logger.error(err);
         return null;
@@ -124,6 +126,8 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
       .read(`${this.prefix}${PATHS.CERTIFICATE}`)
       .then(({ data }) => data)
       .catch((err) => {
+        this.logger.error('failed to retrieve certificates');
+        this.logger.error(err);
         this.logger.error(err.message);
         this.logger.error(err);
         return null;
@@ -143,6 +147,7 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
       .read(`${this.prefix}${PATHS.MNEMONIC}`)
       .then(({ data }) => data.mnemonic)
       .catch((err) => {
+        this.logger.error('failed to retrieve mnemonic');
         this.logger.error(err.message);
         this.logger.error(err);
         return null;
@@ -172,6 +177,7 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
       .read(`${this.prefix}${PATHS.IDENTITY_PRIVATE_KEY}`)
       .then(({ data }) => data.key)
       .catch((err) => {
+        this.logger.error('failed to read private key');
         this.logger.error(err.message);
         this.logger.error(err);
         return null;
@@ -204,6 +210,7 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
       .read(`${this.prefix}${PATHS.RSA_KEY}`)
       .then(({ data }) => data.privateKey)
       .catch((err) => {
+        this.logger.error('failed to obtain private RSA key');
         this.logger.error(err.message);
         this.logger.error(err);
         return null;
