@@ -52,9 +52,6 @@ export class UserAuthService {
       throw new Error('Auth not enabled');
     }
 
-    const userList = await this.secretsEngineService.getAllUsers();
-    this.logger.log(`${JSON.stringify(userList)}`);
-
     const userDetails: UserDetails =
       await this.secretsEngineService.getUserAuthDetails(username);
     this.logger.log(`${JSON.stringify(userDetails)}`);
