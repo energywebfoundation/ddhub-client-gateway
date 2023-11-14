@@ -29,6 +29,17 @@ export class OfflineMessagesService {
     protected readonly keysService: KeysService
   ) {}
 
+  public async getOfflineUploadedFile(
+    clientGatewayMessageId: string
+  ): Promise<SentMessageEntity | null> {
+    return this.sentMessagesRepositoryWrapper.repository.findOne({
+      where: {
+        clientGatewayMessageId,
+        isFile: true,
+      },
+    });
+  }
+
   public async getOfflineSentMessages(
     filterParams: GetSentMessagesRequestDto
   ): Promise<GetSentMessageResponseDto[]> {

@@ -325,6 +325,20 @@ paths:
           description: "Refreshed cache"
       tags:
         - "Channels"
+  /api/v2/messages/sent/download/{cgwId}:
+    get:
+      operationId: "MessageController_downloadOfflineFile"
+      parameters:
+        - name: "cgwId"
+          required: true
+          in: "path"
+          schema:
+            type: "string"
+      responses:
+        200:
+          description: "File downloaded successfully"
+      tags:
+        - "Messaging"
   /api/v2/messages/sent:
     get:
       operationId: "MessageController_getSentMessages"

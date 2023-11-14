@@ -4,6 +4,7 @@ import {
   CronStatus,
   CronWrapperRepository,
   FileMetadataWrapperRepository,
+  SentMessageRepositoryWrapper,
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
 import { CronJob } from 'cron';
 import { Span } from 'nestjs-otel';
@@ -12,6 +13,10 @@ import { SchedulerRegistry } from '@nestjs/schedule';
 import * as fs from 'fs';
 import { join } from 'path';
 import moment from 'moment';
+import {
+  ConfigDto,
+  DdhubConfigService,
+} from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
 
 @Injectable()
 export class FileCleanerService implements OnApplicationBootstrap {
@@ -21,6 +26,8 @@ export class FileCleanerService implements OnApplicationBootstrap {
     protected readonly cronWrapper: CronWrapperRepository,
     protected readonly configService: ConfigService,
     protected readonly schedulerRegistry: SchedulerRegistry,
+    protected readonly ddhubConfigService: DdhubConfigService,
+    protected readonly sentMessagesWrapperRepository: SentMessageRepositoryWrapper,
     protected readonly wrapper: FileMetadataWrapperRepository
   ) {}
 
@@ -62,6 +69,8 @@ export class FileCleanerService implements OnApplicationBootstrap {
       return;
     }
 
+    const config: ConfigDto = await this.ddhubConfigService.getConfig();
+
     await Promise.all(
       fileNames.map(async (name) => {
         const fullPath: string = join(path, name);
@@ -70,17 +79,22 @@ export class FileCleanerService implements OnApplicationBootstrap {
 
         this.logger.debug(`fetching file ${fullPath}`);
 
-        if (
-          moment(fileDetails.birthtime)
-            .add(lifetimeMinutes, 'minutes')
-            .isSameOrBefore()
-        ) {
+        const isUploadedFile = name.includes('.offline.unenc');
+
+        const duration = isUploadedFile
+          ? moment.duration(config.msgExpired, 'milliseconds')
+          : moment.duration(lifetimeMinutes, 'minutes');
+
+        if (moment(fileDetails.birthtime).add(duration).isSameOrBefore()) {
           this.logger.debug(`file ${fullPath} marked for deletion`);
 
           fs.unlinkSync(fullPath);
-          await this.wrapper.repository.delete({
-            fileId: name.replace('.enc', ''),
-          });
+
+          if (!isUploadedFile) {
+            await this.wrapper.repository.delete({
+              fileId: name.replace('.enc', ''),
+            });
+          }
         } else {
           this.logger.debug(
             `file ${fullPath} is not applicable for deletion, birth date: ${fileDetails.birthtime}`
