@@ -12,6 +12,7 @@ import { useUserDataEffects } from './UserData.effects';
 import { useCustomAlert } from '@ddhub-client-gateway-frontend/ui/core';
 import { useGatewayConfig } from '@ddhub-client-gateway-frontend/ui/api-hooks';
 import { useEffect, useState } from 'react';
+import { useCheckAccountStatus } from './check-account-status/CheckAccountStatus.effects';
 
 interface PrivateKeyEffects {
   setIsChecking: (isChecking: boolean) => void;
@@ -82,6 +83,7 @@ const useUserLoginEffects = ({
 export const useLoginEffects = () => {
   const Swal = useCustomAlert();
   const { isLoading: isConfigLoading, config } = useGatewayConfig();
+  const { checking: isCheckingIdentity } = useCheckAccountStatus();
   const [authEnabled, setAuthEnabled] = useState(false);
 
   const onError = (err: any) => {
@@ -127,5 +129,6 @@ export const useLoginEffects = () => {
     userData,
     userAuth,
     errorMessage: userData.errorMessage || userAuth.errorMessage,
+    isCheckingIdentity,
   };
 };
