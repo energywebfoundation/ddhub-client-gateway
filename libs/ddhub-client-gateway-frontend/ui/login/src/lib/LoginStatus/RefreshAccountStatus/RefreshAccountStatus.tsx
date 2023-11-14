@@ -3,11 +3,11 @@ import { useEffect } from 'react';
 import { useQueryClient } from 'react-query';
 import { useCountdown } from '../Countdown.effects';
 import { getIdentityControllerGetQueryKey } from '@dsb-client-gateway/dsb-client-gateway-api-client';
-import { useCheckAccountStatusEffects } from '../../check-account-status/CheckAccountStatus.effects';
+import { useCheckAccountStatus } from '../../check-account-status/CheckAccountStatus.effects';
 
 function RefreshAccountStatus() {
   const queryClient = useQueryClient();
-  const { checking, setChecking } = useCheckAccountStatusEffects(false, false);
+  const { checking, setChecking } = useCheckAccountStatus(false, false);
 
   const { resetCountdown, totalSeconds } = useCountdown(10 * 1000, () => {
     setChecking(true);

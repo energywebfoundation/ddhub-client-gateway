@@ -1,46 +1,31 @@
-import * as Yup from 'yup';
-import { useForm, FieldValues } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
 import { LoginFormProps } from './LoginForm';
+import { usePrivateKeyLoginFormEffects } from './PrivateKeyLogin.effects';
+import { useUserLoginFormEffects } from './UserLogin.effects';
 
-export const PRIVATE_KEY_FIELD = 'privateKey';
-
-export const useLoginFormEffects = ({ onPrivateKeySubmit }: LoginFormProps) => {
-  const validationSchema = Yup.object().shape({
-    [PRIVATE_KEY_FIELD]: Yup.string().max(64, 'Maximum length is 64').required(),
+export const useLoginFormEffects = ({
+  privateKeySubmitHandler,
+  userLoginSubmitHandler,
+  authEnabled,
+  userIsAuthenticated,
+}: LoginFormProps) => {
+  const privateKeyForm = usePrivateKeyLoginFormEffects({
+    onSubmitHandler: privateKeySubmitHandler,
+  });
+  const userLoginForm = useUserLoginFormEffects({
+    onSubmitHandler: userLoginSubmitHandler,
   });
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isValid },
-  } = useForm<FieldValues>({
-    resolver: yupResolver(validationSchema),
-    mode: 'onChange',
-    defaultValues: {
-      [PRIVATE_KEY_FIELD]: '',
-    },
-  });
-
-  const field = {
-    name: PRIVATE_KEY_FIELD,
-    label: 'Enter your private key here',
-    inputProps: {
-      placeholder: 'Private key',
-    },
-  };
-
-  const onSubmit = handleSubmit((data: FieldValues) =>
-    onPrivateKeySubmit(data[PRIVATE_KEY_FIELD])
-  );
-
-  const buttonDisabled = !isValid;
-
-  return {
-    field,
-    register,
-    onSubmit,
-    buttonDisabled,
-    errorMessage: errors[PRIVATE_KEY_FIELD]?.message,
-  };
+  const buttonDisabled =
+    authEnabled && !userIsAuthenticated
+      ? !userLoginForm.isValid
+      : !privateKeyForm.isValid;
+  return authEnabled && !userIsAuthenticated
+    ? {
+        ...userLoginForm,
+        buttonDisabled,
+      }
+    : {
+        ...privateKeyForm,
+        buttonDisabled,
+      };
 };

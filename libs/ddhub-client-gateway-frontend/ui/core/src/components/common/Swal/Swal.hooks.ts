@@ -4,13 +4,13 @@ import { SweetAlertResult } from 'sweetalert2';
 export const useCustomAlert = () => {
   const CustomSwal = Swal();
   const fire = async (props: SwalProps): Promise<SweetAlertResult> => {
-    return await CustomSwal(props).fire();
+    return CustomSwal(props).fire();
   };
 
   const error = async (
     props: Partial<SwalProps>
   ): Promise<SweetAlertResult> => {
-    return await CustomSwal({
+    return CustomSwal({
       title: 'Error',
       type: 'error',
       confirmButtonText: 'Dismiss',
@@ -21,7 +21,7 @@ export const useCustomAlert = () => {
   const warning = async (
     props: Partial<SwalProps>
   ): Promise<SweetAlertResult> => {
-    return await CustomSwal({
+    return CustomSwal({
       title: 'Are you sure you want to proceed?',
       type: 'warning',
       showCancelButton: true,
@@ -33,7 +33,7 @@ export const useCustomAlert = () => {
   const success = async (
     props: Partial<SwalProps>
   ): Promise<SweetAlertResult> => {
-    return await CustomSwal({
+    return CustomSwal({
       title: 'Success',
       type: 'success',
       confirmButtonText: 'Dismiss',
@@ -58,7 +58,7 @@ export const useCustomAlert = () => {
       }
     }
 
-    return await CustomSwal({
+    return CustomSwal({
       title: 'Error',
       type: 'error',
       confirmButtonText: 'Dismiss',
