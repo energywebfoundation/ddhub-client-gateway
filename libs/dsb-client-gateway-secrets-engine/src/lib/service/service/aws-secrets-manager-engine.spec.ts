@@ -6,7 +6,7 @@ import {
   SecretsManagerClient,
 } from '@aws-sdk/client-secrets-manager';
 import { ConfigService } from '@nestjs/config';
-import { AwsSecretsManagerService } from '../lib/service/service/aws-secrets-manager.service';
+import { AwsSecretsManagerService } from './aws-secrets-manager.service';
 import { mockClient } from 'aws-sdk-client-mock';
 
 describe('AWS Secrets Manager Engine', () => {
