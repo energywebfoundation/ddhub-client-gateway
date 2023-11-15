@@ -76,6 +76,10 @@ export const SCHEDULER_ENVS = Joi.object({
   HEARTBEAT_CRON_ENABLED: Joi.boolean()
     .default(true)
     .description('Should run heartbeat'),
+  UPLOAD_FILES_LIFETIME: Joi.number()
+    .positive()
+    .default(30)
+    .description('Specifies how long stored files should live (in minutes)'),
   DOWNLOAD_FILES_LIFETIME: Joi.number()
     .positive()
     .default(30)

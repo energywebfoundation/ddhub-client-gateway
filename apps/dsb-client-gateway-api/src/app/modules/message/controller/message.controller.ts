@@ -5,6 +5,9 @@ import {
   HttpCode,
   HttpStatus,
   Logger,
+  NotFoundException,
+  Param,
+  ParseUUIDPipe,
   Post,
   Query,
   Response,
@@ -34,20 +37,44 @@ import { GetSentMessageResponseDto } from '../dto/response/get-sent-message-resp
 import { OfflineMessagesService } from '../service/offline-messages.service';
 import {
   Roles,
+  UserGuard,
   UserRole,
 } from '@dsb-client-gateway/ddhub-client-gateway-user-roles';
 import { AckMessagesRequestDto } from '../dto/request/ack-messages-request.dto';
 
 @Controller('messages')
-@UseGuards(MtlsGuard, UseGuards)
+@UseGuards(MtlsGuard, UserGuard)
 @ApiTags('Messaging')
 export class MessageController {
   private readonly logger = new Logger();
+
   constructor(
     protected readonly messageService: MessageService,
     protected readonly offlineMessagesService: OfflineMessagesService,
     protected readonly pinoLogger: PinoLogger
   ) {}
+
+  @Get('/sent/download/:cgwId')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'File downloaded successfully',
+  })
+  @Roles(UserRole.MESSAGING, UserRole.ADMIN)
+  @HttpCode(HttpStatus.OK)
+  public async downloadOfflineFile(
+    @Param('cgwId', ParseUUIDPipe)
+    cgwId: string,
+    @Response() res
+  ) {
+    const readable: Readable | null =
+      await this.messageService.downloadOfflineUploadedFile(cgwId);
+
+    if (!readable) {
+      throw new NotFoundException();
+    }
+
+    return readable.pipe(res);
+  }
 
   @Get('/sent')
   @ApiResponse({
