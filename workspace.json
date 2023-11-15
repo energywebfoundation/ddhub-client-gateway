@@ -3,6 +3,7 @@
   "projects": {
     "ddhub-client-gateway-address-book": "libs/ddhub-client-gateway-address-book",
     "ddhub-client-gateway-association-keys": "libs/ddhub-client-gateway-association-keys",
+    "ddhub-client-gateway-cleanup": "libs/ddhub-client-gateway-cleanup",
     "ddhub-client-gateway-clients": "libs/ddhub-client-gateway-clients",
     "ddhub-client-gateway-did-auth": "libs/ddhub-client-gateway-did-auth",
     "ddhub-client-gateway-encryption": "libs/ddhub-client-gateway-encryption",

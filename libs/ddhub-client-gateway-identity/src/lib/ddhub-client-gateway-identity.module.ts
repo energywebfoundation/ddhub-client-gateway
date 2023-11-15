@@ -6,6 +6,7 @@ import { IdentityRepositoryModule } from '@dsb-client-gateway/dsb-client-gateway
 import { SecretsEngineModule } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
 import { DdhubClientGatewayEnrolmentModule } from '@dsb-client-gateway/ddhub-client-gateway-enrolment';
 import { CqrsModule } from '@nestjs/cqrs';
+import { DdhubClientGatewayCleanupModule } from '@dsb-client-gateway/ddhub-client-gateway-cleanup';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { CqrsModule } from '@nestjs/cqrs';
     forwardRef(() => DdhubClientGatewayEnrolmentModule),
     IdentityRepositoryModule,
     SecretsEngineModule,
+    DdhubClientGatewayCleanupModule,
   ],
   providers: [IdentityService, IamInitService],
   exports: [IdentityService, IamInitService],
