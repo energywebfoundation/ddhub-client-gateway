@@ -1,9 +1,15 @@
 declare namespace Cypress {
+  // @TODO - Consider mixin instead of big interface
   interface Chainable<Subject = any> {
+    // LOGIN
     loginAdmin(): Chainable<any>;
 
+    // CHANNELS
     createChannel(payloadPath: string): Chainable<any>;
 
+    cleanupChannel(payloadPath: string): Chainable<any>;
+
+    // TOPICS
     createTopic(payload: any): Chainable<Cypress.Response<any>>;
 
     deleteTopic(topicId: string): Chainable<Cypress.Response<any>>;
@@ -12,14 +18,26 @@ declare namespace Cypress {
 
     deleteAllTopics(): Chainable<any>;
 
-    setupPrivateKey(): Chainable<any>;
+    listTopicVersions(topicId: string): Chainable<Cypress.Response<any>>;
 
-    cleanupChannel(payloadPath: string): Chainable<any>;
+    createTopicVersion(
+      topicId: string,
+      desiredVersion: string,
+      fixture: object
+    ): Chainable<Cypress.Response<any>>;
 
+    getTopicVersions(topicId: string): Chainable<Cypress.Response<any>>;
+
+    generateTopicFixture(version?: string): Chainable<any>;
+
+    generateTopicVersionFixture(name: string, version: string): Chainable<any>;
+
+    // IDENTITY/PRIVATE KEY
     getIdentity(): Chainable<Cypress.Response<any>>;
 
-    generateTopicFixture(): Chainable<any>;
+    setupPrivateKey(): Chainable<any>;
 
+    // HELPERS
     loadFixture<T = any>(param: string): Chainable<T>;
   }
 }
@@ -33,17 +51,6 @@ Cypress.Commands.add('getIdentity', () => {
 
 Cypress.Commands.add('loadFixture', (param: string) => {
   return cy.fixture(Cypress.env('CYPRESS_TARGET_ENV') + '/' + param);
-});
-
-Cypress.Commands.add('createChannel', (param: string) => {
-  cy.loadFixture('topic/topic.json').then((payload) => {
-    cy.request({
-      method: 'POST',
-      url: Cypress.env('CYPRESS_API_BASE_URL') + '/channel',
-      body: payload,
-      auth: {},
-    });
-  });
 });
 
 Cypress.Commands.add('setupPrivateKey', () => {
