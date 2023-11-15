@@ -14,6 +14,7 @@ import {
   FileMetadataWrapperRepository,
   PendingAcksEntity,
   PendingAcksWrapperRepository,
+  SentMessageEntity,
   TopicEntity,
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
 import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
@@ -64,9 +65,9 @@ import {
 } from '@dsb-client-gateway/ddhub-client-gateway-association-keys';
 import { MessageStoreService } from './message-store.service';
 import { OfflineMessagesService } from './offline-messages.service';
-import { IdentityService } from '@dsb-client-gateway/ddhub-client-gateway-identity';
 import { IamService } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
 import { DateTime } from 'luxon';
+import { Readable } from 'stream';
 
 export enum EventEmitMode {
   SINGLE = 'SINGLE',
@@ -79,6 +80,7 @@ export class MessageService {
   protected readonly uploadPath: string;
   protected readonly downloadPath: string;
   protected readonly ext: string = '.enc';
+  protected readonly offlineExt: string = '.offline.unenc';
 
   constructor(
     protected readonly secretsEngineService: SecretsEngineService,
@@ -852,6 +854,12 @@ export class MessageService {
 
     const symmetricKey: string = this.keyService.generateRandomKey();
 
+    let originalPath: string | null = null;
+
+    if (channel.messageForms) {
+      originalPath = await this.storeOriginalFile(clientGatewayMessageId, file);
+    }
+
     let filePath: string;
 
     if (channel.payloadEncryption) {
@@ -890,7 +898,6 @@ export class MessageService {
       clientGatewayMessageId
     );
 
-    //uploading file
     const result: SendMessageResponseFile =
       await this.ddhubFilesService.uploadFile(
         fs.createReadStream(filePath),
@@ -904,15 +911,129 @@ export class MessageService {
         dto.transactionId
       );
 
+    await this.handlePostFileUpload(
+      channel,
+      originalPath,
+      file,
+      result,
+      clientGatewayMessageId,
+      dto.transactionId,
+      topic,
+      signature
+    );
+
+    return result;
+  }
+
+  private async storeOriginalFile(
+    clientGatewayMessageId: string,
+    file: Express.Multer.File
+  ): Promise<string> {
+    const originalFilePath = join(
+      this.uploadPath,
+      clientGatewayMessageId + this.offlineExt
+    );
+
+    const stream = fs.createWriteStream(originalFilePath);
+
+    const writeStream = file.stream.pipe(stream);
+
+    const promise = () =>
+      new Promise((resolve) => {
+        writeStream.on('finish', () => resolve(null));
+      });
+
+    await promise();
+
+    return originalFilePath;
+  }
+
+  private async handlePostFileUpload(
+    channel: ChannelEntity,
+    filePath: string | null,
+    file: Express.Multer.File,
+    result: SendMessageResponseFile,
+    clientGatewayMessageId: string,
+    transactionId: string,
+    topic: TopicEntity,
+    signature: string
+  ): Promise<void> {
     try {
-      fs.unlinkSync(filePath);
-      fs.unlinkSync(file.path);
+      if (!channel.messageForms) {
+        fs.unlinkSync(filePath);
+        fs.unlinkSync(file.path);
+      } else {
+        if (!filePath) {
+          this.logger.error('no original path available');
+
+          return;
+        }
+
+        const messageIds: string[] = [];
+
+        for (const res of result.status) {
+          for (const detail of res.details) {
+            if (detail.messageId) {
+              messageIds.push(detail.messageId);
+
+              await this.messageStoreService.storeRecipients(
+                detail.did,
+                detail.messageId,
+                'todo',
+                detail.statusCode ?? 200,
+                clientGatewayMessageId
+              );
+            }
+          }
+        }
+
+        await this.messageStoreService.storeSentMessage([
+          {
+            topicOwner: topic.owner,
+            topicName: topic.name,
+            messageIds: messageIds,
+            initiatingMessageId: undefined,
+            fqcn: channel.fqcn,
+            signature: signature,
+            transactionId: transactionId,
+            senderDid: this.iamService.getDIDAddress(),
+            initiatingTransactionId: undefined,
+            topic: topic,
+            clientGatewayMessageId: clientGatewayMessageId,
+            isFile: true,
+            payload: '',
+            timestampNanos: new Date(),
+            totalFailed: result.recipients.failed,
+            totalSent: result.recipients.sent,
+            totalRecipients: result.recipients.total,
+            payloadEncryption: channel.payloadEncryption,
+            filePath: channel.messageForms ? filePath : null,
+          },
+        ]);
+
+        this.logger.debug(`message forms enabled`);
+      }
     } catch (e) {
       this.logger.error('file unlink failed');
       this.logger.error(e);
     }
+  }
 
-    return result;
+  public async downloadOfflineUploadedFile(
+    clientGatewayMessageId: string
+  ): Promise<Readable | null> {
+    const fileMetadata: SentMessageEntity | null =
+      await this.offlineMessagesService.getOfflineUploadedFile(
+        clientGatewayMessageId
+      );
+
+    if (!fileMetadata || !fileMetadata.filePath) {
+      return null;
+    }
+
+    const stream = fs.createReadStream(fileMetadata.filePath);
+
+    return Readable.from(stream);
   }
 
   public async downloadMessages(
