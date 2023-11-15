@@ -11,6 +11,10 @@ export const useUserAuthHeaders = () => {
   }
 
   useEffect(() => {
+    if (!userContext.userAuth) {
+      return;
+    }
+
     let requestInterceptorId: number | undefined;
     if (
       userContext.userAuth.authenticated &&

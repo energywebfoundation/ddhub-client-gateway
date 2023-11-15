@@ -25,6 +25,7 @@ export const useLoginStatusEffects = () => {
     errorMessage,
     userData,
     userAuth,
+    isCheckingIdentity,
   } = useLoginEffects();
 
   const checkingIdentity = () => (
@@ -58,13 +59,23 @@ export const useLoginStatusEffects = () => {
     }
   }, [status]);
 
+  useEffect(() => {
+    if (userAuth === null) {
+      setIsFirstLogin(true);
+    }
+  }, [userAuth]);
+
   const statusFactory = () => {
     if (
       userAuth.authenticated &&
       userAuth.role !== UserRole.ADMIN &&
       status !== RoleStatus.SYNCED
     ) {
-      return <NonAdminUser />;
+      if (isCheckingIdentity) {
+        return checkingIdentity();
+      } else {
+        return <NonAdminUser />;
+      }
     }
 
     if (authEnabled && !userAuth.authenticated) {

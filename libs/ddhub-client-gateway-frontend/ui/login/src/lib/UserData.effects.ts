@@ -54,7 +54,8 @@ const mapRoleRestrictions = (
     .map((key: string) => {
       if (
         restrictions[key][roleKey].some(
-          (allowedAuthRole: string) => allowedAuthRole === role
+          (allowedRole: string) =>
+            allowedRole === role || role.includes(allowedRole)
         )
       ) {
         return routeRestrictions.get(key);
@@ -137,7 +138,7 @@ export const useUserDataEffects = () => {
   const [routeRestrictionList, setRouteRestrictionList] = useState(
     {} as RouteRestrictions
   );
-  const [result, setResult] = useState({} as IdentityWithEnrolment);
+  const [identity, setIdentity] = useState({} as IdentityWithEnrolment);
   const [version, setVersion] = useState<string>(VersionStatus.UNAVAILABLE);
 
   useEffect(() => {
@@ -146,11 +147,11 @@ export const useUserDataEffects = () => {
         setVersion(config.version);
       }
 
-      if (result?.enrolment?.roles) {
-        const accountStatus = checkAccountStatus(result);
+      if (identity?.enrolment?.roles) {
+        const accountStatus = checkAccountStatus(identity);
 
         const displayedRoutes = getRoutesToDisplay(
-          result.enrolment.roles,
+          identity.enrolment.roles,
           routeRestrictionList as unknown as IndexableRouteRestrictions,
           config,
           config.authEnabled ? userAuth : undefined
@@ -159,15 +160,15 @@ export const useUserDataEffects = () => {
         setUserData((prevValue) => ({
           ...prevValue,
           accountStatus,
-          roles: result.enrolment.roles,
+          roles: identity.enrolment.roles,
           isChecking: false,
           routeRestrictions: routeRestrictionList,
           displayedRoutes,
-          did: result.enrolment.did,
+          did: identity.enrolment.did,
         }));
       }
     }
-  }, [config, result, routeRestrictionList]);
+  }, [config, identity, routeRestrictionList]);
 
   const setData = (
     res: IdentityWithEnrolment,
@@ -181,7 +182,7 @@ export const useUserDataEffects = () => {
     };
 
     const accountStatus = checkAccountStatus(res);
-    setResult(res);
+    setIdentity(res);
     setRouteRestrictionList(routeRestrictions);
 
     if (!res?.enrolment?.roles) {

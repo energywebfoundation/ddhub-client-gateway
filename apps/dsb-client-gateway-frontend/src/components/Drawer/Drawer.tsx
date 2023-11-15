@@ -145,7 +145,11 @@ export const Drawer = () => {
   ) => {
     return routes.map((route) => {
       if (isMenuItemProps(route)) {
-        return displayedRoutes.has(route.href) && <MenuItem {...route} />;
+        return (
+          displayedRoutes.has(route.href) && (
+            <MenuItem key={route.title} {...route} />
+          )
+        );
       } else {
         return (
           route.subMenu

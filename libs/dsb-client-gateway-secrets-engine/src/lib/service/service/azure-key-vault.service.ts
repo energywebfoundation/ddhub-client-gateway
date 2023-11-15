@@ -6,7 +6,7 @@ import {
   SecretsEngineService,
   UserDetails,
   UsersList,
-} from '../secrets-engine.interface';
+} from '../../secrets-engine.interface';
 import { Span } from 'nestjs-otel';
 import { DefaultAzureCredential } from '@azure/identity';
 import { KeyVaultSecret, SecretClient } from '@azure/keyvault-secrets';
@@ -39,25 +39,81 @@ export class AzureKeyVaultService
     this.logger.log('Azure Key Vault Service initialized');
   }
 
-  getMnemonic(): Promise<string | null> {
-    return Promise.resolve(undefined);
+  @Span('azure_kv_getMnemonic')
+  public async getMnemonic(): Promise<string | null> {
+    const name = this.encodeAzureKey(`${this.prefix}${PATHS.MNEMONIC}`);
+    return this.client
+      .getSecret(name)
+      .then(({ value }) => {
+        if (!value || value === '' || value === '""') {
+          throw new Error('Secret does not contain valid value');
+        }
+        return value;
+      })
+      .catch((err) => {
+        this.logger.error(err.message);
+        return null;
+      });
   }
 
-  setMnemonic(mnemonic: string): Promise<string> {
-    return Promise.resolve(''); // @TODO
+  @Span('azure_kv_setMnemonic')
+  public async setMnemonic(mnemonic: string): Promise<string> {
+    const name = this.encodeAzureKey(`${this.prefix}${PATHS.MNEMONIC}`);
+    return this.client
+      .setSecret(name, mnemonic)
+      .then((response) => {
+        this.logger.log(`Successfully set mnemonic: ${name}`);
+        return response.value;
+      })
+      .catch(async (err) => {
+        this.logger.error(err.message);
+        return null;
+      });
   }
 
   @Span('azure_kv_getUserAuthDetails')
-  public async getUserAuthDetails(username: string): Promise<UserDetails> {
-    return {
-      username: 'd',
-      password: 'd',
-      role: 'd',
-    }; // @TODO
+  public async getUserAuthDetails(
+    username: string
+  ): Promise<UserDetails | null> {
+    const secretName = this.encodeAzureKey(
+      `${this.prefix}${PATHS.USERS}/${username}`
+    );
+
+    return this.client
+      .getSecret(secretName)
+      .then(({ value }) => this.parseUserDetailsSecret(username, value))
+      .catch((err) => {
+        this.logger.error(err.message);
+        return null;
+      });
   }
 
+  @Span('azure_kv_getAllUsers')
   public async getAllUsers(): Promise<UsersList> {
-    return [];
+    const userSecretIdentifiers: string[] = [];
+    for await (const secret of this.client.listPropertiesOfSecrets()) {
+      if (
+        secret.enabled &&
+        secret.name.startsWith(
+          this.encodeAzureKey(`${this.prefix}${PATHS.USERS}`)
+        )
+      ) {
+        userSecretIdentifiers.push(secret.name);
+      }
+    }
+    const userListResponse = await Promise.allSettled(
+      userSecretIdentifiers.map((name) =>
+        this.client
+          .getSecret(name)
+          .then(({ value }) => this.parseUserDetailsSecret(name, value))
+      )
+    );
+    return userListResponse
+      .filter(
+        (res): res is PromiseFulfilledResult<UserDetails> =>
+          res.status === 'fulfilled'
+      )
+      .map(({ value }) => value);
   }
 
   @Span('azure_kv_setRSAKey')
@@ -269,5 +325,41 @@ export class AzureKeyVaultService
    */
   private encodeAzureKey(key: string): string {
     return key.replace(/\/|_/g, '-');
+  }
+
+  private isUserDetails(value: unknown): value is UserDetails {
+    return (
+      typeof value === 'object' &&
+      value !== null &&
+      'password' in value &&
+      'role' in value &&
+      typeof value['password'] === 'string' &&
+      typeof value['role'] === 'string'
+    );
+  }
+
+  private parseUserDetailsSecret(
+    usernameWithPrefix: string,
+    value: string
+  ): UserDetails {
+    const userDetails = this.parseJSONLike(value);
+    if (!this.isUserDetails(userDetails)) {
+      throw new Error('Secret does not contain valid user details');
+    }
+    return {
+      username: usernameWithPrefix.replace(
+        this.encodeAzureKey(`${this.prefix}${PATHS.USERS}/`),
+        ''
+      ),
+      ...userDetails,
+    };
+  }
+
+  private parseJSONLike(value: string): unknown {
+    try {
+      return JSON.parse(value);
+    } catch (err) {
+      return value;
+    }
   }
 }

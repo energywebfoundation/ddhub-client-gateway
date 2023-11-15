@@ -26,8 +26,8 @@ export function Header() {
     });
 
     if (result.isConfirmed) {
-      userContext.setUserAuth(null);
-      userContext.resetAuthData();
+      // userContext.setUserAuth(null);
+      await userContext.resetAuthData();
     }
   };
 
