@@ -1,17 +1,25 @@
 ARG IMAGE=node:16.10-alpine
 ARG NODE_ENV=production
 
-FROM $IMAGE
-
-ENV NODE_ENV=$NODE_ENV
+FROM $IMAGE as deps
 
 RUN apk add --no-cache python3 py3-pip make g++
 
-COPY --chown=node:node dist/apps/dsb-client-gateway-scheduler/* /usr/app/
+COPY --chown=node:node dist/apps/dsb-client-gateway-scheduler/package.json /usr/app/
 COPY --chown=node:node package-lock.json /usr/app/
 
 WORKDIR /usr/app
 RUN npm ci --production
+
+
+FROM $IMAGE
+
+ENV NODE_ENV=$NODE_ENV
+
+COPY --chown=node:node dist/apps/dsb-client-gateway-scheduler/* /usr/app/
+COPY --from=deps --chown=node:node /usr/app/node_modules /usr/app/node_modules
+
+WORKDIR /usr/app
 
 USER node
 

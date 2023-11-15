@@ -51,7 +51,7 @@ export class DidAuthService {
     const response = await this.didAuthApiService.login(proof);
 
     if (!response) {
-      throw new Error();
+      throw new Error('invalid message broker response during login');
     }
 
     this.accessToken = response.access_token;

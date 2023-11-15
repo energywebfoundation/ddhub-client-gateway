@@ -45,6 +45,7 @@ export class GatewayController {
     }
 
     return {
+      authEnabled: this.configService.get('USER_AUTH_ENABLED', false),
       version: this.versionService.getVersion(),
       did: this.iamService.getDIDAddress(),
       messageBrokerStatus:

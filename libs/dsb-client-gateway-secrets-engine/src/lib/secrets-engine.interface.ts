@@ -12,6 +12,7 @@ export enum PATHS {
   CA_CERTIFICATE = 'certificate/ca_certificate',
   RSA_KEY = 'rsa_key',
   MNEMONIC = 'mnemonic',
+  USERS = 'users',
 }
 
 export abstract class SecretsEngineService implements OnModuleInit {
@@ -21,15 +22,33 @@ export abstract class SecretsEngineService implements OnModuleInit {
   abstract setCertificateDetails(
     details: CertificateDetails
   ): Promise<SetCertificateDetailsResponse>;
-  abstract getCertificateDetails(): Promise<CertificateDetails>;
+  abstract getCertificateDetails(): Promise<CertificateDetails | null>;
   abstract setRSAPrivateKey(
     privateKey: string
   ): Promise<SetRSAPrivateKeyResponse>;
   abstract getRSAPrivateKey(): Promise<string | null>;
-  abstract setMnemonic(mnemonic: string): Promise<string>;
+  abstract setMnemonic(mnemonic: string): Promise<string | null>;
   abstract getMnemonic(): Promise<string | null>;
   abstract deleteAll(): Promise<void>;
+
+  /**
+   *
+   * @param username
+   * @param password
+   *
+   * @returns {String|null} user password
+   */
+  abstract getUserAuthDetails(username: string): Promise<UserDetails>;
+  abstract getAllUsers(): Promise<UsersList>;
 }
+
+export interface UserDetails {
+  username: string;
+  password: string;
+  role: string;
+}
+
+export type UsersList = UserDetails[];
 
 export interface CertificateDetails {
   privateKey: string;

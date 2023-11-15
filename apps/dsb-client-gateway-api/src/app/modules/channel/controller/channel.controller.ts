@@ -17,6 +17,7 @@ import { CreateChannelDto } from '../dto/request/create-channel.dto';
 import { ChannelValidationPipe } from '../pipes/channel-validation.pipe';
 import { ChannelService } from '../service/channel.service';
 import {
+  CountChannelMessagesQueryDto,
   GetChannelByTypeQueryDto,
   GetChannelParamsDto,
   GetChannelQualifiedDidsParamsDto,
@@ -32,17 +33,69 @@ import { RefreshAllChannelsCacheDataCommand } from '../command/refresh-all-chann
 import { ChannelEntity } from '@dsb-client-gateway/dsb-client-gateway-storage';
 import { MtlsGuard } from '../../certificate/guards/mtls.guard';
 import { PinoLogger } from 'nestjs-pino';
+import { GetChannelMessagesCountDto } from '../dto/request/get-channel-messages-count.dto';
+import {
+  Roles,
+  UserGuard,
+  UserRole,
+} from '@dsb-client-gateway/ddhub-client-gateway-user-roles';
 
 @Controller('channels')
 @ApiTags('Channels')
 @UseInterceptors(LokiMetadataStripInterceptor)
-@UseGuards(MtlsGuard)
+@UseGuards(MtlsGuard, UserGuard)
 export class ChannelController {
   constructor(
     protected readonly channelService: ChannelService,
     protected readonly commandbus: CommandBus,
     protected readonly logger: PinoLogger
   ) {}
+
+  @Get('/messages/count')
+  @Roles(UserRole.MESSAGING, UserRole.ADMIN)
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Channel messages count returned successfully',
+    type: () => GetChannelMessagesCountDto,
+    isArray: true,
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Invalid request',
+  })
+  @HttpCode(HttpStatus.OK)
+  public async getCountOfChannels(
+    @Query() query: CountChannelMessagesQueryDto
+  ): Promise<GetChannelMessagesCountDto[]> {
+    return this.channelService.getMultipleChannelsMessageCount({
+      ...query,
+      messageForms: true,
+    });
+  }
+
+  @Get('/messages/count/:fqcn')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Channel messages count returned successfully',
+    type: () => GetChannelMessagesCountDto,
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Invalid request',
+  })
+  @HttpCode(HttpStatus.OK)
+  @Roles(UserRole.MESSAGING, UserRole.ADMIN)
+  public async getCount(
+    @Param('fqcn') fqcn: string
+  ): Promise<GetChannelMessagesCountDto> {
+    const amountOfMessages: number =
+      await this.channelService.getChannelMessageCount(fqcn);
+
+    return {
+      count: amountOfMessages,
+      fqcn: fqcn,
+    };
+  }
 
   @Post()
   @ApiResponse({
@@ -60,6 +113,7 @@ export class ChannelController {
     description: 'Unauthorized',
   })
   @HttpCode(HttpStatus.CREATED)
+  @Roles(UserRole.ADMIN)
   public async create(
     @Body(ChannelValidationPipe) dto: CreateChannelDto
   ): Promise<ChannelEntity> {
@@ -86,6 +140,7 @@ export class ChannelController {
     status: HttpStatus.NOT_FOUND,
     description: 'Channel not found',
   })
+  @Roles(UserRole.MESSAGING, UserRole.ADMIN)
   public async get(
     @Param() { fqcn }: GetChannelParamsDto
   ): Promise<GetChannelResponseDto> {
@@ -110,6 +165,7 @@ export class ChannelController {
     status: HttpStatus.NOT_FOUND,
     description: 'Channel not found',
   })
+  @Roles(UserRole.MESSAGING, UserRole.ADMIN)
   public async getQualifiedDids(
     @Param() { fqcn }: GetChannelQualifiedDidsParamsDto
   ): Promise<GetChannelQualifiedDidsDto> {
@@ -130,14 +186,23 @@ export class ChannelController {
     status: HttpStatus.UNAUTHORIZED,
     description: 'Unauthorized',
   })
+  @Roles(UserRole.MESSAGING, UserRole.ADMIN)
   public async getByType(
     @Query() query: GetChannelByTypeQueryDto
   ): Promise<GetChannelResponseDto[]> {
     this.logger.assign({
       type: query.type,
+      useAnonymousExtChannel: query.useAnonymousExtChannel,
+      messageForms: query.messageForms,
+      payloadEncryption: query.payloadEncryption,
     });
 
-    return this.channelService.getChannelsByType(query.type);
+    return this.channelService.queryChannels({
+      type: query.type,
+      useAnonymousExtChannel: query.useAnonymousExtChannel,
+      messageForms: query.messageForms,
+      payloadEncryption: query.payloadEncryption,
+    });
   }
 
   @Delete('/:fqcn')
@@ -153,6 +218,7 @@ export class ChannelController {
     status: HttpStatus.NOT_FOUND,
     description: 'Channel not found',
   })
+  @Roles(UserRole.ADMIN)
   public async delete(@Param() { fqcn }: GetChannelParamsDto): Promise<void> {
     this.logger.assign({
       type: fqcn,
@@ -177,6 +243,7 @@ export class ChannelController {
     description: 'Unauthorized',
   })
   @HttpCode(HttpStatus.OK)
+  @Roles(UserRole.ADMIN)
   public async update(
     @Body() dto: UpdateChannelDto,
     @Param() { fqcn }: GetChannelParamsDto
@@ -191,6 +258,7 @@ export class ChannelController {
   }
 
   @Post('refresh')
+  @Roles(UserRole.ADMIN)
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Refreshed cache',

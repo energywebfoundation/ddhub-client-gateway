@@ -23,9 +23,14 @@ export const useRemoveChannel = () => {
     Swal.httpError(err);
   };
 
-  const removeChannelHandler = async (fqcn: string) => {
+  const removeChannelHandler = async (
+    fqcn: string,
+    isFormBuilder?: boolean
+  ) => {
     const { isDismissed } = await Swal.warning({
-      text: 'you will remove the channel',
+      text: isFormBuilder
+        ? 'You will remove this channel including all associated messages stored in the Client Gateway.'
+        : 'you will remove the channel',
     });
     if (isDismissed) {
       return;

@@ -9,6 +9,7 @@ import {
   ConfigDto,
   DdhubConfigService,
   DdhubMessagesService,
+  GetInternalMessageResponse,
   SymmetricKeyEntity,
 } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
 import { EnrolmentService } from '@dsb-client-gateway/ddhub-client-gateway-enrolment';
@@ -108,7 +109,7 @@ export class SymmetricKeysCacheService {
         return;
       }
 
-      const symmetricKeys: SymmetricKeyEntity[] =
+      const symmetricKeys: GetInternalMessageResponse[] =
         await this.ddhubMessagingService.getSymmetricKeys(
           {
             clientId: this.configService.get('SYMMETRIC_KEY_CLIENT_ID'),

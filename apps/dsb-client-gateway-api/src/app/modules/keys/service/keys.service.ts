@@ -189,6 +189,7 @@ export class KeysService implements OnModuleInit {
       this.configService.get<string>('MULTER_UPLOADS_PATH', 'uploads'),
       filename + '.enc'
     );
+
     const writeStream = fs.createWriteStream(path);
 
     const promise = () =>

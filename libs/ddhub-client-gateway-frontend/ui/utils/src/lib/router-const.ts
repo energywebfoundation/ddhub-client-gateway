@@ -3,7 +3,8 @@ export enum Queries {
   Owner = 'owner',
   TopicId = 'topicId',
   FQCN = 'fqcn',
-  PrivateKey = 'privateKey'
+  PrivateKey = 'privateKey',
+  MessageId = 'messageId',
 }
 
 export const routerConst = {
@@ -27,8 +28,16 @@ export const routerConst = {
   FileDownloadChannelTopic: `/messages/file-download/[${Queries.FQCN}]/[${Queries.TopicId}]`,
   DataMessagingFileUpload: '/messages/file-upload',
   DataMessagingFileDownload: '/messages/file-download',
+  MyMessages: '/messages',
+  SentMessages: '/messages/sent',
   VersionHistory: `/applications/[${Queries.Namespace}]/[${Queries.TopicId}]/version-history`,
   ChannelTopicVersionHistory: `/channels/applications/[${Queries.Namespace}]/[${Queries.TopicId}]/version-history`,
   WS: '/integration/ws',
-  RestApiDocs: '/docs'
+  RestApiDocs: '/docs',
+  AddressBook: '/address-book',
+  MessageInbox: '/messages/inbox',
+  MessageInboxChannel: `/messages/inbox/[${Queries.FQCN}]`,
+  MessageOutbox: '/messages/outbox',
+  MessageOutboxChannel: `/messages/outbox/[${Queries.FQCN}]`,
+  MessageOutboxRelated: `/messages/outbox/[${Queries.FQCN}]/[${Queries.MessageId}]`,
 };

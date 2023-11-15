@@ -1,4 +1,4 @@
-import { ReactElement, ChangeEvent } from 'react';
+import { ReactElement } from 'react';
 import { TableCellProps, TableContainerProps } from '@mui/material';
 import { TTableComponentAction } from '../Table/TableComponentActions';
 import { FilterValue } from 'react-table';
@@ -9,7 +9,7 @@ export interface TableHeader {
   filter?: string;
   isSortable?: boolean;
   style?: TableCellProps['style'];
-  Cell?: React.ReactNode,
+  Cell?: React.ReactNode;
   color?: string;
 }
 

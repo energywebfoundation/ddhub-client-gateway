@@ -1,10 +1,16 @@
 import { useContext } from 'react';
-import { UserDataContext } from '@ddhub-client-gateway-frontend/ui/login';
+import { UserContext } from '@ddhub-client-gateway-frontend/ui/login';
 import { AccountStatusEnum } from '../check-account-status/CheckAccountStatus';
 import { useCustomAlert } from '@ddhub-client-gateway-frontend/ui/core';
 
 export const useResetPrivateKeyEffects = () => {
-  const { userData, setUserData } = useContext(UserDataContext);
+  const userContext = useContext(UserContext);
+  if (!userContext) {
+    throw new Error(
+      'useResetPrivateKeyEffects must be used within a UserContext provider'
+    );
+  }
+  const { userData, setUserData } = userContext;
   const Swal = useCustomAlert();
 
   const resetPrivateKeyHandler = async () => {
@@ -15,7 +21,7 @@ export const useResetPrivateKeyEffects = () => {
     if (result.isConfirmed) {
       setUserData({
         ...userData,
-        accountStatus: AccountStatusEnum.NotSetPrivateKey,
+        accountStatus: AccountStatusEnum.NO_PRIVATE_KEY,
         isChecking: false,
         errorMessage: '',
       });

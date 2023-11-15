@@ -4,14 +4,21 @@ export interface IndexableRouteRestrictions {
 
 export class RouteRestriction {
   allowedRoles: string[] = [];
+  allowedAuthRoles: string[] = [];
 }
 
 export class RouteRestrictions {
-  topicManagement: RouteRestriction = new RouteRestriction();
-  myAppsAndTopics: RouteRestriction = new RouteRestriction();
-  channelManagement: RouteRestriction = new RouteRestriction();
-  largeFileUpload: RouteRestriction = new RouteRestriction();
-  largeFileDownload: RouteRestriction = new RouteRestriction();
-  fileUpload: RouteRestriction = new RouteRestriction();
-  fileDownload: RouteRestriction = new RouteRestriction();
+  gatewaySettings = new RouteRestriction();
+  topicManagement = new RouteRestriction();
+  myAppsAndTopics = new RouteRestriction();
+  channelManagement = new RouteRestriction();
+  largeFileUpload = new RouteRestriction();
+  largeFileDownload = new RouteRestriction();
+  fileUpload = new RouteRestriction();
+  fileDownload = new RouteRestriction();
+  messageInbox = new RouteRestriction();
+  messageOutbox = new RouteRestriction();
+  addressBook = new RouteRestriction();
+  clientIds = new RouteRestriction();
+  integrationApis = new RouteRestriction();
 }

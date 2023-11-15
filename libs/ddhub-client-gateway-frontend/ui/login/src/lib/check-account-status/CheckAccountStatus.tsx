@@ -5,21 +5,21 @@ import {
 } from '@ddhub-client-gateway/identity/models';
 
 export enum AccountStatusEnum {
-  InsufficientFund = 'Insufficient fund',
-  NotSetPrivateKey = 'Not Set Private Key',
-  ErrorOccur = 'Error Occur',
-  FirstLogin = 'First Login',
+  INSUFFICIENT_FUNDS = 'Insufficient fund',
+  NO_PRIVATE_KEY = 'Not Set Private Key',
+  ERROR = 'Error Occur',
+  FIRST_LOGIN = 'First Login',
 }
 
 export const checkAccountStatus = (
   res: IdentityWithEnrolment
 ): AccountStatusEnum | RoleStatus => {
   if (!res) {
-    return AccountStatusEnum.FirstLogin;
+    return AccountStatusEnum.FIRST_LOGIN;
   }
 
   if (isBalanceTooLow(res.balance)) {
-    return AccountStatusEnum.InsufficientFund;
+    return AccountStatusEnum.INSUFFICIENT_FUNDS;
   }
 
   const requiredRoles = res.enrolment.roles
@@ -50,7 +50,7 @@ export const checkAccountStatus = (
     return RoleStatus.APPROVED;
   }
 
-  return AccountStatusEnum.NotSetPrivateKey;
+  return AccountStatusEnum.NO_PRIVATE_KEY;
 };
 
 const isBalanceTooLow = (balanceStatus: string): boolean => {

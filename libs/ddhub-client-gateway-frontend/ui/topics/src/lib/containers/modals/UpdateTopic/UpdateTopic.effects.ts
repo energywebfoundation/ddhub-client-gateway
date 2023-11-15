@@ -111,7 +111,9 @@ export const useUpdateTopicEffects = () => {
         getTopicsControllerGetTopicsHistoryByIdQueryKey(topic.id)
       );
     } else if (isSearch) {
-      queryClient.invalidateQueries(getTopicsControllerGetTopicsBySearchQueryKey());
+      queryClient.invalidateQueries(
+        getTopicsControllerGetTopicsBySearchQueryKey()
+      );
     } else {
       queryClient.invalidateQueries(getTopicsControllerGetTopicsQueryKey());
     }
@@ -132,29 +134,32 @@ export const useUpdateTopicEffects = () => {
       schema: parseJson(values.schema),
     };
 
-    updateTopicHandler(
-      formattedValues as PostTopicDto,
-      onUpdateTopics
-    );
+    updateTopicHandler(formattedValues as PostTopicDto, onUpdateTopics);
   };
 
   const topicSubmitHandler: SubmitHandler<FieldValues> = (data) => {
     const values = data as PostTopicDto;
 
     if (values.version !== topicWithSchema.version) {
-      topicsControllerGetTopicHistoryByIdAndVersion(values.id, values.version).then((data) => {
-        if (data) {
-          openWarnModal(values);
-        } else {
-          postTopicUpdate(values);
-        }
-      }).catch((err) => {
-        if (err.response && err.response.status === 400 && err.response.data.err.code === 'TOPIC::NOT_FOUND') {
-          postTopicUpdate(values);
-        } else {
-          Swal.httpError(err);
-        }
-      });
+      topicsControllerGetTopicHistoryByIdAndVersion(values.id, values.version)
+        .then((data) => {
+          if (data) {
+            openWarnModal(values);
+          } else {
+            postTopicUpdate(values);
+          }
+        })
+        .catch((err) => {
+          if (
+            err.response &&
+            err.response.status === 400 &&
+            err.response.data.err.code === 'TOPIC::NOT_FOUND'
+          ) {
+            postTopicUpdate(values);
+          } else {
+            Swal.httpError(err);
+          }
+        });
     } else {
       postTopicUpdate(values);
     }
@@ -166,7 +171,7 @@ export const useUpdateTopicEffects = () => {
     hideModal();
     const result = await Swal.fire({
       title: 'Are you sure you want to proceed?',
-      text: 'you will close update topic form',
+      text: 'You will close the update topic form',
       type: 'warning',
       showCancelButton: true,
     });

@@ -1,5 +1,4 @@
 import {
-  GetTopicDto,
   ApplicationDTO,
   GetChannelResponseDto,
   ChannelTopic,

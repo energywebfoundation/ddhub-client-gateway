@@ -1,99 +1,214 @@
+import { Test, TestingModule } from '@nestjs/testing';
 import { CertificateService } from './certificate.service';
-import { Agent } from 'https';
 import { SecretsEngineService } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
 import { TlsAgentService } from '@dsb-client-gateway/ddhub-client-gateway-tls-agent';
 import { ConfigService } from '@nestjs/config';
-import { EventsService } from '@dsb-client-gateway/ddhub-client-gateway-events';
+import {
+  Events,
+  EventsService,
+} from '@dsb-client-gateway/ddhub-client-gateway-events';
 
-const secretsEngineMock = {
+const mockSecretsEngineService = {
   setCertificateDetails: jest.fn(),
 };
 
-const tlsAgentService = {
+const mockTlsAgentService = {
+  get: jest.fn(),
   create: jest.fn(),
+};
+
+const mockConfigService = {
   get: jest.fn(),
 };
 
-const configService = {
-  get: jest.fn(),
-};
-
-const eventsService = {
+const mockEventsService = {
   triggerEvent: jest.fn(),
   emitEvent: jest.fn(),
 };
 
-describe.skip('CertificateService (SPEC)', () => {
-  let certificateService: CertificateService;
+describe('CertificateService', () => {
+  let service: CertificateService;
+  let error: Error | null;
+  let result: unknown;
 
-  beforeEach(() => {
-    certificateService = new CertificateService(
-      secretsEngineMock as unknown as SecretsEngineService,
-      tlsAgentService as unknown as TlsAgentService,
-      configService as unknown as ConfigService,
-      eventsService as unknown as EventsService
-    );
+  beforeEach(async () => {
+    jest.resetAllMocks();
+
+    error = null;
+    result = null;
+
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        CertificateService,
+        {
+          provide: SecretsEngineService,
+          useValue: mockSecretsEngineService,
+        },
+        {
+          provide: TlsAgentService,
+          useValue: mockTlsAgentService,
+        },
+        {
+          provide: ConfigService,
+          useValue: mockConfigService,
+        },
+        {
+          provide: EventsService,
+          useValue: mockEventsService,
+        },
+      ],
+    }).compile();
+
+    service = module.get<CertificateService>(CertificateService);
   });
 
-  afterEach(() => {
-    jest.clearAllMocks();
+  it('should be defined', () => {
+    expect(service).toBeDefined();
   });
 
-  describe('isMTLSConfigured', () => {
-    it('should return true due to disabled mTLS', async () => {
-      configService.get = jest.fn().mockImplementationOnce(() => false);
+  describe('isMTLSConfigured()', () => {
+    describe('should return true for disabled mTLS', () => {
+      beforeEach(async () => {
+        mockConfigService.get = jest.fn().mockImplementationOnce(() => false);
 
-      const result: boolean = await certificateService.isMTLSConfigured();
+        try {
+          result = await service.isMTLSConfigured();
+        } catch (e) {
+          error = e;
+        }
+      });
 
-      expect(result).toBe(true);
-      expect(tlsAgentService.get).toBeCalledTimes(0);
-      expect(tlsAgentService.create).toBeCalledTimes(0);
+      it('should call config service to obtain mTLS information', () => {
+        expect(mockConfigService.get).toBeCalledTimes(1);
+        expect(mockConfigService.get).toBeCalledWith('MTLS_ENABLED');
+      });
+
+      it('should not call tls agent service', () => {
+        expect(mockTlsAgentService.get).toBeCalledTimes(0);
+      });
+
+      it('should execute', () => {
+        expect(error).toBeNull();
+        expect(result).toBeTruthy();
+      });
     });
 
-    it('should return true as HTTPS Agent is returned', async () => {
-      configService.get = jest.fn().mockImplementationOnce(() => true);
+    describe('should return true for created agent', () => {
+      beforeEach(async () => {
+        mockConfigService.get = jest.fn().mockImplementationOnce(() => true);
 
-      tlsAgentService.get = jest
-        .fn()
-        .mockImplementationOnce(async () => new Agent());
+        mockTlsAgentService.get = jest.fn().mockImplementationOnce(() => {
+          return {
+            id: 1, // we don't need to return anything special here as it's not validated in code
+          };
+        });
 
-      const result: boolean = await certificateService.isMTLSConfigured();
+        try {
+          result = await service.isMTLSConfigured();
+        } catch (e) {
+          error = e;
+        }
+      });
 
-      expect(result).toBe(true);
-      expect(tlsAgentService.get).toBeCalledTimes(1);
-      expect(tlsAgentService.create).toBeCalledTimes(0);
+      it('should call config service to obtain mTLS information', () => {
+        expect(mockConfigService.get).toBeCalledTimes(1);
+        expect(mockConfigService.get).toBeCalledWith('MTLS_ENABLED');
+      });
+
+      it('should call tls agent service', () => {
+        expect(mockTlsAgentService.get).toBeCalledTimes(1);
+      });
+
+      it('should execute', () => {
+        expect(error).toBeNull();
+        expect(result).toBeTruthy();
+      });
     });
+  });
 
-    it('should return true as HTTPS Agent is created', async () => {
-      configService.get = jest.fn().mockImplementationOnce(() => true);
+  describe('configureMTLS()', () => {
+    describe('should create agent', () => {
+      beforeEach(async () => {
+        mockTlsAgentService.create = jest
+          .fn()
+          .mockImplementationOnce(async () => null);
 
-      tlsAgentService.get = jest
-        .fn()
-        .mockImplementationOnce(() => undefined)
-        .mockImplementationOnce(() => new Agent());
+        mockTlsAgentService.get = jest.fn().mockImplementationOnce(async () => {
+          return {
+            id: 1, // we don't need to return anything special here as it's not validated in code
+          };
+        });
 
-      const result: boolean = await certificateService.isMTLSConfigured();
+        try {
+          result = await service.configureMTLS();
+        } catch (e) {
+          error = e;
+        }
+      });
 
-      expect(result).toBe(true);
+      it('should execute', () => {
+        expect(error).toBeNull();
+        expect(result).toBeTruthy();
+      });
 
-      expect(tlsAgentService.get).toBeCalledTimes(2);
-      expect(tlsAgentService.create).toBeCalledTimes(1);
+      it('should call create agent', () => {
+        expect(mockTlsAgentService.create).toBeCalledTimes(1);
+      });
+
+      it('should call get agent after creation', () => {
+        expect(mockTlsAgentService.get).toBeCalledTimes(1);
+      });
     });
+  });
 
-    it('should return false as certificate is not set', async () => {
-      configService.get = jest.fn().mockImplementationOnce(() => true);
+  describe('save()', () => {
+    describe('should save certificate', () => {
+      beforeEach(async () => {
+        try {
+          const payload = [
+            {
+              buffer: Buffer.from('1'),
+            },
+            {
+              buffer: Buffer.from('2'),
+            },
+            {
+              buffer: Buffer.from('3'),
+            },
+          ] as Express.Multer.File[];
 
-      tlsAgentService.get = jest
-        .fn()
-        .mockImplementationOnce(() => undefined)
-        .mockImplementationOnce(() => undefined);
+          await service.save(payload[0], payload[1], payload[2]);
+        } catch (e) {
+          error = e;
+        }
+      });
 
-      const result: boolean = await certificateService.isMTLSConfigured();
+      it('should execute', () => {
+        expect(error).toBeNull();
+      });
 
-      expect(result).toBe(true);
+      it('should store certificate information in secrets engine', () => {
+        expect(mockSecretsEngineService.setCertificateDetails).toBeCalledTimes(
+          1
+        );
+        expect(mockSecretsEngineService.setCertificateDetails).toBeCalledWith({
+          caCertificate: '3',
+          certificate: '1',
+          privateKey: '2',
+        });
+      });
 
-      expect(tlsAgentService.get).toBeCalledTimes(2);
-      expect(tlsAgentService.create).toBeCalledTimes(1);
+      it('should emit events', () => {
+        expect(mockEventsService.triggerEvent).toBeCalledTimes(1);
+        expect(mockEventsService.triggerEvent).toBeCalledWith(
+          Events.CERTIFICATE_CHANGED
+        );
+
+        expect(mockEventsService.emitEvent).toBeCalledTimes(1);
+        expect(mockEventsService.emitEvent).toBeCalledWith(
+          Events.CERTIFICATE_CHANGED
+        );
+      });
     });
   });
 });

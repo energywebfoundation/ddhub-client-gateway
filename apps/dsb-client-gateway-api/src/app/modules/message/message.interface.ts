@@ -56,6 +56,8 @@ export interface SearchMessageResponseDto {
   isFile: boolean;
   payloadEncryption: boolean;
   clientGatewayMessageId: string;
+  initiatingMessageId?: string;
+  initiatingTransactionId?: string;
 }
 
 export interface Decryption {
@@ -72,9 +74,17 @@ export interface GetMessageResponse {
   signature: string;
   sender: string;
   timestampNanos: number;
+  timestampISO?: string;
   transactionId: string;
   signatureValid: EncryptionStatus;
   decryption: Decryption;
+  initiatingMessageId?: string;
+  initiatingTransactionId?: string;
+  payloadEncryption: boolean;
+  clientGatewayMessageId: string;
+  topicId: string;
+  relatedMessagesCount?: number;
+  isRead?: boolean;
 }
 
 export interface DownloadMessageResponse {

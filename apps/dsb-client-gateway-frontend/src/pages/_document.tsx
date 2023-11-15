@@ -17,6 +17,11 @@ class MyDocument extends Document {
             href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600;1,700&amp;display=swap"
             rel="stylesheet"
           />
+          <link
+            // eslint-disable-next-line
+            href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600;1,700&amp;display=swap"
+            rel="stylesheet"
+          />
         </Head>
         <body>
           <Main />

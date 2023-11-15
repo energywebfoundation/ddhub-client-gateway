@@ -187,7 +187,7 @@ export class AssociationKeysService implements OnApplicationBootstrap {
         owner: this.iamService.getDIDAddress(),
         sentDate: null,
         validFrom: forDate,
-        validTo: currentKeyValidity,
+        validTo: currentKeyValidity.toDate(),
         isShared: false,
         sharedDate: null,
         iteration: `${firstIterationKey}_${secondIterationKey}`,
@@ -260,7 +260,12 @@ export class AssociationKeysService implements OnApplicationBootstrap {
         })
         .catch((e) => retry(e));
 
-      if ((result && result.status[0].status === 'Fail' && result.status[0].message !== 'Record exists' ) || (!result && result == false)) {
+      if (
+        (result &&
+          result.status[0].status === 'Fail' &&
+          result.status[0].message !== 'Record exists') ||
+        (!result && result == false)
+      ) {
         this.logger.error(
           `association key ${key.associationKey} external channel failed`
         );
@@ -276,7 +281,11 @@ export class AssociationKeysService implements OnApplicationBootstrap {
       key.isSent = true;
       key.sentDate = new Date();
 
-      await this.wrapper.repository.save(key).catch((e) => retry(e));
+      await this.wrapper.repository
+        .save({
+          ...key,
+        })
+        .catch((e) => retry(e));
 
       this.logger.log(`association key ${key.associationKey} is sent to mb`);
     });
@@ -314,7 +323,12 @@ export class AssociationKeysService implements OnApplicationBootstrap {
         })
         .catch((e) => retry(e));
 
-      if ((result && result.status[0].status === 'Fail' && result.status[0].message !== 'Record exists' ) || (!result && result == false)) {
+      if (
+        (result &&
+          result.status[0].status === 'Fail' &&
+          result.status[0].message !== 'Record exists') ||
+        (!result && result == false)
+      ) {
         this.logger.error(
           `association key ${key.associationKey} external channel failed`
         );

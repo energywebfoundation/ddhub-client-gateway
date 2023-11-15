@@ -30,6 +30,32 @@ export class TopicDto {
   owner: string;
 }
 
+export class ResponseTopicDto {
+  @IsString()
+  @ApiProperty({
+    type: String,
+    description: 'Topic name',
+    example: 'operatorEnvelope',
+  })
+  topicName: string;
+
+  @IsString()
+  @ApiProperty({
+    type: String,
+    example: 'aemo.edge',
+    description: 'Owner name',
+  })
+  owner: string;
+
+  @IsString()
+  @ApiProperty({
+    type: String,
+    example: 'id',
+    description: 'Response topic id',
+  })
+  responseTopicId: string;
+}
+
 export class ChannelConditionsDto {
   @IsOptional()
   @IsDID({
@@ -70,6 +96,18 @@ export class ChannelConditionsDto {
     type: () => [TopicDto],
   })
   topics: TopicDto[];
+
+  @ValidateNested({
+    each: true,
+  })
+  @IsOptional()
+  @ArrayUnique((o) => `${o.topicName}_${o.owner}`)
+  @Type(() => ResponseTopicDto)
+  @ApiProperty({
+    description: 'Array of response topics',
+    type: () => [ResponseTopicDto],
+  })
+  responseTopics: ResponseTopicDto[];
 }
 
 export class CreateChannelDto {
@@ -94,6 +132,16 @@ export class CreateChannelDto {
   @IsBoolean()
   @IsOptional()
   useAnonymousExtChannel: boolean;
+
+  @ApiProperty({
+    description: 'Create message forms',
+    example: true,
+    required: false,
+    default: false,
+  })
+  @IsBoolean()
+  @IsOptional()
+  messageForms: boolean;
 
   @ApiProperty({
     description: 'Channel encryption',

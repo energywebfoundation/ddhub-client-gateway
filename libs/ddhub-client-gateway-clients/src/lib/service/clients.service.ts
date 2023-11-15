@@ -140,7 +140,7 @@ export class ClientsService {
 
     const config: ConfigDto = await this.ddhubConfigService.getConfig();
 
-    if (currentCount + 1 >= config.natsMaxClientidSize) {
+    if (currentCount + 1 > config.natsMaxClientidSize) {
       this.logger.log(`failed to create client ${clientId}`);
 
       throw new MaximumNumberOfClientsReachedException(

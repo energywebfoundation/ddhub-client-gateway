@@ -92,6 +92,65 @@ paths:
           description: "Unauthorized"
       tags:
         - "Gateway Configuration"
+  /api/v2/channels/messages/count:
+    get:
+      operationId: "ChannelController_getCountOfChannels"
+      parameters:
+        - name: "type"
+          required: false
+          in: "query"
+          description: "Channel type"
+          example: "sub"
+          schema:
+            enum:
+              - "sub"
+              - "pub"
+            type: "string"
+        - name: "useAnonymousExtChannel"
+          required: false
+          in: "query"
+          example: true
+          schema:
+            type: "boolean"
+        - name: "payloadEncryption"
+          required: false
+          in: "query"
+          example: true
+          schema:
+            type: "boolean"
+      responses:
+        200:
+          description: "Channel messages count returned successfully"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/GetChannelMessagesCountDto"
+        400:
+          description: "Invalid request"
+      tags:
+        - "Channels"
+  /api/v2/channels/messages/count/{fqcn}:
+    get:
+      operationId: "ChannelController_getCount"
+      parameters:
+        - name: "fqcn"
+          required: true
+          in: "path"
+          schema:
+            type: "string"
+      responses:
+        200:
+          description: "Channel messages count returned successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetChannelMessagesCountDto"
+        400:
+          description: "Invalid request"
+      tags:
+        - "Channels"
   /api/v2/channels:
     post:
       operationId: "ChannelController_create"
@@ -119,7 +178,7 @@ paths:
       operationId: "ChannelController_getByType"
       parameters:
         - name: "type"
-          required: true
+          required: false
           in: "query"
           description: "Channel type"
           example: "sub"
@@ -130,6 +189,24 @@ paths:
               - "download"
               - "upload"
             type: "string"
+        - name: "useAnonymousExtChannel"
+          required: false
+          in: "query"
+          example: true
+          schema:
+            type: "boolean"
+        - name: "payloadEncryption"
+          required: false
+          in: "query"
+          example: true
+          schema:
+            type: "boolean"
+        - name: "messageForms"
+          required: false
+          in: "query"
+          example: true
+          schema:
+            type: "boolean"
       responses:
         200:
           description: "Gives channels based on type from query"
@@ -248,9 +325,110 @@ paths:
           description: "Refreshed cache"
       tags:
         - "Channels"
+  /api/v2/messages/sent:
+    get:
+      operationId: "MessageController_getSentMessages"
+      parameters:
+        - name: "limit"
+          required: false
+          in: "query"
+          description: "Limit per request"
+          example: 1
+          schema:
+            default: 0
+            type: "number"
+        - name: "fqcn"
+          required: true
+          in: "query"
+          example: "channel.name"
+          description: "channel name"
+          schema:
+            type: "string"
+        - name: "initiatingMessageId"
+          required: false
+          in: "query"
+          example: "507f191e810c19729de860ea"
+          description: "Initiating message id"
+          schema:
+            type: "string"
+        - name: "initiatingTransactionId"
+          required: false
+          in: "query"
+          example: "45d5a89f-7c2c-48b0-ae9a-54f4128e818f"
+          description: "Initiating transaction id"
+          schema:
+            type: "string"
+        - name: "transactionId"
+          required: false
+          in: "query"
+          example: "45d5a89f-7c2c-48b0-ae9a-54f4128e818f"
+          description: "Transaction id"
+          schema:
+            type: "string"
+        - name: "messageId"
+          required: false
+          in: "query"
+          example: "507f191e810c19729de860ea"
+          description: "Message id"
+          schema:
+            type: "string"
+        - name: "topicName"
+          required: false
+          in: "query"
+          example: "getOperatingEnvelope"
+          description: "topic name"
+          schema:
+            type: "string"
+        - name: "topicOwner"
+          required: false
+          in: "query"
+          example: "torta.apps.eggplant.vege.iam.ewc"
+          description: "application namespace"
+          schema:
+            type: "string"
+        - name: "page"
+          required: false
+          in: "query"
+          description: "Current page"
+          example: 1
+          schema:
+            default: 0
+            type: "number"
+      responses:
+        200:
+          description: "Message received successfully"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/GetSentMessageResponseDto"
+        400:
+          description: "Validation failed or some requirements were not fully satisfied"
+        401:
+          description: "Unauthorized"
+        404:
+          description: "Messages Not found"
+      tags:
+        - "Messaging"
+  /api/v2/messages/ack:
+    post:
+      operationId: "MessageController_ackMessages"
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AckMessagesRequestDto"
+      responses:
+        204:
+          description: "Messages acked successfully"
+      tags:
+        - "Messaging"
   /api/v2/messages:
     get:
-      operationId: "MessageControlller_getMessage"
+      operationId: "MessageController_getMessage"
       parameters:
         - name: "fqcn"
           required: true
@@ -294,6 +472,34 @@ paths:
           description: "cursor for pointing to messages"
           schema:
             type: "string"
+        - name: "initiatingMessageId"
+          required: false
+          in: "query"
+          example: "507f191e810c19729de860ea"
+          description: "Initiating message id"
+          schema:
+            type: "string"
+        - name: "initiatingTransactionId"
+          required: false
+          in: "query"
+          example: "45d5a89f-7c2c-48b0-ae9a-54f4128e818f"
+          description: "Initiating transaction id"
+          schema:
+            type: "string"
+        - name: "transactionId"
+          required: false
+          in: "query"
+          example: "45d5a89f-7c2c-48b0-ae9a-54f4128e818f"
+          description: "Initiating transaction id"
+          schema:
+            type: "string"
+        - name: "messageId"
+          required: false
+          in: "query"
+          example: "507f191e810c19729de860ea"
+          description: "Message id"
+          schema:
+            type: "string"
       responses:
         200:
           description: "Message received successfully"
@@ -312,7 +518,7 @@ paths:
       tags:
         - "Messaging"
     post:
-      operationId: "MessageControlller_create"
+      operationId: "MessageController_create"
       parameters: []
       requestBody:
         required: true
@@ -326,7 +532,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SendMessagelResponseDto"
+                $ref: "#/components/schemas/SendMessageResponseDto"
         400:
           description: "Validation failed or some requirements were not fully satisfied"
         401:
@@ -337,7 +543,7 @@ paths:
         - "Messaging"
   /api/v2/messages/download:
     get:
-      operationId: "MessageControlller_downloadMessage"
+      operationId: "MessageController_downloadMessage"
       parameters:
         - name: "fileId"
           required: true
@@ -357,7 +563,7 @@ paths:
         - "Messaging"
   /api/v2/messages/upload:
     post:
-      operationId: "MessageControlller_uploadFile"
+      operationId: "MessageController_uploadFile"
       parameters: []
       requestBody:
         required: true
@@ -371,7 +577,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SendMessagelResponseDto"
+                $ref: "#/components/schemas/SendMessageResponseDto"
         400:
           description: "Validation failed or some requirements were not fully satisfied"
         401:
@@ -988,6 +1194,119 @@ paths:
           description: "Client deleted"
       tags:
         - "Clients"
+  /api/v2/contacts:
+    post:
+      operationId: "AddressBookController_storeContact"
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateContactDto"
+      responses:
+        204:
+          description: "Contact created successfully"
+      tags:
+        - "Address Book"
+    get:
+      operationId: "AddressBookController_getAllContacts"
+      parameters: []
+      responses:
+        200:
+          description: "List of contacts"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/GetAllContactsResponseDto"
+      tags:
+        - "Address Book"
+  /api/v2/contacts/{did}:
+    delete:
+      operationId: "AddressBookController_deleteContact"
+      parameters:
+        - name: "did"
+          required: true
+          in: "path"
+          schema:
+            type: "string"
+      responses:
+        204:
+          description: "Contact deleted successfully"
+      tags:
+        - "Address Book"
+    put:
+      operationId: "AddressBookController_updateContact"
+      parameters:
+        - name: "did"
+          required: true
+          in: "path"
+          schema:
+            type: "string"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateContactRequestDto"
+      responses:
+        204:
+          description: "Contact modified successfully"
+      tags:
+        - "Address Book"
+  /api/v2/login/config:
+    get:
+      operationId: "LoginController_isAuthEnabled"
+      parameters: []
+      responses:
+        200:
+          description: "Returns login config"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConfigResponseDto"
+      tags:
+        - "Login"
+  /api/v2/login/refresh-token:
+    post:
+      operationId: "LoginController_refreshToken"
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RefreshTokenRequestDto"
+      responses:
+        200:
+          description: "Successfully refreshed tokens"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponseDto"
+      tags:
+        - "Login"
+  /api/v2/login:
+    post:
+      operationId: "LoginController_login"
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequestDto"
+      responses:
+        200:
+          description: "Successfully logged in"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponseDto"
+      tags:
+        - "Login"
 info:
   title: "DDHub Client Gateway"
   description: "DDHub Client Gateway"
@@ -1129,6 +1448,20 @@ components:
       required:
         - "certificate"
         - "privateKey"
+    GetChannelMessagesCountDto:
+      type: "object"
+      properties:
+        count:
+          type: "number"
+          description: "Count of total messages"
+          example: 5
+        fqcn:
+          type: "string"
+          description: "Channel name"
+          example: "szostak.pub"
+      required:
+        - "count"
+        - "fqcn"
     TopicDto:
       type: "object"
       properties:
@@ -1143,6 +1476,25 @@ components:
       required:
         - "topicName"
         - "owner"
+    ResponseTopicDto:
+      type: "object"
+      properties:
+        topicName:
+          type: "string"
+          description: "Topic name"
+          example: "operatorEnvelope"
+        owner:
+          type: "string"
+          example: "aemo.edge"
+          description: "Owner name"
+        responseTopicId:
+          type: "string"
+          example: "id"
+          description: "Response topic id"
+      required:
+        - "topicName"
+        - "owner"
+        - "responseTopicId"
     ChannelConditionsDto:
       type: "object"
       properties:
@@ -1165,10 +1517,16 @@ components:
           type: "array"
           items:
             $ref: "#/components/schemas/TopicDto"
+        responseTopics:
+          description: "Array of response topics"
+          type: "array"
+          items:
+            $ref: "#/components/schemas/ResponseTopicDto"
       required:
         - "dids"
         - "roles"
         - "topics"
+        - "responseTopics"
     CreateChannelDto:
       type: "object"
       properties:
@@ -1180,6 +1538,11 @@ components:
           type: "boolean"
           description: "Use anonymous external channels"
           example: true
+        messageForms:
+          type: "boolean"
+          description: "Create message forms"
+          example: true
+          default: false
         payloadEncryption:
           type: "boolean"
           description: "Channel encryption"
@@ -1224,6 +1587,30 @@ components:
         - "topicName"
         - "owner"
         - "topicId"
+    ChannelResponseTopic:
+      type: "object"
+      properties:
+        topicName:
+          type: "string"
+          description: "Topic name"
+          example: "operatorEnvelope"
+        topicOwner:
+          type: "string"
+          example: "aemo.edge"
+          description: "Owner name"
+        topicId:
+          type: "string"
+          example: "622fed6e4258501225095045"
+          description: "Topic ID from Message Broker"
+        responseTopicId:
+          type: "string"
+          example: "622fed6e4258501225095045"
+          description: "Response Topic ID from Message Broker"
+      required:
+        - "topicName"
+        - "topicOwner"
+        - "topicId"
+        - "responseTopicId"
     ChannelConditions:
       type: "object"
       properties:
@@ -1254,11 +1641,17 @@ components:
           type: "array"
           items:
             $ref: "#/components/schemas/ChannelTopic"
+        responseTopics:
+          description: "Array of response topics"
+          type: "array"
+          items:
+            $ref: "#/components/schemas/ChannelResponseTopic"
       required:
         - "dids"
         - "roles"
         - "qualifiedDids"
         - "topics"
+        - "responseTopics"
     GetChannelResponseDto:
       type: "object"
       properties:
@@ -1266,6 +1659,11 @@ components:
           type: "string"
           description: "Channel type"
           example: "channel.name"
+        messageForms:
+          type: "boolean"
+          description: "Message forms"
+          example: false
+          default: false
         payloadEncryption:
           type: "boolean"
           description: "Channel encryption"
@@ -1290,6 +1688,7 @@ components:
             - $ref: "#/components/schemas/ChannelConditions"
       required:
         - "fqcn"
+        - "messageForms"
         - "payloadEncryption"
         - "type"
         - "useAnonymousExtChannel"
@@ -1333,6 +1732,10 @@ components:
           type: "boolean"
           description: "Use anonymous external channels"
           example: true
+        messageForms:
+          type: "boolean"
+          description: "Enable message forms"
+          example: true
         payloadEncryption:
           type: "boolean"
           description: "Channel encryption"
@@ -1345,6 +1748,153 @@ components:
         - "type"
         - "payloadEncryption"
         - "conditions"
+    GetSentMessageRecipientsResponseDto:
+      type: "object"
+      properties:
+        did:
+          type: "string"
+          description: "Recipient did"
+          example: "did:ethr:volta:0x782aB0383Bfc807439d8EE29516937B47815d697"
+        failed:
+          type: "boolean"
+          description: "Status"
+          example: false
+        messageId:
+          type: "string"
+          description: "Message id"
+          example: "507f191e810c19729de860ea"
+      required:
+        - "did"
+        - "failed"
+        - "messageId"
+    GetSentMessageResponseDto:
+      type: "object"
+      properties:
+        clientGatewayMessageId:
+          type: "string"
+          example: "f923afb7-e334-419c-a72c-a60b293184ea"
+          description: "Client gateway generated message id"
+        initiatingMessageId:
+          type: "string"
+          example: "507f191e810c19729de860ea"
+          description: "Initating message id"
+        initiatingTransactionId:
+          type: "string"
+          example: "f923afb7-e334-419c-a72c-a60b293184ea"
+          description: "Initating transaction id"
+        topicId:
+          type: "string"
+          example: "507f191e810c19729de860ea"
+          description: "Topic ID"
+        topicName:
+          type: "string"
+          example: "getOperatingEnvelope"
+          description: "topic name"
+        topicOwner:
+          type: "string"
+          example: "torta.apps.eggplant.vege.iam.ewc"
+          description: "application namespace"
+        topicVersion:
+          type: "string"
+          example: "0.0.1"
+          description: "Topic version"
+        transactionId:
+          type: "string"
+          example: "f923afb7-e334-419c-a72c-a60b293184ea"
+          description: "Transaction ID"
+        signature:
+          type: "string"
+          description: "Generated signature"
+        payloadEncryption:
+          type: "boolean"
+          example: false
+          description: "Was payload encrypted"
+        payload:
+          type: "string"
+          description: "Sent payload"
+        timestampNanos:
+          type: "number"
+          description: "timestamp in nano seconds"
+          example: 1649147198388
+        senderDid:
+          type: "string"
+          example: "did:ethr:volta:0x782aB0383Bfc807439d8EE29516937B47815d697"
+          description: "Sender DID"
+        fqcn:
+          type: "string"
+          example: "channel.name"
+          description: "Channel name"
+        relatedMessagesCount:
+          type: "number"
+          example: 1
+          description: "Related messages count"
+        isFile:
+          type: "boolean"
+          example: false
+          description: "Is file"
+        totalRecipients:
+          type: "number"
+          example: 1
+          description: "Total amount of recipients"
+        totalSent:
+          type: "number"
+          example: 1
+          description: "Total sent messages"
+        totalFailed:
+          type: "number"
+          example: 1
+          description: "Total failed messages"
+        createdDate:
+          type: "string"
+          description: "When application got stored in cache"
+          example: "2022-05-18T11:19:07.000Z"
+        updatedDate:
+          type: "string"
+          description: "When application got stored in cache"
+          example: "2022-05-18T11:19:07.000Z"
+        messagesIds:
+          example:
+            - "507f191e810c19729de860ea"
+          description: "Message id"
+          type: "array"
+          items:
+            type: "string"
+        recipients:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/GetSentMessageRecipientsResponseDto"
+      required:
+        - "clientGatewayMessageId"
+        - "topicId"
+        - "topicVersion"
+        - "transactionId"
+        - "signature"
+        - "payloadEncryption"
+        - "payload"
+        - "timestampNanos"
+        - "senderDid"
+        - "fqcn"
+        - "relatedMessagesCount"
+        - "isFile"
+        - "totalRecipients"
+        - "totalSent"
+        - "totalFailed"
+        - "createdDate"
+        - "updatedDate"
+        - "recipients"
+    AckMessagesRequestDto:
+      type: "object"
+      properties:
+        messagesIds:
+          example:
+            - "id1"
+            - "id2"
+          description: "Offline messages IDs to acknowledge"
+          type: "array"
+          items:
+            type: "string"
+      required:
+        - "messagesIds"
     GetMessagesResponseDto:
       type: "object"
       properties:
@@ -1404,6 +1954,10 @@ components:
             - "REQUIRED_NOT_PERFORMED"
             - "SUCCESS"
           example: "SUCCESS"
+        relatedMessagesCount:
+          type: "number"
+          description: "Related messages count. Only appears for channels with message forms."
+          example: 5
       required:
         - "id"
         - "topicName"
@@ -1423,6 +1977,14 @@ components:
           type: "string"
           description: "Channel Name"
           example: "channel.name"
+        initiatingMessageId:
+          type: "string"
+          description: "Initiating message id"
+          example: "507f1f77bcf86cd799439011"
+        initiatingTransactionId:
+          type: "string"
+          description: "Initiating transaction id"
+          example: "8ac55aa7-7d6d-438a-98bd-376079903c7b"
         topicName:
           type: "string"
           description: "Topic name"
@@ -1508,7 +2070,7 @@ components:
       required:
         - "details"
         - "name"
-    SendMessagelResponseDto:
+    SendMessageResponseDto:
       type: "object"
       properties:
         clientGatewayMessageId:
@@ -2038,6 +2600,8 @@ components:
             - "MESSAGE_CLEANER"
             - "CLIENTS"
             - "ASSOCIATION_KEYS_SHARE"
+            - "MESSAGES_FETCH"
+            - "CLEANUP_MESSAGES"
         latestStatus:
           type: "string"
           description: "CRON job status"
@@ -2061,6 +2625,9 @@ components:
         did:
           type: "string"
           description: "Configured DID"
+        authEnabled:
+          type: "boolean"
+          description: "User auth enabled"
         messageBrokerStatus:
           type: "string"
           enum:
@@ -2080,6 +2647,7 @@ components:
           example: "v15.15.0"
       required:
         - "did"
+        - "authEnabled"
         - "messageBrokerStatus"
         - "mtlsIsValid"
         - "namespace"
@@ -2116,6 +2684,77 @@ components:
             type: "string"
       required:
         - "clientsIds"
+    CreateContactDto:
+      type: "object"
+      properties: {}
+    UpdateContactRequestDto:
+      type: "object"
+      properties: {}
+    GetAllContactsResponseDto:
+      type: "object"
+      properties:
+        did:
+          type: "string"
+          description: "DID"
+          example: "did:ethr:volta:0x782aB0383Bfc807439d8EE29516937B47815d697"
+        alias:
+          type: "string"
+          description: "Alias"
+          example: "Krzysztof Szostak"
+      required:
+        - "did"
+        - "alias"
+    ConfigResponseDto:
+      type: "object"
+      properties:
+        authEnabled:
+          type: "boolean"
+          description: "Is auth enabled"
+          example: true
+      required:
+        - "authEnabled"
+    RefreshTokenRequestDto:
+      type: "object"
+      properties:
+        refreshToken:
+          type: "string"
+          description: "Refresh token"
+      required:
+        - "refreshToken"
+    LoginResponseDto:
+      type: "object"
+      properties:
+        accessToken:
+          type: "string"
+          description: "Access token"
+        refreshToken:
+          type: "string"
+          description: "Refresh token"
+        role:
+          type: "string"
+          description: "User role"
+        username:
+          type: "string"
+          description: "Username"
+      required:
+        - "accessToken"
+        - "refreshToken"
+        - "role"
+        - "username"
+    LoginRequestDto:
+      type: "object"
+      properties:
+        username:
+          type: "string"
+          description: "Username"
+          example: "admin"
+        password:
+          type: "string"
+          description: "Password"
+          example: "password"
+      required:
+        - "username"
+        - "password"
 externalDocs:
   description: "Postman Collection"
   url: "/docs-json"

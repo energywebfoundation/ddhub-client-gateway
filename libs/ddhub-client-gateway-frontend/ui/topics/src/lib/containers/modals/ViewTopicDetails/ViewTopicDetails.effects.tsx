@@ -1,7 +1,11 @@
 import { Edit, Download } from 'react-feather';
 import { useRouter } from 'next/router';
 import { useTopicVersion } from '@ddhub-client-gateway-frontend/ui/api-hooks';
-import { downloadJson, Queries, routerConst } from '@ddhub-client-gateway-frontend/ui/utils';
+import {
+  downloadJson,
+  Queries,
+  routerConst,
+} from '@ddhub-client-gateway-frontend/ui/utils';
 import {
   useTopicsModalsStore,
   useTopicsModalsDispatch,
@@ -9,12 +13,12 @@ import {
 } from '../../../context';
 import { fields } from './ViewTopicDetails.utils';
 import { useStyles } from './ViewTopicDetails.styles';
-import { useSetUserDataEffect, useUserData } from '@ddhub-client-gateway-frontend/ui/login';
+import { useUserDataEffects } from '@ddhub-client-gateway-frontend/ui/login';
 
 export const useViewTopicDetailsEffects = () => {
   const { classes } = useStyles();
   const router = useRouter();
-  const {userData} = useSetUserDataEffect();
+  const { userData } = useUserDataEffects();
   const {
     topicDetails: { open, topic, application, showActionButtons, isSearch },
   } = useTopicsModalsStore();
@@ -71,14 +75,12 @@ export const useViewTopicDetailsEffects = () => {
   ];
 
   if (userData.displayedRoutes.has(routerConst.TopicManagement)) {
-    buttons.push(
-      {
-        name: 'edit',
-        icon: <Edit className={classes.icon} />,
-        onClick: openUpdateTopic,
-        wrapperClassName: classes.editIconButton,
-      },
-    )
+    buttons.push({
+      name: 'edit',
+      icon: <Edit className={classes.icon} />,
+      onClick: openUpdateTopic,
+      wrapperClassName: classes.editIconButton,
+    });
   }
 
   const details = {

@@ -12,6 +12,7 @@ import { TMessage } from './Messages.type';
 import { FileContentType } from './Messages.utils';
 import moment from 'moment';
 import getConfig from 'next/config';
+import { DateTime } from 'luxon';
 
 export const useMessagesEffects = () => {
   const router = useRouter();
@@ -37,9 +38,12 @@ export const useMessagesEffects = () => {
   });
 
   const data: TMessage[] = messages.map((message) => {
-    const timestampMillis = Math.round(message?.timestampNanos/1e6);
+    const timestampMillis = Math.round(message?.timestampNanos / 1e6);
     return {
-      timestampNanos: dayjs(timestampMillis).format('MM/DD/YYYY'),
+      timestamp: DateTime.fromMillis(timestampMillis).toLocaleString(
+        DateTime.DATETIME_MED
+      ),
+      timestampNanos: message?.timestampNanos,
       sender: didFormatMinifier(message?.sender),
       schemaType: message?.topicSchemaType,
       details: {
