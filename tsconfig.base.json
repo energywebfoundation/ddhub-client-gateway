@@ -62,6 +62,9 @@
       "@dsb-client-gateway/ddhub-client-gateway-association-keys": [
         "libs/ddhub-client-gateway-association-keys/src/index.ts"
       ],
+      "@dsb-client-gateway/ddhub-client-gateway-cleanup": [
+        "libs/ddhub-client-gateway-cleanup/src/index.ts"
+      ],
       "@dsb-client-gateway/ddhub-client-gateway-clients": [
         "libs/ddhub-client-gateway-clients/src/index.ts"
       ],

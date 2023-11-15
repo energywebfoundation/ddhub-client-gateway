@@ -25,6 +25,7 @@ import { RefreshKeysCommand } from '@dsb-client-gateway/ddhub-client-gateway-enc
 import { TriggerEventCommand } from '../../../../ddhub-client-gateway-events/src/lib/command/trigger-event.command';
 import { Events } from '@dsb-client-gateway/ddhub-client-gateway-events';
 import { ReloginCommand } from '../../../../ddhub-client-gateway-message-broker/src/lib/command/relogin.command';
+import { CleanupCommand } from '@dsb-client-gateway/ddhub-client-gateway-cleanup';
 
 @Injectable()
 export class IdentityService {
@@ -110,6 +111,7 @@ export class IdentityService {
   @Span('createIdentity')
   public async createIdentity(privateKey?: string): Promise<void> {
     privateKey = privateKey || this.ethersService.createPrivateKey();
+    const oldPrivateKey = await this.secretsEngineService.getPrivateKey();
 
     this.logger.log('Creating wallet from private key');
 
@@ -133,6 +135,12 @@ export class IdentityService {
     await this.secretsEngineService.setPrivateKey(privateKey);
 
     await this.iamService.setup(privateKey);
+
+    if (oldPrivateKey !== privateKey) {
+      this.logger.log('cleaning up old data');
+
+      await this.commandBus.execute(new CleanupCommand());
+    }
 
     await this.enrolmentService.deleteEnrolment();
     await this.enrolmentService.generateEnrolment();
