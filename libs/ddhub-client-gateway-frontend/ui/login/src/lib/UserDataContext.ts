@@ -82,7 +82,7 @@ interface UserContext {
   userAuth: UserAuthContext;
   setUserData: Dispatch<SetStateAction<UserDataContext>>;
   setUserAuth: Dispatch<SetStateAction<UserAuthContext>>;
-  resetAuthData: (withErrorMessage?: string) => void;
+  resetAuthData: (withErrorMessage?: string) => Promise<boolean>;
   refreshIdentity: boolean;
   setRefreshIdentity: Dispatch<SetStateAction<boolean>>;
   authenticated: boolean;
@@ -109,7 +109,7 @@ export const useUserData = (queryClient: QueryClient) => {
       errorMessage: withErrorMessage ?? '',
     });
     setAuthenticated(false);
-    router.push(routerConst.InitialPage);
+    return router.push(routerConst.InitialPage);
   };
 
   const userDataValue = useMemo(() => ({ userData, setUserData }), [userData]);
@@ -138,13 +138,20 @@ export const useUserData = (queryClient: QueryClient) => {
           refreshToken();
         } else {
           setAuthenticated(true);
+          setRefreshIdentity(true);
+          queryClient.setDefaultOptions({
+            queries: {
+              ...queryClientOptions.queries,
+              enabled: authenticated,
+            },
+          });
         }
       }
     }
   }, [config]);
 
   useEffect(() => {
-    if (userAuth.authenticated) {
+    if (userAuth && userAuth.authenticated) {
       updateTokenStorage(userAuth);
       setRefreshIdentity(true);
       setAuthenticated(true);
@@ -170,7 +177,7 @@ export const useUserData = (queryClient: QueryClient) => {
     const token = localStorage.getItem('refreshToken');
     if (!token) {
       setAuthenticated(false);
-      resetAuthData('No refresh token found');
+      await resetAuthData('No refresh token found');
       return;
     }
 
@@ -202,7 +209,7 @@ export const useUserData = (queryClient: QueryClient) => {
     } catch (error: any) {
       console.error(error);
       setAuthenticated(false);
-      resetAuthData(error.message);
+      await resetAuthData(error.message);
     }
   };
 

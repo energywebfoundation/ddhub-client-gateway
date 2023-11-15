@@ -18,6 +18,10 @@ function RefreshAccountStatus() {
     if (!checking) {
       resetCountdown();
     }
+
+    return () => {
+      setChecking(false);
+    };
   }, [checking]);
 
   return (
