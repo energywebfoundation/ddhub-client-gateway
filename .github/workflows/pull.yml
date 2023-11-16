@@ -7,6 +7,8 @@ jobs:
   run-chores:
     needs: lint-commits
     uses: ./.github/workflows/test.yml
+    with:
+      branch: ${{ github.ref_name }}
   lint-commits:
     uses: ./.github/workflows/commitlint.yml
   build-api:

@@ -1,5 +1,11 @@
 name: Lint Commit Messages
-on: [workflow_call]
+
+on:
+  workflow_call:
+    inputs:
+      branch:
+        required: true
+        type: string
 
 jobs:
   commitlint:
@@ -25,9 +31,14 @@ jobs:
             ${{ runner.os }}-
       - name: Install NPM
         run: npm install -g npm@8.5.0
+      - run: |
+            if [ "${{ inputs.branch }}" == "pre_release" ]; then
+              echo "failOnErrors=false" >> $GITHUB_ENV
+            else
+              echo "failOnErrors=true" >> $GITHUB_ENV
       - run: npm install
       - uses: wagoid/commitlint-github-action@v5
         with:
-          failOnErrors: false
+          failOnErrors: ${{ env.failOnErrors }}
         env:
           NODE_PATH: ${{ github.workspace }}/node_modules
