@@ -1,4 +1,4 @@
-import { Entity, PrimaryColumn, Column } from 'typeorm';
+import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity('sent_messages')
 export class SentMessageEntity {
@@ -54,6 +54,13 @@ export class SentMessageEntity {
 
   @Column({ default: false })
   isFile: boolean;
+
+  @Column({
+    default: null,
+    nullable: true,
+    type: String,
+  })
+  public filePath: string;
 
   @Column()
   totalRecipients: number;

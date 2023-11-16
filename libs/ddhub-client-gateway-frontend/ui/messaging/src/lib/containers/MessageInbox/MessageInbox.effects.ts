@@ -57,7 +57,6 @@ export const useMessageInboxEffects = (isRelatedMessages?: boolean) => {
     isRelatedMessages
   );
   const openDetailsModal = (data: GetMessagesResponseDto) => {
-    console.log(data);
     const timestampMillis = Math.round(data?.timestampNanos / 1e6);
     dispatch({
       type: ModalActionsEnum.SHOW_MESSAGE_INBOX_DETAILS,

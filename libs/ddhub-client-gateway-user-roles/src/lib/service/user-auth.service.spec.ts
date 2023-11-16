@@ -137,7 +137,7 @@ describe(`${UserAuthService.name}`, () => {
 
       it('should not execute', () => {
         expect(error.message).toBe(
-          'User does not exists or password is incorrect'
+          'User does not exist or password is incorrect'
         );
         expect(result).toBeNull();
       });
@@ -162,7 +162,7 @@ describe(`${UserAuthService.name}`, () => {
           .fn()
           .mockImplementationOnce(async () => ({
             password: 'password',
-            role: UserRole.ADMIN
+            role: UserRole.ADMIN,
           }));
 
         mockUserRolesTokenService.generateTokens = jest
@@ -230,7 +230,7 @@ describe(`${UserAuthService.name}`, () => {
 
       it('should throw error', () => {
         expect(error.message).toBe(
-          'User does not exists or password is incorrect'
+          'User does not exist or password is incorrect'
         );
         expect(result).toBeNull();
       });

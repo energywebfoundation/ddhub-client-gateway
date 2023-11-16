@@ -10,4 +10,14 @@ export class LoginResponseDto {
     description: 'Refresh token',
   })
   public refreshToken: string;
+
+  @ApiProperty({
+    description: 'User role',
+  })
+  public role: string;
+
+  @ApiProperty({
+    description: 'Username',
+  })
+  public username: string;
 }

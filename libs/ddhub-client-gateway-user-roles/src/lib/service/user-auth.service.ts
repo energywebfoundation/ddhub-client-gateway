@@ -54,9 +54,10 @@ export class UserAuthService {
 
     const userDetails: UserDetails =
       await this.secretsEngineService.getUserAuthDetails(username);
+    this.logger.log(`${JSON.stringify(userDetails)}`);
 
     if (!userDetails || !userDetails.password) {
-      throw new Error('User does not exists or password is incorrect');
+      throw new Error('User does not exist or password is incorrect');
     }
 
     if (password === userDetails.password) {
@@ -70,6 +71,6 @@ export class UserAuthService {
 
     this.logger.warn('incorrect password attempt');
 
-    throw new Error('User does not exists or password is incorrect');
+    throw new Error('User does not exist or password is incorrect');
   }
 }

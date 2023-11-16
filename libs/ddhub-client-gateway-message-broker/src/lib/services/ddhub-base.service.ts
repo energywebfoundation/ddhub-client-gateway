@@ -11,7 +11,7 @@ import {
 import { DdhubLoginService } from './ddhub-login.service';
 import { DsbClientGatewayErrors } from '@dsb-client-gateway/dsb-client-gateway-errors';
 import { MessageBrokerException } from '../exceptions';
-import { MessageBrokerUnauthrizedException } from '../exceptions/message-broker-unauthrized.exception';
+import { MessageBrokerUnauthorizedException } from '../exceptions/message-broker-unauthrized.exception';
 import { TlsAgentService } from '@dsb-client-gateway/ddhub-client-gateway-tls-agent';
 
 export abstract class DdhubBaseService {
@@ -118,7 +118,7 @@ export abstract class DdhubBaseService {
         defaults.stopOnResponseCodes
       );
 
-      throw new MessageBrokerUnauthrizedException(
+      throw new MessageBrokerUnauthorizedException(
         e.message,
         DsbClientGatewayErrors.MB_ERROR,
         e.response.data.returnCode,
