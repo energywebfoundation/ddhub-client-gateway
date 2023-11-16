@@ -1,9 +1,10 @@
 import {
   AccountStatusEnum,
   checkAccountStatus,
-} from './check-account-status/CheckAccountStatus';
+} from './check-account-status/CheckAccountStatus.effects';
 import {
   LoginResponseDto,
+  getGatewayControllerGetQueryKey,
   getIdentityControllerGetQueryKey,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import {
@@ -124,15 +125,17 @@ export const useUserDataEffects = () => {
     );
   }
 
+  const { config, isLoading: configIsLoading } = useGatewayConfig();
   const router = useRouter();
-  const { config } = useGatewayConfig();
   const {
     userData,
     setUserData,
     userAuth,
     setUserAuth,
+    resetUserData,
     resetAuthData,
     refreshIdentity,
+    setRefreshIdentity,
   } = userContext;
   const queryClient = useQueryClient();
   const [routeRestrictionList, setRouteRestrictionList] = useState(
@@ -195,6 +198,7 @@ export const useUserDataEffects = () => {
     }
 
     queryClient.setQueryData(getIdentityControllerGetQueryKey(), res);
+    setRefreshIdentity(true);
 
     redirect(accountStatus).catch(console.error);
   };
@@ -263,6 +267,9 @@ export const useUserDataEffects = () => {
     setUserAuthOnError,
     setRestrictions,
     version,
+    resetUserData,
     userAuthLogout,
+    authEnabled: config?.authEnabled ?? false,
+    configIsLoading,
   };
 };

@@ -8,20 +8,19 @@ import { ModalActionsEnum, useModalDispatch } from '../../context';
 
 export const useGatewayIdentityEffects = () => {
   const { config } = useGatewayConfig();
-  const { userData, setUserData, refreshIdentity } = useUserDataEffects();
+  const { userData, resetUserData, refreshIdentity } = useUserDataEffects();
   const { identity } = useIdentity(refreshIdentity);
   const Swal = useCustomAlert();
   const dispatch = useModalDispatch();
   const namespace = config?.namespace ?? 'ddhub.apps.energyweb.iam.ewc';
 
-  const update = async () => {
+  const resetIdentity = async () => {
     const result = await Swal.warning({
-      text: 'You will be logged out if you wish to proceed',
+      text: 'The private key will be reset',
     });
 
     if (result.isConfirmed) {
-      // Setting to null will force the user to be logged out and redirected to private key form
-      setUserData(null);
+      await resetUserData();
     }
   };
 
@@ -40,7 +39,7 @@ export const useGatewayIdentityEffects = () => {
   };
 
   return {
-    update,
+    resetIdentity,
     identity: { enrolment: { did: userData.did } },
     namespace,
     openRolesModal,

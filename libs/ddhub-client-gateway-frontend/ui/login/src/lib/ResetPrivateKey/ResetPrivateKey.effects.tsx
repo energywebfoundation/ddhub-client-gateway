@@ -1,6 +1,6 @@
 import { useContext } from 'react';
 import { UserContext } from '@ddhub-client-gateway-frontend/ui/login';
-import { AccountStatusEnum } from '../check-account-status/CheckAccountStatus';
+import { AccountStatusEnum } from '../check-account-status/CheckAccountStatus.effects';
 import { useCustomAlert } from '@ddhub-client-gateway-frontend/ui/core';
 
 export const useResetPrivateKeyEffects = () => {
