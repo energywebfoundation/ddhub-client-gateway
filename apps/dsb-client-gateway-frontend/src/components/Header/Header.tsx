@@ -16,7 +16,7 @@ export function Header() {
 
   const { classes } = useStyles();
   const {
-    config: { did, authEnabled },
+    config: { authEnabled },
   } = useGatewayConfig();
 
   const openLogoutModal = async () => {
@@ -26,28 +26,31 @@ export function Header() {
     });
 
     if (result.isConfirmed) {
-      // userContext.setUserAuth(null);
       await userContext.resetAuthData();
     }
   };
 
   return (
     <div className={classes.root}>
-      <div className={classes.content}>
-        <Typography variant="body2" className={classes.did}>
-          {didFormatMinifier(did)}
-        </Typography>
-        <Typography variant="body2" className={classes.client}>
-          Client gateway
-        </Typography>
-      </div>
-      <div className={classes.avatar}>
-        <img
-          src="/icons/online-status.svg"
-          alt="online status icon"
-          className={classes.status}
-        />
-      </div>
+      {userContext.userData?.did && (
+        <>
+          <div className={classes.content}>
+            <Typography variant="body2" className={classes.did}>
+              {didFormatMinifier(userContext.userData?.did)}
+            </Typography>
+            <Typography variant="body2" className={classes.client}>
+              Client gateway
+            </Typography>
+          </div>
+          <div className={classes.avatar}>
+            <img
+              src="/icons/online-status.svg"
+              alt="online status icon"
+              className={classes.status}
+            />
+          </div>
+        </>
+      )}
       {authEnabled && userContext.authenticated && (
         <div className={classes.logoutButton}>
           <IconButton onClick={() => openLogoutModal()}>

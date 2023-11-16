@@ -2651,6 +2651,9 @@ components:
         mtlsIsValid:
           type: "boolean"
           description: "Checks if the gateway is configured correctly to use mTLS (if mTLS is enabled)"
+        isAssociationKeyEnabled:
+          type: "boolean"
+          description: "Checks if the gateway is configured for associationKeys are enable"
         namespace:
           type: "string"
           description: "Configured namespace"
@@ -2664,6 +2667,7 @@ components:
         - "authEnabled"
         - "messageBrokerStatus"
         - "mtlsIsValid"
+        - "isAssociationKeyEnabled"
         - "namespace"
         - "version"
     GetAllClientsResponseDto:
