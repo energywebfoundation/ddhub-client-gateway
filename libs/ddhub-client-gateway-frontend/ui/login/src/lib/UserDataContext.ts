@@ -7,7 +7,7 @@ import {
   useState,
 } from 'react';
 import { Role, RoleStatus } from '@ddhub-client-gateway/identity/models';
-import { AccountStatusEnum } from './check-account-status/CheckAccountStatus';
+import { AccountStatusEnum } from './check-account-status/CheckAccountStatus.effects';
 import { RouteRestrictions } from './config/route-restrictions.interface';
 import { DefaultOptions, MutationFunction, QueryClient } from 'react-query';
 import {
@@ -82,11 +82,13 @@ interface UserContext {
   userAuth: UserAuthContext;
   setUserData: Dispatch<SetStateAction<UserDataContext>>;
   setUserAuth: Dispatch<SetStateAction<UserAuthContext>>;
+  resetUserData: (withErrorMessage?: string) => Promise<boolean>;
   resetAuthData: (withErrorMessage?: string) => Promise<boolean>;
   refreshIdentity: boolean;
   setRefreshIdentity: Dispatch<SetStateAction<boolean>>;
   authenticated: boolean;
   refreshToken: () => Promise<void>;
+  authEnabled?: boolean;
 }
 
 export const UserContext = createContext<UserContext | undefined>(undefined);
@@ -102,6 +104,12 @@ export const useUserData = (queryClient: QueryClient) => {
   const [refreshIdentity, setRefreshIdentity] = useState(false);
   const [authenticated, setAuthenticated] = useState(false);
 
+  const resetUserData = (withErrorMessage?: string) => {
+    setRefreshIdentity(false);
+    setUserData({ ...initialUserData, errorMessage: withErrorMessage ?? '' });
+    return router.push(routerConst.InitialPage);
+  };
+
   const resetAuthData = (withErrorMessage?: string) => {
     resetTokenStorage();
     setUserAuth({
@@ -109,6 +117,7 @@ export const useUserData = (queryClient: QueryClient) => {
       errorMessage: withErrorMessage ?? '',
     });
     setAuthenticated(false);
+    setRefreshIdentity(false);
     return router.push(routerConst.InitialPage);
   };
 
@@ -237,11 +246,13 @@ export const useUserData = (queryClient: QueryClient) => {
     setUserData,
     userAuthValue,
     setUserAuth,
+    resetUserData,
     resetAuthData,
     refreshIdentityValue,
     setRefreshIdentity,
     authenticatedValue,
     setAuthenticated,
     refreshToken,
+    authEnabled: config?.authEnabled,
   };
 };

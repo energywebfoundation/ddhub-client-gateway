@@ -3,15 +3,13 @@ import {
   CreateIdentityDto,
   LoginRequestDto,
   LoginResponseDto,
-  RefreshTokenRequestDto,
   useIdentityControllerPost,
   useLoginControllerLogin,
-  useLoginControllerRefreshToken,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { useUserDataEffects } from './UserData.effects';
 import { useCustomAlert } from '@ddhub-client-gateway-frontend/ui/core';
 import { useGatewayConfig } from '@ddhub-client-gateway-frontend/ui/api-hooks';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useCheckAccountStatus } from './check-account-status/CheckAccountStatus.effects';
 
 interface PrivateKeyEffects {
@@ -83,8 +81,7 @@ const useUserLoginEffects = ({
 export const useLoginEffects = () => {
   const Swal = useCustomAlert();
   const { isLoading: isConfigLoading, config } = useGatewayConfig();
-  const { checking: isCheckingIdentity } = useCheckAccountStatus();
-  const [authEnabled, setAuthEnabled] = useState(false);
+  const { checking: isCheckingIdentity, setChecking } = useCheckAccountStatus();
 
   const onError = (err: any) => {
     console.error(err);
@@ -100,6 +97,7 @@ export const useLoginEffects = () => {
     setIsCheckingAuth,
     setUserDataOnError,
     setUserAuthOnError,
+    refreshIdentity,
   } = useUserDataEffects();
   const privateKeyLogin = usePrivateKeyEffects({
     setIsChecking: setIsCheckingIdentity,
@@ -115,13 +113,11 @@ export const useLoginEffects = () => {
   });
 
   useEffect(() => {
-    if (!isConfigLoading && config?.authEnabled) {
-      setAuthEnabled(true);
-    }
-  }, [isConfigLoading, config]);
+    setChecking(refreshIdentity);
+  }, [refreshIdentity]);
 
   return {
-    authEnabled,
+    authEnabled: config?.authEnabled ?? false,
     isLoading: isConfigLoading || userData.isChecking || userAuth.isChecking,
     privateKeySubmitHandler: privateKeyLogin.onSubmit,
     userLoginSubmitHandler: userLogin.onSubmit,

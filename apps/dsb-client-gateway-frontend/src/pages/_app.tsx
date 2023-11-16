@@ -67,8 +67,10 @@ function MyApp(props: MyAppProps) {
     userAuthValue,
     refreshIdentityValue,
     authenticatedValue,
+    resetUserData,
     resetAuthData,
     refreshToken,
+    authEnabled,
   } = useUserData(queryClient);
 
   const getLayout =
@@ -109,8 +111,10 @@ function MyApp(props: MyAppProps) {
                 ...userAuthValue,
                 ...refreshIdentityValue,
                 ...authenticatedValue,
+                resetUserData,
                 resetAuthData,
                 refreshToken,
+                authEnabled,
               }}
             >
               <ModalProvider>
