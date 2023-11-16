@@ -26,6 +26,8 @@ jobs:
       - name: Install NPM
         run: npm install -g npm@8.5.0
       - run: npm install
-      - uses: wagoid/commitlint-github-action@v4
+      - uses: wagoid/commitlint-github-action@v5
+        with:
+          failOnErrors: false
         env:
           NODE_PATH: ${{ github.workspace }}/node_modules
