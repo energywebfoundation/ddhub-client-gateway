@@ -59,7 +59,7 @@ export const useLoginStatusEffects = () => {
     }
 
     return () => {
-      setIsFirstLogin(true);
+      setIsFirstLogin(false);
     };
   }, [status]);
 
@@ -69,7 +69,7 @@ export const useLoginStatusEffects = () => {
     }
 
     return () => {
-      setIsFirstLogin(true);
+      setIsFirstLogin(false);
     };
   }, [userAuth]);
 
