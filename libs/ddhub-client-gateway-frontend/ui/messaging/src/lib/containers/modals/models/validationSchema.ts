@@ -18,7 +18,7 @@ export const validationSchema = yup
     Channel: yup.string().required(),
     'Topic Name': yup.string().required(),
     Version: yup.string().required(),
-    'Transaction ID': yup.string().required(),
+    'Transaction ID': yup.string(),
     Message: message,
   })
   .required();

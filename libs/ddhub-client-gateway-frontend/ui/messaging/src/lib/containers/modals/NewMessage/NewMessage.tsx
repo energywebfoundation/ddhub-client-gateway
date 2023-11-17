@@ -32,7 +32,6 @@ export const NewMessage: FC = () => {
     control,
     selectedChannel,
     selectedTopic,
-    channelsLoaded,
     formContext,
     fields,
     activeStep,
@@ -42,6 +41,8 @@ export const NewMessage: FC = () => {
     getActionButtonsProps,
     sendMessage,
     isSending,
+    isLoading,
+    isRefetching,
   } = useNewMessageEffects();
 
   const [formData, setFormData] = useState([]);
@@ -100,7 +101,7 @@ export const NewMessage: FC = () => {
                     register={register}
                     control={control}
                     variant="outlined"
-                    disabled={!channelsLoaded}
+                    disabled={isLoading || isRefetching}
                   />
                 </Grid>
                 <Grid item>
