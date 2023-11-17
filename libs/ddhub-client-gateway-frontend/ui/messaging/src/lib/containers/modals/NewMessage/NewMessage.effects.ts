@@ -42,7 +42,6 @@ export const useNewMessageEffects = () => {
   const {
     newMessage: { open },
   } = useModalStore();
-  const [firstLoad, setFirstLoad] = useState(true);
   const [newMessageValues, setNewMessageValues] =
     useState<INewMessage>(initialState);
   const [activeStep, setActiveStep] = useState(0);
@@ -52,6 +51,7 @@ export const useNewMessageEffects = () => {
   const {
     channels,
     isLoading,
+    isRefetching,
     channelsLoaded,
     refetch: refreshChannels,
   } = useChannels({
@@ -163,18 +163,11 @@ export const useNewMessageEffects = () => {
       refreshChannels();
     } else {
       resetToInitialState();
-      setFirstLoad(true);
     }
   }, [open]);
 
   useEffect(() => {
     if (channelsLoaded) {
-      setFirstLoad(false);
-    }
-  }, [channelsLoaded]);
-
-  useEffect(() => {
-    if (channels && channels.length && !firstLoad) {
       setFields((prev) => ({
         ...prev,
         channel: {
@@ -186,7 +179,7 @@ export const useNewMessageEffects = () => {
         },
       }));
     }
-  }, [firstLoad]);
+  }, [channelsLoaded]);
 
   useEffect(() => {
     if (selectedChannel) {
@@ -422,6 +415,7 @@ export const useNewMessageEffects = () => {
     closeModal,
     channels,
     isLoading,
+    isRefetching,
     channelsLoaded,
     formContext,
     register,
