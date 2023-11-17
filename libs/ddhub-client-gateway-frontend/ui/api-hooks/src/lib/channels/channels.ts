@@ -5,10 +5,16 @@ import {
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { keyBy } from 'lodash';
 import { useCustomAlert } from '@ddhub-client-gateway-frontend/ui/core';
+import { useEffect, useState } from 'react';
 
 export const useChannels = (params?: ChannelControllerGetByTypeParams) => {
   const Swal = useCustomAlert();
-  const { data, isLoading, isSuccess, isError, refetch } =
+  const [channels, setChannels] = useState<ChannelDto[]>([]);
+  const [channelsByName, setChannelsByName] = useState<
+    Record<string, ChannelDto>
+  >({});
+  const [channelsLoaded, setChannelsLoaded] = useState(false);
+  const { data, isLoading, isSuccess, isError, refetch, isRefetching } =
     useChannelControllerGetByType(params, {
       query: {
         onError: (err: unknown) => {
@@ -18,26 +24,34 @@ export const useChannels = (params?: ChannelControllerGetByTypeParams) => {
       },
     });
 
-  let channels: ChannelDto[] = [];
-  if (data) {
-    channels = data.map((channel) => {
-      return {
-        ...channel,
-        enabledConfigs: {
-          payloadEncryption: channel.payloadEncryption,
-          useAnonymousExtChannel: channel.useAnonymousExtChannel,
-          messageForms: channel.messageForms,
-        },
-      };
-    });
-  }
+  useEffect(() => {
+    if (isLoading || isRefetching) {
+      setChannelsLoaded(false);
+    }
+  }, [isLoading, isRefetching]);
 
-  const channelsByName = keyBy(channels, 'fqcn');
-  const channelsLoaded = data !== undefined && isSuccess && !isError;
+  useEffect(() => {
+    if (data && isSuccess && !isError) {
+      const channels = data.map((channel) => {
+        return {
+          ...channel,
+          enabledConfigs: {
+            payloadEncryption: channel.payloadEncryption,
+            useAnonymousExtChannel: channel.useAnonymousExtChannel,
+            messageForms: channel.messageForms,
+          },
+        };
+      });
+      setChannels(channels);
+      setChannelsByName(keyBy(channels, 'fqcn'));
+      setChannelsLoaded(true);
+    }
+  }, [data, isError, isSuccess]);
 
   return {
     channels,
     isLoading,
+    isRefetching,
     channelsLoaded,
     channelsByName,
     refetch,
