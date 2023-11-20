@@ -659,7 +659,7 @@ describe(`${KeysService.name}`, () => {
         configServiceMock.get = jest.fn().mockImplementationOnce(() => 'path');
 
         try {
-          const buffer = new Buffer('asdfghj', 'base64');
+          const buffer = Buffer.from('asdfghj', 'base64');
           const readable = Readable.from(buffer);
 
           result = await service.encryptMessageStream(

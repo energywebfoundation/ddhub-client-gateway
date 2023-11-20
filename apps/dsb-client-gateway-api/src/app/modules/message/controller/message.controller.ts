@@ -41,6 +41,7 @@ import {
   UserRole,
 } from '@dsb-client-gateway/ddhub-client-gateway-user-roles';
 import { AckMessagesRequestDto } from '../dto/request/ack-messages-request.dto';
+import { GetReceivedMessageResponseDto } from '../dto/response/get-received-message-response.dto';
 
 @Controller('messages')
 @UseGuards(MtlsGuard, UserGuard)
@@ -108,6 +109,40 @@ export class MessageController {
     });
 
     return this.offlineMessagesService.getOfflineSentMessages(dto);
+  }
+
+  @Get('/received')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Message received successfully',
+    type: GetReceivedMessageResponseDto,
+    isArray: true,
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description:
+      'Validation failed or some requirements were not fully satisfied',
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Unauthorized',
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Messages Not found',
+  })
+  @Roles(UserRole.MESSAGING, UserRole.ADMIN)
+  @HttpCode(HttpStatus.OK)
+  public async getReceivedMessages(
+    @Query() dto: GetMessagesDto
+  ): Promise<GetReceivedMessageResponseDto[]> {
+    this.pinoLogger.assign({
+      fqcn: dto.fqcn,
+      topicName: dto.topicName,
+      topicOwner: dto.topicOwner,
+    });
+
+    return this.offlineMessagesService.getOfflineReceivedMessages(dto);
   }
 
   @Post('/ack')

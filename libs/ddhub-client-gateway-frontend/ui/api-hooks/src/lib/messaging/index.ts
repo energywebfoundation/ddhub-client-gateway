@@ -3,3 +3,4 @@ export * from './getMessages';
 export * from './getCachedMessages';
 export * from './downloadMessage';
 export * from './getSentMessages';
+export * from './getReceivedMessages';

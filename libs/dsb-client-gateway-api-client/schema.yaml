@@ -425,6 +425,97 @@ paths:
           description: "Messages Not found"
       tags:
         - "Messaging"
+  /api/v2/messages/received:
+    get:
+      operationId: "MessageController_getReceivedMessages"
+      parameters:
+        - name: "fqcn"
+          required: true
+          in: "query"
+          example: "channel.name"
+          description: "channel name"
+          schema:
+            type: "string"
+        - name: "from"
+          required: false
+          in: "query"
+          description: "date from which messages to be fetched"
+          example: "2022-03-31T09:48:44.357Z"
+          schema:
+            type: "string"
+        - name: "amount"
+          required: false
+          in: "query"
+          example: 1
+          description: "Latest amount of messages to be fetched"
+          schema:
+            type: "number"
+        - name: "topicName"
+          required: false
+          in: "query"
+          example: "getOperatingEnvelope"
+          description: "topic name"
+          schema:
+            type: "string"
+        - name: "topicOwner"
+          required: false
+          in: "query"
+          example: "torta.apps.eggplant.vege.iam.ewc"
+          description: "application namespace"
+          schema:
+            type: "string"
+        - name: "clientId"
+          required: false
+          in: "query"
+          example: "test2"
+          description: "cursor for pointing to messages"
+          schema:
+            type: "string"
+        - name: "initiatingMessageId"
+          required: false
+          in: "query"
+          example: "507f191e810c19729de860ea"
+          description: "Initiating message id"
+          schema:
+            type: "string"
+        - name: "initiatingTransactionId"
+          required: false
+          in: "query"
+          example: "45d5a89f-7c2c-48b0-ae9a-54f4128e818f"
+          description: "Initiating transaction id"
+          schema:
+            type: "string"
+        - name: "transactionId"
+          required: false
+          in: "query"
+          example: "45d5a89f-7c2c-48b0-ae9a-54f4128e818f"
+          description: "Initiating transaction id"
+          schema:
+            type: "string"
+        - name: "messageId"
+          required: false
+          in: "query"
+          example: "507f191e810c19729de860ea"
+          description: "Message id"
+          schema:
+            type: "string"
+      responses:
+        200:
+          description: "Message received successfully"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/GetReceivedMessageResponseDto"
+        400:
+          description: "Validation failed or some requirements were not fully satisfied"
+        401:
+          description: "Unauthorized"
+        404:
+          description: "Messages Not found"
+      tags:
+        - "Messaging"
   /api/v2/messages/ack:
     post:
       operationId: "MessageController_ackMessages"
@@ -1830,6 +1921,10 @@ components:
           type: "number"
           description: "timestamp in nano seconds"
           example: 1649147198388
+        timestampISO:
+          type: "string"
+          description: "timestamp formatted in ISO"
+          example: "2023-11-19T16:00:00.000Z"
         senderDid:
           type: "string"
           example: "did:ethr:volta:0x782aB0383Bfc807439d8EE29516937B47815d697"
@@ -1886,6 +1981,7 @@ components:
         - "payloadEncryption"
         - "payload"
         - "timestampNanos"
+        - "timestampISO"
         - "senderDid"
         - "fqcn"
         - "relatedMessagesCount"
@@ -1896,6 +1992,86 @@ components:
         - "createdDate"
         - "updatedDate"
         - "recipients"
+    GetReceivedMessageResponseDto:
+      type: "object"
+      properties:
+        id:
+          type: "string"
+          description: "message id"
+          example: "110"
+        topicName:
+          type: "string"
+          description: "topic Name"
+          example: "getOperatingEnvelope"
+        topicOwner:
+          type: "string"
+          description: "application namespace"
+          example: "torta.apps.eggplant.vege.iam.ewc"
+        topicVersion:
+          type: "string"
+          description: "Topic Version"
+          example: "1.0.0"
+        topicSchemaType:
+          type: "string"
+          description: "schema type of the topic"
+          enum:
+            - "JSD7"
+            - "XML"
+            - "XSD6"
+            - "CSV"
+            - "TSV"
+          example: "JSD7"
+        payload:
+          type: "string"
+          description: "Payload sent to message"
+          example: "{\"fileId\":\"624bfd4f4c6cf04abfc20041\"}"
+        signature:
+          type: "string"
+          description: "signature sent to message"
+          example: "0x0abc6026b01856a756de47ec6f44d9c14fe69009bbf3b9b6cf522d8d783a1c654425848381affca5dab9284d8715fa2f9e34155374bafd923d75c219496cbe161c"
+        sender:
+          type: "string"
+          description: "message sender"
+          example: "did:ethr:volta:0x03830466Ce257f9B798B0f27359D7639dFB6457D"
+        timestampNanos:
+          type: "number"
+          description: "timestamp in nano seconds"
+          example: 1649147198388
+        timestampISO:
+          type: "string"
+          description: "timestamp formatted in ISO"
+          example: "2023-11-19T16:00:00.000Z"
+        transactionId:
+          type: "string"
+          description: "transactionId sent to message for idempotency"
+          example: "1649147198388"
+        signatureValid:
+          type: "string"
+          description: "Signature validation status for a message"
+          enum:
+            - "FAILED"
+            - "NOT_PERFORMED"
+            - "NOT_REQUIRED"
+            - "REQUIRED_NOT_PERFORMED"
+            - "SUCCESS"
+          example: "SUCCESS"
+        relatedMessagesCount:
+          type: "number"
+          description: "Related messages count. Only appears for channels with message forms."
+          example: 5
+      required:
+        - "id"
+        - "topicName"
+        - "topicOwner"
+        - "topicVersion"
+        - "topicSchemaType"
+        - "payload"
+        - "signature"
+        - "sender"
+        - "timestampNanos"
+        - "timestampISO"
+        - "transactionId"
+        - "signatureValid"
     AckMessagesRequestDto:
       type: "object"
       properties:

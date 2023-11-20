@@ -106,34 +106,37 @@ export class ChannelService {
       throw new ChannelAlreadyExistsException(payload.fqcn);
     }
 
-    this.logger.debug(payload);
+    this.logger.debug(`Create message payload: ${JSON.stringify(payload)}`);
 
     const topicsWithIds: ChannelTopic[] = await this.getTopicsWithIds(
       payload.conditions.topics
     );
 
-    const responseTopicsWithIds: ChannelTopic[] = await this.getTopicsWithIds(
-      payload.conditions.responseTopics
-    );
+    let responseTopicsWithChannels: ChannelResponseTopic[] = [];
+    if (payload.conditions.responseTopics.length) {
+      const responseTopicsWithIds: ChannelTopic[] = await this.getTopicsWithIds(
+        payload.conditions.responseTopics
+      );
 
-    const uniqueResponseTopicsIds: string[] = [
-      ...new Set(
-        payload.conditions.responseTopics.map(
-          ({ responseTopicId }) => responseTopicId
-        )
-      ),
-    ];
+      const uniqueResponseTopicsIds: string[] = [
+        ...new Set(
+          payload.conditions.responseTopics.map(
+            ({ responseTopicId }) => responseTopicId
+          )
+        ),
+      ];
 
-    const responseTopicsCount = await this.getTopicsCountByIds(
-      uniqueResponseTopicsIds
-    );
+      const responseTopicsCount = await this.getTopicsCountByIds(
+        uniqueResponseTopicsIds
+      );
 
-    const responseTopicsWithChannels = this.verifyResponseTopics(
-      responseTopicsCount,
-      uniqueResponseTopicsIds,
-      payload.conditions.responseTopics,
-      responseTopicsWithIds
-    );
+      responseTopicsWithChannels = this.verifyResponseTopics(
+        responseTopicsCount,
+        uniqueResponseTopicsIds,
+        payload.conditions.responseTopics,
+        responseTopicsWithIds
+      );
+    }
 
     await this.validateTopics(topicsWithIds, payload.type);
 
@@ -279,28 +282,31 @@ export class ChannelService {
       dto.conditions.topics
     );
 
-    const responseTopicsWithIds: ChannelTopic[] = await this.getTopicsWithIds(
-      dto.conditions.responseTopics
-    );
+    let responseTopicsWithChannels: ChannelResponseTopic[] = [];
+    if (dto.conditions.responseTopics.length) {
+      const responseTopicsWithIds: ChannelTopic[] = await this.getTopicsWithIds(
+        dto.conditions.responseTopics
+      );
 
-    const uniqueResponseTopicsIds: string[] = [
-      ...new Set(
-        dto.conditions.responseTopics.map(
-          ({ responseTopicId }) => responseTopicId
-        )
-      ),
-    ];
+      const uniqueResponseTopicsIds: string[] = [
+        ...new Set(
+          dto.conditions.responseTopics.map(
+            ({ responseTopicId }) => responseTopicId
+          )
+        ),
+      ];
 
-    const responseTopicsCount = await this.getTopicsCountByIds(
-      uniqueResponseTopicsIds
-    );
+      const responseTopicsCount = await this.getTopicsCountByIds(
+        uniqueResponseTopicsIds
+      );
 
-    const responseTopicsWithChannels = this.verifyResponseTopics(
-      responseTopicsCount,
-      uniqueResponseTopicsIds,
-      dto.conditions.responseTopics,
-      responseTopicsWithIds
-    );
+      responseTopicsWithChannels = this.verifyResponseTopics(
+        responseTopicsCount,
+        uniqueResponseTopicsIds,
+        dto.conditions.responseTopics,
+        responseTopicsWithIds
+      );
+    }
 
     await this.validateTopics(topicsWithIds, channel.type);
 
@@ -340,11 +346,16 @@ export class ChannelService {
   }
 
   protected async getTopicsCountByIds(topicIds: string[]): Promise<number> {
-    return this.topicRepository.topicRepository.count({
-      where: {
-        id: In(topicIds),
-      },
-    });
+    if (!topicIds || topicIds.length === 0) {
+      return 0;
+    }
+
+    const [, count] =
+      await this.topicRepository.topicRepository.getTopicsAndCountByIds(
+        topicIds,
+        true
+      );
+    return count;
   }
 
   @Span('channels_getTopicsWithIds')
