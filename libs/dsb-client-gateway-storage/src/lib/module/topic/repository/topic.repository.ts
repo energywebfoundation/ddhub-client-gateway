@@ -3,6 +3,41 @@ import { TopicEntity } from '../entity/topic.entity';
 
 @EntityRepository(TopicEntity)
 export class TopicRepository extends Repository<TopicEntity> {
+  /**
+   * Returns the total count of topics when passed a list of topic ids
+   * By default it returns the count of all versions of the return topics
+   * @param topicIds Topic ids to find and count
+   * @param onlyLatestVersion Only return the latest version for each topic (default: false)
+   * @returns {Promise<[TopicEntity[], number]>} Returns all found topics and the total count of all found topics (including all versions by default)
+   */
+  public async getTopicsAndCountByIds(
+    topicIds: string[],
+    onlyLatestVersion = false
+  ): Promise<[TopicEntity[], number]> {
+    const query = this.createQueryBuilder('t');
+    query.select('t.*');
+    query.where('t.id IN (:...topicIds)', { topicIds });
+    query.orderBy('t.id,t.version', 'DESC');
+    if (onlyLatestVersion) {
+      query.distinctOn(['t.id']);
+    }
+    const result = await query.execute();
+    return [
+      result.map((rawEntity) => {
+        return {
+          name: rawEntity.name,
+          schemaType: rawEntity.schemaType,
+          tags: JSON.parse(rawEntity.tags),
+          owner: rawEntity.owner,
+          schema: JSON.parse(rawEntity.schema),
+          id: rawEntity.id,
+          version: rawEntity.version,
+        };
+      }),
+      result.length,
+    ];
+  }
+
   public async getTopicsAndCountSearch(
     limit: number,
     name: string,
@@ -13,13 +48,11 @@ export class TopicRepository extends Repository<TopicEntity> {
     query.select('t.*');
     query.distinctOn(['t.id']);
     query.where('t.name like :name', { name: `%${name}%` });
-    query
-      .limit(limit)
-      .offset(limit * (page - 1));
+    query.limit(limit).offset(limit * (page - 1));
     if (owner) {
       query.andWhere('t.owner = :owner', { owner: owner });
     }
-    query.orderBy("t.id,t.version", "DESC");
+    query.orderBy('t.id,t.version', 'DESC');
     const result = await query.execute();
     return result.map((rawEntity) => {
       return {
@@ -36,7 +69,7 @@ export class TopicRepository extends Repository<TopicEntity> {
 
   public async getTopicsCountSearch(
     name: string,
-    owner: string,
+    owner: string
   ): Promise<number> {
     const subQuery = this.createQueryBuilder('t');
     subQuery.select('t.*');
@@ -134,10 +167,10 @@ export class TopicRepository extends Repository<TopicEntity> {
     name: string,
     tags: string[]
   ): SelectQueryBuilder<TopicEntity> {
-    const qb = this.createQueryBuilder("t");
+    const qb = this.createQueryBuilder('t');
 
-    qb.select('t.*')
-    qb.distinctOn(['id'])
+    qb.select('t.*');
+    qb.distinctOn(['id']);
     if (owner) {
       qb.where('owner = :owner', { owner });
     }
@@ -161,7 +194,7 @@ export class TopicRepository extends Repository<TopicEntity> {
 
       qb.andWhere(tagQueryString + ')');
     }
-    qb.orderBy("id,version", "DESC");
+    qb.orderBy('id,version', 'DESC');
     return qb;
   }
 }

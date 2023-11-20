@@ -54,6 +54,7 @@ const mockReceivedMessagesRepositoryWrapper = {
 const mockTopicRepositoryWrapper = {
   topicRepository: {
     count: jest.fn(),
+    getTopicsAndCountByIds: jest.fn(),
   },
 };
 
@@ -61,6 +62,9 @@ describe(`${ChannelService.name}`, () => {
   let service: ChannelService;
 
   beforeEach(async () => {
+    jest.resetAllMocks();
+    jest.clearAllMocks();
+
     const module = await Test.createTestingModule({
       providers: [
         ChannelService,
@@ -307,40 +311,40 @@ describe(`${ChannelService.name}`, () => {
 
         ddhubTopicsServiceMock.getTopicsByOwnerAndName = jest
           .fn()
-          .mockImplementationOnce(async () => {
-            return {
-              count: 1,
-              limit: 1,
-              page: 1,
-              records: [
-                {
-                  id: 'TOPIC-1',
-                  name: 'topicName',
-                  owner: 'topicOwner',
-                  schemaType: SchemaType.JSD7,
-                },
-              ],
-            };
+          .mockResolvedValueOnce({
+            count: 1,
+            limit: 1,
+            page: 1,
+            records: [
+              {
+                id: 'TOPIC-1',
+                name: 'topicName',
+                owner: 'topicOwner',
+                schemaType: SchemaType.JSD7,
+              },
+            ],
           })
-          .mockImplementationOnce(async () => {
-            return {
-              count: 1,
-              limit: 1,
-              page: 1,
-              records: [
-                {
-                  id: 'RESPONSE-TOPIC-1',
-                  name: 'responseTopicName',
-                  owner: 'responseTopicOwner',
-                  schemaType: SchemaType.JSD7,
-                },
-              ],
-            };
+          .mockResolvedValueOnce({
+            count: 1,
+            limit: 1,
+            page: 1,
+            records: [
+              {
+                id: 'RESPONSE-TOPIC-1',
+                name: 'responseTopicName',
+                owner: 'responseTopicOwner',
+                schemaType: SchemaType.JSD7,
+              },
+            ],
           });
+
+        mockTopicRepositoryWrapper.topicRepository.getTopicsAndCountByIds = jest
+          .fn()
+          .mockResolvedValue([[], 1]);
 
         mockTopicRepositoryWrapper.topicRepository.count = jest
           .fn()
-          .mockImplementationOnce(async () => 1);
+          .mockResolvedValue(1);
 
         try {
           result = await service.createChannel(channelPayload);
@@ -383,7 +387,7 @@ describe(`${ChannelService.name}`, () => {
 
       it('should call topics repository for count', () => {
         expect(
-          mockTopicRepositoryWrapper.topicRepository.count
+          mockTopicRepositoryWrapper.topicRepository.getTopicsAndCountByIds
         ).toBeCalledTimes(1);
       });
 

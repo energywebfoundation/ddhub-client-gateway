@@ -340,11 +340,12 @@ export class ChannelService {
   }
 
   protected async getTopicsCountByIds(topicIds: string[]): Promise<number> {
-    return this.topicRepository.topicRepository.count({
-      where: {
-        id: In(topicIds),
-      },
-    });
+    const [, count] =
+      await this.topicRepository.topicRepository.getTopicsAndCountByIds(
+        topicIds,
+        true
+      );
+    return count;
   }
 
   @Span('channels_getTopicsWithIds')
