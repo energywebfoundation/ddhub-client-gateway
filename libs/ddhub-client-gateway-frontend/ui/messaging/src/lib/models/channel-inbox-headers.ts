@@ -3,11 +3,10 @@ import { DateTime } from 'luxon';
 export const CHANNEL_INBOX_HEADERS = [
   {
     Header: 'DATE & TIME',
-    accessor: 'timestampNanos',
+    accessor: 'timestampISO',
     Cell: (props: any) => {
-      return DateTime.fromISO(props?.value).toLocaleString(
-        DateTime.DATETIME_MED
-      );
+      if (!props?.value) return '';
+      return DateTime.fromISO(props.value).toFormat('yyyy/MM/dd h:mm:ss a');
     },
   },
   {

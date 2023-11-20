@@ -4,16 +4,14 @@ import {
   RelatedMessageProps,
 } from '../containers/MessageOutbox';
 import { DateTime } from 'luxon';
-import { Plus } from 'react-feather';
 
 export const CHANNEL_OUTBOX_HEADERS = [
   {
     Header: 'DATE & TIME',
-    accessor: 'timestampNanos',
+    accessor: 'timestampISO',
     Cell: (props: any) => {
-      return DateTime.fromISO(props?.value).toLocaleString(
-        DateTime.DATETIME_MED
-      );
+      if (!props.value) return '';
+      return DateTime.fromISO(props.value).toFormat('yyyy/MM/dd h:mm:ss a');
     },
   },
   {
