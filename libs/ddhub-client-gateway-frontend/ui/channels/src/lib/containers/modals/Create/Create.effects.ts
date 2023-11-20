@@ -141,7 +141,7 @@ export const useCreateChannelEffects = () => {
       conditions: {
         ...channelValues.conditions,
         topics: data.topics,
-        // responseTopics: data.responseTopics,
+        responseTopics: data.responseTopics,
       },
     });
   };
@@ -202,7 +202,7 @@ export const useCreateChannelEffects = () => {
         ...values.conditions,
         roles: rolesData,
         topics: topicsData,
-        // responseTopics: responseTopicsData,
+        responseTopics: responseTopicsData,
       },
       payloadEncryption: values.payloadEncryption,
       useAnonymousExtChannel: values.useAnonymousExtChannel,

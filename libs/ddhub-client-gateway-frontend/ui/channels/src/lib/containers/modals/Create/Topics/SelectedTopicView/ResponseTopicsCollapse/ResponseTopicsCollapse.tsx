@@ -1,5 +1,4 @@
 import { Box, Chip, Collapse, Grid, Stack, Typography } from '@mui/material';
-import React from 'react';
 import { useStyles } from './ResponseTopicsCollapse.styles';
 import { ResponseTopicDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 
@@ -10,8 +9,8 @@ interface SelectedTopicsCollapseProps {
 
 export const SelectedTopicsCollapse = ({
   expandResponse,
-}: // responseTopics,
-SelectedTopicsCollapseProps) => {
+  responseTopics,
+}: SelectedTopicsCollapseProps) => {
   const { classes } = useStyles();
 
   return (
@@ -22,7 +21,7 @@ SelectedTopicsCollapseProps) => {
         </Typography>
 
         <Stack direction="row" spacing="6px">
-          {/* {(!responseTopics || !responseTopics.length) && (
+          {(!responseTopics || !responseTopics.length) && (
             <Box className={classes.noRecord}>
               <Typography className={classes.noRecordLabel}>
                 No response topic added
@@ -40,7 +39,7 @@ SelectedTopicsCollapseProps) => {
                   label: classes.chipLabel,
                 }}
               />
-            ))} */}
+            ))}
         </Stack>
       </Grid>
     </Collapse>

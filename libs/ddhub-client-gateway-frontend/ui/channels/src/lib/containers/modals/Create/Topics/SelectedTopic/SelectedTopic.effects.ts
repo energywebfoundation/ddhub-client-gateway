@@ -28,14 +28,15 @@ export const useSelectedTopicEffects = ({
   topicsList,
   availableTopics,
   saveResponse,
-}: // responseTopics = [],
-SelectedTopicEffectsProps) => {
+  responseTopics = [],
+}: SelectedTopicEffectsProps) => {
   const [expanded, setExpanded] = useState<string | false>(false);
   const [updatedTopic, setUpdatedTopic] = useState<Topic>(initialState);
   const [editTopic, setEditTopic] = useState<Topic>(initialState);
   const [filteredTopics, setFilteredTopics] = useState<Topic[]>([]);
   const [isResponse, setIsResponse] = useState<boolean>(false);
   const [selected, setSelected] = useState<ResponseTopicDto[]>([]);
+  const [panelId, setPanelId] = useState<string>('');
 
   useEffect(() => {
     if (Array.isArray(availableTopics)) {
@@ -59,22 +60,25 @@ SelectedTopicEffectsProps) => {
     handleReset();
   };
 
-  const handleOpen = (event: any) => {
+  useEffect(() => {
     setSelectedApplication(topic.owner);
-    setExpanded(event.currentTarget.id);
     setEditTopic(topic);
-  };
+  }, [topic]);
 
-  const handleOpenEdit = () => {
+  const handleOpenEdit = (event: any) => {
+    event.stopPropagation();
+    setExpanded(panelId);
     setIsResponse(false);
     setUpdatedTopic(initialState);
     setFilteredTopics(availableTopics);
   };
 
-  const handleOpenResponse = () => {
+  const handleOpenResponse = (event: any) => {
+    event.stopPropagation();
+    setExpanded(panelId);
     setIsResponse(true);
     setFilteredTopics(topicsList);
-    // setSelected(responseTopics);
+    setSelected(responseTopics);
   };
 
   const handleSubmitForm = () => {
@@ -169,11 +173,11 @@ SelectedTopicEffectsProps) => {
     onFilterChange,
     filteredTopics,
     handleKeyDown,
-    handleOpen,
     handleOpenResponse,
     handleOpenEdit,
     isResponse,
     handleClickTopicCheckbox,
     selectedIndex,
+    setPanelId,
   };
 };
