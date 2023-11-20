@@ -129,15 +129,16 @@ export const useUpdateChannelEffects = () => {
 
   const channelUpdateHandler = (data: any) => {
     let responseTopicsData: ResponseTopicDto[] = [];
-
     data.topics.map((topic: Topic) => {
       const topicId = topic.id ?? topic.topicId;
-      const respTopics = data.responseTopics.filter(
-        (item: ResponseTopicDto) => item.responseTopicId === topicId
-      );
+      if (data.responseTopics) {
+        const respTopics = data.responseTopics.filter(
+          (item: ResponseTopicDto) => item.responseTopicId === topicId
+        );
 
-      if (respTopics.length) {
-        responseTopicsData = responseTopicsData.concat(respTopics);
+        if (respTopics.length) {
+          responseTopicsData = responseTopicsData.concat(respTopics);
+        }
       }
     });
 
@@ -149,7 +150,7 @@ export const useUpdateChannelEffects = () => {
       conditions: {
         ...channelValues.conditions,
         topics: data.topics,
-        // responseTopics: responseTopicsData,
+        responseTopics: responseTopicsData,
       },
     };
     updateChannelHandler(updateData, onUpdate);
