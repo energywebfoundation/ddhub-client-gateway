@@ -40,6 +40,7 @@ import {
 } from '../message.const';
 import { MalformedJSONException } from '../exceptions/malformed-json.exception';
 import { DateTime } from 'luxon';
+import { GetReceivedMessageResponseDto } from '../dto/response/get-received-message-response.dto';
 
 const mockSecretsEngineService = {
   getPrivateKey: jest.fn(),
@@ -480,7 +481,7 @@ describe(`${MessageService.name}`, () => {
 
   describe('getOfflineMessages()', () => {
     let error: Error | null;
-    let result: GetMessageResponse[] | null;
+    let result: GetReceivedMessageResponseDto[] | null;
 
     beforeEach(() => {
       jest.resetAllMocks();
