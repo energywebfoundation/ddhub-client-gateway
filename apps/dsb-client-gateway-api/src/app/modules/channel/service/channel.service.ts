@@ -108,6 +108,10 @@ export class ChannelService {
 
     this.logger.debug(`Create message payload: ${JSON.stringify(payload)}`);
 
+    const topicsWithIds: ChannelTopic[] = await this.getTopicsWithIds(
+      payload.conditions.topics
+    );
+
     let responseTopicsWithChannels: ChannelResponseTopic[] = [];
     if (payload.conditions.responseTopics.length) {
       const responseTopicsWithIds: ChannelTopic[] = await this.getTopicsWithIds(
@@ -133,10 +137,6 @@ export class ChannelService {
         responseTopicsWithIds
       );
     }
-
-    const topicsWithIds: ChannelTopic[] = await this.getTopicsWithIds(
-      payload.conditions.topics
-    );
 
     await this.validateTopics(topicsWithIds, payload.type);
 
