@@ -68,6 +68,7 @@ import { OfflineMessagesService } from './offline-messages.service';
 import { IamService } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
 import { DateTime } from 'luxon';
 import { Readable } from 'stream';
+import { GetReceivedMessageResponseDto } from '../dto/response/get-received-message-response.dto';
 
 export enum EventEmitMode {
   SINGLE = 'SINGLE',
@@ -597,7 +598,7 @@ export class MessageService {
   @Span('message_getOfflineMessages')
   public async getOfflineMessages(
     dto: Partial<GetMessagesDto>
-  ): Promise<GetMessageResponse[]> {
+  ): Promise<GetReceivedMessageResponseDto[]> {
     return this.offlineMessagesService.getOfflineReceivedMessages(dto);
   }
 
@@ -626,7 +627,9 @@ export class MessageService {
     if (shouldFetchOffline) {
       this.logger.log('handling message forms channel');
 
-      return this.getOfflineMessages(getMessagesDto);
+      return (await this.getOfflineMessages(
+        getMessagesDto
+      )) as GetMessageResponse[];
     }
 
     const topicsIds: string[] = await this.getTopicsIds(

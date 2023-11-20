@@ -15,6 +15,8 @@ import { EncryptionStatus } from '../message.const';
 import { KeysService } from '../../keys/service/keys.service';
 import { GetSentMessagesRequestDto } from '../dto/request/get-sent-messages-request.dto';
 import { GetSentMessageResponseDto } from '../dto/response/get-sent-message-response.dto';
+import { GetReceivedMessageResponseDto } from '../dto/response/get-received-message-response.dto';
+import { SchemaType } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
 
 @Injectable()
 export class OfflineMessagesService {
@@ -160,14 +162,15 @@ export class OfflineMessagesService {
             senderDid: entity.senderDid,
             signature: entity.signature,
             topicId: entity.topicId,
-            timestampNanos: entity.timestampNanos,
+            timestampNanos: entity.timestampNanos.getTime() * (1000 * 1000),
+            timestampISO: entity.timestampNanos.toISOString(),
             topicVersion: entity.topicVersion,
             totalSent: +entity.totalSent,
             totalFailed: +entity.totalFailed,
             transactionId: entity.transactionId,
             totalRecipients: +entity.totalRecipients,
             updatedDate: entity.updatedDate,
-          } as GetSentMessageResponseDto;
+          };
         })
       );
     });
@@ -175,7 +178,7 @@ export class OfflineMessagesService {
 
   public async getOfflineReceivedMessages(
     dto: Partial<GetMessagesDto>
-  ): Promise<GetMessageResponse[]> {
+  ): Promise<GetReceivedMessageResponseDto[]> {
     const {
       initiatingTransactionId,
       initiatingMessageId,
@@ -190,17 +193,9 @@ export class OfflineMessagesService {
     const query = this.receivedMessageRepositoryWrapper.repository
       .createQueryBuilder(rm)
       .where((qb) => {
-        // qb.where(`${rms}.messageId IS NULL`);
-
         if (fqcn) {
           qb.andWhere(`${rm}.fqcn = :fqcn`, { fqcn });
         }
-
-        // if (from) {
-        //   qb.andWhere(`${rm}.timestampNanos = :from`, {
-        //     from: moment(from).utc().toDate(),
-        //   });
-        // }
 
         if (topicOwner) {
           qb.andWhere(`${rm}.topicOwner = :topicOwner`, { topicOwner });
@@ -239,7 +234,7 @@ export class OfflineMessagesService {
     const prefetchedSignatureKeys: Record<string, DidEntity | null> =
       await this.keysService.prefetchSignatureKeys(uniqueSenderDids);
 
-    const receivedMessages: GetMessageResponse[] = await Promise.all(
+    return await Promise.all(
       messages.map(async (message: ReceivedMessageEntity) => {
         const isSignatureValid: boolean =
           await this.keysService.verifySignature(
@@ -293,7 +288,7 @@ export class OfflineMessagesService {
           timestampISO: message.timestampNanos.toISOString(),
           id: message.messageId,
           topicId: message.topicId,
-          topicSchemaType: 'JSD7',
+          topicSchemaType: SchemaType.JSD7,
           signatureValid: isSignatureValid
             ? EncryptionStatus.SUCCESS
             : EncryptionStatus.FAILED,
@@ -301,8 +296,6 @@ export class OfflineMessagesService {
         };
       })
     );
-
-    return receivedMessages;
   }
 
   public async ackMessages(messagesIds: string[]): Promise<void> {
