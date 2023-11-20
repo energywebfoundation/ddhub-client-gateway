@@ -140,17 +140,19 @@ export const MessageInboxDetails: FC = () => {
                       field={{
                         label: 'Timestamp',
                         value: DateTime.fromISO(
-                          inboxDetails.timestamp
-                        ).toLocaleString(DateTime.DATETIME_MED_WITH_SECONDS),
+                          inboxDetails.timestampISO
+                        ).toFormat('yyyy/MM/dd h:mm:ss a'),
                       }}
                     />
-                    <MessageDetail
-                      field={{
-                        label: 'Transaction ID',
-                        value: inboxDetails.transactionId,
-                        copy: true,
-                      }}
-                    />
+                    {inboxDetails.transactionId && (
+                      <MessageDetail
+                        field={{
+                          label: 'Transaction ID',
+                          value: inboxDetails.transactionId,
+                          copy: true,
+                        }}
+                      />
+                    )}
                     <MessageDetail
                       field={{
                         label: 'Message ID',
