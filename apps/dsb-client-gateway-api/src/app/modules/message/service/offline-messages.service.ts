@@ -230,9 +230,11 @@ export class OfflineMessagesService {
     const uniqueSenderDids: string[] = [
       ...new Set(messages.map(({ senderDid }) => senderDid)),
     ];
-
     const prefetchedSignatureKeys: Record<string, DidEntity | null> =
       await this.keysService.prefetchSignatureKeys(uniqueSenderDids);
+
+    const addressBook =
+      await this.addressBookRepositoryWrapper.repository.find();
 
     return await Promise.all(
       messages.map(async (message: ReceivedMessageEntity) => {
@@ -273,6 +275,9 @@ export class OfflineMessagesService {
           topicVersion: message.topicVersion,
           clientGatewayMessageId: message.clientGatewayMessageId,
           sender: message.senderDid,
+          senderAlias: addressBook.find(
+            (item) => item.did === message.senderDid
+          )?.name,
           signature: message.signature,
           relatedMessagesCount: relatedMessages.length,
           initiatingMessageId: message.initiatingMessageId,
