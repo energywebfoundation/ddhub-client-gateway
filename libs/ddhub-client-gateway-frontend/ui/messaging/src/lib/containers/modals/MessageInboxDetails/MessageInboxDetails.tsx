@@ -76,7 +76,7 @@ export const MessageInboxDetails: FC = () => {
   const [expanded, setExpanded] = useState<number | false>(false);
 
   useEffect(() => {
-    if (inboxDetails) {
+    if (inboxDetails && !inboxDetails.isSender) {
       ackMessage([inboxDetails.messageId]);
     }
   }, [inboxDetails]);

@@ -7,7 +7,6 @@ import { useRouter } from 'next/router';
 import { TTableComponentAction } from '@ddhub-client-gateway-frontend/ui/core';
 import { GetSentMessageResponseDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { ModalActionsEnum, useModalDispatch } from '../../context';
-import { DateTime } from 'luxon';
 
 export const useMessageOutboxEffects = () => {
   const router = useRouter();
@@ -34,6 +33,7 @@ export const useMessageOutboxEffects = () => {
           timestampISO: data.timestampISO,
           timestampNanos: data.timestampNanos,
           isSender: true,
+          isRead: false,
         },
       },
     });
