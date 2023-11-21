@@ -41,7 +41,10 @@ export class MessagesCleanupService implements OnApplicationBootstrap {
       }
     );
 
-    this.schedulerRegistry.addCronJob(CronJobType.CLEANUP_MESSAGES, cronJob);
+    this.schedulerRegistry.addCronJob(
+      CronJobType.OFFLINE_MESSAGES_CLEANER,
+      cronJob
+    );
 
     cronJob.start();
   }
@@ -51,13 +54,13 @@ export class MessagesCleanupService implements OnApplicationBootstrap {
       await this.messageStoreService.deleteExpiredMessages();
 
       await this.cronWrapper.cronRepository.save({
-        jobName: CronJobType.CLEANUP_MESSAGES,
+        jobName: CronJobType.OFFLINE_MESSAGES_CLEANER,
         latestStatus: CronStatus.SUCCESS,
         executedAt: new Date(),
       });
     } catch (e) {
       await this.cronWrapper.cronRepository.save({
-        jobName: CronJobType.CLEANUP_MESSAGES,
+        jobName: CronJobType.OFFLINE_MESSAGES_CLEANER,
         latestStatus: CronStatus.FAILED,
         executedAt: new Date(),
       });

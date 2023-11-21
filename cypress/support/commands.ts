@@ -2,12 +2,43 @@ declare namespace Cypress {
   // @TODO - Consider mixin instead of big interface
   interface Chainable<Subject = any> {
     // LOGIN
-    loginAdmin(): Chainable<any>;
+    loginAdmin(): Chainable<any> | any;
+
+    // MESSAGING
+    sendMessage(payload: object): Chainable<Cypress.Response<any>>;
+
+    receiveMessage(
+      fqcn: string,
+      restArgs: object
+    ): Chainable<Cypress.Response<any>>;
+
+    // ADDRESS BOOK
+
+    getAllContacts(): Chainable<Cypress.Response<any>>;
+
+    deleteContact(did: string): Chainable<Cypress.Response<any>>;
+
+    createContact(payload: object): Chainable<Cypress.Response<any>>;
 
     // CHANNELS
-    createChannel(payloadPath: string): Chainable<any>;
+    createChannel(payload: object): Chainable<Cypress.Response<any>>;
 
-    cleanupChannel(payloadPath: string): Chainable<any>;
+    getAllChannels(): Chainable<Cypress.Response<any>>;
+
+    updateChannel(
+      fqcn: string,
+      payload: object
+    ): Chainable<Cypress.Response<any>>;
+
+    deleteChannel(fqcn: string): Chainable<Cypress.Response<any>>;
+
+    createChannelWithTopic(
+      type: string,
+      messageForms: boolean,
+      payloadEncryption: boolean
+    ): Chainable<Cypress.Response<any>>;
+
+    getChannelByFqcn(fqcn: string): Chainable<Cypress.Response<any>>;
 
     // TOPICS
     createTopic(payload: any): Chainable<Cypress.Response<any>>;
@@ -60,6 +91,7 @@ Cypress.Commands.add('setupPrivateKey', () => {
     body: {
       privateKey: Cypress.env('CYPRESS_API_PRIVATE_KEY'),
     },
+    timeout: 30000,
   });
 });
 
@@ -67,7 +99,11 @@ Cypress.Commands.add('loginAdmin', () => {
   if (!Cypress.env('CYPRESS_AUTH_ENABLED')) {
     cy.log('auth disabled');
 
-    return;
+    return cy.wrap(
+      new Cypress.Promise((resolve) => {
+        resolve();
+      })
+    );
   }
 
   return cy
@@ -83,35 +119,4 @@ Cypress.Commands.add('loginAdmin', () => {
 
       return cy.wrap(response);
     });
-});
-
-Cypress.Commands.overwrite('request', (originalFn, ...options) => {
-  const token = Cypress.env('ACCESS_TOKEN');
-
-  const apiKey = Cypress.env('CYPRESS_API_TOKEN');
-
-  const defaults = {
-    headers: {
-      Accept: 'application/json',
-      ...(token
-        ? {
-            authorization: 'Bearer ' + token,
-          }
-        : {}),
-      ...(apiKey ? { 'x-api-key': apiKey } : {}),
-    },
-  };
-
-  const optionsObject = options[0];
-
-  if (optionsObject === Object(optionsObject)) {
-    optionsObject.headers = {
-      ...defaults.headers,
-      ...optionsObject.headers,
-    };
-
-    return originalFn(optionsObject);
-  }
-
-  return originalFn(...options);
 });

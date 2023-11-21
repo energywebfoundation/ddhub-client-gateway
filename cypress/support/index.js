@@ -17,6 +17,19 @@
 import './commands';
 import './topic-commands';
 import './channel-commands';
-
+import './address-book-commands';
+import './message-commands';
+import './ovewrite-commands';
 // Alternatively you can use CommonJS syntax:
 // require('./commands')
+
+// beforeAll(async () => {
+//   Cypress.env('CYPRESS_RUN_ID', uuidv4());
+//
+//   cy.log('run id ' + Cypress.env('CYPRESS_RUN_ID'));
+//
+//   cy.request({
+//     method: 'GET',
+//     url: Cypress.env('CYPRESS_API_BASE_URL'),
+//   });
+// });
