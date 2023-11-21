@@ -1,5 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import {
+  IsBoolean,
+  IsEnum,
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+} from 'class-validator';
 import { SchemaType } from '../../../topic/topic.const';
 import { EncryptionStatus } from '../../message.const';
 
@@ -133,4 +139,12 @@ export class GetReceivedMessageResponseDto {
     required: false,
   })
   relatedMessagesCount?: number;
+
+  @IsBoolean()
+  @ApiProperty({
+    description: 'Acknowledgement status of the message',
+    type: Boolean,
+    example: false,
+  })
+  isRead: boolean;
 }

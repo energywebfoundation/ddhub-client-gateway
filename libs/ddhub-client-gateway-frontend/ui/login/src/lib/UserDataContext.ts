@@ -183,9 +183,14 @@ export const useUserData = (queryClient: QueryClient) => {
   };
 
   const refreshToken = async () => {
+    if (!config?.authEnabled) {
+      setAuthenticated(true);
+      return;
+    }
+
+    setAuthenticated(false);
     const token = localStorage.getItem('refreshToken');
     if (!token) {
-      setAuthenticated(false);
       await resetAuthData('No refresh token found');
       return;
     }
@@ -195,7 +200,6 @@ export const useUserData = (queryClient: QueryClient) => {
       { data: RefreshTokenRequestDto }
     > = (props) => {
       const { data } = props || {};
-
       return loginControllerRefreshToken(data);
     };
 
@@ -209,12 +213,13 @@ export const useUserData = (queryClient: QueryClient) => {
       setUserAuth((prevValue) => ({
         ...prevValue,
         username,
-        role: role as unknown as string, // TODO: fix type
+        role,
         accessToken,
         refreshToken,
         isChecking: false,
         authenticated: true,
       }));
+      setAuthenticated(true);
     } catch (error: any) {
       console.error(error);
       setAuthenticated(false);

@@ -306,8 +306,7 @@ describe(`${MessageService.name}`, () => {
               amount: 1,
               clientId: 'clientId',
             },
-            true,
-            false
+            true
           );
         } catch (e) {
           error = e;
@@ -420,111 +419,6 @@ describe(`${MessageService.name}`, () => {
       it('should call channel service to obtain channel', () => {
         expect(mockChannelService.getChannelOrThrow).toBeCalledTimes(1);
         expect(mockChannelService.getChannelOrThrow).toBeCalledWith('fqcn');
-      });
-
-      it('should not call getOfflineMessages', () => {
-        expect(
-          mockOfflineMessagesService.getOfflineReceivedMessages
-        ).toBeCalledTimes(0);
-      });
-    });
-
-    describe('should fetch offline messages because channel message forms is true', () => {
-      beforeEach(async () => {
-        mockOfflineMessagesService.getOfflineReceivedMessages = jest
-          .fn()
-          .mockImplementationOnce(async () => []);
-
-        mockChannelService.getChannelOrThrow = jest
-          .fn()
-          .mockImplementationOnce(async () => {
-            return {
-              messageForms: true,
-              fqcn: 'fqcn', // it doesn't matter in that test case if we send full channel, it's not important here
-            };
-          });
-
-        try {
-          result = await service.getMessages(
-            {
-              fqcn: 'fqcn',
-              topicOwner: 'topicOwner',
-              topicName: 'topicName',
-            },
-            true,
-            false
-          );
-        } catch (e) {
-          error = e;
-        }
-      });
-
-      it('should call channel service to obtain channel', () => {
-        expect(mockChannelService.getChannelOrThrow).toBeCalledTimes(1);
-        expect(mockChannelService.getChannelOrThrow).toBeCalledWith('fqcn');
-      });
-
-      it('should call getOfflineMessages', () => {
-        expect(
-          mockOfflineMessagesService.getOfflineReceivedMessages
-        ).toBeCalledTimes(1);
-        expect(
-          mockOfflineMessagesService.getOfflineReceivedMessages
-        ).toBeCalledWith({
-          fqcn: 'fqcn',
-          topicOwner: 'topicOwner',
-          topicName: 'topicName',
-        });
-      });
-    });
-  });
-
-  describe('getOfflineMessages()', () => {
-    let error: Error | null;
-    let result: GetReceivedMessageResponseDto[] | null;
-
-    beforeEach(() => {
-      jest.resetAllMocks();
-
-      result = null;
-      error = null;
-    });
-
-    describe('should return offline messages', () => {
-      beforeEach(async () => {
-        mockOfflineMessagesService.getOfflineReceivedMessages = jest
-          .fn()
-          .mockImplementationOnce(async () => []);
-
-        try {
-          result = await service.getOfflineMessages({
-            fqcn: 'fqcn',
-          });
-        } catch (e) {
-          error = e;
-        }
-      });
-
-      it('should call getOfflineMessages', () => {
-        expect(
-          mockOfflineMessagesService.getOfflineReceivedMessages
-        ).toBeCalledTimes(1);
-        expect(
-          mockOfflineMessagesService.getOfflineReceivedMessages
-        ).toBeCalledWith({
-          fqcn: 'fqcn',
-        });
-      });
-
-      it('should call getOfflineMessages', () => {
-        expect(
-          mockOfflineMessagesService.getOfflineReceivedMessages
-        ).toBeCalledTimes(1);
-        expect(
-          mockOfflineMessagesService.getOfflineReceivedMessages
-        ).toBeCalledWith({
-          fqcn: 'fqcn',
-        });
       });
     });
   });

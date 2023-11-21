@@ -21,6 +21,7 @@ export const modalInitialState: IModalStore = {
   },
   inboxDetails: {
     open: false,
+    ackMessage: undefined,
     data: undefined,
   },
   newMessage: {

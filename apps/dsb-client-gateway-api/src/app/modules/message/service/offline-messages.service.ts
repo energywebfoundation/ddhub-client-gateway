@@ -1,10 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { GetMessagesDto } from '../dto/request/get-messages.dto';
-import { GetMessageResponse } from '../message.interface';
 import {
   AddressBookRepositoryWrapper,
   DidEntity,
   ReceivedMessageEntity,
+  ReceivedMessageReadStatusEntity,
   ReceivedMessageReadStatusRepositoryWrapper,
   ReceivedMessageRepositoryWrapper,
   SentMessageEntity,
@@ -303,14 +303,34 @@ export class OfflineMessagesService {
     );
   }
 
-  public async ackMessages(messagesIds: string[]): Promise<void> {
+  public async ackMessages(
+    username: string,
+    messagesIds: string[]
+  ): Promise<void> {
+    const messageReadEntities = messagesIds.map((messageId: string) => {
+      const entity = new ReceivedMessageReadStatusEntity();
+      entity.messageId = messageId;
+      entity.recipientUser = username;
+      return entity;
+    });
+    const alreadyAckedMessages =
+      await this.receivedMessageReadStatusRepositoryWrapper.repository.findByIds(
+        messageReadEntities
+      );
+
+    const messagesToAck = messageReadEntities.filter(
+      (entity: ReceivedMessageReadStatusEntity) =>
+        !alreadyAckedMessages.find(
+          (alreadyAckedMessage) =>
+            alreadyAckedMessage.messageId === entity.messageId
+        )
+    );
+    if (!messagesToAck.length) {
+      return;
+    }
+
     await this.receivedMessageReadStatusRepositoryWrapper.repository.save(
-      messagesIds.map((messageId: string) => {
-        return {
-          messageId,
-          recipientUser: '@TODO',
-        };
-      })
+      messagesToAck
     );
   }
 }
