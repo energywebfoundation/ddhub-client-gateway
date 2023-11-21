@@ -26,6 +26,7 @@
 | PRIVATE_KEY_CRON_ENABLED | boolean | true | Should check for private key changes |  |  |
 | HEARTBEAT_CRON_SCHEDULE | string | 30 * * * * * | How often CRON JOB heartbeat should run |  |  |
 | HEARTBEAT_CRON_ENABLED | boolean | true | Should run heartbeat |  |  |
+| UPLOAD_FILES_LIFETIME | number | 30 | Specifies how long stored files should live (in minutes) |  |  |
 | DOWNLOAD_FILES_LIFETIME | number | 30 | Specifies how long downloaded file should live (in minutes) |  |  |
 | DID_LISTENER_ENABLED | boolean | true | Should listen for DID attributes changes |  |  |
 | ASSOCIATION_KEY_INTERVAL | number | 24 | Association key interval (hours) |  |  |

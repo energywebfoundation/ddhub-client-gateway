@@ -1,18 +1,38 @@
 import { ConfigService } from '@nestjs/config';
-import { SecretClient, KeyVaultSecret } from '@azure/keyvault-secrets';
-import { AzureKeyVaultService } from '../lib/service/azure-key-vault.service';
+import {
+  SecretClient,
+  KeyVaultSecret,
+  SecretProperties,
+} from '@azure/keyvault-secrets';
+import { AzureKeyVaultService } from './azure-key-vault.service';
+import { Test } from '@nestjs/testing';
+import { getPagedAsyncIterator } from '@azure/core-paging';
 
+jest.mock('@azure/identity');
 jest.mock('@azure/keyvault-secrets');
+const mockConfigService = {
+  get: jest.fn(),
+};
 
-describe('Azure Key Vault Engine', () => {
-  const service = new AzureKeyVaultService(new ConfigService());
+describe(`${AzureKeyVaultService.name}`, () => {
+  let service: AzureKeyVaultService;
 
-  beforeAll(async () => {
+  beforeEach(async () => {
+    jest.clearAllMocks();
+    mockConfigService.get = jest.fn().mockImplementationOnce(() => 'ddhub/');
+
+    const module = await Test.createTestingModule({
+      providers: [
+        AzureKeyVaultService,
+        {
+          provide: ConfigService,
+          useValue: mockConfigService,
+        },
+      ],
+    }).compile();
+
+    service = module.get<AzureKeyVaultService>(AzureKeyVaultService);
     await service.onModuleInit();
-  });
-
-  beforeEach(() => {
-    (SecretClient as any).mockClear();
   });
 
   it('should get an RSA Private Key', async () => {
@@ -265,5 +285,126 @@ describe('Azure Key Vault Engine', () => {
 
     const response = await service.deleteAll();
     expect(response).toBeUndefined();
+  });
+
+  it('should list all User secrets', async () => {
+    const testUsername = 'test-user-1';
+    const testData = {
+      password: 'test_password',
+      role: 'test_role',
+    };
+
+    jest.spyOn(SecretClient.prototype, 'getSecret').mockResolvedValueOnce({
+      name: `ddhub-users-${testUsername}`,
+      value: JSON.stringify(testData),
+      properties: {
+        vaultUrl: '',
+        name: `ddhub-users-${testUsername}`,
+      },
+    });
+
+    jest
+      .spyOn(SecretClient.prototype, 'listPropertiesOfSecrets')
+      .mockReturnValue(
+        getPagedAsyncIterator<SecretProperties>({
+          firstPageLink: '',
+          getPage: () =>
+            Promise.resolve({
+              page: <SecretProperties[]>[
+                {
+                  name: `ddhub-users-${testUsername}`,
+                  vaultUrl: '',
+                  enabled: true,
+                },
+                {
+                  name: 'some-other-secret',
+                  vaultUrl: '',
+                  enabled: true,
+                },
+              ],
+            }),
+        })
+      );
+
+    const response = await service.getAllUsers();
+    expect(response).toBeDefined();
+    expect(response.length).toBe(1);
+    expect(response[0]).toStrictEqual({
+      username: testUsername,
+      ...testData,
+    });
+  });
+
+  it('should return empty when no user secrets exist', async () => {
+    jest
+      .spyOn(SecretClient.prototype, 'listPropertiesOfSecrets')
+      .mockReturnValue(
+        getPagedAsyncIterator<SecretProperties>({
+          firstPageLink: '',
+          getPage: () =>
+            Promise.resolve({
+              page: <SecretProperties[]>[
+                {
+                  name: 'some-other-secret',
+                  vaultUrl: '',
+                  enabled: true,
+                },
+              ],
+            }),
+        })
+      );
+
+    const response = await service.getAllUsers();
+    expect(response).toBeDefined();
+    expect(response).toStrictEqual([]);
+    expect(response.length).toBe(0);
+  });
+
+  it('should return valid user details when retrieving with a username', async () => {
+    const testUsername = 'test-user-1';
+    const testData = {
+      password: 'test_password',
+      role: 'test_role',
+    };
+
+    jest.spyOn(SecretClient.prototype, 'getSecret').mockResolvedValueOnce({
+      name: `ddhub-users-${testUsername}`,
+      value: JSON.stringify(testData),
+      properties: {
+        vaultUrl: '',
+        name: `ddhub-users-${testUsername}`,
+      },
+    });
+
+    const response = await service.getUserAuthDetails(testUsername);
+    expect(response).toBeDefined();
+    expect(response).toStrictEqual({
+      username: testUsername,
+      ...testData,
+    });
+  });
+
+  it('should return null when a secret value is invalid', async () => {
+    const testUsername = 'test-user-1';
+    jest.spyOn(SecretClient.prototype, 'getSecret').mockResolvedValueOnce({
+      name: `ddhub-users-${testUsername}`,
+      value: 'invalid',
+      properties: {
+        vaultUrl: '',
+        name: `ddhub-users-${testUsername}`,
+      },
+    });
+
+    const response = await service.getUserAuthDetails(testUsername);
+    expect(response).toBeNull();
+  });
+
+  it("should return null when a secret doesn't exist", async () => {
+    jest
+      .spyOn(SecretClient.prototype, 'getSecret')
+      .mockRejectedValueOnce(new Error('Secret does not exist'));
+
+    const response = await service.getUserAuthDetails('test-user-1');
+    expect(response).toBeNull();
   });
 });

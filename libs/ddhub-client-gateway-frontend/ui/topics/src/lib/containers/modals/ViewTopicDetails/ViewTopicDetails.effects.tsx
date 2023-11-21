@@ -13,12 +13,12 @@ import {
 } from '../../../context';
 import { fields } from './ViewTopicDetails.utils';
 import { useStyles } from './ViewTopicDetails.styles';
-import { useSetUserDataEffect } from '@ddhub-client-gateway-frontend/ui/login';
+import { useUserDataEffects } from '@ddhub-client-gateway-frontend/ui/login';
 
 export const useViewTopicDetailsEffects = () => {
   const { classes } = useStyles();
   const router = useRouter();
-  const { userData } = useSetUserDataEffect();
+  const { userData } = useUserDataEffects();
   const {
     topicDetails: { open, topic, application, showActionButtons, isSearch },
   } = useTopicsModalsStore();

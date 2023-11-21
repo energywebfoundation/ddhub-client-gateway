@@ -1,0 +1,22 @@
+{
+  "root": "libs/ddhub-client-gateway-cleanup",
+  "sourceRoot": "libs/ddhub-client-gateway-cleanup/src",
+  "targets": {
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/ddhub-client-gateway-cleanup/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/libs/ddhub-client-gateway-cleanup"],
+      "options": {
+        "jestConfig": "libs/ddhub-client-gateway-cleanup/jest.config.js",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": []
+}

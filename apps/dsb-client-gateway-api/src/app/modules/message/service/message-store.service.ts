@@ -19,6 +19,7 @@ interface StoreSentMessage {
   messageIds: string[];
   topicOwner: string;
   topicName: string;
+  filePath?: string;
   initiatingTransactionId?: string | null;
   clientGatewayMessageId: string;
   topic: TopicEntity;
@@ -119,7 +120,7 @@ export class MessageStoreService {
           entity.initiatingTransactionId = item.initiatingMessageId;
           entity.initiatingMessageId = item.initiatingMessageId;
           entity.clientGatewayMessageId = item.clientGatewayMessageId;
-          entity.isFile = false;
+          entity.isFile = item.isFile;
           entity.payloadEncryption = item.payloadEncryption;
           entity.transactionId = item.transactionId;
           entity.topicId = item.topic.id;
@@ -187,10 +188,11 @@ export class MessageStoreService {
         entity.payloadEncryption = item.payloadEncryption;
         entity.payload = item.payload;
         entity.timestampNanos = item.timestampNanos;
-        entity.isFile = false;
+        entity.isFile = item.isFile;
         entity.totalRecipients = item.totalRecipients;
         entity.totalSent = item.totalSent;
         entity.totalFailed = item.totalFailed;
+        entity.filePath = item.filePath;
 
         return entity;
       })

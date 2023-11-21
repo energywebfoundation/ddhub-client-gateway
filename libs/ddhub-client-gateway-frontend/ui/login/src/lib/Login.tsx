@@ -1,12 +1,11 @@
 import { Box, Container, Stack, Typography } from '@mui/material';
 import { useStyles } from './Login.styles';
 import LoginStatus from './LoginStatus/LoginStatus';
-import React from 'react';
-import { useSetUserDataEffect } from './SetUserData.effects';
+import { useUserDataEffects } from './UserData.effects';
 
 export function Login() {
   const { classes } = useStyles();
-  const { version } = useSetUserDataEffect();
+  const { version } = useUserDataEffects();
 
   return (
     <>
@@ -18,8 +17,12 @@ export function Login() {
           <LoginStatus />
         </Container>
       </Stack>
-      { version && (
-        <Box display="flex" justifyContent="center" className={classes.footerDiv}>
+      {version && (
+        <Box
+          display="flex"
+          justifyContent="center"
+          className={classes.footerDiv}
+        >
           <Typography variant="body2" className={classes.version}>
             Version {version}
           </Typography>
