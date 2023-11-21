@@ -1,10 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { GetMessagesDto } from '../dto/request/get-messages.dto';
-import { GetMessageResponse } from '../message.interface';
 import {
   AddressBookRepositoryWrapper,
   DidEntity,
   ReceivedMessageEntity,
+  ReceivedMessageReadStatusEntity,
   ReceivedMessageReadStatusRepositoryWrapper,
   ReceivedMessageRepositoryWrapper,
   SentMessageEntity,
@@ -230,9 +230,11 @@ export class OfflineMessagesService {
     const uniqueSenderDids: string[] = [
       ...new Set(messages.map(({ senderDid }) => senderDid)),
     ];
-
     const prefetchedSignatureKeys: Record<string, DidEntity | null> =
       await this.keysService.prefetchSignatureKeys(uniqueSenderDids);
+
+    const addressBook =
+      await this.addressBookRepositoryWrapper.repository.find();
 
     return await Promise.all(
       messages.map(async (message: ReceivedMessageEntity) => {
@@ -273,6 +275,9 @@ export class OfflineMessagesService {
           topicVersion: message.topicVersion,
           clientGatewayMessageId: message.clientGatewayMessageId,
           sender: message.senderDid,
+          senderAlias: addressBook.find(
+            (item) => item.did === message.senderDid
+          )?.name,
           signature: message.signature,
           relatedMessagesCount: relatedMessages.length,
           initiatingMessageId: message.initiatingMessageId,
@@ -298,14 +303,34 @@ export class OfflineMessagesService {
     );
   }
 
-  public async ackMessages(messagesIds: string[]): Promise<void> {
+  public async ackMessages(
+    username: string,
+    messagesIds: string[]
+  ): Promise<void> {
+    const messageReadEntities = messagesIds.map((messageId: string) => {
+      const entity = new ReceivedMessageReadStatusEntity();
+      entity.messageId = messageId;
+      entity.recipientUser = username;
+      return entity;
+    });
+    const alreadyAckedMessages =
+      await this.receivedMessageReadStatusRepositoryWrapper.repository.findByIds(
+        messageReadEntities
+      );
+
+    const messagesToAck = messageReadEntities.filter(
+      (entity: ReceivedMessageReadStatusEntity) =>
+        !alreadyAckedMessages.find(
+          (alreadyAckedMessage) =>
+            alreadyAckedMessage.messageId === entity.messageId
+        )
+    );
+    if (!messagesToAck.length) {
+      return;
+    }
+
     await this.receivedMessageReadStatusRepositoryWrapper.repository.save(
-      messagesIds.map((messageId: string) => {
-        return {
-          messageId,
-          recipientUser: '@TODO',
-        };
-      })
+      messagesToAck
     );
   }
 }

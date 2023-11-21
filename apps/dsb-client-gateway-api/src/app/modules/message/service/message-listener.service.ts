@@ -99,7 +99,6 @@ export class MessageListenerService implements OnApplicationBootstrap {
                 topicOwner: channelTopic.owner,
                 from: undefined,
               },
-              true,
               true
             );
 

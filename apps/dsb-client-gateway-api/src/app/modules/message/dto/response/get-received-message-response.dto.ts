@@ -1,5 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import {
+  IsBoolean,
+  IsEnum,
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+} from 'class-validator';
 import { SchemaType } from '../../../topic/topic.const';
 import { EncryptionStatus } from '../../message.const';
 
@@ -72,11 +78,19 @@ export class GetReceivedMessageResponseDto {
 
   @IsString()
   @ApiProperty({
-    description: 'message sender',
+    description: 'message sender did',
     type: String,
     example: 'did:ethr:volta:0x03830466Ce257f9B798B0f27359D7639dFB6457D',
   })
   sender: string;
+
+  @IsString()
+  @ApiProperty({
+    description: 'message sender alias if set',
+    type: String,
+    example: 'John Doe',
+  })
+  senderAlias?: string;
 
   @IsNumber()
   @ApiProperty({
@@ -125,4 +139,12 @@ export class GetReceivedMessageResponseDto {
     required: false,
   })
   relatedMessagesCount?: number;
+
+  @IsBoolean()
+  @ApiProperty({
+    description: 'Acknowledgement status of the message',
+    type: Boolean,
+    example: false,
+  })
+  isRead: boolean;
 }

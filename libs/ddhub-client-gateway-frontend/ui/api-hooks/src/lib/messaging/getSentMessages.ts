@@ -4,18 +4,24 @@ import {
   GetSentMessageResponseDto,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { useCustomAlert } from '@ddhub-client-gateway-frontend/ui/core';
+import { useQueryClient } from 'react-query';
 
 export const useSentMessages = (
   params?: MessageControllerGetSentMessagesParams,
   isRelatedMessage?: boolean
 ) => {
   const Swal = useCustomAlert();
-  let enabled;
+  const queryClient = useQueryClient();
 
+  let enabled;
   if (isRelatedMessage) {
     enabled = !!params?.fqcn && !!params?.messageId;
   } else {
     enabled = !!params?.fqcn;
+  }
+
+  if (queryClient.getDefaultOptions().queries?.enabled === false) {
+    enabled = false;
   }
 
   const { data, isLoading, isSuccess, isError } =

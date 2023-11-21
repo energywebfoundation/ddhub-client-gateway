@@ -39,6 +39,7 @@ import {
   Roles,
   UserGuard,
   UserRole,
+  Username,
 } from '@dsb-client-gateway/ddhub-client-gateway-user-roles';
 import { AckMessagesRequestDto } from '../dto/request/ack-messages-request.dto';
 import { GetReceivedMessageResponseDto } from '../dto/response/get-received-message-response.dto';
@@ -151,8 +152,12 @@ export class MessageController {
     description: 'Messages acked successfully',
   })
   @HttpCode(HttpStatus.NO_CONTENT)
-  public async ackMessages(@Body() body: AckMessagesRequestDto): Promise<void> {
-    await this.offlineMessagesService.ackMessages(body.messagesIds);
+  @Roles(UserRole.MESSAGING, UserRole.ADMIN)
+  public async ackMessages(
+    @Body() body: AckMessagesRequestDto,
+    @Username() username: string
+  ): Promise<void> {
+    await this.offlineMessagesService.ackMessages(username, body.messagesIds);
   }
 
   @Get('/')

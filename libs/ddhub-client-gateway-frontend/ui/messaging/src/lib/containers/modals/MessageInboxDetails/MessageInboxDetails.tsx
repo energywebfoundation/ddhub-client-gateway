@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import { FC, useEffect, useState } from 'react';
 import {
   DialogContent,
   Typography,
@@ -65,10 +65,21 @@ const AccordionDetails = styled(MuiAccordionDetails)(({ theme }) => ({
 
 export const MessageInboxDetails: FC = () => {
   const { classes } = useStyles();
-  const { open, closeModal, inboxDetails, parsedPayload, parsedDetails } =
-    useMessageInboxDetailsEffects();
+  const {
+    open,
+    closeModal,
+    ackMessage,
+    inboxDetails,
+    parsedPayload,
+    parsedDetails,
+  } = useMessageInboxDetailsEffects();
+  const [expanded, setExpanded] = useState<number | false>(false);
 
-  const [expanded, setExpanded] = React.useState<number | false>(false);
+  useEffect(() => {
+    if (inboxDetails && !inboxDetails.isSender) {
+      ackMessage([inboxDetails.messageId]);
+    }
+  }, [inboxDetails]);
 
   const handleAccordionChange =
     (index: number) => (event: React.SyntheticEvent, isExpanded: boolean) => {

@@ -11,7 +11,7 @@ export const useUserAuthHeaders = () => {
   }
 
   useEffect(() => {
-    if (!userContext.userAuth) {
+    if (!userContext.authEnabled || !userContext.userAuth) {
       return;
     }
 
