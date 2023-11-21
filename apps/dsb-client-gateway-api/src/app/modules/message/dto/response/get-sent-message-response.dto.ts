@@ -9,6 +9,13 @@ export class GetSentMessageRecipientsResponseDto {
   did: string;
 
   @ApiProperty({
+    description: 'Recipient alias',
+    type: String,
+    example: 'John Doe',
+  })
+  alias?: string;
+
+  @ApiProperty({
     description: 'Status',
     example: false,
     type: Boolean,

@@ -1860,6 +1860,10 @@ components:
           type: "string"
           description: "Recipient did"
           example: "did:ethr:volta:0x782aB0383Bfc807439d8EE29516937B47815d697"
+        alias:
+          type: "string"
+          description: "Recipient alias"
+          example: "John Doe"
         failed:
           type: "boolean"
           description: "Status"
@@ -1870,6 +1874,7 @@ components:
           example: "507f191e810c19729de860ea"
       required:
         - "did"
+        - "alias"
         - "failed"
         - "messageId"
     GetSentMessageResponseDto:
@@ -2031,8 +2036,12 @@ components:
           example: "0x0abc6026b01856a756de47ec6f44d9c14fe69009bbf3b9b6cf522d8d783a1c654425848381affca5dab9284d8715fa2f9e34155374bafd923d75c219496cbe161c"
         sender:
           type: "string"
-          description: "message sender"
+          description: "message sender did"
           example: "did:ethr:volta:0x03830466Ce257f9B798B0f27359D7639dFB6457D"
+        senderAlias:
+          type: "string"
+          description: "message sender alias if set"
+          example: "John Doe"
         timestampNanos:
           type: "number"
           description: "timestamp in nano seconds"
@@ -2068,6 +2077,7 @@ components:
         - "payload"
         - "signature"
         - "sender"
+        - "senderAlias"
         - "timestampNanos"
         - "timestampISO"
         - "transactionId"
