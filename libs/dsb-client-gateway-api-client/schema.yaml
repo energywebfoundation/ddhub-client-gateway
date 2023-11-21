@@ -2068,6 +2068,10 @@ components:
           type: "number"
           description: "Related messages count. Only appears for channels with message forms."
           example: 5
+        isRead:
+          type: "boolean"
+          description: "Acknowledgement status of the message"
+          example: false
       required:
         - "id"
         - "topicName"
@@ -2082,6 +2086,7 @@ components:
         - "timestampISO"
         - "transactionId"
         - "signatureValid"
+        - "isRead"
     AckMessagesRequestDto:
       type: "object"
       properties:

@@ -211,7 +211,6 @@ describe(`${MessageListenerService.name}`, () => {
             topicOwner: 'topicOwner',
             from: undefined,
           },
-          true,
           true
         );
       });

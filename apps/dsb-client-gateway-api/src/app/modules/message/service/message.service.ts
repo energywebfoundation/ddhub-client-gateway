@@ -68,7 +68,6 @@ import { OfflineMessagesService } from './offline-messages.service';
 import { IamService } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
 import { DateTime } from 'luxon';
 import { Readable } from 'stream';
-import { GetReceivedMessageResponseDto } from '../dto/response/get-received-message-response.dto';
 
 export enum EventEmitMode {
   SINGLE = 'SINGLE',
@@ -595,18 +594,10 @@ export class MessageService {
     }
   }
 
-  @Span('message_getOfflineMessages')
-  public async getOfflineMessages(
-    dto: Partial<GetMessagesDto>
-  ): Promise<GetReceivedMessageResponseDto[]> {
-    return this.offlineMessagesService.getOfflineReceivedMessages(dto);
-  }
-
   @Span('message_getMessages')
   public async getMessages(
     getMessagesDto: Partial<GetMessagesDto>,
-    ack: boolean | undefined = true,
-    cronMode: boolean = false
+    ack: boolean | undefined = true
   ): Promise<GetMessageResponse[]> {
     const { fqcn, from, amount, topicName, topicOwner, clientId } =
       getMessagesDto;
@@ -620,17 +611,6 @@ export class MessageService {
     const channel: ChannelEntity = await this.channelService.getChannelOrThrow(
       fqcn
     );
-
-    const shouldFetchOffline: boolean =
-      cronMode === false ? channel.messageForms : false;
-
-    if (shouldFetchOffline) {
-      this.logger.log('handling message forms channel');
-
-      return (await this.getOfflineMessages(
-        getMessagesDto
-      )) as GetMessageResponse[];
-    }
 
     const topicsIds: string[] = await this.getTopicsIds(
       channel,
