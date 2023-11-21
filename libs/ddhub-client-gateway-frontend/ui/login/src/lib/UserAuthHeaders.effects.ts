@@ -41,7 +41,6 @@ export const useUserAuthHeaders = () => {
           (err.response.status === 401 || err.response.status === 403) &&
           !originalRequest._retry
         ) {
-          console.log('Refreshing token...');
           await userContext.refreshToken();
           originalRequest._retry = true;
           return Axios(originalRequest);
@@ -57,8 +56,4 @@ export const useUserAuthHeaders = () => {
       Axios.interceptors.response.eject(responseInterceptorId);
     };
   }, [userContext.userAuth]);
-};
-
-const sleep = async (ms: number) => {
-  return new Promise((resolve) => setTimeout(resolve, ms));
 };
