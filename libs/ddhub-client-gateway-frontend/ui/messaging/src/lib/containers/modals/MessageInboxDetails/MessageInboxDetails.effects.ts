@@ -13,7 +13,7 @@ export const useMessageInboxDetailsEffects = () => {
   const [parsedPayload, setParsedPayload] = useState({});
 
   const {
-    inboxDetails: { open, data: inboxDetails },
+    inboxDetails: { open, ackMessage, data: inboxDetails },
   } = useModalStore();
 
   useEffect(() => {
@@ -76,6 +76,7 @@ export const useMessageInboxDetailsEffects = () => {
   return {
     open,
     closeModal,
+    ackMessage,
     inboxDetails,
     parsedPayload,
     parsedDetails,

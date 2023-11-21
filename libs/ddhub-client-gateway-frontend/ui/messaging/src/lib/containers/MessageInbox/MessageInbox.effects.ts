@@ -50,12 +50,13 @@ export const useMessageInboxEffects = (isRelatedMessages?: boolean) => {
 
   const { channel } = useChannel(router.query[Queries.FQCN] as string);
 
-  const { messages, messagesLoaded } = useReceivedMessages(params);
+  const { messages, messagesLoaded, ackMessage } = useReceivedMessages(params);
   const openDetailsModal = (data: GetReceivedMessageResponseDto) => {
     dispatch({
       type: ModalActionsEnum.SHOW_MESSAGE_INBOX_DETAILS,
       payload: {
         open: true,
+        ackMessage: ackMessage,
         data: {
           payload: data.payload,
           channelName: channel?.fqcn,
@@ -67,6 +68,7 @@ export const useMessageInboxEffects = (isRelatedMessages?: boolean) => {
           timestampISO: data.timestampISO,
           timestampNanos: data.timestampNanos,
           isSender: false,
+          isRead: data.isRead,
         },
       },
     });

@@ -9,6 +9,7 @@ export const useChannelMessagesCount = (
   params?: ChannelControllerGetCountOfChannelsParams
 ) => {
   const Swal = useCustomAlert();
+
   const { data, isLoading } = useChannelControllerGetCountOfChannels(params, {
     query: {
       onError: (err: any) => {
