@@ -13,7 +13,7 @@ export const useMessageInboxDetailsEffects = () => {
   const [parsedPayload, setParsedPayload] = useState({});
 
   const {
-    inboxDetails: { open, ackMessage, data: inboxDetails },
+    inboxDetails: { open, ackMessage, openReplyModal, data: inboxDetails },
   } = useModalStore();
 
   useEffect(() => {
@@ -27,7 +27,7 @@ export const useMessageInboxDetailsEffects = () => {
     if (Array.isArray(parsed)) {
       const parsedArray: any[] = [];
 
-      parsed.map((item: any) => {
+      parsed.forEach((item: any) => {
         const parsedItem = parsePayloadItems(item);
         parsedArray.push(parsedItem);
       });
@@ -77,6 +77,7 @@ export const useMessageInboxDetailsEffects = () => {
     open,
     closeModal,
     ackMessage,
+    openReplyModal,
     inboxDetails,
     parsedPayload,
     parsedDetails,

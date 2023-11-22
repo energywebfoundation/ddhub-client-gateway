@@ -57,6 +57,7 @@ export const useMessageInboxEffects = (isRelatedMessages?: boolean) => {
       payload: {
         open: true,
         ackMessage: ackMessage,
+        openReplyModal: () => openReplyModal(data),
         data: {
           payload: data.payload,
           channelName: channel?.fqcn,
@@ -69,13 +70,20 @@ export const useMessageInboxEffects = (isRelatedMessages?: boolean) => {
           timestampNanos: data.timestampNanos,
           isSender: false,
           isRead: data.isRead,
+          dto: data,
         },
       },
     });
   };
 
   const openReplyModal = (data: GetReceivedMessageResponseDto) => {
-    console.log(data); // todo
+    dispatch({
+      type: ModalActionsEnum.SHOW_NEW_MESSAGE,
+      payload: {
+        open: true,
+        data,
+      },
+    });
   };
 
   const actionsList: TTableComponentAction<GetReceivedMessageResponseDto>[] = [

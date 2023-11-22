@@ -7,6 +7,7 @@ import {
   Stack,
   styled,
   DialogActions,
+  Button,
 } from '@mui/material';
 import {
   CloseButton,
@@ -70,6 +71,7 @@ export const MessageInboxDetails: FC = () => {
     open,
     closeModal,
     ackMessage,
+    openReplyModal,
     inboxDetails,
     parsedPayload,
     parsedDetails,
@@ -218,6 +220,16 @@ export const MessageInboxDetails: FC = () => {
         <Box className={classes.closeButtonWrapper}>
           <CloseButton onClose={closeModal} />
         </Box>
+        {!inboxDetails?.isSender && (
+          <Button
+            onClick={() => {
+              closeModal();
+              openReplyModal();
+            }}
+          >
+            Reply
+          </Button>
+        )}
       </DialogActions>
     </Dialog>
   );
