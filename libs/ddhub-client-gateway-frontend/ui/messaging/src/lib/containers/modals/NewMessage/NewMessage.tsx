@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from 'react';
+import { FC, useState } from 'react';
 import {
   DialogContent,
   DialogActions,
@@ -22,6 +22,7 @@ import { useStyles } from './NewMessage.styles';
 import { ActionButtons } from './ActionButtons';
 import validator from '@rjsf/validator-ajv8';
 import { Controller } from 'react-hook-form';
+import { CopyToClipboard } from '@ddhub-client-gateway-frontend/ui/core';
 
 export const NewMessage: FC = () => {
   const { classes } = useStyles();
@@ -43,6 +44,8 @@ export const NewMessage: FC = () => {
     isSending,
     isLoading,
     isRefetching,
+    isReply,
+    replyData,
   } = useNewMessageEffects();
 
   const [formData, setFormData] = useState([]);
@@ -73,13 +76,102 @@ export const NewMessage: FC = () => {
     }
   };
 
+  const renderReplyDetails = (isReviewStep = false) => {
+    if (!(isReply && replyData)) return null;
+    if (isReviewStep) {
+      return {
+        labels: (
+          <>
+            <Typography className={classes.detailsInfoLabel}>
+              Initiating Message ID:
+            </Typography>
+            <Typography className={classes.detailsInfoLabel}>
+              Initiating Transaction ID:
+            </Typography>
+          </>
+        ),
+        values: (
+          <>
+            <Grid container>
+              <Grid item>
+                <Typography className={classes.detailsInfoValue}>
+                  {replyData.id}
+                </Typography>
+              </Grid>
+              <Grid item>
+                <CopyToClipboard text={replyData.id} />
+              </Grid>
+            </Grid>
+            <Grid container>
+              <Grid item>
+                <Typography className={classes.detailsInfoValue}>
+                  {replyData.transactionId ? replyData.transactionId : '-'}
+                </Typography>
+              </Grid>
+              {replyData.transactionId && (
+                <Grid item>
+                  <CopyToClipboard text={replyData.transactionId} />
+                </Grid>
+              )}
+            </Grid>
+          </>
+        ),
+      };
+    }
+
+    return (
+      <Grid
+        direction="row"
+        container
+        alignItems="stretch"
+        style={{ flexWrap: 'nowrap' }}
+        pb={2}
+      >
+        <Grid item>
+          <Typography className={classes.detailsInfoLabel}>
+            Initiating Message ID:
+          </Typography>
+          <Typography className={classes.detailsInfoLabel}>
+            Initiating Transaction ID:
+          </Typography>
+        </Grid>
+        <Grid item>
+          <Grid container>
+            <Grid item>
+              <Typography className={classes.detailsInfoValue}>
+                {replyData.id}
+              </Typography>
+            </Grid>
+            <Grid item>
+              <CopyToClipboard text={replyData.id} />
+            </Grid>
+          </Grid>
+          <Grid container>
+            <Grid item>
+              <Typography className={classes.detailsInfoValue}>
+                {replyData.transactionId ? replyData.transactionId : '-'}
+              </Typography>
+            </Grid>
+            {replyData.transactionId && (
+              <Grid item>
+                <CopyToClipboard text={replyData.transactionId} />
+              </Grid>
+            )}
+          </Grid>
+        </Grid>
+      </Grid>
+    );
+  };
+
   return (
     <Dialog
       open={open}
       onClose={openCancelModal}
       paperClassName={classes.paper}
     >
-      <DialogTitle className={classes.title}>New Message</DialogTitle>
+      <DialogTitle className={classes.title}>
+        {isReply ? 'Reply to Message' : 'New Message'}
+      </DialogTitle>
       <DialogSubTitle>Provide data with this form</DialogSubTitle>
       <DialogContent className={classes.dialogContent}>
         <Grid container className={classes.content} flexDirection="row">
@@ -94,42 +186,46 @@ export const NewMessage: FC = () => {
           </Grid>
           <Grid item className={classes.contentWrapper} xs={8}>
             {activeStep === 0 && (
-              <Grid container spacing={2} direction="column">
-                <Grid item>
-                  <FormSelect
-                    field={fields['channel']}
-                    register={register}
-                    control={control}
-                    variant="outlined"
-                    disabled={isLoading || isRefetching}
-                  />
-                </Grid>
-                <Grid item>
-                  <Grid container spacing={2}>
-                    <Grid item flexGrow="1">
-                      <FormSelect
-                        field={fields['topic']}
-                        register={register}
-                        control={control}
-                        variant="outlined"
-                        disabled={!selectedChannel}
-                      />
-                    </Grid>
-                    <Grid item width="40%">
-                      <FormSelect
-                        field={fields['version']}
-                        register={register}
-                        control={control}
-                        variant="outlined"
-                        disabled={!selectedTopic}
-                      />
+              <>
+                {renderReplyDetails()}
+                <Grid container spacing={2} direction="column">
+                  <Grid item>
+                    <FormSelect
+                      field={fields['channel']}
+                      register={register}
+                      control={control}
+                      variant="outlined"
+                      disabled={isLoading || isRefetching}
+                    />
+                  </Grid>
+                  <Grid item>
+                    <Grid container spacing={2}>
+                      <Grid item flexGrow="1">
+                        <FormSelect
+                          field={fields['topic']}
+                          register={register}
+                          control={control}
+                          variant="outlined"
+                          disabled={!selectedChannel}
+                        />
+                      </Grid>
+                      <Grid item width="40%">
+                        <FormSelect
+                          field={fields['version']}
+                          register={register}
+                          control={control}
+                          variant="outlined"
+                          disabled={!selectedTopic}
+                        />
+                      </Grid>
                     </Grid>
                   </Grid>
                 </Grid>
-              </Grid>
+              </>
             )}
             {activeStep === 1 && (
               <Box>
+                {renderReplyDetails()}
                 <FormInput
                   field={fields['transactionId']}
                   register={register}
@@ -173,6 +269,7 @@ export const NewMessage: FC = () => {
                   style={{ flexWrap: 'nowrap' }}
                 >
                   <Grid item>
+                    {(renderReplyDetails(true) as any)?.labels}
                     <Typography className={classes.detailsInfoLabel}>
                       Channel:
                     </Typography>
@@ -184,6 +281,7 @@ export const NewMessage: FC = () => {
                     </Typography>
                   </Grid>
                   <Grid item>
+                    {(renderReplyDetails(true) as any)?.values}
                     <Typography className={classes.detailsInfoValue}>
                       {newMessageValues.fqcn}
                     </Typography>

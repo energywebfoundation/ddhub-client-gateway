@@ -7,6 +7,7 @@ import { CHANNEL_OUTBOX_HEADERS } from '../../models/channel-outbox-headers';
 import { Queries } from '@ddhub-client-gateway-frontend/ui/utils';
 import { useRouter } from 'next/router';
 import { routerConst } from '@ddhub-client-gateway-frontend/ui/utils';
+import Link from 'next/link';
 
 export interface RelatedMessageProps {
   value: {
@@ -20,27 +21,20 @@ export function RelatedMessage({ value }: RelatedMessageProps) {
   const router = useRouter();
 
   return (
-    <Box
-      onClick={(event: React.MouseEvent<HTMLElement>) => {
-        event.stopPropagation();
-
-        if (value) {
-          const msgIdParam = value.transactionId
+    <Link
+      href={{
+        pathname: routerConst.MessageOutboxRelated,
+        query: {
+          [Queries.FQCN]: router.query[Queries.FQCN],
+          [Queries.MessageId]: value.transactionId
             ? `${value.messageId}&transactionId=${value.transactionId}`
-            : value.messageId;
-
-          router.push({
-            pathname: routerConst.MessageOutboxRelated,
-            query: {
-              [Queries.FQCN]: router.query[Queries.FQCN],
-              [Queries.MessageId]: msgIdParam,
-            },
-          });
-        }
+            : value.messageId,
+        },
       }}
+      passHref
     >
-      {value?.relatedMessagesCount}
-    </Box>
+      <a onClick={(e) => e.stopPropagation()}>{value.relatedMessagesCount}</a>
+    </Link>
   );
 }
 

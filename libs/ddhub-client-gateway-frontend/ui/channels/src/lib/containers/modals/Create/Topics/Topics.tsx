@@ -133,8 +133,8 @@ export const Topics = ({ channelValues, actionButtonsProps }: TopicsProps) => {
           edit={updateSelectedTopic}
           showTopicResponse={
             channelValues.messageForms &&
-            channelValues.channelType === CreateChannelDtoType.pub &&
-            channelValues.responseTopics?.length > 0
+            channelValues.channelType === CreateChannelDtoType.pub
+            // && channelValues.responseTopics?.length > 0
           }
           saveResponse={saveTopicResponse}
           responseTopics={responseTopics}

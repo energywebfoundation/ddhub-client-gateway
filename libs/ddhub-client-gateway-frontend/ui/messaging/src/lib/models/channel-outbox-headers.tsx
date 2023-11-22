@@ -65,22 +65,8 @@ export const CHANNEL_OUTBOX_HEADERS = [
         );
       } else {
         return `${recipients.length} recipients`;
-        //   return props?.value.map((recipient: any, index: number) => {
-        //     let cellText = recipient.did;
-
-        //     if (index !== props.value.length - 1) {
-        //       cellText += ', ';
-        //     }
-
-        //     return cellText;
-        //   });
       }
     },
-  },
-  {
-    Header: 'MESSAGE ID',
-    accessor: 'clientGatewayMessageId',
-    isSortable: true,
   },
   {
     Header: 'TRANSACTION ID',
@@ -93,6 +79,9 @@ export const CHANNEL_OUTBOX_HEADERS = [
     accessor: 'relatedMessageItems',
     isSortable: true,
     Cell: ({ value }: RelatedMessageProps) => {
+      if (!value.messageId) {
+        return value.relatedMessagesCount;
+      }
       return <RelatedMessage value={value} />;
     },
   },

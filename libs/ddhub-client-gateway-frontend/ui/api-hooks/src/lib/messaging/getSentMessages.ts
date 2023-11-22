@@ -44,8 +44,8 @@ export const useSentMessages = (
         id: message.clientGatewayMessageId,
         relatedMessageItems: {
           relatedMessagesCount: message.relatedMessagesCount,
-          messageId: message.clientGatewayMessageId,
-          transactionId: message.transactionId,
+          messageId: message.initiatingMessageId,
+          transactionId: message.initiatingTransactionId,
         },
       };
     });
