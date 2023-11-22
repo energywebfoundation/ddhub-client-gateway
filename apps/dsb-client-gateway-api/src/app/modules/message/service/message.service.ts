@@ -594,18 +594,10 @@ export class MessageService {
     }
   }
 
-  @Span('message_getOfflineMessages')
-  public async getOfflineMessages(
-    dto: Partial<GetMessagesDto>
-  ): Promise<GetMessageResponse[]> {
-    return this.offlineMessagesService.getOfflineReceivedMessages(dto);
-  }
-
   @Span('message_getMessages')
   public async getMessages(
     getMessagesDto: Partial<GetMessagesDto>,
-    ack: boolean | undefined = true,
-    cronMode: boolean = false
+    ack: boolean | undefined = true
   ): Promise<GetMessageResponse[]> {
     const { fqcn, from, amount, topicName, topicOwner, clientId } =
       getMessagesDto;
@@ -619,15 +611,6 @@ export class MessageService {
     const channel: ChannelEntity = await this.channelService.getChannelOrThrow(
       fqcn
     );
-
-    const shouldFetchOffline: boolean =
-      cronMode === false ? channel.messageForms : false;
-
-    if (shouldFetchOffline) {
-      this.logger.log('handling message forms channel');
-
-      return this.getOfflineMessages(getMessagesDto);
-    }
 
     const topicsIds: string[] = await this.getTopicsIds(
       channel,

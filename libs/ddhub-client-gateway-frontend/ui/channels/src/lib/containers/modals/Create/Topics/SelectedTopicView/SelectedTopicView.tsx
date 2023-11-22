@@ -11,7 +11,6 @@ import { MouseEvent } from 'react';
 import clsx from 'clsx';
 import { useStyles } from '../SelectedTopicView/SelectedTopicView.styles';
 import { Topic } from '../Topics.effects';
-import { useSelectedTopicViewEffects } from './SelectedTopicView.effects';
 import { SelectedTopicsCollapse } from './ResponseTopicsCollapse/ResponseTopicsCollapse';
 import { ResponseTopicDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 
@@ -21,12 +20,14 @@ export interface SelectedTopicViewProps {
   index: number;
   isSummary?: boolean;
   showTopicResponse?: boolean;
-  handleOpenResponse?: () => void;
-  handleOpenEdit?: () => void;
+  handleOpenResponse?: (event: any) => void;
+  handleOpenEdit?: (event: any) => void;
   expanded?: string | false;
   remove?: () => void;
   canCopy?: boolean;
   responseTopics?: ResponseTopicDto[];
+  expandResponse?: boolean;
+  setExpandResponse?: (value: boolean) => void;
 }
 
 export const SelectedTopicView = ({
@@ -41,9 +42,10 @@ export const SelectedTopicView = ({
   remove,
   canCopy,
   responseTopics,
+  expandResponse,
+  setExpandResponse,
 }: SelectedTopicViewProps) => {
   const { classes, theme } = useStyles();
-  const { expandResponse, setExpandResponse } = useSelectedTopicViewEffects();
 
   return (
     <Grid

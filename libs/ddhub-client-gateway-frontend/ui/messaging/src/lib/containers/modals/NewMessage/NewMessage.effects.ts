@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   useModalStore,
   useModalDispatch,
@@ -42,7 +42,6 @@ export const useNewMessageEffects = () => {
   const {
     newMessage: { open },
   } = useModalStore();
-  const [firstLoad, setFirstLoad] = useState(true);
   const [newMessageValues, setNewMessageValues] =
     useState<INewMessage>(initialState);
   const [activeStep, setActiveStep] = useState(0);
@@ -52,6 +51,7 @@ export const useNewMessageEffects = () => {
   const {
     channels,
     isLoading,
+    isRefetching,
     channelsLoaded,
     refetch: refreshChannels,
   } = useChannels({
@@ -163,18 +163,11 @@ export const useNewMessageEffects = () => {
       refreshChannels();
     } else {
       resetToInitialState();
-      setFirstLoad(true);
     }
   }, [open]);
 
   useEffect(() => {
     if (channelsLoaded) {
-      setFirstLoad(false);
-    }
-  }, [channelsLoaded]);
-
-  useEffect(() => {
-    if (channels && channels.length && !firstLoad) {
       setFields((prev) => ({
         ...prev,
         channel: {
@@ -186,7 +179,7 @@ export const useNewMessageEffects = () => {
         },
       }));
     }
-  }, [firstLoad]);
+  }, [channelsLoaded]);
 
   useEffect(() => {
     if (selectedChannel) {
@@ -255,45 +248,6 @@ export const useNewMessageEffects = () => {
     if (topicWithSchemaLoaded) {
       if (topicWithSchema.schema) {
         const schema = JSON.parse(topicWithSchema.schema);
-        /* if (schema.required && Array.isArray(schema.required)) {
-          schema.required.unshift('transactionId');
-        } else {
-          schema.required = ['transactionId'];
-        }
-
-        const transactionIdProperty = {
-          transactionId: {
-            type: 'string',
-            title: 'Transaction ID',
-          },
-        };
-        if (schema.properties && !schema.properties.transactionId) {
-          schema.properties.transactionId = {
-            type: 'string',
-            title: 'Transaction ID',
-          };
-        } else if (!schema.properties) {
-          schema.properties = {
-            ...transactionIdProperty,
-          };
-        }
-        let uiSchema = {
-          'ui:order': ['transactionId', '*'],
-        };
-        if (schema.uiSchema) {
-          const embeddedSchema = schema.uiSchema;
-          if (embeddedSchema['ui:order']) {
-            embeddedSchema['ui:order'] = [
-              'transactionId',
-              ...embeddedSchema['ui:order'],
-              '*',
-            ];
-          }
-          uiSchema = {
-            ...uiSchema,
-            ...embeddedSchema,
-          };
-        } */
         setNewMessageValues((prev) => ({
           ...prev,
           schema: JSON.stringify(schema),
@@ -393,13 +347,7 @@ export const useNewMessageEffects = () => {
                   .includes(key)
               );
         }
-        return (
-          validateStep(0) &&
-          !!message &&
-          !!formState['Transaction ID'] &&
-          formIsValid &&
-          isValid
-        );
+        return validateStep(0) && !!message && formIsValid && isValid;
       }
       case 2:
         return isValid;
@@ -467,6 +415,7 @@ export const useNewMessageEffects = () => {
     closeModal,
     channels,
     isLoading,
+    isRefetching,
     channelsLoaded,
     formContext,
     register,

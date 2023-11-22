@@ -1,16 +1,15 @@
 import {
   useChannel,
-  useMessages,
+  useReceivedMessages,
 } from '@ddhub-client-gateway-frontend/ui/api-hooks';
 import { Queries } from '@ddhub-client-gateway-frontend/ui/utils';
 import { useRouter } from 'next/router';
 import moment from 'moment';
 import getConfig from 'next/config';
 import { TTableComponentAction } from '@ddhub-client-gateway-frontend/ui/core';
-import { GetMessagesResponseDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
+import { GetReceivedMessageResponseDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { ModalActionsEnum, useModalDispatch } from '../../context';
 import { split } from 'lodash';
-import { DateTime } from 'luxon';
 
 export const useMessageInboxEffects = (isRelatedMessages?: boolean) => {
   const router = useRouter();
@@ -51,17 +50,13 @@ export const useMessageInboxEffects = (isRelatedMessages?: boolean) => {
 
   const { channel } = useChannel(router.query[Queries.FQCN] as string);
 
-  const { messages, messagesLoaded } = useMessages(
-    params,
-    !isRelatedMessages,
-    isRelatedMessages
-  );
-  const openDetailsModal = (data: GetMessagesResponseDto) => {
-    const timestampMillis = Math.round(data?.timestampNanos / 1e6);
+  const { messages, messagesLoaded, ackMessage } = useReceivedMessages(params);
+  const openDetailsModal = (data: GetReceivedMessageResponseDto) => {
     dispatch({
       type: ModalActionsEnum.SHOW_MESSAGE_INBOX_DETAILS,
       payload: {
         open: true,
+        ackMessage: ackMessage,
         data: {
           payload: data.payload,
           channelName: channel?.fqcn,
@@ -70,28 +65,29 @@ export const useMessageInboxEffects = (isRelatedMessages?: boolean) => {
           topicOwner: data.topicOwner,
           topicName: data.topicName,
           topicVersion: data.topicVersion,
-          timestamp: DateTime.fromMillis(timestampMillis).toLocaleString(
-            DateTime.DATETIME_MED
-          ),
+          timestampISO: data.timestampISO,
           timestampNanos: data.timestampNanos,
           isSender: false,
+          isRead: data.isRead,
         },
       },
     });
   };
 
-  const openReplyModal = (data: GetMessagesResponseDto) => {
+  const openReplyModal = (data: GetReceivedMessageResponseDto) => {
     console.log(data); // todo
   };
 
-  const actionsList: TTableComponentAction<GetMessagesResponseDto>[] = [
+  const actionsList: TTableComponentAction<GetReceivedMessageResponseDto>[] = [
     {
       label: 'View message',
-      onClick: (message: GetMessagesResponseDto) => openDetailsModal(message),
+      onClick: (message: GetReceivedMessageResponseDto) =>
+        openDetailsModal(message),
     },
     {
       label: 'Reply',
-      onClick: (message: GetMessagesResponseDto) => openReplyModal(message),
+      onClick: (message: GetReceivedMessageResponseDto) =>
+        openReplyModal(message),
     },
   ];
 

@@ -11,7 +11,7 @@ import {
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { ChannelType } from '../../../../models';
 import { getChannelType } from '../../../../utils';
-import { TopicsProps } from './Topics';
+import { TopicChannelValues } from './Topics';
 
 const topicsFilters: Record<ChannelType, GetTopicDtoSchemaType[]> = {
   [ChannelType.Messaging]: [GetTopicDtoSchemaType.JSD7],
@@ -41,9 +41,7 @@ const initialState = {
   value: '',
 };
 
-export const useTopicsEffects = (
-  channelValues: TopicsProps['channelValues']
-) => {
+export const useTopicsEffects = (channelValues: TopicChannelValues) => {
   const [selectedApplication, setSelectedApplication] =
     useState<Application>(initialState);
   const [selectedTopics, setSelectedTopics] = useState<Topic[]>(
@@ -210,6 +208,6 @@ export const useTopicsEffects = (
     setTopicInputValue,
     topicValue,
     saveTopicResponse,
-    // responseTopics,
+    responseTopics,
   };
 };

@@ -24,7 +24,6 @@ import '@asyncapi/react-component/styles/default.min.css';
 import 'nprogress/nprogress.css';
 import '../styles/globals.css';
 import { ModalProvider } from '@ddhub-client-gateway-frontend/ui/messaging';
-import { useGatewayConfig } from '@ddhub-client-gateway-frontend/ui/api-hooks';
 
 if (
   process.env.NODE_ENV !== 'production' &&
@@ -67,8 +66,10 @@ function MyApp(props: MyAppProps) {
     userAuthValue,
     refreshIdentityValue,
     authenticatedValue,
+    resetUserData,
     resetAuthData,
     refreshToken,
+    authEnabled,
   } = useUserData(queryClient);
 
   const getLayout =
@@ -109,8 +110,10 @@ function MyApp(props: MyAppProps) {
                 ...userAuthValue,
                 ...refreshIdentityValue,
                 ...authenticatedValue,
+                resetUserData,
                 resetAuthData,
                 refreshToken,
+                authEnabled,
               }}
             >
               <ModalProvider>

@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import { FC, useEffect, useState } from 'react';
 import {
   DialogContent,
   Typography,
@@ -65,10 +65,21 @@ const AccordionDetails = styled(MuiAccordionDetails)(({ theme }) => ({
 
 export const MessageInboxDetails: FC = () => {
   const { classes } = useStyles();
-  const { open, closeModal, inboxDetails, parsedPayload, parsedDetails } =
-    useMessageInboxDetailsEffects();
+  const {
+    open,
+    closeModal,
+    ackMessage,
+    inboxDetails,
+    parsedPayload,
+    parsedDetails,
+  } = useMessageInboxDetailsEffects();
+  const [expanded, setExpanded] = useState<number | false>(false);
 
-  const [expanded, setExpanded] = React.useState<number | false>(false);
+  useEffect(() => {
+    if (inboxDetails && !inboxDetails.isSender) {
+      ackMessage([inboxDetails.messageId]);
+    }
+  }, [inboxDetails]);
 
   const handleAccordionChange =
     (index: number) => (event: React.SyntheticEvent, isExpanded: boolean) => {
@@ -140,17 +151,19 @@ export const MessageInboxDetails: FC = () => {
                       field={{
                         label: 'Timestamp',
                         value: DateTime.fromISO(
-                          inboxDetails.timestamp
-                        ).toLocaleString(DateTime.DATETIME_MED_WITH_SECONDS),
+                          inboxDetails.timestampISO
+                        ).toFormat('yyyy/MM/dd h:mm:ss a'),
                       }}
                     />
-                    <MessageDetail
-                      field={{
-                        label: 'Transaction ID',
-                        value: inboxDetails.transactionId,
-                        copy: true,
-                      }}
-                    />
+                    {inboxDetails.transactionId && (
+                      <MessageDetail
+                        field={{
+                          label: 'Transaction ID',
+                          value: inboxDetails.transactionId,
+                          copy: true,
+                        }}
+                      />
+                    )}
                     <MessageDetail
                       field={{
                         label: 'Message ID',

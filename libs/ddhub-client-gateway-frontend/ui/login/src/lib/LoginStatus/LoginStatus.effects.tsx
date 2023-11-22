@@ -1,5 +1,5 @@
 import { useLoginEffects } from '../Login.effects';
-import { AccountStatusEnum } from '../check-account-status/CheckAccountStatus';
+import { AccountStatusEnum } from '../check-account-status/CheckAccountStatus.effects';
 import LoginForm from '../LoginForm/LoginForm';
 import InsufficientFund from './InsufficientFund/InsufficientFund';
 import { RoleStatus } from '@ddhub-client-gateway/identity/models';
@@ -57,12 +57,20 @@ export const useLoginStatusEffects = () => {
     if (status === AccountStatusEnum.FIRST_LOGIN) {
       setIsFirstLogin(true);
     }
+
+    return () => {
+      setIsFirstLogin(false);
+    };
   }, [status]);
 
   useEffect(() => {
     if (userAuth === null) {
       setIsFirstLogin(true);
     }
+
+    return () => {
+      setIsFirstLogin(false);
+    };
   }, [userAuth]);
 
   const statusFactory = () => {

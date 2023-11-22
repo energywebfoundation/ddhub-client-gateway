@@ -1,12 +1,4 @@
-import {
-  Entity,
-  PrimaryColumn,
-  Column,
-  ManyToOne,
-  JoinColumn,
-  OneToMany,
-} from 'typeorm';
-import { TopicEntity } from '../../topic/entity/topic.entity';
+import { Entity, PrimaryColumn, Column, OneToMany } from 'typeorm';
 import { ReceivedMessageReadStatusEntity } from './received-message-read-status.entity';
 
 @Entity('received_messages')

@@ -17,6 +17,7 @@ type TDetails = {
 
 type TInboxDetails = {
   open: boolean;
+  ackMessage?: (messagesIds: string[]) => void;
   data: {
     channelName: string;
     transactionId: string;
@@ -25,9 +26,10 @@ type TInboxDetails = {
     topicName: string;
     topicVersion: string;
     payload: string;
-    timestamp: string;
+    timestampISO: string;
     timestampNanos: number;
     isSender: boolean;
+    isRead: boolean;
   };
 };
 

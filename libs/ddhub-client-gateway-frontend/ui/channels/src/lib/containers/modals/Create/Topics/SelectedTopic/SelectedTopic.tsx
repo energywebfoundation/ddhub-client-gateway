@@ -11,11 +11,12 @@ import {
 import { useStyles } from './SelectedTopic.styles';
 import { X as Close, Search } from 'react-feather';
 import { Topic } from '../Topics.effects';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { TopicItem } from '../TopicItem/TopicItem';
 import { SelectedTopicView } from '../SelectedTopicView/SelectedTopicView';
 import { useSelectedTopicEffects } from './SelectedTopic.effects';
 import { ResponseTopicDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
+import { useSelectedTopicViewEffects } from '../SelectedTopicView/SelectedTopicView.effects';
 
 export interface SelectedTopicProps {
   topic: Topic;
@@ -49,8 +50,8 @@ export const SelectedTopic = ({
   topicsLoading = false,
   showTopicResponse = false,
   saveResponse,
-}: // responseTopics,
-SelectedTopicProps) => {
+  responseTopics,
+}: SelectedTopicProps) => {
   const { classes } = useStyles();
   const {
     expanded,
@@ -65,12 +66,12 @@ SelectedTopicProps) => {
     onFilterChange,
     filteredTopics,
     handleKeyDown,
-    handleOpen,
     handleOpenResponse,
     handleOpenEdit,
     isResponse,
     handleClickTopicCheckbox,
     selectedIndex,
+    setPanelId,
   } = useSelectedTopicEffects({
     setSelectedApplication,
     topic,
@@ -78,8 +79,13 @@ SelectedTopicProps) => {
     topicsList,
     availableTopics,
     saveResponse,
-    // responseTopics,
+    responseTopics,
   });
+  const { expandResponse, setExpandResponse } = useSelectedTopicViewEffects();
+
+  useEffect(() => {
+    setPanelId(`panel-${index}`);
+  }, [index]);
 
   return (
     <Select
@@ -87,7 +93,13 @@ SelectedTopicProps) => {
       key={`panel-${index}`}
       value={topic.topicName}
       open={expanded === `panel-${index}`}
-      onOpen={handleOpen}
+      onOpen={
+        showTopicResponse
+          ? () => {
+              setExpandResponse(!expandResponse);
+            }
+          : handleOpenEdit
+      }
       onClose={handleClose}
       IconComponent={() => null}
       classes={{
@@ -109,7 +121,9 @@ SelectedTopicProps) => {
           expanded={expanded}
           index={index}
           remove={remove}
-          // responseTopics={responseTopics}
+          responseTopics={responseTopics}
+          expandResponse={expandResponse}
+          setExpandResponse={setExpandResponse}
         />
       )}
     >

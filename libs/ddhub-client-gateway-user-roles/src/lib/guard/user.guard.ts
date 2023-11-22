@@ -3,6 +3,7 @@ import {
   ExecutionContext,
   Injectable,
   Logger,
+  createParamDecorator,
 } from '@nestjs/common';
 import { UserAuthService } from '../service/user-auth.service';
 import { Reflector } from '@nestjs/core';
@@ -54,6 +55,10 @@ export class UserGuard implements CanActivate {
         const decodedToken: UserTokenData =
           this.userAuthService.verifyToken(token);
 
+        request.user = {
+          username: decodedToken.username,
+        };
+
         if (decodedToken.accountType === UserRole.ADMIN) {
           return true;
         }
@@ -72,3 +77,8 @@ export class UserGuard implements CanActivate {
     return false;
   }
 }
+
+export const Username = createParamDecorator((_, context: ExecutionContext) => {
+  const request = context.switchToHttp().getRequest();
+  return request.user.username;
+});

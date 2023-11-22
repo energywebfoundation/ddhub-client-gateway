@@ -1,4 +1,3 @@
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class GetSentMessageRecipientsResponseDto {
@@ -8,6 +7,13 @@ export class GetSentMessageRecipientsResponseDto {
     example: 'did:ethr:volta:0x782aB0383Bfc807439d8EE29516937B47815d697',
   })
   did: string;
+
+  @ApiProperty({
+    description: 'Recipient alias',
+    type: String,
+    example: 'John Doe',
+  })
+  alias?: string;
 
   @ApiProperty({
     description: 'Status',
@@ -115,7 +121,14 @@ export class GetSentMessageResponseDto {
     type: Number,
     example: 1649147198388,
   })
-  timestampNanos: Date;
+  timestampNanos: number;
+
+  @ApiProperty({
+    description: 'timestamp formatted in ISO',
+    type: String,
+    example: '2023-11-19T16:00:00.000Z',
+  })
+  timestampISO: string;
 
   @ApiProperty({
     type: String,

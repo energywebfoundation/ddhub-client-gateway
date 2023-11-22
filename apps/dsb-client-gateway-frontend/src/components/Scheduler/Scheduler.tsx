@@ -22,7 +22,10 @@ export const Scheduler = () => {
                 key={job.jobName}
                 name={job.jobName}
                 date={dayjs(job.updatedDate).format('DD/MM/YYYY HH:mm:ssA')}
-                icon={schedulerIconMap.get(job.jobName) || schedulerIconMap.get('DEFAULT_SCHEDULER')}
+                icon={
+                  schedulerIconMap.get(job.jobName) ||
+                  schedulerIconMap.get('DEFAULT_SCHEDULER')
+                }
                 status={job.latestStatus}
               />
             );

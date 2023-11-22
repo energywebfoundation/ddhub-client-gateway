@@ -1,7 +1,6 @@
 import { Grid, Typography, Box } from '@mui/material';
 import {
   CreateChannelDtoType,
-  GetChannelResponseDtoType,
   ResponseTopicDto,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { SelectedTopicList } from './SelectedTopicList/SelectedTopicList';
@@ -12,14 +11,17 @@ import { ActionButtons } from '../ActionButtons';
 import { TActionButtonsProps } from '../ActionButtons/ActionButtons';
 import { Topic, useTopicsEffects } from './Topics.effects';
 import { useStyles } from './Topics.styles';
+import { Filter } from 'react-feather';
+
+export interface TopicChannelValues {
+  topics: Topic[];
+  channelType: CreateChannelDtoType;
+  messageForms?: boolean;
+  responseTopics?: ResponseTopicDto[];
+}
 
 export interface TopicsProps {
-  channelValues: {
-    topics: Topic[];
-    channelType: GetChannelResponseDtoType;
-    messageForms?: boolean;
-    responseTopics?: ResponseTopicDto[];
-  };
+  channelValues: TopicChannelValues;
   actionButtonsProps: TActionButtonsProps;
 }
 
@@ -43,7 +45,7 @@ export const Topics = ({ channelValues, actionButtonsProps }: TopicsProps) => {
     setTopicInputValue,
     topicValue,
     saveTopicResponse,
-    // responseTopics,
+    responseTopics,
   } = useTopicsEffects(channelValues);
 
   return (
@@ -120,9 +122,9 @@ export const Topics = ({ channelValues, actionButtonsProps }: TopicsProps) => {
           <Typography className={classes.label}>
             {selectedTopics.length} Topics
           </Typography>
-          {/*<Typography className={classes.filterLabel}>*/}
-          {/*  <Filter size={10}/> Filter*/}
-          {/*</Typography>*/}
+          <Typography className={classes.filterLabel}>
+            <Filter size={10} /> Filter
+          </Typography>
         </Box>
 
         <SelectedTopicList
@@ -131,10 +133,11 @@ export const Topics = ({ channelValues, actionButtonsProps }: TopicsProps) => {
           edit={updateSelectedTopic}
           showTopicResponse={
             channelValues.messageForms &&
-            channelValues.channelType === CreateChannelDtoType.pub
+            channelValues.channelType === CreateChannelDtoType.pub &&
+            channelValues.responseTopics?.length > 0
           }
           saveResponse={saveTopicResponse}
-          // responseTopics={responseTopics}
+          responseTopics={responseTopics}
           filters={filters}
           recent={recent}
         />
@@ -152,7 +155,7 @@ export const Topics = ({ channelValues, actionButtonsProps }: TopicsProps) => {
             onClick: () =>
               actionButtonsProps.nextClickButtonProps.onClick({
                 topics: selectedTopics,
-                // responseTopics,
+                responseTopics,
               }),
           }}
         />
