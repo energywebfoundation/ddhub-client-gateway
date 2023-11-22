@@ -2,6 +2,8 @@ import { FC } from 'react';
 import { CardContent, Paper, Typography, Box } from '@mui/material';
 import { useStyles } from './MessageInfo.styles';
 import { GetSentMessageResponseDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
+import { didFormatMinifier } from '@ddhub-client-gateway-frontend/ui/utils';
+import { DateTime } from 'luxon';
 
 interface MessageInfoProps {
   messageInfo: GetSentMessageResponseDto;
@@ -19,11 +21,13 @@ export const MessageInfo: FC<MessageInfoProps> = ({
           <>
             <Box className={classes.row}>
               <Typography className={classes.title} variant="h4">
-                Date & time
+                Date & Time
               </Typography>
               <Box display="flex" alignItems="center">
                 <Typography className={classes.subTitle} noWrap>
-                  {messageInfo.relatedMessagesCount}
+                  {DateTime.fromISO(messageInfo.timestampISO).toFormat(
+                    'yyyy/MM/dd h:mm:ss a'
+                  )}
                 </Typography>
               </Box>
             </Box>
@@ -52,32 +56,30 @@ export const MessageInfo: FC<MessageInfoProps> = ({
                 To
               </Typography>
               <Box display="flex" alignItems="center">
-                <Typography className={classes.subTitle} noWrap>
+                <Typography
+                  className={`${classes.subTitle} ${classes.monospace}`}
+                >
                   {messageInfo.recipients?.map(
-                    (recipient: any, index: number) => {
-                      if (index !== messageInfo.recipients.length - 1) {
-                        return recipient.did + ', ';
-                      }
-                      return recipient.did;
-                    }
+                    (recipient: any, index: number) =>
+                      `${didFormatMinifier(recipient.did)}\n`
                   )}
                 </Typography>
               </Box>
             </Box>
             <Box className={classes.row}>
               <Typography className={classes.title} variant="h4">
-                Message ID
+                Related Message ID
               </Typography>
               <Typography className={classes.subTitle} noWrap>
-                {messageInfo.clientGatewayMessageId}
+                {messageInfo.initiatingMessageId}
               </Typography>
             </Box>
             <Box className={classes.row}>
               <Typography className={classes.title} variant="h4">
-                Transaction ID
+                Related Transaction ID
               </Typography>
               <Typography className={classes.subTitle} noWrap>
-                {messageInfo.transactionId}
+                {messageInfo.initiatingTransactionId}
               </Typography>
             </Box>
           </>

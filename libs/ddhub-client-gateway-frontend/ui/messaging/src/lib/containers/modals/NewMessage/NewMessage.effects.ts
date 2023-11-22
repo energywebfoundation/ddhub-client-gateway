@@ -16,7 +16,12 @@ import {
 import { FieldValues, useForm, useWatch } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { validationSchema } from '../models/validationSchema';
-import { GetChannelResponseDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
+import {
+  ChannelResponseTopic,
+  ChannelTopic,
+  GetChannelResponseDto,
+  GetReceivedMessageResponseDto,
+} from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { TActionButtonsProps } from './ActionButtons';
 import { useCustomAlert } from '@ddhub-client-gateway-frontend/ui/core';
 
@@ -40,13 +45,20 @@ export const useNewMessageEffects = () => {
   const Swal = useCustomAlert();
   const dispatch = useModalDispatch();
   const {
-    newMessage: { open },
+    newMessage: { open, data: replyData },
   } = useModalStore();
   const [newMessageValues, setNewMessageValues] =
     useState<INewMessage>(initialState);
   const [activeStep, setActiveStep] = useState(0);
   const [modalSteps, setModalSteps] = useState(MODAL_STEPS);
   const [fields, setFields] = useState(initialFieldState);
+  const [isReply, setIsReply] = useState(false);
+
+  useEffect(() => {
+    if (replyData) {
+      setIsReply(true);
+    }
+  }, [replyData]);
 
   const {
     channels,
@@ -56,6 +68,7 @@ export const useNewMessageEffects = () => {
     refetch: refreshChannels,
   } = useChannels({
     type: 'pub',
+    messageForms: true,
   });
   const { topicHistory, topicHistoryLoaded } = useTopicVersionHistory({
     id: newMessageValues.topicId,
@@ -76,6 +89,8 @@ export const useNewMessageEffects = () => {
 
     sendNewMessageHandler(
       {
+        initiatingMessageId: replyData?.id,
+        initiatingTransactionId: replyData?.transactionId,
         fqcn: newMessageValues.fqcn,
         topicName: newMessageValues.topicName,
         topicVersion: newMessageValues.version,
@@ -166,20 +181,76 @@ export const useNewMessageEffects = () => {
     }
   }, [open]);
 
+  const filterReplyChannels = (channels: GetChannelResponseDto[]) => {
+    const responseTopicIds: string[] = [];
+    const validTopicTester = (topic: ChannelTopic | ChannelResponseTopic) => {
+      if ('responseTopicId' in topic) {
+        return topic.responseTopicId === replyData.topicId;
+      } else {
+        return (
+          topic.topicId === replyData.topicId ||
+          responseTopicIds.some(
+            (responseTopicId) => responseTopicId === topic.topicId
+          )
+        );
+      }
+    };
+
+    const validChannels = channels.reduce((acc, channel) => {
+      const validResponseTopics =
+        channel.conditions.responseTopics.filter(validTopicTester);
+      if (validResponseTopics.length) {
+        responseTopicIds.push(...validResponseTopics.map((t) => t.topicId));
+      }
+      const validTopics = channel.conditions.topics.filter(validTopicTester);
+      if (validTopics.length) {
+        return [...acc, channel];
+      }
+      return acc;
+    }, []);
+
+    return validChannels;
+  };
+
   useEffect(() => {
     if (channelsLoaded) {
       setFields((prev) => ({
         ...prev,
         channel: {
           ...prev['channel'],
-          options: channels.map((channel) => ({
-            label: channel.fqcn,
-            value: JSON.stringify(channel),
-          })),
+          options: (isReply ? filterReplyChannels(channels) : channels).map(
+            (channel) => ({
+              label: channel.fqcn,
+              value: JSON.stringify(channel),
+            })
+          ),
         },
       }));
     }
-  }, [channelsLoaded]);
+  }, [channelsLoaded, isReply]);
+
+  const filterReplyTopics = (topics: ChannelTopic[]) => {
+    const validTopicTester = (topic: ChannelTopic | ChannelResponseTopic) => {
+      if ('responseTopicId' in topic) {
+        return topic.responseTopicId === replyData.topicId;
+      } else {
+        return topic.topicId === replyData.topicId;
+      }
+    };
+
+    const validTopics = channels.reduce((acc, channel) => {
+      const responseTopics =
+        channel.conditions.responseTopics.filter(validTopicTester);
+      const topics = channel.conditions.topics.filter(validTopicTester);
+      return [...acc, ...responseTopics, ...topics];
+    }, []);
+    const filteredTopics = topics.filter((topic) => {
+      return validTopics.some(
+        (validTopic) => validTopic.topicId === topic.topicId
+      );
+    });
+    return filteredTopics;
+  };
 
   useEffect(() => {
     if (selectedChannel) {
@@ -195,7 +266,10 @@ export const useNewMessageEffects = () => {
         ...prev,
         topic: {
           ...prev['topic'],
-          options: channel.conditions.topics.map((topic) => ({
+          options: (isReply
+            ? filterReplyTopics(channel.conditions.topics)
+            : channel.conditions.topics
+          ).map((topic) => ({
             label: topic.topicName,
             subLabel: topic.owner,
             value: JSON.stringify(topic),
@@ -276,7 +350,17 @@ export const useNewMessageEffects = () => {
       type: ModalActionsEnum.SHOW_NEW_MESSAGE,
       payload: {
         open: true,
-        data: {},
+        data: undefined,
+      },
+    });
+  };
+
+  const openReplyModal = (replyMessage: GetReceivedMessageResponseDto) => {
+    dispatch({
+      type: ModalActionsEnum.SHOW_NEW_MESSAGE,
+      payload: {
+        open: true,
+        data: replyMessage,
       },
     });
   };
@@ -290,6 +374,7 @@ export const useNewMessageEffects = () => {
       },
     });
     resetToInitialState();
+    setIsReply(false);
   };
 
   const resetToInitialState = () => {
@@ -427,11 +512,14 @@ export const useNewMessageEffects = () => {
     newMessageValues,
     setMessageValue,
     openNewMessageModal,
+    openReplyModal,
     sendMessage,
     isSending,
     selectedChannel,
     selectedTopic,
     selectedVersion,
     getActionButtonsProps,
+    isReply,
+    replyData,
   };
 };

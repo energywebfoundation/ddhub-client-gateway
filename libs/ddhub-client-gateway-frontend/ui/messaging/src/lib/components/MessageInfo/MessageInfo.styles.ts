@@ -25,7 +25,9 @@ export const useStyles = makeStyles()((theme) => ({
     letterSpacing: '0.4px',
     fontFamily: theme.typography.body2.fontFamily,
     maxWidth: 190,
-    wordBreak: 'break-all',
+  },
+  monospace: {
+    fontFamily: 'Source Code Pro',
   },
   row: {
     marginBottom: 16,
