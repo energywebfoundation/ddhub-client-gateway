@@ -4,6 +4,7 @@ import {
   getAddressBookControllerGetAllContactsQueryKey,
   GetAllContactsResponseDto,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
+import { constants } from 'http2';
 import {
   createContext,
   Dispatch,
@@ -78,7 +79,7 @@ export const useAddressBookContext = (queryClient: QueryClient) => {
     let retVal = did;
 
     if (addressBookData.addressBook.addressBookList) {
-      let list = addressBookData.addressBook.addressBookList;
+      const list = addressBookData.addressBook.addressBookList;
       for (let i = 0; i < list.length; i++) {
         if (list[i].did === did) {
           retVal = list[i].alias;
