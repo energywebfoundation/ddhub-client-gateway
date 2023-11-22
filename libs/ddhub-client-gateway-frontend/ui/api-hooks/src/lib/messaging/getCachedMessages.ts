@@ -5,13 +5,27 @@ import {
   MessageControllerGetMessageParams,
   getMessageControllerGetMessageQueryKey,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
+import { useContext } from 'react';
+import { AddressBookContext } from '@ddhub-client-gateway-frontend/ui/login';
 
 export const useCachedMessages = (
   params?: MessageControllerGetMessageParams
 ) => {
   const queryClient = useQueryClient();
-  const cachedMessages: GetMessagesResponseDto[] | undefined =
-    queryClient.getQueryData(getMessageControllerGetMessageQueryKey(params));
+  const addressBookContext = useContext(AddressBookContext);
+  const data: GetMessagesResponseDto[] | undefined = queryClient.getQueryData(
+    getMessageControllerGetMessageQueryKey(params)
+  );
+
+  let cachedMessages: GetMessagesResponseDto[] | undefined;
+  if (data) {
+    cachedMessages = data.map((message) => {
+      return {
+        ...message,
+        senderAlias: addressBookContext?.getAlias(message.sender),
+      };
+    });
+  }
 
   const messagesById = keyBy(cachedMessages, 'id');
 

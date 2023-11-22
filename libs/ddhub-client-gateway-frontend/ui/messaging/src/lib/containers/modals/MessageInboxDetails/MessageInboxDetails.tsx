@@ -27,6 +27,7 @@ import MuiAccordionSummary, {
 } from '@mui/material/AccordionSummary';
 import MuiAccordionDetails from '@mui/material/AccordionDetails';
 import { ChevronRight } from 'react-feather';
+import { didFormatMinifier } from '@ddhub-client-gateway-frontend/ui/utils';
 
 const Accordion = styled((props: AccordionProps) => (
   <MuiAccordion disableGutters elevation={0} square {...props} />
@@ -167,7 +168,11 @@ export const MessageInboxDetails: FC = () => {
                     <MessageDetail
                       field={{
                         label: 'Message ID',
-                        value: inboxDetails.messageId,
+                        value:
+                          inboxDetails.messageId.length > 24
+                            ? didFormatMinifier(inboxDetails.messageId)
+                            : inboxDetails.messageId,
+                        copyValue: inboxDetails.messageId,
                         copy: true,
                       }}
                     />

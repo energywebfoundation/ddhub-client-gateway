@@ -4,6 +4,7 @@ import {
   RelatedMessageProps,
 } from '../containers/MessageOutbox';
 import { DateTime } from 'luxon';
+import { didFormatMinifier } from '@ddhub-client-gateway-frontend/ui/utils';
 
 export const CHANNEL_OUTBOX_HEADERS = [
   {
@@ -32,6 +33,7 @@ export const CHANNEL_OUTBOX_HEADERS = [
       const recipients = props?.value.filter(
         (recipient: any) => !recipient.failed
       );
+      if (!recipients.length) return 'No successful recipient.';
       const aliases = recipients.filter((recipient: any) => !!recipient.alias);
       const hasAliases = aliases.length > 0;
 
@@ -40,31 +42,40 @@ export const CHANNEL_OUTBOX_HEADERS = [
         return (
           <Box>
             <Box mr={1}>
-              {aliasesToRender.map((recipient: any, index: number) => {
-                let cellText = recipient.alias;
-
-                if (index !== aliasesToRender.length - 1) {
-                  cellText += ', ';
-                }
-
-                return cellText;
-              })}
+              {aliasesToRender[0].alias}
+              {recipients.length > 1 && (
+                <Chip
+                  sx={{ ml: 1 }}
+                  label={
+                    <Typography fontWeight="600" variant="body2">
+                      +&nbsp;
+                      {recipients.length - 1}
+                    </Typography>
+                  }
+                />
+              )}
             </Box>
-
-            {recipients.length > aliasesToRender.length && (
-              <Chip
-                label={
-                  <Typography fontWeight="600" variant="body2">
-                    +&nbsp;
-                    {recipients.length - aliasesToRender.length}
-                  </Typography>
-                }
-              />
-            )}
           </Box>
         );
       } else {
-        return `${recipients.length} recipients`;
+        return (
+          <Box>
+            <Box mr={1}>
+              {didFormatMinifier(recipients[0].did)}
+              {recipients.length > 1 && (
+                <Chip
+                  sx={{ ml: 1 }}
+                  label={
+                    <Typography fontWeight="600" variant="body2">
+                      +&nbsp;
+                      {recipients.length - 1}
+                    </Typography>
+                  }
+                />
+              )}
+            </Box>
+          </Box>
+        );
         //   return props?.value.map((recipient: any, index: number) => {
         //     let cellText = recipient.did;
 
@@ -77,11 +88,12 @@ export const CHANNEL_OUTBOX_HEADERS = [
       }
     },
   },
-  {
-    Header: 'MESSAGE ID',
-    accessor: 'clientGatewayMessageId',
-    isSortable: true,
-  },
+  // #----- Removed as this will confuse users with the correct message id -----#
+  // {
+  //   Header: 'MESSAGE ID',
+  //   accessor: 'clientGatewayMessageId',
+  //   isSortable: true,
+  // },
   {
     Header: 'TRANSACTION ID',
     accessor: 'transactionId',

@@ -1,3 +1,4 @@
+import { didFormatMinifier } from '@ddhub-client-gateway-frontend/ui/utils';
 import { DateTime } from 'luxon';
 
 export const CHANNEL_INBOX_HEADERS = [
@@ -23,6 +24,12 @@ export const CHANNEL_INBOX_HEADERS = [
     Header: 'FROM',
     accessor: 'sender',
     isSortable: true,
+    Cell: (props: any) => {
+      return (
+        props.row.original.senderAlias ||
+        didFormatMinifier(props.row.original.sender)
+      );
+    },
   },
   {
     Header: 'MESSAGE ID',

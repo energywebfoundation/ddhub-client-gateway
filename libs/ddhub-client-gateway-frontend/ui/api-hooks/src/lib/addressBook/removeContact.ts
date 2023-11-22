@@ -4,8 +4,11 @@ import {
   getAddressBookControllerGetAllContactsQueryKey,
   useAddressBookControllerDeleteContact,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
+import { AddressBookContext } from '@ddhub-client-gateway-frontend/ui/login';
+import { useContext } from 'react';
 
 export const useRemoveContact = () => {
+  const addressBookContext = useContext(AddressBookContext);
   const queryClient = useQueryClient();
   const Swal = useCustomAlert();
 
@@ -18,6 +21,12 @@ export const useRemoveContact = () => {
     queryClient.invalidateQueries(
       getAddressBookControllerGetAllContactsQueryKey()
     );
+    if (addressBookContext) {
+      addressBookContext
+        .refreshAddressBook()
+        .then()
+        .catch((e) => console.error('Could not refresh address book.', e));
+    }
   };
 
   const removeContactError = async (err: any) => {
