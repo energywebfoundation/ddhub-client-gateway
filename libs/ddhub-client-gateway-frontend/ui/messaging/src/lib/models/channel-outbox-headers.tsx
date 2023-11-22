@@ -105,6 +105,9 @@ export const CHANNEL_OUTBOX_HEADERS = [
     accessor: 'relatedMessageItems',
     isSortable: true,
     Cell: ({ value }: RelatedMessageProps) => {
+      if (!value.messageId) {
+        return value.relatedMessagesCount;
+      }
       return <RelatedMessage value={value} />;
     },
   },
