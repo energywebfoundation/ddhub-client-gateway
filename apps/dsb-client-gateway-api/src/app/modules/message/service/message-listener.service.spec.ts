@@ -126,6 +126,7 @@ describe(`${MessageListenerService.name}`, () => {
                 {
                   fqcn: 'fqcn',
                   conditions: {
+                    qualifiedDids: ['senderDid'],
                     topics: [
                       {
                         topicId: 'topicId',
