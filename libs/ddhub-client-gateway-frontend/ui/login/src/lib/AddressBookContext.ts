@@ -95,7 +95,7 @@ export const useAddressBookContext = (queryClient: QueryClient) => {
     let retVal = didFormatMinifier(did);
 
     if (addressBookData.addressBook.addressBookList) {
-      let list = addressBookData.addressBook.addressBookList;
+      const list = addressBookData.addressBook.addressBookList;
       for (let i = 0; i < list.length; i++) {
         if (list[i].did === did) {
           retVal = list[i].alias;

@@ -68,8 +68,8 @@ export const useChannelListEffects = () => {
     },
   ];
 
-  let mutatedChannels = channels.map((channel) => {
-    let didsAlias: string[] = [];
+  const mutatedChannels = channels.map((channel) => {
+    const didsAlias: string[] = [];
     if (channel.conditions.dids) {
       channel.conditions.dids.forEach((did) => {
         didsAlias.push(addressBookContext.getAliasOrMinifiedDid(did));

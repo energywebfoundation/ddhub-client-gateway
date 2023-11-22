@@ -45,6 +45,11 @@ export const RestrictionListView = (
             <Box className={classes.gridItem}>
               <Typography variant="body2" className={classes.typeText}>{ type }</Typography>
             </Box>
+            {type === RestrictionType.DID && (
+              <Box className={classes.gridItem}>
+                <Typography variant="body2" className={classes.typeText}>{ 'KIM' }</Typography>
+              </Box>
+            )}
           )}
           <Typography noWrap variant="body2" className={classes.itemText} pl='14px'>
             {type === RestrictionType.DID ? didFormatMinifier(item) : item}

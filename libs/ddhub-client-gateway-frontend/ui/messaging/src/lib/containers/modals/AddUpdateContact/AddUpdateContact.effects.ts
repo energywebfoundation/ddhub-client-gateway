@@ -12,8 +12,9 @@ import {
 } from '@ddhub-client-gateway-frontend/ui/api-hooks';
 import { useQueryClient } from 'react-query';
 import { getAddressBookControllerGetAllContactsQueryKey } from '@dsb-client-gateway/dsb-client-gateway-api-client';
-const didRegex = new RegExp(/^did:[a-z0-9]+:([a-z0-9]+:)?(0x[0-9a-fA-F]{40})$/);
 import { AddressBookContext } from '@ddhub-client-gateway-frontend/ui/login';
+
+const didRegex = new RegExp(/^did:[a-z0-9]+:([a-z0-9]+:)?(0x[0-9a-fA-F]{40})$/);
 
 export const useAddUpdateContactEffects = () => {
   const addressBookContext = useContext(AddressBookContext);
