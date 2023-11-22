@@ -20,6 +20,14 @@ export class GetReceivedMessageResponseDto {
 
   @IsString()
   @ApiProperty({
+    description: 'topic id',
+    type: String,
+    example: '111',
+  })
+  topicId: string;
+
+  @IsString()
+  @ApiProperty({
     description: 'topic Name',
     type: String,
     example: 'getOperatingEnvelope',

@@ -90,14 +90,10 @@ export class AzureKeyVaultService
 
   @Span('azure_kv_getAllUsers')
   public async getAllUsers(): Promise<UsersList> {
+    const userSecretPath = this.encodeAzureKey(`${this.prefix}${PATHS.USERS}`);
     const userSecretIdentifiers: string[] = [];
     for await (const secret of this.client.listPropertiesOfSecrets()) {
-      if (
-        secret.enabled &&
-        secret.name.startsWith(
-          this.encodeAzureKey(`${this.prefix}${PATHS.USERS}`)
-        )
-      ) {
+      if (secret.enabled && secret.name.startsWith(userSecretPath)) {
         userSecretIdentifiers.push(secret.name);
       }
     }
@@ -359,6 +355,7 @@ export class AzureKeyVaultService
     try {
       return JSON.parse(value);
     } catch (err) {
+      this.logger.error(err.message);
       return value;
     }
   }

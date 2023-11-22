@@ -45,48 +45,55 @@ export class OfflineMessagesService {
   public async getOfflineSentMessages(
     filterParams: GetSentMessagesRequestDto
   ): Promise<GetSentMessageResponseDto[]> {
+    this.logger.debug(
+      `getOfflineSentMessagesParams: ${JSON.stringify(filterParams)}`
+    );
+
     const queryBuilder =
       this.sentMessagesRepositoryWrapper.repository.createQueryBuilder(
         'sent_messages'
       );
 
-    if (filterParams.transactionId) {
-      queryBuilder.andWhere('sent_messages.transactionId = :transactionId', {
-        transactionId: filterParams.transactionId,
-      });
-    }
-
-    if (filterParams.fqcn) {
+    if (
+      filterParams.fqcn &&
+      !(filterParams.messageId || filterParams.transactionId)
+    ) {
       queryBuilder.andWhere('sent_messages.fqcn = :fqcn', {
         fqcn: filterParams.fqcn,
       });
     }
 
-    if (filterParams.initiatingMessageId) {
+    if (filterParams.transactionId) {
       queryBuilder.andWhere(
-        'sent_messages.initiatingMessageId = :initiatingMessageId',
+        'sent_messages.initiatingTransactionId = :transactionId',
         {
-          initiatingMessageId: filterParams.initiatingMessageId,
-        }
-      );
-    }
-
-    if (filterParams.initiatingTransactionId) {
-      queryBuilder.andWhere(
-        'sent_messages.initiatingTransactionId = :initiatingTransactionId',
-        {
-          initiatingTransactionId: filterParams.initiatingTransactionId,
+          transactionId: filterParams.transactionId,
         }
       );
     }
 
     if (filterParams.messageId) {
       queryBuilder.andWhere(
-        ':messageId = ANY(sent_messages."messageIds"::text[])',
+        'sent_messages.initiatingMessageId = :initiatingMessageId',
         {
-          messageId: `${filterParams.messageId}`,
+          initiatingMessageId: filterParams.messageId,
         }
       );
+    }
+
+    if (filterParams.initiatingMessageId) {
+      queryBuilder.andWhere(
+        ':messageId = ANY(sent_messages."messageIds"::text[])',
+        {
+          messageId: filterParams.initiatingMessageId,
+        }
+      );
+    }
+
+    if (filterParams.initiatingTransactionId) {
+      queryBuilder.andWhere('sent_messages.transactionId = :transactionId', {
+        transactionId: filterParams.initiatingTransactionId,
+      });
     }
 
     if (filterParams.topicName) {
@@ -118,13 +125,13 @@ export class OfflineMessagesService {
           const relatedMessagesCount =
             await this.sentMessagesRepositoryWrapper.repository
               .createQueryBuilder('sent_messages')
-              .where('sent_messages.initiatingMessageId IN (:...messageIds)', {
-                messageIds: entity.messageIds,
+              .where(':initiatingMessageId = ANY(sent_messages.messageIds)', {
+                initiatingMessageId: entity.initiatingMessageId,
               })
               .orWhere(
-                'sent_messages.initiatingTransactionId = :transactionId',
+                'sent_messages.transactionId = :initiatingTransactionId',
                 {
-                  transactionId: entity.transactionId,
+                  initiatingTransactionId: entity.initiatingTransactionId,
                 }
               )
               .getCount();
@@ -179,6 +186,10 @@ export class OfflineMessagesService {
   public async getOfflineReceivedMessages(
     dto: Partial<GetMessagesDto>
   ): Promise<GetReceivedMessageResponseDto[]> {
+    this.logger.debug(
+      `getOfflineReceivedMessagesParams: ${JSON.stringify(dto)}`
+    );
+
     const {
       initiatingTransactionId,
       initiatingMessageId,
@@ -193,7 +204,7 @@ export class OfflineMessagesService {
     const query = this.receivedMessageRepositoryWrapper.repository
       .createQueryBuilder(rm)
       .where((qb) => {
-        if (fqcn) {
+        if (fqcn && !(initiatingMessageId || initiatingTransactionId)) {
           qb.andWhere(`${rm}.fqcn = :fqcn`, { fqcn });
         }
 
@@ -206,16 +217,15 @@ export class OfflineMessagesService {
         }
 
         if (initiatingMessageId) {
-          qb.andWhere(`${rm}.initiatingMessageId = :initiatingMessageId`, {
+          qb.andWhere(`${rm}.messageId = :initiatingMessageId`, {
             initiatingMessageId,
           });
         }
 
         if (initiatingTransactionId) {
-          qb.andWhere(
-            `${rm}.initiatingTransactionId = :initiatingTransactionId`,
-            { initiatingTransactionId }
-          );
+          qb.andWhere(`${rm}.transactionId = :initiatingTransactionId`, {
+            initiatingTransactionId,
+          });
         }
 
         if (messageId) {
