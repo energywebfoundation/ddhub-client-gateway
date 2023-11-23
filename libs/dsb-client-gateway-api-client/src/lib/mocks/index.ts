@@ -119,13 +119,13 @@ export const getTopicsControllerPostTopicsMock = () => ({
   schema: faker.random.word(),
   schemaType: faker.helpers.randomize(['JSD7', 'XML', 'CSV', 'TSV']),
   tags: [...Array(faker.datatype.number({ min: 1, max: 10 }))].map(() =>
-    faker.random.word(),
+    faker.random.word()
   ),
   version: faker.random.word(),
 });
 
 export const getTopicsControllerGetTopicsHistoryByIdMock = (
-  queryParams: any,
+  queryParams: any
 ) => {
   return {
     count: 12,

@@ -15,7 +15,7 @@ export const useUpdateChannel = () => {
 
   const updateChannelHandler = (
     values: UpdateChannelDto & { fqcn: string },
-    onSuccess: () => void,
+    onSuccess: () => void
   ) => {
     const { fqcn, ...data } = values;
     mutate(
@@ -26,7 +26,7 @@ export const useUpdateChannel = () => {
       {
         onSuccess,
         onError: updateError,
-      },
+      }
     );
   };
 

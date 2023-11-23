@@ -4,5 +4,7 @@ import { PendingAcksRepository } from '../repository/pending-acks.repository';
 
 @Injectable()
 export class AcksWrapperRepository {
-  constructor(public readonly acksRepository: AcksRepository) {}
+  constructor(
+    public readonly acksRepository: AcksRepository,
+  ) { }
 }

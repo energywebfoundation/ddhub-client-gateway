@@ -16,7 +16,7 @@ export const useUpdateContact = () => {
 
   const updateContactHandler = (
     values: UpdateContactRequestDto & { did: string },
-    onSuccess: () => void,
+    onSuccess: () => void
   ) => {
     const { did, ...data } = values;
     mutate(
@@ -27,7 +27,7 @@ export const useUpdateContact = () => {
       {
         onSuccess,
         onError: updateError,
-      },
+      }
     );
   };
 

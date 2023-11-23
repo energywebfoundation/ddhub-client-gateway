@@ -45,10 +45,10 @@ export const useTopicsEffects = (channelValues: TopicChannelValues) => {
   const [selectedApplication, setSelectedApplication] =
     useState<Application>(initialState);
   const [selectedTopics, setSelectedTopics] = useState<Topic[]>(
-    channelValues.topics,
+    channelValues.topics
   );
   const [responseTopics, setResponseTopics] = useState<ResponseTopicDto[]>(
-    channelValues.responseTopics,
+    channelValues.responseTopics
   );
   const { applications, isLoading: isLoadingApplications } =
     useApplications('user');
@@ -63,7 +63,7 @@ export const useTopicsEffects = (channelValues: TopicChannelValues) => {
   const channelType = getChannelType(channelValues.channelType);
   const filters = topicsFilters[channelType as ChannelType];
   const filteredTopics = topics.filter((item) =>
-    filters.includes(item.schemaType),
+    filters.includes(item.schemaType)
   );
 
   useEffect(() => {
@@ -141,7 +141,7 @@ export const useTopicsEffects = (channelValues: TopicChannelValues) => {
 
   const saveTopicResponse = (
     topics: ResponseTopicDto[],
-    selectedTopicId: string,
+    selectedTopicId: string
   ) => {
     if (topics.length) {
       const respTopics = filterResponseTopics(selectedTopicId);
@@ -160,7 +160,7 @@ export const useTopicsEffects = (channelValues: TopicChannelValues) => {
   const availableTopics: Topic[] = differenceBy(
     filteredTopics,
     formattedSelectedTopics,
-    'id',
+    'id'
   ).map((topic: GetTopicDto) => ({
     label: topic.name,
     topicName: topic.name,

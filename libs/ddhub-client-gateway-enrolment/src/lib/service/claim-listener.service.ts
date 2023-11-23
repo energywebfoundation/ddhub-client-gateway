@@ -24,7 +24,7 @@ export class ClaimListenerService {
     private readonly configService: ConfigService,
     private readonly iamService: IamService,
     @Inject(forwardRef(() => EnrolmentService))
-    private readonly enrolmentService: EnrolmentService,
+    private readonly enrolmentService: EnrolmentService
   ) {}
 
   public async stop(): Promise<void> {
@@ -68,7 +68,7 @@ export class ClaimListenerService {
           }
 
           const claim = await this.iamService.getClaimById(
-            claimMessage.claimId,
+            claimMessage.claimId
           );
 
           if (!claim) {
@@ -81,7 +81,7 @@ export class ClaimListenerService {
             this.logger.warn(
               'Claim requester does not match DID address',
               claim.requester,
-              this.iamService.getDIDAddress,
+              this.iamService.getDIDAddress
             );
 
             continue;
@@ -91,18 +91,18 @@ export class ClaimListenerService {
             this.logger.log(`Received ${this.sub.getProcessed()} messages`);
 
             const decodedToken = (await this.iamService.decodeJWTToken(
-              claim.issuedToken,
+              claim.issuedToken
             )) as any;
 
             if (roles.includes(decodedToken.claimData.claimType)) {
               this.logger.log(
-                `Attempting to publish ${decodedToken.claimData.claimType} to DID document`,
+                `Attempting to publish ${decodedToken.claimData.claimType} to DID document`
               );
 
               await this.iamService.publishPublicClaim(claim.issuedToken);
 
               this.logger.log(
-                `Synced ${decodedToken.claimData.claimType} claim to DID document`,
+                `Synced ${decodedToken.claimData.claimType} claim to DID document`
               );
             }
           }
@@ -124,7 +124,7 @@ export class ClaimListenerService {
       ClaimEventType.ISSUE_CREDENTIAL
     }.claim-exchange.${this.iamService.getDIDAddress()}.${this.configService.get<string>(
       'NATS_ENV_NAME',
-      'ewf-dev',
+      'ewf-dev'
     )}`;
   }
 }

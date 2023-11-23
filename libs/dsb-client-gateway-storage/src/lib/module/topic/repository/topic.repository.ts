@@ -12,7 +12,7 @@ export class TopicRepository extends Repository<TopicEntity> {
    */
   public async getTopicsAndCountByIds(
     topicIds: string[],
-    onlyLatestVersion = false,
+    onlyLatestVersion = false
   ): Promise<[TopicEntity[], number]> {
     const query = this.createQueryBuilder('t');
     query.select('t.*');
@@ -42,7 +42,7 @@ export class TopicRepository extends Repository<TopicEntity> {
     limit: number,
     name: string,
     owner: string,
-    page: number,
+    page: number
   ): Promise<TopicEntity[]> {
     const query = this.createQueryBuilder('t');
     query.select('t.*');
@@ -69,7 +69,7 @@ export class TopicRepository extends Repository<TopicEntity> {
 
   public async getTopicsCountSearch(
     name: string,
-    owner: string,
+    owner: string
   ): Promise<number> {
     const subQuery = this.createQueryBuilder('t');
     subQuery.select('t.*');
@@ -83,7 +83,7 @@ export class TopicRepository extends Repository<TopicEntity> {
 
     const result = await this.query(
       `SELECT COUNT(*) as count FROM (${query}) t`,
-      params,
+      params
     );
 
     if (Array.isArray(result) && result.length) {
@@ -96,7 +96,7 @@ export class TopicRepository extends Repository<TopicEntity> {
   public async getCountOfLatest(
     name: string,
     owner: string,
-    tags: string[],
+    tags: string[]
   ): Promise<number> {
     const subQuery = this.getLatestVersionsQuery(owner, name, tags);
 
@@ -104,7 +104,7 @@ export class TopicRepository extends Repository<TopicEntity> {
 
     const result = await this.query(
       `SELECT COUNT(*) as count FROM (${query}) t`,
-      params,
+      params
     );
 
     if (Array.isArray(result) && result.length) {
@@ -116,14 +116,14 @@ export class TopicRepository extends Repository<TopicEntity> {
 
   public async getOne(
     name: string,
-    owner: string,
+    owner: string
   ): Promise<TopicEntity | null> {
     const query: TopicEntity[] = await this.getLatest(
       1,
       name,
       owner,
       1,
-      undefined,
+      undefined
     );
 
     if (!query.length) {
@@ -138,7 +138,7 @@ export class TopicRepository extends Repository<TopicEntity> {
     name: string,
     owner: string,
     page: number,
-    tags: string[],
+    tags: string[]
   ): Promise<TopicEntity[]> {
     // @TODO - type
     const query = this.getLatestVersionsQuery(owner, name, tags);
@@ -165,7 +165,7 @@ export class TopicRepository extends Repository<TopicEntity> {
   protected getLatestVersionsQuery(
     owner: string,
     name: string,
-    tags: string[],
+    tags: string[]
   ): SelectQueryBuilder<TopicEntity> {
     const qb = this.createQueryBuilder('t');
 

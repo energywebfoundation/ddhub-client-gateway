@@ -14,7 +14,7 @@ interface AutocompleteProps {
   options: any[];
   onChange?: (event: React.SyntheticEvent, value: any) => void;
   onTextChange?: (
-    event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,
+    event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
   ) => void;
   onInputChange?: (event: React.SyntheticEvent, value: string) => void;
   renderOption?: (props: any, option: any) => ReactNode;
@@ -87,7 +87,7 @@ export const Autocomplete: FC<AutocompleteProps> = ({
         }}
         renderInput={(params) => (
           <TextField
-            autoComplete="off"
+            autoComplete='off'
             {...params}
             placeholder={placeholder}
             classes={{ root: classes.autocomplete }}

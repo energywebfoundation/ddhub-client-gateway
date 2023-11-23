@@ -31,7 +31,7 @@ export const useStyles = makeStyles()((theme) => ({
     paddingTop: 16,
     flexGrow: 1,
     paddingLeft: 23,
-    borderLeft: '1px solid #404656',
+    borderLeft: '1px solid #404656'
   },
   channelWrapper: {
     display: 'flex',

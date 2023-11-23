@@ -36,7 +36,7 @@ describe('AWS Secrets Manager Engine', () => {
     smMockClient
       .on(GetSecretValueCommand)
       .rejectsOnce(
-        new ResourceNotFoundException({ Message: 'test', $metadata: {} }),
+        new ResourceNotFoundException({ Message: 'test', $metadata: {} })
       );
 
     const key = await service.getRSAPrivateKey();
@@ -49,7 +49,7 @@ describe('AWS Secrets Manager Engine', () => {
     smMockClient
       .on(PutSecretValueCommand)
       .rejects(
-        new ResourceNotFoundException({ Message: 'test', $metadata: {} }),
+        new ResourceNotFoundException({ Message: 'test', $metadata: {} })
       );
     smMockClient.on(CreateSecretCommand).resolves({
       Name: '/ddhub/rsa_key',
@@ -97,7 +97,7 @@ describe('AWS Secrets Manager Engine', () => {
       new ResourceNotFoundException({
         Message: 'test',
         $metadata: {},
-      }),
+      })
     );
 
     const key = await service.getPrivateKey();
@@ -110,7 +110,7 @@ describe('AWS Secrets Manager Engine', () => {
     smMockClient
       .on(PutSecretValueCommand)
       .rejects(
-        new ResourceNotFoundException({ Message: 'test', $metadata: {} }),
+        new ResourceNotFoundException({ Message: 'test', $metadata: {} })
       );
     smMockClient.on(CreateSecretCommand).resolves({
       Name: '/ddhub/identity/private_key',
@@ -183,13 +183,13 @@ describe('AWS Secrets Manager Engine', () => {
     smMockClient
       .on(GetSecretValueCommand)
       .rejectsOnce(
-        new ResourceNotFoundException({ Message: 'test', $metadata: {} }),
+        new ResourceNotFoundException({ Message: 'test', $metadata: {} })
       )
       .rejectsOnce(
-        new ResourceNotFoundException({ Message: 'test', $metadata: {} }),
+        new ResourceNotFoundException({ Message: 'test', $metadata: {} })
       )
       .rejectsOnce(
-        new ResourceNotFoundException({ Message: 'test', $metadata: {} }),
+        new ResourceNotFoundException({ Message: 'test', $metadata: {} })
       );
     const details = await service.getCertificateDetails();
     expect(details).toBeDefined();
@@ -204,13 +204,13 @@ describe('AWS Secrets Manager Engine', () => {
     smMockClient
       .on(PutSecretValueCommand)
       .rejectsOnce(
-        new ResourceNotFoundException({ Message: 'test', $metadata: {} }),
+        new ResourceNotFoundException({ Message: 'test', $metadata: {} })
       )
       .rejectsOnce(
-        new ResourceNotFoundException({ Message: 'test', $metadata: {} }),
+        new ResourceNotFoundException({ Message: 'test', $metadata: {} })
       )
       .rejectsOnce(
-        new ResourceNotFoundException({ Message: 'test', $metadata: {} }),
+        new ResourceNotFoundException({ Message: 'test', $metadata: {} })
       );
     smMockClient
       .on(CreateSecretCommand)

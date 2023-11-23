@@ -5,7 +5,7 @@ import { FormSelectOption } from '../FormSelect';
 export const useSelectAutocompleteEffects = (
   onChange: (newValue: FormSelectOption[]) => void,
   field: GenericFormField,
-  currentValue: FormSelectOption[] = [],
+  currentValue: FormSelectOption[] = []
 ) => {
   const [textValue, setTextValue] = useState<string>('');
 
@@ -24,7 +24,7 @@ export const useSelectAutocompleteEffects = (
 
   const changeHandler = (
     _event: SyntheticEvent,
-    value: (string | FormSelectOption)[],
+    value: (string | FormSelectOption)[]
   ) => {
     const maxValues = field.multiple ? field.maxValues : 1;
     const slicedValues = value

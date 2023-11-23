@@ -29,7 +29,7 @@ export const topicsModalsInitialState: ITopicsModalsStore = {
 
 export const topicsModalsReducer = (
   state = topicsModalsInitialState,
-  action: TTopicsModalsAction,
+  action: TTopicsModalsAction
 ): ITopicsModalsStore => {
   switch (action.type) {
     case TopicsModalsActionsEnum.SHOW_CREATE_TOPIC:

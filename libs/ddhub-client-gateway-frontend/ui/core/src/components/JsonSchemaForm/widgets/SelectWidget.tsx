@@ -60,7 +60,7 @@ export const SelectWidget = ({
   const selectedIndexes = enumOptionsIndexForValue(
     value,
     enumOptions,
-    multiple,
+    multiple
   );
 
   return (

@@ -7,9 +7,9 @@ import {
   CopyToClipboard,
   GenericTable,
 } from '@ddhub-client-gateway-frontend/ui/core';
-import { Box, Grid, Typography, Stack } from '@mui/material';
+import { Box, Grid, Typography, Stack} from '@mui/material';
 import { useRolesEffects } from './Roles.effects';
-import { didFormatMinifier } from '@ddhub-client-gateway-frontend/ui/utils';
+import {didFormatMinifier} from '@ddhub-client-gateway-frontend/ui/utils';
 import { RoleDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { ROLES_HEADERS } from './roles-headers';
 
@@ -22,13 +22,15 @@ export const Roles: FC = () => {
       <Grid container className={classes.content}>
         <Grid item xs={4}>
           <Box className={classes.infoWrapper}>
-            <Box width={31} height={31}>
-              <RolesIcon />
+            <Box
+              width={31}
+              height={31}>
+              <RolesIcon/>
             </Box>
 
-            <Box display="flex" alignItems="center" mt={3} mb={1.375}>
+            <Box display="flex"  alignItems="center" mt={3} mb={1.375}>
               <Typography className={classes.did}>
-                {didFormatMinifier(info.did)}
+                { didFormatMinifier(info.did) }
               </Typography>
               <CopyToClipboard text={info.did} />
             </Box>
@@ -39,7 +41,7 @@ export const Roles: FC = () => {
               </Typography>
               <Box display="flex">
                 <Typography className={classes.value} variant="body2" noWrap>
-                  {info.namespace}
+                  { info.namespace }
                 </Typography>
               </Box>
             </Stack>
@@ -56,10 +58,10 @@ export const Roles: FC = () => {
             tableRows={info.roles}
             showFooter={true}
             showSearch={false}
-            containerProps={{ style: { boxShadow: 'none' } }}
+            containerProps={{ style: { boxShadow: 'none' }}}
             stripedTable={true}
-            defaultSortBy="namespace"
-            defaultOrder="asc"
+            defaultSortBy='namespace'
+            defaultOrder='asc'
             customStyle={{ tableMinWidth: 'auto' }}
             rowsPerPageOptions={[]}
           />
@@ -69,5 +71,5 @@ export const Roles: FC = () => {
         <CloseButton onClose={closeModal} />
       </Box>
     </Dialog>
-  );
+  )
 };

@@ -1,11 +1,11 @@
 import axios, { AxiosRequestConfig } from 'axios';
 
 export const getWithResponseType = <T>(
-  config: AxiosRequestConfig,
+  config: AxiosRequestConfig
 ): Promise<T> => {
   const source = axios.CancelToken.source();
   const promise = axios({ ...config, cancelToken: source.token }).then(
-    ({ data }) => data as T,
+    ({ data }) => data as T
   );
 
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment

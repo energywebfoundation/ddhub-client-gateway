@@ -49,7 +49,7 @@ export interface GenericFormProps<FormValues = any> {
   hideSubmitButton?: boolean;
   submitHandler: (
     values: FormValues,
-    resetForm: UseFormReset<FieldValues>,
+    resetForm: UseFormReset<FieldValues>
   ) => void;
   validationSchema: yup.AnyObjectSchema;
   initialValues: FormValues;
@@ -83,5 +83,5 @@ type GenericFormEffectsReturnType = {
 };
 
 export type TGenericFormEffects = (
-  props: GenericFormEffectsProps,
+  props: GenericFormEffectsProps
 ) => GenericFormEffectsReturnType;

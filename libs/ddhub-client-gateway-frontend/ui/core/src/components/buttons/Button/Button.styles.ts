@@ -47,7 +47,7 @@ export const useStyles = makeStyles()((theme) => ({
     '&.MuiButton-root': {
       border: `1px solid ${theme.palette.secondary.main}`,
       '&:hover': {
-        background: alpha(theme.palette.secondary.main, 0.04),
+        background: alpha(theme.palette.secondary.main, 0.04)
       },
     },
   },

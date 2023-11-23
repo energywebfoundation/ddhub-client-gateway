@@ -36,7 +36,7 @@ export class AssociationKeysService implements OnApplicationBootstrap {
     protected readonly iamService: IamService,
     protected readonly ddhubLoginService: DdhubLoginService,
     protected readonly retryConfigService: RetryConfigService,
-    protected readonly ddhubChannelStreamService: DdhubChannelStreamService,
+    protected readonly ddhubChannelStreamService: DdhubChannelStreamService
   ) {}
 
   public async updateKeySharedState(keys: string[]): Promise<void> {
@@ -47,7 +47,7 @@ export class AssociationKeysService implements OnApplicationBootstrap {
       {
         isShared: true,
         sharedDate: new Date(),
-      },
+      }
     );
   }
 
@@ -157,7 +157,7 @@ export class AssociationKeysService implements OnApplicationBootstrap {
 
     const associationKeyInterval: number = this.configService.get<number>(
       'ASSOCIATION_KEY_INTERVAL',
-      24,
+      24
     );
 
     const [firstIterationKey, secondIterationKey]: [number, number] = [
@@ -168,17 +168,17 @@ export class AssociationKeysService implements OnApplicationBootstrap {
     if (!currentKey) {
       const currentKeyValidity = moment(forDate).add(
         associationKeyInterval,
-        'hours',
+        'hours'
       );
 
       const key: Bip39KeySet = await this.bip39Service.deriveKey(
         mnemonic,
         firstIterationKey,
-        secondIterationKey,
+        secondIterationKey
       );
 
       this.logger.log(
-        `creating new current association key with ${firstIterationKey}_${secondIterationKey} iteration`,
+        `creating new current association key with ${firstIterationKey}_${secondIterationKey} iteration`
       );
 
       currentKey = await this.wrapper.repository.save({
@@ -198,7 +198,7 @@ export class AssociationKeysService implements OnApplicationBootstrap {
 
     const nextIterationDate: moment.Moment = moment(currentKey.validTo).add(
       associationKeyInterval,
-      'hours',
+      'hours'
     );
 
     const hasNextKey: AssociationKeyEntity | undefined =
@@ -211,7 +211,7 @@ export class AssociationKeysService implements OnApplicationBootstrap {
 
     if (hasNextKey) {
       this.logger.log(
-        `next key exists for iteration ${nextFirstIterationKey}_${nextSecondIterationKey}`,
+        `next key exists for iteration ${nextFirstIterationKey}_${nextSecondIterationKey}`
       );
 
       return;
@@ -220,11 +220,11 @@ export class AssociationKeysService implements OnApplicationBootstrap {
     const key: Bip39KeySet = await this.bip39Service.deriveKey(
       mnemonic,
       nextFirstIterationKey,
-      nextSecondIterationKey,
+      nextSecondIterationKey
     );
 
     this.logger.log(
-      `creating new current association key with ${nextFirstIterationKey}_${nextSecondIterationKey} iteration`,
+      `creating new current association key with ${nextFirstIterationKey}_${nextSecondIterationKey} iteration`
     );
 
     const nextKey: AssociationKeyEntity = await this.wrapper.repository.save({
@@ -247,7 +247,7 @@ export class AssociationKeysService implements OnApplicationBootstrap {
   protected async initKeyChannel(key: AssociationKeyEntity): Promise<void> {
     await promiseRetry(async (retry, number) => {
       this.logger.log(
-        `attempting to init ext channel for key ${key.associationKey}, attempt number #${number}`,
+        `attempting to init ext channel for key ${key.associationKey}, attempt number #${number}`
       );
 
       const result = await this.ddhubLoginService
@@ -267,7 +267,7 @@ export class AssociationKeysService implements OnApplicationBootstrap {
         (!result && result == false)
       ) {
         this.logger.error(
-          `association key ${key.associationKey} external channel failed`,
+          `association key ${key.associationKey} external channel failed`
         );
         this.logger.error(result);
 
@@ -310,7 +310,7 @@ export class AssociationKeysService implements OnApplicationBootstrap {
   public async emitKey(key: AssociationKeyEntity): Promise<void> {
     await promiseRetry(async (retry, number) => {
       this.logger.log(
-        `attempting to emit key ${key.associationKey}, attempt number #${number}`,
+        `attempting to emit key ${key.associationKey}, attempt number #${number}`
       );
 
       const result = await this.ddhubLoginService
@@ -330,7 +330,7 @@ export class AssociationKeysService implements OnApplicationBootstrap {
         (!result && result == false)
       ) {
         this.logger.error(
-          `association key ${key.associationKey} external channel failed`,
+          `association key ${key.associationKey} external channel failed`
         );
         this.logger.error(result);
 
@@ -352,7 +352,7 @@ export class AssociationKeysService implements OnApplicationBootstrap {
 
   public async clearOldKeys(): Promise<void> {
     const offset: number = this.configService.get<number>(
-      'ASSOCIATION_KEY_OFFSET',
+      'ASSOCIATION_KEY_OFFSET'
     );
 
     const keysToDelete: AssociationKeyEntity[] =
@@ -370,7 +370,7 @@ export class AssociationKeysService implements OnApplicationBootstrap {
         });
       } catch (e) {
         this.logger.error(
-          `delete association key ${key.associationKey} failed`,
+          `delete association key ${key.associationKey} failed`
         );
         this.logger.error(e);
       }

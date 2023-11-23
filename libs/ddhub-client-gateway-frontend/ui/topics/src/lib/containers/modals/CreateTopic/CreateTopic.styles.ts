@@ -23,7 +23,7 @@ export const useStyles = makeStyles()((theme) => ({
     '&:hover': {
       border: `1px solid ${alpha(theme.palette.secondary.main, 0.5)}`,
       background: alpha(theme.palette.secondary.main, 0.04),
-    },
+    }
   },
   confirmButton: {
     width: 75,

@@ -38,11 +38,7 @@ export const CreateTopic: FC = () => {
   } = useCreateTopicEffects();
 
   return (
-    <Dialog
-      open={open}
-      onClose={openCancelModal}
-      paperClassName={classes.paper}
-    >
+    <Dialog open={open} onClose={openCancelModal} paperClassName={classes.paper}>
       <DialogTitle>Create topic</DialogTitle>
       <form onSubmit={onSubmit}>
         <DialogContent sx={{ padding: 0 }}>

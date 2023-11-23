@@ -16,7 +16,7 @@ export class UserGuard implements CanActivate {
 
   constructor(
     protected readonly userAuthService: UserAuthService,
-    protected readonly reflector: Reflector,
+    protected readonly reflector: Reflector
   ) {}
 
   public async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -30,7 +30,7 @@ export class UserGuard implements CanActivate {
 
     const excludedRoute: boolean = this.reflector.get<boolean>(
       EXCLUDED_ROUTE,
-      context.getHandler(),
+      context.getHandler()
     );
 
     if (excludedRoute === true) {
@@ -56,7 +56,7 @@ export class UserGuard implements CanActivate {
 
         const requiredRoles = this.reflector.get<string[]>(
           ROLES_KEY,
-          context.getHandler(),
+          context.getHandler()
         );
 
         return requiredRoles.some((role) => role === decodedToken.accountType);

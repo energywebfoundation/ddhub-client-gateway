@@ -35,7 +35,7 @@ export const Summary = ({
   }
   const { classes } = useStyles();
   const { countRestrictions, getSelectedResponseTopics } = useSummaryEffects(
-    channelValues.conditions?.responseTopics || [],
+    channelValues.conditions?.responseTopics || []
   );
   const restrictionCount = countRestrictions(channelValues?.conditions);
   const restrictionRoles = clone(channelValues.conditions.roles);

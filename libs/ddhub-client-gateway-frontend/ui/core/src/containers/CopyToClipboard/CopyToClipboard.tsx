@@ -40,7 +40,7 @@ export const CopyToClipboard: FC<CopyToClipboardProps> = memo(
         </ReactCopyToClipboard>
       </Box>
     );
-  },
+  }
 );
 
 CopyToClipboard.displayName = 'CopyToClipboard';

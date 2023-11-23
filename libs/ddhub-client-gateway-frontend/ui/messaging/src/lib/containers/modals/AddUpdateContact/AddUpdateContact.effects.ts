@@ -20,7 +20,7 @@ export const useAddUpdateContactEffects = () => {
   const addressBookContext = useContext(AddressBookContext);
   if (!addressBookContext) {
     throw new Error(
-      '[useAddUpdateContactEffects] AddressBookContext provider not available',
+      '[useAddUpdateContactEffects] AddressBookContext provider not available'
     );
   }
   const queryClient = useQueryClient();
@@ -47,7 +47,7 @@ export const useAddUpdateContactEffects = () => {
       } else {
         setIsValid(true);
       }
-    }, 300),
+    }, 300)
   ).current;
 
   useEffect(() => {
@@ -158,7 +158,7 @@ export const useAddUpdateContactEffects = () => {
       } contact.`,
     });
     queryClient.invalidateQueries(
-      getAddressBookControllerGetAllContactsQueryKey(),
+      getAddressBookControllerGetAllContactsQueryKey()
     );
     if (addressBookContext) {
       addressBookContext

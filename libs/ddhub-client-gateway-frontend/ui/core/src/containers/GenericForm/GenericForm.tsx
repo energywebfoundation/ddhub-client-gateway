@@ -68,7 +68,7 @@ export const GenericForm: FC<GenericFormProps> = memo(
                 variant={inputsVariant}
                 {...formInputsProps}
               />
-            ),
+            )
         )}
         {children}
         <Box
@@ -104,5 +104,5 @@ export const GenericForm: FC<GenericFormProps> = memo(
         </Box>
       </form>
     );
-  },
+  }
 );

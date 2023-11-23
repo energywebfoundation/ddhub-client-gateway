@@ -11,7 +11,7 @@ export const useRemoveContact = () => {
   const addressBookContext = useContext(AddressBookContext);
   if (!addressBookContext) {
     throw new Error(
-      '[useRemoveContact] AddressBookContext provider not available',
+      '[useRemoveContact] AddressBookContext provider not available'
     );
   }
   const queryClient = useQueryClient();
@@ -24,7 +24,7 @@ export const useRemoveContact = () => {
       text: 'You have successfully deleted the contact',
     });
     queryClient.invalidateQueries(
-      getAddressBookControllerGetAllContactsQueryKey(),
+      getAddressBookControllerGetAllContactsQueryKey()
     );
     if (addressBookContext) {
       addressBookContext
@@ -54,7 +54,7 @@ export const useRemoveContact = () => {
       {
         onSuccess: removeContactSuccess,
         onError: removeContactError,
-      },
+      }
     );
   };
 

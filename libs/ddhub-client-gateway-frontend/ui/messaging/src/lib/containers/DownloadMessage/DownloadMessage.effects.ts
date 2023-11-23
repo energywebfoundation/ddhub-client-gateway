@@ -1,7 +1,4 @@
-import {
-  useDownloadMessage,
-  TDownloadData,
-} from '@ddhub-client-gateway-frontend/ui/api-hooks';
+import { useDownloadMessage, TDownloadData } from '@ddhub-client-gateway-frontend/ui/api-hooks';
 import { DownloadMessageProps } from './DownloadMessage';
 import { parsePayload } from '../../utils';
 
@@ -18,7 +15,7 @@ export const useDownloadMessageEffects = ({ value }: DownloadMessageProps) => {
 
   const data: TDownloadData = {
     fileId,
-    contentType: value.contentType,
+    contentType: value.contentType
   };
 
   return {

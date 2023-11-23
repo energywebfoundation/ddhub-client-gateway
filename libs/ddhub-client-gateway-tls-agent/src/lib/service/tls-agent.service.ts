@@ -10,7 +10,7 @@ export class TlsAgentService implements OnApplicationBootstrap {
 
   constructor(
     protected readonly secretsEngineService: SecretsEngineService,
-    protected readonly configService: ConfigService,
+    protected readonly configService: ConfigService
   ) {}
 
   public async onApplicationBootstrap(): Promise<void> {
@@ -33,9 +33,7 @@ export class TlsAgentService implements OnApplicationBootstrap {
       await this.secretsEngineService.getCertificateDetails();
 
     if (!certificateDetails) {
-      this.logger.debug(
-        'Not creating HTTPS agent: no stored certificate details',
-      );
+      this.logger.debug('Not creating HTTPS agent: no stored certificate details');
 
       return undefined;
     }

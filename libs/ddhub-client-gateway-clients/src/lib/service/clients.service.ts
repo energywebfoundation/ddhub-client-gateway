@@ -21,7 +21,7 @@ export class ClientsService {
     protected readonly wrapper: ClientWrapperRepository,
     protected readonly ddhubConfigService: DdhubConfigService,
     protected readonly ddhubClientsService: DdhubClientsService,
-    protected readonly iamService: IamService,
+    protected readonly iamService: IamService
   ) {}
 
   @Span('clients_sync')
@@ -30,7 +30,7 @@ export class ClientsService {
 
     if (!did) {
       this.logger.error(
-        `failing to sync clients due to not initialized iam service`,
+        `failing to sync clients due to not initialized iam service`
       );
 
       return;
@@ -38,7 +38,7 @@ export class ClientsService {
 
     const clients: string[] = await this.ddhubClientsService.getClients();
     const existingClients: ClientEntity[] = await this.wrapper.repository.find(
-      {},
+      {}
     );
 
     for (const clientId of clients) {
@@ -46,7 +46,7 @@ export class ClientsService {
 
       const matchingClient: ClientEntity | undefined = existingClients.find(
         (clientEntity: ClientEntity) =>
-          clientEntity.clientId === clientWithRemovedDid,
+          clientEntity.clientId === clientWithRemovedDid
       );
 
       if (matchingClient) {
@@ -84,7 +84,7 @@ export class ClientsService {
       },
       {
         clientId,
-      },
+      }
     );
   }
 
@@ -144,7 +144,7 @@ export class ClientsService {
       this.logger.log(`failed to create client ${clientId}`);
 
       throw new MaximumNumberOfClientsReachedException(
-        config.natsMaxClientidSize,
+        config.natsMaxClientidSize
       );
     }
 
@@ -158,7 +158,7 @@ export class ClientsService {
       .catch((e) => {
         if (e?.code === '23505') {
           this.logger.warn(
-            `Duplicate clientid ${clientId} detected. No need save to db.`,
+            `Duplicate clientid ${clientId} detected. No need save to db.`
           );
         } else {
           throw e;

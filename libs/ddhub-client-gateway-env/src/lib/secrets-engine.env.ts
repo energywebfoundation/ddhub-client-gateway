@@ -38,7 +38,7 @@ export const SECRETS_ENGINE_ENV = Joi.object({
   SECRET_PREFIX: Joi.string().default('ddhub/'),
   AWS_REGION: awsEnabled(
     Joi.string().default('ap-southeast-2'),
-    'AWS Secrets Manager region',
+    'AWS Secrets Manager region'
   ),
   AZURE_VAULT_URL: azureEnabled(Joi.string().required(), 'Azure Vault URL'),
 });

@@ -13,7 +13,7 @@ export const useEditorEffects = ({ showPlaceholder }: TUseEditorEffects) => {
   const monacoRef = useRef<monaco.editor.IStandaloneCodeEditor>();
 
   const handleEditorDidMount = (
-    editor: monaco.editor.IStandaloneCodeEditor,
+    editor: monaco.editor.IStandaloneCodeEditor
   ) => {
     setIsEditorReady(true);
     monacoRef.current = editor;

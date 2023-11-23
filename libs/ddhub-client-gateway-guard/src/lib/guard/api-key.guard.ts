@@ -14,7 +14,7 @@ export class ApiKeyGuard implements CanActivate {
 
   constructor(
     protected readonly configService: ConfigService,
-    protected readonly userGuard: UserGuard,
+    protected readonly userGuard: UserGuard
   ) {
     const credentials: Array<string | undefined> = [
       this.configService.get<string | undefined>('API_KEY'),
@@ -79,7 +79,7 @@ export class ApiKeyGuard implements CanActivate {
 
     const decodedPassword: string = new Buffer(
       passwordFromHeaders,
-      'base64',
+      'base64'
     ).toString('ascii');
 
     return usernameFromHeaders === username && decodedPassword === password;

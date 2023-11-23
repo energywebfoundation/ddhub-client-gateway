@@ -30,7 +30,7 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
     await Promise.all(
       Object.values(PATHS).map(async (path) => {
         await this.client.delete(`${this.prefix}${path}`);
-      }),
+      })
     );
   }
 
@@ -81,7 +81,7 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
   @Span('vault_setUserAuthDetails')
   public async setUserPassword(
     username: string,
-    password: string,
+    password: string
   ): Promise<void> {
     this.logger.log('Attempting to write user');
 
@@ -186,7 +186,7 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
 
   @Span('vault_setRSAKey')
   public async setRSAPrivateKey(
-    privateKey: string,
+    privateKey: string
   ): Promise<SetRSAPrivateKeyResponse> {
     this.logger.log('Attempting to write private RSA key');
 
@@ -218,12 +218,12 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
   }
 
   public async setCertificateDetails(
-    certificateDetails: CertificateDetails,
+    certificateDetails: CertificateDetails
   ): Promise<null> {
     this.logger.log('saving certificate to vault');
     await this.client.write(
       `${this.prefix}${PATHS.CERTIFICATE}`,
-      certificateDetails,
+      certificateDetails
     );
 
     this.logger.log('certificates successfully saved to the vault');

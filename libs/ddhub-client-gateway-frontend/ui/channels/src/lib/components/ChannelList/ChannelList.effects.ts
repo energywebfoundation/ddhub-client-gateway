@@ -16,7 +16,7 @@ export const useChannelListEffects = () => {
   const addressBookContext = useContext(AddressBookContext);
   if (!addressBookContext) {
     throw new Error(
-      '[useChannelListEffects] AddressBookContext provider not available',
+      '[useChannelListEffects] AddressBookContext provider not available'
     );
   }
   const { channels, isLoading, channelsLoaded } = useChannels();
@@ -68,8 +68,7 @@ export const useChannelListEffects = () => {
       onClick: (channel: GetChannelResponseDto) =>
         removeChannelHandler(
           channel.fqcn,
-          channel.messageForms &&
-            channel.type === GetChannelResponseDtoType.pub,
+          channel.messageForms && channel.type === GetChannelResponseDtoType.pub
         ),
     },
   ];

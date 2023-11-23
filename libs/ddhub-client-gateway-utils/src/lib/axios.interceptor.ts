@@ -10,7 +10,7 @@ import { VersionService } from '@dsb-client-gateway/ddhub-client-gateway-version
 export const useInterceptors = (
   httpService: HttpService,
   logger: Logger,
-  versionService: VersionService,
+  versionService: VersionService
 ) => {
   httpService.axiosRef.interceptors.request.use(
     (config: AxiosRequestConfig) => {
@@ -18,7 +18,7 @@ export const useInterceptors = (
       config.headers['X-DDHUB-Client-Version'] = versionService.getVersion();
 
       return config;
-    },
+    }
   );
 
   httpService.axiosRef.interceptors.response.use(
@@ -40,6 +40,6 @@ export const useInterceptors = (
       logger.debug(JSON.stringify(errorObject));
 
       return Promise.reject(err);
-    },
+    }
   );
 };

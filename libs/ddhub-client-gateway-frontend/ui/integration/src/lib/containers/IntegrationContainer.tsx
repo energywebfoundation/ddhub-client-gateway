@@ -1,11 +1,7 @@
 import { Grid } from '@mui/material';
 import React from 'react';
 import { ApiBox } from '../components/ApiBox';
-import {
-  IeeeApi,
-  RestApi,
-  WebSocketApi,
-} from '@ddhub-client-gateway-frontend/ui/core';
+import { IeeeApi, RestApi, WebSocketApi } from '@ddhub-client-gateway-frontend/ui/core';
 import { useIntegrationContainerEffects } from './IntegrationContainer.effects';
 
 export const IntegrationContainer = () => {

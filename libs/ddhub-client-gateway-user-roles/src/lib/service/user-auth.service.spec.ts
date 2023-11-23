@@ -74,7 +74,7 @@ describe(`${UserAuthService.name}`, () => {
         expect(mockConfigService.get).toBeCalledTimes(1);
         expect(mockConfigService.get).toBeCalledWith(
           'USER_AUTH_ENABLED',
-          false,
+          false
         );
       });
     });
@@ -101,7 +101,7 @@ describe(`${UserAuthService.name}`, () => {
         expect(mockConfigService.get).toBeCalledTimes(1);
         expect(mockConfigService.get).toBeCalledWith(
           'USER_AUTH_ENABLED',
-          false,
+          false
         );
       });
     });
@@ -131,13 +131,13 @@ describe(`${UserAuthService.name}`, () => {
         expect(mockConfigService.get).toBeCalledTimes(1);
         expect(mockConfigService.get).toBeCalledWith(
           'USER_AUTH_ENABLED',
-          false,
+          false
         );
       });
 
       it('should not execute', () => {
         expect(error.message).toBe(
-          'User does not exist or password is incorrect',
+          'User does not exist or password is incorrect'
         );
         expect(result).toBeNull();
       });
@@ -145,7 +145,7 @@ describe(`${UserAuthService.name}`, () => {
       it('should call secrets engine to obtain user information', () => {
         expect(mockSecretsEngineService.getUserAuthDetails).toBeCalledTimes(1);
         expect(mockSecretsEngineService.getUserAuthDetails).toBeCalledWith(
-          'admin',
+          'admin'
         );
       });
 
@@ -180,7 +180,7 @@ describe(`${UserAuthService.name}`, () => {
         expect(mockConfigService.get).toBeCalledTimes(1);
         expect(mockConfigService.get).toBeCalledWith(
           'USER_AUTH_ENABLED',
-          false,
+          false
         );
       });
 
@@ -192,7 +192,7 @@ describe(`${UserAuthService.name}`, () => {
       it('should call secrets engine to obtain user information', () => {
         expect(mockSecretsEngineService.getUserAuthDetails).toBeCalledTimes(1);
         expect(mockSecretsEngineService.getUserAuthDetails).toBeCalledWith(
-          'admin',
+          'admin'
         );
       });
 
@@ -200,7 +200,7 @@ describe(`${UserAuthService.name}`, () => {
         expect(mockUserRolesTokenService.generateTokens).toBeCalledTimes(1);
         expect(mockUserRolesTokenService.generateTokens).toBeCalledWith(
           'admin',
-          UserRole.ADMIN,
+          UserRole.ADMIN
         );
       });
     });
@@ -224,13 +224,13 @@ describe(`${UserAuthService.name}`, () => {
         expect(mockConfigService.get).toBeCalledTimes(1);
         expect(mockConfigService.get).toBeCalledWith(
           'USER_AUTH_ENABLED',
-          false,
+          false
         );
       });
 
       it('should throw error', () => {
         expect(error.message).toBe(
-          'User does not exist or password is incorrect',
+          'User does not exist or password is incorrect'
         );
         expect(result).toBeNull();
       });
@@ -238,7 +238,7 @@ describe(`${UserAuthService.name}`, () => {
       it('should call secrets engine to obtain user information', () => {
         expect(mockSecretsEngineService.getUserAuthDetails).toBeCalledTimes(1);
         expect(mockSecretsEngineService.getUserAuthDetails).toBeCalledWith(
-          'username',
+          'username'
         );
       });
 
@@ -262,7 +262,7 @@ describe(`${UserAuthService.name}`, () => {
         expect(mockConfigService.get).toBeCalledTimes(1);
         expect(mockConfigService.get).toBeCalledWith(
           'USER_AUTH_ENABLED',
-          false,
+          false
         );
       });
 

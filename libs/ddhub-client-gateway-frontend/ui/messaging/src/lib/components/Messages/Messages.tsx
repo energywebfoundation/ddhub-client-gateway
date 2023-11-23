@@ -1,11 +1,7 @@
 import { FC } from 'react';
 import { Stack, Box } from '@mui/material';
 import { ChannelInfo } from '@ddhub-client-gateway-frontend/ui/channels';
-import {
-  GenericTable,
-  TTableComponentAction,
-  TableHeader,
-} from '@ddhub-client-gateway-frontend/ui/core';
+import { GenericTable, TTableComponentAction, TableHeader } from '@ddhub-client-gateway-frontend/ui/core';
 import { useMessagesEffects } from './Messages.effects';
 import { TMessage } from './Messages.type';
 
@@ -15,11 +11,7 @@ export interface MessageProps {
   openDetailsModal?: (message: TMessage) => void;
 }
 
-export const Messages: FC<MessageProps> = ({
-  actions,
-  headers,
-  openDetailsModal,
-}) => {
+export const Messages: FC<MessageProps> = ({ actions, headers, openDetailsModal }) => {
   const { channel, topic, messages, loading } = useMessagesEffects();
 
   return (

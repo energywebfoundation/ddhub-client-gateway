@@ -323,7 +323,7 @@ describe(`${AzureKeyVaultService.name}`, () => {
                 },
               ],
             }),
-        }),
+        })
       );
 
     const response = await service.getAllUsers();
@@ -351,7 +351,7 @@ describe(`${AzureKeyVaultService.name}`, () => {
                 },
               ],
             }),
-        }),
+        })
       );
 
     const response = await service.getAllUsers();

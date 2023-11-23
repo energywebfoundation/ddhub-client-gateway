@@ -15,7 +15,9 @@ export function ResetPrivateKey() {
       onClick={() => resetPrivateKeyHandler()}
       fullWidth
     >
-      <Typography variant="body2">Reset private key</Typography>
+      <Typography variant="body2">
+        Reset private key
+      </Typography>
     </Button>
   );
 }

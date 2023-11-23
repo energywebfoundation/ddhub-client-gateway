@@ -21,7 +21,10 @@ export const useUpdateTopics = (canUpdateSchema: boolean) => {
     Swal.httpError(err);
   };
 
-  const updateTopic = (topic: PostTopicDto, onSuccess: () => void) => {
+  const updateTopic = (
+    topic: PostTopicDto,
+    onSuccess: () => void,
+  ) => {
     const { id, tags } = topic;
     mutateTopic(
       {
@@ -31,11 +34,14 @@ export const useUpdateTopics = (canUpdateSchema: boolean) => {
       {
         onSuccess,
         onError: updateError,
-      },
+      }
     );
   };
 
-  const updateTopicByVersion = (topic: PostTopicDto, onSuccess: () => void) => {
+  const updateTopicByVersion = (
+    topic: PostTopicDto,
+    onSuccess: () => void,
+  ) => {
     const { id, version, schema } = topic;
     mutateTopicByVersion(
       {
@@ -46,7 +52,7 @@ export const useUpdateTopics = (canUpdateSchema: boolean) => {
       {
         onSuccess,
         onError: updateError,
-      },
+      }
     );
   };
 

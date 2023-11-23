@@ -38,7 +38,7 @@ export const useRestrictionListEffects = ({
   const addressBookContext = useContext(AddressBookContext);
   if (!addressBookContext) {
     throw new Error(
-      '[useRestrictionListEffects] AddressBookContext provider not available',
+      '[useRestrictionListEffects] AddressBookContext provider not available'
     );
   }
   const [expanded, setExpanded] = useState<string | false>(false);
@@ -63,13 +63,13 @@ export const useRestrictionListEffects = ({
         // Enable Address Book
         setDIDRestrictionValue(
           RestrictionFieldNames.DID_SOURCE,
-          DIDSource.ADDRESS_BOOK,
+          DIDSource.ADDRESS_BOOK
         );
         setDIDRestrictionValue(RestrictionFieldNames.ADDRESS_BOOK, selectValue);
       } else {
         setDIDRestrictionValue(
           RestrictionFieldNames.DID_SOURCE,
-          DIDSource.MANUAL_INPUT,
+          DIDSource.MANUAL_INPUT
         );
         setDIDInput(selectValue);
       }

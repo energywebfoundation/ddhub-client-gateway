@@ -16,8 +16,7 @@ import { useStyles } from './Details.styles';
 
 export const Details: FC = () => {
   const { classes } = useStyles();
-  const { open, closeModal, details, downloadMessage, parsedPayload } =
-    useDetailsEffects();
+  const { open, closeModal, details, downloadMessage, parsedPayload } = useDetailsEffects();
   return (
     <Dialog open={open} onClose={closeModal} paperClassName={classes.paper}>
       <DialogContent sx={{ padding: 0 }}>

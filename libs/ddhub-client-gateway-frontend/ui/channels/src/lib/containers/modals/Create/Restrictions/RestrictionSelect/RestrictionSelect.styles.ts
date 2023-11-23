@@ -37,7 +37,7 @@ export const useStyles = makeStyles()((theme) => ({
     '&:hover': {
       backgroundColor: alpha(theme.palette.primary.main, 0.04),
       border: `1px solid ${theme.palette.primary.main}`,
-    },
+    }
   },
   buttonText: {
     fontSize: 14,

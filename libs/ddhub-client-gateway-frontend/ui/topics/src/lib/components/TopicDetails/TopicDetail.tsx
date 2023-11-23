@@ -29,9 +29,7 @@ export const TopicDetail: FC<TopicDetailProps> = ({ topic, field }) => {
           </Box>
         ) : (
           <Box display="flex">
-            <Typography className={classes.detailsInfoValue}>
-              {value}
-            </Typography>
+            <Typography className={classes.detailsInfoValue}>{value}</Typography>
           </Box>
         )}
       </Stack>

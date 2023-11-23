@@ -22,10 +22,7 @@ export const DownloadMessage: FC<DownloadMessageProps> = ({ value }) => {
           sx={{ color: theme.palette.primary.main }}
         />
       ) : (
-        <IconButton
-          sx={{ padding: 0 }}
-          onClick={() => downloadMessageHandler(data)}
-        >
+        <IconButton sx={{ padding: 0 }} onClick={() => downloadMessageHandler(data)}>
           <Download className={classes.icon} />
         </IconButton>
       )}

@@ -61,7 +61,7 @@ export const useDIDRestrictionEffects = (currentDids: string[]) => {
   const addressBookContext = useContext(AddressBookContext);
   if (!addressBookContext) {
     throw new Error(
-      '[useDIDRestrictionEffects] AddressBookContext provider not available',
+      '[useDIDRestrictionEffects] AddressBookContext provider not available'
     );
   }
   const [dids, setDids] = useState<string[]>(currentDids);
@@ -77,7 +77,7 @@ export const useDIDRestrictionEffects = (currentDids: string[]) => {
       } else {
         setIsValid(true);
       }
-    }, 300),
+    }, 300)
   ).current;
 
   useEffect(() => {
@@ -111,7 +111,7 @@ export const useDIDRestrictionEffects = (currentDids: string[]) => {
   const updateDID = (
     type: RestrictionType,
     oldValue: string,
-    newValue: string,
+    newValue: string
   ) => {
     const filteredDids = dids.filter((did) => did !== oldValue);
 
@@ -154,7 +154,7 @@ export const useDIDRestrictionEffects = (currentDids: string[]) => {
           });
         }
         return !exists;
-      },
+      }
     );
 
     if (selectedDIDSource === DIDSource.ADDRESS_BOOK) {

@@ -4,18 +4,18 @@ import { Queries, routerConst } from '@ddhub-client-gateway-frontend/ui/utils';
 import { useRouter } from 'next/router';
 import { replace } from 'lodash';
 
-type TBreadcrumbs = { title: string; imageUrl?: string; path?: string }[];
+type TBreadcrumbs = { title: string; imageUrl?: string, path?: string }[];
 
 export const useBreadcrumbsEffects = (): TBreadcrumbs => {
   const router = useRouter();
 
   const getUsedRoleForApplication = router.pathname.includes(
-    routerConst.Channels,
+    routerConst.Channels
   )
     ? 'user'
     : undefined;
   const { applicationsByNamespace } = useCachedApplications(
-    getUsedRoleForApplication,
+    getUsedRoleForApplication
   );
 
   const pathName = router.pathname;
@@ -40,11 +40,7 @@ export const useBreadcrumbsEffects = (): TBreadcrumbs => {
         const topicId = router.query[Queries.TopicId] as string;
 
         if (application?.namespace) {
-          itemPath = replace(
-            itemPath,
-            `[${Queries.Namespace}]`,
-            application?.namespace,
-          );
+          itemPath = replace(itemPath, `[${Queries.Namespace}]`, application?.namespace);
         }
 
         if (fqcn) {
