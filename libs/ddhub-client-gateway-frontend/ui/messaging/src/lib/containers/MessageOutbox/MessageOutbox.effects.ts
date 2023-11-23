@@ -49,11 +49,21 @@ export const useMessageOutboxEffects = () => {
   };
 
   const openRecipientListModal = (data: GetSentMessageResponseDto) => {
+    const modifiedRecipientFormat = data.recipients.map((recipient) => {
+      return {
+        ...recipient,
+        did: addressBookContext.getAliasOrMinifiedDid(recipient.did),
+      };
+    });
+
     dispatch({
       type: ModalActionsEnum.SHOW_RECIPIENT_LIST,
       payload: {
         open: true,
-        data: data,
+        data: {
+          ...data,
+          recipients: modifiedRecipientFormat,
+        },
       },
     });
   };
@@ -67,16 +77,7 @@ export const useMessageOutboxEffects = () => {
     {
       label: 'View recipients',
       onClick: (message: GetSentMessageResponseDto) => {
-        const recipients = message.recipients.map((recipient) => {
-          return {
-            ...recipient,
-            did: addressBookContext.getAliasOrMinifiedDid(recipient.did),
-          };
-        });
-        openRecipientListModal({
-          ...message,
-          recipients,
-        });
+        openRecipientListModal(message);
       },
     },
   ];
