@@ -3,6 +3,7 @@ import { Box, Stack, Typography } from '@mui/material';
 import { useStyles } from './MessageInboxDetails.styles';
 import { CopyToClipboard } from '@ddhub-client-gateway-frontend/ui/core';
 import { capitalize, isObject } from 'lodash';
+import { DateTime } from 'luxon';
 
 interface MessageDetailProps {
   field: {
@@ -20,6 +21,11 @@ export const MessageDetail: FC<MessageDetailProps> = ({
 }: MessageDetailProps) => {
   const { classes } = useStyles();
   let valueFieldText = field.value;
+  const valueAsDateTime = DateTime.fromISO(valueFieldText);
+  if (valueAsDateTime.isValid) {
+    valueFieldText = valueAsDateTime.toFormat('dd/MM/yyyy HH:mm:ss');
+  }
+
   const parsedArrayItem: any[] = [];
   let payloadArray: any[] = [];
 

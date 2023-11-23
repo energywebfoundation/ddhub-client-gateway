@@ -3,6 +3,7 @@ import { SchemaNotValidException } from '../../../message/exceptions/schema-not-
 import { SchemaType } from '../../../message/message.const';
 import addFormats from 'ajv-formats';
 import { MalformedJSONException } from '../../../message/exceptions/malformed-json.exception';
+import { DateTime } from 'luxon';
 
 export function IsSchemaValid(
   schemaType: string,
@@ -47,6 +48,12 @@ function validateJSONSchema(schema: object, payload: string) {
       'binary',
     ],
     keywords: true,
+  });
+  ajv.addFormat('local-date-time', {
+    type: 'string',
+    validate: (value: string): boolean => {
+      return DateTime.fromISO(value).isValid;
+    },
   });
 
   let validate;
