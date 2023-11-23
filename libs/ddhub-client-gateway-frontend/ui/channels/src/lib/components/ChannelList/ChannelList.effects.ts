@@ -3,14 +3,22 @@ import {
   useRemoveChannel,
 } from '@ddhub-client-gateway-frontend/ui/api-hooks';
 import { TTableComponentAction } from '@ddhub-client-gateway-frontend/ui/core';
+import { AddressBookContext } from '@ddhub-client-gateway-frontend/ui/login';
 import { theme } from '@ddhub-client-gateway-frontend/ui/utils';
 import {
   GetChannelResponseDto,
   GetChannelResponseDtoType,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
+import { useContext } from 'react';
 import { ModalActionsEnum, useModalDispatch } from '../../context';
 
 export const useChannelListEffects = () => {
+  const addressBookContext = useContext(AddressBookContext);
+  if (!addressBookContext) {
+    throw new Error(
+      '[useChannelListEffects] AddressBookContext provider not available'
+    );
+  }
   const { channels, isLoading, channelsLoaded } = useChannels();
   const dispatch = useModalDispatch();
 
@@ -65,8 +73,25 @@ export const useChannelListEffects = () => {
     },
   ];
 
+  const mutatedChannels = channels.map((channel) => {
+    const didsAlias: string[] = [];
+    if (channel.conditions.dids) {
+      channel.conditions.dids.forEach((did) => {
+        didsAlias.push(addressBookContext.getAliasOrMinifiedDid(did));
+      });
+    }
+
+    return {
+      ...channel,
+      conditions: {
+        ...channel.conditions,
+        didsAlias,
+      },
+    };
+  });
+
   return {
-    channels,
+    channels: mutatedChannels,
     isLoading,
     onCreateHandler,
     actions,

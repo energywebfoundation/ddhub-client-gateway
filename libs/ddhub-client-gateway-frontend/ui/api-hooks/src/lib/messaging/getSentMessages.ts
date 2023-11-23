@@ -5,12 +5,20 @@ import {
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { useCustomAlert } from '@ddhub-client-gateway-frontend/ui/core';
 import { useQueryClient } from 'react-query';
+import { useContext } from 'react';
+import { AddressBookContext } from '@ddhub-client-gateway-frontend/ui/login';
 
 export const useSentMessages = (
   params?: MessageControllerGetSentMessagesParams,
   isRelatedMessage?: boolean
 ) => {
   const Swal = useCustomAlert();
+  const addressBookContext = useContext(AddressBookContext);
+  if (!addressBookContext) {
+    throw new Error(
+      '[useSentMessages] AddressBookContext provider not available'
+    );
+  }
   const queryClient = useQueryClient();
 
   let enabled;
@@ -39,9 +47,16 @@ export const useSentMessages = (
 
   if (data) {
     messages = data.map((message) => {
+      const recipients = message.recipients.map((recipient) => {
+        return {
+          ...recipient,
+          alias: addressBookContext?.getAlias(recipient.did),
+        };
+      });
       return {
         ...message,
         id: message.clientGatewayMessageId,
+        senderAlias: addressBookContext?.getAlias(message.senderDid),
         relatedMessageItems: {
           relatedMessagesCount: message.relatedMessagesCount,
           messageId: message.initiatingMessageId,
