@@ -5,6 +5,8 @@ import {
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { keyBy } from 'lodash';
 import { useCustomAlert } from '@ddhub-client-gateway-frontend/ui/core';
+import { useContext } from 'react';
+import { AddressBookContext } from '@ddhub-client-gateway-frontend/ui/login';
 
 export const useMessages = (
   params?: MessageControllerGetMessageParams,
@@ -12,6 +14,10 @@ export const useMessages = (
   isRelatedMessage?: boolean
 ) => {
   const Swal = useCustomAlert();
+  const addressBookContext = useContext(AddressBookContext);
+  if (!addressBookContext) {
+    throw new Error('[useMessages] AddressBookContext provider not available');
+  }
   let enabled;
 
   if (isMessageBox) {
@@ -38,7 +44,16 @@ export const useMessages = (
       },
     });
 
-  const messages = data ?? ([] as GetMessagesResponseDto[]);
+  let mutatedData;
+  if (data) {
+    mutatedData = data.map((message) => {
+      return {
+        ...message,
+        senderAlias: addressBookContext?.getAlias(message.sender),
+      };
+    });
+  }
+  const messages = mutatedData ?? ([] as GetMessagesResponseDto[]);
   const messagesById = keyBy(messages, 'id');
   const messagesLoaded = (data !== undefined && isSuccess) || isError;
 

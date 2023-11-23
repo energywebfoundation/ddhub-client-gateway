@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import {
   ModalActionsEnum,
   useModalDispatch,
@@ -12,9 +12,17 @@ import {
 } from '@ddhub-client-gateway-frontend/ui/api-hooks';
 import { useQueryClient } from 'react-query';
 import { getAddressBookControllerGetAllContactsQueryKey } from '@dsb-client-gateway/dsb-client-gateway-api-client';
+import { AddressBookContext } from '@ddhub-client-gateway-frontend/ui/login';
+
 const didRegex = new RegExp(/^did:[a-z0-9]+:([a-z0-9]+:)?(0x[0-9a-fA-F]{40})$/);
 
 export const useAddUpdateContactEffects = () => {
+  const addressBookContext = useContext(AddressBookContext);
+  if (!addressBookContext) {
+    throw new Error(
+      '[useAddUpdateContactEffects] AddressBookContext provider not available'
+    );
+  }
   const queryClient = useQueryClient();
 
   const [aliasInput, setAliasInput] = useState('');
@@ -152,6 +160,12 @@ export const useAddUpdateContactEffects = () => {
     queryClient.invalidateQueries(
       getAddressBookControllerGetAllContactsQueryKey()
     );
+    if (addressBookContext) {
+      addressBookContext
+        .refreshAddressBook()
+        .then()
+        .catch((e) => console.error('Could not refresh address book.', e));
+    }
   };
 
   const createUpdateContact = () => {
