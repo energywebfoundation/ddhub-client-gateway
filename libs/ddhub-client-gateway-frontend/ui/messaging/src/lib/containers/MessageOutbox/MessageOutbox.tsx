@@ -39,15 +39,21 @@ export function RelatedMessage({ value }: RelatedMessageProps) {
 }
 
 export function MessageOutbox() {
-  const { channel, messages, isLoading, actions, openDetailsModal } =
-    useMessageOutboxEffects();
+  const {
+    channel,
+    messages,
+    isLoading,
+    actions,
+    openDetailsModal,
+    openRecipientListModal,
+  } = useMessageOutboxEffects();
 
   return (
     <Stack spacing={2} direction="row">
       <ChannelInfo channel={channel} />
       <Box flexGrow={1}>
         <GenericTable<GetSentMessageResponseDto>
-          headers={CHANNEL_OUTBOX_HEADERS}
+          headers={CHANNEL_OUTBOX_HEADERS(openRecipientListModal)}
           tableRows={messages}
           loading={isLoading}
           showSearch={true}
