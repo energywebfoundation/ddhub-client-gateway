@@ -7,6 +7,6 @@ import {
 @Injectable()
 export class ReceivedMessageReadStatusRepositoryWrapper {
   constructor(
-    public readonly repository: ReceivedMessageReadStatusRepository
+    public readonly repository: ReceivedMessageReadStatusRepository,
   ) {}
 }

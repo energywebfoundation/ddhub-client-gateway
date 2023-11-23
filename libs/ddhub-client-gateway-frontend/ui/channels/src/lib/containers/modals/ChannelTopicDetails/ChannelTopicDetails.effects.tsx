@@ -18,7 +18,7 @@ export const useChannelTopicDetailsEffects = () => {
 
   const { topic: topicWithSchema, isLoading } = useTopicVersion(
     data?.topic?.id,
-    data?.topic?.version
+    data?.topic?.version,
   );
 
   const closeModal = () => {
@@ -34,7 +34,7 @@ export const useChannelTopicDetailsEffects = () => {
   const exportSchema = () => {
     downloadJson(
       topicWithSchema.schema,
-      `Schema_${topicWithSchema.name}_${topicWithSchema.version}.json`
+      `Schema_${topicWithSchema.name}_${topicWithSchema.version}.json`,
     );
   };
 

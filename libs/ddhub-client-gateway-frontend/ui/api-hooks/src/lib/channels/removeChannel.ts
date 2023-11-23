@@ -25,7 +25,7 @@ export const useRemoveChannel = () => {
 
   const removeChannelHandler = async (
     fqcn: string,
-    isFormBuilder?: boolean
+    isFormBuilder?: boolean,
   ) => {
     const { isDismissed } = await Swal.warning({
       text: isFormBuilder
@@ -43,7 +43,7 @@ export const useRemoveChannel = () => {
       {
         onSuccess: removeChannelSuccess,
         onError: removeChannelError,
-      }
+      },
     );
   };
 

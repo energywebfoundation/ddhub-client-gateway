@@ -12,12 +12,12 @@ import {
   useCachedApplications,
 } from '@ddhub-client-gateway-frontend/ui/api-hooks';
 import { useRouter } from 'next/router';
-import { GetTopicSearchDto} from '@dsb-client-gateway/dsb-client-gateway-api-client';
+import { GetTopicSearchDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { useTopicsModalsDispatch, TopicsModalsActionsEnum } from '../context';
 
 export const useVersionActionsEffects = (
   namespace: string,
-  topicId: string
+  topicId: string,
 ) => {
   const router = useRouter();
   const Swal = useCustomAlert();
@@ -56,7 +56,7 @@ export const useVersionActionsEffects = (
     });
     if (buttonClick) {
       await router.push(
-        routerConst.Topics.replace(`[${Queries.Namespace}]`, namespace)
+        routerConst.Topics.replace(`[${Queries.Namespace}]`, namespace),
       );
     }
   };

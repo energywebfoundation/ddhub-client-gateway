@@ -13,7 +13,7 @@ export const Applications: FC<ApplicationsProps> = (props) => {
   const { role, topicUrl } = props;
   const { applications, isLoading, handleRowClick } = useApplications(
     role,
-    topicUrl
+    topicUrl,
   );
   return (
     <section style={{ marginTop: 16 }}>

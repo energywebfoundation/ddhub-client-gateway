@@ -15,7 +15,7 @@ export const useSendNewMessage = () => {
 
   const sendNewMessageHandler = (
     values: SendMessageDto,
-    onSuccess: () => void
+    onSuccess: () => void,
   ) => {
     mutate(
       {
@@ -24,7 +24,7 @@ export const useSendNewMessage = () => {
       {
         onSuccess,
         onError: createNewMessageError,
-      }
+      },
     );
   };
 

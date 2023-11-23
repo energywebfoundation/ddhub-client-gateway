@@ -5,7 +5,7 @@ export const TOPICS_HEADERS: TableHeader[] = [
     Header: 'VERSION',
     accessor: 'version',
     color: 'primary',
-    isSortable: true
+    isSortable: true,
   },
   {
     Header: 'TOPIC NAME',
@@ -16,7 +16,7 @@ export const TOPICS_HEADERS: TableHeader[] = [
   {
     Header: 'SCHEMA TYPE',
     accessor: 'schemaType',
-    isSortable: true
+    isSortable: true,
   },
   {
     Header: 'TAGS',

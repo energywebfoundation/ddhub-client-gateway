@@ -4,6 +4,6 @@ import { SymmetricKeysRepository } from '../repository';
 @Injectable()
 export class SymmetricKeysRepositoryWrapper {
   constructor(
-    public readonly symmetricKeysRepository: SymmetricKeysRepository
+    public readonly symmetricKeysRepository: SymmetricKeysRepository,
   ) {}
 }

@@ -15,7 +15,9 @@
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/ddhub-client-gateway-frontend/ui/applications"],
+      "outputs": [
+        "coverage/libs/ddhub-client-gateway-frontend/ui/applications"
+      ],
       "options": {
         "jestConfig": "libs/ddhub-client-gateway-frontend/ui/applications/jest.config.js",
         "passWithNoTests": true

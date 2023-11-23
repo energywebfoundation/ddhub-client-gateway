@@ -12,7 +12,7 @@ export class ValidationException extends BaseException {
       {
         errors,
       },
-      HttpStatus.BAD_REQUEST
+      HttpStatus.BAD_REQUEST,
     );
   }
 }

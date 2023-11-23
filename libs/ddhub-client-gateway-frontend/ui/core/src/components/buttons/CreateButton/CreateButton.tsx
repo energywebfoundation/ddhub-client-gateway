@@ -17,7 +17,7 @@ export function CreateButton({ onCreate, buttonText }: CreateButtonProps) {
         onClick={onCreate}
       >
         <Typography variant="body2" className={classes.createTopicButtonText}>
-          { buttonText ?? 'Create' }
+          {buttonText ?? 'Create'}
         </Typography>
       </Button>
     </div>

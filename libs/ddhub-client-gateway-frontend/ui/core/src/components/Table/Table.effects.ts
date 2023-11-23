@@ -38,18 +38,18 @@ export function useTableEffects<T>({
 
   const data = useMemo(
     () => tableRows,
-    [tableRows]
+    [tableRows],
   ) as unknown as readonly object[];
   const filterTypes = useMemo(
     () => ({
       fuzzyText: fuzzyTextFilterFn,
       text: textFilter,
     }),
-    []
+    [],
   );
   const columns = useMemo(
     () => headers,
-    [headers]
+    [headers],
   ) as unknown as readonly Column<object>[];
   const totalLength = data.length;
 
@@ -71,7 +71,7 @@ export function useTableEffects<T>({
     useFilters,
     useGlobalFilter,
     useSortBy,
-    usePagination
+    usePagination,
   );
 
   const resetCheckbox = () => {
@@ -99,13 +99,13 @@ export function useTableEffects<T>({
 
   const handleChangePage = (
     _event: React.MouseEvent<HTMLButtonElement> | null,
-    newPage: number
+    newPage: number,
   ) => {
     changePage(newPage, pageSize);
   };
 
   const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const limit = parseInt(event.target.value, 10);
     setPageSize(limit);
@@ -121,7 +121,7 @@ export function useTableEffects<T>({
 
   const handleRequestSort = (
     event: React.MouseEvent<unknown>,
-    property: string
+    property: string,
   ) => {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
@@ -139,7 +139,7 @@ export function useTableEffects<T>({
   function descendingComparator(
     a: Record<string, string>,
     b: Record<string, string>,
-    orderBy: string
+    orderBy: string,
   ) {
     if (b[orderBy] < a[orderBy]) {
       return -1;
@@ -152,10 +152,10 @@ export function useTableEffects<T>({
 
   function getComparator(
     order: Order,
-    orderBy: string
+    orderBy: string,
   ): (
     a: { values: Record<string, string> },
-    b: { values: Record<string, string> }
+    b: { values: Record<string, string> },
   ) => number {
     return order === 'desc'
       ? (a, b) => descendingComparator(a.values, b.values, orderBy)
@@ -186,7 +186,7 @@ export function useTableEffects<T>({
 
   const handleCheckboxClick = (
     event: React.MouseEvent<unknown>,
-    name: string
+    name: string,
   ) => {
     const selectedIndex = selected.indexOf(name);
     let newSelected: string[] = [];

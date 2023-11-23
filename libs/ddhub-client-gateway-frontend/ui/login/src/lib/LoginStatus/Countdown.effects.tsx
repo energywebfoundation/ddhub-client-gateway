@@ -15,7 +15,7 @@ const useCountdown = (milliseconds: number, callback?: () => void) => {
         })
         .toMillis() -
         DateTime.now().toMillis()) /
-        1000
+        1000,
     ) * 1000;
 
   const [countdown, setCountdown] = useState(countdownTime);
@@ -46,7 +46,7 @@ const useCountdown = (milliseconds: number, callback?: () => void) => {
 const getReturnValues = (countdown: number) => {
   const days = Math.floor(countdown / (1000 * 60 * 60 * 24));
   const hours = Math.floor(
-    (countdown % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+    (countdown % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
   );
   const minutes = Math.floor((countdown % (1000 * 60 * 60)) / (1000 * 60));
   const seconds = Math.floor((countdown % (1000 * 60)) / 1000);

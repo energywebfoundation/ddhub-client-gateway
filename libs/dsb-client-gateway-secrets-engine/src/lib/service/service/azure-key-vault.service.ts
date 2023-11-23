@@ -73,10 +73,10 @@ export class AzureKeyVaultService
 
   @Span('azure_kv_getUserAuthDetails')
   public async getUserAuthDetails(
-    username: string
+    username: string,
   ): Promise<UserDetails | null> {
     const secretName = this.encodeAzureKey(
-      `${this.prefix}${PATHS.USERS}/${username}`
+      `${this.prefix}${PATHS.USERS}/${username}`,
     );
 
     return this.client
@@ -101,20 +101,20 @@ export class AzureKeyVaultService
       userSecretIdentifiers.map((name) =>
         this.client
           .getSecret(name)
-          .then(({ value }) => this.parseUserDetailsSecret(name, value))
-      )
+          .then(({ value }) => this.parseUserDetailsSecret(name, value)),
+      ),
     );
     return userListResponse
       .filter(
         (res): res is PromiseFulfilledResult<UserDetails> =>
-          res.status === 'fulfilled'
+          res.status === 'fulfilled',
       )
       .map(({ value }) => value);
   }
 
   @Span('azure_kv_setRSAKey')
   public async setRSAPrivateKey(
-    privateKey: string
+    privateKey: string,
   ): Promise<KeyVaultSecret | null> {
     const name = this.encodeAzureKey(`${this.prefix}${PATHS.RSA_KEY}`);
     return this.client
@@ -162,7 +162,7 @@ export class AzureKeyVaultService
       },
     ];
     const commands = paths.map(({ path, key }) =>
-      this.client.setSecret(path, key)
+      this.client.setSecret(path, key),
     );
 
     if (caCertificate) {
@@ -180,14 +180,14 @@ export class AzureKeyVaultService
             throw new Error(
               JSON.stringify({
                 error: err,
-              })
+              }),
             );
-          })
-      )
+          }),
+      ),
     );
 
     const errors = responses.filter(
-      ({ status }) => status === 'rejected'
+      ({ status }) => status === 'rejected',
     ) as PromiseRejectedResult[];
 
     // Log errors and rollback
@@ -202,7 +202,7 @@ export class AzureKeyVaultService
     return responses
       .filter(({ status }) => status === 'fulfilled')
       .map((response) =>
-        response.status === 'fulfilled' ? response.value : null
+        response.status === 'fulfilled' ? response.value : null,
       ) as KeyVaultSecret[];
   }
 
@@ -210,18 +210,18 @@ export class AzureKeyVaultService
   public async getCertificateDetails(): Promise<CertificateDetails> {
     const responses = await Promise.allSettled([
       this.client.getSecret(
-        this.encodeAzureKey(`${this.prefix}${PATHS.CERTIFICATE_KEY}`)
+        this.encodeAzureKey(`${this.prefix}${PATHS.CERTIFICATE_KEY}`),
       ),
       this.client.getSecret(
-        this.encodeAzureKey(`${this.prefix}${PATHS.CERTIFICATE}`)
+        this.encodeAzureKey(`${this.prefix}${PATHS.CERTIFICATE}`),
       ),
       this.client.getSecret(
-        this.encodeAzureKey(`${this.prefix}${PATHS.CA_CERTIFICATE}`)
+        this.encodeAzureKey(`${this.prefix}${PATHS.CA_CERTIFICATE}`),
       ),
     ]);
 
     const errors = responses.filter(
-      ({ status }) => status === 'rejected'
+      ({ status }) => status === 'rejected',
     ) as PromiseRejectedResult[];
     if (errors.length > 0) {
       this.logger.error(errors.map(({ reason }) => reason.message).join(', '));
@@ -242,7 +242,7 @@ export class AzureKeyVaultService
   @Span('azure_kv_setPrivateKey')
   public async setPrivateKey(key: string): Promise<KeyVaultSecret | null> {
     const name = this.encodeAzureKey(
-      `${this.prefix}${PATHS.IDENTITY_PRIVATE_KEY}`
+      `${this.prefix}${PATHS.IDENTITY_PRIVATE_KEY}`,
     );
     return this.client
       .setSecret(name, key)
@@ -265,7 +265,7 @@ export class AzureKeyVaultService
     }
     return this.client
       .getSecret(
-        this.encodeAzureKey(`${this.prefix}${PATHS.IDENTITY_PRIVATE_KEY}`)
+        this.encodeAzureKey(`${this.prefix}${PATHS.IDENTITY_PRIVATE_KEY}`),
       )
       .then(({ value }) => {
         if (!value || value === '' || value === '""') {
@@ -285,22 +285,22 @@ export class AzureKeyVaultService
     const pollers = [];
     for (const path of Object.values(PATHS)) {
       const poller = await this.client.beginDeleteSecret(
-        this.encodeAzureKey(`${this.prefix}${path}`)
+        this.encodeAzureKey(`${this.prefix}${path}`),
       );
       pollers.push(poller);
     }
     const responses = await Promise.allSettled(
-      pollers.map((poller) => poller.pollUntilDone())
+      pollers.map((poller) => poller.pollUntilDone()),
     );
     const errors = responses.filter(
-      (response) => response.status === 'rejected'
+      (response) => response.status === 'rejected',
     );
     if (errors.length > 0) {
       this.logger.error(
         `Could not delete Azure KV secrets: ${errors
           .map((err) => (err.status === 'rejected' ? err.reason : null))
           .filter((err) => !!err)
-          .join(', ')}`
+          .join(', ')}`,
       );
     }
   }
@@ -336,7 +336,7 @@ export class AzureKeyVaultService
 
   private parseUserDetailsSecret(
     usernameWithPrefix: string,
-    value: string
+    value: string,
   ): UserDetails {
     const userDetails = this.parseJSONLike(value);
     if (!this.isUserDetails(userDetails)) {
@@ -345,7 +345,7 @@ export class AzureKeyVaultService
     return {
       username: usernameWithPrefix.replace(
         this.encodeAzureKey(`${this.prefix}${PATHS.USERS}/`),
-        ''
+        '',
       ),
       ...userDetails,
     };

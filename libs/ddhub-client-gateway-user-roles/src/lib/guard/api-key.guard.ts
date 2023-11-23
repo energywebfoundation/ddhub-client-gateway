@@ -69,7 +69,7 @@ export class ApiKeyGuard implements CanActivate {
 
     const decodedPassword: string = new Buffer(
       passwordFromHeaders,
-      'base64'
+      'base64',
     ).toString('ascii');
 
     return usernameFromHeaders === username && decodedPassword === password;

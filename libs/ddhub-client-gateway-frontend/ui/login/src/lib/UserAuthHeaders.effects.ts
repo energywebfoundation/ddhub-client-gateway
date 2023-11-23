@@ -6,7 +6,7 @@ export const useUserAuthHeaders = () => {
   const userContext = useContext(UserContext);
   if (!userContext) {
     throw new Error(
-      'useUserAuthHeaders must be used within a UserContext provider'
+      'useUserAuthHeaders must be used within a UserContext provider',
     );
   }
 
@@ -46,7 +46,7 @@ export const useUserAuthHeaders = () => {
           return Axios(originalRequest);
         }
         return Promise.reject(err);
-      }
+      },
     );
 
     return () => {

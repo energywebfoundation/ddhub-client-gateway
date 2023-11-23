@@ -168,10 +168,10 @@ describe('SymmetricKeysCacheService', () => {
 
       it('should delete one expired key', () => {
         expect(
-          mockSymmetricKeysRepositoryWrapper.symmetricKeysRepository.delete
+          mockSymmetricKeysRepositoryWrapper.symmetricKeysRepository.delete,
         ).toBeCalledTimes(1);
         expect(
-          mockSymmetricKeysRepositoryWrapper.symmetricKeysRepository.delete
+          mockSymmetricKeysRepositoryWrapper.symmetricKeysRepository.delete,
         ).toBeCalledWith({
           id: 'id1',
         });
@@ -245,10 +245,10 @@ describe('SymmetricKeysCacheService', () => {
 
       it('should save symmetric key', () => {
         expect(
-          mockSymmetricKeysRepositoryWrapper.symmetricKeysRepository.save
+          mockSymmetricKeysRepositoryWrapper.symmetricKeysRepository.save,
         ).toBeCalledTimes(1);
         expect(
-          mockSymmetricKeysRepositoryWrapper.symmetricKeysRepository.save
+          mockSymmetricKeysRepositoryWrapper.symmetricKeysRepository.save,
         ).toBeCalledWith({
           clientGatewayMessageId: 'cgwId',
           payload: 'payload',
@@ -265,7 +265,7 @@ describe('SymmetricKeysCacheService', () => {
           },
           {
             retries: 1,
-          }
+          },
         );
       });
     });
@@ -310,7 +310,7 @@ describe('SymmetricKeysCacheService', () => {
       it('should not call further methods', () => {
         expect(mockDdhubMessagesService.getSymmetricKeys).toBeCalledTimes(0);
         expect(
-          mockSymmetricKeysRepositoryWrapper.symmetricKeysRepository.save
+          mockSymmetricKeysRepositoryWrapper.symmetricKeysRepository.save,
         ).toBeCalledTimes(0);
       });
     });
@@ -348,7 +348,7 @@ describe('SymmetricKeysCacheService', () => {
         expect(mockEnrolmentService.get).toBeCalledTimes(0);
         expect(mockDdhubMessagesService.getSymmetricKeys).toBeCalledTimes(0);
         expect(
-          mockSymmetricKeysRepositoryWrapper.symmetricKeysRepository.save
+          mockSymmetricKeysRepositoryWrapper.symmetricKeysRepository.save,
         ).toBeCalledTimes(0);
       });
     });
@@ -379,7 +379,7 @@ describe('SymmetricKeysCacheService', () => {
         expect(mockEnrolmentService.get).toBeCalledTimes(0);
         expect(mockDdhubMessagesService.getSymmetricKeys).toBeCalledTimes(0);
         expect(
-          mockSymmetricKeysRepositoryWrapper.symmetricKeysRepository.save
+          mockSymmetricKeysRepositoryWrapper.symmetricKeysRepository.save,
         ).toBeCalledTimes(0);
       });
     });

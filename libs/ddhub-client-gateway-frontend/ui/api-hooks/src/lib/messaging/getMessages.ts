@@ -11,7 +11,7 @@ import { AddressBookContext } from '@ddhub-client-gateway-frontend/ui/login';
 export const useMessages = (
   params?: MessageControllerGetMessageParams,
   isMessageBox?: boolean,
-  isRelatedMessage?: boolean
+  isRelatedMessage?: boolean,
 ) => {
   const Swal = useCustomAlert();
   const addressBookContext = useContext(AddressBookContext);

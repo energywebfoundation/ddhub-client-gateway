@@ -12,89 +12,89 @@ import type {
   PopulatedTransaction,
   Signer,
   utils,
-} from "ethers";
+} from 'ethers';
 import type {
   FunctionFragment,
   Result,
   EventFragment,
-} from "@ethersproject/abi";
-import type { Listener, Provider } from "@ethersproject/providers";
+} from '@ethersproject/abi';
+import type { Listener, Provider } from '@ethersproject/providers';
 import type {
   TypedEventFilter,
   TypedEvent,
   TypedListener,
   OnEvent,
-} from "./common";
+} from './common';
 
 export interface EthereumDIDRegistryInterface extends utils.Interface {
   functions: {
-    "owners(address)": FunctionFragment;
-    "delegates(address,bytes32,address)": FunctionFragment;
-    "nonce(address)": FunctionFragment;
-    "changed(address)": FunctionFragment;
-    "identityOwner(address)": FunctionFragment;
-    "validDelegate(address,bytes32,address)": FunctionFragment;
-    "changeOwner(address,address)": FunctionFragment;
-    "changeOwnerSigned(address,uint8,bytes32,bytes32,address)": FunctionFragment;
-    "addDelegate(address,bytes32,address,uint256)": FunctionFragment;
-    "addDelegateSigned(address,uint8,bytes32,bytes32,bytes32,address,uint256)": FunctionFragment;
-    "revokeDelegate(address,bytes32,address)": FunctionFragment;
-    "revokeDelegateSigned(address,uint8,bytes32,bytes32,bytes32,address)": FunctionFragment;
-    "setAttribute(address,bytes32,bytes,uint256)": FunctionFragment;
-    "setAttributeSigned(address,uint8,bytes32,bytes32,bytes32,bytes,uint256)": FunctionFragment;
-    "revokeAttribute(address,bytes32,bytes)": FunctionFragment;
-    "revokeAttributeSigned(address,uint8,bytes32,bytes32,bytes32,bytes)": FunctionFragment;
+    'owners(address)': FunctionFragment;
+    'delegates(address,bytes32,address)': FunctionFragment;
+    'nonce(address)': FunctionFragment;
+    'changed(address)': FunctionFragment;
+    'identityOwner(address)': FunctionFragment;
+    'validDelegate(address,bytes32,address)': FunctionFragment;
+    'changeOwner(address,address)': FunctionFragment;
+    'changeOwnerSigned(address,uint8,bytes32,bytes32,address)': FunctionFragment;
+    'addDelegate(address,bytes32,address,uint256)': FunctionFragment;
+    'addDelegateSigned(address,uint8,bytes32,bytes32,bytes32,address,uint256)': FunctionFragment;
+    'revokeDelegate(address,bytes32,address)': FunctionFragment;
+    'revokeDelegateSigned(address,uint8,bytes32,bytes32,bytes32,address)': FunctionFragment;
+    'setAttribute(address,bytes32,bytes,uint256)': FunctionFragment;
+    'setAttributeSigned(address,uint8,bytes32,bytes32,bytes32,bytes,uint256)': FunctionFragment;
+    'revokeAttribute(address,bytes32,bytes)': FunctionFragment;
+    'revokeAttributeSigned(address,uint8,bytes32,bytes32,bytes32,bytes)': FunctionFragment;
   };
 
   getFunction(
     nameOrSignatureOrTopic:
-      | "owners"
-      | "delegates"
-      | "nonce"
-      | "changed"
-      | "identityOwner"
-      | "validDelegate"
-      | "changeOwner"
-      | "changeOwnerSigned"
-      | "addDelegate"
-      | "addDelegateSigned"
-      | "revokeDelegate"
-      | "revokeDelegateSigned"
-      | "setAttribute"
-      | "setAttributeSigned"
-      | "revokeAttribute"
-      | "revokeAttributeSigned"
+      | 'owners'
+      | 'delegates'
+      | 'nonce'
+      | 'changed'
+      | 'identityOwner'
+      | 'validDelegate'
+      | 'changeOwner'
+      | 'changeOwnerSigned'
+      | 'addDelegate'
+      | 'addDelegateSigned'
+      | 'revokeDelegate'
+      | 'revokeDelegateSigned'
+      | 'setAttribute'
+      | 'setAttributeSigned'
+      | 'revokeAttribute'
+      | 'revokeAttributeSigned',
   ): FunctionFragment;
 
-  encodeFunctionData(functionFragment: "owners", values: [string]): string;
+  encodeFunctionData(functionFragment: 'owners', values: [string]): string;
   encodeFunctionData(
-    functionFragment: "delegates",
-    values: [string, BytesLike, string]
+    functionFragment: 'delegates',
+    values: [string, BytesLike, string],
   ): string;
-  encodeFunctionData(functionFragment: "nonce", values: [string]): string;
-  encodeFunctionData(functionFragment: "changed", values: [string]): string;
+  encodeFunctionData(functionFragment: 'nonce', values: [string]): string;
+  encodeFunctionData(functionFragment: 'changed', values: [string]): string;
   encodeFunctionData(
-    functionFragment: "identityOwner",
-    values: [string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "validDelegate",
-    values: [string, BytesLike, string]
+    functionFragment: 'identityOwner',
+    values: [string],
   ): string;
   encodeFunctionData(
-    functionFragment: "changeOwner",
-    values: [string, string]
+    functionFragment: 'validDelegate',
+    values: [string, BytesLike, string],
   ): string;
   encodeFunctionData(
-    functionFragment: "changeOwnerSigned",
-    values: [string, BigNumberish, BytesLike, BytesLike, string]
+    functionFragment: 'changeOwner',
+    values: [string, string],
   ): string;
   encodeFunctionData(
-    functionFragment: "addDelegate",
-    values: [string, BytesLike, string, BigNumberish]
+    functionFragment: 'changeOwnerSigned',
+    values: [string, BigNumberish, BytesLike, BytesLike, string],
   ): string;
   encodeFunctionData(
-    functionFragment: "addDelegateSigned",
+    functionFragment: 'addDelegate',
+    values: [string, BytesLike, string, BigNumberish],
+  ): string;
+  encodeFunctionData(
+    functionFragment: 'addDelegateSigned',
     values: [
       string,
       BigNumberish,
@@ -102,23 +102,23 @@ export interface EthereumDIDRegistryInterface extends utils.Interface {
       BytesLike,
       BytesLike,
       string,
-      BigNumberish
-    ]
+      BigNumberish,
+    ],
   ): string;
   encodeFunctionData(
-    functionFragment: "revokeDelegate",
-    values: [string, BytesLike, string]
+    functionFragment: 'revokeDelegate',
+    values: [string, BytesLike, string],
   ): string;
   encodeFunctionData(
-    functionFragment: "revokeDelegateSigned",
-    values: [string, BigNumberish, BytesLike, BytesLike, BytesLike, string]
+    functionFragment: 'revokeDelegateSigned',
+    values: [string, BigNumberish, BytesLike, BytesLike, BytesLike, string],
   ): string;
   encodeFunctionData(
-    functionFragment: "setAttribute",
-    values: [string, BytesLike, BytesLike, BigNumberish]
+    functionFragment: 'setAttribute',
+    values: [string, BytesLike, BytesLike, BigNumberish],
   ): string;
   encodeFunctionData(
-    functionFragment: "setAttributeSigned",
+    functionFragment: 'setAttributeSigned',
     values: [
       string,
       BigNumberish,
@@ -126,80 +126,80 @@ export interface EthereumDIDRegistryInterface extends utils.Interface {
       BytesLike,
       BytesLike,
       BytesLike,
-      BigNumberish
-    ]
+      BigNumberish,
+    ],
   ): string;
   encodeFunctionData(
-    functionFragment: "revokeAttribute",
-    values: [string, BytesLike, BytesLike]
+    functionFragment: 'revokeAttribute',
+    values: [string, BytesLike, BytesLike],
   ): string;
   encodeFunctionData(
-    functionFragment: "revokeAttributeSigned",
-    values: [string, BigNumberish, BytesLike, BytesLike, BytesLike, BytesLike]
+    functionFragment: 'revokeAttributeSigned',
+    values: [string, BigNumberish, BytesLike, BytesLike, BytesLike, BytesLike],
   ): string;
 
-  decodeFunctionResult(functionFragment: "owners", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "delegates", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "nonce", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "changed", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'owners', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'delegates', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'nonce', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'changed', data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "identityOwner",
-    data: BytesLike
+    functionFragment: 'identityOwner',
+    data: BytesLike,
   ): Result;
   decodeFunctionResult(
-    functionFragment: "validDelegate",
-    data: BytesLike
+    functionFragment: 'validDelegate',
+    data: BytesLike,
   ): Result;
   decodeFunctionResult(
-    functionFragment: "changeOwner",
-    data: BytesLike
+    functionFragment: 'changeOwner',
+    data: BytesLike,
   ): Result;
   decodeFunctionResult(
-    functionFragment: "changeOwnerSigned",
-    data: BytesLike
+    functionFragment: 'changeOwnerSigned',
+    data: BytesLike,
   ): Result;
   decodeFunctionResult(
-    functionFragment: "addDelegate",
-    data: BytesLike
+    functionFragment: 'addDelegate',
+    data: BytesLike,
   ): Result;
   decodeFunctionResult(
-    functionFragment: "addDelegateSigned",
-    data: BytesLike
+    functionFragment: 'addDelegateSigned',
+    data: BytesLike,
   ): Result;
   decodeFunctionResult(
-    functionFragment: "revokeDelegate",
-    data: BytesLike
+    functionFragment: 'revokeDelegate',
+    data: BytesLike,
   ): Result;
   decodeFunctionResult(
-    functionFragment: "revokeDelegateSigned",
-    data: BytesLike
+    functionFragment: 'revokeDelegateSigned',
+    data: BytesLike,
   ): Result;
   decodeFunctionResult(
-    functionFragment: "setAttribute",
-    data: BytesLike
+    functionFragment: 'setAttribute',
+    data: BytesLike,
   ): Result;
   decodeFunctionResult(
-    functionFragment: "setAttributeSigned",
-    data: BytesLike
+    functionFragment: 'setAttributeSigned',
+    data: BytesLike,
   ): Result;
   decodeFunctionResult(
-    functionFragment: "revokeAttribute",
-    data: BytesLike
+    functionFragment: 'revokeAttribute',
+    data: BytesLike,
   ): Result;
   decodeFunctionResult(
-    functionFragment: "revokeAttributeSigned",
-    data: BytesLike
+    functionFragment: 'revokeAttributeSigned',
+    data: BytesLike,
   ): Result;
 
   events: {
-    "DIDOwnerChanged(address,address,uint256)": EventFragment;
-    "DIDDelegateChanged(address,bytes32,address,uint256,uint256)": EventFragment;
-    "DIDAttributeChanged(address,bytes32,bytes,uint256,uint256)": EventFragment;
+    'DIDOwnerChanged(address,address,uint256)': EventFragment;
+    'DIDDelegateChanged(address,bytes32,address,uint256,uint256)': EventFragment;
+    'DIDAttributeChanged(address,bytes32,bytes,uint256,uint256)': EventFragment;
   };
 
-  getEvent(nameOrSignatureOrTopic: "DIDOwnerChanged"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "DIDDelegateChanged"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "DIDAttributeChanged"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'DIDOwnerChanged'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'DIDDelegateChanged'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'DIDAttributeChanged'): EventFragment;
 }
 
 export interface DIDOwnerChangedEventObject {
@@ -254,15 +254,15 @@ export interface EthereumDIDRegistry extends BaseContract {
   queryFilter<TEvent extends TypedEvent>(
     event: TypedEventFilter<TEvent>,
     fromBlockOrBlockhash?: string | number | undefined,
-    toBlock?: string | number | undefined
+    toBlock?: string | number | undefined,
   ): Promise<Array<TEvent>>;
 
   listeners<TEvent extends TypedEvent>(
-    eventFilter?: TypedEventFilter<TEvent>
+    eventFilter?: TypedEventFilter<TEvent>,
   ): Array<TypedListener<TEvent>>;
   listeners(eventName?: string): Array<Listener>;
   removeAllListeners<TEvent extends TypedEvent>(
-    eventFilter: TypedEventFilter<TEvent>
+    eventFilter: TypedEventFilter<TEvent>,
   ): this;
   removeAllListeners(eventName?: string): this;
   off: OnEvent<this>;
@@ -277,7 +277,7 @@ export interface EthereumDIDRegistry extends BaseContract {
       arg0: string,
       arg1: BytesLike,
       arg2: string,
-      overrides?: CallOverrides
+      overrides?: CallOverrides,
     ): Promise<[BigNumber]>;
 
     nonce(arg0: string, overrides?: CallOverrides): Promise<[BigNumber]>;
@@ -286,20 +286,20 @@ export interface EthereumDIDRegistry extends BaseContract {
 
     identityOwner(
       identity: string,
-      overrides?: CallOverrides
+      overrides?: CallOverrides,
     ): Promise<[string]>;
 
     validDelegate(
       identity: string,
       delegateType: BytesLike,
       delegate: string,
-      overrides?: CallOverrides
+      overrides?: CallOverrides,
     ): Promise<[boolean]>;
 
     changeOwner(
       identity: string,
       newOwner: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: Overrides & { from?: string | Promise<string> },
     ): Promise<ContractTransaction>;
 
     changeOwnerSigned(
@@ -308,7 +308,7 @@ export interface EthereumDIDRegistry extends BaseContract {
       sigR: BytesLike,
       sigS: BytesLike,
       newOwner: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: Overrides & { from?: string | Promise<string> },
     ): Promise<ContractTransaction>;
 
     addDelegate(
@@ -316,7 +316,7 @@ export interface EthereumDIDRegistry extends BaseContract {
       delegateType: BytesLike,
       delegate: string,
       validity: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: Overrides & { from?: string | Promise<string> },
     ): Promise<ContractTransaction>;
 
     addDelegateSigned(
@@ -327,14 +327,14 @@ export interface EthereumDIDRegistry extends BaseContract {
       delegateType: BytesLike,
       delegate: string,
       validity: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: Overrides & { from?: string | Promise<string> },
     ): Promise<ContractTransaction>;
 
     revokeDelegate(
       identity: string,
       delegateType: BytesLike,
       delegate: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: Overrides & { from?: string | Promise<string> },
     ): Promise<ContractTransaction>;
 
     revokeDelegateSigned(
@@ -344,7 +344,7 @@ export interface EthereumDIDRegistry extends BaseContract {
       sigS: BytesLike,
       delegateType: BytesLike,
       delegate: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: Overrides & { from?: string | Promise<string> },
     ): Promise<ContractTransaction>;
 
     setAttribute(
@@ -352,7 +352,7 @@ export interface EthereumDIDRegistry extends BaseContract {
       name: BytesLike,
       value: BytesLike,
       validity: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: Overrides & { from?: string | Promise<string> },
     ): Promise<ContractTransaction>;
 
     setAttributeSigned(
@@ -363,14 +363,14 @@ export interface EthereumDIDRegistry extends BaseContract {
       name: BytesLike,
       value: BytesLike,
       validity: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: Overrides & { from?: string | Promise<string> },
     ): Promise<ContractTransaction>;
 
     revokeAttribute(
       identity: string,
       name: BytesLike,
       value: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: Overrides & { from?: string | Promise<string> },
     ): Promise<ContractTransaction>;
 
     revokeAttributeSigned(
@@ -380,7 +380,7 @@ export interface EthereumDIDRegistry extends BaseContract {
       sigS: BytesLike,
       name: BytesLike,
       value: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: Overrides & { from?: string | Promise<string> },
     ): Promise<ContractTransaction>;
   };
 
@@ -390,7 +390,7 @@ export interface EthereumDIDRegistry extends BaseContract {
     arg0: string,
     arg1: BytesLike,
     arg2: string,
-    overrides?: CallOverrides
+    overrides?: CallOverrides,
   ): Promise<BigNumber>;
 
   nonce(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
@@ -403,13 +403,13 @@ export interface EthereumDIDRegistry extends BaseContract {
     identity: string,
     delegateType: BytesLike,
     delegate: string,
-    overrides?: CallOverrides
+    overrides?: CallOverrides,
   ): Promise<boolean>;
 
   changeOwner(
     identity: string,
     newOwner: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
+    overrides?: Overrides & { from?: string | Promise<string> },
   ): Promise<ContractTransaction>;
 
   changeOwnerSigned(
@@ -418,7 +418,7 @@ export interface EthereumDIDRegistry extends BaseContract {
     sigR: BytesLike,
     sigS: BytesLike,
     newOwner: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
+    overrides?: Overrides & { from?: string | Promise<string> },
   ): Promise<ContractTransaction>;
 
   addDelegate(
@@ -426,7 +426,7 @@ export interface EthereumDIDRegistry extends BaseContract {
     delegateType: BytesLike,
     delegate: string,
     validity: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
+    overrides?: Overrides & { from?: string | Promise<string> },
   ): Promise<ContractTransaction>;
 
   addDelegateSigned(
@@ -437,14 +437,14 @@ export interface EthereumDIDRegistry extends BaseContract {
     delegateType: BytesLike,
     delegate: string,
     validity: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
+    overrides?: Overrides & { from?: string | Promise<string> },
   ): Promise<ContractTransaction>;
 
   revokeDelegate(
     identity: string,
     delegateType: BytesLike,
     delegate: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
+    overrides?: Overrides & { from?: string | Promise<string> },
   ): Promise<ContractTransaction>;
 
   revokeDelegateSigned(
@@ -454,7 +454,7 @@ export interface EthereumDIDRegistry extends BaseContract {
     sigS: BytesLike,
     delegateType: BytesLike,
     delegate: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
+    overrides?: Overrides & { from?: string | Promise<string> },
   ): Promise<ContractTransaction>;
 
   setAttribute(
@@ -462,7 +462,7 @@ export interface EthereumDIDRegistry extends BaseContract {
     name: BytesLike,
     value: BytesLike,
     validity: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
+    overrides?: Overrides & { from?: string | Promise<string> },
   ): Promise<ContractTransaction>;
 
   setAttributeSigned(
@@ -473,14 +473,14 @@ export interface EthereumDIDRegistry extends BaseContract {
     name: BytesLike,
     value: BytesLike,
     validity: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
+    overrides?: Overrides & { from?: string | Promise<string> },
   ): Promise<ContractTransaction>;
 
   revokeAttribute(
     identity: string,
     name: BytesLike,
     value: BytesLike,
-    overrides?: Overrides & { from?: string | Promise<string> }
+    overrides?: Overrides & { from?: string | Promise<string> },
   ): Promise<ContractTransaction>;
 
   revokeAttributeSigned(
@@ -490,7 +490,7 @@ export interface EthereumDIDRegistry extends BaseContract {
     sigS: BytesLike,
     name: BytesLike,
     value: BytesLike,
-    overrides?: Overrides & { from?: string | Promise<string> }
+    overrides?: Overrides & { from?: string | Promise<string> },
   ): Promise<ContractTransaction>;
 
   callStatic: {
@@ -500,7 +500,7 @@ export interface EthereumDIDRegistry extends BaseContract {
       arg0: string,
       arg1: BytesLike,
       arg2: string,
-      overrides?: CallOverrides
+      overrides?: CallOverrides,
     ): Promise<BigNumber>;
 
     nonce(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
@@ -513,13 +513,13 @@ export interface EthereumDIDRegistry extends BaseContract {
       identity: string,
       delegateType: BytesLike,
       delegate: string,
-      overrides?: CallOverrides
+      overrides?: CallOverrides,
     ): Promise<boolean>;
 
     changeOwner(
       identity: string,
       newOwner: string,
-      overrides?: CallOverrides
+      overrides?: CallOverrides,
     ): Promise<void>;
 
     changeOwnerSigned(
@@ -528,7 +528,7 @@ export interface EthereumDIDRegistry extends BaseContract {
       sigR: BytesLike,
       sigS: BytesLike,
       newOwner: string,
-      overrides?: CallOverrides
+      overrides?: CallOverrides,
     ): Promise<void>;
 
     addDelegate(
@@ -536,7 +536,7 @@ export interface EthereumDIDRegistry extends BaseContract {
       delegateType: BytesLike,
       delegate: string,
       validity: BigNumberish,
-      overrides?: CallOverrides
+      overrides?: CallOverrides,
     ): Promise<void>;
 
     addDelegateSigned(
@@ -547,14 +547,14 @@ export interface EthereumDIDRegistry extends BaseContract {
       delegateType: BytesLike,
       delegate: string,
       validity: BigNumberish,
-      overrides?: CallOverrides
+      overrides?: CallOverrides,
     ): Promise<void>;
 
     revokeDelegate(
       identity: string,
       delegateType: BytesLike,
       delegate: string,
-      overrides?: CallOverrides
+      overrides?: CallOverrides,
     ): Promise<void>;
 
     revokeDelegateSigned(
@@ -564,7 +564,7 @@ export interface EthereumDIDRegistry extends BaseContract {
       sigS: BytesLike,
       delegateType: BytesLike,
       delegate: string,
-      overrides?: CallOverrides
+      overrides?: CallOverrides,
     ): Promise<void>;
 
     setAttribute(
@@ -572,7 +572,7 @@ export interface EthereumDIDRegistry extends BaseContract {
       name: BytesLike,
       value: BytesLike,
       validity: BigNumberish,
-      overrides?: CallOverrides
+      overrides?: CallOverrides,
     ): Promise<void>;
 
     setAttributeSigned(
@@ -583,14 +583,14 @@ export interface EthereumDIDRegistry extends BaseContract {
       name: BytesLike,
       value: BytesLike,
       validity: BigNumberish,
-      overrides?: CallOverrides
+      overrides?: CallOverrides,
     ): Promise<void>;
 
     revokeAttribute(
       identity: string,
       name: BytesLike,
       value: BytesLike,
-      overrides?: CallOverrides
+      overrides?: CallOverrides,
     ): Promise<void>;
 
     revokeAttributeSigned(
@@ -600,50 +600,50 @@ export interface EthereumDIDRegistry extends BaseContract {
       sigS: BytesLike,
       name: BytesLike,
       value: BytesLike,
-      overrides?: CallOverrides
+      overrides?: CallOverrides,
     ): Promise<void>;
   };
 
   filters: {
-    "DIDOwnerChanged(address,address,uint256)"(
+    'DIDOwnerChanged(address,address,uint256)'(
       identity?: string | null,
       owner?: null,
-      previousChange?: null
+      previousChange?: null,
     ): DIDOwnerChangedEventFilter;
     DIDOwnerChanged(
       identity?: string | null,
       owner?: null,
-      previousChange?: null
+      previousChange?: null,
     ): DIDOwnerChangedEventFilter;
 
-    "DIDDelegateChanged(address,bytes32,address,uint256,uint256)"(
+    'DIDDelegateChanged(address,bytes32,address,uint256,uint256)'(
       identity?: string | null,
       delegateType?: null,
       delegate?: null,
       validTo?: null,
-      previousChange?: null
+      previousChange?: null,
     ): DIDDelegateChangedEventFilter;
     DIDDelegateChanged(
       identity?: string | null,
       delegateType?: null,
       delegate?: null,
       validTo?: null,
-      previousChange?: null
+      previousChange?: null,
     ): DIDDelegateChangedEventFilter;
 
-    "DIDAttributeChanged(address,bytes32,bytes,uint256,uint256)"(
+    'DIDAttributeChanged(address,bytes32,bytes,uint256,uint256)'(
       identity?: string | null,
       name?: null,
       value?: null,
       validTo?: null,
-      previousChange?: null
+      previousChange?: null,
     ): DIDAttributeChangedEventFilter;
     DIDAttributeChanged(
       identity?: string | null,
       name?: null,
       value?: null,
       validTo?: null,
-      previousChange?: null
+      previousChange?: null,
     ): DIDAttributeChangedEventFilter;
   };
 
@@ -654,7 +654,7 @@ export interface EthereumDIDRegistry extends BaseContract {
       arg0: string,
       arg1: BytesLike,
       arg2: string,
-      overrides?: CallOverrides
+      overrides?: CallOverrides,
     ): Promise<BigNumber>;
 
     nonce(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
@@ -663,20 +663,20 @@ export interface EthereumDIDRegistry extends BaseContract {
 
     identityOwner(
       identity: string,
-      overrides?: CallOverrides
+      overrides?: CallOverrides,
     ): Promise<BigNumber>;
 
     validDelegate(
       identity: string,
       delegateType: BytesLike,
       delegate: string,
-      overrides?: CallOverrides
+      overrides?: CallOverrides,
     ): Promise<BigNumber>;
 
     changeOwner(
       identity: string,
       newOwner: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: Overrides & { from?: string | Promise<string> },
     ): Promise<BigNumber>;
 
     changeOwnerSigned(
@@ -685,7 +685,7 @@ export interface EthereumDIDRegistry extends BaseContract {
       sigR: BytesLike,
       sigS: BytesLike,
       newOwner: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: Overrides & { from?: string | Promise<string> },
     ): Promise<BigNumber>;
 
     addDelegate(
@@ -693,7 +693,7 @@ export interface EthereumDIDRegistry extends BaseContract {
       delegateType: BytesLike,
       delegate: string,
       validity: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: Overrides & { from?: string | Promise<string> },
     ): Promise<BigNumber>;
 
     addDelegateSigned(
@@ -704,14 +704,14 @@ export interface EthereumDIDRegistry extends BaseContract {
       delegateType: BytesLike,
       delegate: string,
       validity: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: Overrides & { from?: string | Promise<string> },
     ): Promise<BigNumber>;
 
     revokeDelegate(
       identity: string,
       delegateType: BytesLike,
       delegate: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: Overrides & { from?: string | Promise<string> },
     ): Promise<BigNumber>;
 
     revokeDelegateSigned(
@@ -721,7 +721,7 @@ export interface EthereumDIDRegistry extends BaseContract {
       sigS: BytesLike,
       delegateType: BytesLike,
       delegate: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: Overrides & { from?: string | Promise<string> },
     ): Promise<BigNumber>;
 
     setAttribute(
@@ -729,7 +729,7 @@ export interface EthereumDIDRegistry extends BaseContract {
       name: BytesLike,
       value: BytesLike,
       validity: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: Overrides & { from?: string | Promise<string> },
     ): Promise<BigNumber>;
 
     setAttributeSigned(
@@ -740,14 +740,14 @@ export interface EthereumDIDRegistry extends BaseContract {
       name: BytesLike,
       value: BytesLike,
       validity: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: Overrides & { from?: string | Promise<string> },
     ): Promise<BigNumber>;
 
     revokeAttribute(
       identity: string,
       name: BytesLike,
       value: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: Overrides & { from?: string | Promise<string> },
     ): Promise<BigNumber>;
 
     revokeAttributeSigned(
@@ -757,49 +757,49 @@ export interface EthereumDIDRegistry extends BaseContract {
       sigS: BytesLike,
       name: BytesLike,
       value: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: Overrides & { from?: string | Promise<string> },
     ): Promise<BigNumber>;
   };
 
   populateTransaction: {
     owners(
       arg0: string,
-      overrides?: CallOverrides
+      overrides?: CallOverrides,
     ): Promise<PopulatedTransaction>;
 
     delegates(
       arg0: string,
       arg1: BytesLike,
       arg2: string,
-      overrides?: CallOverrides
+      overrides?: CallOverrides,
     ): Promise<PopulatedTransaction>;
 
     nonce(
       arg0: string,
-      overrides?: CallOverrides
+      overrides?: CallOverrides,
     ): Promise<PopulatedTransaction>;
 
     changed(
       arg0: string,
-      overrides?: CallOverrides
+      overrides?: CallOverrides,
     ): Promise<PopulatedTransaction>;
 
     identityOwner(
       identity: string,
-      overrides?: CallOverrides
+      overrides?: CallOverrides,
     ): Promise<PopulatedTransaction>;
 
     validDelegate(
       identity: string,
       delegateType: BytesLike,
       delegate: string,
-      overrides?: CallOverrides
+      overrides?: CallOverrides,
     ): Promise<PopulatedTransaction>;
 
     changeOwner(
       identity: string,
       newOwner: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: Overrides & { from?: string | Promise<string> },
     ): Promise<PopulatedTransaction>;
 
     changeOwnerSigned(
@@ -808,7 +808,7 @@ export interface EthereumDIDRegistry extends BaseContract {
       sigR: BytesLike,
       sigS: BytesLike,
       newOwner: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: Overrides & { from?: string | Promise<string> },
     ): Promise<PopulatedTransaction>;
 
     addDelegate(
@@ -816,7 +816,7 @@ export interface EthereumDIDRegistry extends BaseContract {
       delegateType: BytesLike,
       delegate: string,
       validity: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: Overrides & { from?: string | Promise<string> },
     ): Promise<PopulatedTransaction>;
 
     addDelegateSigned(
@@ -827,14 +827,14 @@ export interface EthereumDIDRegistry extends BaseContract {
       delegateType: BytesLike,
       delegate: string,
       validity: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: Overrides & { from?: string | Promise<string> },
     ): Promise<PopulatedTransaction>;
 
     revokeDelegate(
       identity: string,
       delegateType: BytesLike,
       delegate: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: Overrides & { from?: string | Promise<string> },
     ): Promise<PopulatedTransaction>;
 
     revokeDelegateSigned(
@@ -844,7 +844,7 @@ export interface EthereumDIDRegistry extends BaseContract {
       sigS: BytesLike,
       delegateType: BytesLike,
       delegate: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: Overrides & { from?: string | Promise<string> },
     ): Promise<PopulatedTransaction>;
 
     setAttribute(
@@ -852,7 +852,7 @@ export interface EthereumDIDRegistry extends BaseContract {
       name: BytesLike,
       value: BytesLike,
       validity: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: Overrides & { from?: string | Promise<string> },
     ): Promise<PopulatedTransaction>;
 
     setAttributeSigned(
@@ -863,14 +863,14 @@ export interface EthereumDIDRegistry extends BaseContract {
       name: BytesLike,
       value: BytesLike,
       validity: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: Overrides & { from?: string | Promise<string> },
     ): Promise<PopulatedTransaction>;
 
     revokeAttribute(
       identity: string,
       name: BytesLike,
       value: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: Overrides & { from?: string | Promise<string> },
     ): Promise<PopulatedTransaction>;
 
     revokeAttributeSigned(
@@ -880,7 +880,7 @@ export interface EthereumDIDRegistry extends BaseContract {
       sigS: BytesLike,
       name: BytesLike,
       value: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: Overrides & { from?: string | Promise<string> },
     ): Promise<PopulatedTransaction>;
   };
 }

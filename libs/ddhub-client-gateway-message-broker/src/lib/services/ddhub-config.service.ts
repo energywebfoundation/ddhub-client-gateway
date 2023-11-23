@@ -16,13 +16,13 @@ export class DdhubConfigService extends DdhubBaseService {
     protected readonly retryConfigService: RetryConfigService,
     protected readonly didAuthService: DidAuthService,
     protected readonly tlsAgentService: TlsAgentService,
-    protected readonly ddhubLoginService: DdhubLoginService
+    protected readonly ddhubLoginService: DdhubLoginService,
   ) {
     super(
       new Logger(DdhubConfigService.name),
       retryConfigService,
       ddhubLoginService,
-      tlsAgentService
+      tlsAgentService,
     );
   }
 
@@ -39,7 +39,7 @@ export class DdhubConfigService extends DdhubBaseService {
           }),
         {
           stopOnResponseCodes: [MessageBrokerErrors.UNAUTHORIZED_ACCESS],
-        }
+        },
       );
 
       return r.data;

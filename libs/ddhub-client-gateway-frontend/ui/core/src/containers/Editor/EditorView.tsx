@@ -9,17 +9,14 @@ interface EditorViewProps {
   height?: number;
 }
 
-export const EditorView: FC<EditorViewProps> = ({ value , height = 132}) => {
+export const EditorView: FC<EditorViewProps> = ({ value, height = 132 }) => {
   const { classes } = useStyles();
   const { options, formatValue } = useEditorEffects({
     showPlaceholder: false,
   });
 
   return (
-    <Box
-      height={height}
-      sx={{ position: 'relative', width: '100%' }}
-    >
+    <Box height={height} sx={{ position: 'relative', width: '100%' }}>
       <Box className={classes.wrapper}>
         <MonacoEditor
           height="calc(100% - 19px)"

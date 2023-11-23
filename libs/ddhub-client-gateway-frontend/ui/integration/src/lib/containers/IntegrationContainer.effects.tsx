@@ -1,4 +1,4 @@
-import { routerConst } from "@ddhub-client-gateway-frontend/ui/utils";
+import { routerConst } from '@ddhub-client-gateway-frontend/ui/utils';
 
 export const useIntegrationContainerEffects = () => {
   const restApiUrl = routerConst.RestApiDocs;

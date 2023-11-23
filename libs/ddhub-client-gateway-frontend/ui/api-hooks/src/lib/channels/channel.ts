@@ -21,7 +21,7 @@ export const useChannel = (fqcn: string) => {
           Swal.httpError(err);
         },
       },
-    }
+    },
   );
   const channelLoaded = data !== undefined && isSuccess && !isError;
   const channel = data ?? ({} as GetChannelResponseDto);

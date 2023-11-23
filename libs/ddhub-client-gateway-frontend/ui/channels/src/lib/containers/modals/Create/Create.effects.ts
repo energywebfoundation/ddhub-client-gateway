@@ -183,7 +183,7 @@ export const useCreateChannelEffects = () => {
 
     const topicsData = values.conditions.topics.map((topic: Topic) => {
       const respTopics = values.conditions.responseTopics.filter(
-        (item: ResponseTopicDto) => item.responseTopicId === topic.id
+        (item: ResponseTopicDto) => item.responseTopicId === topic.id,
       );
 
       if (respTopics.length) {

@@ -36,13 +36,13 @@ export const BASIC_ENVS = Joi.object({
   DOWNLOAD_FILES_DIR: Joi.string()
     .default('./download')
     .description(
-      'Directory where we should store downloaded files for limited time'
+      'Directory where we should store downloaded files for limited time',
     ),
   LOG_LEVEL: Joi.string()
     .valid(...['fatal', 'error', 'warn', 'info', 'debug', 'trace'])
     .default('info')
     .description(
-      'Minimal log level ("fatal" | "error" | "warn" | "info" | "debug" | "trace" | "silent")'
+      'Minimal log level ("fatal" | "error" | "warn" | "info" | "debug" | "trace" | "silent")',
     ),
   LOG_PRETTY: Joi.boolean()
     .default(false)
@@ -67,24 +67,24 @@ export const BASIC_ENVS = Joi.object({
     .positive()
     .default(2)
     .description(
-      'Specifies retry factor (multiplier for timeout) for vulnerable methods'
+      'Specifies retry factor (multiplier for timeout) for vulnerable methods',
     ),
   TIMEOUT: Joi.number()
     .positive()
     .default(1000)
     .description(
-      'Specifies mininum timeout (how much app should wait before retries) for vulnerable methods'
+      'Specifies mininum timeout (how much app should wait before retries) for vulnerable methods',
     ),
   MAX_TIMEOUT: Joi.number()
     .positive()
     .default(60000)
     .description(
-      'Specifies maximum timeout (how much app should wait before retries) for vulnerable methods'
+      'Specifies maximum timeout (how much app should wait before retries) for vulnerable methods',
     ),
   MESSAGING_MAX_TIMEOUT: Joi.number()
     .positive()
     .default(60000)
     .description(
-      'Specifies messaging maximum timeout (how much app should wait before retries) for vulnerable methods'
+      'Specifies messaging maximum timeout (how much app should wait before retries) for vulnerable methods',
     ),
 });

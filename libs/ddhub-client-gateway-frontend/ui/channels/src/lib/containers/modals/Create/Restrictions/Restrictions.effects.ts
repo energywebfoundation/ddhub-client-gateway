@@ -66,10 +66,10 @@ export const useRestrictionsEffects = (restrictions: ChannelConditionsDto) => {
 
   const handleSaveRestriction = () => {
     const selectedDIDSource = didRestrictionValues(
-      RestrictionFieldNames.DID_SOURCE
+      RestrictionFieldNames.DID_SOURCE,
     );
     const selectedAddressBookItem = didRestrictionValues(
-      RestrictionFieldNames.ADDRESS_BOOK
+      RestrictionFieldNames.ADDRESS_BOOK,
     );
     if (type === RestrictionType.DID) {
       if (selectedDIDSource === DIDSource.MANUAL_INPUT) {
@@ -89,10 +89,10 @@ export const useRestrictionsEffects = (restrictions: ChannelConditionsDto) => {
 
   const handleUpdateRestriction = (removeInput: string) => {
     const selectedDIDSource = didRestrictionValues(
-      RestrictionFieldNames.DID_SOURCE
+      RestrictionFieldNames.DID_SOURCE,
     );
     const selectedAddressBookItem = didRestrictionValues(
-      RestrictionFieldNames.ADDRESS_BOOK
+      RestrictionFieldNames.ADDRESS_BOOK,
     );
 
     setRecent(roleInput || didInput);

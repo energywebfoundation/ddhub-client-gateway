@@ -12,7 +12,7 @@ export class MessageBrokerException extends BaseException {
     code: DsbClientGatewayErrors,
     errorCode: string | MessageBrokerErrors,
     errorCodeMessage: string,
-    path: string
+    path: string,
   ) {
     super(
       message,
@@ -23,7 +23,7 @@ export class MessageBrokerException extends BaseException {
         errorCodeMessage,
         path,
       },
-      HttpStatus.BAD_REQUEST
+      HttpStatus.BAD_REQUEST,
     );
   }
 }

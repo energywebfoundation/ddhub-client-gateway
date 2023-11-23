@@ -32,7 +32,7 @@ import { DdhubClientGatewayVersionModule } from '@dsb-client-gateway/ddhub-clien
         return {
           baseURL: configService.get<string>(
             'DSB_BASE_URL',
-            'https://dsb-demo.energyweb.org'
+            'https://dsb-demo.energyweb.org',
           ),
           headers: {
             'Content-Type': 'application/json',

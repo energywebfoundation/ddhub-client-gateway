@@ -9,16 +9,14 @@ interface ApplicationInfoModalProps {
 }
 
 export const ApplicationInfoModal: FC<ApplicationInfoModalProps> = ({
-                                          application
-                                        }: ApplicationInfoModalProps) => {
-  const {classes} = useStyles();
+  application,
+}: ApplicationInfoModalProps) => {
+  const { classes } = useStyles();
 
   return (
     <Box className={classes.appWrapper}>
       <Image src={application.logoUrl} className={classes.appImage} />
-      <Typography className={classes.appName}>
-        {application.appName}
-      </Typography>
+      <Typography className={classes.appName}>{application.appName}</Typography>
       <Stack direction="column">
         <Typography className={classes.label} variant="body2">
           Namespace
@@ -31,4 +29,4 @@ export const ApplicationInfoModal: FC<ApplicationInfoModalProps> = ({
       </Stack>
     </Box>
   );
-}
+};

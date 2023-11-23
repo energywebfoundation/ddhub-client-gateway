@@ -50,7 +50,7 @@ export const useUpdateChannelEffects = () => {
   const applicationMap = new Map();
 
   applications.forEach((application) =>
-    applicationMap.set(application.namespace, application.appName)
+    applicationMap.set(application.namespace, application.appName),
   );
 
   const { updateChannelHandler, isLoading: isUpdating } = useUpdateChannel();
@@ -133,7 +133,7 @@ export const useUpdateChannelEffects = () => {
       const topicId = topic.id ?? topic.topicId;
       if (data.responseTopics) {
         const respTopics = data.responseTopics.filter(
-          (item: ResponseTopicDto) => item.responseTopicId === topicId
+          (item: ResponseTopicDto) => item.responseTopicId === topicId,
         );
 
         if (respTopics.length) {

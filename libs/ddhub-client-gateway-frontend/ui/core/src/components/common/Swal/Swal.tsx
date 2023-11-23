@@ -14,7 +14,7 @@ export interface SwalProps {
   confirmButtonText?: string;
   cancelButtonText?: string;
   width?: string;
-  html?: string | HTMLElement
+  html?: string | HTMLElement;
 }
 
 export const Swal = () => {

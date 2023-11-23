@@ -7,7 +7,7 @@ import {
 } from '@mui/material';
 import { useStyles } from './Backdrop.styles';
 import { alpha } from '@mui/material/styles';
-import { useBackdropContext } from "@ddhub-client-gateway-frontend/ui/context";
+import { useBackdropContext } from '@ddhub-client-gateway-frontend/ui/context';
 
 export const Backdrop: FC = () => {
   const { isLoading } = useBackdropContext();

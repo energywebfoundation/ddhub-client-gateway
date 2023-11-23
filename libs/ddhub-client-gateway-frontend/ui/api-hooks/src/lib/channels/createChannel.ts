@@ -15,7 +15,7 @@ export const useCreateChannel = () => {
 
   const createChannelHandler = (
     values: CreateChannelDto,
-    onSuccess: () => void
+    onSuccess: () => void,
   ) => {
     mutate(
       {
@@ -24,7 +24,7 @@ export const useCreateChannel = () => {
       {
         onSuccess,
         onError: createChannelError,
-      }
+      },
     );
   };
 

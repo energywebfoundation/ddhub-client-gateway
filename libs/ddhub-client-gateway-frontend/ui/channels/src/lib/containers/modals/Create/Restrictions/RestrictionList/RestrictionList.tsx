@@ -49,7 +49,7 @@ export const RestrictionList = ({
   const addressBookContext = useContext(AddressBookContext);
   if (!addressBookContext) {
     throw new Error(
-      '[RestrictionList] AddressBookContext provider not available'
+      '[RestrictionList] AddressBookContext provider not available',
     );
   }
   const { classes } = useStyles();

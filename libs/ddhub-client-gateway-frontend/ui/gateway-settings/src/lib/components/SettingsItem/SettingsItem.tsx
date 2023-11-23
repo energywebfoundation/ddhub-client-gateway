@@ -40,14 +40,17 @@ export const SettingsItem: FC<SettingsItemProps> = ({
       <Box className={classes.footer}>
         <Box flexGrow={1}>{footer}</Box>
         <Box display="flex" alignItems="flex-end">
-          { secondaryButtonText && (
+          {secondaryButtonText && (
             <Button
               type="button"
               variant="outlined"
               className={classes.secondaryButton}
               onClick={onClickSecondary}
             >
-              <Typography className={classes.secondaryButtonText} variant="body2">
+              <Typography
+                className={classes.secondaryButtonText}
+                variant="body2"
+              >
                 {secondaryButtonText}
               </Typography>
             </Button>

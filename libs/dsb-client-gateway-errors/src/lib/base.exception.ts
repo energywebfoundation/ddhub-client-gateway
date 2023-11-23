@@ -6,7 +6,7 @@ export abstract class BaseException extends Error {
     public readonly message: string,
     public readonly code: DsbClientGatewayErrors,
     public readonly additionalDetails?: any,
-    public readonly httpCode: HttpStatus = HttpStatus.BAD_REQUEST
+    public readonly httpCode: HttpStatus = HttpStatus.BAD_REQUEST,
   ) {
     super(message);
   }

@@ -24,7 +24,9 @@ export const useRemoveClientIds = () => {
     Swal.httpError(err);
   };
 
-  const removeClientIdsHandler = async (clientIds: DeleteManyClientsBodyDto) => {
+  const removeClientIdsHandler = async (
+    clientIds: DeleteManyClientsBodyDto,
+  ) => {
     const { isDismissed } = await Swal.warning({
       text: 'You will remove the client subscriptions',
     });
@@ -39,7 +41,7 @@ export const useRemoveClientIds = () => {
       {
         onSuccess: removeClientIdsSuccess,
         onError: removeClientIdsError,
-      }
+      },
     );
   };
 

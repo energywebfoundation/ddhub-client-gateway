@@ -71,7 +71,7 @@ export const RestrictionsViewBox: FC<RestrictionsViewBoxProps> = memo(
         </Box>
       </Box>
     );
-  }
+  },
 );
 
 RestrictionsViewBox.displayName = 'RestrictionsViewBox';

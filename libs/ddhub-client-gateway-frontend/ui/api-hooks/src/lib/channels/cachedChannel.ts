@@ -9,7 +9,7 @@ import {
 export const useCachedChannel = (fqcn: string) => {
   const queryClient = useQueryClient();
   const data: GetChannelResponseDto | undefined = queryClient.getQueryData(
-    getChannelControllerGetQueryKey(fqcn)
+    getChannelControllerGetQueryKey(fqcn),
   );
   const cachedChannel = data ?? ({} as GetChannelResponseDto);
   const topics = cachedChannel?.conditions?.topics ?? ([] as ChannelTopic[]);

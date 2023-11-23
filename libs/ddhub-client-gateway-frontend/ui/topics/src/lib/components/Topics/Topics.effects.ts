@@ -10,31 +10,44 @@ import {
 } from '@ddhub-client-gateway-frontend/ui/api-hooks';
 import { TTableComponentAction } from '@ddhub-client-gateway-frontend/ui/core';
 import { GetTopicDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
-import { downloadJson, Queries, routerConst } from '@ddhub-client-gateway-frontend/ui/utils';
+import {
+  downloadJson,
+  Queries,
+  routerConst,
+} from '@ddhub-client-gateway-frontend/ui/utils';
 import { useStyles } from './Topics.styles';
 import { useState } from 'react';
 
 export const useTopicsEffects = (
   versionHistoryUrl: string,
-  readonly: boolean
+  readonly: boolean,
 ) => {
   const { theme } = useStyles();
   const router = useRouter();
   const [isSearch, setIsSearch] = useState(false);
 
-  const { topics, topicsFetched, getTopics, pagination, topicsLoading, getTopicsBySearch } = useTopics({
+  const {
+    topics,
+    topicsFetched,
+    getTopics,
+    pagination,
+    topicsLoading,
+    getTopicsBySearch,
+  } = useTopics({
     limit: 10,
     page: 1,
     owner: router.query[Queries.Namespace] as string,
   });
 
   const getUsedRoleForApplication = router.pathname.includes(
-    routerConst.Channels
+    routerConst.Channels,
   )
     ? 'user'
     : undefined;
 
-  const { applicationsByNamespace } = useCachedApplications(getUsedRoleForApplication);
+  const { applicationsByNamespace } = useCachedApplications(
+    getUsedRoleForApplication,
+  );
   const { removeTopicHandler } = useRemoveTopic(isSearch);
 
   const application =
@@ -86,10 +99,7 @@ export const useTopicsEffects = (
   };
 
   const exportSchema = (data: any) => {
-    downloadJson(
-      data.schema,
-      `Schema_${data.name}_${data.version}.json`
-    );
+    downloadJson(data.schema, `Schema_${data.name}_${data.version}.json`);
   };
 
   const actions: TTableComponentAction<GetTopicDto>[] = [

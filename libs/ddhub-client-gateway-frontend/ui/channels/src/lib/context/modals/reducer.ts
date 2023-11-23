@@ -36,7 +36,7 @@ export const modalInitialState: IModalStore = {
 
 export const modalsReducer = (
   state = modalInitialState,
-  action: TModalAction
+  action: TModalAction,
 ): IModalStore => {
   switch (action.type) {
     case ModalActionsEnum.SHOW_CREATE:
@@ -58,15 +58,16 @@ export const modalsReducer = (
         update: { ...state.update, open: !action.payload },
       };
     case ModalActionsEnum.HIDE_DETAILS:
-      return { ...state,
-        details: { ...state.details, open: !action.payload},
-      };
+      return { ...state, details: { ...state.details, open: !action.payload } };
     case ModalActionsEnum.SHOW_TOPIC_VERSION_DETAILS:
       return { ...state, topicVersionDetails: action.payload };
     case ModalActionsEnum.HIDE_TOPIC_VERSION_DETAILS:
       return {
         ...state,
-        topicVersionDetails: {...state.topicVersionDetails, open: !action.payload}
-      }
+        topicVersionDetails: {
+          ...state.topicVersionDetails,
+          open: !action.payload,
+        },
+      };
   }
 };

@@ -4,7 +4,7 @@ const LAST_CHARACTERS = 5;
 export function didFormatMinifier(
   value: string,
   charsAfterLastColon: number = CHARACTERS_AFTER_LAST_COLON,
-  lastCharacters: number = LAST_CHARACTERS
+  lastCharacters: number = LAST_CHARACTERS,
 ) {
   if (!value) {
     return value;
@@ -13,6 +13,6 @@ export function didFormatMinifier(
   const lastColonIndex = value.lastIndexOf(':');
   return `${value.substring(
     0,
-    lastColonIndex + charsAfterLastColon
+    lastColonIndex + charsAfterLastColon,
   )}...${value.substring(value.length - lastCharacters)}`;
 }

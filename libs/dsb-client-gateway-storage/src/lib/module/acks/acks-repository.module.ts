@@ -6,10 +6,14 @@ import { AcksWrapperRepository, PendingAcksWrapperRepository } from './wrapper';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([AcksEntity, AcksRepository, PendingAcksEntity, PendingAcksRepository]),
+    TypeOrmModule.forFeature([
+      AcksEntity,
+      AcksRepository,
+      PendingAcksEntity,
+      PendingAcksRepository,
+    ]),
   ],
   providers: [AcksWrapperRepository, PendingAcksWrapperRepository],
   exports: [AcksWrapperRepository, PendingAcksWrapperRepository],
 })
-export class AcksRepositoryModule { }
-
+export class AcksRepositoryModule {}

@@ -1,30 +1,35 @@
-import { TTableComponentAction, useCustomAlert } from '@ddhub-client-gateway-frontend/ui/core';
+import {
+  TTableComponentAction,
+  useCustomAlert,
+} from '@ddhub-client-gateway-frontend/ui/core';
 import {
   GetAllClientsResponseDto,
   useClientControllerGetAll,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { theme } from '@ddhub-client-gateway-frontend/ui/utils';
-import { useRemoveClientId, useRemoveClientIds } from '@ddhub-client-gateway-frontend/ui/api-hooks';
+import {
+  useRemoveClientId,
+  useRemoveClientIds,
+} from '@ddhub-client-gateway-frontend/ui/api-hooks';
 import { useBackdropContext } from '@ddhub-client-gateway-frontend/ui/context';
 
 export const useClientIdsEffects = () => {
   const { setIsLoading, isLoading: isBackdropLoading } = useBackdropContext();
-  const { removeClientIdHandler, isLoading: isRemoveIdLoading } = useRemoveClientId();
-  const { removeClientIdsHandler, isLoading: isRemoveIdsLoading } = useRemoveClientIds();
+  const { removeClientIdHandler, isLoading: isRemoveIdLoading } =
+    useRemoveClientId();
+  const { removeClientIdsHandler, isLoading: isRemoveIdsLoading } =
+    useRemoveClientIds();
   let selectedClientIds: string[] = [];
 
   const Swal = useCustomAlert();
-  const { data, isLoading, isSuccess, isError } =
-    useClientControllerGetAll(
-      {
-        query: {
-          onError: (err: any) => {
-            console.error(err);
-            Swal.httpError(err);
-          },
-        },
-      }
-    );
+  const { data, isLoading, isSuccess, isError } = useClientControllerGetAll({
+    query: {
+      onError: (err: any) => {
+        console.error(err);
+        Swal.httpError(err);
+      },
+    },
+  });
 
   const actions: TTableComponentAction<GetAllClientsResponseDto>[] = [
     {
@@ -44,7 +49,7 @@ export const useClientIdsEffects = () => {
       removeClientIdsHandler({ clientsIds: selectedClientIds });
     } else {
       Swal.error({
-        text: 'Please select a client subscription'
+        text: 'Please select a client subscription',
       });
     }
   };

@@ -1,6 +1,4 @@
-import {
-  TableHeader,
-} from '@ddhub-client-gateway-frontend/ui/core';
+import { TableHeader } from '@ddhub-client-gateway-frontend/ui/core';
 import dayjs from 'dayjs';
 
 export const CLIENT_IDS_HEADERS: TableHeader[] = [

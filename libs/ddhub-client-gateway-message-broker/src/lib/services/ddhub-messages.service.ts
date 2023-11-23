@@ -29,13 +29,13 @@ export class DdhubMessagesService extends DdhubBaseService {
     protected readonly didAuthService: DidAuthService,
     protected readonly tlsAgentService: TlsAgentService,
     protected readonly ddhubLoginService: DdhubLoginService,
-    protected readonly configService: ConfigService
+    protected readonly configService: ConfigService,
   ) {
     super(
       new Logger(DdhubMessagesService.name),
       retryConfigService,
       ddhubLoginService,
-      tlsAgentService
+      tlsAgentService,
     );
   }
 
@@ -44,7 +44,7 @@ export class DdhubMessagesService extends DdhubBaseService {
     messageIds: string[],
     clientId?: string,
     from?: string,
-    anonymousRecipient?: string
+    anonymousRecipient?: string,
   ): Promise<AckResponse> {
     const requestBody = {
       messageIds,
@@ -65,23 +65,23 @@ export class DdhubMessagesService extends DdhubBaseService {
             })
             .pipe(
               timeout(
-                +this.configService.get<number>('MESSAGING_MAX_TIMEOUT', 60000)
-              )
+                +this.configService.get<number>('MESSAGING_MAX_TIMEOUT', 60000),
+              ),
             ),
         {
           stopOnResponseCodes: ['10'],
-        }
+        },
       );
 
       const idsNotAck: string[] = messageIds.filter(
-        (id) => !result.data.acked.includes(id)
+        (id) => !result.data.acked.includes(id),
       );
       if (idsNotAck.length === 0) {
         this.logger.log('messages ack successful', result.data);
       } else {
         this.logger.log('messages not ack', idsNotAck);
         this.logger.error(
-          `['/messages/ack'][post]${JSON.stringify(requestBody)}`
+          `['/messages/ack'][post]${JSON.stringify(requestBody)}`,
         );
       }
 
@@ -89,7 +89,7 @@ export class DdhubMessagesService extends DdhubBaseService {
     } catch (e) {
       this.logger.error('messages ack failed', e);
       this.logger.error(
-        `['/messages/ack'][post]${JSON.stringify(requestBody)}`
+        `['/messages/ack'][post]${JSON.stringify(requestBody)}`,
       );
       throw e;
     }
@@ -103,7 +103,7 @@ export class DdhubMessagesService extends DdhubBaseService {
     clientId?: string,
     from?: string,
     amount?: number,
-    anonymousRecipient?: string
+    anonymousRecipient?: string,
   ): Promise<SearchMessageResponseDto[]> {
     const requestBody = {
       topicId,
@@ -127,12 +127,12 @@ export class DdhubMessagesService extends DdhubBaseService {
             })
             .pipe(
               timeout(
-                +this.configService.get<number>('MESSAGING_MAX_TIMEOUT', 60000)
-              )
+                +this.configService.get<number>('MESSAGING_MAX_TIMEOUT', 60000),
+              ),
             ),
         {
           stopOnResponseCodes: ['10'],
-        }
+        },
       );
 
       this.logger.log('messages search successful', result);
@@ -141,7 +141,7 @@ export class DdhubMessagesService extends DdhubBaseService {
     } catch (e) {
       this.logger.error('messages search failed', e);
       this.logger.error(
-        `['/messages/search'][post]${JSON.stringify(requestBody)}`
+        `['/messages/search'][post]${JSON.stringify(requestBody)}`,
       );
       throw e;
     }
@@ -152,7 +152,7 @@ export class DdhubMessagesService extends DdhubBaseService {
     fqcn: string,
     from?: string,
     clientId?: string,
-    amount?: number
+    amount?: number,
   ): Promise<Message[]> {
     try {
       const result = await this.request<null>(
@@ -172,12 +172,12 @@ export class DdhubMessagesService extends DdhubBaseService {
             })
             .pipe(
               timeout(
-                +this.configService.get<number>('MESSAGING_MAX_TIMEOUT', 60000)
-              )
+                +this.configService.get<number>('MESSAGING_MAX_TIMEOUT', 60000),
+              ),
             ),
         {
           stopOnResponseCodes: ['10'],
-        }
+        },
       );
 
       this.logger.log(`get messages successful for fqcn: ${fqcn}`);
@@ -191,7 +191,7 @@ export class DdhubMessagesService extends DdhubBaseService {
           from,
           clientId,
           amount,
-        })}`
+        })}`,
       );
       throw e;
     }
@@ -209,7 +209,7 @@ export class DdhubMessagesService extends DdhubBaseService {
     anonymousRecipient: string[],
     transactionId?: string,
     initiatingMessageId?: string,
-    initiatingTransactionId?: string
+    initiatingTransactionId?: string,
   ): Promise<SendMessageResponse> {
     const messageData: SendMessageData = {
       fqcns,
@@ -239,12 +239,12 @@ export class DdhubMessagesService extends DdhubBaseService {
             })
             .pipe(
               timeout(
-                +this.configService.get<number>('MESSAGING_MAX_TIMEOUT', 60000)
-              )
+                +this.configService.get<number>('MESSAGING_MAX_TIMEOUT', 60000),
+              ),
             ),
         {
           stopOnResponseCodes: ['10'],
-        }
+        },
       );
 
       this.logger.log('send message successful', result);
@@ -261,7 +261,7 @@ export class DdhubMessagesService extends DdhubBaseService {
   public async sendMessageInternal(
     fqcn: string,
     clientGatewayMessageId: string,
-    payload: string
+    payload: string,
   ): Promise<SendInternalMessageResponse> {
     const requestData: SendInternalMessageRequestDTO = {
       fqcn,
@@ -281,26 +281,26 @@ export class DdhubMessagesService extends DdhubBaseService {
             })
             .pipe(
               timeout(
-                +this.configService.get<number>('MESSAGING_MAX_TIMEOUT', 60000)
-              )
+                +this.configService.get<number>('MESSAGING_MAX_TIMEOUT', 60000),
+              ),
             ),
         {
           stopOnResponseCodes: ['10'],
-        }
+        },
       );
 
       this.logger.log(
-        `send message internal successful with clientGatewayMessageId: ${clientGatewayMessageId}`
+        `send message internal successful with clientGatewayMessageId: ${clientGatewayMessageId}`,
       );
 
       return result.data;
     } catch (e) {
       this.logger.error(
         `send message internal failed with clientGatewayMessageId: ${clientGatewayMessageId}`,
-        e
+        e,
       );
       this.logger.error(
-        `['/messages/internal'][post]${JSON.stringify(requestData)}`
+        `['/messages/internal'][post]${JSON.stringify(requestData)}`,
       );
       throw e;
     }
@@ -309,7 +309,7 @@ export class DdhubMessagesService extends DdhubBaseService {
   @Span('ddhub_mb_getSymmetricKeys')
   public async getSymmetricKeys(
     dto: { clientId: string; amount: number },
-    overrideRetry?: OperationOptions
+    overrideRetry?: OperationOptions,
   ): Promise<GetInternalMessageResponse[]> {
     try {
       const { data } = await this.request<null>(
@@ -323,13 +323,13 @@ export class DdhubMessagesService extends DdhubBaseService {
             })
             .pipe(
               timeout(
-                +this.configService.get<number>('MESSAGING_MAX_TIMEOUT', 60000)
-              )
+                +this.configService.get<number>('MESSAGING_MAX_TIMEOUT', 60000),
+              ),
             ),
         {
           stopOnResponseCodes: ['10'],
         },
-        overrideRetry
+        overrideRetry,
       );
 
       this.logger.log(`get symmetric keys successful with dto:`, dto);
@@ -338,7 +338,7 @@ export class DdhubMessagesService extends DdhubBaseService {
     } catch (e) {
       this.logger.error(`get symmetric keys failed with dto:`, dto, e);
       this.logger.error(
-        `['/messages/internal/search'][get]${JSON.stringify(dto)}`
+        `['/messages/internal/search'][get]${JSON.stringify(dto)}`,
       );
       throw e;
     }

@@ -134,7 +134,7 @@ export class SecretsCacheProxyService extends SecretsEngineService {
   }
 
   public async setCertificateDetails(
-    details: CertificateDetails
+    details: CertificateDetails,
   ): Promise<SetCertificateDetailsResponse> {
     this.logger.debug('setting certificate details');
 
@@ -147,7 +147,7 @@ export class SecretsCacheProxyService extends SecretsEngineService {
   }
 
   public async setPrivateKey(
-    privateKey: string
+    privateKey: string,
   ): Promise<SetPrivateKeyResponse> {
     this.logger.debug('setting private key');
 
@@ -160,7 +160,7 @@ export class SecretsCacheProxyService extends SecretsEngineService {
   }
 
   public async setRSAPrivateKey(
-    privateKey: string
+    privateKey: string,
   ): Promise<SetRSAPrivateKeyResponse> {
     this.logger.debug('setting RSA private key');
 
@@ -177,9 +177,8 @@ export class SecretsCacheProxyService extends SecretsEngineService {
   }
 
   public async setMnemonic(mnemonic: string): Promise<string> {
-    const response: string = await this.secretsEngineService.setMnemonic(
-      mnemonic
-    );
+    const response: string =
+      await this.secretsEngineService.setMnemonic(mnemonic);
 
     this.cachedObjects.mnemonic = mnemonic;
 

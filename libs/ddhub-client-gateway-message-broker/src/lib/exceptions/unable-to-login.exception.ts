@@ -9,7 +9,7 @@ export class UnableToLoginException extends BaseException {
   constructor() {
     super(
       'Unable to login to Message Broker',
-      DsbClientGatewayErrors.MB_UNABLE_TO_LOGIN
+      DsbClientGatewayErrors.MB_UNABLE_TO_LOGIN,
     );
   }
 }

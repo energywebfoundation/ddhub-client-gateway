@@ -12,15 +12,16 @@ export interface ApplicationItemProps {
   listProps: any;
 }
 
-export const ApplicationItem = ({ listProps, option }: ApplicationItemProps) => {
+export const ApplicationItem = ({
+  listProps,
+  option,
+}: ApplicationItemProps) => {
   const { classes } = useStyles();
 
   return (
     <Box key={listProps.key}>
-      { listProps['data-option-index'] === 0 && (
-        <Typography className={classes.select}>
-          Select
-        </Typography>
+      {listProps['data-option-index'] === 0 && (
+        <Typography className={classes.select}>Select</Typography>
       )}
       <Box component="li" {...listProps}>
         <Grid container justifyContent="space-between" wrap="nowrap">

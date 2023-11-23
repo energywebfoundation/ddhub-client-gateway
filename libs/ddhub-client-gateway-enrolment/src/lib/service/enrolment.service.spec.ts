@@ -86,7 +86,7 @@ describe('EnrolmentService', () => {
 
       it('should delete enrolment', () => {
         expect(
-          enrolmentWrapperRepositoryMock.enrolmentRepository.clear
+          enrolmentWrapperRepositoryMock.enrolmentRepository.clear,
         ).toBeCalledTimes(1);
       });
     });
@@ -169,10 +169,10 @@ describe('EnrolmentService', () => {
 
       it('should store enrolment', () => {
         expect(
-          enrolmentWrapperRepositoryMock.enrolmentRepository.createOne
+          enrolmentWrapperRepositoryMock.enrolmentRepository.createOne,
         ).toBeCalledTimes(1);
         expect(
-          enrolmentWrapperRepositoryMock.enrolmentRepository.createOne
+          enrolmentWrapperRepositoryMock.enrolmentRepository.createOne,
         ).toBeCalledWith({
           did: 'did',
           roles: [
@@ -241,10 +241,10 @@ describe('EnrolmentService', () => {
 
       it('should attempt to get enrolment', () => {
         expect(
-          enrolmentWrapperRepositoryMock.enrolmentRepository.findOne
+          enrolmentWrapperRepositoryMock.enrolmentRepository.findOne,
         ).toBeCalledTimes(1);
         expect(
-          enrolmentWrapperRepositoryMock.enrolmentRepository.findOne
+          enrolmentWrapperRepositoryMock.enrolmentRepository.findOne,
         ).toBeCalledWith({
           where: {
             did: 'did',
@@ -287,10 +287,10 @@ describe('EnrolmentService', () => {
 
       it('should attempt to get enrolment', () => {
         expect(
-          enrolmentWrapperRepositoryMock.enrolmentRepository.findOne
+          enrolmentWrapperRepositoryMock.enrolmentRepository.findOne,
         ).toBeCalledTimes(1);
         expect(
-          enrolmentWrapperRepositoryMock.enrolmentRepository.findOne
+          enrolmentWrapperRepositoryMock.enrolmentRepository.findOne,
         ).toBeCalledWith({
           where: {
             did: 'did',
@@ -331,7 +331,7 @@ describe('EnrolmentService', () => {
         expect(configServiceMock.get).toBeCalledTimes(1);
         expect(configServiceMock.get).toBeCalledWith(
           'PARENT_NAMESPACE',
-          'ddhub.apps.energyweb.iam.ewc'
+          'ddhub.apps.energyweb.iam.ewc',
         );
       });
     });

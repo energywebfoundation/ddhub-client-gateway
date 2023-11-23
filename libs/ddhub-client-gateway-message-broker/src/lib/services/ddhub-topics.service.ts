@@ -30,19 +30,19 @@ export class DdhubTopicsService extends DdhubBaseService {
     protected readonly retryConfigService: RetryConfigService,
     protected readonly didAuthService: DidAuthService,
     protected readonly tlsAgentService: TlsAgentService,
-    protected readonly ddhubLoginService: DdhubLoginService
+    protected readonly ddhubLoginService: DdhubLoginService,
   ) {
     super(
       new Logger(DdhubTopicsService.name),
       retryConfigService,
       ddhubLoginService,
-      tlsAgentService
+      tlsAgentService,
     );
   }
 
   @Span('ddhub_mb_getTopicById')
   async getTopicById(
-    topicId: string
+    topicId: string,
   ): Promise<PaginatedData<TopicVersion> | null> {
     try {
       const { data } = await this.request<PaginatedData<TopicVersion> | null>(
@@ -55,7 +55,7 @@ export class DdhubTopicsService extends DdhubBaseService {
           }),
         {
           stopOnResponseCodes: [MessageBrokerErrors.UNAUTHORIZED_ACCESS],
-        }
+        },
       );
       this.logger.log(`Get topic with topicId: ${topicId} successful`);
 
@@ -81,7 +81,7 @@ export class DdhubTopicsService extends DdhubBaseService {
           }),
         {
           stopOnResponseCodes: [MessageBrokerErrors.UNAUTHORIZED_ACCESS],
-        }
+        },
       );
 
       this.logger.log(`delete topic successful with id:${id}`);
@@ -96,11 +96,11 @@ export class DdhubTopicsService extends DdhubBaseService {
   @Span('ddhub_mb_deleteTopicByVersion')
   public async deleteTopicByVersion(
     id: string,
-    version: string
+    version: string,
   ): Promise<DeleteTopicResponseDto> {
     try {
       this.logger.log(
-        `topic to be deleted with version: ${version} and id:${id}`
+        `topic to be deleted with version: ${version} and id:${id}`,
       );
       const { data } = await this.request<DeleteTopicResponseDto>(
         () =>
@@ -112,18 +112,18 @@ export class DdhubTopicsService extends DdhubBaseService {
           }),
         {
           stopOnResponseCodes: [MessageBrokerErrors.UNAUTHORIZED_ACCESS],
-        }
+        },
       );
 
       this.logger.log(
-        `delete topic successful with version: ${version} and id:${id}`
+        `delete topic successful with version: ${version} and id:${id}`,
       );
 
       return data;
     } catch (e) {
       this.logger.error(
         `delete topic with id ${id} and version ${version} failed`,
-        e
+        e,
       );
       throw e;
     }
@@ -133,7 +133,7 @@ export class DdhubTopicsService extends DdhubBaseService {
   public async updateTopicByIdAndVersion(
     topicData: UpdateTopicHistoryDTO,
     id: string,
-    versionNumber: string
+    versionNumber: string,
   ): Promise<Topic> {
     try {
       this.logger.log('topic data to be updated', topicData);
@@ -147,22 +147,22 @@ export class DdhubTopicsService extends DdhubBaseService {
               headers: {
                 Authorization: `Bearer ${this.didAuthService.getToken()}`,
               },
-            }
+            },
           ),
         {
           stopOnResponseCodes: [MessageBrokerErrors.UNAUTHORIZED_ACCESS],
-        }
+        },
       );
 
       this.logger.log(
-        `update topics successful with id: ${id} and versionNumber:${versionNumber}`
+        `update topics successful with id: ${id} and versionNumber:${versionNumber}`,
       );
 
       return result.data;
     } catch (e) {
       this.logger.error(
         `update topics failed with id: ${id} and versionNumber:${versionNumber}`,
-        e
+        e,
       );
       throw e;
     }
@@ -171,7 +171,7 @@ export class DdhubTopicsService extends DdhubBaseService {
   @Span('ddhub_mb_updateTopics')
   public async updateTopic(
     data: UpdateTopicBodyDTO,
-    id: string
+    id: string,
   ): Promise<UpdateTopicResponeDto> {
     try {
       this.logger.log('topic to be updated', data);
@@ -185,7 +185,7 @@ export class DdhubTopicsService extends DdhubBaseService {
           }),
         {
           stopOnResponseCodes: [MessageBrokerErrors.UNAUTHORIZED_ACCESS],
-        }
+        },
       );
 
       this.logger.log(`update topics successful with id: ${id}`);
@@ -212,7 +212,7 @@ export class DdhubTopicsService extends DdhubBaseService {
           }),
         {
           stopOnResponseCodes: [MessageBrokerErrors.UNAUTHORIZED_ACCESS],
-        }
+        },
       );
 
       this.logger.log('post topics successful', data);
@@ -227,7 +227,7 @@ export class DdhubTopicsService extends DdhubBaseService {
   @Span('ddhub_mb_getTopicHistoryByIdAndVersion')
   public async getTopicHistoryByIdAndVersion(
     id: string,
-    versionNumber: string
+    versionNumber: string,
   ): Promise<Topic> {
     try {
       const { data } = await this.request<Topic>(
@@ -240,17 +240,17 @@ export class DdhubTopicsService extends DdhubBaseService {
           }),
         {
           stopOnResponseCodes: [MessageBrokerErrors.UNAUTHORIZED_ACCESS],
-        }
+        },
       );
 
       this.logger.log(
-        `get topics history with id:${id} and version: ${versionNumber} successful`
+        `get topics history with id:${id} and version: ${versionNumber} successful`,
       );
       return data;
     } catch (e) {
       this.logger.error(
         `get topics history with id:${id} and version: ${versionNumber} failed`,
-        e
+        e,
       );
       throw e;
     }
@@ -269,7 +269,7 @@ export class DdhubTopicsService extends DdhubBaseService {
           }),
         {
           stopOnResponseCodes: [MessageBrokerErrors.UNAUTHORIZED_ACCESS],
-        }
+        },
       );
 
       this.logger.log(`get topics history with id:${id} successful`);
@@ -285,7 +285,7 @@ export class DdhubTopicsService extends DdhubBaseService {
     keyword: string,
     owner?: string,
     limit?: number,
-    page?: number
+    page?: number,
   ): Promise<TopicDataResponse | []> {
     if (!keyword) {
       this.logger.debug(`no keyword given so returning empty array`);
@@ -309,7 +309,7 @@ export class DdhubTopicsService extends DdhubBaseService {
           }),
         {
           stopOnResponseCodes: [MessageBrokerErrors.UNAUTHORIZED_ACCESS],
-        }
+        },
       );
 
       this.logger.log(`get topics search with keyword: ${keyword} successful`);
@@ -322,7 +322,7 @@ export class DdhubTopicsService extends DdhubBaseService {
 
   @Span('ddhub_mb_getTopicsCountByOwner')
   public async getTopicsCountByOwner(
-    owners: string[]
+    owners: string[],
   ): Promise<TopicCountDto[]> {
     if (!owners || owners.length === 0) {
       return [];
@@ -345,7 +345,7 @@ export class DdhubTopicsService extends DdhubBaseService {
           }),
         {
           stopOnResponseCodes: [MessageBrokerErrors.UNAUTHORIZED_ACCESS],
-        }
+        },
       );
 
       this.logger.log(`get topics count with owners: ${owners} successful`);
@@ -358,7 +358,7 @@ export class DdhubTopicsService extends DdhubBaseService {
 
   @Span('ddhub_mb_refreshTopicsMonitor')
   public async topicUpdatesMonitor(
-    owners: string[]
+    owners: string[],
   ): Promise<TopicMonitorUpdates[]> {
     try {
       const result = await this.request<null>(
@@ -377,7 +377,7 @@ export class DdhubTopicsService extends DdhubBaseService {
           }),
         {
           stopOnResponseCodes: [MessageBrokerErrors.UNAUTHORIZED_ACCESS],
-        }
+        },
       );
 
       return result.data;
@@ -389,7 +389,7 @@ export class DdhubTopicsService extends DdhubBaseService {
 
   @Span('ddhub_mb_getTopicVersions')
   public async getTopicVersions(
-    topicId: string
+    topicId: string,
   ): Promise<TopicVersionResponse> {
     try {
       const result = await this.request<null>(
@@ -405,7 +405,7 @@ export class DdhubTopicsService extends DdhubBaseService {
           }),
         {
           stopOnResponseCodes: [MessageBrokerErrors.UNAUTHORIZED_ACCESS],
-        }
+        },
       );
 
       return result.data;
@@ -420,7 +420,7 @@ export class DdhubTopicsService extends DdhubBaseService {
     limit: number,
     applicationNameSpace: string,
     page: number,
-    includeDeleted = true
+    includeDeleted = true,
   ): Promise<TopicDataResponse> {
     //replacing double quotes in order to pass correct input to MB
     const owner = applicationNameSpace.replace(/"/g, '');
@@ -442,7 +442,7 @@ export class DdhubTopicsService extends DdhubBaseService {
           }),
         {
           stopOnResponseCodes: [MessageBrokerErrors.UNAUTHORIZED_ACCESS],
-        }
+        },
       );
 
       this.logger.log(`get topics with owner:${owner} successful`);
@@ -456,7 +456,7 @@ export class DdhubTopicsService extends DdhubBaseService {
   @Span('ddhub_mb_getTopicsByOwnerAndName')
   public async getTopicsByOwnerAndName(
     name: string,
-    owner: string
+    owner: string,
   ): Promise<TopicDataResponse> {
     try {
       const { data } = await this.request<TopicDataResponse>(
@@ -473,13 +473,13 @@ export class DdhubTopicsService extends DdhubBaseService {
           }),
         {
           stopOnResponseCodes: [MessageBrokerErrors.UNAUTHORIZED_ACCESS],
-        }
+        },
       );
 
       return data;
     } catch (e) {
       this.logger.log(
-        `get topics with owner: ${owner} and name: ${name} failed`
+        `get topics with owner: ${owner} and name: ${name} failed`,
       );
 
       throw e;

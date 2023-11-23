@@ -42,14 +42,14 @@ export const useTopicsEffects = (responseTopics: ResponseTopicDto[]) => {
 
   const handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
-    newPage: number
+    newPage: number,
   ) => {
     setPage(newPage);
   };
 
   const getSelectedResponseTopics = (selectedTopicId: string) => {
     const selectedResponseTopics = responseTopics.filter(
-      (topic) => topic.responseTopicId === selectedTopicId
+      (topic) => topic.responseTopicId === selectedTopicId,
     );
 
     return selectedResponseTopics;

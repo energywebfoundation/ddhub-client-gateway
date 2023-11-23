@@ -8,7 +8,7 @@ export const useCustomAlert = () => {
   };
 
   const error = async (
-    props: Partial<SwalProps>
+    props: Partial<SwalProps>,
   ): Promise<SweetAlertResult> => {
     return CustomSwal({
       title: 'Error',
@@ -19,7 +19,7 @@ export const useCustomAlert = () => {
   };
 
   const warning = async (
-    props: Partial<SwalProps>
+    props: Partial<SwalProps>,
   ): Promise<SweetAlertResult> => {
     return CustomSwal({
       title: 'Are you sure you want to proceed?',
@@ -31,7 +31,7 @@ export const useCustomAlert = () => {
   };
 
   const success = async (
-    props: Partial<SwalProps>
+    props: Partial<SwalProps>,
   ): Promise<SweetAlertResult> => {
     return CustomSwal({
       title: 'Success',

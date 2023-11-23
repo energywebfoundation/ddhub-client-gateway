@@ -24,12 +24,12 @@ export class Bip39Service {
   public deriveKey(
     mnemonic: string,
     firstIteration: number,
-    secondIteration: number
+    secondIteration: number,
   ): Bip39KeySet {
     const masterKey = this.generateMasterHDKey(mnemonic);
 
     const derivedKey = masterKey.derive(
-      `m/44' /246' /0' /${firstIteration} /${secondIteration}`
+      `m/44' /246' /0' /${firstIteration} /${secondIteration}`,
     );
 
     return {

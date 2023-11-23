@@ -5,7 +5,7 @@ const AsyncApiComponent = dynamic(
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   () => import('@asyncapi/react-component/browser'),
-  { ssr: false }
+  { ssr: false },
 );
 
 export const Websocket = () => {
@@ -14,7 +14,7 @@ export const Websocket = () => {
   if (!schema || typeof navigator === 'undefined') {
     return null;
   }
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
   return <AsyncApiComponent schema={schema} />;
 };

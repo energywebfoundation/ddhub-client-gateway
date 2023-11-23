@@ -11,7 +11,7 @@ export class DidAuthService {
 
   constructor(
     protected readonly didAuthApiService: DidAuthApiService,
-    protected readonly ethersService: EthersService
+    protected readonly ethersService: EthersService,
   ) {}
 
   public getToken(): string | null {
@@ -21,7 +21,7 @@ export class DidAuthService {
   public async login(
     privateKey: string,
     did: string,
-    forceRelogin = false
+    forceRelogin = false,
   ): Promise<void> {
     this.logger.log('Attempting to login');
 

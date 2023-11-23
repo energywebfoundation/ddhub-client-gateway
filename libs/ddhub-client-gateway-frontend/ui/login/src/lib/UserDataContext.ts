@@ -96,7 +96,7 @@ export const UserContext = createContext<UserContext | undefined>(undefined);
 export const useUserData = (queryClient: QueryClient) => {
   const router = useRouter();
   const [config, setConfig] = useState<GatewayResponseDto | undefined>(
-    undefined
+    undefined,
   );
   const [userData, setUserData] = useState<UserDataContext>(initialUserData);
   const [userAuth, setUserAuth] =
@@ -125,11 +125,11 @@ export const useUserData = (queryClient: QueryClient) => {
   const userAuthValue = useMemo(() => ({ userAuth, setUserAuth }), [userAuth]);
   const refreshIdentityValue = useMemo(
     () => ({ refreshIdentity, setRefreshIdentity }),
-    [refreshIdentity]
+    [refreshIdentity],
   );
   const authenticatedValue = useMemo(
     () => ({ authenticated, setAuthenticated }),
-    [authenticated]
+    [authenticated],
   );
 
   useEffect(() => {
@@ -178,7 +178,7 @@ export const useUserData = (queryClient: QueryClient) => {
 
   const fetchGatewayConfig = async () => {
     return await queryClient.fetchQuery<GatewayResponseDto>(
-      getGatewayControllerGetQueryKey()
+      getGatewayControllerGetQueryKey(),
     );
   };
 

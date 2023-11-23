@@ -22,7 +22,7 @@ export enum AccountStatusEnum {
 }
 
 export const checkAccountStatus = (
-  res: IdentityWithEnrolment
+  res: IdentityWithEnrolment,
 ): AccountStatusEnum | RoleStatus => {
   if (!res) {
     return AccountStatusEnum.FIRST_LOGIN;
@@ -37,7 +37,7 @@ export const checkAccountStatus = (
     .filter((role) => role.status !== RoleStatus.REJECTED);
 
   const areRequiredSynced = requiredRoles.every(
-    (role) => role.status === RoleStatus.SYNCED
+    (role) => role.status === RoleStatus.SYNCED,
   );
 
   const checkStatus = (status: RoleStatus) => {
@@ -69,7 +69,7 @@ const isBalanceTooLow = (balanceStatus: string): boolean => {
 
 export const useCheckAccountStatus = (
   triggerQuery = true,
-  withBackdrop = true
+  withBackdrop = true,
 ) => {
   const queryClient = useQueryClient();
   const { setUserData, setIsCheckingIdentity, refreshIdentity } =
@@ -85,7 +85,7 @@ export const useCheckAccountStatus = (
   }, [refreshIdentity]);
 
   const isValidIdentityData = (
-    data: unknown
+    data: unknown,
   ): data is {
     identityData: IdentityWithEnrolment;
     routeRestrictions: RouteRestrictions;
@@ -110,7 +110,7 @@ export const useCheckAccountStatus = (
 
       const identityData = await queryClient.fetchQuery(
         getIdentityControllerGetQueryKey(),
-        identityControllerGet
+        identityControllerGet,
       );
       return { identityData, routeRestrictions };
     } catch (e: unknown) {

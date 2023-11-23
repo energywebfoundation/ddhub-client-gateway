@@ -8,7 +8,7 @@ export const useStyles = makeStyles()((theme) => ({
     fontWeight: 400,
     color: theme.palette.common.white,
     fontFamily: theme.typography.body2.fontFamily,
-    marginBottom: 13
+    marginBottom: 13,
   },
   button: {
     borderRadius: '0px 6px 6px 0px',

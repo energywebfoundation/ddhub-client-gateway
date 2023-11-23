@@ -19,24 +19,24 @@ export abstract class DdhubBaseService {
     protected readonly logger: Logger,
     protected readonly retryConfigService: RetryConfigService,
     protected readonly ddhubLoginService: DdhubLoginService,
-    protected readonly tlsAgentService: TlsAgentService
+    protected readonly tlsAgentService: TlsAgentService,
   ) {}
 
   protected async request<T>(
     requestFn: () => Observable<AxiosResponse<T>>,
     retryOptions: RetryOptions = {},
-    overrideRetryConfig?: OperationOptions
+    overrideRetryConfig?: OperationOptions,
   ): Promise<{ data: T; headers: any }> {
     const { data, headers } = await promiseRetry<AxiosResponse<T>>(
       async (retry) => {
         return lastValueFrom(requestFn()).catch((err) =>
-          this.handleRequestWithRetry(err, retry, retryOptions)
+          this.handleRequestWithRetry(err, retry, retryOptions),
         );
       },
       {
         ...this.retryConfigService.config,
         ...overrideRetryConfig,
-      }
+      },
     );
 
     return { data, headers };
@@ -45,7 +45,7 @@ export abstract class DdhubBaseService {
   protected async handleRequestWithRetry(
     e,
     retry,
-    options: RetryOptions = {}
+    options: RetryOptions = {},
   ): Promise<any> {
     const defaults: RetryOptions = {
       stopOnStatusCodes: [HttpStatus.FORBIDDEN],
@@ -69,7 +69,7 @@ export abstract class DdhubBaseService {
         DsbClientGatewayErrors.MB_UNKNOWN,
         null,
         null,
-        null
+        null,
       );
     }
 
@@ -87,7 +87,7 @@ export abstract class DdhubBaseService {
 
     if (invalidCertificateErrorCodes.includes(e.response.status)) {
       this.logger.error(
-        `Invalid certificate with response code ${e.response.status}`
+        `Invalid certificate with response code ${e.response.status}`,
       );
 
       await this.tlsAgentService.create();
@@ -99,7 +99,7 @@ export abstract class DdhubBaseService {
       this.logger.error(
         'Request stopped because of stopOnResponseCodes rule',
         status,
-        defaults.stopOnStatusCodes
+        defaults.stopOnStatusCodes,
       );
 
       throw new MessageBrokerException(
@@ -107,7 +107,7 @@ export abstract class DdhubBaseService {
         DsbClientGatewayErrors.MB_ERROR,
         e.response.data.returnCode,
         e.response.data.returnMessage,
-        e.request.path
+        e.request.path,
       );
     }
 
@@ -115,14 +115,14 @@ export abstract class DdhubBaseService {
       this.logger.error(
         'Request stopped because resource forbidden',
         e.response.data.returnCode,
-        defaults.stopOnResponseCodes
+        defaults.stopOnResponseCodes,
       );
 
       throw new MessageBrokerUnauthorizedException(
         e.message,
         DsbClientGatewayErrors.MB_ERROR,
         e.response.data.returnCode,
-        e.request.path
+        e.request.path,
       );
     }
 
@@ -133,7 +133,7 @@ export abstract class DdhubBaseService {
       this.logger.error(
         'Request stopped because of stopOnResponseCodes rule',
         e.response.data.returnCode,
-        defaults.stopOnResponseCodes
+        defaults.stopOnResponseCodes,
       );
 
       throw new MessageBrokerException(
@@ -141,7 +141,7 @@ export abstract class DdhubBaseService {
         DsbClientGatewayErrors.MB_ERROR,
         e.response.data.returnCode,
         e.response.data.returnMessage,
-        e.request.path
+        e.request.path,
       );
     }
 
@@ -158,7 +158,7 @@ export abstract class DdhubBaseService {
       DsbClientGatewayErrors.MB_ERROR,
       e.response.data.returnCode,
       e.response.data.returnMessage,
-      e.request.path
+      e.request.path,
     );
   }
 }

@@ -7,7 +7,7 @@ import { IamService } from '../service/iam.service';
 export class InitIamHandler implements ICommandHandler<InitIamCommand> {
   constructor(
     protected readonly iamService: IamService,
-    protected readonly secretsEngineService: SecretsEngineService
+    protected readonly secretsEngineService: SecretsEngineService,
   ) {}
 
   public async execute(): Promise<void> {

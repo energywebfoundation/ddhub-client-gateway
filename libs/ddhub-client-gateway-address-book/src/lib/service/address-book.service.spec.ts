@@ -40,7 +40,7 @@ describe('AddressBookService', () => {
       await addressBookService.save(did, name);
 
       expect(
-        mockAddressBookRepositoryWrapper.repository.save
+        mockAddressBookRepositoryWrapper.repository.save,
       ).toHaveBeenCalledWith({
         did,
         name,
@@ -55,7 +55,7 @@ describe('AddressBookService', () => {
         { did: '2', name: 'Jane' },
       ];
       mockAddressBookRepositoryWrapper.repository.find.mockReturnValue(
-        addressBookEntries
+        addressBookEntries,
       );
 
       const result = await addressBookService.getAll();
@@ -71,7 +71,7 @@ describe('AddressBookService', () => {
       await addressBookService.delete(did);
 
       expect(
-        mockAddressBookRepositoryWrapper.repository.delete
+        mockAddressBookRepositoryWrapper.repository.delete,
       ).toHaveBeenCalledWith({ did });
     });
   });
@@ -84,7 +84,7 @@ describe('AddressBookService', () => {
       await addressBookService.update(did, newName);
 
       expect(
-        mockAddressBookRepositoryWrapper.repository.update
+        mockAddressBookRepositoryWrapper.repository.update,
       ).toHaveBeenCalledWith({ did }, { name: newName });
     });
   });

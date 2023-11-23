@@ -9,7 +9,7 @@ export class DdhubLogService implements OnModuleInit {
 
   constructor(
     protected readonly httpService: HttpService,
-    protected readonly ddhubVersionService: VersionService
+    protected readonly ddhubVersionService: VersionService,
   ) {}
 
   onModuleInit(): void {

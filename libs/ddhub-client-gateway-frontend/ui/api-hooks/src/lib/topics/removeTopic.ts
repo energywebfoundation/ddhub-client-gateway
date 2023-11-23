@@ -16,7 +16,9 @@ export const useRemoveTopic = (isSearch: boolean) => {
     });
 
     if (isSearch) {
-      queryClient.invalidateQueries(getTopicsControllerGetTopicsBySearchQueryKey());
+      queryClient.invalidateQueries(
+        getTopicsControllerGetTopicsBySearchQueryKey(),
+      );
     } else {
       queryClient.invalidateQueries(getTopicsControllerGetTopicsQueryKey());
     }
@@ -42,7 +44,7 @@ export const useRemoveTopic = (isSearch: boolean) => {
       {
         onSuccess: removeTopicSuccess,
         onError: removeTopicError,
-      }
+      },
     );
   };
 

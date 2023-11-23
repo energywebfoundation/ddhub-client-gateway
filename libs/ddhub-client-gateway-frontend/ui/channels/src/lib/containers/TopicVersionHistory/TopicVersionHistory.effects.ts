@@ -15,11 +15,12 @@ export const useTopicVersionHistoryEffects = () => {
   // TODO: add useApplication
   const { applicationsByNamespace, applicationsFetched } =
     useApplications('user');
-  const { topicHistory, topicHistoryLoaded, getTopicHistory, pagination } = useTopicVersionHistory({
-    id: topicId,
-    page: 1,
-    limit: 10,
-  });
+  const { topicHistory, topicHistoryLoaded, getTopicHistory, pagination } =
+    useTopicVersionHistory({
+      id: topicId,
+      page: 1,
+      limit: 10,
+    });
 
   const application = applicationsByNamespace[applicationNamespace];
 

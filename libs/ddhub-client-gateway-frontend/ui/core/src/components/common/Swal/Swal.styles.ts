@@ -16,7 +16,7 @@ export const useStyles = makeStyles()((theme) => ({
     height: 67,
   },
   title: {
-    padding: '18px 62px 0px 62px'
+    padding: '18px 62px 0px 62px',
   },
   popup: {
     paddingBottom: 43,
@@ -32,7 +32,7 @@ export const useStyles = makeStyles()((theme) => ({
         ['color', 'background-color', 'border-color', 'box-shadow'],
         {
           duration: theme.transitions.duration.short,
-        }
+        },
       ),
       backgroundColor: darken(theme.palette.primary.main, 0.2),
     },
