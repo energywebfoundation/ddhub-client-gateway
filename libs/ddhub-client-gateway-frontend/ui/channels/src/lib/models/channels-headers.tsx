@@ -1,7 +1,8 @@
 import { ChannelType, Restrictions, RestrictionsProps } from '../components';
-import { didFormatMinifier } from '@ddhub-client-gateway-frontend/ui/utils';
+import { ChannelConfig, ChannelConfigProps } from '../components/ChannelConfig';
+import { TableHeader } from '@ddhub-client-gateway-frontend/ui/core';
 
-export const CHANNELS_HEADERS = [
+export const CHANNELS_HEADERS: TableHeader[] = [
   {
     Header: 'TYPE',
     accessor: 'type',
@@ -15,13 +16,15 @@ export const CHANNELS_HEADERS = [
     isSortable: true,
   },
   {
+    Header: 'ENABLED CONFIG',
+    accessor: 'enabledConfigs',
+    Cell: ({ value }: ChannelConfigProps) => <ChannelConfig value={value} />,
+  },
+  {
     Header: 'RESTRICTIONS DID',
-    accessor: 'conditions.dids',
+    accessor: 'conditions.didsAlias',
     Cell: ({ value }: Omit<RestrictionsProps, 'type'>) => (
-      <Restrictions
-        value={value?.map((item) => didFormatMinifier(item))}
-        type="DID"
-      />
+      <Restrictions value={value} type="DID" />
     ),
   },
   {

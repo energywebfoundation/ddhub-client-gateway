@@ -7,10 +7,11 @@ import { differenceBy } from 'lodash';
 import {
   GetTopicDto,
   GetTopicDtoSchemaType,
+  ResponseTopicDto,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { ChannelType } from '../../../../models';
 import { getChannelType } from '../../../../utils';
-import { TopicsProps } from './Topics';
+import { TopicChannelValues } from './Topics';
 
 const topicsFilters: Record<ChannelType, GetTopicDtoSchemaType[]> = {
   [ChannelType.Messaging]: [GetTopicDtoSchemaType.JSD7],
@@ -40,10 +41,14 @@ const initialState = {
   value: '',
 };
 
-export const useTopicsEffects = (channelValues: TopicsProps['channelValues']) => {
-  const [selectedApplication, setSelectedApplication] = useState<Application>(initialState);
+export const useTopicsEffects = (channelValues: TopicChannelValues) => {
+  const [selectedApplication, setSelectedApplication] =
+    useState<Application>(initialState);
   const [selectedTopics, setSelectedTopics] = useState<Topic[]>(
     channelValues.topics
+  );
+  const [responseTopics, setResponseTopics] = useState<ResponseTopicDto[]>(
+    channelValues.responseTopics
   );
   const { applications, isLoading: isLoadingApplications } =
     useApplications('user');
@@ -51,12 +56,14 @@ export const useTopicsEffects = (channelValues: TopicsProps['channelValues']) =>
   const [topicInputValue, setTopicInputValue] = useState('');
   const [topicValue, setTopicValue] = useState<string | null>(null);
 
-  const { topics, topicsLoading } = useTopics({ owner: selectedApplication.value });
+  const { topics, topicsLoading } = useTopics({
+    owner: selectedApplication.value,
+  });
 
   const channelType = getChannelType(channelValues.channelType);
   const filters = topicsFilters[channelType as ChannelType];
-  const filteredTopics = topics.filter(
-    (item) => filters.includes(item.schemaType)
+  const filteredTopics = topics.filter((item) =>
+    filters.includes(item.schemaType)
   );
 
   useEffect(() => {
@@ -65,8 +72,8 @@ export const useTopicsEffects = (channelValues: TopicsProps['channelValues']) =>
 
   const addSelectedTopic = (selectedTopic: Topic) => {
     const exist =
-    filteredTopics.findIndex((topic) => topic.name === selectedTopic.name) >
-    -1;
+      filteredTopics.findIndex((topic) => topic.name === selectedTopic.name) >
+      -1;
     if (!exist) {
       return;
     }
@@ -96,10 +103,25 @@ export const useTopicsEffects = (channelValues: TopicsProps['channelValues']) =>
     return filteredTopic;
   };
 
+  const filterResponseTopics = (topicId: string) => {
+    const respTopics = responseTopics.filter((resp) => {
+      return resp.responseTopicId !== topicId;
+    });
+
+    return respTopics;
+  };
+
+  const resetResponseTopics = (topicId: string) => {
+    const respTopics = filterResponseTopics(topicId);
+
+    setResponseTopics(respTopics);
+  };
+
   const removeSelectedTopic = (data: Topic) => {
     const filteredTopic = getFilteredTopics(data);
     setRecent('');
     setSelectedTopics(filteredTopic);
+    resetResponseTopics(data.id);
   };
 
   const updateSelectedTopic = (oldTopic: Topic, newTopic: Topic) => {
@@ -113,6 +135,21 @@ export const useTopicsEffects = (channelValues: TopicsProps['channelValues']) =>
       },
       ...filteredTopic,
     ]);
+
+    resetResponseTopics(oldTopic.id);
+  };
+
+  const saveTopicResponse = (
+    topics: ResponseTopicDto[],
+    selectedTopicId: string
+  ) => {
+    if (topics.length) {
+      const respTopics = filterResponseTopics(selectedTopicId);
+
+      setResponseTopics(respTopics.concat(topics));
+    } else {
+      resetResponseTopics(selectedTopicId);
+    }
   };
 
   const formattedSelectedTopics = selectedTopics.map((topic) => ({
@@ -147,7 +184,7 @@ export const useTopicsEffects = (channelValues: TopicsProps['channelValues']) =>
 
       return matchedTopics || matchedTags !== -1;
     });
-  }
+  };
 
   return {
     applicationList: applications.map((application) => ({
@@ -170,5 +207,7 @@ export const useTopicsEffects = (channelValues: TopicsProps['channelValues']) =>
     topicInputValue,
     setTopicInputValue,
     topicValue,
+    saveTopicResponse,
+    responseTopics,
   };
 };

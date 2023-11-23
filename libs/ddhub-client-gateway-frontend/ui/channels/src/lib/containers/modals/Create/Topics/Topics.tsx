@@ -1,5 +1,8 @@
 import { Grid, Typography, Box } from '@mui/material';
-import { GetChannelResponseDtoType } from '@dsb-client-gateway/dsb-client-gateway-api-client';
+import {
+  CreateChannelDtoType,
+  ResponseTopicDto,
+} from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { SelectedTopicList } from './SelectedTopicList/SelectedTopicList';
 import { Autocomplete } from '@ddhub-client-gateway-frontend/ui/core';
 import { TopicItem } from './TopicItem/TopicItem';
@@ -8,19 +11,21 @@ import { ActionButtons } from '../ActionButtons';
 import { TActionButtonsProps } from '../ActionButtons/ActionButtons';
 import { Topic, useTopicsEffects } from './Topics.effects';
 import { useStyles } from './Topics.styles';
+import { Filter } from 'react-feather';
+
+export interface TopicChannelValues {
+  topics: Topic[];
+  channelType: CreateChannelDtoType;
+  messageForms?: boolean;
+  responseTopics?: ResponseTopicDto[];
+}
 
 export interface TopicsProps {
-  channelValues: {
-    topics: Topic[];
-    channelType: GetChannelResponseDtoType;
-  }
+  channelValues: TopicChannelValues;
   actionButtonsProps: TActionButtonsProps;
 }
 
-export const Topics = ({
-  channelValues,
-  actionButtonsProps,
-}: TopicsProps) => {
+export const Topics = ({ channelValues, actionButtonsProps }: TopicsProps) => {
   const { classes } = useStyles();
   const {
     applicationList,
@@ -39,6 +44,8 @@ export const Topics = ({
     topicInputValue,
     setTopicInputValue,
     topicValue,
+    saveTopicResponse,
+    responseTopics,
   } = useTopicsEffects(channelValues);
 
   return (
@@ -71,11 +78,7 @@ export const Topics = ({
           <Autocomplete
             options={topics}
             renderOption={(props, option) => (
-              <TopicItem
-                key={option.id}
-                option={option}
-                listProps={props}
-              />
+              <TopicItem key={option.id} option={option} listProps={props} />
             )}
             onChange={(event: any, newValue: Topic | null) => {
               if (newValue) {
@@ -101,7 +104,7 @@ export const Topics = ({
           </Typography>
         )}
 
-        {(!topics.length && selectedApplication?.value && !topicsLoading) && (
+        {!topics.length && selectedApplication?.value && !topicsLoading && (
           <Box className={classes.noRecord}>
             <Typography className={classes.noRecordLabel}>
               No topic found
@@ -109,30 +112,50 @@ export const Topics = ({
           </Box>
         )}
 
-        <Box display="flex" justifyContent="space-between" pr={2.5} pt={3.25} pb={1.25}>
+        <Box
+          display="flex"
+          justifyContent="space-between"
+          pr={2.5}
+          pt={3.25}
+          pb={1.25}
+        >
           <Typography className={classes.label}>
             {selectedTopics.length} Topics
           </Typography>
-          {/*<Typography className={classes.filterLabel}>*/}
-          {/*  <Filter size={10}/> Filter*/}
-          {/*</Typography>*/}
+          <Typography className={classes.filterLabel}>
+            <Filter size={10} /> Filter
+          </Typography>
         </Box>
 
         <SelectedTopicList
           selectedTopics={selectedTopics}
           remove={removeSelectedTopic}
           edit={updateSelectedTopic}
+          showTopicResponse={
+            channelValues.messageForms &&
+            channelValues.channelType === CreateChannelDtoType.sub
+          }
+          saveResponse={saveTopicResponse}
+          responseTopics={responseTopics}
           filters={filters}
           recent={recent}
         />
       </Grid>
-      <Grid item alignSelf="flex-end" width="100%" sx={{padding: '22px 7px 27px 0px'}}>
+      <Grid
+        item
+        alignSelf="flex-end"
+        width="100%"
+        sx={{ padding: '22px 7px 27px 0px' }}
+      >
         <ActionButtons
           {...actionButtonsProps}
           nextClickButtonProps={{
             ...actionButtonsProps.nextClickButtonProps,
             onClick: () =>
-              actionButtonsProps.nextClickButtonProps.onClick(selectedTopics),
+              actionButtonsProps.nextClickButtonProps.onClick({
+                topics: selectedTopics,
+                responseTopics,
+              }),
           }}
         />
       </Grid>

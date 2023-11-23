@@ -1,23 +1,108 @@
 {
   "topicManagement": {
-    "allowedRoles": ["topiccreator"]
+    "allowedRoles": [
+      "topiccreator"
+    ],
+    "allowedAuthRoles": [
+      "admin"
+    ]
+  },
+  "gatewaySettings": {
+    "allowedRoles": [
+      "user"
+    ],
+    "allowedAuthRoles": [
+      "admin"
+    ]
   },
   "myAppsAndTopics": {
-    "allowedRoles": ["user"]
+    "allowedRoles": [
+      "user"
+    ],
+    "allowedAuthRoles": [
+      "admin"
+    ]
   },
   "channelManagement": {
-    "allowedRoles": ["user"]
+    "allowedRoles": [
+      "user"
+    ],
+    "allowedAuthRoles": [
+      "admin"
+    ]
   },
   "largeFileUpload": {
-    "allowedRoles": ["user"]
+    "allowedRoles": [
+      "user"
+    ],
+    "allowedAuthRoles": [
+      "admin"
+    ]
   },
   "largeFileDownload": {
-    "allowedRoles": ["user"]
+    "allowedRoles": [
+      "user"
+    ],
+    "allowedAuthRoles": [
+      "admin"
+    ]
   },
   "fileUpload": {
-    "allowedRoles": ["user"]
+    "allowedRoles": [
+      "user"
+    ],
+    "allowedAuthRoles": [
+      "admin"
+    ]
   },
   "fileDownload": {
-    "allowedRoles": ["user"]
+    "allowedRoles": [
+      "user"
+    ],
+    "allowedAuthRoles": [
+      "admin"
+    ]
+  },
+  "addressBook": {
+    "allowedRoles": [
+      "user"
+    ],
+    "allowedAuthRoles": [
+      "admin"
+    ]
+  },
+  "messageInbox": {
+    "allowedRoles": [
+      "user"
+    ],
+    "allowedAuthRoles": [
+      "admin",
+      "messaging"
+    ]
+  },
+  "messageOutbox": {
+    "allowedRoles": [
+      "user"
+    ],
+    "allowedAuthRoles": [
+      "admin",
+      "messaging"
+    ]
+  },
+  "clientIds": {
+    "allowedRoles": [
+      "user"
+    ],
+    "allowedAuthRoles": [
+      "admin"
+    ]
+  },
+  "integrationApis": {
+    "allowedRoles": [
+      "user"
+    ],
+    "allowedAuthRoles": [
+      "admin"
+    ]
   }
 }

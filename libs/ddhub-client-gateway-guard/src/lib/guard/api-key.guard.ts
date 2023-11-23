@@ -5,13 +5,17 @@ import {
   Logger,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { UserGuard } from '@dsb-client-gateway/ddhub-client-gateway-user-roles';
 
 @Injectable()
 export class ApiKeyGuard implements CanActivate {
   protected readonly logger = new Logger(ApiKeyGuard.name);
   protected readonly isAnyCredentialSet: boolean = false;
 
-  constructor(protected readonly configService: ConfigService) {
+  constructor(
+    protected readonly configService: ConfigService,
+    protected readonly userGuard: UserGuard
+  ) {
     const credentials: Array<string | undefined> = [
       this.configService.get<string | undefined>('API_KEY'),
       this.configService.get<string | undefined>('API_PASSWORD'),
@@ -26,11 +30,13 @@ export class ApiKeyGuard implements CanActivate {
       return;
     }
 
-    if (isAnySet.length !== 3) {
-      throw new Error('one of API_KEY/API_USERNAME/API_PASSWORD is not set');
+    if (credentials[0] || (credentials[1] && credentials[2])) {
+      this.isAnyCredentialSet = true;
+
+      return;
     }
 
-    this.isAnyCredentialSet = true;
+    throw new Error('one of API_KEY/API_USERNAME/API_PASSWORD is not set');
   }
 
   public async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -54,6 +60,10 @@ export class ApiKeyGuard implements CanActivate {
 
     const { headers } = request;
 
+    if (headers.authorization) {
+      return this.userGuard.canActivate(context);
+    }
+
     const apiKeyFromHeaders: string | undefined = headers['x-api-key'];
 
     if (apiKeyFromHeaders) {
@@ -73,5 +83,9 @@ export class ApiKeyGuard implements CanActivate {
     ).toString('ascii');
 
     return usernameFromHeaders === username && decodedPassword === password;
+  }
+
+  protected isAuthEnabled(): boolean {
+    return this.configService.get('USER_AUTH_ENABLED', false);
   }
 }

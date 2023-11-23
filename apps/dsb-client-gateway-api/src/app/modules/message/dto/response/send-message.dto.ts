@@ -1,7 +1,4 @@
-import { 
-  ApiProperty,
-  ApiPropertyOptional 
-} from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class Error {
   @ApiProperty({
@@ -181,7 +178,7 @@ export class Status {
   name: string;
 }
 
-export class SendMessagelResponseDto {
+export class SendMessageResponseDto {
   @ApiProperty({
     description: 'client Gateway Message Id',
     type: String,

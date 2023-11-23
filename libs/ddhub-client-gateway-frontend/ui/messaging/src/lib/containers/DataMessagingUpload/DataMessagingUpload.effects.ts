@@ -7,7 +7,7 @@ import {
   useUploadMessage,
 } from '@ddhub-client-gateway-frontend/ui/api-hooks';
 import {
-  SendMessagelResponseDto,
+  SendMessageResponseDto,
   UpdateChannelDtoType,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { DataMessagingUploadProps } from './DataMessagingUpload';
@@ -63,12 +63,13 @@ export const useDataMessagingUploadEffects = ({
   }));
 
   useLayoutEffect(() => {
-    const subscription = messageDataService.getData().subscribe((message: any) => {
-
-      if (message?.value) {
-        uploadMessageSuccess(message.value);
-      }
-    });
+    const subscription = messageDataService
+      .getData()
+      .subscribe((message: any) => {
+        if (message?.value) {
+          uploadMessageSuccess(message.value);
+        }
+      });
 
     return () => subscription.unsubscribe();
   }, []);
@@ -93,7 +94,7 @@ export const useDataMessagingUploadEffects = ({
       value: topic.topicId,
     })) || [];
 
-  const showModal = (data: SendMessagelResponseDto) => {
+  const showModal = (data: SendMessageResponseDto) => {
     dispatch({
       type: ModalActionsEnum.SHOW_POST_DETAILS,
       payload: {
@@ -103,7 +104,7 @@ export const useDataMessagingUploadEffects = ({
     });
   };
 
-  const uploadMessageSuccess = async (res: SendMessagelResponseDto) => {
+  const uploadMessageSuccess = async (res: SendMessageResponseDto) => {
     const recipients = res.recipients;
 
     if (recipients) {
@@ -148,7 +149,7 @@ export const useDataMessagingUploadEffects = ({
         },
       };
 
-      await Swal.httpError(errData);
+      Swal.httpError(errData);
     }
   };
 

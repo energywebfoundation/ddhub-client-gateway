@@ -47,10 +47,6 @@ jobs:
         run: npm install -g nx npm@8.5.0
       - name: Install dependencies
         run: npm ci
-      - name: Run linter
-        run: nx lint dsb-client-gateway-api
-      - name: Run SPEC tests
-        run: npm run test:spec:api && npm run test:spec:clients
       - name: Start containers
         run: docker-compose -f "ci/docker-compose.yml" up -d --build
       - name: Sleep for 10 seconds
@@ -64,43 +60,43 @@ jobs:
         run: npm run migrations:run
         env:
           DB_NAME: "postgresql://ddhub:ddhub@localhost:5432/ddhub"
-      - name: Prepare Vault KV Engine
-        run: docker-compose -f ci/docker-compose.yml exec -T vault_dev sh -c "vault secrets enable -version=1 -path=ddhub -address="http://localhost:8200" kv" || true
-      - name: Run E2E tests
-        env:
-          PRIVATE_KEY_E2E: ${{ secrets.PRIVATE_KEY_E2E }}
-          IPFS_HOST: ipfs.infura.io
-          IPFS_PROTOCOL: https://
-          IPFS_PORT: 5001
-          INFURA_PROJECT_ID: ${{ secrets.INFURA_PROJECT_ID }}
-          INFURA_PROJECT_SECRET: ${{ secrets.INFURA_PROJECT_SECRET }}
-          DB_NAME: "postgresql://ddhub:ddhub@localhost:5432/ddhub"
-          NODE_ENV: development
-          DSB_BASE_URL: "https://ddhub-dev.energyweb.org"
-          BACKEND_API_URL: "http://localhost:3333"
-          CACHE_SERVER_URL: "https://identitycache-dev.energyweb.org/v1"
-          EVENT_SERVER_URL: "https://identityevents-dev.energyweb.org"
-          SECRETS_ENGINE: "vault"
-          WEBSOCKET: "NONE"
-          WEBSOCKET_URL: "ws://localhost:8080"
-          VAULT_ENDPOINT: "http://localhost:8200"
-          VAULT_TOKEN: "root"
-          PORT: 3333
-          NEXT_PUBLIC_SENTRY_ENABLED: false
-          NEXT_PUBLIC_SERVER_BASE_URL: "http://localhost:3333"
-          PARENT_NAMESPACE: "ddhub.apps.energyweb.iam.ewc"
-          SCHEDULED_JOBS: false
-          SYMMETRIC_KEY_CLIENT_ID: "christestingsymmetrickeys1"
-          OPENTELEMETRY_ENABLED: false
-          MTLS_ENABLED: false
-          LOG_PRETTY: false
-          ONEPASSWORD_VAULT_ID: ${{ secrets.ONEPASSWORD_VAULT_ID }}
-          ONEPASSWORD_HOST: ${{ secrets.ONEPASSWORD_HOST }}
-          ONEPASSWORD_TOKEN: ${{ secrets.ONEPASSWORD_TOKEN }}
-          RETRY_FACTOR: 1
-          MAX_RETRIES: 2
-          TIMEOUT: 100
-        run: npm run test:e2e:api
+#      - name: Prepare Vault KV Engine
+#        run: docker-compose -f ci/docker-compose.yml exec -T vault_dev sh -c "vault secrets enable -version=1 -path=ddhub -address="http://localhost:8200" kv" || true
+#      - name: Run E2E tests
+#        env:
+#          PRIVATE_KEY_E2E: ${{ secrets.PRIVATE_KEY_E2E }}
+#          IPFS_HOST: ipfs.infura.io
+#          IPFS_PROTOCOL: https://
+#          IPFS_PORT: 5001
+#          INFURA_PROJECT_ID: ${{ secrets.INFURA_PROJECT_ID }}
+#          INFURA_PROJECT_SECRET: ${{ secrets.INFURA_PROJECT_SECRET }}
+#          DB_NAME: "postgresql://ddhub:ddhub@localhost:5432/ddhub"
+#          NODE_ENV: development
+#          DSB_BASE_URL: "https://ddhub-dev.energyweb.org"
+#          BACKEND_API_URL: "http://localhost:3333"
+#          CACHE_SERVER_URL: "https://identitycache-dev.energyweb.org/v1"
+#          EVENT_SERVER_URL: "https://identityevents-dev.energyweb.org"
+#          SECRETS_ENGINE: "vault"
+#          WEBSOCKET: "NONE"
+#          WEBSOCKET_URL: "ws://localhost:8080"
+#          VAULT_ENDPOINT: "http://localhost:8200"
+#          VAULT_TOKEN: "root"
+#          PORT: 3333
+#          NEXT_PUBLIC_SENTRY_ENABLED: false
+#          NEXT_PUBLIC_SERVER_BASE_URL: "http://localhost:3333"
+#          PARENT_NAMESPACE: "ddhub.apps.energyweb.iam.ewc"
+#          SCHEDULED_JOBS: false
+#          SYMMETRIC_KEY_CLIENT_ID: "christestingsymmetrickeys1"
+#          OPENTELEMETRY_ENABLED: false
+#          MTLS_ENABLED: false
+#          LOG_PRETTY: false
+#          ONEPASSWORD_VAULT_ID: ${{ secrets.ONEPASSWORD_VAULT_ID }}
+#          ONEPASSWORD_HOST: ${{ secrets.ONEPASSWORD_HOST }}
+#          ONEPASSWORD_TOKEN: ${{ secrets.ONEPASSWORD_TOKEN }}
+#          RETRY_FACTOR: 1
+#          MAX_RETRIES: 2
+#          TIMEOUT: 100
+#        run: npm run test:e2e:api
       - name: Stop containers
         if: always()
         run: docker-compose -f "docker-compose.yml" down

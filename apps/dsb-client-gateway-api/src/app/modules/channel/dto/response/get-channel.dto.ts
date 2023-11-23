@@ -2,6 +2,36 @@ import { IsBoolean } from 'class-validator';
 import { ChannelType } from '../../channel.const';
 import { ApiProperty } from '@nestjs/swagger';
 
+export class ChannelResponseTopic {
+  @ApiProperty({
+    type: String,
+    description: 'Topic name',
+    example: 'operatorEnvelope',
+  })
+  topicName: string;
+
+  @ApiProperty({
+    type: String,
+    example: 'aemo.edge',
+    description: 'Owner name',
+  })
+  topicOwner: string;
+
+  @ApiProperty({
+    type: String,
+    example: '622fed6e4258501225095045',
+    description: 'Topic ID from Message Broker',
+  })
+  topicId: string;
+
+  @ApiProperty({
+    type: String,
+    example: '622fed6e4258501225095045',
+    description: 'Response Topic ID from Message Broker',
+  })
+  responseTopicId: string;
+}
+
 export class ChannelTopic {
   @ApiProperty({
     type: String,
@@ -55,6 +85,12 @@ export class ChannelConditions {
     type: () => [ChannelTopic],
   })
   topics: ChannelTopic[];
+
+  @ApiProperty({
+    description: 'Array of response topics',
+    type: () => [ChannelResponseTopic],
+  })
+  responseTopics: ChannelResponseTopic[];
 }
 
 export class GetChannelResponseDto {
@@ -64,6 +100,13 @@ export class GetChannelResponseDto {
     example: 'channel.name',
   })
   fqcn: string;
+
+  @ApiProperty({
+    description: 'Message forms',
+    example: false,
+    default: false,
+  })
+  messageForms: boolean;
 
   @ApiProperty({
     description: 'Channel encryption',

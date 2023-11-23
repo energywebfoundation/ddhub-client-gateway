@@ -1,15 +1,26 @@
 import clsx from 'clsx';
-import { Grid, Typography, IconButton, Select, Box, Button, InputAdornment, TextField } from '@mui/material';
+import {
+  Typography,
+  Select,
+  Box,
+  Button,
+  InputAdornment,
+  TextField,
+  Checkbox,
+} from '@mui/material';
 import { useStyles } from './SelectedTopic.styles';
-import { Edit3, X as Close, Search } from 'react-feather';
+import { X as Close, Search } from 'react-feather';
 import { Topic } from '../Topics.effects';
-import { CopyToClipboard } from '@ddhub-client-gateway-frontend/ui/core';
-import React, { MouseEvent } from 'react';
+import React, { useEffect } from 'react';
 import { TopicItem } from '../TopicItem/TopicItem';
+import { SelectedTopicView } from '../SelectedTopicView/SelectedTopicView';
 import { useSelectedTopicEffects } from './SelectedTopic.effects';
+import { ResponseTopicDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
+import { useSelectedTopicViewEffects } from '../SelectedTopicView/SelectedTopicView.effects';
 
 export interface SelectedTopicProps {
   topic: Topic;
+  availableTopics: Topic[];
   topicsList: Topic[];
   remove: () => void;
   edit?: (oldTopic: Topic, newTopic: Topic) => void;
@@ -20,6 +31,9 @@ export interface SelectedTopicProps {
   index: number;
   recent: string;
   topicsLoading: boolean;
+  showTopicResponse: boolean;
+  saveResponse?: (topics: ResponseTopicDto[], selectedTopicId: string) => void;
+  responseTopics?: ResponseTopicDto[];
 }
 
 export const SelectedTopic = ({
@@ -31,13 +45,16 @@ export const SelectedTopic = ({
   index,
   recent,
   topicsList,
+  availableTopics,
   setSelectedApplication,
   topicsLoading = false,
+  showTopicResponse = false,
+  saveResponse,
+  responseTopics,
 }: SelectedTopicProps) => {
-  const { classes, theme } = useStyles();
+  const { classes } = useStyles();
   const {
     expanded,
-    handleOpen,
     handleClose,
     updatedTopic,
     handleClickTopic,
@@ -49,12 +66,26 @@ export const SelectedTopic = ({
     onFilterChange,
     filteredTopics,
     handleKeyDown,
+    handleOpenResponse,
+    handleOpenEdit,
+    isResponse,
+    handleClickTopicCheckbox,
+    selectedIndex,
+    setPanelId,
   } = useSelectedTopicEffects({
     setSelectedApplication,
     topic,
     edit,
     topicsList,
+    availableTopics,
+    saveResponse,
+    responseTopics,
   });
+  const { expandResponse, setExpandResponse } = useSelectedTopicViewEffects();
+
+  useEffect(() => {
+    setPanelId(`panel-${index}`);
+  }, [index]);
 
   return (
     <Select
@@ -62,7 +93,13 @@ export const SelectedTopic = ({
       key={`panel-${index}`}
       value={topic.topicName}
       open={expanded === `panel-${index}`}
-      onOpen={handleOpen}
+      onOpen={
+        showTopicResponse
+          ? () => {
+              setExpandResponse(!expandResponse);
+            }
+          : handleOpenEdit
+      }
       onClose={handleClose}
       IconComponent={() => null}
       classes={{
@@ -74,64 +111,20 @@ export const SelectedTopic = ({
       sx={{ width: '100px' }}
       displayEmpty={true}
       renderValue={() => (
-        <Grid container justifyContent="space-between" alignItems="center">
-          <Grid item width="100%">
-            <Grid container justifyContent="space-between" alignItems="center">
-              <Grid item>
-                <Box className={classes.appBox}>
-                  <Typography
-                    variant="body2"
-                    className={classes.appName}
-                  >
-                    {topic?.appName}
-                  </Typography>
-                </Box>
-              </Grid>
-              {canRemove && (
-                <Grid item display="flex" flexDirection="row">
-                  <IconButton
-                    onClick={handleOpen}
-                    className={clsx(classes.edit, {
-                      [classes.editActive]: (expanded && expanded === `panel-${index}`),
-                      [classes.editInactive]: (expanded && expanded !== `panel-${index}`),
-                    })}>
-                    <Edit3 size={16} />
-                  </IconButton>
-                  <IconButton
-                    onMouseDown={(event: MouseEvent<HTMLElement>) => {
-                      event.stopPropagation();
-                      remove();
-                    }}
-                    className={classes.close}>
-                    <Close color={theme.palette.secondary.main} size={18} />
-                  </IconButton>
-                </Grid>
-              )}
-            </Grid>
-            <Grid container pt={0.75}>
-              <Grid item>
-                <Typography
-                  variant="h2"
-                  pl={0.625}
-                  pr={2}
-                  className={clsx(classes.name, { [classes.nameSecondary]: canCopy })}
-                >
-                  {topic?.topicName}
-                </Typography>
-              </Grid>
-              <Grid item>
-                <Typography variant="body2" className={classes.owner}>
-                  {topic?.owner}
-                </Typography>
-              </Grid>
-              {canCopy && (
-                <Grid item className={classes.copy}>
-                  <CopyToClipboard text={topic.owner} />
-                </Grid>
-              )}
-            </Grid>
-          </Grid>
-        </Grid>
+        <SelectedTopicView
+          topic={topic}
+          canRemove={canRemove}
+          canCopy={canCopy}
+          showTopicResponse={showTopicResponse}
+          handleOpenResponse={handleOpenResponse}
+          handleOpenEdit={handleOpenEdit}
+          expanded={expanded}
+          index={index}
+          remove={remove}
+          responseTopics={responseTopics}
+          expandResponse={expandResponse}
+          setExpandResponse={setExpandResponse}
+        />
       )}
     >
       <Box>
@@ -141,89 +134,136 @@ export const SelectedTopic = ({
           </Typography>
         )}
 
-        {(!topicsList.length && !topicsLoading) && (
-          <Box className={classes.noRecord}>
-            <Typography className={classes.noRecordLabel}>
-              No topic found
-            </Typography>
-          </Box>
-        )}
-
-        {(topicsList.length !== 0 && !topicsLoading) && (
-          <Box onKeyDown={handleKeyDown}>
-            <Box className={classes.listHeader}>
-              <Typography className={classes.optionTitle}>
-                Edit topic {topic?.topicName}
+        {((!availableTopics.length && !isResponse) ||
+          (!topicsList.length && isResponse)) &&
+          !topicsLoading && (
+            <Box className={classes.noRecord}>
+              <Typography className={classes.noRecordLabel}>
+                No topic found
               </Typography>
-              <TextField
-                autoComplete='off'
-                fullWidth
-                type="text"
-                margin="normal"
-                variant="outlined"
-                name={inputProps.name}
-                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                  onFilterChange(event.target.value);
-                  inputProps.onChange(event);
-                }}
-                inputRef={inputProps.ref}
-                inputProps={{
-                  ...field.inputProps,
-                }}
-                classes={{
-                  root: classes.searchField,
-                }}
-                InputProps={{
-                  endAdornment: value && (
-                    <InputAdornment position="end">
-                      <Close className={classes.closeSearch} onClick={handleReset} />
-                    </InputAdornment>
-                  ),
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <Search className={classes.searchIcon}/>
-                    </InputAdornment>
-                  )
-                }}
-              />
             </Box>
+          )}
 
-            <Box className={classes.topicBox}>
-              { !filteredTopics.length && (
-                <Box className={classes.topic}>
-                  <Typography className={classes.name}>No options</Typography>
-                </Box>
-              )}
-              {filteredTopics?.map((option) => {
-                return (
-                  <Box
-                        className={clsx(classes.topic, {
-                          [classes.selected]: updatedTopic.topicName === option.topicName,
-                        })}
-                        key={option.id}
-                        onClick={() => handleClickTopic(option)}>
-                    <TopicItem
-                      option={option}
-                    />
+        {((availableTopics.length !== 0 && !isResponse) ||
+          (topicsList.length !== 0 && isResponse)) &&
+          !topicsLoading && (
+            <Box onKeyDown={handleKeyDown}>
+              <Box className={classes.listHeader}>
+                <Typography className={classes.optionTitle}>
+                  {isResponse ? 'Choose response topics ' : 'Edit topic '}
+                  {topic?.topicName}
+                </Typography>
+
+                <TextField
+                  autoComplete="off"
+                  fullWidth
+                  type="text"
+                  margin="normal"
+                  variant="outlined"
+                  name={inputProps.name}
+                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                    onFilterChange(event.target.value);
+                    inputProps.onChange(event);
+                  }}
+                  inputRef={inputProps.ref}
+                  inputProps={{
+                    ...field.inputProps,
+                  }}
+                  classes={{
+                    root: classes.searchField,
+                  }}
+                  InputProps={{
+                    endAdornment: value && (
+                      <InputAdornment position="end">
+                        <Close
+                          className={classes.closeSearch}
+                          onClick={handleReset}
+                        />
+                      </InputAdornment>
+                    ),
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Search className={classes.searchIcon} />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              </Box>
+
+              <Box className={classes.topicBox}>
+                {!filteredTopics.length && (
+                  <Box className={classes.topic}>
+                    <Typography className={classes.name}>No options</Typography>
                   </Box>
                 )}
-              )}
-            </Box>
+                {filteredTopics?.map((option, index) => {
+                  const isItemSelected = isResponse
+                    ? selectedIndex(option.topicName) > -1
+                    : false;
+                  const labelId = `response-checkbox-${index}`;
 
-            <Box display="flex" justifyContent="space-between" width="100%" pt={3} pr={2.5} pb={2.5}>
-              <Button variant="outlined" className={classes.cancelButton} onClick={handleClose}>
-                <Typography className={classes.buttonText} variant="body2">
-                  Cancel
-                </Typography>
-              </Button>
-              <Button variant="contained" className={classes.saveButton} type="submit" onClick={handleSubmitForm} disabled={!updatedTopic.topicName}>
-                <Typography className={classes.buttonTextSave} variant="body2">
-                  Update
-                </Typography>
-              </Button>
+                  return (
+                    <Box
+                      className={clsx(classes.topic, {
+                        [classes.selected]:
+                          updatedTopic.topicName === option.topicName,
+                      })}
+                      key={option.id}
+                      onClick={() => handleClickTopic(option)}
+                    >
+                      {isResponse && (
+                        <Checkbox
+                          color="primary"
+                          checked={isItemSelected}
+                          onChange={(event) =>
+                            handleClickTopicCheckbox(event, option)
+                          }
+                          inputProps={{
+                            'aria-labelledby': labelId,
+                          }}
+                        />
+                      )}
+
+                      <TopicItem option={option} />
+                    </Box>
+                  );
+                })}
+              </Box>
+
+              <Box
+                display="flex"
+                justifyContent="space-between"
+                width="100%"
+                pt={3}
+                pr={2.5}
+                pb={2.5}
+              >
+                <Button
+                  variant="outlined"
+                  className={classes.cancelButton}
+                  onClick={handleClose}
+                >
+                  <Typography className={classes.buttonText} variant="body2">
+                    Cancel
+                  </Typography>
+                </Button>
+                <Button
+                  variant="contained"
+                  className={classes.saveButton}
+                  type="submit"
+                  onClick={handleSubmitForm}
+                  disabled={!updatedTopic.topicName}
+                >
+                  <Typography
+                    className={classes.buttonTextSave}
+                    variant="body2"
+                  >
+                    {isResponse ? 'Save' : 'Update'}
+                  </Typography>
+                </Button>
+              </Box>
             </Box>
-          </Box>
-        )}
+          )}
       </Box>
     </Select>
   );

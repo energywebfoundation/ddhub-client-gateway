@@ -14,6 +14,12 @@ export class GatewayResponseDto implements GatewayConfig {
   did: string;
 
   @ApiProperty({
+    type: Boolean,
+    description: 'User auth enabled',
+  })
+  authEnabled: boolean;
+
+  @ApiProperty({
     enum: MessageBrokerStatus,
     description:
       'Checks if the message broker is configured and running correctly',
@@ -26,6 +32,13 @@ export class GatewayResponseDto implements GatewayConfig {
       'Checks if the gateway is configured correctly to use mTLS (if mTLS is enabled)',
   })
   mtlsIsValid?: boolean;
+
+  @ApiProperty({
+    type: Boolean,
+    description:
+      'Checks if the gateway is configured for associationKeys are enable',
+  })
+  isAssociationKeyEnabled: boolean;
 
   @ApiProperty({
     type: String,

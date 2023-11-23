@@ -1,13 +1,26 @@
-import { Controller, Get, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AssociationKeysService } from '@dsb-client-gateway/ddhub-client-gateway-association-keys';
 import { GetAssociationKeysDto } from './dto/get-association-keys.dto';
 import { GetCurrentKeyDto } from './dto/get-current-key.dto';
 import { CommandBus } from '@nestjs/cqrs';
 import { ForceAssociationKeysRunCommand } from '../message/command/force-association-keys-run.command';
+import {
+  Roles,
+  UserGuard,
+  UserRole,
+} from '@dsb-client-gateway/ddhub-client-gateway-user-roles';
 
 @Controller('keys')
 @ApiTags('Keys configuration')
+@UseGuards(UserGuard)
 export class KeysController {
   constructor(
     protected readonly associationKeysService: AssociationKeysService,
@@ -20,6 +33,7 @@ export class KeysController {
     status: HttpStatus.NO_CONTENT,
     description: 'Successfully created association keys',
   })
+  @Roles(UserRole.ADMIN)
   public async forceGeneration(): Promise<void> {
     await this.associationKeysService.derivePublicKeys();
   }
@@ -30,6 +44,7 @@ export class KeysController {
     description: 'List of association keys',
     type: [GetAssociationKeysDto],
   })
+  @Roles(UserRole.ADMIN)
   public async getAssociationKeys(): Promise<GetAssociationKeysDto[]> {
     return this.associationKeysService.getAllKeys();
   }
@@ -41,6 +56,7 @@ export class KeysController {
     description:
       'Force initialization of external channel for current association keys',
   })
+  @Roles(UserRole.ADMIN)
   public async initAssociationKeys(): Promise<void> {
     await this.associationKeysService.initExternalChannels();
   }
@@ -51,6 +67,7 @@ export class KeysController {
     status: HttpStatus.NO_CONTENT,
     description: 'Force sharing association keys',
   })
+  @Roles(UserRole.ADMIN)
   public async sendAssociationKeys(): Promise<void> {
     await this.commandBus.execute(new ForceAssociationKeysRunCommand());
   }
@@ -61,6 +78,7 @@ export class KeysController {
     type: GetCurrentKeyDto,
   })
   @Get('/association/current')
+  @Roles(UserRole.ADMIN)
   public async getCurrentAssociationKey(): Promise<GetCurrentKeyDto> {
     return this.associationKeysService.getCurrentAndNext();
   }

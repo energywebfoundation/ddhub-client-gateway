@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { EventsGateway } from './gateway/events.gateway';
 import { MessageService } from './service/message.service';
 import { UtilsModule } from '../utils/utils.module';
-import { MessageControlller } from './controller/message.controller';
+import { MessageController } from './controller/message.controller';
 import { ChannelModule } from '../channel/channel.module';
 import { CqrsModule } from '@nestjs/cqrs';
 import { KeysModule } from '../keys/keys.module';
@@ -10,9 +10,14 @@ import { SecretsEngineModule } from '@dsb-client-gateway/dsb-client-gateway-secr
 import { StorageModule } from '../storage/storage.module';
 import {
   AcksRepositoryModule,
+  AddressBookRepositoryModule,
+  ChannelRepositoryModule,
   CronRepositoryModule,
   FileMetadataRepositoryModule,
+  MessagesRepositoryModule,
+  ReceivedMessageRepositoryWrapper,
   ReqLockRepositoryModule,
+  SentMessageRepositoryWrapper,
   SymmetricKeysRepositoryModule,
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
 import { DdhubClientGatewayMessageBrokerModule } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
@@ -30,10 +35,16 @@ import { DdhubClientGatewayAssociationKeysModule } from '@dsb-client-gateway/ddh
 import { AssociationKeysListener } from './service/association-keys.listener';
 import { DdhubClientGatewayUtilsModule } from '@dsb-client-gateway/ddhub-client-gateway-utils';
 import { ForceAssociationKeysRunHandler } from './handler/force-association-keys-run.handler';
+import { MessageListenerService } from './service/message-listener.service';
+import { MessageStoreService } from './service/message-store.service';
+import { MessagesCleanupService } from './service/messages-cleanup.service';
+import { OfflineMessagesService } from './service/offline-messages.service';
+import { DdhubClientGatewayUserRolesModule } from '@dsb-client-gateway/ddhub-client-gateway-user-roles';
 
 @Module({
   imports: [
     CqrsModule,
+    DdhubClientGatewayUserRolesModule,
     UtilsModule,
     ChannelModule,
     DdhubClientGatewayIdentityModule,
@@ -42,6 +53,7 @@ import { ForceAssociationKeysRunHandler } from './handler/force-association-keys
     StorageModule,
     KeysModule,
     SymmetricKeysRepositoryModule,
+    ChannelRepositoryModule,
     MulterModule.registerAsync({
       useFactory: (configService: ConfigService) => {
         return {
@@ -67,6 +79,8 @@ import { ForceAssociationKeysRunHandler } from './handler/force-association-keys
     DdhubClientGatewayAssociationKeysModule,
     CronRepositoryModule,
     DdhubClientGatewayUtilsModule,
+    MessagesRepositoryModule,
+    AddressBookRepositoryModule,
   ],
   providers: [
     EventsGateway,
@@ -76,8 +90,12 @@ import { ForceAssociationKeysRunHandler } from './handler/force-association-keys
     AssociationKeysListener,
     ReqLockService,
     ForceAssociationKeysRunHandler,
+    MessageListenerService,
+    MessagesCleanupService,
+    MessageStoreService,
+    OfflineMessagesService,
   ],
   exports: [MessageService],
-  controllers: [MessageControlller],
+  controllers: [MessageController],
 })
 export class MessageModule {}

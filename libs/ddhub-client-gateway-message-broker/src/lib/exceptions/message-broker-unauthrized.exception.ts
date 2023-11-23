@@ -6,7 +6,7 @@ import {
 import { MessageBrokerErrors } from '../ddhub-client-gateway-message-broker.const';
 import { HttpStatus } from '@nestjs/common';
 
-export class MessageBrokerUnauthrizedException extends BaseException {
+export class MessageBrokerUnauthorizedException extends BaseException {
   constructor(
     message: string,
     code: DsbClientGatewayErrors,

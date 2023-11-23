@@ -98,12 +98,12 @@ jobs:
           command: app set ddhub-gateway-dev-1
           options: -p ddhub-client-gateway-api.clientgateway.scheduler.image.tag=${{needs.unique_id.outputs.unique_id}}
 
-      - name: ArgoCD overwrite Dev-2 scheduler image tag
-        uses: clowdhaus/argo-cd-action/@v1.12.1
-        id: argocd_image_tag_overwrite_dev2_scheduler
-        with:
-          command: app set ddhub-gateway-dev-2
-          options: -p ddhub-client-gateway-api.clientgateway.scheduler.image.tag=${{needs.unique_id.outputs.unique_id}}
+      # - name: ArgoCD overwrite Dev-2 scheduler image tag
+      #   uses: clowdhaus/argo-cd-action/@v1.12.1
+      #   id: argocd_image_tag_overwrite_dev2_scheduler
+      #   with:
+      #     command: app set ddhub-gateway-dev-2
+      #     options: -p ddhub-client-gateway-api.clientgateway.scheduler.image.tag=${{needs.unique_id.outputs.unique_id}}
   build-be:
     name: Build Backend
     runs-on: ubuntu-latest
@@ -177,12 +177,12 @@ jobs:
           command: app set ddhub-gateway-dev-1
           options: -p ddhub-client-gateway-api.image.tag=${{needs.unique_id.outputs.unique_id}}
 
-      - name: ArgoCD overwrite DEV-2 image tag
-        uses: clowdhaus/argo-cd-action/@v1.12.1
-        id: argocd_image_tag_dev2_overwrite
-        with:
-          command: app set ddhub-gateway-dev-2
-          options: -p ddhub-client-gateway-api.image.tag=${{needs.unique_id.outputs.unique_id}}
+      # - name: ArgoCD overwrite DEV-2 image tag
+      #   uses: clowdhaus/argo-cd-action/@v1.12.1
+      #   id: argocd_image_tag_dev2_overwrite
+      #   with:
+      #     command: app set ddhub-gateway-dev-2
+      #     options: -p ddhub-client-gateway-api.image.tag=${{needs.unique_id.outputs.unique_id}}
   build-fe:
     name: Build Frontend
     runs-on: ubuntu-latest
@@ -266,9 +266,9 @@ jobs:
           command: app set ddhub-gateway-dev-1
           options: -p ddhub-client-gateway-api.clientgateway.ui.image.tag=${{needs.unique_id.outputs.unique_id}}
 
-      - name: ArgoCD overwrite DEV-2 image tag
-        uses: clowdhaus/argo-cd-action/@v1.12.1
-        id: argocd_image_tag_overwrite_dev2_ui
-        with:
-          command: app set ddhub-gateway-dev-2
-          options: -p ddhub-client-gateway-api.clientgateway.ui.image.tag=${{needs.unique_id.outputs.unique_id}}
+      # - name: ArgoCD overwrite DEV-2 image tag
+      #   uses: clowdhaus/argo-cd-action/@v1.12.1
+      #   id: argocd_image_tag_overwrite_dev2_ui
+      #   with:
+      #     command: app set ddhub-gateway-dev-2
+      #     options: -p ddhub-client-gateway-api.clientgateway.ui.image.tag=${{needs.unique_id.outputs.unique_id}}

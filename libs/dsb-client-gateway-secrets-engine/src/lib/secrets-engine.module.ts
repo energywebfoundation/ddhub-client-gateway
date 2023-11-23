@@ -7,7 +7,7 @@ import { VaultService } from './service/service/vault.service';
 import { InvalidEngineException } from './exceptions/invalid-engine.exception';
 import { SecretsCacheProxyService } from './service';
 import { SecretChangeHandler } from './service/command/secret-change.handler';
-import { AzureKeyVaultService } from './service/azure-key-vault.service';
+import { AzureKeyVaultService } from './service/service/azure-key-vault.service';
 
 @Module({
   providers: [

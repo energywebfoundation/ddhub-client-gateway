@@ -9,6 +9,7 @@ export interface StepProps {
   icon: React.ReactNode;
   clickHandler?: () => void;
   showCursor?: boolean;
+  disabled?: boolean;
 }
 
 export const Step = ({
@@ -18,11 +19,19 @@ export const Step = ({
   title,
   clickHandler,
   showCursor,
+  disabled,
 }: StepProps) => {
   const { classes } = useStyles();
 
   return (
-    <Stack direction="row" className={clsx(classes.root, {[classes.clickableDiv]: showCursor})} onClick={clickHandler}>
+    <Stack
+      direction="row"
+      className={clsx(classes.root, {
+        [classes.clickableDiv]: showCursor,
+        [classes.disabled]: disabled,
+      })}
+      onClick={disabled ? (event) => event.preventDefault() : clickHandler}
+    >
       <Avatar
         variant="rounded"
         className={clsx(classes.icon, { [classes.activeIcon]: active })}

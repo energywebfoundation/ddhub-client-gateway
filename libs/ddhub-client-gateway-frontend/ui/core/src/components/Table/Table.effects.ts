@@ -1,14 +1,15 @@
-import React, { ChangeEvent, useState } from 'react';
+import React, { ChangeEvent, useMemo, useState } from 'react';
 import { fuzzyTextFilterFn } from './filters/fuzzy-text-filter';
 import { textFilter } from './filters/text-filter';
 import {
+  Column,
   useFilters,
   useGlobalFilter,
   usePagination,
   useSortBy,
   useTable,
 } from 'react-table';
-import { TableProps } from './Table.types';
+import { TableHeader, TableProps } from './Table.types';
 
 export type Order = 'asc' | 'desc';
 
@@ -35,18 +36,21 @@ export function useTableEffects<T>({
   const [orderBy, setOrderBy] = useState(defaultSortBy);
   const [selected, setSelected] = useState<string[]>([]);
 
-  const data = React.useMemo(
+  const data = useMemo(
     () => tableRows,
     [tableRows]
   ) as unknown as readonly object[];
-  const filterTypes = React.useMemo(
+  const filterTypes = useMemo(
     () => ({
       fuzzyText: fuzzyTextFilterFn,
       text: textFilter,
     }),
     []
   );
-  const columns = React.useMemo(() => headers, []);
+  const columns = useMemo(
+    () => headers,
+    [headers]
+  ) as unknown as readonly Column<object>[];
   const totalLength = data.length;
 
   const {
@@ -101,7 +105,7 @@ export function useTableEffects<T>({
   };
 
   const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const limit = parseInt(event.target.value, 10);
     setPageSize(limit);
@@ -175,10 +179,15 @@ export function useTableEffects<T>({
       return `Showing ${props.from} to ${props.to} of ${props.count}`;
     }
 
-    return `Showing ${props.from} to ${(rows.length < props.to ? rows.length : props.to)} of ${rows.length}`
+    return `Showing ${props.from} to ${
+      rows.length < props.to ? rows.length : props.to
+    } of ${rows.length}`;
   };
 
-  const handleCheckboxClick = (event: React.MouseEvent<unknown>, name: string) => {
+  const handleCheckboxClick = (
+    event: React.MouseEvent<unknown>,
+    name: string
+  ) => {
     const selectedIndex = selected.indexOf(name);
     let newSelected: string[] = [];
 

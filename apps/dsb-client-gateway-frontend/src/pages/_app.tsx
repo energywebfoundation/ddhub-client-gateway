@@ -14,15 +14,20 @@ import { queryClientOptions } from '../utils';
 import { BackdropContextProvider } from '@ddhub-client-gateway-frontend/ui/context';
 import { Backdrop } from '@ddhub-client-gateway-frontend/ui/core';
 import {
-  useCheckAccountStatusEffects,
-  UserDataContext,
+  useUserAuthHeaders,
+  useCheckAccountStatus,
+  UserContext,
   useUserData,
 } from '@ddhub-client-gateway-frontend/ui/login';
 import { makeServer } from '../services/mock.service';
 import '@asyncapi/react-component/styles/default.min.css';
 import 'nprogress/nprogress.css';
 import '../styles/globals.css';
-import { useGatewayIdentityEffects } from 'libs/ddhub-client-gateway-frontend/ui/gateway-settings/src/lib/containers/GatewayIdentity/GatewayIdentity.effects';
+import { ModalProvider } from '@ddhub-client-gateway-frontend/ui/messaging';
+import {
+  useAddressBookContext,
+  AddressBookContext,
+} from '@ddhub-client-gateway-frontend/ui/login';
 
 if (
   process.env.NODE_ENV !== 'production' &&
@@ -42,20 +47,37 @@ export interface MyAppProps extends AppProps {
 }
 
 function InitializeAccountStatus(props) {
-  useGatewayIdentityEffects();
-  useCheckAccountStatusEffects();
+  useUserAuthHeaders();
+  useCheckAccountStatus(false);
   return <>{props.children}</>;
 }
 
 function MyApp(props: MyAppProps) {
   const { Component, pageProps } = props;
-  const { userDataValue } = useUserData();
   const [queryClient] = React.useState(
     () =>
       new QueryClient({
-        defaultOptions: queryClientOptions,
+        defaultOptions: {
+          queries: {
+            ...queryClientOptions.queries,
+            enabled: false,
+          },
+        },
       })
   );
+  const {
+    userDataValue,
+    userAuthValue,
+    refreshIdentityValue,
+    authenticatedValue,
+    resetUserData,
+    resetAuthData,
+    refreshToken,
+    authEnabled,
+  } = useUserData(queryClient);
+
+  const { addressBook, refreshAddressBook, getAlias, getAliasOrMinifiedDid } =
+    useAddressBookContext(queryClient);
 
   const getLayout =
     (Component as any).getLayout || ((page) => <Layout>{page}</Layout>);
@@ -88,14 +110,38 @@ function MyApp(props: MyAppProps) {
       <DDHubThemeProvider>
         <CssBaseline />
         <BackdropContextProvider>
-          <UserDataContext.Provider value={userDataValue}>
-            <QueryClientProvider client={queryClient}>
-              <InitializeAccountStatus>
-                {getLayout(<Component {...pageProps} />)}
-                <Backdrop />
-              </InitializeAccountStatus>
-            </QueryClientProvider>
-          </UserDataContext.Provider>
+          <QueryClientProvider client={queryClient}>
+            <UserContext.Provider
+              value={{
+                ...userDataValue,
+                ...userAuthValue,
+                ...refreshIdentityValue,
+                ...authenticatedValue,
+                resetUserData,
+                resetAuthData,
+                refreshToken,
+                authEnabled,
+              }}
+            >
+              <AddressBookContext.Provider
+                value={{
+                  ...addressBook,
+                  refreshAddressBook,
+                  getAlias,
+                  getAliasOrMinifiedDid,
+                }}
+              >
+                <ModalProvider>
+                  <InitializeAccountStatus>
+                    <>
+                      {getLayout(<Component {...pageProps} />)}
+                      <Backdrop />
+                    </>
+                  </InitializeAccountStatus>
+                </ModalProvider>
+              </AddressBookContext.Provider>
+            </UserContext.Provider>
+          </QueryClientProvider>
         </BackdropContextProvider>
       </DDHubThemeProvider>
     </CacheProvider>

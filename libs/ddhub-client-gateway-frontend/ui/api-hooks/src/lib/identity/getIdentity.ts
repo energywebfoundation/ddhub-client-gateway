@@ -6,7 +6,7 @@ import {
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { useCustomAlert } from '@ddhub-client-gateway-frontend/ui/core';
 
-export const useIdentity = () => {
+export const useIdentity = (triggerQuery = true) => {
   const Swal = useCustomAlert();
   const queryClient = useQueryClient();
   const cachedIdentity: IdentityResponseDto | undefined =
@@ -14,8 +14,8 @@ export const useIdentity = () => {
 
   const { data, isLoading } = useIdentityControllerGet({
     query: {
-      enabled: !cachedIdentity,
-      onError: (err: { message: string }) => {
+      enabled: !cachedIdentity && triggerQuery,
+      onError: (err: Error) => {
         console.error(err);
         Swal.httpError(err);
       },

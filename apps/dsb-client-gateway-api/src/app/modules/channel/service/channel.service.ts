@@ -1,6 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ChannelTopic } from '../entity/channel.entity';
-import { CreateChannelDto, TopicDto } from '../dto/request/create-channel.dto';
+import {
+  CreateChannelDto,
+  ResponseTopicDto,
+  TopicDto,
+} from '../dto/request/create-channel.dto';
 import { ChannelNotFoundException } from '../exceptions/channel-not-found.exception';
 import { ChannelUpdateRestrictedFieldsException } from '../exceptions/channel-update-restricted-fields.exception';
 import { CommandBus } from '@nestjs/cqrs';
@@ -12,7 +16,12 @@ import { ChannelAlreadyExistsException } from '../exceptions/channel-already-exi
 import { Span } from 'nestjs-otel';
 import {
   ChannelEntity,
+  ChannelResponseTopic,
   ChannelWrapperRepository,
+  QueryChannels,
+  ReceivedMessageRepositoryWrapper,
+  SentMessageRepositoryWrapper,
+  TopicRepositoryWrapper,
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
 import { TopicNotFoundException } from '../exceptions/topic-not-found.exception';
 import {
@@ -22,6 +31,9 @@ import {
 } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
 import { ChannelInvalidTopicException } from '../exceptions/channel-invalid-topic.exception';
 import { differenceBy } from 'lodash';
+import { ChannelMessageFormsOnlyException } from '../exceptions/channel-message-forms-only.exception';
+import { GetChannelMessagesCountDto } from '../dto/request/get-channel-messages-count.dto';
+import { In } from 'typeorm';
 
 @Injectable()
 export class ChannelService {
@@ -30,8 +42,54 @@ export class ChannelService {
   constructor(
     protected readonly wrapperRepository: ChannelWrapperRepository,
     protected readonly ddhubTopicsService: DdhubTopicsService,
-    protected readonly commandBus: CommandBus
+    protected readonly commandBus: CommandBus,
+    protected readonly sentMessagesRepositoryWrapper: SentMessageRepositoryWrapper,
+    protected readonly receivedMessagesRepositoryWrapper: ReceivedMessageRepositoryWrapper,
+    protected readonly topicRepository: TopicRepositoryWrapper
   ) {}
+
+  @Span('channels_multipleMessageCount')
+  public async getMultipleChannelsMessageCount(
+    query: QueryChannels
+  ): Promise<GetChannelMessagesCountDto[]> {
+    const channels: ChannelEntity[] = await this.queryChannels(query);
+
+    const result: GetChannelMessagesCountDto[] = [];
+
+    for (const channel of channels) {
+      const dataToPush: GetChannelMessagesCountDto = {
+        count: await this.getChannelMessageCount(channel.fqcn),
+        fqcn: channel.fqcn,
+      };
+
+      result.push(dataToPush);
+    }
+
+    return result;
+  }
+
+  @Span('channels_messageCount')
+  public async getChannelMessageCount(fqcn: string): Promise<number> {
+    const channel: ChannelEntity = await this.getChannelOrThrow(fqcn);
+
+    if (!channel.messageForms) {
+      throw new ChannelMessageFormsOnlyException(fqcn);
+    }
+
+    if (channel.type === ChannelType.PUB) {
+      return this.sentMessagesRepositoryWrapper.repository.count({
+        where: {
+          fqcn,
+        },
+      });
+    } else {
+      return this.receivedMessagesRepositoryWrapper.repository.count({
+        where: {
+          fqcn,
+        },
+      });
+    }
+  }
 
   @Span('channels_getChannels')
   public async getChannels(): Promise<ChannelEntity[]> {
@@ -48,11 +106,37 @@ export class ChannelService {
       throw new ChannelAlreadyExistsException(payload.fqcn);
     }
 
-    this.logger.debug(payload);
+    this.logger.debug(`Create message payload: ${JSON.stringify(payload)}`);
 
     const topicsWithIds: ChannelTopic[] = await this.getTopicsWithIds(
       payload.conditions.topics
     );
+
+    let responseTopicsWithChannels: ChannelResponseTopic[] = [];
+    if (payload.conditions.responseTopics.length) {
+      const responseTopicsWithIds: ChannelTopic[] = await this.getTopicsWithIds(
+        payload.conditions.responseTopics
+      );
+
+      const uniqueResponseTopicsIds: string[] = [
+        ...new Set(
+          payload.conditions.responseTopics.map(
+            ({ responseTopicId }) => responseTopicId
+          )
+        ),
+      ];
+
+      const responseTopicsCount = await this.getTopicsCountByIds(
+        uniqueResponseTopicsIds
+      );
+
+      responseTopicsWithChannels = this.verifyResponseTopics(
+        responseTopicsCount,
+        uniqueResponseTopicsIds,
+        payload.conditions.responseTopics,
+        responseTopicsWithIds
+      );
+    }
 
     await this.validateTopics(topicsWithIds, payload.type);
 
@@ -63,6 +147,7 @@ export class ChannelService {
     await this.wrapperRepository.channelRepository.save({
       fqcn: payload.fqcn,
       type: payload.type,
+      messageForms: payload.messageForms,
       useAnonymousExtChannel: payload.useAnonymousExtChannel,
       payloadEncryption: payload.payloadEncryption,
       conditions: {
@@ -70,6 +155,7 @@ export class ChannelService {
         dids: payload.conditions.dids,
         roles: payload.conditions.roles,
         qualifiedDids: [],
+        responseTopics: responseTopicsWithChannels,
       },
     });
 
@@ -78,6 +164,38 @@ export class ChannelService {
     await this.commandBus.execute(
       new RefreshChannelCacheDataCommand(payload.fqcn)
     );
+  }
+
+  private verifyResponseTopics(
+    responseTopicsCount: number,
+    uniqueResponseTopicsIds: string[],
+    responseTopics: ResponseTopicDto[],
+    responseTopicsWithIds: ChannelTopic[]
+  ) {
+    if (responseTopicsCount !== uniqueResponseTopicsIds.length) {
+      throw new TopicNotFoundException(
+        `found ${responseTopicsCount} topics expected ${uniqueResponseTopicsIds}`
+      );
+    }
+
+    const responseTopicsWithChannels: ChannelResponseTopic[] =
+      responseTopics.map(({ topicName, owner, responseTopicId }) => {
+        const validTopic: ChannelTopic | undefined = responseTopicsWithIds.find(
+          (topic) => topic.topicName === topicName && topic.owner === owner
+        );
+
+        if (!validTopic) {
+          throw new TopicNotFoundException(validTopic.topicId);
+        }
+
+        return {
+          topicOwner: owner,
+          responseTopicId: responseTopicId,
+          topicId: validTopic.topicId,
+          topicName: topicName,
+        };
+      });
+    return responseTopicsWithChannels;
   }
 
   @Span('channels_updateQualifiedDids')
@@ -164,6 +282,32 @@ export class ChannelService {
       dto.conditions.topics
     );
 
+    let responseTopicsWithChannels: ChannelResponseTopic[] = [];
+    if (dto.conditions.responseTopics.length) {
+      const responseTopicsWithIds: ChannelTopic[] = await this.getTopicsWithIds(
+        dto.conditions.responseTopics
+      );
+
+      const uniqueResponseTopicsIds: string[] = [
+        ...new Set(
+          dto.conditions.responseTopics.map(
+            ({ responseTopicId }) => responseTopicId
+          )
+        ),
+      ];
+
+      const responseTopicsCount = await this.getTopicsCountByIds(
+        uniqueResponseTopicsIds
+      );
+
+      responseTopicsWithChannels = this.verifyResponseTopics(
+        responseTopicsCount,
+        uniqueResponseTopicsIds,
+        dto.conditions.responseTopics,
+        responseTopicsWithIds
+      );
+    }
+
     await this.validateTopics(topicsWithIds, channel.type);
 
     channel.payloadEncryption =
@@ -174,6 +318,7 @@ export class ChannelService {
       dids: dto.conditions.dids,
       roles: dto.conditions.roles,
       topics: topicsWithIds,
+      responseTopics: responseTopicsWithChannels,
     };
 
     await this.wrapperRepository.channelRepository.save(channel);
@@ -198,6 +343,19 @@ export class ChannelService {
         }
       }
     }
+  }
+
+  protected async getTopicsCountByIds(topicIds: string[]): Promise<number> {
+    if (!topicIds || topicIds.length === 0) {
+      return 0;
+    }
+
+    const [, count] =
+      await this.topicRepository.topicRepository.getTopicsAndCountByIds(
+        topicIds,
+        true
+      );
+    return count;
   }
 
   @Span('channels_getTopicsWithIds')
@@ -250,7 +408,7 @@ export class ChannelService {
   }
 
   @Span('channels_getChannelsByType')
-  public async getChannelsByType(type?: ChannelType): Promise<ChannelEntity[]> {
-    return this.wrapperRepository.channelRepository.getChannelsByType(type);
+  public async queryChannels(query: QueryChannels): Promise<ChannelEntity[]> {
+    return this.wrapperRepository.fetch(query);
   }
 }

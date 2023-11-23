@@ -8,14 +8,15 @@ import { CopyToClipboard } from '@ddhub-client-gateway-frontend/ui/core';
 
 export const GatewayIdentity: FC = () => {
   const { classes, theme } = useStyles();
-  const { update, identity, namespace, openRolesModal } = useGatewayIdentityEffects();
+  const { resetIdentity, identity, namespace, openRolesModal } =
+    useGatewayIdentityEffects();
   return (
     <SettingsItem
       title="Gateway identity"
       icon="/icons/gateway-identity.svg"
       buttonText="Update"
       secondaryButtonText="Roles"
-      onClick={update}
+      onClick={resetIdentity}
       onClickSecondary={openRolesModal}
       content={
         <>

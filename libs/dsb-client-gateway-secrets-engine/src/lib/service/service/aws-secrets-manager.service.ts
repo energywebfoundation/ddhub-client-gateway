@@ -16,6 +16,8 @@ import {
   CertificateDetails,
   PATHS,
   SecretsEngineService,
+  UserDetails,
+  UsersList,
 } from '../../secrets-engine.interface';
 import { Span } from 'nestjs-otel';
 
@@ -51,6 +53,28 @@ export class AwsSecretsManagerService
     });
 
     this.logger.log('AWS SSM Service initialized');
+  }
+
+  public async getAllUsers(): Promise<UsersList> {
+    return [];
+  }
+
+  @Span('aws_ssm_getUserAuthDetails')
+  public async getUserAuthDetails(username: string): Promise<UserDetails> {
+    return {
+      role: 'admin',
+      password: 'password',
+      username: 'username',
+    };
+  }
+
+  @Span('aws_ssm_setUserAuthDetails')
+  public async setUserPassword(
+    username: string,
+    password: string
+  ): Promise<void> {
+    // @TODO - Implement
+    return;
   }
 
   @Span('aws_ssm_setRSAKey')

@@ -1,11 +1,11 @@
 import { useStyles } from './SidebarFooter.styles';
 import React from 'react';
 import { Box, Typography } from '@mui/material';
-import { useSetUserDataEffect } from '@ddhub-client-gateway-frontend/ui/login';
+import { useUserDataEffects } from '@ddhub-client-gateway-frontend/ui/login';
 
 function SidebarFooter() {
   const { classes } = useStyles();
-  const { version } = useSetUserDataEffect();
+  const { version } = useUserDataEffects();
 
   return (
     <div className={classes.footerDiv}>
@@ -15,10 +15,14 @@ function SidebarFooter() {
             Powered by
           </Typography>
           <Box className={classes.logoWrapper}>
-            <img src="/ew-logo-main.svg" alt="bottom logo" className={classes.logo} />
+            <img
+              src="/ew-logo-main.svg"
+              alt="bottom logo"
+              className={classes.logo}
+            />
           </Box>
         </Box>
-        { version && (
+        {version && (
           <Box display="flex" justifyContent="center">
             <Typography variant="body2" className={classes.version}>
               Version {version}

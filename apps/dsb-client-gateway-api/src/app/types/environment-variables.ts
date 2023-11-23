@@ -12,7 +12,12 @@ export enum WebSocketImplementation {
 }
 
 export const API_ENVS = Joi.object({
-
+  USER_AUTH_ENABLED: Joi.boolean()
+    .default(false)
+    .description('Should user auth be enabled'),
+  JWT_USER_PRIVATE_KEY: Joi.string()
+    .default('default-private-key')
+    .description('JWT User Private Key'),
   SWAGGER_SCHEMA_PATH: Joi.string()
     .default('./schema.yaml')
     .description(
@@ -125,4 +130,16 @@ export const API_ENVS = Joi.object({
   REQUEST_BODY_SIZE: Joi.string()
     .default('50mb')
     .description('Maximum request size'),
+  FETCH_MESSAGES_CRON_ENABLED: Joi.boolean()
+    .default(false)
+    .description('Enable fetch messages cron'),
+  CLEANUP_MESSAGES_CRON_ENABLED: Joi.boolean()
+    .default(false)
+    .description('Enable cleanup cron'),
+  FETCH_MESSAGES_CRON_SCHEDULE: Joi.string()
+    .default('*/5 * * * *')
+    .description('CRON Expression for fetch messages'),
+  CLEANUP_MESSAGES_CRON_SCHEDULE: Joi.string()
+    .default('*/5 * * * *')
+    .description('CRON Expression for cleanup messages'),
 });

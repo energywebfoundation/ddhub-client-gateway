@@ -56,8 +56,14 @@
       "@ddhub-client-gateway/identity/models": [
         "libs/ddhub-client-gateway-frontend/identity/models/src/index.ts"
       ],
+      "@dsb-client-gateway/ddhub-client-gateway-address-book": [
+        "libs/ddhub-client-gateway-address-book/src/index.ts"
+      ],
       "@dsb-client-gateway/ddhub-client-gateway-association-keys": [
         "libs/ddhub-client-gateway-association-keys/src/index.ts"
+      ],
+      "@dsb-client-gateway/ddhub-client-gateway-cleanup": [
+        "libs/ddhub-client-gateway-cleanup/src/index.ts"
       ],
       "@dsb-client-gateway/ddhub-client-gateway-clients": [
         "libs/ddhub-client-gateway-clients/src/index.ts"
@@ -91,6 +97,9 @@
       ],
       "@dsb-client-gateway/ddhub-client-gateway-tracing": [
         "libs/ddhub-client-gateway-tracing/src/index.ts"
+      ],
+      "@dsb-client-gateway/ddhub-client-gateway-user-roles": [
+        "libs/ddhub-client-gateway-user-roles/src/index.ts"
       ],
       "@dsb-client-gateway/ddhub-client-gateway-utils": [
         "libs/ddhub-client-gateway-utils/src/index.ts"

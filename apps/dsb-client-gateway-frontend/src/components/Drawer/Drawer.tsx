@@ -7,19 +7,174 @@ import {
   Home,
   Layers,
   Settings,
+  Inbox,
+  Edit3,
 } from 'react-feather';
-import { ClientSubscriptionIcon } from '@ddhub-client-gateway-frontend/ui/core';
+import {
+  ClientSubscriptionIcon,
+  AddressBookIcon,
+} from '@ddhub-client-gateway-frontend/ui/core';
 import { routerConst } from '@ddhub-client-gateway-frontend/ui/utils';
 import { useStyles } from './Drawer.styles';
-import { CollapsableMenu } from './CollapsableMenu/CollapsableMenu';
-import { MenuItem } from './MenuItem/MenuItem';
-import { useSetUserDataEffect } from '@ddhub-client-gateway-frontend/ui/login';
+import {
+  CollapsableListItemProps,
+  CollapsableMenu,
+} from './CollapsableMenu/CollapsableMenu';
+import { MenuItem, MenuItemProps } from './MenuItem/MenuItem';
+import { useUserDataEffects } from '@ddhub-client-gateway-frontend/ui/login';
+import {
+  NewMessage,
+  useNewMessageEffects,
+} from '@ddhub-client-gateway-frontend/ui/messaging';
 
 export const Drawer = () => {
   const {
     userData: { displayedRoutes },
-  } = useSetUserDataEffect();
+  } = useUserDataEffects();
   const { classes } = useStyles();
+  const { openNewMessageModal } = useNewMessageEffects();
+
+  const administrationRoutes: (MenuItemProps | CollapsableListItemProps)[] = [
+    {
+      href: routerConst.GatewaySettings,
+      title: 'Gateway Settings',
+      icon: <Settings className={classes.icon} size={18} />,
+    },
+    {
+      href: routerConst.AddressBook,
+      title: 'Address Book',
+      icon: (
+        <Box className={classes.clientIcon}>
+          <AddressBookIcon />
+        </Box>
+      ),
+    },
+    {
+      href: routerConst.TopicManagement,
+      title: 'Topic Management',
+      icon: <Layers className={classes.icon} size={16} />,
+    },
+    {
+      menuTitle: 'Channels',
+      subMenu: [
+        {
+          href: routerConst.ChannelApps,
+          title: 'My Apps and Topics',
+        },
+        {
+          href: routerConst.ChannelsManagement,
+          title: 'Channel Management',
+        },
+      ],
+      menuIcon: <Command className={classes.icon} size={18} />,
+    },
+  ];
+
+  const messagingRoutes: (MenuItemProps | CollapsableListItemProps)[] = [
+    {
+      href: routerConst.IntegrationAPIs,
+      title: 'Integration APIs',
+      icon: <GitMerge className={classes.icon} size={18} />,
+    },
+    {
+      href: routerConst.ClientIds,
+      title: 'Client Subscriptions',
+      icon: (
+        <Box className={classes.clientIcon}>
+          <ClientSubscriptionIcon />
+        </Box>
+      ),
+    },
+    {
+      menuTitle: 'Data Messaging',
+      subMenu: [
+        {
+          href: routerConst.DataMessagingFileUpload,
+          title: 'File Upload',
+        },
+        {
+          href: routerConst.DataMessagingFileDownload,
+          title: 'File Download',
+        },
+      ],
+      menuIcon: <Database className={classes.icon} size={18} />,
+    },
+    {
+      menuTitle: 'Large Data Messaging',
+      subMenu: [
+        {
+          href: routerConst.LargeDataMessagingFileUpload,
+          title: 'File Upload',
+        },
+        {
+          href: routerConst.LargeDataMessagingFileDownload,
+          title: 'File Download',
+        },
+      ],
+      menuIcon: <Database className={classes.icon} size={18} />,
+    },
+    {
+      menuTitle: 'Message Box',
+      subMenu: [
+        {
+          title: 'New Message',
+          onClick: openNewMessageModal,
+          menuIcon: <Edit3 style={{ margin: '0 10px 0 2px' }} size={16} />,
+        },
+        {
+          href: routerConst.MessageInbox,
+          title: 'My Messages',
+        },
+        {
+          href: routerConst.MessageOutbox,
+          title: 'Sent Messages',
+        },
+      ],
+      menuIcon: <Inbox className={classes.icon} size={18} />,
+    },
+  ];
+
+  const isMenuItemProps = (
+    item: MenuItemProps | CollapsableListItemProps
+  ): item is MenuItemProps => {
+    return !!item && 'href' in item;
+  };
+
+  const renderMenuList = (
+    routes: (MenuItemProps | CollapsableListItemProps)[]
+  ) => {
+    return routes.map((route) => {
+      if (isMenuItemProps(route)) {
+        return (
+          displayedRoutes.has(route.href) && (
+            <MenuItem key={route.title} {...route} />
+          )
+        );
+      } else {
+        return (
+          route.subMenu
+            .map((submenuItem) => submenuItem.href)
+            .some((href) => displayedRoutes.has(href)) && (
+            <CollapsableMenu key={route.menuTitle} {...route} />
+          )
+        );
+      }
+    });
+  };
+
+  const routeListHasDisplayedRoutes = (
+    routes: (MenuItemProps | CollapsableListItemProps)[]
+  ) => {
+    return routes.some((route) => {
+      if (isMenuItemProps(route)) {
+        return displayedRoutes.has(route.href);
+      } else {
+        return route.subMenu.some((subMenu) =>
+          displayedRoutes.has(subMenu.href)
+        );
+      }
+    });
+  };
 
   return (
     <div>
@@ -32,85 +187,29 @@ export const Drawer = () => {
           title="Dashboard"
           icon={<Home className={classes.icon} size={20} />}
         />
-        <Divider classes={{ root: classes.dividerColor }} />
       </List>
 
-      <Typography classes={{ root: classes.menuTitle }} variant="body2">
-        Admin
-      </Typography>
-      <List>
-        <MenuItem
-          href={routerConst.GatewaySettings}
-          title="Gateway Settings"
-          icon={<Settings className={classes.icon} size={18} />}
-        />
+      {routeListHasDisplayedRoutes(administrationRoutes) && (
+        <>
+          <Divider classes={{ root: classes.dividerColor }} />
+          <Typography classes={{ root: classes.menuTitle }} variant="body2">
+            Admin
+          </Typography>
+          <List>{renderMenuList(administrationRoutes)}</List>
+        </>
+      )}
 
-        {displayedRoutes.has(routerConst.TopicManagement) && (
-          <MenuItem
-            href={routerConst.TopicManagement}
-            title="Topic management"
-            icon={<Layers className={classes.icon} size={16} />}
-          />
-        )}
+      {routeListHasDisplayedRoutes(messagingRoutes) && (
+        <>
+          <Divider classes={{ root: classes.dividerColor }} />
+          <Typography classes={{ root: classes.menuTitle }} variant="body2">
+            Messaging
+          </Typography>
+          <List>{renderMenuList(messagingRoutes)}</List>
+        </>
+      )}
 
-        <CollapsableMenu
-          menuTitle="Channels"
-          subMenu={[
-            { title: 'My apps and topics', href: routerConst.ChannelApps },
-            {
-              title: 'Channel management',
-              href: routerConst.ChannelsManagement,
-            },
-          ].filter((menu) => displayedRoutes.has(menu.href))}
-          menuIcon={<Command className={classes.icon} size={18} />}
-        />
-
-        <Divider classes={{ root: classes.dividerColor }} />
-      </List>
-
-      <Typography classes={{ root: classes.menuTitle }} variant="body2">
-        Messaging
-      </Typography>
-      <List>
-        <MenuItem
-          href={routerConst.IntegrationAPIs}
-          title="Integration APIs"
-          icon={<GitMerge className={classes.icon} size={18} />}
-        />
-
-        <MenuItem
-          href={routerConst.ClientIds}
-          title="Client Subscriptions"
-          icon={<Box className={classes.clientIcon}><ClientSubscriptionIcon /></Box>}
-        />
-
-        <CollapsableMenu
-          menuTitle="Large Data Messaging"
-          subMenu={[
-            {
-              title: 'File upload',
-              href: routerConst.LargeDataMessagingFileUpload,
-            },
-            {
-              title: 'File download',
-              href: routerConst.LargeDataMessagingFileDownload,
-            },
-          ].filter((menu) => displayedRoutes.has(menu.href))}
-          menuIcon={<Database className={classes.icon} size={18} />}
-        />
-
-        <CollapsableMenu
-          menuTitle="Data Messaging"
-          subMenu={[
-            { title: 'File upload', href: routerConst.DataMessagingFileUpload },
-            {
-              title: 'File download',
-              href: routerConst.DataMessagingFileDownload,
-            },
-          ].filter((menu) => displayedRoutes.has(menu.href))}
-          menuIcon={<Database className={classes.icon} size={18} />}
-        />
-      </List>
+      <NewMessage />
     </div>
   );
 };

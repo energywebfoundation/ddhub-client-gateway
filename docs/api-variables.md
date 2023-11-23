@@ -2,6 +2,8 @@
 
 | KEY | TYPE | DEFAULT | DESCRIPTION | ALLOWED_VALUES | DEPENDENCY |
 | --- | ---- | ------- | ----------- | -------------- | ---------- |
+| USER_AUTH_ENABLED | boolean | false | Should user auth be enabled |  |  |
+| JWT_USER_PRIVATE_KEY | string | default-private-key | JWT User Private Key |  |  |
 | SWAGGER_SCHEMA_PATH | string | ./schema.yaml | Path where OpenAPI Document should be generated - use only in development |  |  |
 | GENERATE_SWAGGER | boolean | false | Should generate Swagger document - use only in development |  |  |
 | AK_SHARE_CRON_ENABLED | boolean | false | Should share association keys |  |  |
@@ -31,6 +33,10 @@
 | MULTER_UPLOADS_PATH | string | uploads | Multer temporary file storage path |  |  |
 | APPLICATION_NAMESPACE_REGULAR_EXPRESSION | string | \w.apps.*\w.iam.ewc | Filter for application namespaces |  |  |
 | REQUEST_BODY_SIZE | string | 50mb | Maximum request size |  |  |
+| FETCH_MESSAGES_CRON_ENABLED | boolean | false | Enable fetch messages cron |  |  |
+| CLEANUP_MESSAGES_CRON_ENABLED | boolean | false | Enable cleanup cron |  |  |
+| FETCH_MESSAGES_CRON_SCHEDULE | string | */5 * * * * | CRON Expression for fetch messages |  |  |
+| CLEANUP_MESSAGES_CRON_SCHEDULE | string | */5 * * * * | CRON Expression for cleanup messages |  |  |
 | USE_CACHE | boolean | true | Should use cache |  |  |
 | SECRETS_ENGINE | string |  | Secrets engine to use | aws,vault,azure |  |
 | VAULT_ENDPOINT | string |  | Vault path |  | SECRETS_ENGINE == vault |

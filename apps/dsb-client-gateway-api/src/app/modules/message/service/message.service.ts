@@ -14,6 +14,7 @@ import {
   FileMetadataWrapperRepository,
   PendingAcksEntity,
   PendingAcksWrapperRepository,
+  SentMessageEntity,
   TopicEntity,
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
 import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
@@ -62,6 +63,11 @@ import {
   AssociationKeyNotAvailableException,
   AssociationKeysService,
 } from '@dsb-client-gateway/ddhub-client-gateway-association-keys';
+import { MessageStoreService } from './message-store.service';
+import { OfflineMessagesService } from './offline-messages.service';
+import { IamService } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
+import { DateTime } from 'luxon';
+import { Readable } from 'stream';
 
 export enum EventEmitMode {
   SINGLE = 'SINGLE',
@@ -74,6 +80,7 @@ export class MessageService {
   protected readonly uploadPath: string;
   protected readonly downloadPath: string;
   protected readonly ext: string = '.enc';
+  protected readonly offlineExt: string = '.offline.unenc';
 
   constructor(
     protected readonly secretsEngineService: SecretsEngineService,
@@ -89,7 +96,10 @@ export class MessageService {
     protected readonly fileMetadataWrapper: FileMetadataWrapperRepository,
     protected readonly reqLockService: ReqLockService,
     protected readonly pendingAcksWrapperRepository: PendingAcksWrapperRepository,
-    protected readonly associationKeysService: AssociationKeysService
+    protected readonly associationKeysService: AssociationKeysService,
+    protected readonly messageStoreService: MessageStoreService,
+    protected readonly offlineMessagesService: OfflineMessagesService,
+    protected readonly iamService: IamService
   ) {
     this.uploadPath = configService.get<string>('UPLOAD_FILES_DIR');
     this.downloadPath = configService.get<string>('DOWNLOAD_FILES_DIR');
@@ -110,6 +120,7 @@ export class MessageService {
     this.validateTopic(topic, channel);
 
     const qualifiedDids = channel.conditions.qualifiedDids;
+    this.logger.log('Qualified DIDs', { qualifiedDids });
 
     if (qualifiedDids.length === 0 && !channel.useAnonymousExtChannel) {
       throw new RecipientsNotFoundException();
@@ -178,15 +189,63 @@ export class MessageService {
         clientGatewayMessageId,
         shouldEncrypt,
         dto.anonymousRecipient ?? [],
-        dto.transactionId
+        dto.transactionId,
+        dto.initiatingMessageId,
+        dto.initiatingTransactionId
       );
+
+    const messageIds: string[] = [];
 
     for (const res of result.status) {
       for (const detail of res.details) {
         messageLoggerContext.log(
           `message sent with id ${detail.messageId} to ${detail.did} with status code ${detail.statusCode}`
         );
+
+        if (detail.messageId) {
+          messageIds.push(detail.messageId);
+
+          await this.messageStoreService.storeRecipients(
+            detail.did,
+            detail.messageId,
+            'todo',
+            detail.statusCode ?? 200,
+            clientGatewayMessageId
+          );
+        }
       }
+    }
+
+    if (channel.messageForms) {
+      this.logger.debug(`attempting to store sent messages`);
+
+      await this.messageStoreService
+        .storeSentMessage([
+          {
+            topicOwner: topic.owner,
+            topicName: topic.name,
+            messageIds: messageIds,
+            initiatingMessageId: dto.initiatingMessageId,
+            initiatingTransactionId: dto.initiatingTransactionId,
+            payload: dto.payload,
+            topic,
+            clientGatewayMessageId: clientGatewayMessageId,
+            isFile: false,
+            fqcn: channel.fqcn,
+            signature: signature,
+            transactionId: dto.transactionId,
+            payloadEncryption: shouldEncrypt,
+            senderDid: this.iamService.getDIDAddress(),
+            timestampNanos: new Date(),
+            totalFailed: result.recipients.failed,
+            totalSent: result.recipients.sent,
+            totalRecipients: result.recipients.total,
+          },
+        ])
+        .catch((e) => {
+          this.logger.error(`failed to store sent message`);
+          this.logger.error(e);
+        });
     }
 
     return result;
@@ -309,7 +368,13 @@ export class MessageService {
         signature: message.signature,
         sender: message.senderDid,
         timestampNanos: message.timestampNanos,
+        timestampISO: DateTime.fromMillis(message.timestampNanos / 1e6).toISO(),
         transactionId: message.transactionId,
+        initiatingMessageId: message.initiatingMessageId,
+        initiatingTransactionId: message.initiatingTransactionId,
+        payloadEncryption: message.payloadEncryption,
+        clientGatewayMessageId: message.clientGatewayMessageId,
+        topicId: message.topicId,
       };
 
     this.logger.log(`attempting to process message ${message.messageId}`);
@@ -485,7 +550,14 @@ export class MessageService {
 
   @Span('message_getMessages_reqLock')
   public async getMessagesWithReqLock(
-    { fqcn, from, amount, topicName, topicOwner, clientId }: GetMessagesDto,
+    {
+      fqcn,
+      from,
+      amount,
+      topicName,
+      topicOwner,
+      clientId,
+    }: Partial<GetMessagesDto>,
     ack: boolean | undefined = true
   ): Promise<GetMessageResponse[]> {
     const usableClientId: string = clientId ? clientId : 'DEFAULT';
@@ -524,9 +596,12 @@ export class MessageService {
 
   @Span('message_getMessages')
   public async getMessages(
-    { fqcn, from, amount, topicName, topicOwner, clientId }: GetMessagesDto,
+    getMessagesDto: Partial<GetMessagesDto>,
     ack: boolean | undefined = true
   ): Promise<GetMessageResponse[]> {
+    const { fqcn, from, amount, topicName, topicOwner, clientId } =
+      getMessagesDto;
+
     const loggerContextKey: string = `${MessageService.name}_${fqcn}_${topicName}_${topicOwner}_${clientId};`;
 
     const messageLoggerContext = new Logger(loggerContextKey);
@@ -610,6 +685,7 @@ export class MessageService {
     const rejected = messageResponses.filter(
       (value) => value.status === 'rejected'
     );
+
     if (rejected.length > 0) {
       messageLoggerContext.error(
         '[getMessages] Error while processing messages'
@@ -667,6 +743,53 @@ export class MessageService {
       }
     }
 
+    if (channel.messageForms) {
+      this.logger.debug(`attempting to store received messages`);
+
+      await this.messageStoreService
+        .storeReceivedMessage(
+          await Promise.all(
+            fulfilledMessages.map(
+              async (messageResponse: GetMessageResponse) => {
+                const topic: TopicEntity | undefined =
+                  await this.topicService.getTopic(
+                    messageResponse.topicName,
+                    topicOwner,
+                    messageResponse.topicVersion
+                  );
+
+                return {
+                  topic,
+                  fqcn,
+                  initiatingMessageId: messageResponse.initiatingMessageId,
+                  initiatingTransactionId:
+                    messageResponse.initiatingTransactionId,
+                  payload: messageResponse.payload,
+                  transactionId: messageResponse.transactionId,
+                  payloadEncryption: messageResponse.payloadEncryption,
+                  clientGatewayMessageId:
+                    messageResponse.clientGatewayMessageId,
+                  messageId: messageResponse.id,
+                  senderDid: messageResponse.sender,
+                  signature: messageResponse.signature,
+                  isFile: false,
+                  timestampNanos: moment(
+                    messageResponse.timestampNanos / (1000 * 1000)
+                  )
+                    .utc()
+                    .toDate(),
+                  topicVersion: topic.version,
+                };
+              }
+            )
+          )
+        )
+        .catch((e) => {
+          this.logger.error(`failed to store received messages`);
+          this.logger.error(e);
+        });
+    }
+
     return fulfilledMessages.sort((a, b) => {
       if (a.timestampNanos < b.timestampNanos) return -1;
       return a.timestampNanos > b.timestampNanos ? 1 : 0;
@@ -714,6 +837,12 @@ export class MessageService {
 
     const symmetricKey: string = this.keyService.generateRandomKey();
 
+    let originalPath: string | null = null;
+
+    if (channel.messageForms) {
+      originalPath = await this.storeOriginalFile(clientGatewayMessageId, file);
+    }
+
     let filePath: string;
 
     if (channel.payloadEncryption) {
@@ -752,7 +881,6 @@ export class MessageService {
       clientGatewayMessageId
     );
 
-    //uploading file
     const result: SendMessageResponseFile =
       await this.ddhubFilesService.uploadFile(
         fs.createReadStream(filePath),
@@ -766,15 +894,129 @@ export class MessageService {
         dto.transactionId
       );
 
+    await this.handlePostFileUpload(
+      channel,
+      originalPath,
+      file,
+      result,
+      clientGatewayMessageId,
+      dto.transactionId,
+      topic,
+      signature
+    );
+
+    return result;
+  }
+
+  private async storeOriginalFile(
+    clientGatewayMessageId: string,
+    file: Express.Multer.File
+  ): Promise<string> {
+    const originalFilePath = join(
+      this.uploadPath,
+      clientGatewayMessageId + this.offlineExt
+    );
+
+    const stream = fs.createWriteStream(originalFilePath);
+
+    const writeStream = file.stream.pipe(stream);
+
+    const promise = () =>
+      new Promise((resolve) => {
+        writeStream.on('finish', () => resolve(null));
+      });
+
+    await promise();
+
+    return originalFilePath;
+  }
+
+  private async handlePostFileUpload(
+    channel: ChannelEntity,
+    filePath: string | null,
+    file: Express.Multer.File,
+    result: SendMessageResponseFile,
+    clientGatewayMessageId: string,
+    transactionId: string,
+    topic: TopicEntity,
+    signature: string
+  ): Promise<void> {
     try {
-      fs.unlinkSync(filePath);
-      fs.unlinkSync(file.path);
+      if (!channel.messageForms) {
+        fs.unlinkSync(filePath);
+        fs.unlinkSync(file.path);
+      } else {
+        if (!filePath) {
+          this.logger.error('no original path available');
+
+          return;
+        }
+
+        const messageIds: string[] = [];
+
+        for (const res of result.status) {
+          for (const detail of res.details) {
+            if (detail.messageId) {
+              messageIds.push(detail.messageId);
+
+              await this.messageStoreService.storeRecipients(
+                detail.did,
+                detail.messageId,
+                'todo',
+                detail.statusCode ?? 200,
+                clientGatewayMessageId
+              );
+            }
+          }
+        }
+
+        await this.messageStoreService.storeSentMessage([
+          {
+            topicOwner: topic.owner,
+            topicName: topic.name,
+            messageIds: messageIds,
+            initiatingMessageId: undefined,
+            fqcn: channel.fqcn,
+            signature: signature,
+            transactionId: transactionId,
+            senderDid: this.iamService.getDIDAddress(),
+            initiatingTransactionId: undefined,
+            topic: topic,
+            clientGatewayMessageId: clientGatewayMessageId,
+            isFile: true,
+            payload: '',
+            timestampNanos: new Date(),
+            totalFailed: result.recipients.failed,
+            totalSent: result.recipients.sent,
+            totalRecipients: result.recipients.total,
+            payloadEncryption: channel.payloadEncryption,
+            filePath: channel.messageForms ? filePath : null,
+          },
+        ]);
+
+        this.logger.debug(`message forms enabled`);
+      }
     } catch (e) {
       this.logger.error('file unlink failed');
       this.logger.error(e);
     }
+  }
 
-    return result;
+  public async downloadOfflineUploadedFile(
+    clientGatewayMessageId: string
+  ): Promise<Readable | null> {
+    const fileMetadata: SentMessageEntity | null =
+      await this.offlineMessagesService.getOfflineUploadedFile(
+        clientGatewayMessageId
+      );
+
+    if (!fileMetadata || !fileMetadata.filePath) {
+      return null;
+    }
+
+    const stream = fs.createReadStream(fileMetadata.filePath);
+
+    return Readable.from(stream);
   }
 
   public async downloadMessages(

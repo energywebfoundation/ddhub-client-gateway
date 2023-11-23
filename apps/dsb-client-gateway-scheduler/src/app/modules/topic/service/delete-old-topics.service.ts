@@ -8,7 +8,7 @@ import { DdhubTopicsService } from '@dsb-client-gateway/ddhub-client-gateway-mes
 import { Span } from 'nestjs-otel';
 
 @Injectable()
-export class DeleteOldTopicsService implements OnApplicationBootstrap {
+export class DeleteOldTopicsService {
   protected readonly logger = new Logger(DeleteOldTopicsService.name);
 
   constructor(
@@ -17,10 +17,9 @@ export class DeleteOldTopicsService implements OnApplicationBootstrap {
     protected readonly ddhubTopicsService: DdhubTopicsService
   ) {}
 
-  public async onApplicationBootstrap(): Promise<void> {
-    await this.refreshTopics();
-  }
-
+  /**
+   * Disabled for now
+   */
   @Span('topic_refresh')
   public async refreshTopics(): Promise<void> {
     try {

@@ -6,6 +6,7 @@ export const useStyles = makeStyles()((theme) => ({
     padding: 4,
     marginBottom: 29,
     borderRadius: 5,
+    transition: 'opacity 0.3s ease-in-out',
   },
   title: {
     fontSize: 14,
@@ -40,6 +41,7 @@ export const useStyles = makeStyles()((theme) => ({
     justifyContent: 'center',
     alignItems: 'center',
     paddingLeft: '12px',
+    paddingRight: 'unset',
   },
   clickableDiv: {
     cursor: 'pointer',
@@ -49,5 +51,9 @@ export const useStyles = makeStyles()((theme) => ({
         color: theme.palette.primary.main,
       },
     },
-  }
+  },
+  disabled: {
+    cursor: 'not-allowed',
+    opacity: 0.5,
+  },
 }));
