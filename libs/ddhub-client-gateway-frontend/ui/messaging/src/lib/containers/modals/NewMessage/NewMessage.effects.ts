@@ -182,32 +182,56 @@ export const useNewMessageEffects = () => {
   }, [open]);
 
   const filterReplyChannels = (channels: GetChannelResponseDto[]) => {
-    const responseTopicIds: string[] = [];
-    const validTopicTester = (topic: ChannelTopic | ChannelResponseTopic) => {
-      if ('responseTopicId' in topic) {
-        return topic.responseTopicId === replyData.topicId;
-      } else {
-        return (
-          topic.topicId === replyData.topicId ||
-          responseTopicIds.some(
-            (responseTopicId) => responseTopicId === topic.topicId
-          )
-        );
-      }
-    };
+    console.log('channels', channels);
 
-    const validChannels = channels.reduce((acc, channel) => {
-      const validResponseTopics =
-        channel.conditions.responseTopics.filter(validTopicTester);
-      if (validResponseTopics.length) {
-        responseTopicIds.push(...validResponseTopics.map((t) => t.topicId));
-      }
-      const validTopics = channel.conditions.topics.filter(validTopicTester);
+    const responseTopicId =
+      replyData.replyChannel.conditions.responseTopics.find(
+        (topic) => topic.responseTopicId === replyData.topicId
+      )?.topicId;
+    if (!responseTopicId) {
+      // all channels are valid
+      console.log('no response topic id found');
+      return channels;
+    }
+    const validChannels = channels.filter((channel) => {
+      const validTopics = channel.conditions.topics.filter(
+        (topic) => topic.topicId === responseTopicId
+      );
       if (validTopics.length) {
-        return [...acc, channel];
+        return true;
       }
-      return acc;
-    }, []);
+      return false;
+    });
+    console.log('valid channels', validChannels);
+
+    // const responseTopicIds: string[] = [];
+    // const validTopicTester = (topic: ChannelTopic | ChannelResponseTopic) => {
+    //   console.log('testing topic', topic);
+    //   console.log('found these response topics', responseTopicIds);
+    //   if ('responseTopicId' in topic) {
+    //     return topic.responseTopicId === replyData.topicId;
+    //   } else {
+    //     return (
+    //       topic.topicId === replyData.topicId ||
+    //       responseTopicIds.some(
+    //         (responseTopicId) => responseTopicId === topic.topicId
+    //       )
+    //     );
+    //   }
+    // };
+
+    // const validChannels = channels.reduce((acc, channel) => {
+    //   const validResponseTopics =
+    //     channel.conditions.responseTopics.filter(validTopicTester);
+    //   if (validResponseTopics.length) {
+    //     responseTopicIds.push(...validResponseTopics.map((t) => t.topicId));
+    //   }
+    //   const validTopics = channel.conditions.topics.filter(validTopicTester);
+    //   if (validTopics.length) {
+    //     return [...acc, channel];
+    //   }
+    //   return acc;
+    // }, []);
 
     return validChannels;
   };
@@ -230,26 +254,20 @@ export const useNewMessageEffects = () => {
   }, [channelsLoaded, isReply]);
 
   const filterReplyTopics = (topics: ChannelTopic[]) => {
-    const validTopicTester = (topic: ChannelTopic | ChannelResponseTopic) => {
-      if ('responseTopicId' in topic) {
-        return topic.responseTopicId === replyData.topicId;
-      } else {
-        return topic.topicId === replyData.topicId;
-      }
-    };
-
-    const validTopics = channels.reduce((acc, channel) => {
-      const responseTopics =
-        channel.conditions.responseTopics.filter(validTopicTester);
-      const topics = channel.conditions.topics.filter(validTopicTester);
-      return [...acc, ...responseTopics, ...topics];
-    }, []);
-    const filteredTopics = topics.filter((topic) => {
-      return validTopics.some(
-        (validTopic) => validTopic.topicId === topic.topicId
-      );
-    });
-    return filteredTopics;
+    const responseTopicId =
+      replyData.replyChannel.conditions.responseTopics.find(
+        (topic) => topic.responseTopicId === replyData.topicId
+      )?.topicId;
+    if (!responseTopicId) {
+      console.log('no response topic id found');
+      // all topics are valid
+      return topics;
+    }
+    const validTopics = topics.filter(
+      (topic) => topic.topicId === responseTopicId
+    );
+    console.log('valid topics', validTopics);
+    return validTopics;
   };
 
   useEffect(() => {
