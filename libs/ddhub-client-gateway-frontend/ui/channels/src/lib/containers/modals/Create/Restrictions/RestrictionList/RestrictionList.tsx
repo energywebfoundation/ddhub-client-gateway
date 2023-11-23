@@ -1,9 +1,15 @@
 import { useStyles } from './RestrictionList.styles';
 import { Select } from '@mui/material';
-import { RestrictionListEffectsProps, useRestrictionListEffects } from './RestrictionList.effects';
+import {
+  RestrictionListEffectsProps,
+  useRestrictionListEffects,
+} from './RestrictionList.effects';
 import { RestrictionSelect } from '../RestrictionSelect/RestrictionSelect';
 import { RestrictionListView } from '../RestrictionListView/RestrictionListView';
 import clsx from 'clsx';
+import { RestrictionType } from '../models/restriction-type.enum';
+import { useContext } from 'react';
+import { AddressBookContext } from '@ddhub-client-gateway-frontend/ui/login';
 
 export interface RestrictionListProps extends RestrictionListEffectsProps {
   canRemove: boolean;
@@ -35,23 +41,33 @@ export const RestrictionList = ({
   setRoleInput,
   setDIDInput,
   recent,
+  didRestrictionValues,
+  setDIDRestrictionValue,
+  setIsUpdate,
+  setDidToUpdate,
 }: RestrictionListProps) => {
+  const addressBookContext = useContext(AddressBookContext);
+  if (!addressBookContext) {
+    throw new Error(
+      '[RestrictionList] AddressBookContext provider not available'
+    );
+  }
   const { classes } = useStyles();
-  const {
-    expanded,
-    handleOpen,
-    handleClose,
-    handleUpdate,
-  } = useRestrictionListEffects({
-    list,
-    clear,
-    setType,
-    type,
-    setDIDInput,
-    setRoleInput,
-    handleUpdateRestriction,
-    remove,
-  });
+  const { expanded, handleOpen, handleClose, handleUpdate } =
+    useRestrictionListEffects({
+      list,
+      clear,
+      setType,
+      type,
+      setDIDInput,
+      setRoleInput,
+      handleUpdateRestriction,
+      remove,
+      didRestrictionValues,
+      setDIDRestrictionValue,
+      setIsUpdate,
+      setDidToUpdate,
+    });
 
   return (
     <>
@@ -76,13 +92,20 @@ export const RestrictionList = ({
             <RestrictionListView
               item={el}
               type={type}
+              didAlias={
+                type === RestrictionType.DID
+                  ? addressBookContext.getAlias(el, true)
+                  : undefined
+              }
               canRemove={canRemove}
               canCopy={canCopy}
-              handleOpen={handleOpen}
+              handleOpenUpdate={handleOpen}
               remove={remove}
               expanded={expanded}
-              index={index}/>
-            )}>
+              index={index}
+            />
+          )}
+        >
           <RestrictionSelect
             setType={setType}
             clear={clear}
@@ -94,7 +117,9 @@ export const RestrictionList = ({
             didInput={didInput}
             isDIDValid={isDIDValid}
             selectedType={type}
-            inputValue={el}>
+            inputValue={el}
+            didRestrictionValues={didRestrictionValues}
+          >
             {children}
           </RestrictionSelect>
         </Select>

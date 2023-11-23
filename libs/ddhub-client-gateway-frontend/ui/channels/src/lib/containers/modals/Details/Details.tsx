@@ -28,6 +28,9 @@ import { AddressBookContext } from '@ddhub-client-gateway-frontend/ui/login';
 
 export const Details: FC = () => {
   const addressBookContext = useContext(AddressBookContext);
+  if (!addressBookContext) {
+    throw new Error('[Details] AddressBookContext provider not available');
+  }
   const { classes } = useStyles();
   const {
     open,

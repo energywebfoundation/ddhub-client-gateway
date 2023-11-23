@@ -34,8 +34,8 @@ export interface AddressBookContext {
   addressBook: AddressBookDataContext;
   setAddressBook: Dispatch<SetStateAction<AddressBookDataContext>>;
   refreshAddressBook: () => Promise<void>;
-  getAlias: (did: string) => string;
-  getAliasOrMinifiedDid: (did: string) => string;
+  getAlias: (did: string, returnUndefined?: boolean) => string;
+  getAliasOrMinifiedDid: (did: string) => string | undefined;
 }
 
 export const AddressBookContext = createContext<AddressBookContext | undefined>(
@@ -75,11 +75,14 @@ export const useAddressBookContext = (queryClient: QueryClient) => {
     refreshAddressBook().then();
   }, [queryClient.defaultQueryOptions().enabled]);
 
-  const getAlias = (did: string): string => {
-    let retVal = did;
+  const getAlias = (
+    did: string,
+    returnUndefined?: boolean
+  ): string | undefined => {
+    let retVal = returnUndefined ? undefined : did;
 
-    if (addressBookData.addressBook.addressBookList) {
-      const list = addressBookData.addressBook.addressBookList;
+    if (addressBook.addressBookList) {
+      const list = addressBook.addressBookList;
       for (let i = 0; i < list.length; i++) {
         if (list[i].did === did) {
           retVal = list[i].alias;
@@ -94,8 +97,8 @@ export const useAddressBookContext = (queryClient: QueryClient) => {
   const getAliasOrMinifiedDid = (did: string): string => {
     let retVal = didFormatMinifier(did);
 
-    if (addressBookData.addressBook.addressBookList) {
-      const list = addressBookData.addressBook.addressBookList;
+    if (addressBook.addressBookList) {
+      const list = addressBook.addressBookList;
       for (let i = 0; i < list.length; i++) {
         if (list[i].did === did) {
           retVal = list[i].alias;

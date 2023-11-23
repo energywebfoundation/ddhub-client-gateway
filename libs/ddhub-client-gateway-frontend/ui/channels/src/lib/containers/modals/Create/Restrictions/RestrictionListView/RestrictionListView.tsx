@@ -10,9 +10,10 @@ import { useStyles } from './RestrictionListView.styles';
 interface RestrictionListViewProps {
   item: string;
   type?: RestrictionType;
+  didAlias?: string | undefined;
   canRemove?: boolean;
   canCopy?: boolean;
-  handleOpen?: (event: any) => void;
+  handleOpenUpdate?: (event: any) => void;
   remove?: (value: string) => void;
   expanded?: string | boolean;
   index: number;
@@ -22,9 +23,10 @@ interface RestrictionListViewProps {
 export const RestrictionListView = ({
   item,
   type,
+  didAlias,
   canRemove = false,
   canCopy = false,
-  handleOpen,
+  handleOpenUpdate,
   remove,
   expanded,
   index,
@@ -48,6 +50,13 @@ export const RestrictionListView = ({
               </Typography>
             </Box>
           )}
+          {type === RestrictionType.DID && didAlias && (
+            <Box className={classes.gridItemAlias} ml={1}>
+              <Typography variant="body2" className={classes.typeText}>
+                {didAlias}
+              </Typography>
+            </Box>
+          )}
           <Typography
             noWrap
             variant="body2"
@@ -60,7 +69,7 @@ export const RestrictionListView = ({
         {canRemove && (
           <Grid item display="flex" flexDirection="row">
             <IconButton
-              onClick={handleOpen}
+              onClick={handleOpenUpdate}
               className={clsx(classes.edit, {
                 [classes.editActive]: expanded && expanded === `panel-${index}`,
                 [classes.editInactive]:

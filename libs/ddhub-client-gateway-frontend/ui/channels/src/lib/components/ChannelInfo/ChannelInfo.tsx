@@ -13,6 +13,9 @@ interface ChannelInfoProps {
 
 export const ChannelInfo: FC<ChannelInfoProps> = ({ channel, topicName }) => {
   const addressBookContext = useContext(AddressBookContext);
+  if (!addressBookContext) {
+    throw new Error('[ChannelInfo] AddressBookContext provider not available');
+  }
   const { classes } = useStyles();
   return (
     <Paper className={classes.root}>

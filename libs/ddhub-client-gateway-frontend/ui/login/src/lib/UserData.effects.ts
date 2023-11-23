@@ -121,9 +121,9 @@ export const getRoutesToDisplay = (
 export const useUserDataEffects = () => {
   const userContext = useContext(UserContext);
   const addressBookContext = useContext(AddressBookContext);
-  if (!userContext) {
+  if (!addressBookContext) {
     throw new Error(
-      'useUserDataEffects must be used within a UserContext provider'
+      '[useUserDataEffects] AddressBookContext provider not available'
     );
   }
 

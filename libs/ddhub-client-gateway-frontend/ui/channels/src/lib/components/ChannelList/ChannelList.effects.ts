@@ -14,6 +14,11 @@ import { ModalActionsEnum, useModalDispatch } from '../../context';
 
 export const useChannelListEffects = () => {
   const addressBookContext = useContext(AddressBookContext);
+  if (!addressBookContext) {
+    throw new Error(
+      '[useChannelListEffects] AddressBookContext provider not available'
+    );
+  }
   const { channels, isLoading, channelsLoaded } = useChannels();
   const dispatch = useModalDispatch();
 

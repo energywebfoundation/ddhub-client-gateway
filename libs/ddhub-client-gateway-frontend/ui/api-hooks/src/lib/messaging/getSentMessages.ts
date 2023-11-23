@@ -14,6 +14,11 @@ export const useSentMessages = (
 ) => {
   const Swal = useCustomAlert();
   const addressBookContext = useContext(AddressBookContext);
+  if (!addressBookContext) {
+    throw new Error(
+      '[useSentMessages] AddressBookContext provider not available'
+    );
+  }
   const queryClient = useQueryClient();
 
   let enabled;
