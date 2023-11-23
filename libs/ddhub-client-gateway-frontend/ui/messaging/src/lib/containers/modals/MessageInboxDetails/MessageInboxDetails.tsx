@@ -171,7 +171,9 @@ export const MessageInboxDetails: FC = () => {
                     {/* Minify Client GW Message ID as it is quite long */}
                     <MessageDetail
                       field={{
-                        label: 'Message ID',
+                        label: inboxDetails.isSender
+                          ? 'Client GW Message ID'
+                          : 'Message ID',
                         value:
                           inboxDetails.messageId.length > 24
                             ? didFormatMinifier(inboxDetails.messageId)

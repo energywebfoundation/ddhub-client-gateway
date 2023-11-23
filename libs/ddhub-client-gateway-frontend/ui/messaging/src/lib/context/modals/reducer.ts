@@ -8,6 +8,7 @@ export enum ModalActionsEnum {
   SHOW_VIEW_MESSAGE = 'SHOW_VIEW_MESSAGE',
   SHOW_ADD_CONTACT = 'SHOW_ADD_CONTACT',
   SHOW_UPDATE_CONTACT = 'SHOW_UPDATE_CONTACT',
+  SHOW_RECIPIENT_LIST = 'SHOW_RECIPIENT_LIST',
 }
 
 export const modalInitialState: IModalStore = {
@@ -39,6 +40,10 @@ export const modalInitialState: IModalStore = {
     open: false,
     data: undefined,
   },
+  recipientList: {
+    open: false,
+    data: undefined,
+  },
 };
 
 export const modalsReducer = (
@@ -60,5 +65,7 @@ export const modalsReducer = (
       return { ...state, addContact: action.payload };
     case ModalActionsEnum.SHOW_UPDATE_CONTACT:
       return { ...state, updateContact: action.payload };
+    case ModalActionsEnum.SHOW_RECIPIENT_LIST:
+      return { ...state, recipientList: action.payload };
   }
 };

@@ -5,6 +5,7 @@ import { MessageInboxDetails } from './MessageInboxDetails';
 import { NewMessage } from './NewMessage';
 import { ViewMessage } from './ViewMessage';
 import { AddUpdateContact } from './AddUpdateContact';
+import { MessageRecipientList } from './MessageRecipientList';
 
 export const ModalsCenter: FC = () => {
   return (
@@ -15,6 +16,7 @@ export const ModalsCenter: FC = () => {
       <NewMessage />
       <ViewMessage />
       <AddUpdateContact />
+      <MessageRecipientList />
     </>
   );
 };
