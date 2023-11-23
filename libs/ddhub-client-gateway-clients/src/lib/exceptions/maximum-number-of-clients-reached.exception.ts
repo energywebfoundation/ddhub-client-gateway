@@ -12,7 +12,7 @@ export class MaximumNumberOfClientsReachedException extends BaseException {
       DsbClientGatewayErrors.MAXIMUM_NUMBER_OF_CLIENTS_REACHED,
       {
         maximumClients: max,
-      },
+      }
     );
   }
 }

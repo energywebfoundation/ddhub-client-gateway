@@ -15,7 +15,7 @@ export const useCertificateSave = () => {
 
   const createConfigurationHandler = (
     data: UploadCertificateBodyDto,
-    onSuccess: () => void,
+    onSuccess: () => void
   ) => {
     mutate({ data }, { onSuccess, onError: createError });
   };

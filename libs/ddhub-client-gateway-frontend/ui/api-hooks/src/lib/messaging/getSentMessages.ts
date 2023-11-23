@@ -10,13 +10,13 @@ import { AddressBookContext } from '@ddhub-client-gateway-frontend/ui/login';
 
 export const useSentMessages = (
   params?: MessageControllerGetSentMessagesParams,
-  isRelatedMessage?: boolean,
+  isRelatedMessage?: boolean
 ) => {
   const Swal = useCustomAlert();
   const addressBookContext = useContext(AddressBookContext);
   if (!addressBookContext) {
     throw new Error(
-      '[useSentMessages] AddressBookContext provider not available',
+      '[useSentMessages] AddressBookContext provider not available'
     );
   }
   const queryClient = useQueryClient();

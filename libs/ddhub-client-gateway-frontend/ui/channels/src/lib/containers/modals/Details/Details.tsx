@@ -162,7 +162,7 @@ export const Details: FC = () => {
                 </Stack>
                 {includes(
                   [ChannelConnectionType.pub, ChannelConnectionType.upload],
-                  ChannelConnectionType[channel.type],
+                  ChannelConnectionType[channel.type]
                 ) && (
                   <Stack direction="row" mt={0.5}>
                     <Typography

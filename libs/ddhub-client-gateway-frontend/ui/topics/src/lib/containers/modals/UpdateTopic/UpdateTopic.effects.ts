@@ -108,11 +108,11 @@ export const useUpdateTopicEffects = () => {
   const onUpdateTopics = () => {
     if (canUpdateSchema) {
       queryClient.invalidateQueries(
-        getTopicsControllerGetTopicsHistoryByIdQueryKey(topic.id),
+        getTopicsControllerGetTopicsHistoryByIdQueryKey(topic.id)
       );
     } else if (isSearch) {
       queryClient.invalidateQueries(
-        getTopicsControllerGetTopicsBySearchQueryKey(),
+        getTopicsControllerGetTopicsBySearchQueryKey()
       );
     } else {
       queryClient.invalidateQueries(getTopicsControllerGetTopicsQueryKey());

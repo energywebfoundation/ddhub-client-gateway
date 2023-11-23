@@ -86,7 +86,7 @@ export const useCreateTopicEffects = () => {
   const onCreateTopic = () => {
     if (isSearch) {
       queryClient.invalidateQueries(
-        getTopicsControllerGetTopicsBySearchQueryKey(),
+        getTopicsControllerGetTopicsBySearchQueryKey()
       );
     } else {
       queryClient.invalidateQueries(getTopicsControllerGetTopicsQueryKey());

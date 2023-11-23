@@ -12,5 +12,5 @@ export const useScheduler = () => {
     },
   });
 
-  return { jobs: data, isLoading };
+  return {jobs: data, isLoading}
 };

@@ -13,11 +13,11 @@ export const useRemoveTopicVersionHistory = () => {
   const removeTopicVersionHistoryHandler = (
     id: string,
     versionNumber: string,
-    onSuccess?: () => void,
+    onSuccess?: () => void
   ) => {
     mutate(
       { id, versionNumber },
-      { onSuccess: onSuccess, onError: removeError },
+      { onSuccess: onSuccess, onError: removeError }
     );
   };
 

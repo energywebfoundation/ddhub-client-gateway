@@ -9,17 +9,17 @@ import { useContext } from 'react';
 import { AddressBookContext } from '@ddhub-client-gateway-frontend/ui/login';
 
 export const useCachedMessages = (
-  params?: MessageControllerGetMessageParams,
+  params?: MessageControllerGetMessageParams
 ) => {
   const queryClient = useQueryClient();
   const addressBookContext = useContext(AddressBookContext);
   if (!addressBookContext) {
     throw new Error(
-      '[useCachedMessages] AddressBookContext provider not available',
+      '[useCachedMessages] AddressBookContext provider not available'
     );
   }
   const data: GetMessagesResponseDto[] | undefined = queryClient.getQueryData(
-    getMessageControllerGetMessageQueryKey(params),
+    getMessageControllerGetMessageQueryKey(params)
   );
 
   let cachedMessages: GetMessagesResponseDto[] | undefined;

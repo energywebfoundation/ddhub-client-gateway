@@ -10,7 +10,7 @@ function RefreshAccountStatus() {
   const userContext = useContext(UserContext);
   if (!userContext) {
     throw new Error(
-      'RefreshAccountStatus must be rendered within a UserContext provider',
+      'RefreshAccountStatus must be rendered within a UserContext provider'
     );
   }
 

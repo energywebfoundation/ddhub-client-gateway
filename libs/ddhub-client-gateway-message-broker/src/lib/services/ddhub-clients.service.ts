@@ -17,13 +17,13 @@ export class DdhubClientsService extends DdhubBaseService {
     protected readonly retryConfigService: RetryConfigService,
     protected readonly didAuthService: DidAuthService,
     protected readonly tlsAgentService: TlsAgentService,
-    protected readonly ddhubLoginService: DdhubLoginService,
+    protected readonly ddhubLoginService: DdhubLoginService
   ) {
     super(
       new Logger(DdhubClientsService.name),
       retryConfigService,
       ddhubLoginService,
-      tlsAgentService,
+      tlsAgentService
     );
   }
 
@@ -43,7 +43,7 @@ export class DdhubClientsService extends DdhubBaseService {
           }),
         {
           stopOnResponseCodes: [MessageBrokerErrors.UNAUTHORIZED_ACCESS],
-        },
+        }
       );
     } catch (e) {
       this.logger.error(`delete clients failed`, e);
@@ -63,7 +63,7 @@ export class DdhubClientsService extends DdhubBaseService {
           }),
         {
           stopOnResponseCodes: [MessageBrokerErrors.UNAUTHORIZED_ACCESS],
-        },
+        }
       );
 
       return r.data;

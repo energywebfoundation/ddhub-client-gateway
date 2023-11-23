@@ -33,7 +33,7 @@ export const CustomFieldTemplate = (props: FieldTemplateProps) => {
   const WrapIfAdditionalTemplate = getTemplate(
     'WrapIfAdditionalTemplate',
     registry,
-    uiOptions,
+    uiOptions
   );
 
   if (hidden) {

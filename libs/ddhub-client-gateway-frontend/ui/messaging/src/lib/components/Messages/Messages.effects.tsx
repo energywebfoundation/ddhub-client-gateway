@@ -18,7 +18,7 @@ export const useMessagesEffects = () => {
   const router = useRouter();
 
   const { cachedChannel, topicsById } = useCachedChannel(
-    router.query[Queries.FQCN] as string,
+    router.query[Queries.FQCN] as string
   );
   const { publicRuntimeConfig } = getConfig();
   const messagingOffset = publicRuntimeConfig?.messagingOffset ?? 10;
@@ -41,7 +41,7 @@ export const useMessagesEffects = () => {
     const timestampMillis = Math.round(message?.timestampNanos / 1e6);
     return {
       timestamp: DateTime.fromMillis(timestampMillis).toLocaleString(
-        DateTime.DATETIME_MED,
+        DateTime.DATETIME_MED
       ),
       timestampNanos: message?.timestampNanos,
       sender: didFormatMinifier(message?.sender),

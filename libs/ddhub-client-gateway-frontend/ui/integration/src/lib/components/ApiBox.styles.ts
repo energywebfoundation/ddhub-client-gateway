@@ -18,7 +18,7 @@ export const useStyles = makeStyles()((theme) => ({
     marginRight: 5,
   },
   cardHeader: {
-    padding: '39px 121px 39px 29px',
+    padding: '39px 121px 39px 29px'
   },
   cardTitle: {
     fontSize: 18,
@@ -27,7 +27,7 @@ export const useStyles = makeStyles()((theme) => ({
   },
   cardSubtitle: {
     fontSize: 12,
-    lineHeight: '18px',
+    lineHeight: '18px'
   },
   cardContent: {
     padding: '12px 21px 24px 21px',
@@ -58,5 +58,5 @@ export const useStyles = makeStyles()((theme) => ({
     fontSize: 18,
     lineHeight: '21px',
     color: theme.palette.secondary.main,
-  },
+  }
 }));

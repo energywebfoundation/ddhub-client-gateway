@@ -45,7 +45,7 @@ export const CheckboxesWidget = ({
         onChange(enumOptionsSelectValue(index, checkboxesValues, enumOptions));
       } else {
         onChange(
-          enumOptionsDeselectValue(index, checkboxesValues, enumOptions),
+          enumOptionsDeselectValue(index, checkboxesValues, enumOptions)
         );
       }
     };
@@ -61,14 +61,14 @@ export const CheckboxesWidget = ({
         <FormLabel className={classes.label} required={required} htmlFor={id}>
           {label || undefined}
         </FormLabel>,
-        hideLabel,
+        hideLabel
       )}
       <FormGroup id={id} row={!!inline}>
         {Array.isArray(enumOptions) &&
           enumOptions.map((option, index: number) => {
             const checked = enumOptionsIsSelected(
               option.value,
-              checkboxesValues,
+              checkboxesValues
             );
             const itemDisabled =
               Array.isArray(enumDisabled) &&

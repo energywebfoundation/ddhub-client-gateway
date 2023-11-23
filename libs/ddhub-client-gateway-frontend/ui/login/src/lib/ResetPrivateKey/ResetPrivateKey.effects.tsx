@@ -7,7 +7,7 @@ export const useResetPrivateKeyEffects = () => {
   const userContext = useContext(UserContext);
   if (!userContext) {
     throw new Error(
-      'useResetPrivateKeyEffects must be used within a UserContext provider',
+      'useResetPrivateKeyEffects must be used within a UserContext provider'
     );
   }
   const { userData, setUserData } = userContext;

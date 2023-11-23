@@ -154,7 +154,7 @@ export const MessageInboxDetails: FC = () => {
                       field={{
                         label: 'Timestamp',
                         value: DateTime.fromISO(
-                          inboxDetails.timestampISO,
+                          inboxDetails.timestampISO
                         ).toFormat('yyyy/MM/dd h:mm:ss a'),
                       }}
                     />

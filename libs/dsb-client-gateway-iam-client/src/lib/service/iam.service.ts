@@ -32,7 +32,7 @@ export class IamService {
   constructor(
     protected readonly iamFactoryService: IamFactoryService,
     protected readonly configService: ConfigService,
-    protected readonly retryConfigService: RetryConfigService,
+    protected readonly retryConfigService: RetryConfigService
   ) {}
 
   @Span('iam_getClaimsWithStatus')
@@ -63,7 +63,7 @@ export class IamService {
         syncedToDidDoc:
           synchronizedToDIDClaims.filter(
             (synchronizedClaim) =>
-              synchronizedClaim.claimType === claim.claimType,
+              synchronizedClaim.claimType === claim.claimType
           ).length > 0,
       };
     });
@@ -88,12 +88,12 @@ export class IamService {
   @Span('iam_setVerificationMethod')
   public async setVerificationMethod(
     publicKey: string,
-    tag = 'dsb',
+    tag = 'dsb'
   ): Promise<void> {
     await promiseRetry(
       async (retryFn, attempt) => {
         this.logger.log(
-          `attempting to update ${tag} in DID document of ${this.getDIDAddress()}, attempt number ${attempt}`,
+          `attempting to update ${tag} in DID document of ${this.getDIDAddress()}, attempt number ${attempt}`
         );
 
         await this.didRegistry
@@ -114,7 +114,7 @@ export class IamService {
           .catch((e) => {
             this.logger.error(
               `failed during updating verification method ${this.getDIDAddress()}`,
-              e,
+              e
             );
 
             return retryFn(e);
@@ -122,7 +122,7 @@ export class IamService {
       },
       {
         ...this.retryConfigService.config,
-      },
+      }
     );
   }
 
@@ -134,7 +134,7 @@ export class IamService {
 
         const connection = await this.iamFactoryService.initialize(
           privateKey,
-          this.configService,
+          this.configService
         );
 
         if (!connection) {
@@ -155,7 +155,7 @@ export class IamService {
         forever: true,
         minTimeout: 1000,
         maxTimeout: 2000,
-      },
+      }
     );
   }
 
@@ -171,7 +171,7 @@ export class IamService {
   @Span('iam_getApplicationsByOwnerAndRole')
   public async getApplicationsByOwnerAndRole(
     roleName: string,
-    ownerDid: string,
+    ownerDid: string
   ): Promise<ApplicationDTO[]> {
     this.logger.debug('start: ApplicationsByOwnerAndRole');
 
@@ -200,9 +200,7 @@ export class IamService {
     });
 
     this.logger.debug(
-      `did claims with ${this.configService.get(
-        'DID_CLAIM_NAMESPACE',
-      )} removed`,
+      `did claims with ${this.configService.get('DID_CLAIM_NAMESPACE')} removed`
     );
 
     this.logger.debug(`start: fetching application for all did claims.`);
@@ -213,7 +211,7 @@ export class IamService {
           .getAppDefinition(namespace)
           .catch((e) => {
             this.logger.error(
-              'getting app definition for ' + namespace + ' failed',
+              'getting app definition for ' + namespace + ' failed'
             );
             this.logger.error(e);
 
@@ -221,7 +219,7 @@ export class IamService {
           })) as ApplicationDTO;
         application.namespace = namespace;
         applications.push(application);
-      }),
+      })
     );
 
     this.logger.debug(`end: fetching application for all did claims.`);
@@ -234,7 +232,7 @@ export class IamService {
   }
 
   public async decodeJWTToken(
-    token: string,
+    token: string
   ): Promise<{ [key: string]: Claim }> {
     return (await this.didRegistry.decodeJWTToken({
       token,
@@ -273,7 +271,7 @@ export class IamService {
     return promiseRetry(
       async (retryFn, attempt) => {
         this.logger.log(
-          `attempting to fetch DID ${didToGet} from registry, attempt ${attempt}`,
+          `attempting to fetch DID ${didToGet} from registry, attempt ${attempt}`
         );
 
         return this.didRegistry
@@ -292,12 +290,12 @@ export class IamService {
       },
       {
         ...this.retryConfigService.config,
-      },
+      }
     )
       .then((didDocument) => didDocument)
       .catch((error) => {
         this.logger.error(
-          `Unable to retrieve DID ${did} from the DID registry due to an upstream error: ${error.message}`,
+          `Unable to retrieve DID ${did} from the DID registry due to an upstream error: ${error.message}`
         );
         return null;
       });

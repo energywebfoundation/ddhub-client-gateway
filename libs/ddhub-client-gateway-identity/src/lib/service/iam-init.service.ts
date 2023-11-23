@@ -20,7 +20,7 @@ export class IamInitService implements OnModuleInit {
     protected readonly secretsEngine: SecretsEngineService,
     @Inject(forwardRef(() => EnrolmentService))
     protected readonly enrolmentService: EnrolmentService,
-    protected readonly identityService: IdentityService,
+    protected readonly identityService: IdentityService
   ) {}
 
   @Span('iam_initializer')

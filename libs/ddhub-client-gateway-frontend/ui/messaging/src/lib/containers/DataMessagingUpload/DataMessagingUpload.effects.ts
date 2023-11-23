@@ -43,7 +43,7 @@ export const useDataMessagingUploadEffects = ({
   const filteredChannels = channels.filter((channel) =>
     isLarge
       ? channel.type === UpdateChannelDtoType.upload
-      : channel.type === UpdateChannelDtoType.pub,
+      : channel.type === UpdateChannelDtoType.pub
   );
 
   const {
@@ -160,7 +160,7 @@ export const useDataMessagingUploadEffects = ({
 
   const onChannelChange = (
     _event: React.SyntheticEvent,
-    newInputValue: TOption,
+    newInputValue: TOption
   ) => {
     if (newInputValue === null) {
       setSelectedChannel('');
@@ -174,7 +174,7 @@ export const useDataMessagingUploadEffects = ({
 
   const onTopicChange = (
     _event: React.SyntheticEvent,
-    newInputValue: TOption,
+    newInputValue: TOption
   ) => {
     if (newInputValue === null) {
       setSelectedTopic('');
@@ -187,7 +187,7 @@ export const useDataMessagingUploadEffects = ({
 
   const onTopicVersionChange = (
     _event: React.SyntheticEvent,
-    newInputValue: TOption,
+    newInputValue: TOption
   ) => {
     setSelectedTopicVersion(newInputValue?.value);
   };
@@ -208,7 +208,7 @@ export const useDataMessagingUploadEffects = ({
         topicOwner: topicsById[selectedTopic]?.owner,
         topicVersion: selectedTopicVersion,
       },
-      onUpload,
+      onUpload
     );
   };
 

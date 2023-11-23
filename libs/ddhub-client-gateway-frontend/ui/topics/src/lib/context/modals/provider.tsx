@@ -9,7 +9,7 @@ const TopicsModalsDispatch =
 export const TopicsModalsProvider: React.FC = ({ children }) => {
   const [state, dispatch] = useReducer(
     topicsModalsReducer,
-    topicsModalsInitialState,
+    topicsModalsInitialState
   );
 
   return (

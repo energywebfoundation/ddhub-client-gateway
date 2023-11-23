@@ -15,11 +15,12 @@ export const Restrictions: FC<RestrictionsProps> = ({ value, type }) => {
   return (
     <Box>
       {isOpen ? (
-        <Collapse in={isOpen} timeout="auto" unmountOnExit>
-          <Typography variant="body2" className={classes.text}>
-            {value.join(', ')}
-          </Typography>
-        </Collapse>
+         <Collapse in={isOpen} timeout="auto" unmountOnExit>
+         <Typography variant="body2" className={classes.text}>
+           {value.join(', ')}
+         </Typography>
+       </Collapse>
+
       ) : (
         <Typography
           variant="body2"

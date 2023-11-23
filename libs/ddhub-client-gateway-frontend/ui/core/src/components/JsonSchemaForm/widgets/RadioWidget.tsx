@@ -49,7 +49,7 @@ export const RadioWidget = ({
         <FormLabel className={classes.label} required={required} htmlFor={id}>
           {label || undefined}
         </FormLabel>,
-        hideLabel,
+        hideLabel
       )}
       <RadioGroup
         id={id}

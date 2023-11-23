@@ -33,6 +33,6 @@ export const useDetailsEffects = () => {
     closeModal,
     details,
     downloadMessage,
-    parsedPayload,
+    parsedPayload
   };
 };

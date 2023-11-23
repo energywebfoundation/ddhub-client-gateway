@@ -1,15 +1,11 @@
 import React from 'react';
 import { useClientIdsEffects } from './ClientIdList.effects';
-import {
-  CreateButton,
-  GenericTable,
-} from '@ddhub-client-gateway-frontend/ui/core';
+import { CreateButton, GenericTable } from '@ddhub-client-gateway-frontend/ui/core';
 import { GetAllClientsResponseDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { CLIENT_IDS_HEADERS } from '../../models/clientids-header';
 
 export const ClientIdList = () => {
-  const { clientIds, isLoading, actions, removeClientIds, setSelectedItems } =
-    useClientIdsEffects();
+  const { clientIds, isLoading, actions, removeClientIds, setSelectedItems } = useClientIdsEffects();
 
   return (
     <section style={{ marginTop: 16 }}>
@@ -19,12 +15,12 @@ export const ClientIdList = () => {
         loading={isLoading}
         showFooter={true}
         actions={actions}
-        defaultSortBy="clientId"
-        defaultOrder="asc"
+        defaultSortBy='clientId'
+        defaultOrder='asc'
         showCheckbox={true}
         setSelectedItems={setSelectedItems}
       >
-        <CreateButton onCreate={removeClientIds} buttonText="Remove" />
+        <CreateButton onCreate={removeClientIds} buttonText='Remove'/>
       </GenericTable>
     </section>
   );

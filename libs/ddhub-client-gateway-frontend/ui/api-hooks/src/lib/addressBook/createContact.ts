@@ -15,7 +15,7 @@ export const useContactSave = () => {
 
   const createContactHandler = (
     data: CreateContactDto,
-    onSuccess: () => void,
+    onSuccess: () => void
   ) => {
     mutate({ data }, { onSuccess, onError: createError });
   };

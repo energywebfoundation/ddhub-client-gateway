@@ -110,7 +110,7 @@ export const RestrictionSelect = ({
                   (!didInput &&
                     !roleInput &&
                     !didRestrictionValues(
-                      RestrictionFieldNames.ADDRESS_BOOK,
+                      RestrictionFieldNames.ADDRESS_BOOK
                     )) ||
                   (didRestrictionValues(RestrictionFieldNames.DID_SOURCE) ===
                     DIDSource.ADDRESS_BOOK &&

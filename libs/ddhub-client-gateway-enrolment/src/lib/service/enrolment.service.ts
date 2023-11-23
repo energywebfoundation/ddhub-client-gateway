@@ -21,7 +21,7 @@ export class EnrolmentService {
     protected readonly configService: ConfigService,
     @Inject(forwardRef(() => RoleListenerService))
     protected readonly roleListenerService: RoleListenerService,
-    protected readonly wrapper: EnrolmentWrapperRepository,
+    protected readonly wrapper: EnrolmentWrapperRepository
   ) {}
 
   public async deleteEnrolment(): Promise<void> {
@@ -86,7 +86,7 @@ export class EnrolmentService {
 
     requiredRoles.forEach((requiredRole: string) => {
       const exists = claimsToRoles.find(
-        ({ namespace }: Role) => namespace === requiredRole,
+        ({ namespace }: Role) => namespace === requiredRole
       );
 
       if (!exists) {
@@ -113,7 +113,7 @@ export class EnrolmentService {
   public getRequiredRoles(): string[] {
     const parentNamespace: string = this.configService.get<string>(
       'PARENT_NAMESPACE',
-      'ddhub.apps.energyweb.iam.ewc',
+      'ddhub.apps.energyweb.iam.ewc'
     );
 
     return [`user.roles.${parentNamespace}`];

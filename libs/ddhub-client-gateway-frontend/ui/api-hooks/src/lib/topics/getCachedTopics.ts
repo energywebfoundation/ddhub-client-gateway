@@ -16,7 +16,7 @@ export const useCachedTopics = (owner: string) => {
       query: {
         enabled: !cachedTopics,
       },
-    },
+    }
   );
 
   const topics = data ?? [];

@@ -14,19 +14,19 @@ export class DidRegistryListenerService {
   constructor(
     private readonly configService: ConfigService,
     private readonly provider: Provider,
-    private readonly commandBus: CommandBus,
+    private readonly commandBus: CommandBus
   ) {}
 
   public async startListening(): Promise<void> {
     const didregistryaddress = this.configService.get<string>(
-      'DID_REGISTRY_ADDRESS',
+      'DID_REGISTRY_ADDRESS'
     );
 
     const chainName = this.configService.get<string>('CHAIN_NAME');
 
     this.didRegistry = EthereumDIDRegistry__factory.connect(
       didregistryaddress,
-      this.provider,
+      this.provider
     );
 
     this.didRegistry.on(this.eventName, async (address) => {

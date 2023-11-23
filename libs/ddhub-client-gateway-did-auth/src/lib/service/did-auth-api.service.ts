@@ -15,7 +15,7 @@ export class DidAuthApiService {
     protected readonly httpService: HttpService,
     protected readonly tlsAgentService: TlsAgentService,
     protected readonly configService: ConfigService,
-    protected readonly versionService: VersionService,
+    protected readonly versionService: VersionService
   ) {
     useInterceptors(this.httpService, this.logger, versionService);
   }
@@ -30,13 +30,13 @@ export class DidAuthApiService {
           },
           {
             httpsAgent: this.tlsAgentService.get(),
-          },
+          }
         )
-        .pipe(timeout(+this.configService.get<number>('MAX_TIMEOUT', 60000))),
+        .pipe(timeout(+this.configService.get<number>('MAX_TIMEOUT', 60000)))
     ).catch((e) => {
       this.logger.error(`[Login Failed][msg] ${e.message}`);
       this.logger.error(
-        `[Login Failed][data] ${JSON.stringify(e.response?.data)}`,
+        `[Login Failed][data] ${JSON.stringify(e.response?.data)}`
       );
 
       throw e;
@@ -46,7 +46,7 @@ export class DidAuthApiService {
   }
 
   public async refreshToken(
-    refreshToken: string | null,
+    refreshToken: string | null
   ): Promise<DidAuthResponse | null> {
     if (!this.refreshToken) {
       this.logger.error('No refresh token to use');
@@ -63,15 +63,15 @@ export class DidAuthApiService {
           },
           {
             httpsAgent: this.tlsAgentService.get(),
-          },
+          }
         )
-        .pipe(timeout(+this.configService.get<number>('MAX_TIMEOUT', 60000))),
+        .pipe(timeout(+this.configService.get<number>('MAX_TIMEOUT', 60000)))
     ).catch((e) => {
       this.logger.error('Refresh token failed');
 
       this.logger.error(e.message);
       this.logger.error(
-        `[Refresh token Failed][data] ${JSON.stringify(e.response?.data)}`,
+        `[Refresh token Failed][data] ${JSON.stringify(e.response?.data)}`
       );
 
       throw e;

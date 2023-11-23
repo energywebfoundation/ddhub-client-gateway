@@ -71,7 +71,7 @@ export class AwsSecretsManagerService
   @Span('aws_ssm_setUserAuthDetails')
   public async setUserPassword(
     username: string,
-    password: string,
+    password: string
   ): Promise<void> {
     // @TODO - Implement
     return;
@@ -79,7 +79,7 @@ export class AwsSecretsManagerService
 
   @Span('aws_ssm_setRSAKey')
   public async setRSAPrivateKey(
-    privateKey: string,
+    privateKey: string
   ): Promise<CreateSecretResponse | PutSecretValueResponse | null> {
     const name = `${this.prefix}${PATHS.RSA_KEY}`;
     const command = new PutSecretValueCommand({
@@ -137,7 +137,7 @@ export class AwsSecretsManagerService
         new PutSecretValueCommand({
           SecretId: `${this.prefix}${PATHS.CA_CERTIFICATE}`,
           SecretString: caCertificate,
-        }),
+        })
       );
     }
 
@@ -149,21 +149,21 @@ export class AwsSecretsManagerService
               SecretId: command.input.SecretId,
               SecretString: command.input.SecretString,
               error: err,
-            }),
+            })
           );
-        }),
-      ),
+        })
+      )
     );
 
     const errors = responses.filter(
-      ({ status }) => status === 'rejected',
+      ({ status }) => status === 'rejected'
     ) as PromiseRejectedResult[];
 
     if (errors.length === 0) {
       return responses
         .filter(({ status }) => status === 'fulfilled')
         .map((response) =>
-          response.status === 'fulfilled' ? response.value : null,
+          response.status === 'fulfilled' ? response.value : null
         ) as PutSecretValueCommandOutput[];
     }
 
@@ -179,7 +179,7 @@ export class AwsSecretsManagerService
           new CreateSecretCommand({
             Name: SecretId,
             SecretString,
-          }),
+          })
         );
       } else {
         unknownErrors.push(error);
@@ -191,11 +191,11 @@ export class AwsSecretsManagerService
         this.client.send(command).then((response) => {
           this.logger.log('Created secret', response);
           return response;
-        }),
-      ),
+        })
+      )
     );
     const createErrors = createResponses.filter(
-      ({ status }) => status === 'rejected',
+      ({ status }) => status === 'rejected'
     ) as PromiseRejectedResult[];
 
     // Return any errors that occurred during secret creation, or any unknown errors that occurred before creation
@@ -205,7 +205,7 @@ export class AwsSecretsManagerService
     return createResponses
       .filter(({ status }) => status === 'fulfilled')
       .map((response) =>
-        response.status === 'fulfilled' ? response.value : null,
+        response.status === 'fulfilled' ? response.value : null
       ) as CreateSecretCommandOutput[];
   }
 
@@ -230,7 +230,7 @@ export class AwsSecretsManagerService
     ]);
 
     const errors = responses.filter(
-      ({ status }) => status === 'rejected',
+      ({ status }) => status === 'rejected'
     ) as PromiseRejectedResult[];
     if (errors.length > 0) {
       this.logger.error(errors.map(({ reason }) => reason.message).join(', '));
@@ -256,7 +256,7 @@ export class AwsSecretsManagerService
 
   @Span('aws_ssm_setPrivateKey')
   public async setPrivateKey(
-    key: string,
+    key: string
   ): Promise<CreateSecretResponse | PutSecretValueResponse | null> {
     const name = `${this.prefix}${PATHS.IDENTITY_PRIVATE_KEY}`;
     const putCommand = new PutSecretValueCommand({
@@ -304,7 +304,7 @@ export class AwsSecretsManagerService
   private async handlePutSecretValueError(
     err: Error,
     name: string,
-    value: string,
+    value: string
   ): Promise<CreateSecretResponse | null> {
     if (err instanceof ResourceNotFoundException) {
       this.logger.log(`${name} not found, creating...`);

@@ -42,7 +42,7 @@ export const useStyles = makeStyles()((theme) => ({
     textAlign: 'center',
     paddingBottom: 17,
     paddingTop: 17,
-    placeSelf: 'center',
+    placeSelf: 'center'
   },
   version: {
     fontSize: 10,

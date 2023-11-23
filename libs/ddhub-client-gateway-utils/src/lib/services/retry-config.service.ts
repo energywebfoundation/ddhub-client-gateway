@@ -10,7 +10,7 @@ export interface RetryOptions {
 
 @Injectable()
 export class RetryConfigService {
-  constructor(protected readonly configService: ConfigService) {}
+  constructor(protected readonly configService: ConfigService) { }
 
   get config(): OperationOptions {
     return {

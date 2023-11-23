@@ -41,11 +41,7 @@ export const UpdateTopic: FC = () => {
   } = useUpdateTopicEffects();
 
   return (
-    <Dialog
-      open={open}
-      onClose={openCancelModal}
-      paperClassName={classes.paper}
-    >
+    <Dialog open={open} onClose={openCancelModal} paperClassName={classes.paper}>
       {isLoading ? (
         <Box className={classes.progress}>
           <CircularProgress />
@@ -102,10 +98,7 @@ export const UpdateTopic: FC = () => {
                         showPlaceholder={false}
                       />
                     ) : (
-                      <EditorView
-                        value={getValues(fields.schema.name)}
-                        height={180}
-                      />
+                      <EditorView value={getValues(fields.schema.name)} height={180} />
                     )}
                   </Box>
                 </Grid>

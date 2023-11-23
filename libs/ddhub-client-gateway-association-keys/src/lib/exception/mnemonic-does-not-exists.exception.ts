@@ -9,7 +9,7 @@ export class MnemonicDoesNotExistsException extends BaseException {
   constructor() {
     super(
       'Mnemonic does not exists',
-      DsbClientGatewayErrors.BIP39_MNEMONIC_DOES_NOT_EXISTS,
+      DsbClientGatewayErrors.BIP39_MNEMONIC_DOES_NOT_EXISTS
     );
   }
 }

@@ -18,7 +18,7 @@ export class UserAuthService {
   constructor(
     protected readonly secretsEngineService: SecretsEngineService,
     protected readonly userRolesTokenService: UserRolesTokenService,
-    protected readonly configService: ConfigService,
+    protected readonly configService: ConfigService
   ) {}
 
   public verifyToken(accessToken: string): UserTokenData {
@@ -32,7 +32,7 @@ export class UserAuthService {
   public refreshToken(refreshToken: string): AuthTokens {
     const isAuthEnabled: boolean = this.configService.get<boolean>(
       'USER_AUTH_ENABLED',
-      false,
+      false
     );
 
     if (!isAuthEnabled) {
@@ -45,7 +45,7 @@ export class UserAuthService {
   public async login(username: string, password: string): Promise<AuthTokens> {
     const isAuthEnabled: boolean = this.configService.get<boolean>(
       'USER_AUTH_ENABLED',
-      false,
+      false
     );
 
     if (!isAuthEnabled) {

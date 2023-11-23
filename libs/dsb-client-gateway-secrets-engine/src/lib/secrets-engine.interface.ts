@@ -20,11 +20,11 @@ export abstract class SecretsEngineService implements OnModuleInit {
   abstract setPrivateKey(privateKey: string): Promise<SetPrivateKeyResponse>;
   abstract getPrivateKey(): Promise<string | null>;
   abstract setCertificateDetails(
-    details: CertificateDetails,
+    details: CertificateDetails
   ): Promise<SetCertificateDetailsResponse>;
   abstract getCertificateDetails(): Promise<CertificateDetails | null>;
   abstract setRSAPrivateKey(
-    privateKey: string,
+    privateKey: string
   ): Promise<SetRSAPrivateKeyResponse>;
   abstract getRSAPrivateKey(): Promise<string | null>;
   abstract setMnemonic(mnemonic: string): Promise<string | null>;

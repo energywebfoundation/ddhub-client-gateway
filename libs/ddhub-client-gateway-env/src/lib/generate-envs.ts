@@ -5,7 +5,7 @@ import * as Joi from 'joi';
 export const generateEnvs = (
   objectSchema: Joi.ObjectSchema,
   title: string,
-  outputPath: string,
+  outputPath: string
 ): void => {
   const schema = objectSchema.describe().keys;
 

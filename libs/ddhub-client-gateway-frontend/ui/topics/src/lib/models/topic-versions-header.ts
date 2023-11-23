@@ -11,6 +11,6 @@ export const TOPIC_VERSIONS_HEADERS = [
     accessor: 'updatedDate',
     Cell: (props: any) => {
       return dayjs(props.value).format('DD/MM/YYYY HH:mm:ssA');
-    },
+    }
   },
-];
+]

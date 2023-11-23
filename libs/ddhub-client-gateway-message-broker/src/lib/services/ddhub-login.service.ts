@@ -24,7 +24,7 @@ export class DdhubLoginService {
     protected readonly tlsAgentService: TlsAgentService,
     protected readonly enrolmentService: EnrolmentService,
     protected readonly secretsEngineService: SecretsEngineService,
-    protected readonly iamService: IamService,
+    protected readonly iamService: IamService
   ) {}
 
   @Span('ddhub_mb_login')
@@ -50,7 +50,7 @@ export class DdhubLoginService {
 
     const hasRequiredRoles =
       enrolment.roles.filter(
-        (role) => role.required === true && role.status === RoleStatus.SYNCED,
+        (role) => role.required === true && role.status === RoleStatus.SYNCED
       ).length > 0;
 
     if (!hasRequiredRoles) {
@@ -61,7 +61,7 @@ export class DdhubLoginService {
 
     await promiseRetry(async (retry, number) => {
       this.logger.log(
-        `[ddhub_mb_login] Attempting to login to DID Auth Server #${number}`,
+        `[ddhub_mb_login] Attempting to login to DID Auth Server #${number}`
       );
       await this.didAuthService
         .login(privateKey, this.iamService.getDIDAddress(), forceRelogin)
@@ -85,9 +85,9 @@ export class DdhubLoginService {
             headers: {
               Authorization: `Bearer ${this.didAuthService.getToken()}`,
             },
-          }),
+          })
         ).catch((e) => retry(e));
-
+        
         return data;
       }, this.retryConfigService.config);
 

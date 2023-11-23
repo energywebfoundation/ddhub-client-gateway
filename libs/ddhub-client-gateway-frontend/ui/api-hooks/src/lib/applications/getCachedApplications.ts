@@ -11,7 +11,7 @@ export const useCachedApplications = (roleName = 'topiccreator') => {
     queryClient.getQueryData(
       getApplicationsControllerGetApplicationsQueryKey({
         roleName,
-      }),
+      })
     );
 
   const applicationsByNamespace = keyBy(cachedApplications, 'namespace');

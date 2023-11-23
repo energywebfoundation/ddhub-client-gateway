@@ -18,13 +18,13 @@ export class DdhubFilesService extends DdhubBaseService {
     protected readonly retryConfigService: RetryConfigService,
     protected readonly didAuthService: DidAuthService,
     protected readonly tlsAgentService: TlsAgentService,
-    protected readonly ddhubLoginService: DdhubLoginService,
+    protected readonly ddhubLoginService: DdhubLoginService
   ) {
     super(
       new Logger(DdhubFilesService.name),
       retryConfigService,
       ddhubLoginService,
-      tlsAgentService,
+      tlsAgentService
     );
   }
 
@@ -38,7 +38,7 @@ export class DdhubFilesService extends DdhubBaseService {
     signature: string,
     clientGatewayMessageId: string,
     payloadEncryption: boolean,
-    transactionId?: string,
+    transactionId?: string
   ): Promise<SendMessageResponseFile> {
     this.logger.log('Uploading File');
     try {
@@ -53,7 +53,7 @@ export class DdhubFilesService extends DdhubBaseService {
       formData.append('clientGatewayMessageId', clientGatewayMessageId);
       formData.append(
         'payloadEncryption',
-        payloadEncryption ? 'true' : 'false',
+        payloadEncryption ? 'true' : 'false'
       );
 
       if (transactionId) {
@@ -73,7 +73,7 @@ export class DdhubFilesService extends DdhubBaseService {
           }),
         {
           stopOnResponseCodes: ['10'],
-        },
+        }
       );
 
       this.logger.log(`upload file with file name: ${originalname} successful`);
@@ -81,7 +81,7 @@ export class DdhubFilesService extends DdhubBaseService {
     } catch (e) {
       this.logger.error(
         `upload file with file name: ${originalname} failed`,
-        e,
+        e
       );
       throw e;
     }
@@ -89,7 +89,7 @@ export class DdhubFilesService extends DdhubBaseService {
 
   @Span('ddhub_mb_downloadFile')
   public async downloadFile(
-    fileId: string,
+    fileId: string
   ): Promise<{ data: IncomingMessage; headers: any }> {
     try {
       const result = await this.request<null>(
@@ -106,17 +106,17 @@ export class DdhubFilesService extends DdhubBaseService {
           }),
         {
           stopOnResponseCodes: ['10'],
-        },
+        }
       );
 
       this.logger.log(
-        `download file with fileId: ${fileId} successful from MB`,
+        `download file with fileId: ${fileId} successful from MB`
       );
       return result;
     } catch (e) {
       this.logger.error(
         `download file with fileId: ${fileId} failed from MB`,
-        e,
+        e
       );
       throw e;
     }

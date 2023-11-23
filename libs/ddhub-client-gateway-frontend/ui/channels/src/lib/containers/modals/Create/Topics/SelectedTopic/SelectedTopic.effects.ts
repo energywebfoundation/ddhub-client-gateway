@@ -102,7 +102,7 @@ export const useSelectedTopicEffects = ({
 
   const handleClickTopicCheckbox = (
     event: ChangeEvent<HTMLInputElement>,
-    topic: Topic,
+    topic: Topic
   ) => {
     const selectedIdx = selectedIndex(topic.topicName);
 

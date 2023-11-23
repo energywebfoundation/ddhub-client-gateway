@@ -7,15 +7,8 @@ import { useStyles } from './ViewTopicDetails.styles';
 
 export const ViewTopicDetails: FC = () => {
   const { classes } = useStyles();
-  const {
-    open,
-    closeModal,
-    isLoading,
-    fields,
-    details,
-    buttons,
-    showActionButtons,
-  } = useViewTopicDetailsEffects();
+  const { open, closeModal, isLoading, fields, details, buttons, showActionButtons } =
+    useViewTopicDetailsEffects();
   return (
     <Dialog open={open} onClose={closeModal} paperClassName={classes.paper}>
       <DialogContent sx={{ padding: 0 }}>

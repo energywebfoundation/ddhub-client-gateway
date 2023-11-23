@@ -10,7 +10,7 @@ import {
 import { useStyles } from './Button.styles';
 
 export const Button: FC<
-  ButtonProps & { secondary?: boolean; loading?: boolean; minWidth?: number }
+  ButtonProps & { secondary?: boolean; loading?: boolean, minWidth?: number }
 > = (props) => {
   const { classes, theme } = useStyles();
   const { secondary = false, loading = false, ...rest } = props;

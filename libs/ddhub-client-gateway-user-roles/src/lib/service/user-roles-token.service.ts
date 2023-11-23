@@ -21,7 +21,7 @@ export class UserRolesTokenService {
   public verifyToken(accessToken: string): UserTokenData {
     const decoded: any = jwt.verify(
       accessToken,
-      this.configService.get('JWT_USER_PRIVATE_KEY'),
+      this.configService.get('JWT_USER_PRIVATE_KEY')
     );
 
     if (decoded.type !== 'access') {
@@ -34,7 +34,7 @@ export class UserRolesTokenService {
   public refreshToken(refreshToken: string): AuthTokens {
     const decryptedToken: any = jwt.verify(
       refreshToken,
-      this.configService.get('JWT_USER_PRIVATE_KEY'),
+      this.configService.get('JWT_USER_PRIVATE_KEY')
     );
 
     if (decryptedToken.type !== 'refresh') {
@@ -43,7 +43,7 @@ export class UserRolesTokenService {
 
     return this.generateTokens(
       decryptedToken.username,
-      decryptedToken.accountType,
+      decryptedToken.accountType
     );
   }
 
@@ -58,7 +58,7 @@ export class UserRolesTokenService {
         this.configService.get('JWT_USER_PRIVATE_KEY'),
         {
           expiresIn: 3600,
-        },
+        }
       ),
       refreshToken: jwt.sign(
         {
@@ -69,7 +69,7 @@ export class UserRolesTokenService {
         this.configService.get('JWT_USER_PRIVATE_KEY'),
         {
           expiresIn: 72000,
-        },
+        }
       ),
     };
   }

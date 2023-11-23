@@ -49,7 +49,7 @@ export class CleanupHandler implements ICommandHandler<CleanupCommand> {
     protected readonly receivedMessagesReadWrapper: ReceivedMessageReadStatusRepositoryWrapper,
     protected readonly sentMessageRecipientWrapper: SentMessageRecipientRepositoryWrapper,
     protected readonly symmetricKeysRepositoryWrapper: SymmetricKeysRepositoryWrapper,
-    protected readonly configService: ConfigService,
+    protected readonly configService: ConfigService
   ) {
     this.downloadPath = configService.get<string>('DOWNLOAD_FILES_DIR');
   }

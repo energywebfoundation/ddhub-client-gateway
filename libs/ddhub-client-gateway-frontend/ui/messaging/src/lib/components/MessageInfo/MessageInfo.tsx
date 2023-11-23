@@ -26,7 +26,7 @@ export const MessageInfo: FC<MessageInfoProps> = ({
               <Box display="flex" alignItems="center">
                 <Typography className={classes.subTitle} noWrap>
                   {DateTime.fromISO(messageInfo.timestampISO).toFormat(
-                    'yyyy/MM/dd h:mm:ss a',
+                    'yyyy/MM/dd h:mm:ss a'
                   )}
                 </Typography>
               </Box>
@@ -61,7 +61,7 @@ export const MessageInfo: FC<MessageInfoProps> = ({
                 >
                   {messageInfo.recipients?.map(
                     (recipient: any, index: number) =>
-                      `${didFormatMinifier(recipient.did)}\n`,
+                      `${didFormatMinifier(recipient.did)}\n`
                   )}
                 </Typography>
               </Box>
