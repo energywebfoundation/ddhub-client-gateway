@@ -25,6 +25,7 @@ import {
   RouteRestriction,
 } from './config/route-restrictions.interface';
 import { useGatewayConfig } from '@ddhub-client-gateway-frontend/ui/api-hooks';
+import { AddressBookContext } from '@ddhub-client-gateway-frontend/ui/login';
 
 export const routeRestrictions = new Map<string, string>()
   .set('gatewaySettings', routerConst.GatewaySettings)
@@ -119,9 +120,13 @@ export const getRoutesToDisplay = (
 
 export const useUserDataEffects = () => {
   const userContext = useContext(UserContext);
+  const addressBookContext = useContext(AddressBookContext);
   if (!userContext) {
+    throw new Error('[useUserDataEffects] UserContext provider not available');
+  }
+  if (!addressBookContext) {
     throw new Error(
-      'useUserDataEffects must be used within a UserContext provider'
+      '[useUserDataEffects] AddressBookContext provider not available'
     );
   }
 
@@ -136,6 +141,7 @@ export const useUserDataEffects = () => {
     resetAuthData,
     refreshIdentity,
     setRefreshIdentity,
+    authenticated,
   } = userContext;
   const queryClient = useQueryClient();
   const [routeRestrictionList, setRouteRestrictionList] = useState(
@@ -143,6 +149,12 @@ export const useUserDataEffects = () => {
   );
   const [identity, setIdentity] = useState({} as IdentityWithEnrolment);
   const [version, setVersion] = useState<string>(VersionStatus.UNAVAILABLE);
+
+  useEffect(() => {
+    if (authenticated && addressBookContext) {
+      addressBookContext.refreshAddressBook().then();
+    }
+  }, [authenticated]);
 
   useEffect(() => {
     if (!isEmpty(config)) {

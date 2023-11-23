@@ -24,6 +24,10 @@ import '@asyncapi/react-component/styles/default.min.css';
 import 'nprogress/nprogress.css';
 import '../styles/globals.css';
 import { ModalProvider } from '@ddhub-client-gateway-frontend/ui/messaging';
+import {
+  useAddressBookContext,
+  AddressBookContext,
+} from '@ddhub-client-gateway-frontend/ui/login';
 
 if (
   process.env.NODE_ENV !== 'production' &&
@@ -43,8 +47,8 @@ export interface MyAppProps extends AppProps {
 }
 
 function InitializeAccountStatus(props) {
-  useCheckAccountStatus(false);
   useUserAuthHeaders();
+  useCheckAccountStatus(false);
   return <>{props.children}</>;
 }
 
@@ -71,6 +75,9 @@ function MyApp(props: MyAppProps) {
     refreshToken,
     authEnabled,
   } = useUserData(queryClient);
+
+  const { addressBook, refreshAddressBook, getAlias, getAliasOrMinifiedDid } =
+    useAddressBookContext(queryClient);
 
   const getLayout =
     (Component as any).getLayout || ((page) => <Layout>{page}</Layout>);
@@ -116,14 +123,23 @@ function MyApp(props: MyAppProps) {
                 authEnabled,
               }}
             >
-              <ModalProvider>
-                <InitializeAccountStatus>
-                  <>
-                    {getLayout(<Component {...pageProps} />)}
-                    <Backdrop />
-                  </>
-                </InitializeAccountStatus>
-              </ModalProvider>
+              <AddressBookContext.Provider
+                value={{
+                  ...addressBook,
+                  refreshAddressBook,
+                  getAlias,
+                  getAliasOrMinifiedDid,
+                }}
+              >
+                <ModalProvider>
+                  <InitializeAccountStatus>
+                    <>
+                      {getLayout(<Component {...pageProps} />)}
+                      <Backdrop />
+                    </>
+                  </InitializeAccountStatus>
+                </ModalProvider>
+              </AddressBookContext.Provider>
             </UserContext.Provider>
           </QueryClientProvider>
         </BackdropContextProvider>

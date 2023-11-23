@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useContext } from 'react';
 import { Edit, Check, X } from 'react-feather';
 import {
   DialogActions,
@@ -24,8 +24,13 @@ import { VIEW_STEPS } from '../Create/Steps/models/viewSteps';
 import { includes } from 'lodash';
 import { ChannelType } from '../../../models';
 import { CreateChannelDtoType } from '@dsb-client-gateway/dsb-client-gateway-api-client';
+import { AddressBookContext } from '@ddhub-client-gateway-frontend/ui/login';
 
 export const Details: FC = () => {
+  const addressBookContext = useContext(AddressBookContext);
+  if (!addressBookContext) {
+    throw new Error('[Details] AddressBookContext provider not available');
+  }
   const { classes } = useStyles();
   const {
     open,
@@ -51,7 +56,9 @@ export const Details: FC = () => {
               <RestrictionsViewBox
                 label="DID"
                 list={channel.conditions?.dids}
-                formatter={(value: string) => didFormatMinifier(value, 5, 3)}
+                formatter={(value: string) =>
+                  addressBookContext.getAliasOrMinifiedDid(value)
+                }
                 wrapperProps={{ mr: 0.8 }}
                 wrapperMaxHeight={650}
                 listMaxHeight={550}

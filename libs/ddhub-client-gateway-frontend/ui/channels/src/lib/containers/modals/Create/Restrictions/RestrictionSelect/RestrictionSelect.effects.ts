@@ -11,15 +11,14 @@ export interface RestrictionSelectEffectsProps {
   inputValue?: string;
 }
 
-export const useRestrictionSelectEffects = (
-  {
-    setType,
-    clear,
-    selectedType,
-    handleSaveRestriction,
-    handleUpdateRestriction,
-    inputValue,
-  }: RestrictionSelectEffectsProps) => {
+export const useRestrictionSelectEffects = ({
+  setType,
+  clear,
+  selectedType,
+  handleSaveRestriction,
+  handleUpdateRestriction,
+  inputValue,
+}: RestrictionSelectEffectsProps) => {
   const fields = {
     restrictionType: {
       name: 'restrictionType',
@@ -28,8 +27,16 @@ export const useRestrictionSelectEffects = (
         marginBottom: '20px',
       },
       options: [
-        { label: RestrictionType.DID, value: RestrictionType.DID, subLabel: 'did:ethr:volta:0x09Df...46993' },
-        { label: RestrictionType.Role, value: RestrictionType.Role, subLabel: 'user.roles.namespace.ewc' },
+        {
+          label: RestrictionType.DID,
+          value: RestrictionType.DID,
+          subLabel: 'did:ethr:volta:0x09Df...46993',
+        },
+        {
+          label: RestrictionType.Role,
+          value: RestrictionType.Role,
+          subLabel: 'user.roles.namespace.ewc',
+        },
       ],
     },
   };
@@ -53,7 +60,8 @@ export const useRestrictionSelectEffects = (
     e.stopPropagation();
   };
 
-  const handleSubmitForm = () => {
+  const handleSubmitForm = (e: any) => {
+    e.preventDefault();
     if (selectedType) {
       handleUpdateRestriction(inputValue);
     } else {

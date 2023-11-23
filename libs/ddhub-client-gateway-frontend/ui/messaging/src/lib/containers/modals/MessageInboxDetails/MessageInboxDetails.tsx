@@ -7,6 +7,7 @@ import {
   Stack,
   styled,
   DialogActions,
+  Button,
 } from '@mui/material';
 import {
   CloseButton,
@@ -27,6 +28,7 @@ import MuiAccordionSummary, {
 } from '@mui/material/AccordionSummary';
 import MuiAccordionDetails from '@mui/material/AccordionDetails';
 import { ChevronRight } from 'react-feather';
+import { didFormatMinifier } from '@ddhub-client-gateway-frontend/ui/utils';
 
 const Accordion = styled((props: AccordionProps) => (
   <MuiAccordion disableGutters elevation={0} square {...props} />
@@ -69,6 +71,7 @@ export const MessageInboxDetails: FC = () => {
     open,
     closeModal,
     ackMessage,
+    openReplyModal,
     inboxDetails,
     parsedPayload,
     parsedDetails,
@@ -79,6 +82,7 @@ export const MessageInboxDetails: FC = () => {
     if (inboxDetails && !inboxDetails.isSender) {
       ackMessage([inboxDetails.messageId]);
     }
+    setExpanded(0);
   }, [inboxDetails]);
 
   const handleAccordionChange =
@@ -164,10 +168,15 @@ export const MessageInboxDetails: FC = () => {
                         }}
                       />
                     )}
+                    {/* Minify Client GW Message ID as it is quite long */}
                     <MessageDetail
                       field={{
                         label: 'Message ID',
-                        value: inboxDetails.messageId,
+                        value:
+                          inboxDetails.messageId.length > 24
+                            ? didFormatMinifier(inboxDetails.messageId)
+                            : inboxDetails.messageId,
+                        copyValue: inboxDetails.messageId,
                         copy: true,
                       }}
                     />
@@ -213,6 +222,16 @@ export const MessageInboxDetails: FC = () => {
         <Box className={classes.closeButtonWrapper}>
           <CloseButton onClose={closeModal} />
         </Box>
+        {!inboxDetails?.isSender && (
+          <Button
+            onClick={() => {
+              closeModal();
+              openReplyModal();
+            }}
+          >
+            Reply
+          </Button>
+        )}
       </DialogActions>
     </Dialog>
   );

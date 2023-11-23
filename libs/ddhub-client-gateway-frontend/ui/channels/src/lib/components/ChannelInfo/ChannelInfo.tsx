@@ -1,10 +1,10 @@
-import { FC } from 'react';
+import { FC, useContext } from 'react';
 import clsx from 'clsx';
 import { CardContent, Paper, Typography, Box } from '@mui/material';
 import { GetChannelResponseDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { useStyles } from './ChannelInfo.styles';
 import { ChannelConnectionType } from '../../models/channel-connection-type.enum';
-import { didFormatMinifier } from '@ddhub-client-gateway-frontend/ui/utils';
+import { AddressBookContext } from '@ddhub-client-gateway-frontend/ui/login';
 
 interface ChannelInfoProps {
   channel: GetChannelResponseDto;
@@ -12,6 +12,10 @@ interface ChannelInfoProps {
 }
 
 export const ChannelInfo: FC<ChannelInfoProps> = ({ channel, topicName }) => {
+  const addressBookContext = useContext(AddressBookContext);
+  if (!addressBookContext) {
+    throw new Error('[ChannelInfo] AddressBookContext provider not available');
+  }
   const { classes } = useStyles();
   return (
     <Paper className={classes.root}>
@@ -69,13 +73,11 @@ export const ChannelInfo: FC<ChannelInfoProps> = ({ channel, topicName }) => {
             <Typography className={classes.subTitle} variant="body2">
               Roles
             </Typography>
-            {
-              !channel.conditions?.roles?.length && (
-                <Typography className={classes.subTitle} variant="body2">
-                  -
-                </Typography>
-              )
-            }
+            {!channel.conditions?.roles?.length && (
+              <Typography className={classes.subTitle} variant="body2">
+                -
+              </Typography>
+            )}
             {channel.conditions?.roles?.map((role) => (
               <Typography
                 key={role}
@@ -91,20 +93,18 @@ export const ChannelInfo: FC<ChannelInfoProps> = ({ channel, topicName }) => {
             <Typography className={classes.subTitle} variant="body2">
               DIDs
             </Typography>
-            {
-              !channel.conditions?.dids?.length && (
-                <Typography className={classes.subTitle} variant="body2">
-                  -
-                </Typography>
-              )
-            }
+            {!channel.conditions?.dids?.length && (
+              <Typography className={classes.subTitle} variant="body2">
+                -
+              </Typography>
+            )}
             {channel.conditions?.dids?.map((did) => (
               <Typography
                 key={did}
                 className={classes.subTitle}
                 variant="body2"
               >
-                {didFormatMinifier(did)}
+                {addressBookContext.getAliasOrMinifiedDid(did)}
               </Typography>
             ))}
           </Box>

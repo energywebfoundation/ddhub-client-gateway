@@ -17,7 +17,7 @@ export const useReceivedMessages = (
     queryClient.getDefaultOptions().queries?.enabled === false
       ? false
       : !!params?.fqcn;
-  const { data, isLoading, isSuccess, isError } =
+  const { data, isLoading, isSuccess, isError, refetch } =
     useMessageControllerGetReceivedMessages(params, {
       query: {
         enabled,
@@ -35,12 +35,8 @@ export const useReceivedMessages = (
 
   const { mutate } = useMessageControllerAckMessages({
     mutation: {
-      onSuccess: (res, { data: { messagesIds } }) => {
-        for (const message of messages) {
-          if (messagesIds.includes(message.id)) {
-            message.isRead = true;
-          }
-        }
+      onSuccess: async () => {
+        await refetch();
       },
       onError: (err: any) => {
         console.error(err);

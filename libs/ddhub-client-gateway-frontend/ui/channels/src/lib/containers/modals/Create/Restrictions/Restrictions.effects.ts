@@ -1,7 +1,11 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ChannelConditionsDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { RestrictionType } from './models/restriction-type.enum';
-import { useDIDRestrictionEffects } from './effects/didRestriction.effects';
+import {
+  DIDSource,
+  RestrictionFieldNames,
+  useDIDRestrictionEffects,
+} from './effects/didRestriction.effects';
 import { useRolesRestrictionEffects } from './effects/roleRestriction.effects';
 
 export const useRestrictionsEffects = (restrictions: ChannelConditionsDto) => {
@@ -16,6 +20,14 @@ export const useRestrictionsEffects = (restrictions: ChannelConditionsDto) => {
     isValid: isDIDValid,
     setDIDInput,
     updateDID,
+    populateAddressBookList,
+    register,
+    control,
+    fields,
+    didRestrictionValues,
+    setDIDRestrictionValue,
+    setIsUpdate,
+    setDidToUpdate,
   } = useDIDRestrictionEffects(restrictions.dids ?? []);
   const {
     roles,
@@ -45,15 +57,28 @@ export const useRestrictionsEffects = (restrictions: ChannelConditionsDto) => {
   };
 
   const handleOpen = () => {
+    setIsUpdate(false);
+    setDidToUpdate(undefined);
     setType(RestrictionType.DID);
     clear();
     setOpen(true);
   };
 
   const handleSaveRestriction = () => {
+    const selectedDIDSource = didRestrictionValues(
+      RestrictionFieldNames.DID_SOURCE
+    );
+    const selectedAddressBookItem = didRestrictionValues(
+      RestrictionFieldNames.ADDRESS_BOOK
+    );
     if (type === RestrictionType.DID) {
-      setRecent(didInput);
-      addDID(didInput);
+      if (selectedDIDSource === DIDSource.MANUAL_INPUT) {
+        setRecent(didInput);
+        addDID(didInput);
+      } else {
+        setRecent(selectedAddressBookItem);
+        addDID(selectedAddressBookItem);
+      }
     } else {
       setRecent(roleInput);
       addRole(roleInput);
@@ -63,14 +88,31 @@ export const useRestrictionsEffects = (restrictions: ChannelConditionsDto) => {
   };
 
   const handleUpdateRestriction = (removeInput: string) => {
+    const selectedDIDSource = didRestrictionValues(
+      RestrictionFieldNames.DID_SOURCE
+    );
+    const selectedAddressBookItem = didRestrictionValues(
+      RestrictionFieldNames.ADDRESS_BOOK
+    );
+
     setRecent(roleInput || didInput);
     updateRole(type, removeInput, roleInput);
-    updateDID(type, removeInput, didInput);
+    if (selectedDIDSource === DIDSource.MANUAL_INPUT) {
+      updateDID(type, removeInput, didInput);
+    } else {
+      updateDID(type, removeInput, selectedAddressBookItem);
+    }
   };
 
   const restrictionsCount = dids.length + roles.length;
 
+  useEffect(() => {
+    populateAddressBookList();
+  }, [restrictions.dids]);
+
   return {
+    register,
+    control,
     type,
     dids,
     roles,
@@ -93,5 +135,10 @@ export const useRestrictionsEffects = (restrictions: ChannelConditionsDto) => {
     setRoleInput,
     setDIDInput,
     recent,
+    fields,
+    didRestrictionValues,
+    setDIDRestrictionValue,
+    setIsUpdate,
+    setDidToUpdate,
   };
 };

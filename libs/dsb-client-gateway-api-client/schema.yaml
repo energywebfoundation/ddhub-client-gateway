@@ -2004,6 +2004,10 @@ components:
           type: "string"
           description: "message id"
           example: "110"
+        topicId:
+          type: "string"
+          description: "topic id"
+          example: "111"
         topicName:
           type: "string"
           description: "topic Name"
@@ -2074,6 +2078,7 @@ components:
           example: false
       required:
         - "id"
+        - "topicId"
         - "topicName"
         - "topicOwner"
         - "topicVersion"

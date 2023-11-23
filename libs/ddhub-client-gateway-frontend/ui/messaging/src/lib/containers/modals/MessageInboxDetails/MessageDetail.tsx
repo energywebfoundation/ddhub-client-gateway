@@ -11,6 +11,7 @@ interface MessageDetailProps {
     valueArray?: any[];
     isEntryView?: boolean;
     copy?: boolean;
+    copyValue?: string;
   };
 }
 
@@ -75,7 +76,9 @@ export const MessageDetail: FC<MessageDetailProps> = ({
               >
                 {valueFieldText}
               </Typography>
-              {field.copy && <CopyToClipboard text={field.value} />}
+              {field.copy && (
+                <CopyToClipboard text={field.copyValue || field.value} />
+              )}
             </>
           )}
         </Box>

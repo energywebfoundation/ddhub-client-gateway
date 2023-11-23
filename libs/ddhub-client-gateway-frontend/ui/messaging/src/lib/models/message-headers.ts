@@ -1,3 +1,4 @@
+import { didFormatMinifier } from '@ddhub-client-gateway-frontend/ui/utils';
 import { DownloadMessage } from '../containers/DownloadMessage';
 
 export const LARGE_MESSAGES_HEADERS = [
@@ -10,6 +11,9 @@ export const LARGE_MESSAGES_HEADERS = [
     Header: 'FROM',
     accessor: 'sender',
     isSortable: true,
+    Cell: (props: any, row: any) => {
+      return row.original.senderAlias || didFormatMinifier(row.original.sender);
+    },
   },
   {
     Header: 'SCHEMA TYPE',
@@ -38,5 +42,11 @@ export const MESSAGES_HEADERS = [
     Header: 'FROM',
     accessor: 'sender',
     isSortable: true,
+    Cell: (props: any) => {
+      return (
+        props.row.original.senderAlias ||
+        didFormatMinifier(props.row.original.sender)
+      );
+    },
   },
 ];

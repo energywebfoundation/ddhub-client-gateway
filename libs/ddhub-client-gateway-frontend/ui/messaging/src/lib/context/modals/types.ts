@@ -1,8 +1,12 @@
 import { ModalActionsEnum } from './reducer';
 import {
   GetAllContactsResponseDto,
+  GetReceivedMessageResponseDto,
+  GetSentMessageResponseDto,
   SendMessageResponseDto,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
+
+type ReplyMessageData = GetReceivedMessageResponseDto;
 
 type TDetails = {
   open: boolean;
@@ -18,6 +22,7 @@ type TDetails = {
 type TInboxDetails = {
   open: boolean;
   ackMessage?: (messagesIds: string[]) => void;
+  openReplyModal?: () => void;
   data: {
     channelName: string;
     transactionId: string;
@@ -30,6 +35,7 @@ type TInboxDetails = {
     timestampNanos: number;
     isSender: boolean;
     isRead: boolean;
+    dto: GetSentMessageResponseDto | GetReceivedMessageResponseDto;
   };
 };
 
@@ -40,7 +46,7 @@ type TPostDetails = {
 
 type TNewMessage = {
   open: boolean;
-  data: any;
+  data?: ReplyMessageData;
 };
 
 type TViewMessage = {

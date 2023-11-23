@@ -1,4 +1,4 @@
-import {makeStyles} from "tss-react/mui";
+import { makeStyles } from 'tss-react/mui';
 
 export const useStyles = makeStyles()((theme) => ({
   container: {
@@ -11,6 +11,16 @@ export const useStyles = makeStyles()((theme) => ({
     width: 45,
     height: 26,
     justifyContent: 'center',
+  },
+  gridItemAlias: {
+    display: 'flex',
+    background: '#343559',
+    borderRadius: 4,
+    width: 'auto',
+    height: 26,
+    justifyContent: 'center',
+    paddingLeft: 10,
+    paddingRight: 10,
   },
   itemText: {
     fontSize: 12,

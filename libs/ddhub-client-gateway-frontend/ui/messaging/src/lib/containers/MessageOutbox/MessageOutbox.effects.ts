@@ -34,6 +34,7 @@ export const useMessageOutboxEffects = () => {
           timestampNanos: data.timestampNanos,
           isSender: true,
           isRead: false,
+          dto: data,
         },
       },
     });
