@@ -1,6 +1,6 @@
-import { useContext, useEffect } from 'react';
-import { UserContext } from './UserDataContext';
+import { useContext, useEffect, useState } from 'react';
 import Axios from 'axios';
+import { UserContext } from './UserDataContext';
 
 export const useUserAuthHeaders = () => {
   const userContext = useContext(UserContext);
@@ -9,20 +9,30 @@ export const useUserAuthHeaders = () => {
       'useUserAuthHeaders must be used within a UserContext provider'
     );
   }
+  const { authEnabled, userAuth, refreshToken } = userContext;
+  const [requestInterceptorId, setRequestInterceptorId] = useState<number>();
+
+  const resetRequestInterceptor = () => {
+    if (requestInterceptorId !== undefined) {
+      Axios.interceptors.request.eject(requestInterceptorId);
+      setRequestInterceptorId(undefined);
+    }
+  };
 
   useEffect(() => {
-    if (!userContext.authEnabled || !userContext.userAuth) {
+    if (!authEnabled || !userAuth || !userAuth.authenticated) {
+      resetRequestInterceptor();
       return;
     }
 
-    let requestInterceptorId: number | undefined;
     if (
-      userContext.userAuth.authenticated &&
-      userContext.userAuth.accessToken
+      userAuth.authenticated &&
+      userAuth.accessToken &&
+      requestInterceptorId === undefined
     ) {
       const accessToken =
-        userContext.userAuth.accessToken ?? localStorage.getItem('accessToken');
-      requestInterceptorId = Axios.interceptors.request.use((config) => {
+        userAuth.accessToken ?? localStorage.getItem('accessToken');
+      const interceptorId = Axios.interceptors.request.use((config) => {
         return {
           ...config,
           headers: {
@@ -31,6 +41,7 @@ export const useUserAuthHeaders = () => {
           },
         };
       });
+      setRequestInterceptorId(interceptorId);
     }
 
     const responseInterceptorId = Axios.interceptors.response.use(
@@ -41,7 +52,7 @@ export const useUserAuthHeaders = () => {
           (err.response.status === 401 || err.response.status === 403) &&
           !originalRequest._retry
         ) {
-          await userContext.refreshToken();
+          await refreshToken();
           originalRequest._retry = true;
           return Axios(originalRequest);
         }
@@ -55,5 +66,5 @@ export const useUserAuthHeaders = () => {
       }
       Axios.interceptors.response.eject(responseInterceptorId);
     };
-  }, [userContext.userAuth]);
+  }, [authEnabled, userAuth]);
 };
