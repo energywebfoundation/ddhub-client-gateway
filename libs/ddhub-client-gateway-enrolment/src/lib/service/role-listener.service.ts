@@ -26,7 +26,7 @@ export class RoleListenerService {
     protected readonly enrolmentService: EnrolmentService,
     protected readonly iamService: IamService,
     @Inject(forwardRef(() => ClaimListenerService))
-    protected readonly claimListenerService: ClaimListenerService
+    protected readonly claimListenerService: ClaimListenerService,
   ) {}
 
   @Span('roleListener_requestClaimsForRequiredRoles')
@@ -46,9 +46,8 @@ export class RoleListenerService {
   }
 
   public async startListening(): Promise<Enrolment> {
-    const identity: Identity | null = await this.identityService.getIdentity(
-      true
-    );
+    const identity: Identity | null =
+      await this.identityService.getIdentity(true);
 
     if (!identity) {
       this.logger.warn('Identity is not set');
@@ -66,7 +65,7 @@ export class RoleListenerService {
       await this.enrolmentService.generateEnrolment();
 
     const remainingRolesToEnrol = enrolment.roles.filter(
-      (role) => role.required && role.status !== RoleStatus.SYNCED
+      (role) => role.required && role.status !== RoleStatus.SYNCED,
     );
 
     if (remainingRolesToEnrol.length === 0) {
@@ -77,13 +76,13 @@ export class RoleListenerService {
 
     this.logger.log(
       'Roles are missing, requesting claims and attempting to enrol',
-      JSON.stringify(remainingRolesToEnrol)
+      JSON.stringify(remainingRolesToEnrol),
     );
 
     await this.requestClaimsForRequiredRoles();
 
     await this.claimListenerService.listen(
-      remainingRolesToEnrol.map(({ namespace }) => namespace)
+      remainingRolesToEnrol.map(({ namespace }) => namespace),
     );
 
     return enrolment;

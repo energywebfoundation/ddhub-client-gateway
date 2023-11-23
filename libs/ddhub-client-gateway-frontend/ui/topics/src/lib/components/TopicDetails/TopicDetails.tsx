@@ -1,5 +1,11 @@
 import { FC } from 'react';
-import { CircularProgress, Typography, Box, IconButton, Grid } from '@mui/material';
+import {
+  CircularProgress,
+  Typography,
+  Box,
+  IconButton,
+  Grid,
+} from '@mui/material';
 import {
   ApplicationDTO,
   PostTopicDto,
@@ -43,9 +49,9 @@ export const TopicDetails: FC<TopicDetailsProps> = ({
           <CircularProgress />
         </Box>
       ) : (
-        <Grid container className={classes.content} flexDirection={"row"}>
+        <Grid container className={classes.content} flexDirection={'row'}>
           <Grid item xs={4} paddingRight={4}>
-            { showActionButtons &&
+            {showActionButtons && (
               <Box className={classes.details}>
                 {buttons.map((button) => {
                   return (
@@ -59,13 +65,18 @@ export const TopicDetails: FC<TopicDetailsProps> = ({
                   );
                 })}
               </Box>
-            }
+            )}
             {application && <ApplicationInfoModal application={application} />}
           </Grid>
           <Grid item className={classes.contentWrapper} xs={8}>
             <Grid container spacing={2}>
               {fields.map((field) => (
-                <Grid item xs={6} className={classes.gridItem} key={field.value}>
+                <Grid
+                  item
+                  xs={6}
+                  className={classes.gridItem}
+                  key={field.value}
+                >
                   <TopicDetail topic={topic} field={field} />
                 </Grid>
               ))}

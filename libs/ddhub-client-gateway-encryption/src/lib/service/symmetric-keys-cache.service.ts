@@ -29,7 +29,7 @@ export class SymmetricKeysCacheService {
     protected readonly wrapper: SymmetricKeysRepositoryWrapper,
     protected readonly configService: ConfigService,
     protected readonly ddhubMessagingService: DdhubMessagesService,
-    protected readonly ddhubConfigService: DdhubConfigService
+    protected readonly ddhubConfigService: DdhubConfigService,
   ) {}
 
   public async deleteExpiredKeys(): Promise<void> {
@@ -63,7 +63,7 @@ export class SymmetricKeysCacheService {
         moment(entity.createdDate)
           .add(config.msgExpired, 'seconds')
           .utc()
-          .isSameOrBefore(moment())
+          .isSameOrBefore(moment()),
       )
       .map<Promise<SymmetricKeysEntity>>(
         async (entity: SymmetricKeysEntity) => {
@@ -74,7 +74,7 @@ export class SymmetricKeysCacheService {
           this.logger.log(`removed symmetric key ${entity.id}`);
 
           return entity;
-        }
+        },
       )
       .flatMap(Highland)
       .collect()
@@ -85,7 +85,7 @@ export class SymmetricKeysCacheService {
     try {
       if (!this.iamService.isInitialized()) {
         this.logger.warn(
-          'IAM connection is not initialized, skipping refresh symmetric key cron'
+          'IAM connection is not initialized, skipping refresh symmetric key cron',
         );
 
         return;
@@ -95,7 +95,7 @@ export class SymmetricKeysCacheService {
 
       if (!identityReady) {
         this.logger.warn(
-          'Private key not set, skipping refresh symmetric key cron'
+          'Private key not set, skipping refresh symmetric key cron',
         );
 
         return;
@@ -117,7 +117,7 @@ export class SymmetricKeysCacheService {
           },
           {
             retries: 1,
-          }
+          },
         );
 
       if (symmetricKeys.length === 0) {

@@ -13,8 +13,9 @@ export const ChannelTopicVersionDetails: FC = () => {
     <Dialog paperClassName={classes.paper} open={open} onClose={closeModal}>
       <DialogContent sx={{ padding: 0 }}>
         <TopicsVersionContainer
-          topicVersionDetails={topicVersionDetails} fields={fields}>
-        </TopicsVersionContainer>
+          topicVersionDetails={topicVersionDetails}
+          fields={fields}
+        ></TopicsVersionContainer>
       </DialogContent>
       <DialogActions className={classes.actions}>
         <Box className={classes.closeButtonWrapper}>

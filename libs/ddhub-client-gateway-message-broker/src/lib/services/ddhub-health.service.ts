@@ -12,13 +12,13 @@ export class DdhubHealthService extends DdhubBaseService {
     protected readonly httpService: HttpService,
     protected readonly retryConfigService: RetryConfigService,
     protected readonly tlsAgentService: TlsAgentService,
-    protected readonly ddhubLoginService: DdhubLoginService
+    protected readonly ddhubLoginService: DdhubLoginService,
   ) {
     super(
       new Logger(DdhubHealthService.name),
       retryConfigService,
       ddhubLoginService,
-      tlsAgentService
+      tlsAgentService,
     );
   }
 
@@ -27,7 +27,7 @@ export class DdhubHealthService extends DdhubBaseService {
       const { data, status } = await lastValueFrom(
         this.httpService.get('/health', {
           httpsAgent: await this.tlsAgentService.create(),
-        })
+        }),
       );
 
       return { statusCode: status, message: data?.status };

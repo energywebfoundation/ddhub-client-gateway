@@ -37,12 +37,12 @@ export const useSelectedTopicListEffects = ({
   const availableTopics: Topic[] = differenceBy(
     filteredTopics,
     formattedSelectedTopics,
-    'id'
+    'id',
   );
 
   const getSelectedResponseTopics = (selectedTopicId: string) => {
     const selectedResponseTopics = responseTopics.filter(
-      (topic) => topic.responseTopicId === selectedTopicId
+      (topic) => topic.responseTopicId === selectedTopicId,
     );
 
     return selectedResponseTopics;

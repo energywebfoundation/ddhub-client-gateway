@@ -43,7 +43,7 @@ export const useDownloadMessage = () => {
           resetState();
         },
       },
-    }
+    },
   );
 
   const downloadMessageHandler = async (data: TDownloadData) => {

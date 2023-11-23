@@ -1,2 +1,2 @@
-export * from './acks.repository'
-export * from './pending-acks.repository'
+export * from './acks.repository';
+export * from './pending-acks.repository';

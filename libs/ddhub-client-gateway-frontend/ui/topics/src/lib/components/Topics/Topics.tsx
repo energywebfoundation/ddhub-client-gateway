@@ -41,8 +41,8 @@ export const Topics: FC<TopicsProps> = ({
         onSearchInput={handleSearchInput}
         backendSearch={true}
         loading={topicsLoading}
-        defaultSortBy='name'
-        defaultOrder='asc'
+        defaultSortBy="name"
+        defaultOrder="asc"
       >
         {!readonly && <CreateButton onCreate={openCreateTopic} />}
       </GenericTable>

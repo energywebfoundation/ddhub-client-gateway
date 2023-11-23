@@ -38,16 +38,18 @@ export function Breadcrumbs() {
         <div></div>
       </MuiBreadcrumbs>
       <MuiBreadcrumbs separator={separator} aria-label="breadcrumb">
-        {list?.map((item, index, list) => (
-          (item.path) ?
-            <Link
-              key={item.title}
-              href={item.path}>
-              <a className={clsx(classes.element, {
-                [classes.lastElement]: index === list.length - 1,
-              })}>{item.title}</a>
+        {list?.map((item, index, list) =>
+          item.path ? (
+            <Link key={item.title} href={item.path}>
+              <a
+                className={clsx(classes.element, {
+                  [classes.lastElement]: index === list.length - 1,
+                })}
+              >
+                {item.title}
+              </a>
             </Link>
-            :
+          ) : (
             <Typography
               key={item.title}
               variant="subtitle2"
@@ -57,7 +59,8 @@ export function Breadcrumbs() {
             >
               {item.title}
             </Typography>
-        ))}
+          ),
+        )}
       </MuiBreadcrumbs>
     </section>
   );

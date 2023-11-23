@@ -21,7 +21,9 @@ export const CHANNEL_TOPICS_HEADERS = [
 
 export const Channel: FC<ChannelProps> = ({ topicsUrl }) => {
   const router = useRouter();
-  const { channel, isLoading } = useChannel(router.query[Queries.FQCN] as string);
+  const { channel, isLoading } = useChannel(
+    router.query[Queries.FQCN] as string,
+  );
 
   const topics = channel.conditions?.topics || [];
 
@@ -46,7 +48,7 @@ export const Channel: FC<ChannelProps> = ({ topicsUrl }) => {
           loading={isLoading}
           showSearch={false}
           loadingRows={2}
-          defaultSortBy='topicName'
+          defaultSortBy="topicName"
         />
       </Box>
     </Stack>

@@ -9,7 +9,7 @@ import { useCustomAlert } from '@ddhub-client-gateway-frontend/ui/core';
 
 export const useApplications = (
   role = 'topiccreator',
-  topicUrl = routerConst.Topics
+  topicUrl = routerConst.Topics,
 ) => {
   const router = useRouter();
   const Swal = useCustomAlert();
@@ -25,7 +25,7 @@ export const useApplications = (
             Swal.httpError(err);
           },
         },
-      }
+      },
     );
 
   const handleRowClick = (data: ApplicationDTO) => {

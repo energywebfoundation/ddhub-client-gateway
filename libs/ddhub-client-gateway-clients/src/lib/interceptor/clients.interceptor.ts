@@ -15,7 +15,7 @@ export function ClientsInterceptor(
   fieldName: string,
   fieldPath: ReqParams,
   fqcnName: string,
-  fqcnPath: ReqParams
+  fqcnPath: ReqParams,
 ): Type<NestInterceptor> {
   @Injectable()
   class MixinInterceptor implements NestInterceptor {
@@ -23,7 +23,7 @@ export function ClientsInterceptor(
 
     public async intercept(
       context: ExecutionContext,
-      next: CallHandler<any>
+      next: CallHandler<any>,
     ): Promise<Observable<any>> {
       const request = context.switchToHttp().getRequest();
 

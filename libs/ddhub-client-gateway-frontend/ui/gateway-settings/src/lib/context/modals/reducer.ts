@@ -21,7 +21,7 @@ export const modalInitialState: IModalStore = {
 
 export const modalsReducer = (
   state = modalInitialState,
-  action: TModalAction
+  action: TModalAction,
 ): IModalStore => {
   switch (action.type) {
     case ModalActionsEnum.SHOW_CERTIFICATE:

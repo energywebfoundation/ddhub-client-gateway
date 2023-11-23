@@ -11,7 +11,7 @@ export class MessageBrokerUnauthorizedException extends BaseException {
     message: string,
     code: DsbClientGatewayErrors,
     errorCode: string | MessageBrokerErrors,
-    path: string
+    path: string,
   ) {
     super(
       message,
@@ -21,7 +21,7 @@ export class MessageBrokerUnauthorizedException extends BaseException {
         errorCode,
         path,
       },
-      HttpStatus.FORBIDDEN
+      HttpStatus.FORBIDDEN,
     );
   }
 }

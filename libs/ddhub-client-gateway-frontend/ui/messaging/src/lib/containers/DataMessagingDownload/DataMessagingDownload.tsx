@@ -17,7 +17,7 @@ const headers: TableHeader[] = [
 ];
 
 export const DataMessagingDownload: FC<DataMessagingDownloadProps> = (
-  props
+  props,
 ) => {
   const { channels, isLoading, navigate } =
     useDataMessagingDownloadEffects(props);

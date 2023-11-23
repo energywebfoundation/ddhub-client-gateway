@@ -17,13 +17,13 @@ export class DdhubChannelStreamService extends DdhubBaseService {
     protected readonly retryConfigService: RetryConfigService,
     protected readonly didAuthService: DidAuthService,
     protected readonly tlsAgentService: TlsAgentService,
-    protected readonly ddhubLoginService: DdhubLoginService
+    protected readonly ddhubLoginService: DdhubLoginService,
   ) {
     super(
       new Logger(DdhubChannelStreamService.name),
       retryConfigService,
       ddhubLoginService,
-      tlsAgentService
+      tlsAgentService,
     );
   }
 
@@ -40,7 +40,7 @@ export class DdhubChannelStreamService extends DdhubBaseService {
           }),
         {
           stopOnResponseCodes: [MessageBrokerErrors.UNAUTHORIZED_ACCESS],
-        }
+        },
       );
     } catch (e) {
       this.logger.error(`delete stream failed`, e);

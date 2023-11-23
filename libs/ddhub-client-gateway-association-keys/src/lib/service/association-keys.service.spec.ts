@@ -109,7 +109,7 @@ describe('AssociationKeysService', () => {
     }).compile();
 
     associationKeysService = module.get<AssociationKeysService>(
-      AssociationKeysService
+      AssociationKeysService,
     );
   });
 
@@ -121,7 +121,7 @@ describe('AssociationKeysService', () => {
     describe('should generate both keys', () => {
       const mockDate = moment(
         '2023-10-18 15:30:00',
-        'YYYY-MM-DD HH:mm:ss'
+        'YYYY-MM-DD HH:mm:ss',
       ).toDate();
 
       beforeEach(async () => {
@@ -188,11 +188,11 @@ describe('AssociationKeysService', () => {
 
       it('should save both keys', () => {
         expect(
-          mockAssociationKeysWrapperRepository.repository.save
+          mockAssociationKeysWrapperRepository.repository.save,
         ).toBeCalledTimes(4);
 
         expect(
-          mockAssociationKeysWrapperRepository.repository.save
+          mockAssociationKeysWrapperRepository.repository.save,
         ).toHaveBeenNthCalledWith(1, {
           associationKey: 'publicKey',
           isSent: false,
@@ -206,7 +206,7 @@ describe('AssociationKeysService', () => {
         });
 
         expect(
-          mockAssociationKeysWrapperRepository.repository.save
+          mockAssociationKeysWrapperRepository.repository.save,
         ).toHaveBeenNthCalledWith(2, {
           associationKey: 'publicKey',
           isSent: true,
@@ -220,7 +220,7 @@ describe('AssociationKeysService', () => {
         });
 
         expect(
-          mockAssociationKeysWrapperRepository.repository.save
+          mockAssociationKeysWrapperRepository.repository.save,
         ).toHaveBeenNthCalledWith(3, {
           associationKey: 'publicKey',
           isSent: false,
@@ -234,7 +234,7 @@ describe('AssociationKeysService', () => {
         });
 
         expect(
-          mockAssociationKeysWrapperRepository.repository.save
+          mockAssociationKeysWrapperRepository.repository.save,
         ).toHaveBeenNthCalledWith(4, {
           associationKey: 'publicKey',
           isSent: true,
@@ -250,18 +250,18 @@ describe('AssociationKeysService', () => {
 
       it('should try to fetch current/next keys', () => {
         expect(
-          mockAssociationKeysWrapperRepository.repository.get
+          mockAssociationKeysWrapperRepository.repository.get,
         ).toBeCalledTimes(2);
 
         expect(
-          mockAssociationKeysWrapperRepository.repository.get
+          mockAssociationKeysWrapperRepository.repository.get,
         ).toHaveBeenNthCalledWith(1, mockDate);
 
         expect(
-          mockAssociationKeysWrapperRepository.repository.get
+          mockAssociationKeysWrapperRepository.repository.get,
         ).toHaveBeenNthCalledWith(
           2,
-          moment(mockDate).add(48, 'hours').toDate()
+          moment(mockDate).add(48, 'hours').toDate(),
         );
       });
 
@@ -289,11 +289,11 @@ describe('AssociationKeysService', () => {
 
       it('should call repository', () => {
         expect(
-          mockAssociationKeysWrapperRepository.repository.getNext
+          mockAssociationKeysWrapperRepository.repository.getNext,
         ).toBeCalledTimes(1);
 
         expect(
-          mockAssociationKeysWrapperRepository.repository.getNext
+          mockAssociationKeysWrapperRepository.repository.getNext,
         ).toBeCalledWith(date);
       });
     });
@@ -362,19 +362,19 @@ describe('AssociationKeysService', () => {
 
       it('should call get current key', () => {
         expect(
-          mockAssociationKeysWrapperRepository.repository.get
+          mockAssociationKeysWrapperRepository.repository.get,
         ).toBeCalledTimes(1);
         expect(
-          mockAssociationKeysWrapperRepository.repository.get
+          mockAssociationKeysWrapperRepository.repository.get,
         ).toBeCalledWith(expect.any(Date));
       });
 
       it('should call for next key', () => {
         expect(
-          mockAssociationKeysWrapperRepository.repository.getNext
+          mockAssociationKeysWrapperRepository.repository.getNext,
         ).toBeCalledTimes(1);
         expect(
-          mockAssociationKeysWrapperRepository.repository.getNext
+          mockAssociationKeysWrapperRepository.repository.getNext,
         ).toBeCalledWith(mockResult.validTo);
       });
     });
@@ -421,10 +421,10 @@ describe('AssociationKeysService', () => {
 
       it('should call repository to find not shared keys', () => {
         expect(
-          mockAssociationKeysWrapperRepository.repository.find
+          mockAssociationKeysWrapperRepository.repository.find,
         ).toBeCalledTimes(1);
         expect(
-          mockAssociationKeysWrapperRepository.repository.find
+          mockAssociationKeysWrapperRepository.repository.find,
         ).toBeCalledWith({
           where: {
             isShared: false,
@@ -450,7 +450,7 @@ describe('AssociationKeysService', () => {
 
       it('should call repository', () => {
         expect(
-          mockAssociationKeysWrapperRepository.repository.update
+          mockAssociationKeysWrapperRepository.repository.update,
         ).toBeCalledTimes(1);
       });
     });

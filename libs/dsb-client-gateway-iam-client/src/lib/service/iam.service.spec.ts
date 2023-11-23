@@ -203,7 +203,7 @@ describe('IamService', () => {
         try {
           result = await service.getApplicationsByOwnerAndRole(
             'user.roles',
-            'ownerDid'
+            'ownerDid',
           );
         } catch (e) {
           error = e;
@@ -216,7 +216,7 @@ describe('IamService', () => {
           'ownerDid',
           {
             isAccepted: true,
-          }
+          },
         );
       });
 
@@ -253,7 +253,7 @@ describe('IamService', () => {
         try {
           result = await service.getApplicationsByOwnerAndRole(
             'roleName',
-            'ownerDid'
+            'ownerDid',
           );
         } catch (e) {
           error = e;
@@ -266,7 +266,7 @@ describe('IamService', () => {
           'ownerDid',
           {
             isAccepted: true,
-          }
+          },
         );
       });
 

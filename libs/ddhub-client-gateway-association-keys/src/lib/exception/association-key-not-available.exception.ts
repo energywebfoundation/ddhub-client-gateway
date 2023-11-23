@@ -9,7 +9,7 @@ export class AssociationKeyNotAvailableException extends BaseException {
   constructor() {
     super(
       'Association key not available',
-      DsbClientGatewayErrors.BIP39_ASSOCIATION_KEY_NOT_AVAILABLE
+      DsbClientGatewayErrors.BIP39_ASSOCIATION_KEY_NOT_AVAILABLE,
     );
   }
 }

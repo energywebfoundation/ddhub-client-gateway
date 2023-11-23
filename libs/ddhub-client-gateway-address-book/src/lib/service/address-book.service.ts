@@ -8,7 +8,7 @@ import {
 @Injectable()
 export class AddressBookService {
   constructor(
-    protected readonly addressBookWrapper: AddressBookRepositoryWrapper
+    protected readonly addressBookWrapper: AddressBookRepositoryWrapper,
   ) {}
 
   public async save(did: string, name: string): Promise<void> {
@@ -35,7 +35,7 @@ export class AddressBookService {
       },
       {
         name: newName,
-      }
+      },
     );
   }
 }

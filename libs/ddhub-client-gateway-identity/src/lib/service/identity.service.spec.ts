@@ -189,7 +189,7 @@ describe('IdentityService', () => {
       it('should create wallet from pk', () => {
         expect(ethersServiceMock.getWalletFromPrivateKey).toBeCalledTimes(1);
         expect(ethersServiceMock.getWalletFromPrivateKey).toBeCalledWith(
-          'private-key'
+          'private-key',
         );
       });
 
@@ -201,11 +201,11 @@ describe('IdentityService', () => {
 
       it('should create identity in database', () => {
         expect(
-          identityRepositoryWrapperMock.identityRepository.createOne
+          identityRepositoryWrapperMock.identityRepository.createOne,
         ).toBeCalledTimes(1);
 
         expect(
-          identityRepositoryWrapperMock.identityRepository.createOne
+          identityRepositoryWrapperMock.identityRepository.createOne,
         ).toBeCalledWith({
           publicKey: 'some-public-key',
           address: 'some-address',
@@ -217,7 +217,7 @@ describe('IdentityService', () => {
         expect(secretsEngineServiceMock.setPrivateKey).toBeCalledTimes(1);
 
         expect(secretsEngineServiceMock.setPrivateKey).toBeCalledWith(
-          'private-key'
+          'private-key',
         );
       });
 
@@ -236,21 +236,21 @@ describe('IdentityService', () => {
 
         expect(commandBusMock.execute).toHaveBeenNthCalledWith(
           1,
-          new CleanupCommand()
+          new CleanupCommand(),
         );
         expect(commandBusMock.execute).toHaveBeenNthCalledWith(
           2,
-          new ReloginCommand('IDENTITY_CHANGE')
+          new ReloginCommand('IDENTITY_CHANGE'),
         );
 
         expect(commandBusMock.execute).toHaveBeenNthCalledWith(
           3,
-          new RefreshKeysCommand()
+          new RefreshKeysCommand(),
         );
 
         expect(commandBusMock.execute).toHaveBeenNthCalledWith(
           4,
-          new TriggerEventCommand(Events.PRIVATE_KEY_CHANGED)
+          new TriggerEventCommand(Events.PRIVATE_KEY_CHANGED),
         );
       });
     });
@@ -273,7 +273,7 @@ describe('IdentityService', () => {
 
       it('should execute without error', () => {
         expect(
-          identityRepositoryWrapperMock.identityRepository.clear
+          identityRepositoryWrapperMock.identityRepository.clear,
         ).toBeCalledTimes(1);
       });
     });
@@ -308,7 +308,7 @@ describe('IdentityService', () => {
 
       it('should call repository', () => {
         expect(
-          identityRepositoryWrapperMock.identityRepository.findOne
+          identityRepositoryWrapperMock.identityRepository.findOne,
         ).toBeCalledTimes(1);
       });
 
@@ -361,7 +361,7 @@ describe('IdentityService', () => {
 
       it('should call repository', () => {
         expect(
-          identityRepositoryWrapperMock.identityRepository.findOne
+          identityRepositoryWrapperMock.identityRepository.findOne,
         ).toBeCalledTimes(1);
       });
 
@@ -373,7 +373,7 @@ describe('IdentityService', () => {
         expect(ethersServiceMock.getWalletFromPrivateKey).toBeCalledTimes(1);
 
         expect(ethersServiceMock.getWalletFromPrivateKey).toBeCalledWith(
-          'private-key'
+          'private-key',
         );
       });
 
@@ -418,7 +418,7 @@ describe('IdentityService', () => {
 
       it('should call repository', () => {
         expect(
-          identityRepositoryWrapperMock.identityRepository.findOne
+          identityRepositoryWrapperMock.identityRepository.findOne,
         ).toBeCalledTimes(1);
       });
 

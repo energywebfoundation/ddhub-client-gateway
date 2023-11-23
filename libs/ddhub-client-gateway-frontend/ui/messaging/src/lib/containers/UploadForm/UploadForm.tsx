@@ -37,13 +37,18 @@ export const UploadForm: FC<UploadFormProps> = ({
         sx={{ minHeight: '44px' }}
       >
         <Box display="flex" flexDirection="column" alignItems="center">
-          <Typography className={clsx(classes.title, {
-            [classes.titleDisabled]: !acceptedFileType,
-          })} variant="body1">
+          <Typography
+            className={clsx(classes.title, {
+              [classes.titleDisabled]: !acceptedFileType,
+            })}
+            variant="body1"
+          >
             Upload {acceptedFileType ? acceptedFileType.toUpperCase() : 'file'}
           </Typography>
           {acceptedFileType && (
-            <Typography className={classes.label} variant="body2">{fileSizeInfo}</Typography>
+            <Typography className={classes.label} variant="body2">
+              {fileSizeInfo}
+            </Typography>
           )}
         </Box>
       </Box>
@@ -57,9 +62,9 @@ export const UploadForm: FC<UploadFormProps> = ({
           isUploadDisabled={!acceptedFileType}
           wrapperProps={{
             className: clsx(classes.uploadWrapper, {
-            [classes.uploadWrapperDisabled]: !acceptedFileType,
-            [classes.uploadWrapperHover]: acceptedFileType,
-            [classes.uploadedWrapperHover]: acceptedFileType && fileTextValue,
+              [classes.uploadWrapperDisabled]: !acceptedFileType,
+              [classes.uploadWrapperHover]: acceptedFileType,
+              [classes.uploadedWrapperHover]: acceptedFileType && fileTextValue,
             }),
           }}
         />

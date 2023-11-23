@@ -167,7 +167,7 @@ describe('ClientsService', () => {
 
       it('should update client', () => {
         expect(mockClientWrapperRepository.repository.update).toBeCalledTimes(
-          1
+          1,
         );
         expect(mockClientWrapperRepository.repository.update).toBeCalledWith(
           {
@@ -175,7 +175,7 @@ describe('ClientsService', () => {
           },
           {
             clientId: 'clientId',
-          }
+          },
         );
       });
     });
@@ -357,7 +357,7 @@ describe('ClientsService', () => {
 
       it('should call repository', () => {
         expect(mockClientWrapperRepository.repository.delete).toBeCalledTimes(
-          1
+          1,
         );
       });
 

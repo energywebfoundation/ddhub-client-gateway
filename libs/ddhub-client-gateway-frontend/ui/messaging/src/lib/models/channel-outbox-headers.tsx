@@ -31,7 +31,7 @@ export const CHANNEL_OUTBOX_HEADERS = [
     Cell: (props: any) => {
       if (!props?.value) return '';
       const recipients = props?.value.filter(
-        (recipient: any) => !recipient.failed
+        (recipient: any) => !recipient.failed,
       );
       if (!recipients.length) return 'No successful recipients.';
       const aliases = recipients.filter((recipient: any) => !!recipient.alias);

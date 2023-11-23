@@ -8,10 +8,10 @@ import { useTopicVersionHistory } from '@ddhub-client-gateway-frontend/ui/api-ho
 
 export const useChannelTopicVersionDetailsEffects = () => {
   const {
-    topicVersionDetails: {open, data},
+    topicVersionDetails: { open, data },
   } = useModalStore();
   const dispatch = useModalDispatch();
-  const { topicHistory } = useTopicVersionHistory({id: data?.topic?.topicId});
+  const { topicHistory } = useTopicVersionHistory({ id: data?.topic?.topicId });
 
   const closeModal = () => {
     dispatch({
@@ -26,13 +26,13 @@ export const useChannelTopicVersionDetailsEffects = () => {
   const topicVersionDetails = {
     application: data?.application,
     topic: data?.topic,
-    versions: topicHistory
+    versions: topicHistory,
   };
 
   return {
     open,
     closeModal,
     fields,
-    topicVersionDetails
+    topicVersionDetails,
   };
-}
+};

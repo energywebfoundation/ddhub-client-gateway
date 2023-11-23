@@ -38,7 +38,7 @@ export class IdentityService {
     protected readonly iamService: IamService,
     @Inject(forwardRef(() => EnrolmentService))
     protected readonly enrolmentService: EnrolmentService,
-    protected readonly commandBus: CommandBus
+    protected readonly commandBus: CommandBus,
   ) {}
 
   public async removeIdentity(): Promise<void> {
@@ -76,7 +76,7 @@ export class IdentityService {
 
   @Span('getIdentity')
   public async getIdentity(
-    forceRefresh = false
+    forceRefresh = false,
   ): Promise<IdentityEntity | null> {
     if (forceRefresh) {
       const rootKey: string | null =
@@ -89,7 +89,7 @@ export class IdentityService {
       const wallet = this.ethersService.getWalletFromPrivateKey(rootKey);
 
       const balanceState: BalanceState = await this.ethersService.getBalance(
-        wallet.address
+        wallet.address,
       );
 
       return {
@@ -151,7 +151,7 @@ export class IdentityService {
       this.logger.warn(`No balance for ${wallet.address}, not deriving keys`);
 
       await this.commandBus.execute(
-        new TriggerEventCommand(Events.PRIVATE_KEY_CHANGED)
+        new TriggerEventCommand(Events.PRIVATE_KEY_CHANGED),
       );
 
       return;
@@ -160,7 +160,7 @@ export class IdentityService {
     await this.commandBus.execute(new RefreshKeysCommand());
 
     await this.commandBus.execute(
-      new TriggerEventCommand(Events.PRIVATE_KEY_CHANGED)
+      new TriggerEventCommand(Events.PRIVATE_KEY_CHANGED),
     );
   }
 }

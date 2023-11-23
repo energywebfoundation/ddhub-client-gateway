@@ -16,7 +16,7 @@ export class VersionService implements OnModuleInit {
 
   public loadVersion(): void {
     const path: string | undefined = this.configService.get<string | undefined>(
-      'VERSION_FILE_PATH'
+      'VERSION_FILE_PATH',
     );
 
     if (!path) {

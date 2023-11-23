@@ -10,7 +10,7 @@ export const useGatewayConfig = () => {
   const Swal = useCustomAlert();
   const queryClient = useQueryClient();
   const cachedConfig: GatewayResponseDto | undefined = queryClient.getQueryData(
-    getGatewayControllerGetQueryKey()
+    getGatewayControllerGetQueryKey(),
   );
 
   const { data, isLoading } = useGatewayControllerGet({

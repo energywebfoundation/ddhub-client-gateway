@@ -7,7 +7,7 @@ import {
 } from '@ddhub-client-gateway-frontend/ui/messaging';
 
 export const DataMessagingUploadContainer: FC<DataMessagingUploadProps> = (
-  props
+  props,
 ) => {
   return (
     <ModalProvider>

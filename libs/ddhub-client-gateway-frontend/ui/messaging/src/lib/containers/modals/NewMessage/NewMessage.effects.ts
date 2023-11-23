@@ -104,7 +104,7 @@ export const useNewMessageEffects = () => {
         Swal.success({
           text: 'Message successfully sent',
         });
-      }
+      },
     );
   };
 
@@ -190,7 +190,7 @@ export const useNewMessageEffects = () => {
         return (
           topic.topicId === replyData.topicId ||
           responseTopicIds.some(
-            (responseTopicId) => responseTopicId === topic.topicId
+            (responseTopicId) => responseTopicId === topic.topicId,
           )
         );
       }
@@ -222,7 +222,7 @@ export const useNewMessageEffects = () => {
             (channel) => ({
               label: channel.fqcn,
               value: JSON.stringify(channel),
-            })
+            }),
           ),
         },
       }));
@@ -246,7 +246,7 @@ export const useNewMessageEffects = () => {
     }, []);
     const filteredTopics = topics.filter((topic) => {
       return validTopics.some(
-        (validTopic) => validTopic.topicId === topic.topicId
+        (validTopic) => validTopic.topicId === topic.topicId,
       );
     });
     return filteredTopics;
@@ -422,14 +422,14 @@ export const useNewMessageEffects = () => {
                   Object.entries(element)
                     .filter(isDefined)
                     .map(([key]) => key)
-                    .includes(key)
-                )
+                    .includes(key),
+                ),
               )
             : requiredFields.every((key) =>
                 Object.entries(message)
                   .filter(isDefined)
                   .map(([key]) => key)
-                  .includes(key)
+                  .includes(key),
               );
         }
         return validateStep(0) && !!message && formIsValid && isValid;
@@ -455,7 +455,7 @@ export const useNewMessageEffects = () => {
             disabled: !validateStep(index - 1),
           };
         }
-      })
+      }),
     );
   }, [formState]);
 

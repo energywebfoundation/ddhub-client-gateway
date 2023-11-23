@@ -1,4 +1,8 @@
-import {ModalActionsEnum, useModalDispatch, useModalStore} from '../../../context';
+import {
+  ModalActionsEnum,
+  useModalDispatch,
+  useModalStore,
+} from '../../../context';
 
 export const useRolesEffects = () => {
   const {

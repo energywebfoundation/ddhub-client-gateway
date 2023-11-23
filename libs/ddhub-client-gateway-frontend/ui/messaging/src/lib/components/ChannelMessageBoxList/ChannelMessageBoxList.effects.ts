@@ -7,7 +7,7 @@ import { useRouter } from 'next/router';
 import { routerConst } from '@ddhub-client-gateway-frontend/ui/utils';
 
 export const useChannelMessageBoxListEffects = (
-  channelType: ChannelControllerGetCountOfChannelsType
+  channelType: ChannelControllerGetCountOfChannelsType,
 ) => {
   const router = useRouter();
   const inboxUrl = routerConst.MessageInboxChannel;

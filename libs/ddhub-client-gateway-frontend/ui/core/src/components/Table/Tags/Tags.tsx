@@ -27,7 +27,6 @@ export const Tags = ({ value }: TagsProps) => {
             />
           ))}
         </Collapse>
-
       ) : (
         <>
           {value.slice(0, 8).map((tag: string) => (

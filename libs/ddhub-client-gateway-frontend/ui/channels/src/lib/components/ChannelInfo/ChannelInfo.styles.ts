@@ -16,12 +16,12 @@ export const useStyles = makeStyles()((theme) => ({
   },
   primary: {
     '&.MuiTypography-root': {
-      color: theme.palette.primary.main
-    }
+      color: theme.palette.primary.main,
+    },
   },
   cardHeaderWithBorder: {
     borderBottom: `1px solid ${lighten(theme.palette.background.paper, 0.2)}`,
-    paddingBottom: 14
+    paddingBottom: 14,
   },
   cardHeaderText: {
     fontSize: 14,

@@ -18,7 +18,7 @@ export const useDataMessagingDownloadEffects = ({
   };
 
   const filteredChannels = channels.filter(
-    (channel) => channel.type === channelType
+    (channel) => channel.type === channelType,
   );
   return { channels: filteredChannels, isLoading, navigate };
 };

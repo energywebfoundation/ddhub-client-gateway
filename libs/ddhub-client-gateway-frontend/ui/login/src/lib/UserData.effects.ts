@@ -50,14 +50,14 @@ enum VersionStatus {
 const mapRoleRestrictions = (
   restrictions: IndexableRouteRestrictions,
   roleKey: keyof RouteRestriction,
-  role: string | UserRole
+  role: string | UserRole,
 ) => {
   return Object.keys(restrictions)
     .map((key: string) => {
       if (
         restrictions[key][roleKey].some(
           (allowedRole: string) =>
-            allowedRole === role || role.includes(allowedRole)
+            allowedRole === role || role.includes(allowedRole),
         )
       ) {
         return routeRestrictions.get(key);
@@ -70,21 +70,21 @@ export const getRoutesToDisplay = (
   accountRoles: Role[],
   restrictions: IndexableRouteRestrictions,
   config: GatewayConfig,
-  userAuth?: UserAuthContext
+  userAuth?: UserAuthContext,
 ): Set<string> => {
   let adminRoutes = new Set<string>();
   if (config.authEnabled && userAuth) {
     switch (userAuth.role) {
       case UserRole.ADMIN:
         adminRoutes = new Set<string>(
-          mapRoleRestrictions(restrictions, 'allowedAuthRoles', UserRole.ADMIN)
+          mapRoleRestrictions(restrictions, 'allowedAuthRoles', UserRole.ADMIN),
         );
         break;
       case UserRole.MESSAGING: {
         const allowedRoutes = mapRoleRestrictions(
           restrictions,
           'allowedAuthRoles',
-          UserRole.MESSAGING
+          UserRole.MESSAGING,
         );
         return new Set(allowedRoutes);
       }
@@ -97,7 +97,7 @@ export const getRoutesToDisplay = (
     .filter(
       (role) =>
         role.status === RoleStatus.SYNCED &&
-        role.namespace.includes(config?.namespace)
+        role.namespace.includes(config?.namespace),
     )
     .map((role) => role.namespace);
 
@@ -108,7 +108,7 @@ export const getRoutesToDisplay = (
   let allowedRoutes: string[] = [];
   for (const role of roles) {
     allowedRoutes.push(
-      ...mapRoleRestrictions(restrictions, 'allowedRoles', role)
+      ...mapRoleRestrictions(restrictions, 'allowedRoles', role),
     );
   }
   if (adminRoutes.size) {
@@ -123,7 +123,7 @@ export const useUserDataEffects = () => {
   const addressBookContext = useContext(AddressBookContext);
   if (!addressBookContext) {
     throw new Error(
-      '[useUserDataEffects] AddressBookContext provider not available'
+      '[useUserDataEffects] AddressBookContext provider not available',
     );
   }
 
@@ -142,7 +142,7 @@ export const useUserDataEffects = () => {
   } = userContext;
   const queryClient = useQueryClient();
   const [routeRestrictionList, setRouteRestrictionList] = useState(
-    {} as RouteRestrictions
+    {} as RouteRestrictions,
   );
   const [identity, setIdentity] = useState({} as IdentityWithEnrolment);
   const [version, setVersion] = useState<string>(VersionStatus.UNAVAILABLE);
@@ -166,7 +166,7 @@ export const useUserDataEffects = () => {
           identity.enrolment.roles,
           routeRestrictionList as unknown as IndexableRouteRestrictions,
           config,
-          config.authEnabled ? userAuth : undefined
+          config.authEnabled ? userAuth : undefined,
         );
 
         setUserData((prevValue) => ({
@@ -184,7 +184,7 @@ export const useUserDataEffects = () => {
 
   const setData = (
     res: IdentityWithEnrolment,
-    routeRestrictions: RouteRestrictions = userData.routeRestrictions
+    routeRestrictions: RouteRestrictions = userData.routeRestrictions,
   ) => {
     const redirect = async (status: AccountStatusEnum | RoleStatus) => {
       if (status !== RoleStatus.SYNCED) {

@@ -26,7 +26,7 @@ export interface TablePaginationActionsProps {
   count: number;
   onPageChange: (
     event: React.MouseEvent<HTMLButtonElement> | null,
-    newPage: number
+    newPage: number,
   ) => void;
   page: number;
   rowsPerPage: number;
@@ -37,25 +37,25 @@ export const TablePaginationActions = (props: TablePaginationActionsProps) => {
   const { count, page, rowsPerPage, onPageChange } = props;
 
   const handleFirstPageButtonClick = (
-    event: React.MouseEvent<HTMLButtonElement> | null
+    event: React.MouseEvent<HTMLButtonElement> | null,
   ) => {
     onPageChange(event, 0);
   };
 
   const handleBackButtonClick = (
-    event: React.MouseEvent<HTMLButtonElement> | null
+    event: React.MouseEvent<HTMLButtonElement> | null,
   ) => {
     onPageChange(event, page - 1);
   };
 
   const handleNextButtonClick = (
-    event: React.MouseEvent<HTMLButtonElement> | null
+    event: React.MouseEvent<HTMLButtonElement> | null,
   ) => {
     onPageChange(event, page + 1);
   };
 
   const handleLastPageButtonClick = (
-    event: React.MouseEvent<HTMLButtonElement> | null
+    event: React.MouseEvent<HTMLButtonElement> | null,
   ) => {
     onPageChange(event, Math.max(0, Math.ceil(count / rowsPerPage) - 1));
   };
@@ -72,9 +72,13 @@ export const TablePaginationActions = (props: TablePaginationActionsProps) => {
         aria-label="first page"
       >
         {theme.direction === 'rtl' ? (
-          <LastPage className={isFirstPage ? classes.disabled : classes.active}/>
+          <LastPage
+            className={isFirstPage ? classes.disabled : classes.active}
+          />
         ) : (
-          <FirstPage className={isFirstPage ? classes.disabled : classes.active}/>
+          <FirstPage
+            className={isFirstPage ? classes.disabled : classes.active}
+          />
         )}
       </IconButton>
       <IconButton
@@ -83,9 +87,13 @@ export const TablePaginationActions = (props: TablePaginationActionsProps) => {
         aria-label="previous page"
       >
         {theme.direction === 'rtl' ? (
-          <KeyboardArrowRight className={isFirstPage ? classes.disabled : classes.active}/>
+          <KeyboardArrowRight
+            className={isFirstPage ? classes.disabled : classes.active}
+          />
         ) : (
-          <KeyboardArrowLeft className={isFirstPage ? classes.disabled : classes.active}/>
+          <KeyboardArrowLeft
+            className={isFirstPage ? classes.disabled : classes.active}
+          />
         )}
       </IconButton>
       <IconButton
@@ -94,9 +102,13 @@ export const TablePaginationActions = (props: TablePaginationActionsProps) => {
         aria-label="next page"
       >
         {theme.direction === 'rtl' ? (
-          <KeyboardArrowLeft className={isLastPage ? classes.disabled : classes.active}/>
+          <KeyboardArrowLeft
+            className={isLastPage ? classes.disabled : classes.active}
+          />
         ) : (
-          <KeyboardArrowRight className={isLastPage ? classes.disabled : classes.active}/>
+          <KeyboardArrowRight
+            className={isLastPage ? classes.disabled : classes.active}
+          />
         )}
       </IconButton>
       <IconButton
@@ -105,9 +117,13 @@ export const TablePaginationActions = (props: TablePaginationActionsProps) => {
         aria-label="last page"
       >
         {theme.direction === 'rtl' ? (
-          <FirstPage className={isLastPage ? classes.disabled : classes.active}/>
+          <FirstPage
+            className={isLastPage ? classes.disabled : classes.active}
+          />
         ) : (
-          <LastPage className={isLastPage ? classes.disabled : classes.active}/>
+          <LastPage
+            className={isLastPage ? classes.disabled : classes.active}
+          />
         )}
       </IconButton>
     </div>

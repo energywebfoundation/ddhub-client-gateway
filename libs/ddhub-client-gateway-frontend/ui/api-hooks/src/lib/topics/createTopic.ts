@@ -15,7 +15,7 @@ export const useCreateTopic = () => {
 
   const createTopicHandler = (
     values: PostTopicBodyDto,
-    onSuccess: () => void
+    onSuccess: () => void,
   ) => {
     mutate(
       {
@@ -24,7 +24,7 @@ export const useCreateTopic = () => {
       {
         onSuccess,
         onError: createError,
-      }
+      },
     );
   };
 

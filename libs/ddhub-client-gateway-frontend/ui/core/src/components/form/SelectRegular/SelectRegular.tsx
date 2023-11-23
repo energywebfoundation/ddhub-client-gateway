@@ -38,7 +38,7 @@ export const SelectRegular: FC<SelectRegularProps> = ({
     <Box {...field.formInputsWrapperProps} flexShrink={0}>
       <InputLabel className={classes.label}>{field.label ?? ''}</InputLabel>
       <TextField
-        autoComplete='off'
+        autoComplete="off"
         select
         fullWidth
         name={`${field.name}`}
@@ -58,9 +58,8 @@ export const SelectRegular: FC<SelectRegularProps> = ({
         }}
         SelectProps={{
           renderValue: (value) => {
-            const label = options.find(
-              (option) => option.value === value
-            )?.label;
+            const label = options.find((option) => option.value === value)
+              ?.label;
             return value ? (
               label
             ) : (

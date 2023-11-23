@@ -77,7 +77,7 @@ export const Editor: FC<EditorProps> = memo(
         </Box>
       </Box>
     );
-  }
+  },
 );
 
 Editor.displayName = 'Editor';

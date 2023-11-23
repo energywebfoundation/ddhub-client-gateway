@@ -9,7 +9,7 @@ export class IamNotInitializedException extends BaseException {
   constructor() {
     super(
       'Invalid private key or IAM not initialized',
-      DsbClientGatewayErrors.IAM_NOT_INITIALIZED
+      DsbClientGatewayErrors.IAM_NOT_INITIALIZED,
     );
   }
 }

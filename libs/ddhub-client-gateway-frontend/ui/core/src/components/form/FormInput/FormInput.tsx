@@ -61,5 +61,5 @@ export const FormInput: FC<FormInputProps> = memo(
         />
       </Box>
     );
-  }
+  },
 );

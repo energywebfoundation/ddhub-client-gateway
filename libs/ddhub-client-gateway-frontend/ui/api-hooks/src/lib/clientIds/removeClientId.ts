@@ -1,7 +1,7 @@
 import { useQueryClient } from 'react-query';
 import {
   useClientControllerDelete,
-  getClientControllerGetAllQueryKey
+  getClientControllerGetAllQueryKey,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { useCustomAlert } from '@ddhub-client-gateway-frontend/ui/core';
 
@@ -38,7 +38,7 @@ export const useRemoveClientId = () => {
       {
         onSuccess: removeClientIdSuccess,
         onError: removeClientIdError,
-      }
+      },
     );
   };
 

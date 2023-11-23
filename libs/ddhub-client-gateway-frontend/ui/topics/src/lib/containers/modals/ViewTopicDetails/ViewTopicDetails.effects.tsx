@@ -28,7 +28,7 @@ export const useViewTopicDetailsEffects = () => {
 
   const { topic: topicWithSchema, isLoading } = useTopicVersion(
     topic?.id,
-    topic?.version
+    topic?.version,
   );
 
   const closeModal = () => {
@@ -61,7 +61,7 @@ export const useViewTopicDetailsEffects = () => {
   const exportSchema = () => {
     downloadJson(
       topicWithSchema.schema,
-      `Schema_${topicWithSchema.name}_${topicWithSchema.version}.json`
+      `Schema_${topicWithSchema.name}_${topicWithSchema.version}.json`,
     );
   };
 

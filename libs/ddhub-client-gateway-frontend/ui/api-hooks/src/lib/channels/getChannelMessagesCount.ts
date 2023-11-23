@@ -6,7 +6,7 @@ import {
 import { useCustomAlert } from '@ddhub-client-gateway-frontend/ui/core';
 
 export const useChannelMessagesCount = (
-  params?: ChannelControllerGetCountOfChannelsParams
+  params?: ChannelControllerGetCountOfChannelsParams,
 ) => {
   const Swal = useCustomAlert();
 

@@ -39,7 +39,7 @@ export interface AddressBookContext {
 }
 
 export const AddressBookContext = createContext<AddressBookContext | undefined>(
-  undefined
+  undefined,
 );
 
 export const useAddressBookContext = (queryClient: QueryClient) => {
@@ -48,7 +48,7 @@ export const useAddressBookContext = (queryClient: QueryClient) => {
 
   const addressBookData = useMemo(
     () => ({ addressBook, setAddressBook }),
-    [addressBook]
+    [addressBook],
   );
 
   const refreshAddressBook = async () => {
@@ -67,7 +67,7 @@ export const useAddressBookContext = (queryClient: QueryClient) => {
   const getAddressBookList = async () => {
     return await queryClient.fetchQuery<GetAllContactsResponseDto[]>(
       getAddressBookControllerGetAllContactsQueryKey(),
-      addressBookControllerGetAllContacts
+      addressBookControllerGetAllContacts,
     );
   };
 
@@ -77,7 +77,7 @@ export const useAddressBookContext = (queryClient: QueryClient) => {
 
   const getAlias = (
     did: string,
-    returnUndefined?: boolean
+    returnUndefined?: boolean,
   ): string | undefined => {
     let retVal = returnUndefined ? undefined : did;
 

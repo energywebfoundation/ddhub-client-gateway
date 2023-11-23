@@ -4,7 +4,7 @@ import {
   PaginatedResponse,
   useTopicsControllerGetTopics,
   TopicsControllerGetTopicsParams,
-  TopicsControllerGetTopicsBySearchParams
+  TopicsControllerGetTopicsBySearchParams,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { useState } from 'react';
 import { useCustomAlert } from '@ddhub-client-gateway-frontend/ui/core';
@@ -20,12 +20,13 @@ export const useTopics = ({
   const [params, setParams] = useState({ page, limit });
   const [searchParams, setSearchParams] = useState({ page, limit, keyword });
 
-  const { topicsBySearch, topicsBySearchLoaded, topicsSearchLoading } = useTopicsSearch({
-    limit: searchParams.limit,
-    page: searchParams.page,
-    keyword: searchParams.keyword,
-    owner,
-  });
+  const { topicsBySearch, topicsBySearchLoaded, topicsSearchLoading } =
+    useTopicsSearch({
+      limit: searchParams.limit,
+      page: searchParams.page,
+      keyword: searchParams.keyword,
+      owner,
+    });
 
   const { data, isLoading, isSuccess, isError } = useTopicsControllerGetTopics(
     { page: params.page, limit: params.limit, owner },
@@ -37,7 +38,7 @@ export const useTopics = ({
           Swal.httpError(err);
         },
       },
-    }
+    },
   );
 
   let paginated = {} as PaginatedResponse;
@@ -54,7 +55,7 @@ export const useTopics = ({
       paginated = {} as PaginatedResponse;
       topics = [] as GetTopicDto[];
     }
-  }
+  };
 
   if (keyword) {
     setReturnValues(topicsBySearch);
@@ -67,7 +68,7 @@ export const useTopics = ({
   const getTopicsBySearch = async ({
     page = 1,
     limit = 10,
-    keyword = ''
+    keyword = '',
   }: TopicsControllerGetTopicsBySearchParams) => {
     setKeyword(keyword);
     setSearchParams({ page, limit, keyword });

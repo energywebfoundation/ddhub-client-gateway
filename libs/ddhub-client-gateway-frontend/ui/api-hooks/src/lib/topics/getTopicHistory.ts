@@ -33,7 +33,7 @@ export const useTopicVersionHistory = ({
             Swal.httpError(err);
           },
         },
-      }
+      },
     );
   const paginated = data ?? ({} as PaginatedResponse);
   const topicHistory: GetTopicSearchDto[] = paginated?.records ?? [];

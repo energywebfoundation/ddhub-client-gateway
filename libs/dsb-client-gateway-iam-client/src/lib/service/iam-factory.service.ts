@@ -21,7 +21,7 @@ export class IamFactoryService {
   @Span('iam_initialize')
   public async initialize(
     privateKey: string,
-    configService: ConfigService
+    configService: ConfigService,
   ): Promise<{
     cacheClient: CacheClient;
     didRegistry: DidRegistry;
@@ -31,11 +31,11 @@ export class IamFactoryService {
     const chainId = configService.get<number>('CHAIN_ID', 73799);
     const rpcUrl = configService.get<string>(
       'RPC_URL',
-      'https://volta-rpc.energyweb.org/'
+      'https://volta-rpc.energyweb.org/',
     );
     const cacheServerUrl = configService.get<string>(
       'CACHE_SERVER_URL',
-      'https://identitycache-dev.energyweb.org/v1'
+      'https://identitycache-dev.energyweb.org/v1',
     );
 
     const { connectToCacheServer, signerService } =
@@ -46,7 +46,7 @@ export class IamFactoryService {
     setChainConfig(chainId, {
       claimManagerAddress: configService.get<string>(
         'CLAIM_MANAGER_ADDRESS',
-        '0x5339adE9332A604A1c957B9bC1C6eee0Bcf7a031'
+        '0x5339adE9332A604A1c957B9bC1C6eee0Bcf7a031',
       ),
     });
 
@@ -61,7 +61,7 @@ export class IamFactoryService {
         await connectToCacheServer();
 
       this.logger.log(
-        'connected to iam cache server, connecting to did registry'
+        'connected to iam cache server, connecting to did registry',
       );
 
       const projectId = configService.get('INFURA_PROJECT_ID');

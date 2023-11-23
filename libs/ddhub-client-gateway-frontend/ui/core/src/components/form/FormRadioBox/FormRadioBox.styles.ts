@@ -1,5 +1,5 @@
 import { makeStyles } from 'tss-react/mui';
-import {alpha} from "@mui/material";
+import { alpha } from '@mui/material';
 
 export const useStyles = makeStyles()((theme) => ({
   label: {

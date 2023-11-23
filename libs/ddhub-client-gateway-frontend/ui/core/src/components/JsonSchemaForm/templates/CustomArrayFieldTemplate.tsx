@@ -74,7 +74,11 @@ export const CustomArrayFieldTemplate = (props: ArrayFieldTemplateProps) => {
     if (!isObjectArray) {
       if (props.items !== items) {
         setItems(
-          props.items.map((item, i) => ({ ...item, classes, value: values[i] }))
+          props.items.map((item, i) => ({
+            ...item,
+            classes,
+            value: values[i],
+          })),
         );
       }
     }
@@ -239,8 +243,8 @@ export const CustomArrayFieldTemplate = (props: ArrayFieldTemplateProps) => {
             {props.items.length === 0
               ? 'At least one message must be added before continuing.'
               : allFormsAreValid()
-              ? 'All messages are valid.'
-              : 'All messages must be valid to continue.'}
+                ? 'All messages are valid.'
+                : 'All messages must be valid to continue.'}
           </Typography>
           {props.items.length > 0 && renderObjectArray(props.items)}
           <Divider sx={{ margin: '8px 0' }} />

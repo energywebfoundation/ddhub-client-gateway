@@ -5,5 +5,11 @@ import { useMessagesContainerEffects } from './Messages.effects';
 
 export const Messages: FC = () => {
   const { actions, openDetailsModal } = useMessagesContainerEffects();
-  return <MessagesComponent actions={actions} headers={MESSAGES_HEADERS} openDetailsModal={openDetailsModal}/>;
+  return (
+    <MessagesComponent
+      actions={actions}
+      headers={MESSAGES_HEADERS}
+      openDetailsModal={openDetailsModal}
+    />
+  );
 };

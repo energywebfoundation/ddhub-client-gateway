@@ -31,7 +31,7 @@ export class EventsService implements OnApplicationBootstrap {
     protected readonly eventsWrapper: EventsWrapperRepository,
     protected readonly commandBus: CommandBus,
     protected readonly configService: ConfigService,
-    protected readonly schedulerRegistry: SchedulerRegistry
+    protected readonly schedulerRegistry: SchedulerRegistry,
   ) {}
 
   public async onApplicationBootstrap(): Promise<void> {
@@ -103,7 +103,7 @@ export class EventsService implements OnApplicationBootstrap {
     switch (eventType) {
       case Events.PRIVATE_KEY_CHANGED:
         await this.commandBus.execute(
-          new SecretChangeCommand(SecretType.PRIVATE_KEY)
+          new SecretChangeCommand(SecretType.PRIVATE_KEY),
         );
         await this.commandBus.execute(new InitIamCommand());
         await this.commandBus.execute(new ReloginCommand('PRIVATE_KEY'));
@@ -116,7 +116,7 @@ export class EventsService implements OnApplicationBootstrap {
       case Events.CERTIFICATE_CHANGED:
         await this.commandBus.execute(new CertificateChangedCommand());
         await this.commandBus.execute(
-          new SecretChangeCommand(SecretType.CERTIFICATE)
+          new SecretChangeCommand(SecretType.CERTIFICATE),
         );
         return;
       default:

@@ -16,13 +16,13 @@ export class DdhubDidService extends DdhubBaseService {
     protected readonly retryConfigService: RetryConfigService,
     protected readonly didAuthService: DidAuthService,
     protected readonly tlsAgentService: TlsAgentService,
-    protected readonly ddhubLoginService: DdhubLoginService
+    protected readonly ddhubLoginService: DdhubLoginService,
   ) {
     super(
       new Logger(DdhubDidService.name),
       retryConfigService,
       ddhubLoginService,
-      tlsAgentService
+      tlsAgentService,
     );
   }
 
@@ -30,7 +30,7 @@ export class DdhubDidService extends DdhubBaseService {
   public async getDIDsFromRoles(
     roles: string[] | undefined,
     searchType: 'ANY',
-    overrideRetry?: OperationOptions
+    overrideRetry?: OperationOptions,
   ): Promise<string[]> {
     if (!roles || roles.length === 0) {
       return [];
@@ -52,7 +52,7 @@ export class DdhubDidService extends DdhubBaseService {
           },
         }),
       {},
-      overrideRetry
+      overrideRetry,
     );
 
     return data.dids;

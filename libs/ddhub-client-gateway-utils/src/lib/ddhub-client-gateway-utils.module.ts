@@ -14,8 +14,8 @@ import { DirectoryCreatedService } from './services/directory-created.service';
         const provider = new providers.JsonRpcProvider(
           configService.get<string>(
             'RPC_URL',
-            'https://volta-rpc.energyweb.org/'
-          )
+            'https://volta-rpc.energyweb.org/',
+          ),
         );
 
         return new EthersService(provider);
