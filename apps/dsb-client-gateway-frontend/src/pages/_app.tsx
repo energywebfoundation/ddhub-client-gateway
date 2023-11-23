@@ -43,8 +43,8 @@ export interface MyAppProps extends AppProps {
 }
 
 function InitializeAccountStatus(props) {
-  useCheckAccountStatus(false);
   useUserAuthHeaders();
+  useCheckAccountStatus(false);
   return <>{props.children}</>;
 }
 
