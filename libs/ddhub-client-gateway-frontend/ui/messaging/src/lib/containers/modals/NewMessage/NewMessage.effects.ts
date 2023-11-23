@@ -182,15 +182,11 @@ export const useNewMessageEffects = () => {
   }, [open]);
 
   const filterReplyChannels = (channels: GetChannelResponseDto[]) => {
-    console.log('channels', channels);
-
     const responseTopicId =
       replyData.replyChannel.conditions.responseTopics.find(
         (topic) => topic.responseTopicId === replyData.topicId
       )?.topicId;
     if (!responseTopicId) {
-      // all channels are valid
-      console.log('no response topic id found');
       return channels;
     }
     const validChannels = channels.filter((channel) => {
@@ -202,37 +198,6 @@ export const useNewMessageEffects = () => {
       }
       return false;
     });
-    console.log('valid channels', validChannels);
-
-    // const responseTopicIds: string[] = [];
-    // const validTopicTester = (topic: ChannelTopic | ChannelResponseTopic) => {
-    //   console.log('testing topic', topic);
-    //   console.log('found these response topics', responseTopicIds);
-    //   if ('responseTopicId' in topic) {
-    //     return topic.responseTopicId === replyData.topicId;
-    //   } else {
-    //     return (
-    //       topic.topicId === replyData.topicId ||
-    //       responseTopicIds.some(
-    //         (responseTopicId) => responseTopicId === topic.topicId
-    //       )
-    //     );
-    //   }
-    // };
-
-    // const validChannels = channels.reduce((acc, channel) => {
-    //   const validResponseTopics =
-    //     channel.conditions.responseTopics.filter(validTopicTester);
-    //   if (validResponseTopics.length) {
-    //     responseTopicIds.push(...validResponseTopics.map((t) => t.topicId));
-    //   }
-    //   const validTopics = channel.conditions.topics.filter(validTopicTester);
-    //   if (validTopics.length) {
-    //     return [...acc, channel];
-    //   }
-    //   return acc;
-    // }, []);
-
     return validChannels;
   };
 
@@ -259,14 +224,11 @@ export const useNewMessageEffects = () => {
         (topic) => topic.responseTopicId === replyData.topicId
       )?.topicId;
     if (!responseTopicId) {
-      console.log('no response topic id found');
-      // all topics are valid
       return topics;
     }
     const validTopics = topics.filter(
       (topic) => topic.topicId === responseTopicId
     );
-    console.log('valid topics', validTopics);
     return validTopics;
   };
 
