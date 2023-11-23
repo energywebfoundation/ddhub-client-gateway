@@ -1,6 +1,7 @@
 import { ModalActionsEnum } from './reducer';
 import {
   GetAllContactsResponseDto,
+  GetChannelResponseDto,
   GetReceivedMessageResponseDto,
   GetSentMessageResponseDto,
   SendMessageResponseDto,
@@ -46,7 +47,7 @@ type TPostDetails = {
 
 type TNewMessage = {
   open: boolean;
-  data?: ReplyMessageData;
+  data?: ReplyMessageData & { replyChannel: GetChannelResponseDto };
 };
 
 type TViewMessage = {

@@ -17,7 +17,6 @@ import { FieldValues, useForm, useWatch } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { validationSchema } from '../models/validationSchema';
 import {
-  ChannelResponseTopic,
   ChannelTopic,
   GetChannelResponseDto,
   GetReceivedMessageResponseDto,
@@ -182,33 +181,22 @@ export const useNewMessageEffects = () => {
   }, [open]);
 
   const filterReplyChannels = (channels: GetChannelResponseDto[]) => {
-    const responseTopicIds: string[] = [];
-    const validTopicTester = (topic: ChannelTopic | ChannelResponseTopic) => {
-      if ('responseTopicId' in topic) {
-        return topic.responseTopicId === replyData.topicId;
-      } else {
-        return (
-          topic.topicId === replyData.topicId ||
-          responseTopicIds.some(
-            (responseTopicId) => responseTopicId === topic.topicId
-          )
-        );
-      }
-    };
-
-    const validChannels = channels.reduce((acc, channel) => {
-      const validResponseTopics =
-        channel.conditions.responseTopics.filter(validTopicTester);
-      if (validResponseTopics.length) {
-        responseTopicIds.push(...validResponseTopics.map((t) => t.topicId));
-      }
-      const validTopics = channel.conditions.topics.filter(validTopicTester);
+    const responseTopicId =
+      replyData.replyChannel.conditions.responseTopics.find(
+        (topic) => topic.responseTopicId === replyData.topicId
+      )?.topicId;
+    if (!responseTopicId) {
+      return channels;
+    }
+    const validChannels = channels.filter((channel) => {
+      const validTopics = channel.conditions.topics.filter(
+        (topic) => topic.topicId === responseTopicId
+      );
       if (validTopics.length) {
-        return [...acc, channel];
+        return true;
       }
-      return acc;
-    }, []);
-
+      return false;
+    });
     return validChannels;
   };
 
@@ -230,26 +218,17 @@ export const useNewMessageEffects = () => {
   }, [channelsLoaded, isReply]);
 
   const filterReplyTopics = (topics: ChannelTopic[]) => {
-    const validTopicTester = (topic: ChannelTopic | ChannelResponseTopic) => {
-      if ('responseTopicId' in topic) {
-        return topic.responseTopicId === replyData.topicId;
-      } else {
-        return topic.topicId === replyData.topicId;
-      }
-    };
-
-    const validTopics = channels.reduce((acc, channel) => {
-      const responseTopics =
-        channel.conditions.responseTopics.filter(validTopicTester);
-      const topics = channel.conditions.topics.filter(validTopicTester);
-      return [...acc, ...responseTopics, ...topics];
-    }, []);
-    const filteredTopics = topics.filter((topic) => {
-      return validTopics.some(
-        (validTopic) => validTopic.topicId === topic.topicId
-      );
-    });
-    return filteredTopics;
+    const responseTopicId =
+      replyData.replyChannel.conditions.responseTopics.find(
+        (topic) => topic.responseTopicId === replyData.topicId
+      )?.topicId;
+    if (!responseTopicId) {
+      return topics;
+    }
+    const validTopics = topics.filter(
+      (topic) => topic.topicId === responseTopicId
+    );
+    return validTopics;
   };
 
   useEffect(() => {
@@ -355,7 +334,11 @@ export const useNewMessageEffects = () => {
     });
   };
 
-  const openReplyModal = (replyMessage: GetReceivedMessageResponseDto) => {
+  const openReplyModal = (
+    replyMessage: GetReceivedMessageResponseDto & {
+      replyChannel: GetChannelResponseDto;
+    }
+  ) => {
     dispatch({
       type: ModalActionsEnum.SHOW_NEW_MESSAGE,
       payload: {

@@ -81,7 +81,10 @@ export const useMessageInboxEffects = (isRelatedMessages?: boolean) => {
       type: ModalActionsEnum.SHOW_NEW_MESSAGE,
       payload: {
         open: true,
-        data,
+        data: {
+          ...data,
+          replyChannel: channel,
+        },
       },
     });
   };
