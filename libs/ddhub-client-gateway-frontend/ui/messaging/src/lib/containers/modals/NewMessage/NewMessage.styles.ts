@@ -106,4 +106,7 @@ export const useStyles = makeStyles()((theme) => ({
     marginTop: 18.4,
     borderBottom: `1px solid ${lighten(theme.palette.background.paper, 0.07)}`,
   },
+  form: {
+    paddingBottom: 16,
+  },
 }));

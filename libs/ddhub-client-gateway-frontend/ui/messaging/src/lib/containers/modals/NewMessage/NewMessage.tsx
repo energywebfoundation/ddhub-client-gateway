@@ -15,12 +15,12 @@ import {
   FormInput,
   FormSelect,
   JSONSchemaForm,
+  JSONSchemaFormValidator,
   Steps,
 } from '@ddhub-client-gateway-frontend/ui/core';
 import { useNewMessageEffects } from './NewMessage.effects';
 import { useStyles } from './NewMessage.styles';
 import { ActionButtons } from './ActionButtons';
-import validator from '@rjsf/validator-ajv8';
 import { Controller } from 'react-hook-form';
 import { CopyToClipboard } from '@ddhub-client-gateway-frontend/ui/core';
 
@@ -49,6 +49,7 @@ export const NewMessage: FC = () => {
   } = useNewMessageEffects();
 
   const [formData, setFormData] = useState([]);
+  const [errors, setErrors] = useState({});
 
   const buildStepActionButtons = () => {
     switch (activeStep) {
@@ -244,17 +245,18 @@ export const NewMessage: FC = () => {
                           ? JSON.parse(newMessageValues.uiSchema)
                           : {}
                       }
-                      validator={validator}
-                      liveValidate={true}
-                      formData={formData}
-                      formContext={formContext}
-                      showErrorList={false}
-                      onChange={(data, id) => {
+                      validator={JSONSchemaFormValidator}
+                      errors={errors}
+                      updateErrors={setErrors}
+                      changeHandler={(data: any, id: any) => {
                         if (id !== undefined) {
                           onChange(data.formData);
                           setFormData(data.formData);
                         }
                       }}
+                      formData={formData}
+                      formContext={formContext}
+                      className={classes.form}
                     />
                   )}
                 />
