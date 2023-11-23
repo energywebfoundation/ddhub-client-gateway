@@ -17,7 +17,6 @@ import { FieldValues, useForm, useWatch } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { validationSchema } from '../models/validationSchema';
 import {
-  ChannelResponseTopic,
   ChannelTopic,
   GetChannelResponseDto,
   GetReceivedMessageResponseDto,
@@ -335,7 +334,11 @@ export const useNewMessageEffects = () => {
     });
   };
 
-  const openReplyModal = (replyMessage: GetReceivedMessageResponseDto) => {
+  const openReplyModal = (
+    replyMessage: GetReceivedMessageResponseDto & {
+      replyChannel: GetChannelResponseDto;
+    }
+  ) => {
     dispatch({
       type: ModalActionsEnum.SHOW_NEW_MESSAGE,
       payload: {
