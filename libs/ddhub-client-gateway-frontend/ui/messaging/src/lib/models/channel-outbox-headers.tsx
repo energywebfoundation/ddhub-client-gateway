@@ -33,7 +33,7 @@ export const CHANNEL_OUTBOX_HEADERS = [
       const recipients = props?.value.filter(
         (recipient: any) => !recipient.failed
       );
-      if (!recipients.length) return 'No successful recipient.';
+      if (!recipients.length) return 'No successful recipients.';
       const aliases = recipients.filter((recipient: any) => !!recipient.alias);
       const hasAliases = aliases.length > 0;
 
@@ -76,24 +76,9 @@ export const CHANNEL_OUTBOX_HEADERS = [
             </Box>
           </Box>
         );
-        //   return props?.value.map((recipient: any, index: number) => {
-        //     let cellText = recipient.did;
-
-        //     if (index !== props.value.length - 1) {
-        //       cellText += ', ';
-        //     }
-
-        //     return cellText;
-        //   });
       }
     },
   },
-  // #----- Removed as this will confuse users with the correct message id -----#
-  // {
-  //   Header: 'MESSAGE ID',
-  //   accessor: 'clientGatewayMessageId',
-  //   isSortable: true,
-  // },
   {
     Header: 'TRANSACTION ID',
     accessor: 'transactionId',

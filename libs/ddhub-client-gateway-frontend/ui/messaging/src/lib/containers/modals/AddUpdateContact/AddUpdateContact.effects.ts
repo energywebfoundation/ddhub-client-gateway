@@ -18,6 +18,11 @@ const didRegex = new RegExp(/^did:[a-z0-9]+:([a-z0-9]+:)?(0x[0-9a-fA-F]{40})$/);
 
 export const useAddUpdateContactEffects = () => {
   const addressBookContext = useContext(AddressBookContext);
+  if (!addressBookContext) {
+    throw new Error(
+      '[useAddUpdateContactEffects] AddressBookContext provider not available'
+    );
+  }
   const queryClient = useQueryClient();
 
   const [aliasInput, setAliasInput] = useState('');

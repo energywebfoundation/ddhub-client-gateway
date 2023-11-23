@@ -13,6 +13,11 @@ export const useCachedMessages = (
 ) => {
   const queryClient = useQueryClient();
   const addressBookContext = useContext(AddressBookContext);
+  if (!addressBookContext) {
+    throw new Error(
+      '[useCachedMessages] AddressBookContext provider not available'
+    );
+  }
   const data: GetMessagesResponseDto[] | undefined = queryClient.getQueryData(
     getMessageControllerGetMessageQueryKey(params)
   );

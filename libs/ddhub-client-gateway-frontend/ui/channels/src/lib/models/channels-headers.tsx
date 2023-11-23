@@ -24,7 +24,7 @@ export const CHANNELS_HEADERS: TableHeader[] = [
     Header: 'RESTRICTIONS DID',
     accessor: 'conditions.didsAlias',
     Cell: ({ value }: Omit<RestrictionsProps, 'type'>) => (
-      <Restrictions value={value?.map((item) => item)} type="DID" />
+      <Restrictions value={value} type="DID" />
     ),
   },
   {

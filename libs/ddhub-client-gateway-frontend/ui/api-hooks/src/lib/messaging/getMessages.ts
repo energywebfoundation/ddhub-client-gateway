@@ -15,6 +15,9 @@ export const useMessages = (
 ) => {
   const Swal = useCustomAlert();
   const addressBookContext = useContext(AddressBookContext);
+  if (!addressBookContext) {
+    throw new Error('[useMessages] AddressBookContext provider not available');
+  }
   let enabled;
 
   if (isMessageBox) {

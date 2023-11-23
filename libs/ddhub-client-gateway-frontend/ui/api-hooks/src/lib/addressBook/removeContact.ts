@@ -9,6 +9,11 @@ import { useContext } from 'react';
 
 export const useRemoveContact = () => {
   const addressBookContext = useContext(AddressBookContext);
+  if (!addressBookContext) {
+    throw new Error(
+      '[useRemoveContact] AddressBookContext provider not available'
+    );
+  }
   const queryClient = useQueryClient();
   const Swal = useCustomAlert();
 

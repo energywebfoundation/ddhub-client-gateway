@@ -167,6 +167,7 @@ export const MessageInboxDetails: FC = () => {
                         }}
                       />
                     )}
+                    {/* Minify Client GW Message ID as it is quite long */}
                     <MessageDetail
                       field={{
                         label: 'Message ID',

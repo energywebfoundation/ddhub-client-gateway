@@ -7,10 +7,14 @@ import { TActionButtonsProps } from '../ActionButtons/ActionButtons';
 import { useRestrictionsEffects } from './Restrictions.effects';
 import { useStyles } from './Restrictions.styles';
 import { RestrictionSelect } from './RestrictionSelect/RestrictionSelect';
-import { TextField } from '@ddhub-client-gateway-frontend/ui/core';
+import { TextField, FormSelect } from '@ddhub-client-gateway-frontend/ui/core';
 import { RestrictionList } from './RestrictionList/RestrictionList';
-import { ConnectionType } from "../Details/models/connection-type.enum";
+import { ConnectionType } from '../Details/models/connection-type.enum';
 import { includes } from 'lodash';
+import {
+  DIDSource,
+  RestrictionFieldNames,
+} from './effects/didRestriction.effects';
 
 export interface RestrictionsProps {
   restrictions: ChannelConditionsDto;
@@ -24,6 +28,8 @@ export const Restrictions = ({
   connectionType,
 }: RestrictionsProps) => {
   const {
+    register,
+    control,
     type,
     setType,
     dids,
@@ -46,16 +52,21 @@ export const Restrictions = ({
     setRoleInput,
     setDIDInput,
     recent,
+    fields,
+    didRestrictionValues,
+    setDIDRestrictionValue,
+    setIsUpdate,
+    setDidToUpdate,
   } = useRestrictionsEffects(restrictions);
   const { classes } = useStyles();
 
   const selectRoleRestriction = type === RestrictionType.Role && (
     <TextField
-      autoComplete='off'
+      autoComplete="off"
       fullWidth
       variant={'outlined'}
       value={roleInput}
-      placeholder='user.roles.namespace.ewc'
+      placeholder="user.roles.namespace.ewc"
       onChange={(event) => {
         rolesInputChangeHandler(event.target.value);
       }}
@@ -65,18 +76,45 @@ export const Restrictions = ({
   );
 
   const setDIDRestriction = type === RestrictionType.DID && (
-    <TextField
-      autoComplete='off'
-      fullWidth
-      variant={'outlined'}
-      value={didInput}
-      placeholder='did:ethr:volta:0x09Df...46993'
-      onChange={(event) => {
-        didInputChangeHandler(event.target.value);
-      }}
-      error={!isDIDValid}
-      helperText={!isDIDValid ? 'DID format is invalid' : ''}
-    />
+    <Grid container spacing={2} direction="column">
+      <Grid item>
+        <FormSelect
+          field={fields['didSource']}
+          register={register}
+          control={control}
+          variant="outlined"
+        />
+      </Grid>
+      {didRestrictionValues(RestrictionFieldNames.DID_SOURCE) ===
+        DIDSource.ADDRESS_BOOK && (
+        <Grid item>
+          <FormSelect
+            field={fields['addressBook']}
+            register={register}
+            control={control}
+            variant="outlined"
+          />
+        </Grid>
+      )}
+      {didRestrictionValues(RestrictionFieldNames.DID_SOURCE) ===
+        DIDSource.MANUAL_INPUT && (
+        <Grid item>
+          <InputLabel className={classes.label}>{'DID'}</InputLabel>
+          <TextField
+            autoComplete="off"
+            fullWidth
+            variant={'outlined'}
+            value={didInput}
+            placeholder="did:ethr:volta:0x09Df...46993"
+            onChange={(event) => {
+              didInputChangeHandler(event.target.value);
+            }}
+            error={!isDIDValid}
+            helperText={!isDIDValid ? 'DID format is invalid' : ''}
+          />
+        </Grid>
+      )}
+    </Grid>
   );
 
   const restrictionsTypes = Object.values(RestrictionType);
@@ -85,8 +123,8 @@ export const Restrictions = ({
       <RestrictionList
         key={value}
         type={value}
-        list={ value === RestrictionType.Role ? roles : dids}
-        remove={ value === RestrictionType.Role ? removeRole : removeDID }
+        list={value === RestrictionType.Role ? roles : dids}
+        remove={value === RestrictionType.Role ? removeRole : removeDID}
         canRemove={true}
         canCopy={false}
         setType={setType}
@@ -99,7 +137,12 @@ export const Restrictions = ({
         setRoleInput={setRoleInput}
         setDIDInput={setDIDInput}
         recent={recent}
-        handleUpdateRestriction={handleUpdateRestriction}>
+        handleUpdateRestriction={handleUpdateRestriction}
+        didRestrictionValues={didRestrictionValues}
+        setDIDRestrictionValue={setDIDRestrictionValue}
+        setIsUpdate={setIsUpdate}
+        setDidToUpdate={setDidToUpdate}
+      >
         <>
           {selectRoleRestriction}
           {setDIDRestriction}
@@ -117,10 +160,17 @@ export const Restrictions = ({
       sx={{ height: '100%', flexWrap: 'nowrap' }}
     >
       <Grid item>
-        <Grid container spacing={2} sx={{ paddingRight: '27px' }} direction="column">
+        <Grid
+          container
+          spacing={2}
+          sx={{ paddingRight: '27px' }}
+          direction="column"
+        >
           <Grid item sx={{ marginBottom: '22px' }} flexGrow="1">
             <InputLabel id="restriction-type" className={classes.label}>
-              { includes([ConnectionType.Subscribe, 'sub'], connectionType) ? 'Senders' : 'Recipients' }
+              {includes([ConnectionType.Subscribe, 'sub'], connectionType)
+                ? 'Senders'
+                : 'Recipients'}
             </InputLabel>
             <Select
               labelId="restriction-type"
@@ -136,8 +186,10 @@ export const Restrictions = ({
               sx={{ width: '100px' }}
               displayEmpty={true}
               renderValue={() => (
-                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                  <Typography className={classes.selectValue} variant="body2">{open ? type : 'Add Restriction'}</Typography>
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                  <Typography className={classes.selectValue} variant="body2">
+                    {open ? type : 'Add Restriction'}
+                  </Typography>
                 </Box>
               )}
             >
@@ -149,7 +201,9 @@ export const Restrictions = ({
                 roleInput={roleInput}
                 isRoleValid={isRoleValid}
                 didInput={didInput}
-                isDIDValid={isDIDValid}>
+                didRestrictionValues={didRestrictionValues}
+                isDIDValid={isDIDValid}
+              >
                 <>
                   {selectRoleRestriction}
                   {setDIDRestriction}
@@ -166,11 +220,14 @@ export const Restrictions = ({
           {/*  <Filter size={10}/> Filter*/}
           {/*</Typography>*/}
         </Box>
-        <Box className={classes.restrictionBox}>
-          {selectRestriction}
-        </Box>
+        <Box className={classes.restrictionBox}>{selectRestriction}</Box>
       </Grid>
-      <Grid item alignSelf="flex-end" width="100%" sx={{ padding: '22px 7px 27px 0px' }}>
+      <Grid
+        item
+        alignSelf="flex-end"
+        width="100%"
+        sx={{ padding: '22px 7px 27px 0px' }}
+      >
         <ActionButtons
           {...actionButtonsProps}
           nextClickButtonProps={{

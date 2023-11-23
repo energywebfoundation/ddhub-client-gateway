@@ -11,13 +11,14 @@ import { TActionButtonsProps } from '../ActionButtons/ActionButtons';
 import { useSummaryEffects } from './Summary.effects';
 import { useStyles } from './Summary.styles';
 import { Check, X } from 'react-feather';
-import React from 'react';
+import React, { useContext } from 'react';
 import { RestrictionListView } from '../Restrictions/RestrictionListView/RestrictionListView';
 import { clone } from 'lodash';
 import { ConnectionType } from '../Details/models/connection-type.enum';
 import { ChannelType } from '../../../../models';
 import { Topic } from '../Topics/Topics.effects';
 import { SelectedTopicView } from '../Topics/SelectedTopicView/SelectedTopicView';
+import { AddressBookContext } from '@ddhub-client-gateway-frontend/ui/login';
 
 export interface SummaryProps {
   channelValues: ICreateChannel;
@@ -28,6 +29,10 @@ export const Summary = ({
   channelValues,
   actionButtonsProps,
 }: SummaryProps) => {
+  const addressBookContext = useContext(AddressBookContext);
+  if (!addressBookContext) {
+    throw new Error('[Summary] AddressBookContext provider not available');
+  }
   const { classes } = useStyles();
   const { countRestrictions, getSelectedResponseTopics } = useSummaryEffects(
     channelValues.conditions?.responseTopics || []
@@ -66,6 +71,7 @@ export const Summary = ({
                 className: classes.restrictionBox,
               }}
               key={index}
+              didAlias={addressBookContext.getAlias(el, true)}
               item={el}
               type={RestrictionType.DID}
               index={index}
