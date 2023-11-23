@@ -2,21 +2,11 @@ import { FC } from 'react';
 import {
   DialogContent,
   DialogActions,
-  Typography,
   Box,
   Grid,
   DialogTitle,
 } from '@mui/material';
-import {
-  CloseButton,
-  Dialog,
-  DialogSubTitle,
-  EditorView,
-  FormSelect,
-  JSONSchemaForm,
-  Steps,
-  Tabs,
-} from '@ddhub-client-gateway-frontend/ui/core';
+import { Dialog, DialogSubTitle } from '@ddhub-client-gateway-frontend/ui/core';
 import { useStyles } from './ViewMessage.styles';
 import { useViewMessageEffects } from './ViewMessage.effects';
 
