@@ -82,6 +82,7 @@ export const MessageInboxDetails: FC = () => {
     if (inboxDetails && !inboxDetails.isSender) {
       ackMessage([inboxDetails.messageId]);
     }
+    setExpanded(0);
   }, [inboxDetails]);
 
   const handleAccordionChange =
