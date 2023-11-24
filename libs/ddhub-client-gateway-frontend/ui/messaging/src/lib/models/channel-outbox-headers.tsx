@@ -1,7 +1,5 @@
 import { Box, Chip, Typography } from '@mui/material';
-import {
-  RelatedMessage,
-} from '../containers/MessageOutbox';
+import { RelatedMessage } from '../containers/MessageOutbox';
 import { DateTime } from 'luxon';
 import { didFormatMinifier } from '@ddhub-client-gateway-frontend/ui/utils';
 

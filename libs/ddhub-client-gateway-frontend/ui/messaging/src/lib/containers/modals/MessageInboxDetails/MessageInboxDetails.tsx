@@ -29,6 +29,7 @@ import MuiAccordionSummary, {
 import MuiAccordionDetails from '@mui/material/AccordionDetails';
 import { ChevronRight } from 'react-feather';
 import { didFormatMinifier } from '@ddhub-client-gateway-frontend/ui/utils';
+import clsx from 'clsx';
 
 const Accordion = styled((props: AccordionProps) => (
   <MuiAccordion disableGutters elevation={0} square {...props} />
@@ -230,8 +231,15 @@ export const MessageInboxDetails: FC = () => {
               closeModal();
               openReplyModal();
             }}
+            variant="contained"
+            className={clsx(classes.button, {
+              [classes.center]: false,
+            })}
+            classes={{ endIcon: classes.buttonIcon }}
           >
-            Reply
+            <Typography className={classes.buttonText} variant="body2">
+              Reply
+            </Typography>
           </Button>
         )}
       </DialogActions>
