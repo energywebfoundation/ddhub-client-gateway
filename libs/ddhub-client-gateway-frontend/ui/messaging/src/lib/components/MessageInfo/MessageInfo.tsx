@@ -55,31 +55,40 @@ export const MessageInfo: FC<MessageInfoProps> = ({
               <Typography className={classes.title} variant="h4">
                 To
               </Typography>
-              <Box display="flex" alignItems="center">
-                <Typography
-                  className={`${classes.subTitle} ${classes.monospace}`}
-                >
-                  {messageInfo.recipients?.map(
-                    (recipient: any, index: number) =>
-                      `${didFormatMinifier(recipient.did)}\n`
-                  )}
-                </Typography>
+              <Box>
+                {messageInfo.recipients?.map(
+                  (recipient: any, index: number) => {
+                    const hasAlias =
+                      !!recipient.alias &&
+                      !recipient.alias.startsWith('did:ethr');
+                    return (
+                      <Typography
+                        key={`recipient-${index}`}
+                        className={`${classes.subTitle} ${classes.monospace}`}
+                      >
+                        {hasAlias
+                          ? recipient.alias
+                          : didFormatMinifier(recipient.did)}
+                      </Typography>
+                    );
+                  }
+                )}
               </Box>
             </Box>
             <Box className={classes.row}>
               <Typography className={classes.title} variant="h4">
-                Related Message ID
+                Message ID
               </Typography>
               <Typography className={classes.subTitle} noWrap>
-                {messageInfo.initiatingMessageId}
+                {didFormatMinifier(messageInfo.clientGatewayMessageId)}
               </Typography>
             </Box>
             <Box className={classes.row}>
               <Typography className={classes.title} variant="h4">
-                Related Transaction ID
+                Transaction ID
               </Typography>
               <Typography className={classes.subTitle} noWrap>
-                {messageInfo.initiatingTransactionId}
+                {messageInfo.transactionId}
               </Typography>
             </Box>
           </>

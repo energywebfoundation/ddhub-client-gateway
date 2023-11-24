@@ -7,9 +7,8 @@ import { useRouter } from 'next/router';
 import moment from 'moment';
 import getConfig from 'next/config';
 import { TTableComponentAction } from '@ddhub-client-gateway-frontend/ui/core';
-import { GetReceivedMessageResponseDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
+import { GetReceivedMessageResponseDto, MessageControllerGetReceivedMessagesParams } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { ModalActionsEnum, useModalDispatch } from '../../context';
-import { split } from 'lodash';
 
 export const useMessageInboxEffects = (isRelatedMessages?: boolean) => {
   const router = useRouter();
@@ -21,31 +20,21 @@ export const useMessageInboxEffects = (isRelatedMessages?: boolean) => {
   const currentDate = moment().seconds(0).milliseconds(0);
   const fromDate = currentDate.subtract(Number(messagingOffset), 'minutes');
 
-  const params = {
+  let params: MessageControllerGetReceivedMessagesParams = {
     fqcn: router.query[Queries.FQCN] as string,
     clientId: 'cgui',
     from: fromDate.toISOString(),
     amount: Number(messagingAmount),
-    initiatingMessageId: '',
-    initiatingTransactionId: '',
   };
 
   if (isRelatedMessages) {
-    const messageIdParam = router.query[Queries.MessageId] as string;
-    const urlParams = split(messageIdParam, '&transactionId=', 2);
-
-    if (urlParams[0]) {
-      params.initiatingMessageId = urlParams[0];
-    }
-
-    if (urlParams[1]) {
-      params.initiatingTransactionId = urlParams[1];
-    } else {
-      delete params.initiatingTransactionId;
-    }
-  } else {
-    delete params.initiatingMessageId;
-    delete params.initiatingTransactionId;
+    const messageIdsParam = router.query['messageIds'] as string;
+    const transactionIdParam = router.query['transactionId'] as string;
+    params = {
+      ...params,
+      messageIds: messageIdsParam,
+      transactionId: transactionIdParam,
+    };
   }
 
   const { channel } = useChannel(router.query[Queries.FQCN] as string);

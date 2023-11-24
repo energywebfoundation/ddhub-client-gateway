@@ -23,7 +23,7 @@ export const useSentMessages = (
 
   let enabled;
   if (isRelatedMessage) {
-    enabled = !!params?.fqcn && !!params?.messageId;
+    enabled = !!params?.fqcn && !!params?.clientGatewayMessageId;
   } else {
     enabled = !!params?.fqcn;
   }
@@ -55,6 +55,7 @@ export const useSentMessages = (
       });
       return {
         ...message,
+        recipients,
         id: message.clientGatewayMessageId,
         senderAlias: addressBookContext?.getAlias(message.senderDid),
         relatedMessageItems: {
