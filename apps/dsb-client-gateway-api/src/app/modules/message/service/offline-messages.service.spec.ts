@@ -352,10 +352,6 @@ describe(`${OfflineMessagesService.name}`, () => {
       it('should return isRead true', () => {
         expect(result[0].isRead).toStrictEqual(true);
       });
-
-      it('should have related messages', () => {
-        expect(result[0].relatedMessagesCount).toStrictEqual(1);
-      });
     });
   });
 
@@ -402,7 +398,13 @@ describe(`${OfflineMessagesService.name}`, () => {
                 updatedDate: new Date(),
               },
             ]),
-            getCount: jest.fn().mockResolvedValue(0),
+          }));
+
+        receivedMessageRepositoryWrapper.repository.createQueryBuilder = jest
+          .fn()
+          .mockImplementation(() => ({
+            ...queryBuilder,
+            getCount: jest.fn().mockResolvedValue(1),
           }));
 
         addressBookRepositoryWrapper.repository.find.mockResolvedValueOnce([
@@ -437,6 +439,7 @@ describe(`${OfflineMessagesService.name}`, () => {
             transactionId: 'transactionId',
             messageId: 'messageId',
             page: 1,
+            clientGatewayMessageId: '',
           });
         } catch (e) {
           error = e;
@@ -458,6 +461,10 @@ describe(`${OfflineMessagesService.name}`, () => {
 
       it('should apply an alias to the recipient', () => {
         expect(result[0].recipients[0]?.alias).toStrictEqual('name');
+      });
+
+      it('should have related messages', () => {
+        expect(result[0].relatedMessagesCount).toStrictEqual(1);
       });
     });
   });
