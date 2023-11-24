@@ -6,6 +6,7 @@ import {
   Box,
   Grid,
   DialogTitle,
+  Button,
 } from '@mui/material';
 import {
   CloseButton,
@@ -23,6 +24,7 @@ import { useStyles } from './NewMessage.styles';
 import { ActionButtons } from './ActionButtons';
 import { Controller } from 'react-hook-form';
 import { CopyToClipboard } from '@ddhub-client-gateway-frontend/ui/core';
+import { generateUuid } from '@ddhub-client-gateway-frontend/ui/utils';
 
 export const NewMessage: FC = () => {
   const { classes } = useStyles();
@@ -46,6 +48,7 @@ export const NewMessage: FC = () => {
     isRefetching,
     isReply,
     replyData,
+    setTransactionId,
   } = useNewMessageEffects();
 
   const [formData, setFormData] = useState([]);
@@ -228,7 +231,22 @@ export const NewMessage: FC = () => {
               <Box>
                 {renderReplyDetails()}
                 <FormInput
-                  field={fields['transactionId']}
+                  field={{
+                    ...fields['transactionId'],
+                    endAdornment: {
+                      element: (
+                        <Button
+                          sx={{ mr: 1 }}
+                          onClick={() => {
+                            const uuid = generateUuid();
+                            setTransactionId(uuid.replace(/-/g, ''));
+                          }}
+                        >
+                          Generate
+                        </Button>
+                      ),
+                    },
+                  }}
                   register={register}
                   control={control}
                   variant="outlined"
@@ -273,6 +291,9 @@ export const NewMessage: FC = () => {
                   <Grid item>
                     {(renderReplyDetails(true) as any)?.labels}
                     <Typography className={classes.detailsInfoLabel}>
+                      Transaction ID:
+                    </Typography>
+                    <Typography className={classes.detailsInfoLabel}>
                       Channel:
                     </Typography>
                     <Typography className={classes.detailsInfoLabel}>
@@ -284,6 +305,9 @@ export const NewMessage: FC = () => {
                   </Grid>
                   <Grid item>
                     {(renderReplyDetails(true) as any)?.values}
+                    <Typography className={classes.detailsInfoValue}>
+                      {newMessageValues.transactionId}
+                    </Typography>
                     <Typography className={classes.detailsInfoValue}>
                       {newMessageValues.fqcn}
                     </Typography>

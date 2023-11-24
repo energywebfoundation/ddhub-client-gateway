@@ -126,6 +126,7 @@ export const useNewMessageEffects = () => {
     register,
     control,
     formState: { isValid },
+    setValue,
     reset,
     resetField,
   } = formContext;
@@ -504,5 +505,6 @@ export const useNewMessageEffects = () => {
     getActionButtonsProps,
     isReply,
     replyData,
+    setTransactionId: (value: string) => setValue('Transaction ID', value),
   };
 };

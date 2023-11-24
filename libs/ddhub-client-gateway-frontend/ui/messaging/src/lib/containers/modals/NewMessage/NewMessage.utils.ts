@@ -36,6 +36,7 @@ export const fields: { [name: string]: GenericFormField } = {
     label: 'Transaction ID',
     required: false,
     inputProps: {
+      defaultValue: '',
       placeholder: 'Enter a transaction ID',
     },
   },
