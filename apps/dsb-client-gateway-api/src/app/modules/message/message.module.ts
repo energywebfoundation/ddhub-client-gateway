@@ -40,6 +40,7 @@ import { MessageStoreService } from './service/message-store.service';
 import { MessagesCleanupService } from './service/messages-cleanup.service';
 import { OfflineMessagesService } from './service/offline-messages.service';
 import { DdhubClientGatewayUserRolesModule } from '@dsb-client-gateway/ddhub-client-gateway-user-roles';
+import { IamModule } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
 
 @Module({
   imports: [
@@ -81,6 +82,7 @@ import { DdhubClientGatewayUserRolesModule } from '@dsb-client-gateway/ddhub-cli
     DdhubClientGatewayUtilsModule,
     MessagesRepositoryModule,
     AddressBookRepositoryModule,
+    IamModule,
   ],
   providers: [
     EventsGateway,

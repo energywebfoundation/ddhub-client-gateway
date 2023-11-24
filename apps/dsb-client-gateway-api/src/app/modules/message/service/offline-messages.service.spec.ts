@@ -12,6 +12,7 @@ import { GetReceivedMessageResponseDto } from '../dto/response/get-received-mess
 import { SelectQueryBuilder } from 'typeorm';
 import { ModuleMocker } from 'jest-mock';
 import { GetSentMessageResponseDto } from '../dto/response/get-sent-message-response.dto';
+import { IamService } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
 
 const mockKeysService = {
   generateRandomKey: jest.fn(),
@@ -21,6 +22,11 @@ const mockKeysService = {
   verifySignature: jest.fn(),
   createSignature: jest.fn(),
   prefetchSignatureKeys: jest.fn(),
+};
+
+const mockIamService = {
+  isInitialized: jest.fn(),
+  getDIDAddress: jest.fn(),
 };
 
 function createMockInstance(cl: any) {
@@ -136,6 +142,10 @@ describe(`${OfflineMessagesService.name}`, () => {
         {
           provide: KeysService,
           useValue: mockKeysService,
+        },
+        {
+          provide: IamService,
+          useValue: mockIamService,
         },
       ],
     }).compile();
@@ -480,6 +490,39 @@ describe(`${OfflineMessagesService.name}`, () => {
 
         try {
           result = await service.ackMessages('recipientUser', ['messageId2']);
+        } catch (e) {
+          error = e;
+        }
+      });
+
+      it('should execute function successfully', () => {
+        expect(error).toBeNull();
+        expect(result).not.toBeDefined();
+        expect(
+          receivedMessageReadStatusRepositoryWrapper.repository.save
+        ).toBeCalledTimes(1);
+      });
+    });
+
+    describe('should ack messages with did if no username provided', () => {
+      beforeEach(async () => {
+        receivedMessageReadStatusRepositoryWrapper.repository.findByIds.mockResolvedValueOnce(
+          [
+            {
+              messageId: 'messageId',
+              recipientUser: 'recipientUser',
+            },
+          ]
+        );
+
+        receivedMessageReadStatusRepositoryWrapper.repository.save.mockImplementationOnce(
+          () => null
+        );
+
+        mockIamService.getDIDAddress.mockReturnValueOnce('did');
+
+        try {
+          result = await service.ackMessages(null, ['messageId2']);
         } catch (e) {
           error = e;
         }

@@ -17,6 +17,7 @@ import { GetSentMessagesRequestDto } from '../dto/request/get-sent-messages-requ
 import { GetSentMessageResponseDto } from '../dto/response/get-sent-message-response.dto';
 import { GetReceivedMessageResponseDto } from '../dto/response/get-received-message-response.dto';
 import { SchemaType } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
+import { IamService } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
 
 @Injectable()
 export class OfflineMessagesService {
@@ -28,7 +29,8 @@ export class OfflineMessagesService {
     protected readonly sentMessagesRecipientsWrapper: SentMessageRecipientRepositoryWrapper,
     protected readonly receivedMessageReadStatusRepositoryWrapper: ReceivedMessageReadStatusRepositoryWrapper,
     protected readonly addressBookRepositoryWrapper: AddressBookRepositoryWrapper,
-    protected readonly keysService: KeysService
+    protected readonly keysService: KeysService,
+    protected readonly iamService: IamService
   ) {}
 
   public async getOfflineUploadedFile(
@@ -314,13 +316,14 @@ export class OfflineMessagesService {
   }
 
   public async ackMessages(
-    username: string,
+    username: string | null,
     messagesIds: string[]
   ): Promise<void> {
+    const recipientUser = username ?? this.iamService.getDIDAddress();
     const messageReadEntities = messagesIds.map((messageId: string) => {
       const entity = new ReceivedMessageReadStatusEntity();
       entity.messageId = messageId;
-      entity.recipientUser = username;
+      entity.recipientUser = recipientUser;
       return entity;
     });
     const alreadyAckedMessages =
