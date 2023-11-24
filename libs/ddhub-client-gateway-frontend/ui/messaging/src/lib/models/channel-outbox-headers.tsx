@@ -1,7 +1,6 @@
 import { Box, Chip, Typography } from '@mui/material';
 import {
   RelatedMessage,
-  RelatedMessageProps,
 } from '../containers/MessageOutbox';
 import { DateTime } from 'luxon';
 import { didFormatMinifier } from '@ddhub-client-gateway-frontend/ui/utils';
@@ -96,11 +95,20 @@ export const CHANNEL_OUTBOX_HEADERS = (openRecipientListModal: any) => {
       color: 'primary',
       accessor: 'relatedMessageItems',
       isSortable: true,
-      Cell: ({ value }: RelatedMessageProps) => {
-        if (!value.messageId) {
-          return value.relatedMessagesCount;
+      Cell: (props: any) => {
+        if (props.row.original.relatedMessagesCount === 0) {
+          return 0;
         }
-        return <RelatedMessage value={value} />;
+        return (
+          <RelatedMessage
+            value={{
+              relatedMessagesCount: props.row.original.relatedMessagesCount,
+              transactionId: props.row.original.transactionId,
+              messageIds: props.row.original.messagesIds,
+              clientGatewayMessageId: props.row.original.clientGatewayMessageId,
+            }}
+          />
+        );
       },
     },
   ];

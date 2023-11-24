@@ -69,6 +69,16 @@ export class GetSentMessagesRequestDto {
   @IsString()
   messageId: string;
 
+  @ApiProperty({
+    type: String,
+    required: false,
+    example: '45d5a89f-7c2c-48b0-ae9a-54f4128e818f',
+    description: 'Client Gateway Message id',
+  })
+  @IsOptional()
+  @IsString()
+  clientGatewayMessageId: string;
+
   @IsString()
   @ApiProperty({
     type: String,

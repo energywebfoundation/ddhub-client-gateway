@@ -12,7 +12,6 @@ export const MESSAGE_RECIPIENT_LIST_HEADERS = [
     Header: 'STATUS',
     accessor: 'failed',
     Cell: (value: any) => {
-      console.log('failed', value?.failed);
       return value?.failed ? 'FAILED' : 'SENT';
     },
   },

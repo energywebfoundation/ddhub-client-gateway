@@ -16,6 +16,16 @@ export const CHANNEL_OUTBOX_RELATED_HEADERS = [
     isSortable: true,
   },
   {
+    Header: 'MESSAGE ID',
+    accessor: 'id',
+    isSortable: true,
+  },
+  {
+    Header: 'TRANSACTION ID',
+    accessor: 'transactionId',
+    isSortable: true,
+  },
+  {
     Header: 'FROM',
     accessor: 'sender',
     isSortable: true,
