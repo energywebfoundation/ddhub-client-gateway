@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import {
   DialogContent,
   DialogActions,
@@ -53,6 +53,14 @@ export const NewMessage: FC = () => {
 
   const [formData, setFormData] = useState([]);
   const [errors, setErrors] = useState({});
+
+  useEffect(() => {
+    if (!open) {
+      // Reset data
+      setFormData([]);
+      setErrors({});
+    }
+  }, [open]);
 
   const buildStepActionButtons = () => {
     switch (activeStep) {
