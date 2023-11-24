@@ -11,8 +11,9 @@ import Link from 'next/link';
 
 export interface RelatedMessageProps {
   value: {
-    messageId: boolean;
-    transactionId: boolean;
+    messageIds: string[];
+    transactionId: string;
+    clientGatewayMessageId: string;
     relatedMessagesCount: number;
   };
 }
@@ -26,10 +27,10 @@ export function RelatedMessage({ value }: RelatedMessageProps) {
         pathname: routerConst.MessageOutboxRelated,
         query: {
           [Queries.FQCN]: router.query[Queries.FQCN],
-          [Queries.MessageId]: value.transactionId
-            ? `${value.messageId}&transactionId=${value.transactionId}`
-            : value.messageId,
-        },
+          [Queries.ClientGatewayMessageId]: value.clientGatewayMessageId,
+          messageIds: value.messageIds.join(','),
+          transactionId: value.transactionId,
+        }
       }}
       passHref
     >
