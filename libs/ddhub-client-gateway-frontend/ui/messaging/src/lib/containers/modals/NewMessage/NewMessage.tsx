@@ -35,6 +35,7 @@ export const NewMessage: FC = () => {
     control,
     selectedChannel,
     selectedTopic,
+    selectedVersion,
     formContext,
     fields,
     activeStep,
@@ -55,12 +56,12 @@ export const NewMessage: FC = () => {
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
-    if (!open) {
-      // Reset data
+    // Reset data when modal is closed or the selected channel/topic/version changes
+    if (!open || selectedChannel || selectedTopic || selectedVersion) {
       setFormData([]);
       setErrors({});
     }
-  }, [open]);
+  }, [open, selectedChannel, selectedTopic, selectedVersion]);
 
   const buildStepActionButtons = () => {
     switch (activeStep) {

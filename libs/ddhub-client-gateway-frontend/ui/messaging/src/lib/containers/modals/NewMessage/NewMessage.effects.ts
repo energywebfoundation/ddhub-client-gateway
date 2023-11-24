@@ -235,6 +235,7 @@ export const useNewMessageEffects = () => {
   useEffect(() => {
     if (selectedChannel) {
       resetFormSelectOptions('topic');
+      resetFormSelectOptions('version');
 
       const channel: GetChannelResponseDto = JSON.parse(selectedChannel);
       setNewMessageValues({
