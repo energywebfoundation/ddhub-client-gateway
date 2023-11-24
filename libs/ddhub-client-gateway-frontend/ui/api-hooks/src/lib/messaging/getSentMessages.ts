@@ -50,7 +50,7 @@ export const useSentMessages = (
       const recipients = message.recipients.map((recipient) => {
         return {
           ...recipient,
-          alias: addressBookContext?.getAlias(recipient.did),
+          alias: addressBookContext?.getAlias(recipient.did, true),
         };
       });
       return {
