@@ -122,7 +122,8 @@ export const useStyles = makeStyles()((theme) => ({
     },
   },
   selected: {
-    border: `1px solid ${theme.palette.common.white}`,
+    border: `1px solid ${theme.palette.primary.main}`,
+    backgroundColor: alpha(theme.palette.primary.main, 0.1),
     '& .MuiTypography-root': {
       color: theme.palette.common.white,
     },

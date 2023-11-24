@@ -177,6 +177,7 @@ export const useSelectedTopicEffects = ({
     handleOpenEdit,
     isResponse,
     handleClickTopicCheckbox,
+    selected,
     selectedIndex,
     setPanelId,
   };
