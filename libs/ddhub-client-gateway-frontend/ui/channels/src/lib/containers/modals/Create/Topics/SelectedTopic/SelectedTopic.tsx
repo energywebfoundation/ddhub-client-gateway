@@ -70,6 +70,7 @@ export const SelectedTopic = ({
     handleOpenEdit,
     isResponse,
     handleClickTopicCheckbox,
+    selected,
     selectedIndex,
     setPanelId,
   } = useSelectedTopicEffects({
@@ -198,7 +199,7 @@ export const SelectedTopic = ({
                 )}
                 {filteredTopics?.map((option, index) => {
                   const isItemSelected = isResponse
-                    ? selectedIndex(option.topicName) > -1
+                    ? selectedIndex(option.topicName) !== -1
                     : false;
                   const labelId = `response-checkbox-${index}`;
 
@@ -209,7 +210,12 @@ export const SelectedTopic = ({
                           updatedTopic.topicName === option.topicName,
                       })}
                       key={option.id}
-                      onClick={() => handleClickTopic(option)}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        if (!isResponse) {
+                          handleClickTopic(option)
+                        }
+                       }}
                     >
                       {isResponse && (
                         <Checkbox
@@ -252,7 +258,7 @@ export const SelectedTopic = ({
                   className={classes.saveButton}
                   type="submit"
                   onClick={handleSubmitForm}
-                  disabled={!updatedTopic.topicName}
+                  disabled={isResponse ? selected.length === 0 : !updatedTopic.topicName}
                 >
                   <Typography
                     className={classes.buttonTextSave}

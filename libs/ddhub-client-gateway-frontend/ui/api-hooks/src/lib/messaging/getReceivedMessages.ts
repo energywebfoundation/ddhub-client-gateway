@@ -16,7 +16,7 @@ export const useReceivedMessages = (
   const enabled =
     queryClient.getDefaultOptions().queries?.enabled === false
       ? false
-      : !!params?.fqcn;
+      : !!params?.fqcn && !!params?.messageIds;
   const { data, isLoading, isSuccess, isError, refetch } =
     useMessageControllerGetReceivedMessages(params, {
       query: {

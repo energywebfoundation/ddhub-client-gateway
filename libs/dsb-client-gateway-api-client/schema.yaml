@@ -386,6 +386,13 @@ paths:
           description: "Message id"
           schema:
             type: "string"
+        - name: "clientGatewayMessageId"
+          required: false
+          in: "query"
+          example: "45d5a89f-7c2c-48b0-ae9a-54f4128e818f"
+          description: "Client Gateway Message id"
+          schema:
+            type: "string"
         - name: "topicName"
           required: false
           in: "query"
@@ -499,6 +506,13 @@ paths:
           description: "Message id"
           schema:
             type: "string"
+        - name: "messageIds"
+          required: false
+          in: "query"
+          example: "507f191e810c19729de860ea,507f191e810c19729de9821a"
+          description: "Message id array as comma separated string"
+          schema:
+            type: "string"
       responses:
         200:
           description: "Message received successfully"
@@ -603,6 +617,13 @@ paths:
           in: "query"
           example: "507f191e810c19729de860ea"
           description: "Message id"
+          schema:
+            type: "string"
+        - name: "messageIds"
+          required: false
+          in: "query"
+          example: "507f191e810c19729de860ea,507f191e810c19729de9821a"
+          description: "Message id array as comma separated string"
           schema:
             type: "string"
       responses:

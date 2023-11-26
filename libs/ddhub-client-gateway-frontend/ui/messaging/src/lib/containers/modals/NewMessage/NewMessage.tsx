@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import {
   DialogContent,
   DialogActions,
@@ -6,6 +6,7 @@ import {
   Box,
   Grid,
   DialogTitle,
+  Button,
 } from '@mui/material';
 import {
   CloseButton,
@@ -23,6 +24,7 @@ import { useStyles } from './NewMessage.styles';
 import { ActionButtons } from './ActionButtons';
 import { Controller } from 'react-hook-form';
 import { CopyToClipboard } from '@ddhub-client-gateway-frontend/ui/core';
+import { generateUuid } from '@ddhub-client-gateway-frontend/ui/utils';
 
 export const NewMessage: FC = () => {
   const { classes } = useStyles();
@@ -33,6 +35,7 @@ export const NewMessage: FC = () => {
     control,
     selectedChannel,
     selectedTopic,
+    selectedVersion,
     formContext,
     fields,
     activeStep,
@@ -46,10 +49,19 @@ export const NewMessage: FC = () => {
     isRefetching,
     isReply,
     replyData,
+    setTransactionId,
   } = useNewMessageEffects();
 
   const [formData, setFormData] = useState([]);
   const [errors, setErrors] = useState({});
+
+  useEffect(() => {
+    // Reset data when modal is closed or the selected channel/topic/version changes
+    if (!open || selectedChannel || selectedTopic || selectedVersion) {
+      setFormData([]);
+      setErrors({});
+    }
+  }, [open, selectedChannel, selectedTopic, selectedVersion]);
 
   const buildStepActionButtons = () => {
     switch (activeStep) {
@@ -228,7 +240,22 @@ export const NewMessage: FC = () => {
               <Box>
                 {renderReplyDetails()}
                 <FormInput
-                  field={fields['transactionId']}
+                  field={{
+                    ...fields['transactionId'],
+                    endAdornment: {
+                      element: (
+                        <Button
+                          sx={{ mr: 1 }}
+                          onClick={() => {
+                            const uuid = generateUuid();
+                            setTransactionId(uuid.replace(/-/g, ''));
+                          }}
+                        >
+                          Generate
+                        </Button>
+                      ),
+                    },
+                  }}
                   register={register}
                   control={control}
                   variant="outlined"
@@ -273,6 +300,9 @@ export const NewMessage: FC = () => {
                   <Grid item>
                     {(renderReplyDetails(true) as any)?.labels}
                     <Typography className={classes.detailsInfoLabel}>
+                      Transaction ID:
+                    </Typography>
+                    <Typography className={classes.detailsInfoLabel}>
                       Channel:
                     </Typography>
                     <Typography className={classes.detailsInfoLabel}>
@@ -284,6 +314,9 @@ export const NewMessage: FC = () => {
                   </Grid>
                   <Grid item>
                     {(renderReplyDetails(true) as any)?.values}
+                    <Typography className={classes.detailsInfoValue}>
+                      {newMessageValues.transactionId}
+                    </Typography>
                     <Typography className={classes.detailsInfoValue}>
                       {newMessageValues.fqcn}
                     </Typography>

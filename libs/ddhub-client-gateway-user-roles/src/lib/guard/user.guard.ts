@@ -71,5 +71,8 @@ export class UserGuard implements CanActivate {
 
 export const Username = createParamDecorator((_, context: ExecutionContext) => {
   const request = context.switchToHttp().getRequest();
+  if (!request.user) {
+    return null;
+  }
   return request.user.username;
 });
