@@ -146,7 +146,7 @@ export class DdhubTopicsService extends DdhubBaseService {
               httpsAgent: this.tlsAgentService.get(),
               headers: {
                 Authorization: `Bearer ${this.didAuthService.getToken()}`,
-              },
+              }, // 6553584dba652752a020db94
             }
           ),
         {

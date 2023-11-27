@@ -155,12 +155,11 @@ export class TopicsController {
   public async postTopics(
     @Body() data: PostTopicBodyDto
   ): Promise<PostTopicDto> {
-    return this.ddhubTopicsService
-      .postTopics(data)
-      .then((topic: PostTopicDto) => {
-        this.topicService.saveTopic(topic);
-        return topic;
-      });
+    const result = await this.ddhubTopicsService.postTopics(data);
+
+    await this.topicService.saveTopic(result);
+
+    return result;
   }
 
   @Put('/:id/versions/:versionNumber')
