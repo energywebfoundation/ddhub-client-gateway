@@ -7,7 +7,10 @@ import { useRouter } from 'next/router';
 import moment from 'moment';
 import getConfig from 'next/config';
 import { TTableComponentAction } from '@ddhub-client-gateway-frontend/ui/core';
-import { GetReceivedMessageResponseDto, MessageControllerGetReceivedMessagesParams } from '@dsb-client-gateway/dsb-client-gateway-api-client';
+import {
+  GetReceivedMessageResponseDto,
+  MessageControllerGetReceivedMessagesParams,
+} from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { ModalActionsEnum, useModalDispatch } from '../../context';
 
 export const useMessageInboxEffects = (isRelatedMessages?: boolean) => {
@@ -39,7 +42,10 @@ export const useMessageInboxEffects = (isRelatedMessages?: boolean) => {
 
   const { channel } = useChannel(router.query[Queries.FQCN] as string);
 
-  const { messages, messagesLoaded, ackMessage } = useReceivedMessages(params);
+  const { messages, messagesLoaded, ackMessage } = useReceivedMessages(
+    params,
+    isRelatedMessages
+  );
   const openDetailsModal = (data: GetReceivedMessageResponseDto) => {
     dispatch({
       type: ModalActionsEnum.SHOW_MESSAGE_INBOX_DETAILS,
