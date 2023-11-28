@@ -8,7 +8,8 @@ import { useCustomAlert } from '@ddhub-client-gateway-frontend/ui/core';
 import { useQueryClient } from 'react-query';
 
 export const useReceivedMessages = (
-  params?: MessageControllerGetReceivedMessagesParams
+  params?: MessageControllerGetReceivedMessagesParams,
+  isRelatedMessages = false
 ) => {
   const Swal = useCustomAlert();
   const queryClient = useQueryClient();
@@ -16,7 +17,7 @@ export const useReceivedMessages = (
   const enabled =
     queryClient.getDefaultOptions().queries?.enabled === false
       ? false
-      : !!params?.fqcn;
+      : !!params?.fqcn && (isRelatedMessages ? !!params?.messageIds : true);
   const { data, isLoading, isSuccess, isError, refetch } =
     useMessageControllerGetReceivedMessages(params, {
       query: {

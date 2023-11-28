@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { GetMessagesDto } from '../dto/request/get-messages.dto';
 import {
+  AddressBookEntity,
   AddressBookRepositoryWrapper,
   DidEntity,
   ReceivedMessageEntity,
@@ -17,6 +18,7 @@ import { GetSentMessagesRequestDto } from '../dto/request/get-sent-messages-requ
 import { GetSentMessageResponseDto } from '../dto/response/get-sent-message-response.dto';
 import { GetReceivedMessageResponseDto } from '../dto/response/get-received-message-response.dto';
 import { SchemaType } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
+import { IamService } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
 
 @Injectable()
 export class OfflineMessagesService {
@@ -28,7 +30,8 @@ export class OfflineMessagesService {
     protected readonly sentMessagesRecipientsWrapper: SentMessageRecipientRepositoryWrapper,
     protected readonly receivedMessageReadStatusRepositoryWrapper: ReceivedMessageReadStatusRepositoryWrapper,
     protected readonly addressBookRepositoryWrapper: AddressBookRepositoryWrapper,
-    protected readonly keysService: KeysService
+    protected readonly keysService: KeysService,
+    protected readonly iamService: IamService
   ) {}
 
   public async getOfflineUploadedFile(
@@ -49,10 +52,85 @@ export class OfflineMessagesService {
       `getOfflineSentMessagesParams: ${JSON.stringify(filterParams)}`
     );
 
+    const addressBook =
+      await this.addressBookRepositoryWrapper.repository.find();
+
+    const buildSentMessageResponse = async (entity: SentMessageEntity) => {
+      const relatedMessagesQb = this.receivedMessageRepositoryWrapper.repository
+        .createQueryBuilder('rm')
+        .where('rm.initiatingMessageId = ANY((:messageIds)::text[])', {
+          messageIds: entity.messageIds,
+        });
+
+      if (entity.transactionId) {
+        relatedMessagesQb.andWhere(
+          'rm.initiatingTransactionId = :transactionId',
+          {
+            transactionId: entity.transactionId,
+          }
+        );
+      }
+
+      const relatedMessagesCount = await relatedMessagesQb.getCount();
+
+      const recipients =
+        await this.sentMessagesRecipientsWrapper.repository.find({
+          where: {
+            clientGatewayMessageId: entity.clientGatewayMessageId,
+          },
+        });
+
+      return {
+        recipients: recipients.map((recipient) => {
+          return {
+            messageId: recipient.messageId,
+            did: recipient.recipientDid,
+            alias: addressBook.find(
+              (item) => item.did === recipient.recipientDid
+            )?.name,
+            failed: +recipient.statusCode !== 200,
+          };
+        }),
+        topicOwner: entity.topicOwner,
+        topicName: entity.topicName,
+        messagesIds: entity.messageIds,
+        clientGatewayMessageId: entity.clientGatewayMessageId,
+        initiatingMessageId: entity.initiatingMessageId,
+        fqcn: entity.fqcn,
+        initiatingTransactionId: entity.initiatingTransactionId,
+        payload: entity.payload,
+        createdDate: entity.createdDate,
+        isFile: entity.isFile,
+        payloadEncryption: entity.payloadEncryption,
+        relatedMessagesCount: relatedMessagesCount,
+        senderDid: entity.senderDid,
+        signature: entity.signature,
+        topicId: entity.topicId,
+        timestampNanos: entity.timestampNanos.getTime() * (1000 * 1000),
+        timestampISO: entity.timestampNanos.toISOString(),
+        topicVersion: entity.topicVersion,
+        totalSent: +entity.totalSent,
+        totalFailed: +entity.totalFailed,
+        transactionId: entity.transactionId,
+        totalRecipients: +entity.totalRecipients,
+        updatedDate: entity.updatedDate,
+      };
+    };
+
     const queryBuilder =
       this.sentMessagesRepositoryWrapper.repository.createQueryBuilder(
         'sent_messages'
       );
+
+    if (filterParams.clientGatewayMessageId) {
+      queryBuilder.where('sent_messages.clientGatewayMessageId = :id', {
+        id: filterParams.clientGatewayMessageId,
+      });
+      return await queryBuilder
+        .getOne()
+        .then(buildSentMessageResponse)
+        .then((response) => [response]);
+    }
 
     if (
       filterParams.fqcn &&
@@ -117,69 +195,8 @@ export class OfflineMessagesService {
 
     queryBuilder.take(limit).skip(skip);
 
-    const addressBook =
-      await this.addressBookRepositoryWrapper.repository.find();
     return queryBuilder.getMany().then(async (entities) => {
-      return await Promise.all(
-        entities.map(async (entity: SentMessageEntity) => {
-          const relatedMessagesCount =
-            await this.sentMessagesRepositoryWrapper.repository
-              .createQueryBuilder('sent_messages')
-              .where(':initiatingMessageId = ANY(sent_messages.messageIds)', {
-                initiatingMessageId: entity.initiatingMessageId,
-              })
-              .orWhere(
-                'sent_messages.transactionId = :initiatingTransactionId',
-                {
-                  initiatingTransactionId: entity.initiatingTransactionId,
-                }
-              )
-              .getCount();
-
-          const recipients =
-            await this.sentMessagesRecipientsWrapper.repository.find({
-              where: {
-                clientGatewayMessageId: entity.clientGatewayMessageId,
-              },
-            });
-
-          return {
-            recipients: recipients.map((recipient) => {
-              return {
-                messageId: recipient.messageId,
-                did: recipient.recipientDid,
-                alias: addressBook.find(
-                  (item) => item.did === recipient.recipientDid
-                )?.name,
-                failed: +recipient.statusCode !== 200,
-              };
-            }),
-            topicOwner: entity.topicOwner,
-            topicName: entity.topicName,
-            messagesIds: entity.messageIds,
-            clientGatewayMessageId: entity.clientGatewayMessageId,
-            initiatingMessageId: entity.initiatingMessageId,
-            fqcn: entity.fqcn,
-            initiatingTransactionId: entity.initiatingTransactionId,
-            payload: entity.payload,
-            createdDate: entity.createdDate,
-            isFile: entity.isFile,
-            payloadEncryption: entity.payloadEncryption,
-            relatedMessagesCount: relatedMessagesCount,
-            senderDid: entity.senderDid,
-            signature: entity.signature,
-            topicId: entity.topicId,
-            timestampNanos: entity.timestampNanos.getTime() * (1000 * 1000),
-            timestampISO: entity.timestampNanos.toISOString(),
-            topicVersion: entity.topicVersion,
-            totalSent: +entity.totalSent,
-            totalFailed: +entity.totalFailed,
-            transactionId: entity.transactionId,
-            totalRecipients: +entity.totalRecipients,
-            updatedDate: entity.updatedDate,
-          };
-        })
-      );
+      return await Promise.all(entities.map(buildSentMessageResponse));
     });
   }
 
@@ -198,13 +215,23 @@ export class OfflineMessagesService {
       topicName,
       topicOwner,
       messageId,
+      messageIds,
+      transactionId,
     } = dto;
 
     const rm = 'rm';
     const query = this.receivedMessageRepositoryWrapper.repository
       .createQueryBuilder(rm)
       .where((qb) => {
-        if (fqcn && !(initiatingMessageId || initiatingTransactionId)) {
+        if (
+          fqcn &&
+          !(
+            initiatingMessageId ||
+            initiatingTransactionId ||
+            messageIds ||
+            transactionId
+          )
+        ) {
           qb.andWhere(`${rm}.fqcn = :fqcn`, { fqcn });
         }
 
@@ -222,9 +249,24 @@ export class OfflineMessagesService {
           });
         }
 
+        if (messageIds) {
+          qb.andWhere(
+            `${rm}.initiatingMessageId = ANY((:messageIds)::text[])`,
+            {
+              messageIds: messageIds.split(',') || [],
+            }
+          );
+        }
+
         if (initiatingTransactionId) {
           qb.andWhere(`${rm}.transactionId = :initiatingTransactionId`, {
             initiatingTransactionId,
+          });
+        }
+
+        if (transactionId) {
+          qb.andWhere(`${rm}.initiatingTransactionId = :transactionId`, {
+            transactionId,
           });
         }
 
@@ -314,13 +356,14 @@ export class OfflineMessagesService {
   }
 
   public async ackMessages(
-    username: string,
+    username: string | null,
     messagesIds: string[]
   ): Promise<void> {
+    const recipientUser = username ?? this.iamService.getDIDAddress();
     const messageReadEntities = messagesIds.map((messageId: string) => {
       const entity = new ReceivedMessageReadStatusEntity();
       entity.messageId = messageId;
-      entity.recipientUser = username;
+      entity.recipientUser = recipientUser;
       return entity;
     });
     const alreadyAckedMessages =

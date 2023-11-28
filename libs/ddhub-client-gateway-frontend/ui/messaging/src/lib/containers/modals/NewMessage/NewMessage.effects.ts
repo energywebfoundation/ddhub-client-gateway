@@ -126,6 +126,7 @@ export const useNewMessageEffects = () => {
     register,
     control,
     formState: { isValid },
+    setValue,
     reset,
     resetField,
   } = formContext;
@@ -234,6 +235,7 @@ export const useNewMessageEffects = () => {
   useEffect(() => {
     if (selectedChannel) {
       resetFormSelectOptions('topic');
+      resetFormSelectOptions('version');
 
       const channel: GetChannelResponseDto = JSON.parse(selectedChannel);
       setNewMessageValues({
@@ -504,5 +506,6 @@ export const useNewMessageEffects = () => {
     getActionButtonsProps,
     isReply,
     replyData,
+    setTransactionId: (value: string) => setValue('Transaction ID', value),
   };
 };

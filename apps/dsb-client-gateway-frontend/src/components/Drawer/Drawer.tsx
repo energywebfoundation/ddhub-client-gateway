@@ -26,8 +26,12 @@ import {
   NewMessage,
   useNewMessageEffects,
 } from '@ddhub-client-gateway-frontend/ui/messaging';
+import getConfig from 'next/config';
 
 export const Drawer = () => {
+  const { publicRuntimeConfig } = getConfig();
+  const brandingLogoPath = publicRuntimeConfig?.customBranding ?? '/ew-main-logo.svg';
+
   const {
     userData: { displayedRoutes },
   } = useUserDataEffects();
@@ -179,7 +183,7 @@ export const Drawer = () => {
   return (
     <div>
       <Box className={classes.logoWrapper}>
-        <img src="/ew-main-logo.svg" alt="logo" className={classes.logo} />
+        <img src={brandingLogoPath} alt="logo" className={classes.logo} />
       </Box>
       <List>
         <MenuItem

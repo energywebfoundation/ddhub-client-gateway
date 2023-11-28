@@ -59,6 +59,10 @@ You can find docker images in `ci` directory.
 
 For more details please refer to [Deployment Guide](https://energyweb.atlassian.net/wiki/spaces/AEMO/pages/3178627074/DDHub+Client+Deployment+Guide)
 
+## Cypress tests
+To configure cypress tests we need to configure env. vars listed in `cypress/plugins/index.js`  
+After that we have to setup `cypress/{ENV_NAME}/identity.json` file.
+
 ## Swagger
 Swagger is available on route `{{API_HOST}}/docs`.    
 Postman collection to import is available under `${{API_HOST}}/docs-json`
@@ -75,3 +79,4 @@ Please make sure to update tests as appropriate.
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
+

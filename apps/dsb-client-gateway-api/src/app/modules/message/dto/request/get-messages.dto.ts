@@ -99,4 +99,14 @@ export class GetMessagesDto {
   @IsOptional()
   @IsString()
   messageId: string;
+
+  @ApiProperty({
+    type: String,
+    required: false,
+    example: '507f191e810c19729de860ea,507f191e810c19729de9821a',
+    description: 'Message id array as comma separated string',
+  })
+  @IsOptional()
+  @IsString()
+  messageIds: string;
 }

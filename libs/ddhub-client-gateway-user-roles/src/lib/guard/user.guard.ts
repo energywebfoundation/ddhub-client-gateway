@@ -19,6 +19,10 @@ export class UserGuard implements CanActivate {
     protected readonly reflector: Reflector
   ) {}
 
+  public isAuthEnabled(): boolean {
+    return this.userAuthService.isAuthEnabled();
+  }
+
   public async canActivate(context: ExecutionContext): Promise<boolean> {
     if (!this.userAuthService.isAuthEnabled()) {
       this.logger.debug('auth disabled');
@@ -34,13 +38,18 @@ export class UserGuard implements CanActivate {
     );
 
     if (excludedRoute === true) {
+      console.log('excluded route');
       return true;
     }
 
     const authHeader = request.headers.authorization;
 
+    console.log('auth header', authHeader);
+
     if (authHeader) {
       const token = authHeader.split(' ')[1];
+
+      console.log('token', token);
 
       try {
         const decodedToken: UserTokenData =
@@ -71,5 +80,8 @@ export class UserGuard implements CanActivate {
 
 export const Username = createParamDecorator((_, context: ExecutionContext) => {
   const request = context.switchToHttp().getRequest();
+  if (!request.user) {
+    return null;
+  }
   return request.user.username;
 });
