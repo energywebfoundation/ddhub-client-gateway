@@ -2828,11 +2828,11 @@ components:
             - "FILE_CLEANER"
             - "EVENTS"
             - "ROLES_REFRESH"
-            - "MESSAGE_CLEANER"
+            - "INTERNAL_MESSAGE_CLEANER"
             - "CLIENTS"
             - "ASSOCIATION_KEYS_SHARE"
             - "MESSAGES_FETCH"
-            - "CLEANUP_MESSAGES"
+            - "OFFLINE_MESSAGES_CLEANER"
         latestStatus:
           type: "string"
           description: "CRON job status"

@@ -3,8 +3,6 @@ import {alpha} from "@mui/material/styles";
 
 export const useStyles = makeStyles()((theme) => ({
   footerDiv: {
-    position: 'fixed',
-    bottom: 0,
     textAlign: 'center',
     paddingBottom: 17,
     paddingTop: 17,
