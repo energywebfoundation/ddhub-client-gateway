@@ -3,7 +3,7 @@ on: [workflow_call]
 
 jobs:
   commitlint:
-    runs-on: ubuntu-latest
+    runs-on: ddhub-client-gateway
     steps:
       - uses: actions/checkout@v2
         with:
