@@ -42,7 +42,7 @@ export class MessageService implements OnApplicationBootstrap {
     );
 
     await this.schedulerRegistry.addCronJob(
-      CronJobType.MESSAGE_CLEANER,
+      CronJobType.INTERNAL_MESSAGE_CLEANER,
       cronJob
     );
 
@@ -54,13 +54,13 @@ export class MessageService implements OnApplicationBootstrap {
       await this.symmetricKeysService.deleteExpiredKeys();
 
       await this.cronWrapper.cronRepository.save({
-        jobName: CronJobType.MESSAGE_CLEANER,
+        jobName: CronJobType.INTERNAL_MESSAGE_CLEANER,
         latestStatus: CronStatus.SUCCESS,
         executedAt: new Date(),
       });
     } catch (e) {
       await this.cronWrapper.cronRepository.save({
-        jobName: CronJobType.MESSAGE_CLEANER,
+        jobName: CronJobType.INTERNAL_MESSAGE_CLEANER,
         latestStatus: CronStatus.FAILED,
         executedAt: new Date(),
       });

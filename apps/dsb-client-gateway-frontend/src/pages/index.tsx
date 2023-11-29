@@ -3,9 +3,15 @@ import { Grid, Stack, Typography } from '@mui/material';
 import React from 'react';
 import { Login } from '@ddhub-client-gateway-frontend/ui/login';
 import { MobileUnsupported } from '../components/MobileUnsupported/MobileUnsupported';
+import getConfig from 'next/config';
 
 export default function Index() {
   const { classes } = useStyles();
+  const { publicRuntimeConfig } = getConfig();
+  const defaultLogoPath = '/ew-main-logo.svg';
+  const brandingLogoPath =
+    publicRuntimeConfig?.customBranding ?? defaultLogoPath;
+  const isCustomBranding = brandingLogoPath !== defaultLogoPath;
 
   return (
     <>
@@ -25,7 +31,7 @@ export default function Index() {
             spacing={2}
           >
             <div>
-              <img src="ew-flex-logo.png" alt="logo" className={classes.logo} />
+              <img src={brandingLogoPath} alt="logo" className={classes.logo} />
             </div>
             <Grid
               container
@@ -35,18 +41,22 @@ export default function Index() {
                 paddingRight: '50%',
               }}
             >
-              <Grid item>
-                <Typography className={classes.mainLabel}>
-                  Powering the <br />
-                  <span className={classes.underline}>Zero Carbon</span> Economy
-                </Typography>
-                <Typography className={classes.subLabel}>
-                  We deploy digital operating systems for energy grids with our
-                  global community of more than 100 energy market participants.
-                  These systems make it simple, secure, and efficient for clean
-                  energy assets to support the grid of the future.
-                </Typography>
-              </Grid>
+              {!isCustomBranding && (
+                <Grid item>
+                  <Typography className={classes.mainLabel}>
+                    Powering the <br />
+                    <span className={classes.underline}>Zero Carbon</span>{' '}
+                    Economy
+                  </Typography>
+                  <Typography className={classes.subLabel}>
+                    We deploy digital operating systems for energy grids with
+                    our global community of more than 100 energy market
+                    participants. These systems make it simple, secure, and
+                    efficient for clean energy assets to support the grid of the
+                    future.
+                  </Typography>
+                </Grid>
+              )}
             </Grid>
           </Stack>
         </Grid>
@@ -80,6 +90,7 @@ const useStyles = makeStyles()((theme) => ({
     backgroundSize: 'cover',
     backgroundPosition: 'center',
     position: 'relative',
+    width: '100%',
   },
   logo: {
     height: '70px',

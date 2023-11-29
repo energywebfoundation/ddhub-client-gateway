@@ -89,6 +89,10 @@ export class MessageListenerService implements OnApplicationBootstrap {
 
       for (const channel of applicableChannels) {
         for (const channelTopic of channel.conditions.topics) {
+          if (channel.conditions.qualifiedDids.length === 0) {
+            continue;
+          }
+
           const messages: GetMessageResponse[] =
             await this.messageService.getMessages(
               {

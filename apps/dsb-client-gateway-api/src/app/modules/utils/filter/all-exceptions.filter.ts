@@ -5,6 +5,7 @@ import {
   ForbiddenException,
   HttpStatus,
   Logger,
+  NotFoundException,
 } from '@nestjs/common';
 import { AbstractHttpAdapter, HttpAdapterHost } from '@nestjs/core';
 import { HttpArgumentsHost } from '@nestjs/common/interfaces';
@@ -37,6 +38,26 @@ export class AllExceptionsFilter implements ExceptionFilter {
     };
 
     this.logger.debug('Catched error', JSON.stringify(log));
+
+    if (exception instanceof NotFoundException) {
+      const responseBody: ResponseErrorDto = {
+        err: {
+          code: DsbClientGatewayErrors.ROUTE_NOT_FOUND,
+          reason: exception.message,
+          additionalDetails: {
+            hint: 'Route not found',
+          },
+        },
+        timestamp: new Date().toISOString(),
+        statusCode: HttpStatus.NOT_FOUND,
+      };
+
+      this.logger.error(JSON.stringify(responseBody));
+
+      this.emitError(ctx, httpAdapter, responseBody, responseBody.statusCode);
+
+      return;
+    }
 
     if (exception instanceof ForbiddenException) {
       const responseBody: ResponseErrorDto = {
