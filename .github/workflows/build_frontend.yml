@@ -34,4 +34,6 @@ jobs:
           DB_NAME: postgresql://ddhub:ddhub@localhost:5432/ddhub
           SECRETS_ENGINE: vault
           LOG_LEVEL: error
-          NODE_OPTIONS: "--max-old-space-size=8192"
+          NODE_OPTIONS: '--max-old-space-size=8192'
+          NEXT_PUBLIC_CUSTOM_BRANDING_PATH: '/aemo-logo.svg'
+          NEXT_PUBLIC_CUSTOM_CGW_NAME: 'TEDD'
