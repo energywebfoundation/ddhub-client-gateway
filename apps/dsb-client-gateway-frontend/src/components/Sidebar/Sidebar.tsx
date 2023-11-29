@@ -1,5 +1,5 @@
 import React from 'react';
-import { Drawer as MuiDrawer } from '@mui/material';
+import { Box, Drawer as MuiDrawer } from '@mui/material';
 import { Drawer } from '../Drawer';
 import SidebarFooter from './SidebarFooter/SidebarFooter';
 import { useStyles } from './Sidebar.styles';
@@ -19,6 +19,7 @@ function Sidebar() {
           }}
         >
           <Drawer />
+          <Box flexGrow={1}></Box>
           <SidebarFooter />
         </MuiDrawer>
       </nav>
