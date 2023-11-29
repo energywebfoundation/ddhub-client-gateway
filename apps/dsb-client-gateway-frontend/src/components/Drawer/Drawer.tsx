@@ -30,7 +30,8 @@ import getConfig from 'next/config';
 
 export const Drawer = () => {
   const { publicRuntimeConfig } = getConfig();
-  const brandingLogoPath = publicRuntimeConfig?.customBranding ?? '/ew-main-logo.svg';
+  const brandingLogoPath =
+    publicRuntimeConfig?.customBranding ?? '/ew-main-logo.svg';
 
   const {
     userData: { displayedRoutes },
@@ -181,7 +182,7 @@ export const Drawer = () => {
   };
 
   return (
-    <div>
+    <Box sx={{ paddingBottom: 4 }}>
       <Box className={classes.logoWrapper}>
         <img src={brandingLogoPath} alt="logo" className={classes.logo} />
       </Box>
@@ -214,6 +215,6 @@ export const Drawer = () => {
       )}
 
       <NewMessage />
-    </div>
+    </Box>
   );
 };
