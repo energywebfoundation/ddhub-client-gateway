@@ -29,7 +29,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: Build
-        run: npm run export
+        run: NEXT_PUBLIC_CUSTOM_BRANDING_PATH=/aemo-logo.svg NEXT_PUBLIC_CUSTOM_CGW_NAME=TEDD npm run export
         env:
           DB_NAME: postgresql://ddhub:ddhub@localhost:5432/ddhub
           SECRETS_ENGINE: vault
