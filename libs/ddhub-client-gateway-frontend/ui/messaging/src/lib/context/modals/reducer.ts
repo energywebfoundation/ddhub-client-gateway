@@ -29,10 +29,6 @@ export const modalInitialState: IModalStore = {
     open: false,
     data: undefined,
   },
-  viewMessage: {
-    open: false,
-    data: undefined,
-  },
   addContact: {
     open: false,
   },
