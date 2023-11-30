@@ -1,5 +1,6 @@
 import { WidgetProps } from '@rjsf/utils';
 import {
+  DateOrTimeView,
   DateTimePickerToolbar,
   DateTimeValidationError,
   DesktopDateTimePicker,
@@ -12,11 +13,47 @@ import { useStyles } from '../../form/FormInput/FormInput.styles';
 import { DateTime } from 'luxon';
 import { DateTimeIcon } from '../../icons';
 
-const format = 'dd/MM/yyyy HH:mm:ss';
+const defaultFormat = 'dd/MM/yyyy HH:mm:ss';
+const defaultViews: DateOrTimeView[] = [
+  'year',
+  'month',
+  'day',
+  'hours',
+  'minutes',
+  'seconds',
+];
 export const DateTimeWidget = (props: WidgetProps) => {
   const { theme, classes } = useStyles();
+  const { label, onChange, value, options } = props;
+  const withSeconds = options['withSeconds'] === false ? false : true;
 
-  const { label, onChange, value } = props;
+  const views = !withSeconds
+    ? defaultViews.slice(0, defaultViews.length - 1)
+    : defaultViews;
+  const format = !withSeconds ? 'dd/MM/yyyy HH:mm' : defaultFormat;
+  const formatDateTimeToISO = (value: DateTime | null) => {
+    if (DateTime.isDateTime(value)) {
+      if (!withSeconds) {
+        return value.startOf('minute').toISO();
+      } else {
+        return value.startOf('second').toISO();
+      }
+    }
+    return null;
+  };
+  const buildDateTimeFromISO = (value: string | null) => {
+    if (value) {
+      const dateTime = DateTime.fromISO(value);
+      if (dateTime.isValid) {
+        if (!withSeconds) {
+          return dateTime.startOf('minute');
+        } else {
+          return dateTime.startOf('second');
+        }
+      }
+    }
+    return null;
+  };
 
   return (
     <Box>
@@ -27,38 +64,28 @@ export const DateTimeWidget = (props: WidgetProps) => {
             value: DateTime | null,
             context: PickerChangeHandlerContext<DateTimeValidationError>
           ) => {
-            if (
-              !context.validationError &&
-              !!value &&
-              DateTime.isDateTime(value)
-            ) {
-              onChange(value.startOf('second').toISO());
-            } else {
-              onChange(null);
+            if (!context.validationError) {
+              onChange(formatDateTimeToISO(value));
             }
           }}
           onAccept={(value: DateTime | null) => {
-            if (value && DateTime.isDateTime(value)) {
-              onChange(value.startOf('second').toISO());
-            } else {
-              onChange(null);
-            }
+            onChange(formatDateTimeToISO(value));
           }}
           timezone="system"
-          value={value ? DateTime.fromISO(value).startOf('second') : value}
+          value={buildDateTimeFromISO(value)}
           ampm={false}
           format={format}
-          orientation="landscape"
+          orientation="portrait"
           onOpen={() => {
             if (!value) {
-              onChange(DateTime.local().startOf('second').toISO());
+              onChange(formatDateTimeToISO(DateTime.local()));
             }
           }}
           timeSteps={{
             seconds: 1,
             minutes: 1,
           }}
-          views={['year', 'month', 'day', 'hours', 'minutes', 'seconds']}
+          views={views}
           slots={{
             openPickerIcon: () => <DateTimeIcon />,
             toolbar: DateTimePickerToolbar,
