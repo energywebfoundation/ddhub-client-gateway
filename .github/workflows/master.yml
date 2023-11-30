@@ -12,7 +12,7 @@ env:
 jobs:
   cancel-previous:
     name: 'Cancel Previous Runs'
-    runs-on: ubuntu-latest
+    runs-on: ddhub-client-gateway
     timeout-minutes: 3
     steps:
       - uses: styfle/cancel-workflow-action@0.9.0
@@ -21,7 +21,7 @@ jobs:
 
   semantic-version:
     name: Semantic release
-    runs-on: ubuntu-latest
+    runs-on: ddhub-client-gateway
     needs: [cancel-previous]
     steps:
       - name: Checkout
@@ -44,7 +44,7 @@ jobs:
 
   build-scheduler:
     name: Build scheduler
-    runs-on: ubuntu-latest
+    runs-on: ddhub-client-gateway
     needs: [cancel-previous, semantic-version]
     steps:
       - uses: actions/checkout@v2
@@ -152,7 +152,7 @@ jobs:
 #          options: -p ddhub-client-gateway-api.clientgateway.scheduler.image.tag=${{needs.semantic-version.outputs.new_version}}
   build-be:
     name: Build Backend & Release
-    runs-on: ubuntu-latest
+    runs-on: ddhub-client-gateway
     needs: [cancel-previous, semantic-version]
     steps:
       - uses: actions/checkout@v2
@@ -273,7 +273,7 @@ jobs:
 
   build-fe:
     name: Build Frontend
-    runs-on: ubuntu-latest
+    runs-on: ddhub-client-gateway
     needs: [cancel-previous, semantic-version]
     services:
       postgres:

@@ -13,7 +13,7 @@ env:
 jobs:
   cancel-previous:
     name: 'Cancel Previous Runs'
-    runs-on: ubuntu-latest
+    runs-on: ddhub-client-gateway
     timeout-minutes: 3
     steps:
       - uses: styfle/cancel-workflow-action@0.9.0
@@ -21,7 +21,7 @@ jobs:
           access_token: ${{ github.token }}
 
   unique_id:
-    runs-on: ubuntu-latest
+    runs-on: ddhub-client-gateway
     steps:
       - name: Generate unique id
         id: unique_id
@@ -31,7 +31,7 @@ jobs:
 
   build-scheduler:
     name: Build scheduler
-    runs-on: ubuntu-latest
+    runs-on: ddhub-client-gateway
     needs: [cancel-previous, unique_id]
     steps:
       - uses: actions/checkout@v2
@@ -106,7 +106,7 @@ jobs:
       #     options: -p ddhub-client-gateway-api.clientgateway.scheduler.image.tag=${{needs.unique_id.outputs.unique_id}}
   build-be:
     name: Build Backend
-    runs-on: ubuntu-latest
+    runs-on: ddhub-client-gateway
     needs: [cancel-previous, unique_id]
     steps:
       - uses: actions/checkout@v2
@@ -185,7 +185,7 @@ jobs:
       #     options: -p ddhub-client-gateway-api.image.tag=${{needs.unique_id.outputs.unique_id}}
   build-fe:
     name: Build Frontend
-    runs-on: ubuntu-latest
+    runs-on: ddhub-client-gateway
     needs: [cancel-previous, unique_id]
     services:
       postgres:
