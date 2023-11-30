@@ -38,6 +38,7 @@ export const routerConst = {
   AddressBook: '/address-book',
   MessageInbox: '/messages/inbox',
   MessageInboxChannel: `/messages/inbox/[${Queries.FQCN}]`,
+  ReplyMessages: `/messages/inbox/[${Queries.FQCN}]/related`,
   MessageOutbox: '/messages/outbox',
   MessageOutboxChannel: `/messages/outbox/[${Queries.FQCN}]`,
   MessageOutboxRelated: `/messages/outbox/[${Queries.FQCN}]/related`,

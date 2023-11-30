@@ -10,7 +10,8 @@ import { AddressBookContext } from '@ddhub-client-gateway-frontend/ui/login';
 
 export const useSentMessages = (
   params?: MessageControllerGetSentMessagesParams,
-  isRelatedMessage?: boolean
+  isRelatedMessages?: boolean,
+  isReplyMessages?: boolean
 ) => {
   const Swal = useCustomAlert();
   const addressBookContext = useContext(AddressBookContext);
@@ -22,8 +23,10 @@ export const useSentMessages = (
   const queryClient = useQueryClient();
 
   let enabled;
-  if (isRelatedMessage) {
+  if (isRelatedMessages) {
     enabled = !!params?.fqcn && !!params?.clientGatewayMessageId;
+  } else if (isReplyMessages) {
+    enabled = !!params?.fqcn && !!params?.messageId;
   } else {
     enabled = !!params?.fqcn;
   }

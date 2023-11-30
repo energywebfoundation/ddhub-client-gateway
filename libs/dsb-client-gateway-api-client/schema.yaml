@@ -2029,6 +2029,11 @@ components:
           type: "string"
           description: "topic id"
           example: "111"
+        replyMessagesCount:
+          type: "number"
+          example: 2
+          description: "Reply messages count"
+          default: 0
         topicName:
           type: "string"
           description: "topic Name"
@@ -2100,6 +2105,7 @@ components:
       required:
         - "id"
         - "topicId"
+        - "replyMessagesCount"
         - "topicName"
         - "topicOwner"
         - "topicVersion"
