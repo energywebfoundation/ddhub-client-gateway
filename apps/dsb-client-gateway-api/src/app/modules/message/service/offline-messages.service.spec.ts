@@ -60,6 +60,7 @@ const sentMessagesRepositoryWrapper = {
     find: jest.fn(),
     save: jest.fn(),
     createQueryBuilder: jest.fn(),
+    query: jest.fn(),
   },
 };
 const sentMessagesRecipientsWrapper = {
@@ -222,6 +223,10 @@ describe(`${OfflineMessagesService.name}`, () => {
             getOne: jest.fn().mockResolvedValueOnce(null),
           }));
 
+        sentMessagesRepositoryWrapper.repository.query = jest
+          .fn()
+          .mockResolvedValueOnce([{ count: 0 }]);
+
         try {
           result = await service.getOfflineReceivedMessages({
             fqcn: 'fqcn',
@@ -331,6 +336,10 @@ describe(`${OfflineMessagesService.name}`, () => {
             }),
           }));
 
+        sentMessagesRepositoryWrapper.repository.query = jest
+          .fn()
+          .mockResolvedValueOnce([{ count: 1 }]);
+
         try {
           result = await service.getOfflineReceivedMessages({
             fqcn: 'fqcn',
@@ -351,6 +360,11 @@ describe(`${OfflineMessagesService.name}`, () => {
 
       it('should return isRead true', () => {
         expect(result[0].isRead).toStrictEqual(true);
+      });
+
+      it('should return have related message count and reply message count', () => {
+        expect(result[0].replyMessagesCount).toStrictEqual(1);
+        expect(result[0].relatedMessagesCount).toStrictEqual(1);
       });
     });
   });

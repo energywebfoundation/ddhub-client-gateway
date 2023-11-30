@@ -33,7 +33,6 @@ import { ChannelInvalidTopicException } from '../exceptions/channel-invalid-topi
 import { differenceBy } from 'lodash';
 import { ChannelMessageFormsOnlyException } from '../exceptions/channel-message-forms-only.exception';
 import { GetChannelMessagesCountDto } from '../dto/request/get-channel-messages-count.dto';
-import { In } from 'typeorm';
 
 @Injectable()
 export class ChannelService {
@@ -113,7 +112,10 @@ export class ChannelService {
     );
 
     let responseTopicsWithChannels: ChannelResponseTopic[] = [];
-    if (payload.conditions.responseTopics.length) {
+    if (
+      payload.conditions.responseTopics &&
+      payload.conditions.responseTopics.length
+    ) {
       const responseTopicsWithIds: ChannelTopic[] = await this.getTopicsWithIds(
         payload.conditions.responseTopics
       );

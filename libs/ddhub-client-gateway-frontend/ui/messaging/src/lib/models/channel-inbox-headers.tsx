@@ -1,5 +1,6 @@
 import { didFormatMinifier } from '@ddhub-client-gateway-frontend/ui/utils';
 import { DateTime } from 'luxon';
+import { ReplyMessageCount } from '../containers/MessageInbox';
 
 export const CHANNEL_INBOX_HEADERS = [
   {
@@ -40,6 +41,25 @@ export const CHANNEL_INBOX_HEADERS = [
     Header: 'TRANSACTION ID',
     accessor: 'transactionId',
     isSortable: true,
+  },
+  {
+    Header: 'REPLY COUNT',
+    color: 'primary',
+    accessor: 'replyMessageItems',
+    Cell: (props: any) => {
+      if (props.row.original.replyMessagesCount === 0) {
+        return 0;
+      }
+      return (
+        <ReplyMessageCount
+          value={{
+            replyMessagesCount: props.row.original.replyMessagesCount,
+            messageId: props.row.original.id,
+            transactionId: props.row.original.transactionId,
+          }}
+        />
+      );
+    },
   },
   {
     Header: 'READ',
