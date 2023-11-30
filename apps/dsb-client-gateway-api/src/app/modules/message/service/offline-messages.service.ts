@@ -314,11 +314,10 @@ export class OfflineMessagesService {
           await this.sentMessagesRepositoryWrapper.repository
             .query(
               `
-            SELECT COUNT(DISTINCT m."clientGatewayMessageId")
-            FROM public.sent_messages m
-            WHERE m."initiatingMessageId" = $1
-               OR (m."initiatingTransactionId" = $2 AND $2 IS NOT NULL AND $2 != '');
-          `,
+              SELECT COUNT(DISTINCT m."clientGatewayMessageId")
+              FROM public.sent_messages m
+              WHERE m."initiatingMessageId" = $1
+              OR (m."initiatingTransactionId" = $2 AND $2 IS NOT NULL AND $2 != '');`,
               [message.messageId, message.transactionId]
             )
             .then((result) => +result[0].count);
