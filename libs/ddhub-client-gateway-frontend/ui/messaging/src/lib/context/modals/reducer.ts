@@ -5,7 +5,6 @@ export enum ModalActionsEnum {
   SHOW_POST_DETAILS = 'SHOW_POST_DETAILS',
   SHOW_MESSAGE_INBOX_DETAILS = 'SHOW_MESSAGE_INBOX_DETAILS',
   SHOW_NEW_MESSAGE = 'SHOW_NEW_MESSAGE',
-  SHOW_VIEW_MESSAGE = 'SHOW_VIEW_MESSAGE',
   SHOW_ADD_CONTACT = 'SHOW_ADD_CONTACT',
   SHOW_UPDATE_CONTACT = 'SHOW_UPDATE_CONTACT',
   SHOW_RECIPIENT_LIST = 'SHOW_RECIPIENT_LIST',
@@ -55,8 +54,6 @@ export const modalsReducer = (
       return { ...state, inboxDetails: action.payload };
     case ModalActionsEnum.SHOW_NEW_MESSAGE:
       return { ...state, newMessage: action.payload };
-    case ModalActionsEnum.SHOW_VIEW_MESSAGE:
-      return { ...state, viewMessage: action.payload };
     case ModalActionsEnum.SHOW_ADD_CONTACT:
       return { ...state, addContact: action.payload };
     case ModalActionsEnum.SHOW_UPDATE_CONTACT:
