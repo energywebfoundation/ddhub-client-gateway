@@ -50,11 +50,6 @@ type TNewMessage = {
   data?: ReplyMessageData & { replyChannel: GetChannelResponseDto };
 };
 
-type TViewMessage = {
-  open: boolean;
-  data: any;
-};
-
 type TAddContact = {
   open: boolean;
 };
@@ -74,7 +69,6 @@ export interface IModalStore {
   postDetails: TPostDetails;
   inboxDetails: TInboxDetails;
   newMessage: TNewMessage;
-  viewMessage: TViewMessage;
   addContact: TAddContact;
   updateContact: TUpdateContact;
   recipientList: TRecipientList;
@@ -110,11 +104,6 @@ interface IShowNewMessageAction {
   payload: TNewMessage;
 }
 
-interface IShowViewMessageAction {
-  type: ModalActionsEnum.SHOW_VIEW_MESSAGE;
-  payload: TViewMessage;
-}
-
 interface IShowRecipientListAction {
   type: ModalActionsEnum.SHOW_RECIPIENT_LIST;
   payload: TRecipientList;
@@ -125,7 +114,6 @@ export type TModalAction =
   | IShowPostDetailsAction
   | IShowMessageInboxDetailsAction
   | IShowNewMessageAction
-  | IShowViewMessageAction
   | IShowAddContactAction
   | IShowUpdateContactAction
   | IShowRecipientListAction;

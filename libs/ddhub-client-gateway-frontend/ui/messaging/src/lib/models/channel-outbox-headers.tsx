@@ -92,7 +92,6 @@ export const CHANNEL_OUTBOX_HEADERS = (openRecipientListModal: any) => {
       Header: 'RELATED MESSAGES',
       color: 'primary',
       accessor: 'relatedMessageItems',
-      isSortable: true,
       Cell: (props: any) => {
         if (props.row.original.relatedMessagesCount === 0) {
           return 0;

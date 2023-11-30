@@ -9,7 +9,8 @@ import { useQueryClient } from 'react-query';
 
 export const useReceivedMessages = (
   params?: MessageControllerGetReceivedMessagesParams,
-  isRelatedMessages = false
+  isRelatedMessages = false,
+  isReplyMessages = false
 ) => {
   const Swal = useCustomAlert();
   const queryClient = useQueryClient();
@@ -17,7 +18,9 @@ export const useReceivedMessages = (
   const enabled =
     queryClient.getDefaultOptions().queries?.enabled === false
       ? false
-      : !!params?.fqcn && (isRelatedMessages ? !!params?.messageIds : true);
+      : !!params?.fqcn &&
+        ((isRelatedMessages ? !!params?.messageIds : true) ||
+          (isReplyMessages ? !!params?.messageId : true));
   const { data, isLoading, isSuccess, isError, refetch } =
     useMessageControllerGetReceivedMessages(params, {
       query: {
