@@ -1,7 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { GetMessagesDto } from '../dto/request/get-messages.dto';
 import {
-  AddressBookEntity,
   AddressBookRepositoryWrapper,
   DidEntity,
   ReceivedMessageEntity,
@@ -134,7 +133,12 @@ export class OfflineMessagesService {
 
     if (
       filterParams.fqcn &&
-      !(filterParams.messageId || filterParams.transactionId)
+      !(
+        filterParams.messageId ||
+        filterParams.transactionId ||
+        filterParams.initiatingMessageId ||
+        filterParams.initiatingTransactionId
+      )
     ) {
       queryBuilder.andWhere('sent_messages.fqcn = :fqcn', {
         fqcn: filterParams.fqcn,
@@ -306,6 +310,19 @@ export class OfflineMessagesService {
             })
             .getOne());
 
+        const replyMessagesCount =
+          await this.sentMessagesRepositoryWrapper.repository
+            .query(
+              `
+            SELECT COUNT(DISTINCT m."clientGatewayMessageId")
+            FROM public.sent_messages m
+            WHERE m."initiatingMessageId" = $1
+               OR (m."initiatingTransactionId" = $2 AND $2 IS NOT NULL AND $2 != '');
+          `,
+              [message.messageId, message.transactionId]
+            )
+            .then((result) => +result[0].count);
+
         const relatedMessages =
           await this.receivedMessageRepositoryWrapper.repository
             .createQueryBuilder('m')
@@ -325,6 +342,7 @@ export class OfflineMessagesService {
           topicOwner: message.topicOwner,
           topicName: message.topicName,
           topicVersion: message.topicVersion,
+          replyMessagesCount: replyMessagesCount,
           clientGatewayMessageId: message.clientGatewayMessageId,
           sender: message.senderDid,
           senderAlias: addressBook.find(

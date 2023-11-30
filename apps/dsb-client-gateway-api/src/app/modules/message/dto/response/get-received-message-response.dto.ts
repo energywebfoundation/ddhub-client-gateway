@@ -26,6 +26,14 @@ export class GetReceivedMessageResponseDto {
   })
   topicId: string;
 
+  @ApiProperty({
+    type: Number,
+    example: 2,
+    description: 'Reply messages count',
+    default: 0,
+  })
+  replyMessagesCount: number;
+
   @IsString()
   @ApiProperty({
     description: 'topic Name',
