@@ -41,6 +41,11 @@ export const useChannels = (params?: ChannelControllerGetByTypeParams) => {
             messageForms: channel.messageForms,
           },
         };
+      })
+      .sort((a, b) => {
+        const fqcnA = a.fqcn.toLowerCase();
+        const fqcnB = b.fqcn.toLowerCase();
+        return fqcnA.localeCompare(fqcnB);
       });
       setChannels(channels);
       setChannelsByName(keyBy(channels, 'fqcn'));
