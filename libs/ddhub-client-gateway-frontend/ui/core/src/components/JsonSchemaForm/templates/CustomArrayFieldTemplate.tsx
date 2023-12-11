@@ -100,6 +100,7 @@ export const CustomArrayFieldTemplate = (props: ArrayFieldTemplateProps) => {
     value,
     disabled: !props.canAdd,
     placeholder: 'Enter a value',
+    autoComplete: 'off',
     onKeyDown: (e) => {
       if (e.key === 'Enter' && !!value) {
         e.preventDefault();
@@ -134,18 +135,9 @@ export const CustomArrayFieldTemplate = (props: ArrayFieldTemplateProps) => {
 
   const renderObjectArray = (items: ArrayFieldTemplateItemType[]) => {
     return items.map((element, index) => {
-      const {
-        hasMoveUp,
-        hasMoveDown,
-        hasRemove,
-        disabled,
-        readonly,
-        onReorderClick,
-        onDropIndexClick,
-        registry,
-      } = element;
-      const { MoveUpButton, MoveDownButton, RemoveButton } =
-        registry.templates.ButtonTemplates;
+      const { hasRemove, disabled, readonly, onDropIndexClick, registry } =
+        element;
+      const { RemoveButton } = registry.templates.ButtonTemplates;
       return (
         <Accordion
           key={element.key}
@@ -173,20 +165,6 @@ export const CustomArrayFieldTemplate = (props: ArrayFieldTemplateProps) => {
             </Box>
           </AccordionSummary>
           <AccordionActions>
-            {/* {(hasMoveUp || hasMoveDown) && (
-              <MoveUpButton
-                disabled={disabled || readonly || !hasMoveUp}
-                onClick={onReorderClick(index, index - 1)}
-                registry={registry}
-              />
-            )}
-            {(hasMoveUp || hasMoveDown) && (
-              <MoveDownButton
-                disabled={disabled || readonly || !hasMoveDown}
-                onClick={onReorderClick(index, index + 1)}
-                registry={registry}
-              />
-            )} */}
             {hasRemove && (
               <RemoveButton
                 disabled={disabled || readonly || !hasRemove}

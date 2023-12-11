@@ -16,6 +16,7 @@ export const TextFieldInputTemplate = (props: BaseInputTemplateProps) => {
   const customProps = {
     label: '',
     placeholder: label,
+    autoComplete: 'off',
     classes: {
       root: classes.root,
     },

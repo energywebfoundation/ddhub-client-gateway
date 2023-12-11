@@ -114,33 +114,40 @@ export const mapUrlToBreadcrumbs = new Map<string, Breadcrumb[]>()
     { title: 'Client Subscriptions' },
   ])
   .set(routerConst.MessageInbox, [
-    { title: 'My messages' },
-    { title: 'Message box' },
-    { title: 'Channel list' },
+    { title: 'My Messages' },
+    { title: 'Message box', path: routerConst.MessageInbox },
+    { title: 'Channel list', path: routerConst.MessageInbox },
   ])
   .set(routerConst.MessageInboxChannel, [
-    { title: 'My messages' },
+    { title: 'My Messages' },
     { title: 'Message box', path: routerConst.MessageInbox },
-    { title: 'Channel list' },
-    { title: 'My messages' },
+    { title: 'Channel list', path: routerConst.MessageInbox },
+    { title: 'Received', path: routerConst.MessageInboxChannel },
+  ])
+  .set(routerConst.ReplyMessages, [
+    { title: 'My Messages' },
+    { title: 'Message box', path: routerConst.MessageInbox },
+    { title: 'Channel list', path: routerConst.MessageInbox },
+    { title: 'Received', path: routerConst.MessageInboxChannel },
+    { title: 'Your replies' },
   ])
   .set(routerConst.MessageOutbox, [
     { title: 'Sent' },
-    { title: 'Message box' },
-    { title: 'Channel list' },
+    { title: 'Message box', path: routerConst.MessageOutbox },
+    { title: 'Channel list', path: routerConst.MessageOutbox },
   ])
   .set(routerConst.MessageOutboxChannel, [
     { title: 'Sent' },
     { title: 'Message box', path: routerConst.MessageOutbox },
-    { title: 'Channel list' },
-    { title: 'Sent' },
+    { title: 'Channel list', path: routerConst.MessageOutbox },
+    { title: 'Sent messages', path: routerConst.MessageOutboxChannel },
   ])
   .set(routerConst.MessageOutboxRelated, [
-    { title: 'Related messages' },
-    { title: 'Message box', path: routerConst.MessageOutbox },
-    { title: 'Channel list', path: routerConst.MessageOutboxChannel },
-    { title: 'Sent' },
-    { title: 'Related messages' },
+    { title: 'Related Messages' },
+    { title: 'Message box' },
+    { title: 'Channel list', path: routerConst.MessageOutbox },
+    { title: 'Sent', path: routerConst.MessageOutboxChannel },
+    { title: 'Responses' },
   ])
   .set(routerConst.AddressBook, [
     { title: 'Address book' },

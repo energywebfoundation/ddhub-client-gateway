@@ -52,7 +52,7 @@ export const useMessageInboxDetailsEffects = () => {
     const parsedArrayItem: any[] = [];
 
     Object.entries(parsed).forEach(([name, value]) => {
-      const validValue = typeof value === 'string' || typeof value === 'number';
+      const validValue = typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean';
       const valueArray = isObject(value) ? value : [];
       const formattedKey = camelToFlat(name);
 

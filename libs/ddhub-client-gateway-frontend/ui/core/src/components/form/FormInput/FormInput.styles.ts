@@ -65,6 +65,20 @@ export const useStyles = makeStyles()((theme) => ({
       color: theme.palette.common.white,
     },
   },
+  checkboxLabel: {
+    position: 'relative',
+    fontSize: 12,
+    lineHeight: '14px',
+    fontWeight: 400,
+    letterSpacing: '0.4px',
+    color: theme.palette.common.white,
+    fontFamily: theme.typography.body2.fontFamily,
+    marginBottom: 0,
+    transform: 'unset',
+    '&.Mui-focused': {
+      color: theme.palette.common.white,
+    },
+  },
   formControlLabel: {
     fontSize: 14,
     lineHeight: '21px',

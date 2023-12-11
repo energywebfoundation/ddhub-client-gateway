@@ -1,5 +1,7 @@
 import { WidgetProps } from '@rjsf/utils';
 import {
+  DateOrTimeView,
+  DateTimePickerToolbar,
   DateTimeValidationError,
   DesktopDateTimePicker,
   LocalizationProvider,
@@ -11,11 +13,47 @@ import { useStyles } from '../../form/FormInput/FormInput.styles';
 import { DateTime } from 'luxon';
 import { DateTimeIcon } from '../../icons';
 
-const format = 'dd/MM/yyyy HH:mm:ss';
+const defaultFormat = 'dd/MM/yyyy HH:mm:ss';
+const defaultViews: DateOrTimeView[] = [
+  'year',
+  'month',
+  'day',
+  'hours',
+  'minutes',
+  'seconds',
+];
 export const DateTimeWidget = (props: WidgetProps) => {
-  const { classes } = useStyles();
+  const { theme, classes } = useStyles();
+  const { label, onChange, value, options } = props;
+  const withSeconds = options['withSeconds'] === false ? false : true;
 
-  const { label, onChange, value } = props;
+  const views = !withSeconds
+    ? defaultViews.slice(0, defaultViews.length - 1)
+    : defaultViews;
+  const format = !withSeconds ? 'dd/MM/yyyy HH:mm' : defaultFormat;
+  const formatDateTimeToISO = (value: DateTime | null) => {
+    if (DateTime.isDateTime(value)) {
+      if (!withSeconds) {
+        return value.startOf('minute').toISO();
+      } else {
+        return value.startOf('second').toISO();
+      }
+    }
+    return null;
+  };
+  const buildDateTimeFromISO = (value: string | null) => {
+    if (value) {
+      const dateTime = DateTime.fromISO(value);
+      if (dateTime.isValid) {
+        if (!withSeconds) {
+          return dateTime.startOf('minute');
+        } else {
+          return dateTime.startOf('second');
+        }
+      }
+    }
+    return null;
+  };
 
   return (
     <Box>
@@ -26,35 +64,51 @@ export const DateTimeWidget = (props: WidgetProps) => {
             value: DateTime | null,
             context: PickerChangeHandlerContext<DateTimeValidationError>
           ) => {
-            if (!context.validationError && !!value) {
-              onChange(value.toISO());
+            if (!context.validationError) {
+              onChange(formatDateTimeToISO(value));
             }
           }}
           onAccept={(value: DateTime | null) => {
-            if (value) {
-              onChange(value.toISO());
-            }
+            onChange(formatDateTimeToISO(value));
           }}
           timezone="system"
-          value={value ? DateTime.fromISO(value) : value}
+          value={buildDateTimeFromISO(value)}
           ampm={false}
           format={format}
-          orientation="landscape"
-          views={['year', 'month', 'day', 'hours', 'minutes', 'seconds']}
+          orientation="portrait"
+          onOpen={() => {
+            if (!value) {
+              onChange(formatDateTimeToISO(DateTime.local()));
+            }
+          }}
+          timeSteps={{
+            seconds: 1,
+            minutes: 1,
+          }}
+          views={views}
+          slots={{
+            openPickerIcon: () => <DateTimeIcon />,
+            toolbar: DateTimePickerToolbar,
+          }}
           slotProps={{
             textField: { classes: { root: classes.root } },
             nextIconButton: { sx: { color: 'white' } },
             previousIconButton: { sx: { color: 'white' } },
             switchViewButton: { sx: { color: 'white' } },
+            actionBar: {
+              actions: ['today', 'clear'],
+              sx: { justifyContent: 'flex-end' },
+            },
+            toolbar: {
+              toolbarFormat: 'dd/MM/yyyy',
+              hidden: false,
+            },
             openPickerButton: {
               sx: {
                 mr: 1,
-                color: 'white',
+                color: theme.palette.primary.main,
               },
             },
-          }}
-          slots={{
-            openPickerIcon: () => <DateTimeIcon />,
           }}
         />
       </LocalizationProvider>

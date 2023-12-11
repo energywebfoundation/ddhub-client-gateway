@@ -117,8 +117,8 @@ export class MessageStoreService {
           entity.signature = item.signature;
           entity.senderDid = item.senderDid;
           entity.fqcn = item.fqcn;
-          entity.initiatingTransactionId = item.initiatingMessageId;
-          entity.initiatingMessageId = item.initiatingMessageId;
+          entity.initiatingTransactionId = item.initiatingTransactionId ?? null;
+          entity.initiatingMessageId = item.initiatingMessageId ?? null;
           entity.clientGatewayMessageId = item.clientGatewayMessageId;
           entity.isFile = item.isFile;
           entity.payloadEncryption = item.payloadEncryption;
