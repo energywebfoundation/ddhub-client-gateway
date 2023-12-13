@@ -1,5 +1,7 @@
 name: Run tests
 on: [workflow_call]
+env:
+  NX_BASE: refs/heads/develop
 jobs:
   run-tests:
     name: Run tests
@@ -32,11 +34,12 @@ jobs:
       - name: Run tests
         id: getAffected
         run: |
-          affected_apps=$(nx print-affected --base origin/develop --select=projects)
+          affected_apps=$(nx print-affected --select=projects)
           echo $affected_apps
+          echo $NX_BASE
           echo "affected_apps=$affected_apps" >>"$GITHUB_OUTPUT"
       - name: Run tests
-        run: nx affected --target=test --exclude=dsb-client-gateway-api-e2e,ui-core --base origin/develop
+        run: nx affected --target=test --exclude=dsb-client-gateway-api-e2e,ui-core
       - name: Run linters
-        run: nx affected --target=lint --exclude=dsb-client-gateway-api-e2e,ui-core --base origin/develop
+        run: nx affected --target=lint --exclude=dsb-client-gateway-api-e2e,ui-core
         
