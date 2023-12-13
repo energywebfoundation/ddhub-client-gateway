@@ -1,9 +1,4 @@
-import {
-  CanActivate,
-  ExecutionContext,
-  Injectable,
-  Logger,
-} from '@nestjs/common';
+import { ExecutionContext, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
@@ -34,6 +29,8 @@ export class ApiKeyGuard {
   }
 
   public async canActivate(context: ExecutionContext): Promise<boolean> {
+    const request = context.switchToHttp().getRequest();
+
     const apiKey: string | undefined = this.configService.get<
       string | undefined
     >('API_KEY');
@@ -49,8 +46,6 @@ export class ApiKeyGuard {
     if (!apiKey && !password && !username) {
       return true;
     }
-
-    const request = context.switchToHttp().getRequest();
 
     const { headers } = request;
 
