@@ -1,18 +1,23 @@
-name: Run tests
+name: Run tests and getAffected
 on: 
   workflow_call:
     outputs:
       affected:
         description: "Affected Apps comparing with develop branch"
         value: ${{ jobs.run_tests.outputs.affected }}
-env:
-  NX_BASE: origin/develop
+    secrets:
+      NX_BASE:
+        required: true
+        description: "NX comparison base"
+
 jobs:
   run_tests:
     name: Run tests
     runs-on: ubuntu-latest
     outputs:
       affected: ${{ steps.getAffected.outputs.affected_apps }}
+    env:
+      NX_BASE: ${{ secrets.NX_BASE }}
     steps:
       - uses: actions/checkout@v2
         with:
@@ -44,7 +49,9 @@ jobs:
           echo $NX_BASE
           echo "affected_apps=$affected_apps" >>"$GITHUB_OUTPUT"
       - name: Run tests
+        if: contains(secrets.NX_BASE, 'develop')
         run: nx affected --target=test --exclude=dsb-client-gateway-api-e2e,ui-core
       - name: Run linters
+        if: contains(secrets.NX_BASE, 'develop')
         run: nx affected --target=lint --exclude=dsb-client-gateway-api-e2e,ui-core
         
