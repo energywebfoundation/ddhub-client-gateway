@@ -2,7 +2,9 @@ name: Run tests
 on: 
   workflow_call:
     outputs:
-      affected: ${{ jobs.run_tests.outputs.affected }}
+      affected:
+        description: "Affected Apps comparing with develop branch"
+        value: ${{ jobs.run_tests.outputs.affected }}
 env:
   NX_BASE: origin/develop
 jobs:
