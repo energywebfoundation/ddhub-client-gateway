@@ -49,9 +49,9 @@ jobs:
           echo $NX_BASE
           echo "affected_apps=$affected_apps" >>"$GITHUB_OUTPUT"
       - name: Run tests
-        if: contains(secrets.NX_BASE, 'develop')
+        if: contains($NX_BASE, 'develop')
         run: nx affected --target=test --exclude=dsb-client-gateway-api-e2e,ui-core
       - name: Run linters
-        if: contains(secrets.NX_BASE, 'develop')
+        if: contains($NX_BASE, 'develop')
         run: nx affected --target=lint --exclude=dsb-client-gateway-api-e2e,ui-core
         
