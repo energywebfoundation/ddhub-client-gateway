@@ -1,9 +1,12 @@
 name: Run tests
-on: [workflow_call]
+on: 
+  workflow_call:
+    outputs:
+      affected: ${{ jobs.run_tests.outputs.affected }}
 env:
   NX_BASE: origin/develop
 jobs:
-  run-tests:
+  run_tests:
     name: Run tests
     runs-on: ubuntu-latest
     outputs:
