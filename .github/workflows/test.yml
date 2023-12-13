@@ -1,9 +1,23 @@
-name: Run tests
-on: [workflow_call]
+name: Run tests and getAffected
+on: 
+  workflow_call:
+    outputs:
+      affected:
+        description: "Affected Apps comparing with develop branch"
+        value: ${{ jobs.run_tests.outputs.affected }}
+    secrets:
+      NX_BASE:
+        required: true
+        description: "NX comparison base"
+
 jobs:
-  run-tests:
+  run_tests:
     name: Run tests
     runs-on: ubuntu-latest
+    outputs:
+      affected: ${{ steps.getAffected.outputs.affected_apps }}
+    env:
+      NX_BASE: ${{ secrets.NX_BASE }}
     steps:
       - uses: actions/checkout@v2
         with:
@@ -27,7 +41,17 @@ jobs:
         run: npm install -g nx npm@8.5.0
       - name: Install dependencies
         run: npm ci
+      - name: Caculate affected apps
+        id: getAffected
+        run: |
+          affected_apps=$(nx print-affected --select=projects)
+          echo $affected_apps
+          echo $NX_BASE
+          echo "affected_apps=$affected_apps" >>"$GITHUB_OUTPUT"
       - name: Run tests
-        run: nx run-many --target=test --exclude=dsb-client-gateway-api-e2e,ui-core
+        if: contains(${{ env.NX_BASE }}, 'develop')
+        run: nx affected --target=test --exclude=dsb-client-gateway-api-e2e,ui-core
       - name: Run linters
-        run: nx run-many --target=lint --exclude=dsb-client-gateway-api-e2e,ui-core
+        if: contains(${{ env.NX_BASE }}, 'develop')
+        run: nx affected --target=lint --exclude=dsb-client-gateway-api-e2e,ui-core
+        

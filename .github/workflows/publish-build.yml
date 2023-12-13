@@ -22,6 +22,7 @@ jobs:
 
   unique_id:
     runs-on: ubuntu-latest
+    needs: cancel-previous
     steps:
       - name: Generate unique id
         id: unique_id
@@ -29,10 +30,17 @@ jobs:
     outputs:
       unique_id: ${{ steps.unique_id.outputs.id }}
 
+  get_affected:
+    needs: cancel-previous
+    uses: ./.github/workflows/test.yml
+    secrets:
+      NX_BASE: HEAD~1
+
   build-scheduler:
     name: Build scheduler
     runs-on: ubuntu-latest
-    needs: [cancel-previous, unique_id]
+    needs: [cancel-previous, unique_id, get_affected]
+    if: contains(needs.get_affected.outputs.affected, 'dsb-client-gateway-scheduler')
     steps:
       - uses: actions/checkout@v2
         with:
@@ -107,7 +115,8 @@ jobs:
   build-be:
     name: Build Backend
     runs-on: ubuntu-latest
-    needs: [cancel-previous, unique_id]
+    needs: [cancel-previous, unique_id, get_affected]
+    if: contains(needs.get_affected.outputs.affected, 'dsb-client-gateway-api')
     steps:
       - uses: actions/checkout@v2
         with:
@@ -186,7 +195,8 @@ jobs:
   build-fe:
     name: Build Frontend
     runs-on: ubuntu-latest
-    needs: [cancel-previous, unique_id]
+    needs: [cancel-previous, unique_id, get_affected]
+    if: contains(needs.get_affected.outputs.affected, 'dsb-client-gateway-frontend')
     services:
       postgres:
         image: postgres
