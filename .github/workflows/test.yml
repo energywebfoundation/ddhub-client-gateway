@@ -4,6 +4,8 @@ jobs:
   run-tests:
     name: Run tests
     runs-on: ubuntu-latest
+    outputs:
+      affected: ${{ steps.getAffected.outputs.affected_apps }}
     steps:
       - uses: actions/checkout@v2
         with:
@@ -28,6 +30,13 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: Run tests
-        run: nx run-many --target=test --exclude=dsb-client-gateway-api-e2e,ui-core
+        id: getAffected
+        run: |
+          affected_apps=$(nx print-affected --base origin/develop --select=projects)
+          echo $affected_apps
+          echo "affected_apps=$affected_apps" >>"$GITHUB_OUTPUT"
+      - name: Run tests
+        run: nx affected --target=test --exclude=dsb-client-gateway-api-e2e,ui-core --base origin/develop
       - name: Run linters
-        run: nx run-many --target=lint --exclude=dsb-client-gateway-api-e2e,ui-core
+        run: nx affected --target=lint --exclude=dsb-client-gateway-api-e2e,ui-core --base origin/develop
+        
