@@ -14,7 +14,7 @@ import getConfig from 'next/config';
 export function BrokerCard() {
   const { classes } = useStyles();
   const { publicRuntimeConfig } = getConfig();
-  const defaultMbName = 'Energy Web';
+  const defaultMbName = 'DDHub Message Broker';
   const mbName = publicRuntimeConfig?.customMessageBrokerName ?? defaultMbName;
 
   return (
