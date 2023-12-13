@@ -22,9 +22,10 @@ jobs:
   #     INFURA_PROJECT_SECRET: ${{ secrets.INFURA_PROJECT_SECRET }}
   #     INFURA_PROJECT_ID: ${{ secrets.INFURA_PROJECT_ID }}
   #     PRIVATE_KEY_E2E: ${{ secrets.PRIVATE_KEY_E2E }}
-  # build-frontend:
-  #   needs: lint-commits
-  #   uses: ./.github/workflows/build_frontend.yml
+  build-frontend:
+    needs: [lint-commits, run-chores]
+    if: contains(needs.run-chores.outputs.affected, 'dsb-client-gateway-frontend')
+    uses: ./.github/workflows/build_frontend.yml
   # build-scheduler:
   #   needs: lint-commits
   #   uses: ./.github/workflows/build_scheduler.yml
