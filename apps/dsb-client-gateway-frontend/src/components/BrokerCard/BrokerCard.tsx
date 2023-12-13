@@ -9,14 +9,19 @@ import {
 import { Mail } from 'react-feather';
 import { Badge } from '@ddhub-client-gateway-frontend/ui/core';
 import { useStyles } from './BrokerCard.styles';
+import getConfig from 'next/config';
 
 export function BrokerCard() {
   const { classes } = useStyles();
+  const { publicRuntimeConfig } = getConfig();
+  const defaultMbName = 'Energy Web';
+  const mbName = publicRuntimeConfig?.customMessageBrokerName ?? defaultMbName;
+
   return (
     <Card className={classes.card}>
       <Box>
         <CardHeader
-          title={'DDHub message broker'}
+          title={mbName}
           avatar={
             <Avatar className={classes.avatar}>
               <Mail size={24} className={classes.mailIcon} />
