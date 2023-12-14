@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import jwt from 'jsonwebtoken';
 import { UserRole } from '../const';
@@ -16,6 +16,8 @@ export interface UserTokenData {
 
 @Injectable()
 export class UserRolesTokenService {
+  protected readonly logger = new Logger(UserRolesTokenService.name);
+
   constructor(protected readonly configService: ConfigService) {}
 
   public verifyToken(accessToken: string): UserTokenData {
@@ -43,11 +45,20 @@ export class UserRolesTokenService {
 
     return this.generateTokens(
       decryptedToken.username,
-      decryptedToken.accountType
+      decryptedToken.accountType,
+      true
     );
   }
 
-  public generateTokens(username: string, accountType: UserRole): AuthTokens {
+  public generateTokens(
+    username: string,
+    accountType: UserRole,
+    isRefresh = false
+  ): AuthTokens {
+    this.logger.log(
+      `User "${username}" ${isRefresh ? 'refreshed tokens' : 'logged in'}`
+    );
+
     return {
       accessToken: jwt.sign(
         {
