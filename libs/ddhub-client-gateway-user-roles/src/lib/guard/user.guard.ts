@@ -47,14 +47,8 @@ export class UserGuard implements CanActivate {
     }
 
     const authHeader = request.headers.authorization;
-
-    console.log('auth header', authHeader);
-
     if (authHeader) {
       const token = authHeader.split(' ')[1];
-
-      console.log('token', token);
-
       try {
         const decodedToken: UserTokenData =
           this.userAuthService.verifyToken(token);
