@@ -1,9 +1,9 @@
 import {
   CanActivate,
+  createParamDecorator,
   ExecutionContext,
   Injectable,
   Logger,
-  createParamDecorator,
 } from '@nestjs/common';
 import { UserAuthService } from '../service/user-auth.service';
 import { Reflector } from '@nestjs/core';
@@ -32,6 +32,10 @@ export class UserGuard implements CanActivate {
 
     const request = context.switchToHttp().getRequest();
 
+    if (request.url === '/api/v2/health') {
+      return true;
+    }
+
     const excludedRoute: boolean = this.reflector.get<boolean>(
       EXCLUDED_ROUTE,
       context.getHandler()
@@ -43,14 +47,8 @@ export class UserGuard implements CanActivate {
     }
 
     const authHeader = request.headers.authorization;
-
-    console.log('auth header', authHeader);
-
     if (authHeader) {
       const token = authHeader.split(' ')[1];
-
-      console.log('token', token);
-
       try {
         const decodedToken: UserTokenData =
           this.userAuthService.verifyToken(token);
