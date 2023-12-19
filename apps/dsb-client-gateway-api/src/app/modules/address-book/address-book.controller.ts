@@ -21,12 +21,18 @@ import {
   UserGuard,
   UserRole,
 } from '@dsb-client-gateway/ddhub-client-gateway-user-roles';
+import { GetContactParamsDto } from './dto/request/get-contact.dto';
+import { PinoLogger } from 'nestjs-pino';
+import { ContactNotFoundException } from './exceptions/contact-not-found-exception';
 
 @Controller('contacts')
 @ApiTags('Address Book')
 @UseGuards(UserGuard)
 export class AddressBookController {
-  constructor(protected readonly addressBookService: AddressBookService) {}
+  constructor(
+    protected readonly addressBookService: AddressBookService,
+    protected readonly logger: PinoLogger
+  ) {}
 
   @Post()
   @ApiResponse({
@@ -80,5 +86,34 @@ export class AddressBookController {
       did: contact.did,
       alias: contact.name,
     }));
+  }
+
+  @Get('/:did')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Get contact by DID',
+    type: [GetAllContactsResponseDto],
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Contact not found',
+  })
+  @HttpCode(HttpStatus.OK)
+  @Roles(UserRole.ADMIN, UserRole.MESSAGING)
+  public async get(
+    @Param() { did }: GetContactParamsDto
+  ): Promise<GetAllContactsResponseDto> {
+    this.logger.assign({
+      did,
+    });
+
+    const contact = await this.addressBookService.findContact(did);
+    if (!contact) {
+      throw new ContactNotFoundException(did);
+    }
+    return {
+      did: contact.did,
+      alias: contact.name,
+    };
   }
 }

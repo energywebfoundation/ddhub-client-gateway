@@ -72,6 +72,9 @@ export enum DsbClientGatewayErrors {
 
   // Validation errors
   VALIDATION_FAILED = 'VALIDATION::FAILED',
+
+  // Contact errors
+  CONTACT_NOT_FOUND = 'CONTACT::NOT_FOUND',
 }
 
 export const DsbMessageBrokerErrors = {
