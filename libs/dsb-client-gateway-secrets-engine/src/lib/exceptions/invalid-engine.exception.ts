@@ -10,7 +10,11 @@ export class InvalidEngineException extends BaseException {
       'Invalid secrets engine specified',
       DsbClientGatewayErrors.SECRETS_ENGINE_INVALID,
       {
-        allowedValues: [SecretsEngine.AWS, SecretsEngine.VAULT],
+        allowedValues: [
+          SecretsEngine.AWS,
+          SecretsEngine.VAULT,
+          SecretsEngine.AZURE,
+        ],
       }
     );
   }
