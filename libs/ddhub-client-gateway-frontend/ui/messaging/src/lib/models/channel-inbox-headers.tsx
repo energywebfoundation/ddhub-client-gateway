@@ -27,8 +27,8 @@ export const CHANNEL_INBOX_HEADERS = [
     isSortable: true,
     Cell: (props: any) => {
       return (
-        props.row.original.senderAlias ||
-        didFormatMinifier(props.row.original.sender)
+        props?.row?.original?.senderAlias ||
+        didFormatMinifier(props?.row?.original?.sender)
       );
     },
   },

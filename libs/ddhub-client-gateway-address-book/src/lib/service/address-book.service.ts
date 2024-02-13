@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import {
   AddressBookEntity,
-  AddressBookRepository,
   AddressBookRepositoryWrapper,
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
 
@@ -20,6 +19,15 @@ export class AddressBookService {
 
   public async getAll(): Promise<AddressBookEntity[]> {
     return this.addressBookWrapper.repository.find();
+  }
+
+  public async findContact(did: string): Promise<AddressBookEntity> {
+    const contact = this.addressBookWrapper.repository.findOne({
+      where: {
+        did,
+      },
+    });
+    return contact;
   }
 
   public async delete(did: string): Promise<void> {

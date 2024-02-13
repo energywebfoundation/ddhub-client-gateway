@@ -7,13 +7,16 @@ on:
       - "pre_release"
 
 jobs:
-  run-chores:
+  run_chores:
     needs: lint-commits
     uses: ./.github/workflows/test.yml
+    secrets:
+      NX_BASE: origin/develop
   lint-commits:
     uses: ./.github/workflows/commitlint.yml
   build-api:
-    needs: lint-commits
+    needs: [lint-commits, run_chores]
+    if: contains(needs.run_chores.outputs.affected, 'dsb-client-gateway-api')
     uses: ./.github/workflows/build_api.yml
     secrets:
       ONEPASSWORD_VAULT_ID: ${{ secrets.ONEPASSWORD_VAULT_ID }}
@@ -23,8 +26,10 @@ jobs:
       INFURA_PROJECT_ID: ${{ secrets.INFURA_PROJECT_ID }}
       PRIVATE_KEY_E2E: ${{ secrets.PRIVATE_KEY_E2E }}
   build-frontend:
-    needs: lint-commits
+    needs: [lint-commits, run_chores]
+    if: contains(needs.run_chores.outputs.affected, 'dsb-client-gateway-frontend')
     uses: ./.github/workflows/build_frontend.yml
   build-scheduler:
-    needs: lint-commits
+    needs: [lint-commits, run_chores]
+    if: contains(needs.run_chores.outputs.affected, 'dsb-client-gateway-scheduler')
     uses: ./.github/workflows/build_scheduler.yml
