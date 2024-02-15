@@ -7,7 +7,7 @@ export function Login() {
   const { classes } = useStyles();
   const { version } = useUserDataEffects();
   const { publicRuntimeConfig } = getConfig();
-  const defaultCgwName = 'Energy Web';
+  const defaultCgwName = 'Energy Web Client Gateway';
   const cgwName = publicRuntimeConfig?.customName ?? defaultCgwName;
 
   return (
@@ -15,7 +15,7 @@ export function Login() {
       <Stack direction="column" alignItems="center">
         <Container className={classes.container}>
           <Typography variant="h2" sx={{ margin: 0 }}>
-            <span className={classes.highlight}>{cgwName}</span> Client Gateway
+            <span className={classes.highlight}>{cgwName}</span>
           </Typography>
           <LoginStatus />
         </Container>
