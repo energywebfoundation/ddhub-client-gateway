@@ -2,7 +2,6 @@ import {
   FormSelectOption,
   GenericFormField,
 } from '@ddhub-client-gateway-frontend/ui/core';
-import { PROPERTIES_KEY } from '@rjsf/utils';
 
 export const fields: { [name: string]: GenericFormField } = {
   channel: {
@@ -43,22 +42,24 @@ export const fields: { [name: string]: GenericFormField } = {
   },
 };
 
-export const constructDefaultData = (schema: string) => {
+export const constructDefaultData = (schema: string): Record<string, any> => {
   try {
     const jsonSchema = JSON.parse(schema);
     const properties = jsonSchema.properties;
-    if (!properties || Object.keys(properties).length === 0) return [];
+    console.log('constructDefaultData', properties, jsonSchema);
+    if (!properties || Object.keys(properties).length === 0) return {};
 
-    let data: Record<string, any> = {};
+    const data: Record<string, any> = {};
     for (const key in properties) {
-      if (properties[key].default) {
+      if (properties[key].default !== undefined) {
         data[key] = properties[key].default;
       }
     }
+    console.log('constructDefaultData', data);
 
-    return Object.keys(data).length > 0 ? data : [];
+    return Object.keys(data).length > 0 ? data : {};
   } catch (e) {
     console.error('constructDefaultData', e);
-    return [];
+    return {};
   }
 };
