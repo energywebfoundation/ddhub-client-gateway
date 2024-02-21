@@ -11,8 +11,11 @@ export const LARGE_MESSAGES_HEADERS = [
     Header: 'FROM',
     accessor: 'sender',
     isSortable: true,
-    Cell: (props: any, row: any) => {
-      return row.original.senderAlias || didFormatMinifier(row.original.sender);
+    Cell: (props: any) => {
+      return (
+        props?.row?.original?.senderAlias ||
+        didFormatMinifier(props?.row?.original?.sender)
+      );
     },
   },
   {
@@ -44,8 +47,8 @@ export const MESSAGES_HEADERS = [
     isSortable: true,
     Cell: (props: any) => {
       return (
-        props.row.original.senderAlias ||
-        didFormatMinifier(props.row.original.sender)
+        props?.row?.original?.senderAlias ||
+        didFormatMinifier(props?.row?.original?.sender)
       );
     },
   },
