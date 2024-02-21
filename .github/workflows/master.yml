@@ -316,7 +316,7 @@ jobs:
         env:
           DB_NAME: postgresql://ddhub:ddhub@localhost:5432/ddhub
           NEXT_PUBLIC_CUSTOM_BRANDING_PATH: '/aemo-logo.svg'
-          NEXT_PUBLIC_CUSTOM_CGW_NAME: 'TEDD'
+          NEXT_PUBLIC_CUSTOM_CGW_NAME: 'WA Unregistered Equipment Portal'
 
       - name: 'Login via Azure CLI'
         uses: azure/login@v1
