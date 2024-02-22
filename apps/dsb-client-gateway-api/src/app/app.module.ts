@@ -60,6 +60,11 @@ export class AppModule {
                 singleLine: true,
               },
             },
+            customProps: (req, res) => {
+              return {
+                user: res?.req?.user,
+              };
+            },
           },
         }),
         inject: [ConfigService],

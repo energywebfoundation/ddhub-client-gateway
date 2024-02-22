@@ -1,5 +1,5 @@
 import { makeStyles } from 'tss-react/mui';
-import { lighten } from '@mui/material/styles';
+import { alpha, lighten } from '@mui/material/styles';
 
 export const useStyles = makeStyles()((theme) => ({
   root: {
@@ -10,6 +10,18 @@ export const useStyles = makeStyles()((theme) => ({
   },
   card: {
     padding: '22px 23px',
+  },
+  heading: {
+    fontSize: 16,
+    lineHeight: '24px',
+    marginBottom: 8,
+    color: theme.palette.common.white,
+    letterSpacing: '0.4px',
+    fontFamily: theme.typography.body2.fontFamily,
+  },
+  divider: {
+    borderColor: alpha(theme.palette.grey[600], 0.35),
+    margin: '8px 0',
   },
   title: {
     fontSize: 14,

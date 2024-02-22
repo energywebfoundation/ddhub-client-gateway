@@ -41,3 +41,25 @@ export const fields: { [name: string]: GenericFormField } = {
     },
   },
 };
+
+export const constructDefaultData = (schema: string): Record<string, any> => {
+  try {
+    const jsonSchema = JSON.parse(schema);
+    const properties = jsonSchema.properties;
+    console.log('constructDefaultData', properties, jsonSchema);
+    if (!properties || Object.keys(properties).length === 0) return {};
+
+    const data: Record<string, any> = {};
+    for (const key in properties) {
+      if (properties[key].default !== undefined) {
+        data[key] = properties[key].default;
+      }
+    }
+    console.log('constructDefaultData', data);
+
+    return Object.keys(data).length > 0 ? data : {};
+  } catch (e) {
+    console.error('constructDefaultData', e);
+    return {};
+  }
+};

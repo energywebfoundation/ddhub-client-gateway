@@ -12,3 +12,5 @@ export * from './MessageOutboxContainer';
 export * from './RelatedMessageOutbox';
 export * from './RelatedMessageOutboxContainer';
 export * from './AddressBookContainer';
+export * from './ReplyMessages';
+export * from './ReplyMessagesContainer';

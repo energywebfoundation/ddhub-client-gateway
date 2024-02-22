@@ -40,7 +40,11 @@ export const CheckboxWidget = (props: WidgetProps) => {
   return (
     <>
       {labelValue(
-        <FormLabel className={classes.label} required={required} htmlFor={id}>
+        <FormLabel
+          className={classes.checkboxLabel}
+          required={required}
+          htmlFor={id}
+        >
           {label || undefined}
         </FormLabel>,
         hideLabel
@@ -48,7 +52,6 @@ export const CheckboxWidget = (props: WidgetProps) => {
       <FormControlLabel
         classes={{
           root: classes.labelRoot,
-          label: classes.formControlLabel,
         }}
         control={
           <Checkbox

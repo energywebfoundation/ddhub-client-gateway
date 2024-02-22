@@ -60,6 +60,10 @@ export class ApiKeyGuard implements CanActivate {
 
     const { headers } = request;
 
+    if (request.url === '/api/v2/health') {
+      return true;
+    }
+
     if (headers.authorization) {
       return this.userGuard.canActivate(context);
     }

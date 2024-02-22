@@ -25,6 +25,7 @@ import { ActionButtons } from './ActionButtons';
 import { Controller } from 'react-hook-form';
 import { CopyToClipboard } from '@ddhub-client-gateway-frontend/ui/core';
 import { generateUuid } from '@ddhub-client-gateway-frontend/ui/utils';
+import { constructDefaultData } from './NewMessage.utils';
 
 export const NewMessage: FC = () => {
   const { classes } = useStyles();
@@ -52,16 +53,31 @@ export const NewMessage: FC = () => {
     setTransactionId,
   } = useNewMessageEffects();
 
-  const [formData, setFormData] = useState([]);
+  const [formData, setFormData] = useState({});
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
     // Reset data when modal is closed or the selected channel/topic/version changes
     if (!open || selectedChannel || selectedTopic || selectedVersion) {
-      setFormData([]);
+      if (
+        selectedChannel &&
+        selectedTopic &&
+        selectedVersion &&
+        newMessageValues?.schema
+      ) {
+        setFormData(constructDefaultData(newMessageValues.schema));
+      } else {
+        setFormData([]);
+      }
       setErrors({});
     }
-  }, [open, selectedChannel, selectedTopic, selectedVersion]);
+  }, [
+    open,
+    selectedChannel,
+    selectedTopic,
+    selectedVersion,
+    newMessageValues?.schema,
+  ]);
 
   const buildStepActionButtons = () => {
     switch (activeStep) {

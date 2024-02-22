@@ -1350,6 +1350,23 @@ paths:
       tags:
         - "Address Book"
   /api/v2/contacts/{did}:
+    get:
+      operationId: "AddressBookController_getContact"
+      parameters:
+        - name: "did"
+          required: true
+          in: "path"
+          schema:
+            type: "string"
+      responses:
+        200:
+          description: "Get contacts by DID"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetAllContactsResponseDto"
+        404:
+          description: "Contact not found"
     delete:
       operationId: "AddressBookController_deleteContact"
       parameters:
@@ -2029,6 +2046,11 @@ components:
           type: "string"
           description: "topic id"
           example: "111"
+        replyMessagesCount:
+          type: "number"
+          example: 2
+          description: "Reply messages count"
+          default: 0
         topicName:
           type: "string"
           description: "topic Name"
@@ -2100,6 +2122,7 @@ components:
       required:
         - "id"
         - "topicId"
+        - "replyMessagesCount"
         - "topicName"
         - "topicOwner"
         - "topicVersion"
