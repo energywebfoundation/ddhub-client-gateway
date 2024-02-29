@@ -53,7 +53,7 @@ export const NewMessage: FC = () => {
     setTransactionId,
   } = useNewMessageEffects();
 
-  const [formData, setFormData] = useState([]);
+  const [formData, setFormData] = useState({});
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
