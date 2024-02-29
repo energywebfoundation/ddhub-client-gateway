@@ -36,4 +36,4 @@ jobs:
         inlineScript: |
           az extension add --name aks-preview
           az account show  --query user.name -o tsv 
-          az aks nodepool show -g ${{ secrets.DEV_AKS_RG }} --cluster-name ${{ secrets.DEV_AKS_NAME }} --name ewf --query powerState.code -o tsv
+          az aks nodepool start -g ${{ secrets.DEV_AKS_RG }} --cluster-name ${{ secrets.DEV_AKS_NAME }} --name monitoring --query powerState.code -o tsv
