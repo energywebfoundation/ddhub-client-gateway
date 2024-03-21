@@ -36,6 +36,10 @@ export class UserGuard implements CanActivate {
       return true;
     }
 
+    if (request.user === 'api-key') {
+      return true;
+    }
+
     const excludedRoute: boolean = this.reflector.get<boolean>(
       EXCLUDED_ROUTE,
       context.getHandler()
