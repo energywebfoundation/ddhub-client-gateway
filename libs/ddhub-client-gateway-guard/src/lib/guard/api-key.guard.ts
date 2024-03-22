@@ -70,8 +70,9 @@ export class ApiKeyGuard implements CanActivate {
 
     const apiKeyFromHeaders: string | undefined = headers['x-api-key'];
 
-    if (apiKeyFromHeaders) {
-      return apiKeyFromHeaders === apiKey;
+    if (apiKeyFromHeaders && apiKeyFromHeaders === apiKey) {
+      request.user = 'api-key';
+      return true;
     }
 
     const usernameFromHeaders: string | undefined = headers['x-api-username'];
