@@ -32,19 +32,24 @@ export class TlsAgentService implements OnApplicationBootstrap {
     const certificateDetails =
       await this.secretsEngineService.getCertificateDetails();
 
-    if (!certificateDetails) {
-      this.logger.debug('Not creating HTTPS agent: no stored certificate details');
+    if (
+      !certificateDetails ||
+      !certificateDetails.certificate ||
+      !certificateDetails.privateKey
+    ) {
+      this.logger.debug(
+        'Not creating HTTPS agent: no stored certificate details'
+      );
 
       return undefined;
     }
 
-    this.logger.log('https agent configured');
-
     this.agent = new Agent({
       cert: certificateDetails.certificate,
       key: certificateDetails.privateKey,
-      ca: certificateDetails.caCertificate,
+      ca: certificateDetails.caCertificate ?? undefined,
     });
+    this.logger.debug('HTTPS agent configured');
 
     return this.agent;
   }

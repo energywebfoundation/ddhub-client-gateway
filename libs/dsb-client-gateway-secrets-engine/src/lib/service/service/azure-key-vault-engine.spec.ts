@@ -238,7 +238,26 @@ describe(`${AzureKeyVaultService.name}`, () => {
     }
   });
 
-  it('should rollback all Certificate Details secrets if one fails', async () => {
+  it('should retry all Certificate Details secrets if one fails, but delete/purging', async () => {
+    const privateKeyResponse = {
+      name: 'ddhub-certificate-private-key',
+      value: 'test_private_key',
+      properties: {
+        vaultUrl: '',
+        version: '',
+        name: '',
+      },
+    };
+    const certificateResponse = {
+      name: 'ddhub-certificate-certificate',
+      value: 'test_certificate',
+      properties: {
+        vaultUrl: '',
+        version: '',
+        name: '',
+      },
+    };
+
     jest.spyOn(SecretClient.prototype, 'beginDeleteSecret').mockResolvedValue({
       poll: jest.fn(),
       onProgress: jest.fn(),
@@ -251,23 +270,134 @@ describe(`${AzureKeyVaultService.name}`, () => {
       getOperationState: jest.fn(),
     });
     jest
+      .spyOn(SecretClient.prototype, 'purgeDeletedSecret')
+      .mockResolvedValueOnce();
+    jest
       .spyOn(SecretClient.prototype, 'setSecret')
-      .mockResolvedValueOnce({
-        name: 'ddhub-certificate-private-key',
-        value: 'test_private_key',
-        properties: {
-          vaultUrl: '',
-          version: '',
-          name: '',
-        },
-      })
-      .mockRejectedValueOnce(new Error('Test error'));
+      .mockResolvedValueOnce(privateKeyResponse)
+      .mockRejectedValueOnce(new Error('Test error'))
+      .mockResolvedValueOnce(privateKeyResponse)
+      .mockResolvedValueOnce(certificateResponse);
 
     const details = await service.setCertificateDetails({
       privateKey: 'test_private_key',
       certificate: 'test_certificate',
     });
-    expect(details).toBeNull();
+    expect(details).toStrictEqual([privateKeyResponse, certificateResponse]);
+    expect(SecretClient.prototype.setSecret).toHaveBeenCalledTimes(4);
+
+    // Secret should be deleted then purged
+    expect(SecretClient.prototype.beginDeleteSecret).toHaveBeenCalledTimes(2);
+    expect(SecretClient.prototype.purgeDeletedSecret).toHaveBeenCalledTimes(2);
+  });
+
+  it('should receive an error if retry fails on setting Certificate Details secrets', async () => {
+    const privateKeyResponse = {
+      name: 'ddhub-certificate-private-key',
+      value: 'test_private_key',
+      properties: {
+        vaultUrl: '',
+        version: '',
+        name: '',
+      },
+    };
+    const certificateResponse = {
+      name: 'ddhub-certificate-certificate',
+      value: 'test_certificate',
+      properties: {
+        vaultUrl: '',
+        version: '',
+        name: '',
+      },
+    };
+
+    jest.spyOn(SecretClient.prototype, 'beginDeleteSecret').mockResolvedValue({
+      poll: jest.fn(),
+      onProgress: jest.fn(),
+      pollUntilDone: jest.fn().mockImplementation(() => Promise.resolve(true)),
+      isDone: jest.fn(),
+      stopPolling: jest.fn(),
+      isStopped: jest.fn(),
+      getResult: jest.fn(),
+      cancelOperation: jest.fn(),
+      getOperationState: jest.fn(),
+    });
+    jest
+      .spyOn(SecretClient.prototype, 'purgeDeletedSecret')
+      .mockResolvedValueOnce();
+    jest
+      .spyOn(SecretClient.prototype, 'setSecret')
+      .mockResolvedValueOnce(privateKeyResponse)
+      .mockRejectedValueOnce(new Error('Test error'));
+
+    await expect(
+      service.setCertificateDetails(
+        {
+          privateKey: 'test_private_key',
+          certificate: 'test_certificate',
+        },
+        true
+      )
+    ).rejects.toEqual(
+      new Error('Failed to set certificate details after retry')
+    );
+    expect(SecretClient.prototype.setSecret).toHaveBeenCalledTimes(2);
+
+    // Secret should be deleted then purged
+    expect(SecretClient.prototype.beginDeleteSecret).toHaveBeenCalledTimes(2);
+    expect(SecretClient.prototype.purgeDeletedSecret).toHaveBeenCalledTimes(2);
+  });
+
+  it('should purge existing Certificate Details secrets if conflicts occur', async () => {
+    const privateKeyResponse = {
+      name: 'ddhub-certificate-private-key',
+      value: 'test_private_key',
+      properties: {
+        vaultUrl: '',
+        version: '',
+        name: '',
+      },
+    };
+    const certificateResponse = {
+      name: 'ddhub-certificate-certificate',
+      value: 'test_certificate',
+      properties: {
+        vaultUrl: '',
+        version: '',
+        name: '',
+      },
+    };
+    const conflictResponse = {
+      details: {
+        error: {
+          code: 'Conflict',
+          innerError: {
+            code: 'ObjectIsDeletedButRecoverable',
+          },
+        },
+      },
+    };
+
+    jest
+      .spyOn(SecretClient.prototype, 'purgeDeletedSecret')
+      .mockResolvedValue();
+    jest
+      .spyOn(SecretClient.prototype, 'setSecret')
+      .mockResolvedValueOnce(privateKeyResponse)
+      .mockRejectedValueOnce(conflictResponse)
+      .mockResolvedValueOnce(privateKeyResponse)
+      .mockResolvedValueOnce(certificateResponse);
+
+    const details = await service.setCertificateDetails({
+      privateKey: 'test_private_key',
+      certificate: 'test_certificate',
+    });
+    expect(details).toStrictEqual([privateKeyResponse, certificateResponse]);
+    expect(SecretClient.prototype.setSecret).toHaveBeenCalledTimes(4);
+
+    // Conflict errors are thrown by AzureKeyVault when a secret is "soft deleted"
+    expect(SecretClient.prototype.beginDeleteSecret).toHaveBeenCalledTimes(0);
+    expect(SecretClient.prototype.purgeDeletedSecret).toHaveBeenCalledTimes(2);
   });
 
   it('should delete all Azure KV secrets', async () => {
