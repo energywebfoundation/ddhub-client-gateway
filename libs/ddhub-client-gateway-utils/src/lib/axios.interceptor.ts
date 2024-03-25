@@ -28,8 +28,9 @@ export const useInterceptors = (
     (err) => {
       const errorObject = {
         method: err.config?.method,
-        status: err.response?.status,
-        url: err.config?.url,
+        code: err?.code,
+        status: err.response?.status || err?.status,
+        url: `${err.config?.baseURL}${err.config?.url}`,
         message: err.message,
         params: err.config?.params,
         body: err.config?.data,
@@ -37,7 +38,7 @@ export const useInterceptors = (
         httpsAgent: !!err.config?.httpsAgent,
       };
 
-      logger.debug(JSON.stringify(errorObject));
+      logger.debug(`Intercepted Axios Error: ${JSON.stringify(errorObject)}`);
 
       return Promise.reject(err);
     }

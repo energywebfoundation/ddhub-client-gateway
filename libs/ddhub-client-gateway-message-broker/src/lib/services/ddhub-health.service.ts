@@ -5,6 +5,7 @@ import { TlsAgentService } from '@dsb-client-gateway/ddhub-client-gateway-tls-ag
 import { DdhubBaseService } from './ddhub-base.service';
 import { DdhubLoginService } from './ddhub-login.service';
 import { lastValueFrom } from 'rxjs';
+import { isAxiosError, isError } from '@nestjs/terminus/dist/utils';
 
 @Injectable()
 export class DdhubHealthService extends DdhubBaseService {
@@ -24,21 +25,31 @@ export class DdhubHealthService extends DdhubBaseService {
 
   public async health(): Promise<{ statusCode: number; message?: string }> {
     try {
-      const { data, status } = await lastValueFrom(
+      const response = await lastValueFrom(
         this.httpService.get('/health', {
           httpsAgent: await this.tlsAgentService.create(),
         })
       );
 
-      return { statusCode: status, message: data?.status };
-    } catch (e) {
-      if (e.response) {
-        this.logger.error(`DSB Health failed - ${e.response.data}`);
+      this.logger.log(
+        `MB Health response: ${response.status} - ${JSON.stringify(
+          response.data
+        )}`
+      );
+
+      return { statusCode: response?.status, message: response.data?.status };
+    } catch (err: unknown) {
+      if (isAxiosError(err)) {
+        this.logger.error(`MB Health request failed - ${err.message}`);
+        return {
+          statusCode: err.response?.status || 500,
+          message: err.response?.data || 'Internal Server Error',
+        };
       }
 
       return {
-        statusCode: e.response.status,
-        message: e.response.data,
+        statusCode: 500,
+        message: 'Internal Server Error',
       };
     }
   }

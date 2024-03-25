@@ -89,6 +89,7 @@ interface UserContext {
   authenticated: boolean;
   refreshToken: () => Promise<void>;
   authEnabled?: boolean;
+  mtlsIsValid: boolean;
 }
 
 export const UserContext = createContext<UserContext | undefined>(undefined);
@@ -103,6 +104,7 @@ export const useUserData = (queryClient: QueryClient) => {
     useState<UserAuthContext>(initialUserAuthData);
   const [refreshIdentity, setRefreshIdentity] = useState(false);
   const [authenticated, setAuthenticated] = useState(false);
+  const [mtlsIsValid, setMtlsIsValid] = useState(false);
 
   const resetUserData = (withErrorMessage?: string) => {
     setRefreshIdentity(false);
@@ -139,7 +141,32 @@ export const useUserData = (queryClient: QueryClient) => {
   }, []);
 
   useEffect(() => {
+    if (mtlsIsValid) {
+      queryClient.setDefaultOptions({
+        queries: {
+          ...queryClientOptions.queries,
+          enabled: authenticated,
+        },
+      });
+    } else {
+      queryClient.setDefaultOptions({
+        queries: {
+          ...queryClientOptions.queries,
+          enabled: false,
+        },
+      });
+    }
+  }, [authenticated, mtlsIsValid]);
+
+  useEffect(() => {
     if (config) {
+      console.log(config.mtlsIsValid);
+      if (typeof config.mtlsIsValid === 'boolean') {
+        setMtlsIsValid(config.mtlsIsValid);
+      } else {
+        setMtlsIsValid(true);
+      }
+
       if (userAuth.authenticated) {
         setAuthenticated(true);
       } else {
@@ -148,12 +175,6 @@ export const useUserData = (queryClient: QueryClient) => {
         } else {
           setAuthenticated(true);
           setRefreshIdentity(true);
-          queryClient.setDefaultOptions({
-            queries: {
-              ...queryClientOptions.queries,
-              enabled: authenticated,
-            },
-          });
         }
       }
     }
@@ -166,15 +187,6 @@ export const useUserData = (queryClient: QueryClient) => {
       setAuthenticated(true);
     }
   }, [userAuth]);
-
-  useEffect(() => {
-    queryClient.setDefaultOptions({
-      queries: {
-        ...queryClientOptions.queries,
-        enabled: authenticated,
-      },
-    });
-  }, [authenticated]);
 
   const fetchGatewayConfig = async () => {
     return await queryClient.fetchQuery<GatewayResponseDto>(
@@ -259,5 +271,6 @@ export const useUserData = (queryClient: QueryClient) => {
     setAuthenticated,
     refreshToken,
     authEnabled: config?.authEnabled,
+    mtlsIsValid,
   };
 };

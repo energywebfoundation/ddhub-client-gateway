@@ -36,11 +36,13 @@ export class AwsSecretsManagerService
     this.prefix = this.configService.get('SECRET_PREFIX', '/ddhub/');
   }
 
+  @Span('aws_ssm_getMnemonic')
   getMnemonic(): Promise<string | null> {
     return Promise.resolve(undefined);
   }
 
-  setMnemonic(mnemonic: string): Promise<string> {
+  @Span('aws_ssm_setMnemonic')
+  setMnemonic(_mnemonic: string): Promise<string> {
     return Promise.resolve('');
   }
 
@@ -55,26 +57,22 @@ export class AwsSecretsManagerService
     this.logger.log('AWS SSM Service initialized');
   }
 
+  @Span('aws_ssm_getAllUsers')
   public async getAllUsers(): Promise<UsersList> {
-    return [];
+    throw new Error('User Auth is not implemented in AWS Secrets Engine');
   }
 
   @Span('aws_ssm_getUserAuthDetails')
-  public async getUserAuthDetails(username: string): Promise<UserDetails> {
-    return {
-      role: 'admin',
-      password: 'password',
-      username: 'username',
-    };
+  public async getUserAuthDetails(): Promise<UserDetails> {
+    throw new Error('User Auth is not implemented in AWS Secrets Engine');
   }
 
   @Span('aws_ssm_setUserAuthDetails')
   public async setUserPassword(
-    username: string,
-    password: string
+    _username: string,
+    _password: string
   ): Promise<void> {
-    // @TODO - Implement
-    return;
+    throw new Error('User Auth is not implemented in AWS Secrets Engine');
   }
 
   @Span('aws_ssm_setRSAKey')

@@ -16,21 +16,28 @@ export const Scheduler = () => {
           Scheduler
         </Typography>
         <Box>
-          {jobs?.map((job) => {
-            return (
-              <SchedulerItem
-                key={job.jobName}
-                name={job.jobName}
-                date={dayjs(job.updatedDate).format('DD/MM/YYYY HH:mm:ssA')}
-                icon={
-                  schedulerIconMap.get(job.jobName) ||
-                  schedulerIconMap.get('DEFAULT_SCHEDULER')
-                }
-                status={job.latestStatus}
-              />
-            );
-          })}
-          <Divider />
+          {(!jobs || jobs?.length === 0) && (
+            <Typography variant="body2">No jobs found.</Typography>
+          )}
+          {jobs?.length && (
+            <>
+              {jobs?.map((job) => {
+                return (
+                  <SchedulerItem
+                    key={job.jobName}
+                    name={job.jobName}
+                    date={dayjs(job.updatedDate).format('DD/MM/YYYY HH:mm:ssA')}
+                    icon={
+                      schedulerIconMap.get(job.jobName) ||
+                      schedulerIconMap.get('DEFAULT_SCHEDULER')
+                    }
+                    status={job.latestStatus}
+                  />
+                );
+              })}
+              <Divider />
+            </>
+          )}
         </Box>
       </Box>
     </Card>
