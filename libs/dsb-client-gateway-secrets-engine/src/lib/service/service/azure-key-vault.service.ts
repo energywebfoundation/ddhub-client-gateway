@@ -188,8 +188,9 @@ export class AzureKeyVaultService
     const responses = await Promise.allSettled(commands);
 
     const errors = responses.filter(
-      ({ status }) => status === 'rejected'
-    ) as PromiseRejectedResult[];
+      (response): response is PromiseRejectedResult =>
+        response.status === 'rejected'
+    );
 
     // Log errors and rollback
     if (errors.length > 0) {
@@ -226,10 +227,11 @@ export class AzureKeyVaultService
     }
 
     return responses
-      .filter(({ status }) => status === 'fulfilled')
-      .map((response) =>
-        response.status === 'fulfilled' ? response.value : null
-      ) as KeyVaultSecret[];
+      .filter(
+        (response): response is PromiseFulfilledResult<KeyVaultSecret> =>
+          response.status === 'fulfilled'
+      )
+      .map((response) => response.value);
   }
 
   @Span('azure_kv_getCertificateDetails')
