@@ -7,6 +7,14 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { UserGuard } from '@dsb-client-gateway/ddhub-client-gateway-user-roles';
 
+const WHITELISTED_ENDPOINTS = [
+  '/api/v2/health',
+  '/api/v2/login',
+  '/api/v2/login/refresh-token',
+  '/api/v2/login/config',
+  '/api/v2/gateway',
+];
+
 @Injectable()
 export class ApiKeyGuard implements CanActivate {
   protected readonly logger = new Logger(ApiKeyGuard.name);
@@ -60,7 +68,7 @@ export class ApiKeyGuard implements CanActivate {
 
     const { headers } = request;
 
-    if (request.url === '/api/v2/health') {
+    if (WHITELISTED_ENDPOINTS.includes(request.url)) {
       return true;
     }
 
