@@ -186,8 +186,6 @@ export const useUserDataEffects = () => {
           mtlsIsValid
         );
 
-        console.log('displayedRoutes', displayedRoutes);
-
         setUserData((prevValue) => ({
           ...prevValue,
           accountStatus,
@@ -205,8 +203,6 @@ export const useUserDataEffects = () => {
           config.authEnabled ? userAuth : undefined,
           mtlsIsValid
         );
-
-        console.log('displayedRoutes', displayedRoutes);
 
         setUserData((prevValue) => ({
           ...prevValue,
