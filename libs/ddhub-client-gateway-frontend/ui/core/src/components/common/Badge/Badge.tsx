@@ -4,17 +4,22 @@ import { useStyles } from './Badge.styles';
 
 interface BadgeProps {
   text: string;
+  variant?: 'success' | 'error';
 }
 
-export const Badge: FC<BadgeProps> = ({ text }) => {
+export const Badge: FC<BadgeProps> = ({ text, variant }) => {
   const { classes, theme } = useStyles();
+  const color =
+    !variant || variant === 'success'
+      ? theme.palette.success.main
+      : theme.palette.error.main;
+  const wrapperClass =
+    !variant || variant === 'success'
+      ? classes.successWrapper
+      : classes.errorWrapper;
   return (
-    <Box className={classes.wrapper}>
-      <Typography
-        className={classes.text}
-        style={{ color: theme.palette.success.main }}
-        variant="body2"
-      >
+    <Box className={wrapperClass}>
+      <Typography className={classes.text} style={{ color }} variant="body2">
         {text}
       </Typography>
     </Box>

@@ -74,6 +74,7 @@ function MyApp(props: MyAppProps) {
     resetAuthData,
     refreshToken,
     authEnabled,
+    mtlsIsValid,
   } = useUserData(queryClient);
 
   const { addressBook, refreshAddressBook, getAlias, getAliasOrMinifiedDid } =
@@ -121,6 +122,7 @@ function MyApp(props: MyAppProps) {
                 resetAuthData,
                 refreshToken,
                 authEnabled,
+                mtlsIsValid,
               }}
             >
               <AddressBookContext.Provider

@@ -13,6 +13,8 @@ import { useUserDataEffects } from '../UserData.effects';
 import axios from 'axios';
 import { RouteRestrictions } from '../config/route-restrictions.interface';
 import { useBackdropContext } from '@ddhub-client-gateway-frontend/ui/context';
+import { useRouter } from 'next/router';
+import { routerConst } from '@ddhub-client-gateway-frontend/ui/utils';
 
 export enum AccountStatusEnum {
   INSUFFICIENT_FUNDS = 'Insufficient fund',
@@ -71,6 +73,7 @@ export const useCheckAccountStatus = (
   triggerQuery = true,
   withBackdrop = true
 ) => {
+  const router = useRouter();
   const queryClient = useQueryClient();
   const { setUserData, setIsCheckingIdentity, refreshIdentity } =
     useUserDataEffects();
@@ -103,19 +106,16 @@ export const useCheckAccountStatus = (
     if (withBackdrop) {
       setIsLoading(true);
     }
-    try {
-      const routeRestrictions: RouteRestrictions = (
-        await axios.get('/frontend-config.json?' + queryParam, { baseURL: '' })
-      ).data;
 
-      const identityData = await queryClient.fetchQuery(
-        getIdentityControllerGetQueryKey(),
-        identityControllerGet
-      );
-      return { identityData, routeRestrictions };
-    } catch (e: unknown) {
-      return e;
-    }
+    const routeRestrictions: RouteRestrictions = (
+      await axios.get('/frontend-config.json?' + queryParam, { baseURL: '' })
+    ).data;
+
+    const identityData = await queryClient.fetchQuery(
+      getIdentityControllerGetQueryKey(),
+      identityControllerGet
+    );
+    return { identityData, routeRestrictions };
   };
 
   useEffect(() => {
@@ -130,12 +130,12 @@ export const useCheckAccountStatus = (
         .catch((e) => {
           setError(e);
           console.error(e.message);
+          return router.push(routerConst.InitialPage);
         })
         .finally(() => {
           if (withBackdrop) {
             setIsLoading(false);
           }
-          // setChecking(false);
           setIsCheckingIdentity(false);
         });
     }

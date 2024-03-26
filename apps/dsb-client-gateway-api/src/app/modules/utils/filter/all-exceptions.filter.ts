@@ -37,7 +37,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
       statusCode: request.res.statusCode,
     };
 
-    this.logger.debug('Catched error', JSON.stringify(log));
+    this.logger.debug(`Caught HTTP error: ${JSON.stringify(log)}`);
 
     if (exception instanceof NotFoundException) {
       const responseBody: ResponseErrorDto = {
