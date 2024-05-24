@@ -30,7 +30,7 @@ export const MessageDetail: FC<MessageDetailProps> = ({
   let valueFieldText = field.value;
 
   if (isISODateString(valueFieldText)) {
-    const valueAsDateTime = DateTime.fromFormat(valueFieldText, '');
+    const valueAsDateTime = DateTime.fromISO(valueFieldText);
     if (valueAsDateTime.isValid) {
       valueFieldText = valueAsDateTime.toFormat('dd/MM/yyyy HH:mm:ss');
     }
