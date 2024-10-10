@@ -32,9 +32,6 @@ export class init1655893804425 implements MigrationInterface {
         '-- Name: EXTENSION "uuid-ossp"; Type: COMMENT; Schema: -; Owner: -\n' +
         '--\n' +
         '\n' +
-        'COMMENT ON EXTENSION "uuid-ossp" IS \'generate universally unique identifiers (UUIDs)\';\n' +
-        '\n' +
-        '\n' +
         "SET default_tablespace = '';\n" +
         '\n' +
         '--\n' +
