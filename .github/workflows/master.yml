@@ -315,8 +315,8 @@ jobs:
         run: npm run export
         env:
           DB_NAME: postgresql://ddhub:ddhub@localhost:5432/ddhub
-          NEXT_PUBLIC_CUSTOM_BRANDING_PATH: '/aemo-logo.svg'
-          NEXT_PUBLIC_CUSTOM_CGW_NAME: 'WA Unregistered Equipment Portal'
+          NEXT_PUBLIC_CUSTOM_BRANDING_PATH: ${{ secrets.CUSTOME_LOGO }}
+          NEXT_PUBLIC_CUSTOM_CGW_NAME: ${{ secrets.CUSTOME_NAME }}
 
       - name: 'Login via Azure CLI'
         uses: azure/login@v1
