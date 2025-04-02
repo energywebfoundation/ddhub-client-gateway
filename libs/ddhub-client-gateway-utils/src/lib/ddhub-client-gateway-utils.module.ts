@@ -18,7 +18,7 @@ import { DirectoryCreatedService } from './services/directory-created.service';
           )
         );
 
-        return new EthersService(provider);
+        return new EthersService(provider, configService);
       },
       inject: [ConfigService],
     },
@@ -27,4 +27,4 @@ import { DirectoryCreatedService } from './services/directory-created.service';
   ],
   exports: [RetryConfigService, EthersService, Bip39Service],
 })
-export class DdhubClientGatewayUtilsModule {}
+export class DdhubClientGatewayUtilsModule { }
