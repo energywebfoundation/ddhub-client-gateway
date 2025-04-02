@@ -4,7 +4,6 @@ import {
 } from './check-account-status/CheckAccountStatus.effects';
 import {
   LoginResponseDto,
-  getGatewayControllerGetQueryKey,
   getIdentityControllerGetQueryKey,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import {
@@ -70,17 +69,26 @@ export const getRoutesToDisplay = (
   accountRoles: Role[],
   restrictions: IndexableRouteRestrictions,
   config: GatewayConfig,
-  userAuth?: UserAuthContext
+  userAuth?: UserAuthContext,
+  mtlsIsValid?: boolean
 ): Set<string> => {
   let adminRoutes = new Set<string>();
   if (config.authEnabled && userAuth) {
     switch (userAuth.role) {
       case UserRole.ADMIN:
+        if (mtlsIsValid === false) {
+          return new Set([routerConst.GatewaySettings]);
+        }
+
         adminRoutes = new Set<string>(
           mapRoleRestrictions(restrictions, 'allowedAuthRoles', UserRole.ADMIN)
         );
         break;
       case UserRole.MESSAGING: {
+        if (mtlsIsValid === false) {
+          return new Set();
+        }
+
         const allowedRoutes = mapRoleRestrictions(
           restrictions,
           'allowedAuthRoles',
@@ -91,6 +99,10 @@ export const getRoutesToDisplay = (
       default:
         return new Set();
     }
+  }
+
+  if (mtlsIsValid === false) {
+    return new Set([routerConst.GatewaySettings]);
   }
 
   const roles = accountRoles
@@ -142,6 +154,7 @@ export const useUserDataEffects = () => {
     refreshIdentity,
     setRefreshIdentity,
     authenticated,
+    mtlsIsValid,
   } = userContext;
   const queryClient = useQueryClient();
   const [routeRestrictionList, setRouteRestrictionList] = useState(
@@ -169,7 +182,8 @@ export const useUserDataEffects = () => {
           identity.enrolment.roles,
           routeRestrictionList as unknown as IndexableRouteRestrictions,
           config,
-          config.authEnabled ? userAuth : undefined
+          config.authEnabled ? userAuth : undefined,
+          mtlsIsValid
         );
 
         setUserData((prevValue) => ({
@@ -181,9 +195,23 @@ export const useUserDataEffects = () => {
           displayedRoutes,
           did: identity.enrolment.did,
         }));
+      } else if (mtlsIsValid === false) {
+        const displayedRoutes = getRoutesToDisplay(
+          [],
+          routeRestrictionList as unknown as IndexableRouteRestrictions,
+          config,
+          config.authEnabled ? userAuth : undefined,
+          mtlsIsValid
+        );
+
+        setUserData((prevValue) => ({
+          ...prevValue,
+          isChecking: false,
+          displayedRoutes,
+        }));
       }
     }
-  }, [config, identity, routeRestrictionList]);
+  }, [config, mtlsIsValid, identity, routeRestrictionList]);
 
   const setData = (
     res: IdentityWithEnrolment,

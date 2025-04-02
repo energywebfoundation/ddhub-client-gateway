@@ -142,4 +142,8 @@ export const API_ENVS = Joi.object({
   CLEANUP_MESSAGES_CRON_SCHEDULE: Joi.string()
     .default('*/5 * * * *')
     .description('CRON Expression for cleanup messages'),
+  IDENTITY_TOKEN_TTL: Joi.number()
+    .positive()
+    .default(300) // 5 minutes
+    .description('How long cached DID attributes should be valid in seconds'),
 });

@@ -35,6 +35,11 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
   }
 
   public async getAllUsers(): Promise<UsersList> {
+    if (this.configService.get('USER_AUTH_ENABLED', false) === false) {
+      this.logger.debug('User auth is not enabled, skipping getAllUsers call');
+      return [];
+    }
+
     const res = await this.client
       .list(`${this.prefix}/${PATHS.USERS}`)
       .catch((e) => {
@@ -66,7 +71,16 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
   }
 
   @Span('vault_getUserAuthDetails')
-  public async getUserAuthDetails(username: string): Promise<UserDetails> {
+  public async getUserAuthDetails(
+    username: string
+  ): Promise<UserDetails | null> {
+    if (this.configService.get('USER_AUTH_ENABLED', false) === false) {
+      this.logger.debug(
+        'User auth is not enabled, skipping getUserAuthDetails call'
+      );
+      return null;
+    }
+
     return this.client
       .read(`${this.prefix}${PATHS.USERS}/${username}`)
       .then(({ data }) => ({ password: data.password, role: data.role }))
@@ -126,9 +140,7 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
       .read(`${this.prefix}${PATHS.CERTIFICATE}`)
       .then(({ data }) => data)
       .catch((err) => {
-        this.logger.error('failed to retrieve certificates');
-        this.logger.error(err);
-        this.logger.error(err.message);
+        this.logger.error(`Failed to retrieve certificates: ${err.message}`);
         this.logger.error(err);
         return null;
       });

@@ -75,6 +75,13 @@ export class AzureKeyVaultService
   public async getUserAuthDetails(
     username: string
   ): Promise<UserDetails | null> {
+    if (this.configService.get('USER_AUTH_ENABLED', false) === false) {
+      this.logger.debug(
+        'User auth is not enabled, skipping getUserAuthDetails call'
+      );
+      return null;
+    }
+
     const secretName = this.encodeAzureKey(
       `${this.prefix}${PATHS.USERS}/${username}`
     );
@@ -90,6 +97,11 @@ export class AzureKeyVaultService
 
   @Span('azure_kv_getAllUsers')
   public async getAllUsers(): Promise<UsersList> {
+    if (this.configService.get('USER_AUTH_ENABLED', false) === false) {
+      this.logger.debug('User auth is not enabled, skipping getAllUsers call');
+      return [];
+    }
+
     const userSecretPath = this.encodeAzureKey(`${this.prefix}${PATHS.USERS}`);
     const userSecretIdentifiers: string[] = [];
     for await (const secret of this.client.listPropertiesOfSecrets()) {
@@ -146,11 +158,12 @@ export class AzureKeyVaultService
   }
 
   @Span('azure_kv_setCertificateDetails')
-  public async setCertificateDetails({
-    caCertificate,
-    certificate,
-    privateKey,
-  }: CertificateDetails): Promise<KeyVaultSecret[]> {
+  public async setCertificateDetails(
+    { caCertificate, certificate, privateKey }: CertificateDetails,
+    isRetry = false
+  ): Promise<KeyVaultSecret[]> {
+    this.logger.log('Setting certificate details in Azure KV');
+
     const paths = [
       {
         path: this.encodeAzureKey(`${this.prefix}${PATHS.CERTIFICATE_KEY}`),
@@ -172,38 +185,53 @@ export class AzureKeyVaultService
       commands.push(this.client.setSecret(path, key));
     }
 
-    const responses = await Promise.allSettled(
-      commands.map((command) =>
-        command
-          .then((response) => response)
-          .catch((err) => {
-            throw new Error(
-              JSON.stringify({
-                error: err,
-              })
-            );
-          })
-      )
-    );
+    const responses = await Promise.allSettled(commands);
 
     const errors = responses.filter(
-      ({ status }) => status === 'rejected'
-    ) as PromiseRejectedResult[];
+      (response): response is PromiseRejectedResult =>
+        response.status === 'rejected'
+    );
 
     // Log errors and rollback
     if (errors.length > 0) {
-      this.logger.error(errors.map(({ reason }) => reason.message).join(', '));
+      this.logger.error(
+        `Received errors when setting certificate details: ${errors
+          .map(({ reason }) => reason.message)
+          .join(', ')}`
+      );
+      const hasConflictError = errors.some(
+        (error) =>
+          error.reason?.details?.error?.code === 'Conflict' &&
+          error.reason?.details?.error?.innerError?.code ===
+            'ObjectIsDeletedButRecoverable'
+      );
+
       for (const { path } of paths) {
-        await this.deleteOne(path);
+        if (hasConflictError) {
+          await this.purgeOne(path);
+        } else {
+          await this.deleteOne(path);
+        }
       }
-      return null;
+
+      // Only retry setting the certificate details once
+      if (!isRetry) {
+        this.logger.log('Retrying setting certificate details');
+        return this.setCertificateDetails(
+          { caCertificate, certificate, privateKey },
+          true
+        );
+      } else {
+        throw new Error('Failed to set certificate details after retry');
+      }
     }
 
     return responses
-      .filter(({ status }) => status === 'fulfilled')
-      .map((response) =>
-        response.status === 'fulfilled' ? response.value : null
-      ) as KeyVaultSecret[];
+      .filter(
+        (response): response is PromiseFulfilledResult<KeyVaultSecret> =>
+          response.status === 'fulfilled'
+      )
+      .map((response) => response.value);
   }
 
   @Span('azure_kv_getCertificateDetails')
@@ -224,7 +252,11 @@ export class AzureKeyVaultService
       ({ status }) => status === 'rejected'
     ) as PromiseRejectedResult[];
     if (errors.length > 0) {
-      this.logger.error(errors.map(({ reason }) => reason.message).join(', '));
+      this.logger.debug(
+        `Received errors when getting certificate details from Azure KV: ${errors
+          .map(({ reason }) => reason.message)
+          .join(', ')}`
+      );
     }
 
     const [privateKey, certificate, caCertificate] = responses;
@@ -303,15 +335,42 @@ export class AzureKeyVaultService
           .join(', ')}`
       );
     }
+
+    // Attempt to purge deleted secrets for `soft-delete` enabled key vaults
+    for (const path of Object.values(PATHS)) {
+      try {
+        await this.client.purgeDeletedSecret(
+          this.encodeAzureKey(`${this.prefix}${path}`)
+        );
+      } catch (err) {
+        this.logger.error(`Could not purge deleted secret: ${err.message}`);
+      }
+    }
   }
 
   @Span('azure_kv_deleteOne')
   private async deleteOne(path: string): Promise<void> {
-    this.logger.log(`Deleting Azure KV secret: ${path}`);
-    const poller = await this.client.beginDeleteSecret(path);
-    await poller.pollUntilDone().catch((err) => {
-      this.logger.error(err);
-    });
+    try {
+      this.logger.log(`Deleting Azure KV secret: ${path}`);
+      const poller = await this.client.beginDeleteSecret(path);
+      await poller.pollUntilDone().catch((err) => {
+        this.logger.error(err);
+      });
+    } catch (err) {
+      this.logger.error(`Could not delete Azure KV secret: ${err.message}`);
+    }
+
+    await this.purgeOne(path);
+  }
+
+  @Span('azure_kv_purgeOne')
+  private async purgeOne(path: string): Promise<void> {
+    try {
+      this.logger.log(`Purging deleted Azure KV secret: ${path}`);
+      await this.client.purgeDeletedSecret(path);
+    } catch (err) {
+      this.logger.error(`Could not purge deleted secret: ${err.message}`);
+    }
   }
 
   /**

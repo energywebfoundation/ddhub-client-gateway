@@ -8,8 +8,15 @@ export const useStyles = makeStyles()((theme) => ({
     fontWeight: 400,
     color: theme.palette.grey[300],
   },
-  wrapper: {
+  successWrapper: {
     backgroundColor: alpha(theme.palette.success.main, 0.12),
+    borderRadius: 4,
+    padding: '1px 9px',
+    marginTop: 7,
+    width: 'fit-content',
+  },
+  errorWrapper: {
+    backgroundColor: alpha(theme.palette.error.main, 0.12),
     borderRadius: 4,
     padding: '1px 9px',
     marginTop: 7,
