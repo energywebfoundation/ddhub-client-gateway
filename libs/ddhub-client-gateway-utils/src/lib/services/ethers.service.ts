@@ -5,10 +5,14 @@ import { parseEther } from 'ethers/lib/utils';
 import { Span } from 'nestjs-otel';
 import base64url from 'base64url'
 import { InvalidPrivateKeyException } from '../exceptions/invalid-private-key.exception';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class EthersService {
-  constructor(protected readonly provider: providers.JsonRpcProvider) {}
+  constructor(
+    protected readonly provider: providers.JsonRpcProvider,
+    private readonly configService: ConfigService,
+  ) { }
 
   public createPrivateKey(): string {
     return Wallet.createRandom().privateKey;
@@ -22,12 +26,14 @@ export class EthersService {
       typ: 'JWT',
     };
     const encodedHeader = base64url(JSON.stringify(header));
-
+    const ttl: number = this.configService.get<number>('IDENTITY_TOKEN_TTL', 300);
     const payload = {
       iss: did,
       claimData: {
         blockNumber: 999999999999,
       },
+      iat: Math.floor(Date.now() / 1000), // Current
+      exp: Math.floor(Date.now() / 1000) + ttl  // Expires in 5 minutes
     };
 
     const encodedPayload = base64url(JSON.stringify(payload));

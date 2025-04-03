@@ -25,7 +25,7 @@ jobs:
     needs: [cancel-previous]
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -47,14 +47,14 @@ jobs:
     runs-on: ubuntu-latest
     needs: [cancel-previous, semantic-version]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: actions/setup-node@v2-beta
+      - uses: actions/setup-node@v4
         with:
           node-version: '16.14.2'
       - name: Cache node modules
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         env:
           cache-name: cache-node-modules
         with:
@@ -155,14 +155,14 @@ jobs:
     runs-on: ubuntu-latest
     needs: [cancel-previous, semantic-version]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: actions/setup-node@v2-beta
+      - uses: actions/setup-node@v4
         with:
           node-version: '16.14.2'
       - name: Cache node modules
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         env:
           cache-name: cache-node-modules
         with:
@@ -289,14 +289,14 @@ jobs:
           --health-timeout 5s
           --health-retries 5
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: actions/setup-node@v2-beta
+      - uses: actions/setup-node@v4
         with:
           node-version: '16.14.2'
       - name: Cache node modules
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         env:
           cache-name: cache-node-modules
         with:
@@ -394,14 +394,14 @@ jobs:
           --health-timeout 5s
           --health-retries 5
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: actions/setup-node@v2-beta
+      - uses: actions/setup-node@v4
         with:
           node-version: '16.14.2'
       - name: Cache node modules
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         env:
           cache-name: cache-node-modules
         with:
