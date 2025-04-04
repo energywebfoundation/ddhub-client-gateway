@@ -37,6 +37,7 @@
 | CLEANUP_MESSAGES_CRON_ENABLED | boolean | false | Enable cleanup cron |  |  |
 | FETCH_MESSAGES_CRON_SCHEDULE | string | */5 * * * * | CRON Expression for fetch messages |  |  |
 | CLEANUP_MESSAGES_CRON_SCHEDULE | string | */5 * * * * | CRON Expression for cleanup messages |  |  |
+| IDENTITY_TOKEN_TTL | number | 300 | How long cached DID attributes should be valid in seconds |  |  |
 | USE_CACHE | boolean | true | Should use cache |  |  |
 | SECRETS_ENGINE | string |  | Secrets engine to use | aws,vault,azure |  |
 | VAULT_ENDPOINT | string |  | Vault path |  | SECRETS_ENGINE == vault |

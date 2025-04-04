@@ -1,5 +1,5 @@
 name: Run tests and getAffected
-on: 
+on:
   workflow_call:
     outputs:
       affected:
@@ -19,14 +19,14 @@ jobs:
     env:
       NX_BASE: ${{ secrets.NX_BASE }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: actions/setup-node@v2-beta
+      - uses: actions/setup-node@v4
         with:
           node-version: '16.14.2'
       - name: Cache node modules
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         env:
           cache-name: cache-node-modules
         with:
@@ -54,4 +54,4 @@ jobs:
       - name: Run linters
         if: contains(${{ env.NX_BASE }}, 'develop')
         run: nx affected --target=lint --exclude=dsb-client-gateway-api-e2e,ui-core
-        
+
