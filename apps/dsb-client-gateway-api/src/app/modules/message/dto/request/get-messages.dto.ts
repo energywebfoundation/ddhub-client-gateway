@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString, Matches } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class GetMessagesDto {
@@ -58,6 +58,9 @@ export class GetMessagesDto {
     description: 'cursor for pointing to messages',
   })
   @IsOptional()
+  @Matches(/^[^&<>"'\-\/\\\.]+$/, {
+    message: 'clientId contains invalid characters & < > " \' / - .',
+  })
   clientId: string;
 
   @ApiProperty({
