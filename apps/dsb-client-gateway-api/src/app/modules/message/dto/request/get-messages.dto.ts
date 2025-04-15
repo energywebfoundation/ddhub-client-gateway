@@ -58,8 +58,8 @@ export class GetMessagesDto {
     description: 'cursor for pointing to messages',
   })
   @IsOptional()
-  @Matches(/^[^&<>"'\-/\\.]+$/, {
-    message: 'clientId contains invalid characters & < > " \' / - .',
+  @Matches(/^[a-zA-Z0-9\-:]+$/, {
+    message: 'clientId contains invalid characters',
   })
   clientId: string;
 
