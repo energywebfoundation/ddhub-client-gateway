@@ -5,7 +5,7 @@ export class DeleteManyClientsBodyDto {
   @IsArray()
   @IsNotEmpty()
   @ArrayUnique()
-  @Matches(/^[a-zA-Z0-9\-:]+$/, { each: true, message: 'one or more clientIds contains invalid characters' })
+  @Matches(/^[^\s&<>\"'\/\r\n]+$/, { each: true, message: 'one or more clientIds contains invalid characters' })
   @ApiProperty({
     description: 'Clients ids',
     type: [String],

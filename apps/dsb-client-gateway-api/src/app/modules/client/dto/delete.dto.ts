@@ -4,7 +4,7 @@ import { ApiProperty } from '@nestjs/swagger';
 export class DeleteClientParamsDto {
   @IsString()
   @IsNotEmpty()
-    @Matches(/^[a-zA-Z0-9\-:]+$/, {
+    @Matches(/^[^\s&<>\"'\/\r\n]+$/, {
     message: 'clientId contains invalid characters',
   })
   @ApiProperty({
