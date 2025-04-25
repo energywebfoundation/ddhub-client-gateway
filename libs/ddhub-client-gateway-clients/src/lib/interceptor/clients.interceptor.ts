@@ -8,6 +8,8 @@ import {
 } from '@nestjs/common';
 import { ClientsService } from '../service/clients.service';
 import { Observable } from 'rxjs';
+import { ChannelService } from '../service/channels.service';
+import { ChannelEntity } from '@dsb-client-gateway/dsb-client-gateway-storage';
 
 type ReqParams = 'body' | 'params' | 'query';
 
@@ -19,7 +21,10 @@ export function ClientsInterceptor(
 ): Type<NestInterceptor> {
   @Injectable()
   class MixinInterceptor implements NestInterceptor {
-    constructor(protected readonly clientsService: ClientsService) {}
+    constructor(
+      protected readonly clientsService: ClientsService,
+      protected readonly channelService: ChannelService
+    ) {}
 
     public async intercept(
       context: ExecutionContext,
@@ -32,6 +37,16 @@ export function ClientsInterceptor(
 
       if (!param || !fqcn) {
         return next.handle();
+      }
+
+      if (fqcn) {
+        const channel: ChannelEntity | null = await this.channelService.getChannel(
+          fqcn
+        );
+    
+        if (!channel) {
+          return next.handle();
+        }
       }
 
       if (param) {
