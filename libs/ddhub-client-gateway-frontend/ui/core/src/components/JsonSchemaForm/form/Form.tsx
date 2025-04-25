@@ -8,6 +8,7 @@ import {
   RadioWidget,
   SelectWidget,
   CheckboxWidget,
+  TimeWidget,
 } from '../widgets';
 import {
   CustomArrayFieldItemTemplate,
@@ -41,6 +42,7 @@ const customWidgets: RegistryWidgetsType = {
   SelectWidget: SelectWidget,
   DateWidget: DateTimeWidget,
   DateTimeWidget: DateTimeWidget,
+  TimeWidget: TimeWidget,
 };
 
 const customFormats = {
