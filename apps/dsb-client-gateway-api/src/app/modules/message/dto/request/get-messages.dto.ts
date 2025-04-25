@@ -1,5 +1,6 @@
-import { IsNotEmpty, IsOptional, IsString, Matches } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString, Matches, MaxLength } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 
 export class GetMessagesDto {
   @IsString()
@@ -58,7 +59,9 @@ export class GetMessagesDto {
     description: 'cursor for pointing to messages',
   })
   @IsOptional()
-  @Matches(/^[^\s&<>"'/\r\n]+$/, {
+  @MaxLength(247)
+  @Transform(({ value }) => value.trim())
+  @Matches(/^[a-zA-Z0-9]+$/, {
     message: 'clientId contains invalid characters',
   })
   clientId: string;

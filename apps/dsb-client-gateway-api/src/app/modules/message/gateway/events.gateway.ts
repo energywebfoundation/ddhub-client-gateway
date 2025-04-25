@@ -90,7 +90,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayInit {
         return;
       }
 
-      const clientIdRegex = new RegExp(/^[a-zA-Z0-9\-:]+$/);
+      const clientIdRegex = new RegExp(/^[a-zA-Z0-9]+$/);
       if (!clientIdRegex.test(_clientId)) {
         this.logger.warn(
           `Required paramater 'clientId' with format Alphanumeric string`
