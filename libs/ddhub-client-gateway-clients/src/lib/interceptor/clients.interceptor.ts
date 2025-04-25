@@ -34,9 +34,18 @@ export function ClientsInterceptor(
         return next.handle();
       }
 
-      const fullClientId = `${param}:${fqcn}`;
+      if (param) {
+        const paramTrim = param.trim();
+        const clientIdRegex = new RegExp(/^[a-zA-Z0-9]+$/);
 
-      await this.clientsService.upsert(fullClientId);
+        if (clientIdRegex.test(paramTrim)) {
+          const fullClientId = `${paramTrim}:${fqcn}`;
+
+          if (fullClientId.length <= 247) {
+            await this.clientsService.upsert(fullClientId);
+          }
+        }
+      }
 
       return next.handle();
     }
