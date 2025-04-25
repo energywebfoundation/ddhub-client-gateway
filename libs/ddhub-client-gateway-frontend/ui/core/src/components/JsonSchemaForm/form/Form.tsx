@@ -39,6 +39,8 @@ const customWidgets: RegistryWidgetsType = {
   RadioWidget: RadioWidget,
   CheckboxesWidget: CheckboxesWidget,
   SelectWidget: SelectWidget,
+  DateWidget: DateTimeWidget,
+  DateTimeWidget: DateTimeWidget,
 };
 
 const customFormats = {
