@@ -12,7 +12,7 @@ export const TimeWidget = (props: WidgetProps) => {
 
   const formatTime = (value: DateTime | null) => {
     if (DateTime.isDateTime(value)) {
-      return value.toFormat('HH:mm:ssZ');
+      return value.toFormat('HH:mm:ss');
     }
     return null;
   };
@@ -22,8 +22,8 @@ export const TimeWidget = (props: WidgetProps) => {
       // Try parsing as ISO first
       let dateTime = DateTime.fromISO(value);
       if (!dateTime.isValid) {
-        // If not valid ISO, try parsing as HH:mm:ssZ
-        dateTime = DateTime.fromFormat(value, 'HH:mm:ssZ');
+        // If not valid ISO, try parsing as HH:mm:ss
+        dateTime = DateTime.fromFormat(value, 'HH:mm:ss');
       }
       if (dateTime.isValid) {
         return DateTime.fromObject({
