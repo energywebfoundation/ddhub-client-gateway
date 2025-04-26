@@ -40,12 +40,8 @@ function validateJSONSchema(schema: object, payload: string) {
       'uuid',
       'json-pointer',
       'byte',
-      'int32',
-      'int64',
       'float',
       'double',
-      'password',
-      'binary',
     ],
     keywords: true,
   });
