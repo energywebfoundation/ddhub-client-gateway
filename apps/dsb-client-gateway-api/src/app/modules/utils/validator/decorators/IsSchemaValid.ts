@@ -27,7 +27,7 @@ function validateJSONSchema(schema: object, payload: string) {
     mode: 'fast',
     formats: [
       'date',
-      'time',
+      // 'time', -> temporarily disable
       'date-time',
       'duration',
       'uri',
