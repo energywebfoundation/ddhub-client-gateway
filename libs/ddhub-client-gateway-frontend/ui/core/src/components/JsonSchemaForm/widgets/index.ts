@@ -3,3 +3,4 @@ export * from './CheckboxesWidget';
 export * from './RadioWidget';
 export * from './SelectWidget';
 export * from './CheckboxWidget';
+export * from './TimeWidget';

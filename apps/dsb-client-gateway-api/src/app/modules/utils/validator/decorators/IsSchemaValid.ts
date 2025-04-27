@@ -27,7 +27,7 @@ function validateJSONSchema(schema: object, payload: string) {
     mode: 'fast',
     formats: [
       'date',
-      'time',
+      // 'time', -> temporarily disable
       'date-time',
       'duration',
       'uri',
@@ -40,12 +40,8 @@ function validateJSONSchema(schema: object, payload: string) {
       'uuid',
       'json-pointer',
       'byte',
-      'int32',
-      'int64',
       'float',
       'double',
-      'password',
-      'binary',
     ],
     keywords: true,
   });

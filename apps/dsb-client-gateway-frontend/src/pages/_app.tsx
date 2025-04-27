@@ -33,7 +33,7 @@ if (
   process.env.NODE_ENV !== 'production' &&
   process.env.NEXT_PUBLIC_MOCK === 'true'
 ) {
-  makeServer({ environment: process.env.NODE_ENV });
+  makeServer({ environment: process.env.NODE_ENV }); // mock server
 }
 
 Axios.defaults.baseURL = process.env.NEXT_PUBLIC_SERVER_BASE_URL;
