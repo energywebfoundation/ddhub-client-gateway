@@ -19,6 +19,12 @@ export const useUserAuthHeaders = () => {
     }
   };
 
+  const encodeParams = (params: Record<string, string>) => {
+    return Object.entries(params)
+      .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+      .join('&');
+  };
+
   useEffect(() => {
     if (!authEnabled || !userAuth || !userAuth.authenticated) {
       resetRequestInterceptor();
@@ -43,6 +49,15 @@ export const useUserAuthHeaders = () => {
       });
       setRequestInterceptorId(interceptorId);
     }
+
+    // Encode query params
+    Axios.interceptors.request.use((config) => {
+      if (config.params) {
+        config.url += (config.url?.includes('?') ? '&' : '?') + encodeParams(config.params);
+        delete config.params;
+      }
+      return config;
+    });
 
     const responseInterceptorId = Axios.interceptors.response.use(
       undefined,
