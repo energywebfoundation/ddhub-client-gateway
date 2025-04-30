@@ -52,9 +52,10 @@ export const useUserAuthHeaders = () => {
 
     // Encode query params
     Axios.interceptors.request.use((config) => {
-      if (config.params) {
-        config.url += (config.url?.includes('?') ? '&' : '?') + encodeParams(config.params);
-        delete config.params;
+      if (config.method === 'get' && config.params && typeof config.params === 'object') {
+        const queryString = encodeParams(config.params);
+        config.url += (config.url?.includes('?') ? '&' : '?') + queryString;
+        delete config.params; // prevent axios from re-attaching unencoded params
       }
       return config;
     });
