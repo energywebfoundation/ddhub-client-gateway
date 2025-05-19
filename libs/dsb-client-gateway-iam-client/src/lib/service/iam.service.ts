@@ -11,13 +11,14 @@ import {
 import { IAppDefinition } from '@energyweb/credential-governance';
 import { IamFactoryService } from './iam-factory.service';
 import { ConfigService } from '@nestjs/config';
-import { ApplicationDTO, Claim } from '../iam.interface';
+import { ApplicationDTO, Claim, RequesterClaimDTO } from '../iam.interface';
 import { RoleStatus } from '@ddhub-client-gateway/identity/models';
 import { Span } from 'nestjs-otel';
 import promiseRetry from 'promise-retry';
 import { Encoding, PubKeyType } from '@ew-did-registry/did-resolver-interface';
 import { KeyType } from '@ew-did-registry/keys';
 import { RetryConfigService } from '@dsb-client-gateway/ddhub-client-gateway-utils';
+import moment from 'moment';
 
 @Injectable()
 export class IamService {
@@ -35,31 +36,31 @@ export class IamService {
     protected readonly retryConfigService: RetryConfigService
   ) {}
 
+  private getClaimStatus(claim: DIDClaim): RoleStatus {
+    if (claim.isAccepted) {
+      return RoleStatus.APPROVED;
+    }
+
+    if (claim.isRejected) {
+      return RoleStatus.REJECTED;
+    }
+
+    if (!claim.isAccepted && !claim.isRejected) {
+      return RoleStatus.AWAITING_APPROVAL;
+    }
+
+    return RoleStatus.NOT_ENROLLED;
+  };
+
   @Span('iam_getClaimsWithStatus')
   public async getClaimsWithStatus(): Promise<Claim[]> {
     const claims: DIDClaim[] = await this.getClaims();
     const synchronizedToDIDClaims = await this.getUserClaimsFromDID();
 
-    const getClaimStatus = (claim: DIDClaim): RoleStatus => {
-      if (claim.isAccepted) {
-        return RoleStatus.APPROVED;
-      }
-
-      if (claim.isRejected) {
-        return RoleStatus.REJECTED;
-      }
-
-      if (!claim.isAccepted && !claim.isRejected) {
-        return RoleStatus.AWAITING_APPROVAL;
-      }
-
-      return RoleStatus.NOT_ENROLLED;
-    };
-
     return claims.map((claim) => {
       return {
         namespace: claim.claimType,
-        status: getClaimStatus(claim),
+        status: this.getClaimStatus(claim),
         syncedToDidDoc:
           synchronizedToDIDClaims.filter(
             (synchronizedClaim) =>
@@ -307,5 +308,37 @@ export class IamService {
     }
 
     return this.signerService.did;
+  }
+
+  @Span('iam_getRequesterClaims')
+  public async getRequesterClaims(
+    requesterDid: string
+  ): Promise<RequesterClaimDTO[]> {
+    this.logger.debug('start: RequesterClaims');
+
+    const claims = await this.cacheClient
+      .getClaimsByRequester(requesterDid)
+      .catch((e) => {
+        this.logger.log('fetching claims by requester failed', e);
+
+        throw e;
+      });
+
+    this.logger.debug('did claims fetched');
+
+    return claims.map((claim) => {
+      const isExpired = claim.expirationTimestamp ? +claim.expirationTimestamp < Date.now() : false;
+
+      this.logger.debug('end: RequesterClaims');
+
+      return {
+        role: claim.claimType.split('.')[0],
+        requestDate: claim.createdAt,
+        namespace: claim.namespace,
+        status: this.getClaimStatus(claim),
+        expirationDate: claim.expirationTimestamp ? moment(claim.expirationTimestamp).toISOString() : null,
+        expirationStatus: isExpired ? 'EXPIRED' : null,
+      };
+    });
   }
 }

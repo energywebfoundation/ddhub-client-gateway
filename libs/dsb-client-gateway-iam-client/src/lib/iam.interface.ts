@@ -20,3 +20,12 @@ export interface Claims {
   did: string;
   claims: Claim[];
 }
+
+export class RequesterClaimDTO {
+  role: string;
+  requestDate: string;
+  namespace: string;
+  status: string;
+  expirationDate?: string;
+  expirationStatus?: string;
+}
