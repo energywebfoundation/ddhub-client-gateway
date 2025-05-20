@@ -1471,6 +1471,29 @@ paths:
                   $ref: "#/components/schemas/RequesterClaimDTO"
       tags:
         - "SSI Hub"
+  /api/v2/ssi-hub/apps:
+    get:
+      operationId: "RolesController_getApps"
+      parameters:
+        - name: "searchKey"
+          required: true
+          in: "query"
+          example: "ddhub"
+          schema:
+            minLength: 3
+            maxLength: 247
+            type: "string"
+      responses:
+        200:
+          description: "Search apps"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/SearchAppDTO"
+      tags:
+        - "SSI Hub"
 info:
   title: "DDHub Client Gateway"
   description: "DDHub Client Gateway"
@@ -3035,6 +3058,9 @@ components:
         - "username"
         - "password"
     RequesterClaimDTO:
+      type: "object"
+      properties: {}
+    SearchAppDTO:
       type: "object"
       properties: {}
 externalDocs:
