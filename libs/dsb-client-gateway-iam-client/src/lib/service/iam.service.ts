@@ -12,7 +12,7 @@ import {
 import { IAppDefinition } from '@energyweb/credential-governance';
 import { IamFactoryService } from './iam-factory.service';
 import { ConfigService } from '@nestjs/config';
-import { ApplicationDTO, Claim, RequesterClaimDTO, SearchAppDTO } from '../iam.interface';
+import { ApplicationDTO, Claim, RequesterClaimDTO, SearchAppDTO, ApplicationRoleDTO } from '../iam.interface';
 import { RoleStatus } from '@ddhub-client-gateway/identity/models';
 import { Span } from 'nestjs-otel';
 import promiseRetry from 'promise-retry';
@@ -374,6 +374,30 @@ export class IamService {
 
       this.logger.debug('end: SearchApps');
       return application;
+    });
+  }
+
+  @Span('iam_getAppRoles')
+  public async getAppRoles(
+    namespace: string
+  ): Promise<ApplicationRoleDTO[]> {
+    this.logger.debug('start: GetAppRoles ' + namespace);
+
+    const roles = await this.cacheClient
+      .getApplicationRoles(namespace)
+      .catch((e) => {
+        this.logger.log('get application roles', e);
+
+        throw e;
+      });
+
+    this.logger.debug('roles fetched');
+
+    return roles.map((role) => {
+      return {
+        role: role.name,
+        namespace: role.namespace,
+      };
     });
   }
 }

@@ -36,3 +36,8 @@ export class SearchAppDTO {
   appName: string;
   logoUrl: string;
 }
+
+export class ApplicationRoleDTO {
+  role: string;
+  namespace: string;
+}

@@ -19,6 +19,7 @@ const mockCacheClient = {
   getClaimsByRequester: jest.fn(),
   getAppDefinition: jest.fn(),
   getNamespaceBySearchPhrase: jest.fn(),
+  getApplicationRoles: jest.fn(),
 };
 
 const mockClaimsService = {
@@ -786,6 +787,83 @@ describe('IamService', () => {
       it('should throw error', () => {
         expect(error).toBeDefined();
         expect(error.message).toBe('Failed to search apps');
+      });
+    });
+  });
+
+  describe('getAppRoles()', () => {
+    describe('should return application roles', () => {
+      beforeEach(async () => {
+        service['cacheClient'] = mockCacheClient as unknown as CacheClient;
+
+        mockCacheClient.getApplicationRoles = jest
+          .fn()
+          .mockImplementationOnce(async () => {
+            return [
+              {
+                name: 'admin',
+                namespace: 'namespace1',
+              },
+              {
+                name: 'user',
+                namespace: 'namespace1',
+              }
+            ];
+          });
+
+        try {
+          result = await service.getAppRoles('namespace1');
+        } catch (e) {
+          error = e;
+        }
+      });
+
+      it('should execute without error', () => {
+        expect(error).toBeNull();
+        expect(result).toBeDefined();
+      });
+
+      it('should call getApplicationRoles with correct parameters', () => {
+        expect(mockCacheClient.getApplicationRoles).toBeCalledTimes(1);
+        expect(mockCacheClient.getApplicationRoles).toBeCalledWith('namespace1');
+      });
+
+      it('should return correctly formatted roles', () => {
+        const castedResult = result as any;
+        expect(castedResult).toHaveLength(2);
+
+        expect(castedResult[0]).toEqual({
+          role: 'admin',
+          namespace: 'namespace1',
+        });
+
+        expect(castedResult[1]).toEqual({
+          role: 'user',
+          namespace: 'namespace1',
+        });
+      });
+    });
+
+    describe('should handle errors', () => {
+      beforeEach(async () => {
+        service['cacheClient'] = mockCacheClient as unknown as CacheClient;
+
+        mockCacheClient.getApplicationRoles = jest
+          .fn()
+          .mockImplementationOnce(async () => {
+            throw new Error('Failed to fetch roles');
+          });
+
+        try {
+          result = await service.getAppRoles('namespace1');
+        } catch (e) {
+          error = e;
+        }
+      });
+
+      it('should throw error', () => {
+        expect(error).toBeDefined();
+        expect(error.message).toBe('Failed to fetch roles');
       });
     });
   });
