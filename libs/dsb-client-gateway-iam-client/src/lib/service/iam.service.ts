@@ -7,11 +7,12 @@ import {
   DidRegistry,
   RegistrationTypes,
   SignerService,
+  SearchType,
 } from 'iam-client-lib';
 import { IAppDefinition } from '@energyweb/credential-governance';
 import { IamFactoryService } from './iam-factory.service';
 import { ConfigService } from '@nestjs/config';
-import { ApplicationDTO, Claim, RequesterClaimDTO } from '../iam.interface';
+import { ApplicationDTO, Claim, RequesterClaimDTO, SearchAppDTO } from '../iam.interface';
 import { RoleStatus } from '@ddhub-client-gateway/identity/models';
 import { Span } from 'nestjs-otel';
 import promiseRetry from 'promise-retry';
@@ -339,6 +340,40 @@ export class IamService {
         expirationDate: claim.expirationTimestamp ? moment(claim.expirationTimestamp).toISOString() : null,
         expirationStatus: isExpired ? 'EXPIRED' : null,
       };
+    });
+  }
+
+  @Span('iam_searchApps')
+  public async searchApps(
+    searchStr: string
+  ): Promise<SearchAppDTO[]> {
+    this.logger.debug('start: SearchApps ' + searchStr);
+
+    const applications = await this.cacheClient
+      .getNamespaceBySearchPhrase(searchStr, [SearchType.App, SearchType.Org])
+      .catch((e) => {
+        this.logger.log('searching namespace by search phrase', e);
+
+        throw e;
+      });
+
+    this.logger.debug('apps fetched');
+
+    return applications.map((app) => {
+      const application = {
+        name: app.name,
+        namespace: app.namespace,
+        appName: '',
+        logoUrl: ''
+      };
+
+      if ('appName' in app.definition) {
+        application.appName = app.definition.appName;
+        application.logoUrl = app.definition.logoUrl;
+      }
+
+      this.logger.debug('end: SearchApps');
+      return application;
     });
   }
 }

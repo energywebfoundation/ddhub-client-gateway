@@ -29,3 +29,10 @@ export class RequesterClaimDTO {
   expirationDate?: string;
   expirationStatus?: string;
 }
+
+export class SearchAppDTO {
+  name: string;
+  namespace: string;
+  appName: string;
+  logoUrl: string;
+}
