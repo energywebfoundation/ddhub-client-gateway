@@ -20,3 +20,24 @@ export interface Claims {
   did: string;
   claims: Claim[];
 }
+
+export class RequesterClaimDTO {
+  role: string;
+  requestDate: string;
+  namespace: string;
+  status: string;
+  expirationDate?: string;
+  expirationStatus?: string;
+}
+
+export class SearchAppDTO {
+  name: string;
+  namespace: string;
+  appName: string;
+  logoUrl: string;
+}
+
+export class ApplicationRoleDTO {
+  role: string;
+  namespace: string;
+}

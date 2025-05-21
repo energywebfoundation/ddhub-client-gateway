@@ -30,6 +30,7 @@ import { DdhubClientGatewayVersionModule } from '@dsb-client-gateway/ddhub-clien
 import { AddressBookModule } from './modules/address-book/address-book.module';
 import { UserModule } from './modules/user/user.module';
 import { DdhubClientGatewayUserRolesModule } from '@dsb-client-gateway/ddhub-client-gateway-user-roles';
+import { RolesModule } from './modules/roles/roles.module';
 
 @Module({})
 export class AppModule {
@@ -93,6 +94,7 @@ export class AppModule {
       AddressBookModule,
       UserModule,
       DdhubClientGatewayUserRolesModule,
+      RolesModule,
     ];
 
     const providers = [
