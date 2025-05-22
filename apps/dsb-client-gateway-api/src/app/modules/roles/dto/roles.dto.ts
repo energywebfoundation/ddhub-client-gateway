@@ -24,3 +24,13 @@ export class GetRolesByNamespaceDto {
   })
   public namespace: string;
 }
+
+export class RequestRoleDto {
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({
+    example: 'user.roles.ddhub.apps.energyweb.iam.ewc',
+    type: String,
+  })
+  public role: string;
+}
