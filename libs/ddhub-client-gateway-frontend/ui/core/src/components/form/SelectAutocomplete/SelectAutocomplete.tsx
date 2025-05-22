@@ -35,7 +35,7 @@ export const SelectAutocomplete: FC<SelectAutocompleteProps> = ({
     <Box {...field.formInputsWrapperProps} flexShrink={0}>
       <InputLabel className={classes.label}>{field.label ?? ''}</InputLabel>
       <Autocomplete
-        multiple
+        multiple={multiple}
         freeSolo={field.tags}
         filterSelectedOptions
         options={options}
@@ -50,7 +50,7 @@ export const SelectAutocomplete: FC<SelectAutocompleteProps> = ({
         value={value !== undefined ? value : []}
         renderInput={(params) => (
           <TextField
-            autoComplete='off'
+            autoComplete="off"
             {...params}
             required={field.required && !(value?.length > 0)}
             placeholder={field.placeholder}

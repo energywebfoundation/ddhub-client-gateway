@@ -34,6 +34,11 @@ export const mapUrlToBreadcrumbs = new Map<string, Breadcrumb[]>()
     { title: 'My Apps and Topics', path: routerConst.ChannelApps },
     { title: 'Topics' },
   ])
+  .set(routerConst.MyRoles, [{ title: 'My roles' }, { title: 'My roles' }])
+  .set(routerConst.RoleRequests, [
+    { title: 'Role requests' },
+    { title: 'Role requests' },
+  ])
   .set(routerConst.VersionHistory, [
     { type: BreadcrumbsType.App, title: '' },
     { title: 'Apps and Topics', path: routerConst.TopicManagement },

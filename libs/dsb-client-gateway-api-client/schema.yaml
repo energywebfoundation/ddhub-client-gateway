@@ -1350,23 +1350,6 @@ paths:
       tags:
         - "Address Book"
   /api/v2/contacts/{did}:
-    get:
-      operationId: "AddressBookController_getContact"
-      parameters:
-        - name: "did"
-          required: true
-          in: "path"
-          schema:
-            type: "string"
-      responses:
-        200:
-          description: "Get contacts by DID"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/GetAllContactsResponseDto"
-        404:
-          description: "Contact not found"
     delete:
       operationId: "AddressBookController_deleteContact"
       parameters:
@@ -1397,6 +1380,29 @@ paths:
       responses:
         204:
           description: "Contact modified successfully"
+      tags:
+        - "Address Book"
+    get:
+      operationId: "AddressBookController_get"
+      parameters:
+        - name: "did"
+          required: true
+          in: "path"
+          description: "DID"
+          example: "did:ethr:volta:0xfeFBb03EFc1054Cc4e3Fbf36362689cc1F5924a8"
+          schema:
+            type: "string"
+      responses:
+        200:
+          description: "Get contact by DID"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/GetAllContactsResponseDto"
+        404:
+          description: "Contact not found"
       tags:
         - "Address Book"
   /api/v2/login/config:
