@@ -1350,23 +1350,6 @@ paths:
       tags:
         - "Address Book"
   /api/v2/contacts/{did}:
-    get:
-      operationId: "AddressBookController_getContact"
-      parameters:
-        - name: "did"
-          required: true
-          in: "path"
-          schema:
-            type: "string"
-      responses:
-        200:
-          description: "Get contacts by DID"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/GetAllContactsResponseDto"
-        404:
-          description: "Contact not found"
     delete:
       operationId: "AddressBookController_deleteContact"
       parameters:
@@ -1397,6 +1380,29 @@ paths:
       responses:
         204:
           description: "Contact modified successfully"
+      tags:
+        - "Address Book"
+    get:
+      operationId: "AddressBookController_get"
+      parameters:
+        - name: "did"
+          required: true
+          in: "path"
+          description: "DID"
+          example: "did:ethr:volta:0xfeFBb03EFc1054Cc4e3Fbf36362689cc1F5924a8"
+          schema:
+            type: "string"
+      responses:
+        200:
+          description: "Get contact by DID"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/GetAllContactsResponseDto"
+        404:
+          description: "Contact not found"
       tags:
         - "Address Book"
   /api/v2/login/config:
@@ -1450,6 +1456,65 @@ paths:
                 $ref: "#/components/schemas/LoginResponseDto"
       tags:
         - "Login"
+  /api/v2/ssi-hub/roles:
+    get:
+      operationId: "RolesController_getMyRoles"
+      parameters: []
+      responses:
+        200:
+          description: "My roles"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/RequesterClaimDTO"
+      tags:
+        - "SSI Hub"
+  /api/v2/ssi-hub/apps:
+    get:
+      operationId: "RolesController_getApps"
+      parameters:
+        - name: "searchKey"
+          required: true
+          in: "query"
+          example: "ddhub"
+          schema:
+            minLength: 3
+            maxLength: 247
+            type: "string"
+      responses:
+        200:
+          description: "Search apps"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/SearchAppDTO"
+      tags:
+        - "SSI Hub"
+  /api/v2/ssi-hub/apps/{namespace}/roles:
+    get:
+      operationId: "RolesController_getAppRoles"
+      parameters:
+        - name: "namespace"
+          required: true
+          in: "path"
+          example: "ddhub.apps.energyweb.iam.ewc"
+          schema:
+            type: "string"
+      responses:
+        200:
+          description: "Get application roles"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/ApplicationRoleDTO"
+      tags:
+        - "SSI Hub"
 info:
   title: "DDHub Client Gateway"
   description: "DDHub Client Gateway"
@@ -3013,6 +3078,15 @@ components:
       required:
         - "username"
         - "password"
+    RequesterClaimDTO:
+      type: "object"
+      properties: {}
+    SearchAppDTO:
+      type: "object"
+      properties: {}
+    ApplicationRoleDTO:
+      type: "object"
+      properties: {}
 externalDocs:
   description: "Postman Collection"
   url: "/docs-json"
