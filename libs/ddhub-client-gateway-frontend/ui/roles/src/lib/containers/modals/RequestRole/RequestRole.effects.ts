@@ -8,8 +8,11 @@ import {
 import { FieldValues, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import { useSearchNamespaces, useGetRolesForNamespace } from './api';
-import { useGetMyRoles } from '../../../components/RoleList/api';
+import {
+  useRolesControllerGetApps,
+  useRolesControllerGetMyRoles,
+  useRolesControllerGetAppRoles,
+} from '@dsb-client-gateway/dsb-client-gateway-api-client';
 
 export type Details = {
   namespace: string;
@@ -21,27 +24,39 @@ export type Details = {
   };
 };
 
+const requestRoleSchema = yup.object().shape({
+  name: yup.string().required('Name is required'),
+  department: yup.string().required('Department is required'),
+  phone: yup.string().required('Phone is required'),
+});
+
+const initialDetails: Details = {
+  namespace: '',
+  role: '',
+  roleInfo: {
+    name: '',
+    department: '',
+    phone: '',
+  },
+};
+
 export const useRequestRoleEffects = () => {
   const {
     requestRole: { open },
   } = useModalStore();
   const [searchKey, setSearchKey] = useState('');
-  const { data: namespaces } = useSearchNamespaces(searchKey);
+  const [activeStep, setActiveStep] = useState(0);
+  const [details, setDetails] = useState<Details>(initialDetails);
+
+  const { data: namespaces } = useRolesControllerGetApps(
+    { searchKey },
+    { query: { enabled: searchKey.length >= 3 } }
+  );
+  const { data: roles } = useRolesControllerGetAppRoles(details.namespace);
+  const { data: myRoles } = useRolesControllerGetMyRoles();
+
   const dispatch = useModalDispatch();
   const Swal = useCustomAlert();
-  const [activeStep, setActiveStep] = useState(0);
-  const [details, setDetails] = useState<Details>({
-    namespace: '',
-    role: '',
-    roleInfo: {
-      name: '',
-      department: '',
-      phone: '',
-    },
-  });
-
-  const { data: roles } = useGetRolesForNamespace(details.namespace);
-  const { data: myRoles } = useGetMyRoles();
 
   const {
     register,
@@ -51,30 +66,13 @@ export const useRequestRoleEffects = () => {
     formState: { errors, isValid },
   } = useForm<FieldValues>({
     defaultValues: details.roleInfo,
-    resolver: yupResolver(
-      yup
-        .object()
-        .shape({
-          name: yup.string().required('Name is required'),
-          department: yup.string().required('Department is required'),
-          phone: yup.string().required('Phone is required'),
-        })
-        .required()
-    ),
+    resolver: yupResolver(requestRoleSchema),
     mode: 'onChange',
   });
 
   const resetToInitialState = () => {
     setActiveStep(0);
-    setDetails({
-      namespace: '',
-      role: '',
-      roleInfo: {
-        name: '',
-        department: '',
-        phone: '',
-      },
-    });
+    setDetails(initialDetails);
     reset();
   };
 
@@ -134,7 +132,6 @@ export const useRequestRoleEffects = () => {
   };
 
   const requestRole = async () => {
-    console.log(details);
     const result = await Swal.success({
       title: 'Request submitted',
       text: `Your request for the ${details.role} has been successfully submitted`,

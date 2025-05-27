@@ -3080,13 +3080,52 @@ components:
         - "password"
     RequesterClaimDTO:
       type: "object"
-      properties: {}
+      properties:
+        role:
+          type: "string"
+        requestDate:
+          type: "string"
+        namespace:
+          type: "string"
+        status:
+          type: "string"
+        expirationDate:
+          type: "string"
+        expirationStatus:
+          type: "string"
+      required:
+        - "role"
+        - "requestDate"
+        - "namespace"
+        - "status"
+        - "expirationDate"
+        - "expirationStatus"
     SearchAppDTO:
       type: "object"
-      properties: {}
+      properties:
+        name:
+          type: "string"
+        namespace:
+          type: "string"
+        appName:
+          type: "string"
+        logoUrl:
+          type: "string"
+      required:
+        - "name"
+        - "namespace"
+        - "appName"
+        - "logoUrl"
     ApplicationRoleDTO:
       type: "object"
-      properties: {}
+      properties:
+        role:
+          type: "string"
+        namespace:
+          type: "string"
+      required:
+        - "role"
+        - "namespace"
 externalDocs:
   description: "Postman Collection"
   url: "/docs-json"

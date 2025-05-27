@@ -8,10 +8,13 @@ import {
   useRoleRequestsListEffects,
 } from './RoleRequestsList.effects';
 import { Box, Typography } from '@mui/material';
+import { useModalActionsEffects } from './ModalActions.effects';
 
 export function RoleRequestsList() {
-  const { roleRequests, actions, statusFilter, handleChangeStatusFilter } =
+  const { roleRequests, statusFilter, handleChangeStatusFilter } =
     useRoleRequestsListEffects();
+
+  const actions = useModalActionsEffects();
 
   return (
     <div>

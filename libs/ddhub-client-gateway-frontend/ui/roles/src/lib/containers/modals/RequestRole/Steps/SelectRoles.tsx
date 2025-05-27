@@ -58,7 +58,6 @@ export const SelectRoles = ({
             (myRole) => myRole.namespace === availableRole.namespace
           );
 
-          console.log(isSynced, availableRole.namespace, myRoles);
           return (
             <Box key={availableRole.role}>
               <Button

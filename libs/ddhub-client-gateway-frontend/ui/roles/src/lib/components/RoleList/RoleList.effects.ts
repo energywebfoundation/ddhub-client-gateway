@@ -1,10 +1,10 @@
 import { ModalActionsEnum, useModalDispatch } from '../../context';
 import { useState } from 'react';
-import { useGetMyRoles } from './api';
+import { useRolesControllerGetMyRoles } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 
 export const useRoleListEffects = () => {
   const [statusFilter, setStatusFilter] = useState<string>('All');
-  const { data: roles, isLoading, isSuccess } = useGetMyRoles();
+  const { data: roles, isLoading, isSuccess } = useRolesControllerGetMyRoles();
 
   const dispatch = useModalDispatch();
 

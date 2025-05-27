@@ -1,4 +1,4 @@
-import { Search, Check, Slash, MessageCircle } from 'react-feather';
+import { Search, Check, UserPlus, FileText } from 'react-feather';
 import { TStep } from '@ddhub-client-gateway-frontend/ui/core';
 import { Details } from '../RequestRole.effects';
 
@@ -11,13 +11,13 @@ export const REQUEST_ROLE_STEPS = (details: Details): TStep[] => [
   {
     title: 'Select new role',
     subtitle: null,
-    icon: <Slash size={18} />,
+    icon: <UserPlus size={18} />,
     disabled: !details.namespace,
   },
   {
     title: 'Fill in role details',
     subtitle: null,
-    icon: <MessageCircle size={18} />,
+    icon: <FileText size={18} />,
     disabled: !details.role || !details.namespace,
   },
   {

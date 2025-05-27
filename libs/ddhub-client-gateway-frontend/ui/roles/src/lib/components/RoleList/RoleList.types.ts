@@ -1,11 +1,11 @@
 export enum RoleStatus {
-  active = 'Approved',
-  pending = 'Pending',
-  requested = 'Requested',
-  rejected = 'Rejected',
-  synced = 'Synced',
+  approved = 'APPROVED',
+  pending = 'PENDING',
+  requested = 'REQUESTED',
+  rejected = 'REJECTED',
+  synced = 'SYNCED',
 }
 
 export enum ExpirationStatus {
-  expired = 'Expired',
+  expired = 'EXPIRED',
 }

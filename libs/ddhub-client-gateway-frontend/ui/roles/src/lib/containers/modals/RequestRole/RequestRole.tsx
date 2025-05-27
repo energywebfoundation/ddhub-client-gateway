@@ -140,7 +140,6 @@ export const RequestRoleModal = () => {
               })();
             }
             if (activeStep === 3) {
-              console.log(details);
               requestRole();
             } else {
               nextStep();

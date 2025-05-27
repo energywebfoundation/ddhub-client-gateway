@@ -2,7 +2,7 @@ import {
   TableHeader,
   CopyToClipboard,
 } from '@ddhub-client-gateway-frontend/ui/core';
-import { Box, Chip, Typography } from '@mui/material';
+import { Box, Chip, chipClasses, Typography } from '@mui/material';
 import { DateTime } from 'luxon';
 import { alpha, Theme } from '@mui/material/styles';
 import {
@@ -11,7 +11,8 @@ import {
 } from '../components/RoleList/RoleList.types';
 
 const getChipStyles = (status: RoleStatus, theme: Theme) => {
-  if (status === RoleStatus.active || status === RoleStatus.synced) {
+  console.log(theme.palette);
+  if (status === RoleStatus.approved || status === RoleStatus.synced) {
     return {
       backgroundColor: alpha(theme.palette.success.main, 0.12),
       color: theme.palette.success.main,
@@ -29,6 +30,8 @@ const getChipStyles = (status: RoleStatus, theme: Theme) => {
       color: theme.palette.error.main,
     };
   }
+
+  throw new Error(`Unknown role status: ${status}`);
 };
 
 export const ROLES_HEADERS: TableHeader[] = [
@@ -68,7 +71,7 @@ export const ROLES_HEADERS: TableHeader[] = [
     Cell: ({ value }: { value: string }) => {
       return (
         <Chip
-          label={value}
+          label={value.toLowerCase()}
           sx={(theme) => ({
             borderRadius: '5px',
             padding: '1px 2px',
@@ -76,6 +79,7 @@ export const ROLES_HEADERS: TableHeader[] = [
             fontSize: '12px',
             fontWeight: 405,
             lineHeight: '18px',
+            textTransform: 'capitalize',
             ...getChipStyles(value as RoleStatus, theme),
           })}
         />
@@ -108,7 +112,8 @@ export const ROLES_HEADERS: TableHeader[] = [
   {
     Header: 'EXPIRATION DATE',
     accessor: 'expirationDate',
-    Cell: ({ value }: { value: string }) => {
+    Cell: ({ value }: { value: string | null }) => {
+      if (!value) return <Typography variant="body2">-</Typography>;
       const date = DateTime.fromISO(value).toFormat('yyyy-MM-dd');
 
       return (
