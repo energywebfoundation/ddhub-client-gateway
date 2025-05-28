@@ -72,8 +72,8 @@ import {
     })
     @HttpCode(HttpStatus.NO_CONTENT)
     @Roles(UserRole.ADMIN, UserRole.MESSAGING)
-    public async storeContact(@Body() dto: RequestRoleDto): Promise<void> {
-      await this.iamService.requestClaim(dto.role);
+    public async requestRole(@Body() dto: RequestRoleDto): Promise<void> {
+      await this.iamService.requestClaim(dto.role, dto.requestorFields);
     }
   }
   
