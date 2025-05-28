@@ -6,6 +6,8 @@ import {
     Query,
     UseGuards,
     Param,
+    Post,
+    Body,
   } from '@nestjs/common';
   import { ApiResponse, ApiTags } from '@nestjs/swagger';
   import {
@@ -15,7 +17,7 @@ import {
   } from '@dsb-client-gateway/ddhub-client-gateway-user-roles';
   import { IamService, RequesterClaimDTO, ApplicationRoleDTO } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
   import { SearchAppDTO } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
-  import { SearchApplicationsQueryDto, GetRolesByNamespaceDto } from '../dto/roles.dto';
+  import { SearchApplicationsQueryDto, GetRolesByNamespaceDto, RequestRoleDto } from '../dto/roles.dto';
   
   @Controller('ssi-hub')
   @ApiTags('SSI Hub')
@@ -61,6 +63,17 @@ import {
     @Roles(UserRole.ADMIN, UserRole.MESSAGING)
     public async getAppRoles(@Param() { namespace }: GetRolesByNamespaceDto): Promise<ApplicationRoleDTO[]> {
       return await this.iamService.getAppRoles(namespace);
+    }
+
+    @Post('/role')
+    @ApiResponse({
+      status: HttpStatus.NO_CONTENT,
+      description: 'Role requested successfully',
+    })
+    @HttpCode(HttpStatus.NO_CONTENT)
+    @Roles(UserRole.ADMIN, UserRole.MESSAGING)
+    public async requestRole(@Body() dto: RequestRoleDto): Promise<void> {
+      await this.iamService.requestClaim(dto.role, dto.requestorFields);
     }
   }
   
