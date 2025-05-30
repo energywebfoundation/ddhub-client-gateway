@@ -87,7 +87,7 @@ export const Autocomplete: FC<AutocompleteProps> = ({
         }}
         renderInput={(params) => (
           <TextField
-            autoComplete='off'
+            autoComplete="off"
             {...params}
             placeholder={placeholder}
             classes={{ root: classes.autocomplete }}
