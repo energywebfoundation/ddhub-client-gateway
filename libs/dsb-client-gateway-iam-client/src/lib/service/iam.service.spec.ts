@@ -360,7 +360,7 @@ describe('IamService', () => {
           claim: {
             claimType: 'claim',
             claimTypeVersion: 1,
-            fields: [],
+            requestorFields: [],
           },
           registrationTypes: [
             RegistrationTypes.OnChain,
@@ -561,6 +561,8 @@ describe('IamService', () => {
           .mockImplementationOnce(async () => {
             return [
               {
+                id: '1',
+                token: 'token1',
                 claimType: 'user.roles.global.apps.ddhub.energyweb.auth.ewc',
                 namespace: 'energyweb',
                 createdAt: '2024-01-01T00:00:00Z',
@@ -569,6 +571,8 @@ describe('IamService', () => {
                 isRejected: false,
               },
               {
+                id: '2',
+                token: 'token2',
                 claimType: 'marketing.roles.global.apps.ddhub.energyweb.auth.ewc',
                 namespace: 'namespace2',
                 createdAt: '2024-01-01T00:00:00Z',
@@ -577,6 +581,8 @@ describe('IamService', () => {
                 isRejected: false,
               },
               {
+                id: '3',
+                token: 'token3',
                 claimType: 'topiccreator.roles.global.apps.ddhub.energyweb.auth.ewc',
                 namespace: 'ewx',
                 createdAt: '2024-01-01T00:00:00Z',
@@ -609,6 +615,8 @@ describe('IamService', () => {
         expect(castedResult).toHaveLength(3);
 
         expect(castedResult[0]).toEqual({
+          id: '1',
+          token: 'token1',
           role: 'user',
           requestDate: '2024-01-01T00:00:00Z',
           namespace: 'energyweb',
@@ -618,6 +626,8 @@ describe('IamService', () => {
         });
 
         expect(castedResult[1]).toEqual({
+          id: '2',
+          token: 'token2',
           role: 'marketing',
           requestDate: '2024-01-01T00:00:00Z',
           namespace: 'namespace2',
@@ -627,6 +637,8 @@ describe('IamService', () => {
         });
 
         expect(castedResult[2]).toEqual({
+          id: '3',
+          token: 'token3',
           role: 'topiccreator',
           requestDate: '2024-01-01T00:00:00Z',
           namespace: 'ewx',
@@ -803,10 +815,23 @@ describe('IamService', () => {
               {
                 name: 'admin',
                 namespace: 'namespace1',
+                definition: {
+                  requestorFields: [{
+                    label: 'Organisation Name',
+                    pattern: null,
+                    required: true,
+                    fieldType: 'text',
+                    maxLength: null,
+                    minLength: null
+                  }],
+                }
               },
               {
                 name: 'user',
                 namespace: 'namespace1',
+                definition: {
+                  requestorFields: []
+                },
               }
             ];
           });
@@ -835,11 +860,20 @@ describe('IamService', () => {
         expect(castedResult[0]).toEqual({
           role: 'admin',
           namespace: 'namespace1',
+          requestorFields: [{
+            label: 'Organisation Name',
+            pattern: null,
+            required: true,
+            fieldType: 'text',
+            maxLength: null,
+            minLength: null
+          }],
         });
 
         expect(castedResult[1]).toEqual({
           role: 'user',
           namespace: 'namespace1',
+          requestorFields: [],
         });
       });
     });

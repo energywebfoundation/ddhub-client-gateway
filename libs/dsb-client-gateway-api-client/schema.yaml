@@ -1515,6 +1515,21 @@ paths:
                   $ref: "#/components/schemas/ApplicationRoleDTO"
       tags:
         - "SSI Hub"
+  /api/v2/ssi-hub/role:
+    post:
+      operationId: "RolesController_requestRole"
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RequestRoleDto"
+      responses:
+        204:
+          description: "Role requested successfully"
+      tags:
+        - "SSI Hub"
 info:
   title: "DDHub Client Gateway"
   description: "DDHub Client Gateway"
@@ -3081,6 +3096,10 @@ components:
     RequesterClaimDTO:
       type: "object"
       properties:
+        id:
+          type: "string"
+        token:
+          type: "string"
         role:
           type: "string"
         requestDate:
@@ -3094,6 +3113,8 @@ components:
         expirationStatus:
           type: "string"
       required:
+        - "id"
+        - "token"
         - "role"
         - "requestDate"
         - "namespace"
@@ -3126,6 +3147,30 @@ components:
       required:
         - "role"
         - "namespace"
+    RequestorFieldDto:
+      type: "object"
+      properties:
+        key:
+          type: "string"
+          example: "name"
+        value:
+          type: "string"
+          example: "John Doe"
+      required:
+        - "key"
+        - "value"
+    RequestRoleDto:
+      type: "object"
+      properties:
+        role:
+          type: "string"
+          example: "user.roles.ddhub.apps.energyweb.iam.ewc"
+        requestorFields:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/RequestorFieldDto"
+      required:
+        - "role"
 externalDocs:
   description: "Postman Collection"
   url: "/docs-json"

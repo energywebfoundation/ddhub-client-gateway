@@ -1,4 +1,7 @@
-import { IAppDefinition } from '@energyweb/credential-governance';
+import {
+  IAppDefinition,
+  IFieldDefinition,
+} from '@energyweb/credential-governance';
 import { RoleStatus } from '@ddhub-client-gateway/identity/models';
 import { ApiProperty } from '@nestjs/swagger';
 
@@ -23,6 +26,12 @@ export interface Claims {
 }
 
 export class RequesterClaimDTO {
+  @ApiProperty()
+  id: string;
+
+  @ApiProperty()
+  token: string;
+
   @ApiProperty()
   role: string;
 
@@ -62,4 +71,10 @@ export class ApplicationRoleDTO {
 
   @ApiProperty()
   namespace: string;
+  requestorFields?: IFieldDefinition[];
+}
+
+export class RequestorFieldDTO {
+  public key: string;
+  public value: string | number;
 }

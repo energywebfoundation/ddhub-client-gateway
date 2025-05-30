@@ -12,7 +12,7 @@ import {
 import { IAppDefinition } from '@energyweb/credential-governance';
 import { IamFactoryService } from './iam-factory.service';
 import { ConfigService } from '@nestjs/config';
-import { ApplicationDTO, Claim, RequesterClaimDTO, SearchAppDTO, ApplicationRoleDTO } from '../iam.interface';
+import { ApplicationDTO, Claim, RequesterClaimDTO, SearchAppDTO, ApplicationRoleDTO, RequestorFieldDTO } from '../iam.interface';
 import { RoleStatus } from '@ddhub-client-gateway/identity/models';
 import { Span } from 'nestjs-otel';
 import promiseRetry from 'promise-retry';
@@ -249,12 +249,12 @@ export class IamService {
   }
 
   @Span('iam_requestClaim')
-  public async requestClaim(claim: string): Promise<void> {
+  public async requestClaim(claim: string, requestorFields: RequestorFieldDTO[] = []): Promise<void> {
     const claimObject = {
       claim: {
         claimType: claim,
         claimTypeVersion: 1,
-        fields: [],
+        requestorFields,
       },
       registrationTypes: [
         RegistrationTypes.OnChain,
@@ -262,7 +262,7 @@ export class IamService {
       ],
     };
 
-    this.logger.log('Requesting claim', claimObject);
+    this.logger.log(`Requesting claim ${claimObject.claim.claimType}`);
 
     await this.claimsService.createClaimRequest(claimObject);
   }
@@ -333,6 +333,8 @@ export class IamService {
       this.logger.debug('end: RequesterClaims');
 
       return {
+        id: claim.id,
+        token: claim.token,
         role: claim.claimType.split('.')[0],
         requestDate: claim.createdAt,
         namespace: claim.namespace,
@@ -397,6 +399,7 @@ export class IamService {
       return {
         role: role.name,
         namespace: role.namespace,
+        requestorFields: role.definition.requestorFields,
       };
     });
   }
