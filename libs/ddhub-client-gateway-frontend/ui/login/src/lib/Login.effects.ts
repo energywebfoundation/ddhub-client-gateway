@@ -35,10 +35,7 @@ const usePrivateKeyEffects = ({
   const { mutate, isLoading } = useIdentityControllerPost({
     mutation: {
       onMutate: () => setIsChecking(true),
-      onSuccess: (res) => {
-        console.log('res', res);
-        setUserData(res as IdentityWithEnrolment);
-      },
+      onSuccess: (res) => setUserData(res as IdentityWithEnrolment),
       onError: (error: Error) => {
         if (notifyOnError) {
           notifyOnError(error);
