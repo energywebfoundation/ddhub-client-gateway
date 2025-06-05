@@ -28,6 +28,7 @@ const mockClaimsService = {
   publishPublicClaim: jest.fn(),
   requestClaim: jest.fn(),
   createClaimRequest: jest.fn(),
+  deleteClaim: jest.fn(),
 };
 
 const mockDidRegistry = {
@@ -898,6 +899,57 @@ describe('IamService', () => {
       it('should throw error', () => {
         expect(error).toBeDefined();
         expect(error.message).toBe('Failed to fetch roles');
+      });
+    });
+  });
+
+  describe('deleteClaimById()', () => {
+    describe('should delete claim successfully', () => {
+      beforeEach(async () => {
+        service['claimsService'] = mockClaimsService as unknown as ClaimsService;
+
+        try {
+          await service.deleteClaimById('test-claim-id');
+        } catch (e) {
+          error = e;
+        }
+      });
+
+      it('should execute without error', () => {
+        expect(error).toBeNull();
+      });
+
+      it('should call deleteClaim with correct parameters', () => {
+        expect(mockClaimsService.deleteClaim).toBeCalledTimes(1);
+        expect(mockClaimsService.deleteClaim).toBeCalledWith({ id: 'test-claim-id' });
+      });
+    });
+
+    describe('should handle errors', () => {
+      beforeEach(async () => {
+        service['claimsService'] = mockClaimsService as unknown as ClaimsService;
+
+        mockClaimsService.deleteClaim = jest
+          .fn()
+          .mockImplementationOnce(async () => {
+            throw new Error('Failed to delete claim');
+          });
+
+        try {
+          await service.deleteClaimById('test-claim-id');
+        } catch (e) {
+          error = e;
+        }
+      });
+
+      it('should throw error', () => {
+        expect(error).toBeDefined();
+        expect(error.message).toBe('Failed to delete claim');
+      });
+
+      it('should call deleteClaim with correct parameters', () => {
+        expect(mockClaimsService.deleteClaim).toBeCalledTimes(1);
+        expect(mockClaimsService.deleteClaim).toBeCalledWith({ id: 'test-claim-id' });
       });
     });
   });
