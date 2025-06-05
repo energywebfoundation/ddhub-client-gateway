@@ -8,6 +8,7 @@ import {
     Param,
     Post,
     Body,
+    Delete,
   } from '@nestjs/common';
   import { ApiResponse, ApiTags } from '@nestjs/swagger';
   import {
@@ -74,6 +75,17 @@ import {
     @Roles(UserRole.ADMIN, UserRole.MESSAGING)
     public async requestRole(@Body() dto: RequestRoleDto): Promise<void> {
       await this.iamService.requestClaim(dto.role, dto.requestorFields);
+    }
+
+    @Delete('/role/:id')
+    @ApiResponse({
+      status: HttpStatus.NO_CONTENT,
+      description: 'Role deleted successfully',
+    })
+    @HttpCode(HttpStatus.NO_CONTENT)
+    @Roles(UserRole.ADMIN, UserRole.MESSAGING)
+    public async deleteRole(@Param('id') id: string): Promise<void> {
+      await this.iamService.deleteClaimById(id);
     }
   }
   

@@ -1530,6 +1530,20 @@ paths:
           description: "Role requested successfully"
       tags:
         - "SSI Hub"
+  /api/v2/ssi-hub/role/{id}:
+    delete:
+      operationId: "RolesController_deleteRole"
+      parameters:
+        - name: "id"
+          required: true
+          in: "path"
+          schema:
+            type: "string"
+      responses:
+        204:
+          description: "Role deleted successfully"
+      tags:
+        - "SSI Hub"
 info:
   title: "DDHub Client Gateway"
   description: "DDHub Client Gateway"
