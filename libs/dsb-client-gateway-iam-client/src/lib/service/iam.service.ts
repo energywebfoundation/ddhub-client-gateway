@@ -7,17 +7,19 @@ import {
   DidRegistry,
   RegistrationTypes,
   SignerService,
+  SearchType,
 } from 'iam-client-lib';
 import { IAppDefinition } from '@energyweb/credential-governance';
 import { IamFactoryService } from './iam-factory.service';
 import { ConfigService } from '@nestjs/config';
-import { ApplicationDTO, Claim } from '../iam.interface';
+import { ApplicationDTO, Claim, RequesterClaimDTO, SearchAppDTO, ApplicationRoleDTO, RequestorFieldDTO } from '../iam.interface';
 import { RoleStatus } from '@ddhub-client-gateway/identity/models';
 import { Span } from 'nestjs-otel';
 import promiseRetry from 'promise-retry';
 import { Encoding, PubKeyType } from '@ew-did-registry/did-resolver-interface';
 import { KeyType } from '@ew-did-registry/keys';
 import { RetryConfigService } from '@dsb-client-gateway/ddhub-client-gateway-utils';
+import moment from 'moment';
 
 @Injectable()
 export class IamService {
@@ -35,31 +37,31 @@ export class IamService {
     protected readonly retryConfigService: RetryConfigService
   ) {}
 
+  private getClaimStatus(claim: DIDClaim): RoleStatus {
+    if (claim.isAccepted) {
+      return RoleStatus.APPROVED;
+    }
+
+    if (claim.isRejected) {
+      return RoleStatus.REJECTED;
+    }
+
+    if (!claim.isAccepted && !claim.isRejected) {
+      return RoleStatus.AWAITING_APPROVAL;
+    }
+
+    return RoleStatus.NOT_ENROLLED;
+  };
+
   @Span('iam_getClaimsWithStatus')
   public async getClaimsWithStatus(): Promise<Claim[]> {
     const claims: DIDClaim[] = await this.getClaims();
     const synchronizedToDIDClaims = await this.getUserClaimsFromDID();
 
-    const getClaimStatus = (claim: DIDClaim): RoleStatus => {
-      if (claim.isAccepted) {
-        return RoleStatus.APPROVED;
-      }
-
-      if (claim.isRejected) {
-        return RoleStatus.REJECTED;
-      }
-
-      if (!claim.isAccepted && !claim.isRejected) {
-        return RoleStatus.AWAITING_APPROVAL;
-      }
-
-      return RoleStatus.NOT_ENROLLED;
-    };
-
     return claims.map((claim) => {
       return {
         namespace: claim.claimType,
-        status: getClaimStatus(claim),
+        status: this.getClaimStatus(claim),
         syncedToDidDoc:
           synchronizedToDIDClaims.filter(
             (synchronizedClaim) =>
@@ -247,12 +249,12 @@ export class IamService {
   }
 
   @Span('iam_requestClaim')
-  public async requestClaim(claim: string): Promise<void> {
+  public async requestClaim(claim: string, requestorFields: RequestorFieldDTO[] = []): Promise<void> {
     const claimObject = {
       claim: {
         claimType: claim,
         claimTypeVersion: 1,
-        fields: [],
+        requestorFields,
       },
       registrationTypes: [
         RegistrationTypes.OnChain,
@@ -260,7 +262,7 @@ export class IamService {
       ],
     };
 
-    this.logger.log('Requesting claim', claimObject);
+    this.logger.log(`Requesting claim ${claimObject.claim.claimType}`);
 
     await this.claimsService.createClaimRequest(claimObject);
   }
@@ -307,5 +309,104 @@ export class IamService {
     }
 
     return this.signerService.did;
+  }
+
+  @Span('iam_getRequesterClaims')
+  public async getRequesterClaims(
+    requesterDid: string
+  ): Promise<RequesterClaimDTO[]> {
+    this.logger.debug('start: RequesterClaims');
+
+    const claims = await this.cacheClient
+      .getClaimsByRequester(requesterDid)
+      .catch((e) => {
+        this.logger.log('fetching claims by requester failed', e);
+
+        throw e;
+      });
+
+    this.logger.debug('did claims fetched');
+
+    return claims.map((claim) => {
+      const isExpired = claim.expirationTimestamp ? +claim.expirationTimestamp < Date.now() : false;
+
+      this.logger.debug('end: RequesterClaims');
+
+      return {
+        id: claim.id,
+        token: claim.token,
+        role: claim.claimType.split('.')[0],
+        requestDate: claim.createdAt,
+        namespace: claim.namespace,
+        status: this.getClaimStatus(claim),
+        expirationDate: claim.expirationTimestamp ? moment(claim.expirationTimestamp).toISOString() : null,
+        expirationStatus: isExpired ? 'EXPIRED' : null,
+      };
+    });
+  }
+
+  @Span('iam_searchApps')
+  public async searchApps(
+    searchStr: string
+  ): Promise<SearchAppDTO[]> {
+    this.logger.debug('start: SearchApps ' + searchStr);
+
+    const applications = await this.cacheClient
+      .getNamespaceBySearchPhrase(searchStr, [SearchType.App, SearchType.Org])
+      .catch((e) => {
+        this.logger.log('searching namespace by search phrase', e);
+
+        throw e;
+      });
+
+    this.logger.debug('apps fetched');
+
+    return applications.map((app) => {
+      const application = {
+        name: app.name,
+        namespace: app.namespace,
+        appName: '',
+        logoUrl: ''
+      };
+
+      if ('appName' in app.definition) {
+        application.appName = app.definition.appName;
+        application.logoUrl = app.definition.logoUrl;
+      }
+
+      this.logger.debug('end: SearchApps');
+      return application;
+    });
+  }
+
+  @Span('iam_getAppRoles')
+  public async getAppRoles(
+    namespace: string
+  ): Promise<ApplicationRoleDTO[]> {
+    this.logger.debug('start: GetAppRoles ' + namespace);
+
+    const roles = await this.cacheClient
+      .getApplicationRoles(namespace)
+      .catch((e) => {
+        this.logger.log('get application roles', e);
+
+        throw e;
+      });
+
+    this.logger.debug('roles fetched');
+
+    return roles.map((role) => {
+      return {
+        role: role.name,
+        namespace: role.namespace,
+        requestorFields: role.definition.requestorFields,
+      };
+    });
+  }
+
+  @Span('iam_deleteClaimById')
+  public async deleteClaimById(id: string): Promise<void> {
+    this.logger.debug('DeleteClaimById ' + id);
+    await this.claimsService.deleteClaim({ id });
   }
 }
