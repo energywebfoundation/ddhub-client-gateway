@@ -403,4 +403,10 @@ export class IamService {
       };
     });
   }
+
+  @Span('iam_deleteClaimById')
+  public async deleteClaimById(id: string): Promise<void> {
+    this.logger.debug('DeleteClaimById ' + id);
+    await this.claimsService.deleteClaim({ id });
+  }
 }
