@@ -26,6 +26,9 @@
       "@ddhub-client-gateway-frontend/ui/channels": [
         "libs/ddhub-client-gateway-frontend/ui/channels/src/index.ts"
       ],
+      "@ddhub-client-gateway-frontend/ui/roles": [
+        "libs/ddhub-client-gateway-frontend/ui/roles/src/index.ts"
+      ],
       "@ddhub-client-gateway-frontend/ui/client-ids": [
         "libs/ddhub-client-gateway-frontend/ui/client-ids/src/index.ts"
       ],
