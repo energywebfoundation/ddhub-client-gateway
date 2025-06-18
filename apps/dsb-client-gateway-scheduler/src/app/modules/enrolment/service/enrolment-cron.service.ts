@@ -29,7 +29,7 @@ export class EnrolmentCronService implements OnApplicationBootstrap {
     protected readonly iamService: IamService,
     protected readonly eventsService: EventsService,
     protected readonly commandBus: CommandBus
-  ) {}
+  ) { }
 
   public async onApplicationBootstrap(): Promise<void> {
     const isCronEnabled: boolean = this.configService.get<boolean>(
@@ -66,6 +66,8 @@ export class EnrolmentCronService implements OnApplicationBootstrap {
 
         return;
       }
+
+      await this.iamService.unSyncPublicClaim();
 
       const cachedEnrolment: EnrolmentEntity | null =
         await this.enrolmentService.getFromCache();

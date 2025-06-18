@@ -47,7 +47,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
-          node-version: '16.14.2'
+          node-version: '18.20.5'
       - name: Cache node modules
         uses: actions/cache@v4
         env:
@@ -123,7 +123,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
-          node-version: '16.14.2'
+          node-version: '18.20.5'
       - name: Cache node modules
         uses: actions/cache@v4
         env:
@@ -216,7 +216,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
-          node-version: '16.14.2'
+          node-version: '18.20.5'
       - name: Cache node modules
         uses: actions/cache@v4
         env:

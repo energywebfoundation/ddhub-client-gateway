@@ -64,20 +64,20 @@ export class IamFactoryService {
         'connected to iam cache server, connecting to did registry'
       );
 
-      const projectId = configService.get('INFURA_PROJECT_ID');
-      const projectSecret = configService.get('INFURA_PROJECT_SECRET');
-
-      const auth =
-        'Basic ' +
-        Buffer.from(projectId + ':' + projectSecret).toString('base64');
-
+      const AWS_ACCESS_KEY_ID = configService.get('S3_AWS_ACCESS_KEY_ID');
+      const AWS_SECRET_ACCESS_KEY = configService.get('S3_AWS_SECRET_ACCESS_KEY');
+      const AWS_REGION = configService.get('S3_AWS_REGION');
+      const AWS_S3_BUCKET = configService.get('S3_AWS_BUCKET');
       const { claimsService, didRegistry } = await connectToDidRegistry({
-        host: configService.get<string>('IPFS_HOST'),
-        port: configService.get<number>('IPFS_PORT'),
-        protocol: configService.get<string>('IPFS_PROTOCOL'),
-        headers: {
-          authorization: auth,
+        bucketName: AWS_S3_BUCKET,
+        credential: {
+          region: AWS_REGION,
+          credentials: {
+            accessKeyId: AWS_ACCESS_KEY_ID,
+            secretAccessKey: AWS_SECRET_ACCESS_KEY,
+          },
         },
+        host: ''
       });
 
       await didRegistry.init();
