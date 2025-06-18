@@ -35,7 +35,7 @@ export class IamService {
     protected readonly iamFactoryService: IamFactoryService,
     protected readonly configService: ConfigService,
     protected readonly retryConfigService: RetryConfigService
-  ) {}
+  ) { }
 
   private getClaimStatus(claim: DIDClaim): RoleStatus {
     if (claim.isAccepted) {
@@ -246,6 +246,37 @@ export class IamService {
     await this.claimsService.publishPublicClaim({
       claim: { token },
     });
+  }
+
+  @Span('iam_unSyncPublicClaim')
+  public async unSyncPublicClaim(): Promise<void> {
+    const claims = await this.getClaimsWithStatus();
+
+    const needsSync = claims.some(
+      claim => !claim.syncedToDidDoc && claim.status === 'APPROVED'
+    );
+
+    if (needsSync) {
+      const unsyncedClaims = claims.filter(claim => !claim.syncedToDidDoc);
+      for (const claimNamespace of unsyncedClaims) {
+        const _claims = await this.getClaims();
+        // Get all issuedTokens for matching namespace (filter out undefined/null tokens)
+        const issuedTokens = _claims
+          .filter(claim => claim.claimType === claimNamespace.namespace && claim.issuedToken)
+          .map(claim => claim.issuedToken);
+        for (const token of issuedTokens) {
+          this.logger.log(
+            `Attempting to publish ${claimNamespace.namespace} to DID document`
+          );
+
+          await this.publishPublicClaim(token);
+
+          this.logger.log(
+            `Synced ${claimNamespace.namespace} claim to DID document`
+          );
+        }
+      }
+    }
   }
 
   @Span('iam_requestClaim')
