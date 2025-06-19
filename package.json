@@ -101,7 +101,7 @@
     "formidable": "^2.0.1",
     "hdkey": "^2.0.1",
     "highland": "^2.13.5",
-    "iam-client-lib": "^8.2.0-dev.2535.0",
+    "iam-client-lib": "^8.2.0-dev.2538.0",
     "jest-cucumber": "^3.0.1",
     "json-to-pretty-yaml": "^1.2.2",
     "json2md": "^1.12.0",
