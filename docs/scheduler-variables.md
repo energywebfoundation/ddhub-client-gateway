@@ -54,10 +54,6 @@
 | TIMEOUT | number | 1000 | Specifies mininum timeout (how much app should wait before retries) for vulnerable methods |  |  |
 | MAX_TIMEOUT | number | 60000 | Specifies maximum timeout (how much app should wait before retries) for vulnerable methods |  |  |
 | MESSAGING_MAX_TIMEOUT | number | 60000 | Specifies messaging maximum timeout (how much app should wait before retries) for vulnerable methods |  |  |
-| S3_AWS_ACCESS_KEY_ID | string |  | AWS access key for programmatic access to AWS services |  |  |
-| S3_AWS_SECRET_ACCESS_KEY | string |  | AWS secret key for programmatic access to AWS services |  |  |
-| S3_AWS_REGION | string |  | The AWS region, e.g., us-east-1 |  |  |
-| S3_AWS_BUCKET | string |  | The name of the AWS S3 bucket |  |  |
 | INTERNAL_EVENTS_TIMEOUT | number | 5 | How often internal events interval should execute (seconds) |  |  |
 | USE_CACHE | boolean | true | Should use cache |  |  |
 | SECRETS_ENGINE | string |  | Secrets engine to use | aws,vault,azure |  |

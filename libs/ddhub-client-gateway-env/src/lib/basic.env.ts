@@ -87,12 +87,4 @@ export const BASIC_ENVS = Joi.object({
     .description(
       'Specifies messaging maximum timeout (how much app should wait before retries) for vulnerable methods'
     ),
-  S3_AWS_ACCESS_KEY_ID: Joi.string()
-    .description('AWS access key for programmatic access to AWS services'),
-  S3_AWS_SECRET_ACCESS_KEY: Joi.string()
-    .description('AWS secret key for programmatic access to AWS services'),
-  S3_AWS_REGION: Joi.string()
-    .description('The AWS region, e.g., us-east-1'),
-  S3_AWS_BUCKET: Joi.string()
-    .description('The name of the AWS S3 bucket'),
 });
