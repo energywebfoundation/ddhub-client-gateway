@@ -1,4 +1,4 @@
-import { IAppDefinition } from '@energyweb/credential-governance';
+import { IAppDefinition, IFieldDefinition } from '@energyweb/credential-governance';
 import { RoleStatus } from '@ddhub-client-gateway/identity/models';
 
 export class ApplicationDTO implements IAppDefinition {
@@ -19,4 +19,33 @@ export interface Claim {
 export interface Claims {
   did: string;
   claims: Claim[];
+}
+
+export class RequesterClaimDTO {
+  id: string;
+  token: string;
+  role: string;
+  requestDate: string;
+  namespace: string;
+  status: string;
+  expirationDate?: string;
+  expirationStatus?: string;
+}
+
+export class SearchAppDTO {
+  name: string;
+  namespace: string;
+  appName: string;
+  logoUrl: string;
+}
+
+export class ApplicationRoleDTO {
+  role: string;
+  namespace: string;
+  requestorFields?: IFieldDefinition[];
+}
+
+export class RequestorFieldDTO {
+  public key: string;
+  public value: string | number;
 }

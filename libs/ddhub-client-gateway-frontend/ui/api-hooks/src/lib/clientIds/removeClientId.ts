@@ -33,7 +33,7 @@ export const useRemoveClientId = () => {
 
     mutate(
       {
-        clientId,
+        clientId: encodeURIComponent(clientId),
       },
       {
         onSuccess: removeClientIdSuccess,
