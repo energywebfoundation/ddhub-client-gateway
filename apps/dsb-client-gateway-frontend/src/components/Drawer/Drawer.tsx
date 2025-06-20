@@ -9,6 +9,7 @@ import {
   Settings,
   Inbox,
   Edit3,
+  UserCheck,
 } from 'react-feather';
 import {
   ClientSubscriptionIcon,
@@ -72,6 +73,20 @@ export const Drawer = () => {
         },
       ],
       menuIcon: <Command className={classes.icon} size={18} />,
+    },
+    {
+      menuTitle: 'Roles',
+      subMenu: [
+        {
+          href: routerConst.MyRoles,
+          title: 'My roles',
+        },
+        {
+          href: routerConst.RoleRequests,
+          title: 'Role requests',
+        },
+      ],
+      menuIcon: <UserCheck className={classes.icon} size={16} />,
     },
   ];
 
