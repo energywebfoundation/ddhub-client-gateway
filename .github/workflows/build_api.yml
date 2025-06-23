@@ -30,7 +30,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
-          node-version: '16.14.2'
+          node-version: '18.20.5'
       - name: Cache node modules
         uses: actions/cache@v4
         env:
@@ -61,7 +61,7 @@ jobs:
         env:
           DB_NAME: 'postgresql://ddhub:ddhub@localhost:5432/ddhub'
       #      - name: Prepare Vault KV Engine
-      #        run: docker compose -f ci/docker-compose.yml exec -T vault_dev sh -c "vault secrets enable -version=1 -path=ddhub -address="http://localhost:8200" kv" || true
+      #        run: docker-compose -f ci/docker-compose.yml exec -T vault_dev sh -c "vault secrets enable -version=1 -path=ddhub -address="http://localhost:8200" kv" || true
       #      - name: Run E2E tests
       #        env:
       #          PRIVATE_KEY_E2E: ${{ secrets.PRIVATE_KEY_E2E }}

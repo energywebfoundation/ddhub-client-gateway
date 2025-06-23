@@ -2,7 +2,7 @@ name: Build and publish images
 
 on:
   push:
-    branches: [ master, pre_release ]
+    branches: [master, pre_release]
     paths-ignore:
       - 'devops/**'
       - 'get-started/**'
@@ -52,7 +52,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
-          node-version: '16.14.2'
+          node-version: '18.20.5'
       - name: Cache node modules
         uses: actions/cache@v4
         env:
@@ -95,18 +95,18 @@ jobs:
       - name: Set ArgoCD Variable
         id: configure
         run: |
-              echo "Running on branch ${{ github.ref }}"
-              if [ "${{ github.ref }}" = "refs/heads/pre_release" ]; then
-                echo "ENVIRONMENT=test" >> "$GITHUB_ENV"
-                echo "ARGOCD_URL=${{ secrets.ARGOCD_DEV_URL }}" >> "$GITHUB_ENV"
-                echo "ARGOCD_USERNAME=${{ secrets.ARGOCD_DEV_USERNAME }}" >> "$GITHUB_ENV"
-                echo "ARGOCD_PWD=${{ secrets.ARGOCD_DEV_PASS }}" >> "$GITHUB_ENV"
-              else
-                echo "ENVIRONMENT=demo" >> "$GITHUB_ENV"
-                echo "ARGOCD_URL=${{ secrets.ARGOCD_STAGING_URL }}" >> "$GITHUB_ENV"
-                echo "ARGOCD_USERNAME=${{ secrets.ARGOCD_STAGING_USERNAME }}" >> "$GITHUB_ENV"
-                echo "ARGOCD_PWD=${{ secrets.ARGOCD_STAGING_PASS }}" >> "$GITHUB_ENV"
-              fi
+          echo "Running on branch ${{ github.ref }}"
+          if [ "${{ github.ref }}" = "refs/heads/pre_release" ]; then
+            echo "ENVIRONMENT=test" >> "$GITHUB_ENV"
+            echo "ARGOCD_URL=${{ secrets.ARGOCD_DEV_URL }}" >> "$GITHUB_ENV"
+            echo "ARGOCD_USERNAME=${{ secrets.ARGOCD_DEV_USERNAME }}" >> "$GITHUB_ENV"
+            echo "ARGOCD_PWD=${{ secrets.ARGOCD_DEV_PASS }}" >> "$GITHUB_ENV"
+          else
+            echo "ENVIRONMENT=demo" >> "$GITHUB_ENV"
+            echo "ARGOCD_URL=${{ secrets.ARGOCD_STAGING_URL }}" >> "$GITHUB_ENV"
+            echo "ARGOCD_USERNAME=${{ secrets.ARGOCD_STAGING_USERNAME }}" >> "$GITHUB_ENV"
+            echo "ARGOCD_PWD=${{ secrets.ARGOCD_STAGING_PASS }}" >> "$GITHUB_ENV"
+          fi
 
       - name: ArgoCD login
         uses: clowdhaus/argo-cd-action/@v1.12.1
@@ -130,26 +130,26 @@ jobs:
           command: app set ddhub-gateway-${{ env.ENVIRONMENT }}-1
           options: -p ddhub-client-gateway-api.clientgateway.scheduler.image.tag=${{needs.semantic-version.outputs.new_version}}
 
-#      - name: ArgoCD overwrite QA image tag
-#        uses: clowdhaus/argo-cd-action/@v1.12.1
-#        id: argocd_image_tag_overwrite_qa_scheduler
-#        with:
-#          command: app set ddhub-gateway-qa
-#          options: -p ddhub-client-gateway-api.clientgateway.scheduler.image.tag=${{needs.semantic-version.outputs.new_version}}
-#
-#      - name: ArgoCD overwrite QA-1 image tag
-#        uses: clowdhaus/argo-cd-action/@v1.12.1
-#        id: argocd_image_tag_overwrite_qa1_scheduler
-#        with:
-#          command: app set ddhub-gateway-qa-1
-#          options: -p ddhub-client-gateway-api.clientgateway.scheduler.image.tag=${{needs.semantic-version.outputs.new_version}}
-#
-#      - name: ArgoCD overwrite TRIAL image tag
-#        uses: clowdhaus/argo-cd-action/@v1.12.1
-#        id: argocd_image_tag_overwrite_trial_scheduler
-#        with:
-#          command: app set ddhub-gateway-trial
-#          options: -p ddhub-client-gateway-api.clientgateway.scheduler.image.tag=${{needs.semantic-version.outputs.new_version}}
+  #      - name: ArgoCD overwrite QA image tag
+  #        uses: clowdhaus/argo-cd-action/@v1.12.1
+  #        id: argocd_image_tag_overwrite_qa_scheduler
+  #        with:
+  #          command: app set ddhub-gateway-qa
+  #          options: -p ddhub-client-gateway-api.clientgateway.scheduler.image.tag=${{needs.semantic-version.outputs.new_version}}
+  #
+  #      - name: ArgoCD overwrite QA-1 image tag
+  #        uses: clowdhaus/argo-cd-action/@v1.12.1
+  #        id: argocd_image_tag_overwrite_qa1_scheduler
+  #        with:
+  #          command: app set ddhub-gateway-qa-1
+  #          options: -p ddhub-client-gateway-api.clientgateway.scheduler.image.tag=${{needs.semantic-version.outputs.new_version}}
+  #
+  #      - name: ArgoCD overwrite TRIAL image tag
+  #        uses: clowdhaus/argo-cd-action/@v1.12.1
+  #        id: argocd_image_tag_overwrite_trial_scheduler
+  #        with:
+  #          command: app set ddhub-gateway-trial
+  #          options: -p ddhub-client-gateway-api.clientgateway.scheduler.image.tag=${{needs.semantic-version.outputs.new_version}}
   build-be:
     name: Build Backend & Release
     runs-on: ubuntu-latest
@@ -160,7 +160,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
-          node-version: '16.14.2'
+          node-version: '18.20.5'
       - name: Cache node modules
         uses: actions/cache@v4
         env:
@@ -215,18 +215,18 @@ jobs:
       - name: Set ArgoCD Variable
         id: configure
         run: |
-              echo "Running on branch ${{ github.ref }}"
-              if [ "${{ github.ref }}" = "refs/heads/pre_release" ]; then
-                echo "ENVIRONMENT=test" >> "$GITHUB_ENV"
-                echo "ARGOCD_URL=${{ secrets.ARGOCD_DEV_URL }}" >> "$GITHUB_ENV"
-                echo "ARGOCD_USERNAME=${{ secrets.ARGOCD_DEV_USERNAME }}" >> "$GITHUB_ENV"
-                echo "ARGOCD_PWD=${{ secrets.ARGOCD_DEV_PASS }}" >> "$GITHUB_ENV"
-              else
-                echo "ENVIRONMENT=demo" >> "$GITHUB_ENV"
-                echo "ARGOCD_URL=${{ secrets.ARGOCD_STAGING_URL }}" >> "$GITHUB_ENV"
-                echo "ARGOCD_USERNAME=${{ secrets.ARGOCD_STAGING_USERNAME }}" >> "$GITHUB_ENV"
-                echo "ARGOCD_PWD=${{ secrets.ARGOCD_STAGING_PASS }}" >> "$GITHUB_ENV"
-              fi
+          echo "Running on branch ${{ github.ref }}"
+          if [ "${{ github.ref }}" = "refs/heads/pre_release" ]; then
+            echo "ENVIRONMENT=test" >> "$GITHUB_ENV"
+            echo "ARGOCD_URL=${{ secrets.ARGOCD_DEV_URL }}" >> "$GITHUB_ENV"
+            echo "ARGOCD_USERNAME=${{ secrets.ARGOCD_DEV_USERNAME }}" >> "$GITHUB_ENV"
+            echo "ARGOCD_PWD=${{ secrets.ARGOCD_DEV_PASS }}" >> "$GITHUB_ENV"
+          else
+            echo "ENVIRONMENT=demo" >> "$GITHUB_ENV"
+            echo "ARGOCD_URL=${{ secrets.ARGOCD_STAGING_URL }}" >> "$GITHUB_ENV"
+            echo "ARGOCD_USERNAME=${{ secrets.ARGOCD_STAGING_USERNAME }}" >> "$GITHUB_ENV"
+            echo "ARGOCD_PWD=${{ secrets.ARGOCD_STAGING_PASS }}" >> "$GITHUB_ENV"
+          fi
 
       - name: ArgoCD login
         uses: clowdhaus/argo-cd-action/@v1.12.1
@@ -249,27 +249,27 @@ jobs:
         with:
           command: app set ddhub-gateway-${{ env.ENVIRONMENT }}-1
           options: -p ddhub-client-gateway-api.image.tag=${{needs.semantic-version.outputs.new_version}}
-#
-#      - name: ArgoCD overwrite QA image tag
-#        uses: clowdhaus/argo-cd-action/@v1.12.1
-#        id: argocd_image_tag_overwrite_qa_api
-#        with:
-#          command: app set ddhub-gateway-qa
-#          options: -p ddhub-client-gateway-api.image.tag=${{needs.semantic-version.outputs.new_version}}
-#
-#      - name: ArgoCD overwrite QA-1 image tag
-#        uses: clowdhaus/argo-cd-action/@v1.12.1
-#        id: argocd_image_tag_overwrite_qa1_api
-#        with:
-#          command: app set ddhub-gateway-qa-1
-#          options: -p ddhub-client-gateway-api.image.tag=${{needs.semantic-version.outputs.new_version}}
-#
-#      - name: ArgoCD overwrite TRIAL image tag
-#        uses: clowdhaus/argo-cd-action/@v1.12.1
-#        id: argocd_image_tag_overwrite_trial_api
-#        with:
-#          command: app set ddhub-gateway-trial
-#          options: -p ddhub-client-gateway-api.image.tag=${{needs.semantic-version.outputs.new_version}}
+  #
+  #      - name: ArgoCD overwrite QA image tag
+  #        uses: clowdhaus/argo-cd-action/@v1.12.1
+  #        id: argocd_image_tag_overwrite_qa_api
+  #        with:
+  #          command: app set ddhub-gateway-qa
+  #          options: -p ddhub-client-gateway-api.image.tag=${{needs.semantic-version.outputs.new_version}}
+  #
+  #      - name: ArgoCD overwrite QA-1 image tag
+  #        uses: clowdhaus/argo-cd-action/@v1.12.1
+  #        id: argocd_image_tag_overwrite_qa1_api
+  #        with:
+  #          command: app set ddhub-gateway-qa-1
+  #          options: -p ddhub-client-gateway-api.image.tag=${{needs.semantic-version.outputs.new_version}}
+  #
+  #      - name: ArgoCD overwrite TRIAL image tag
+  #        uses: clowdhaus/argo-cd-action/@v1.12.1
+  #        id: argocd_image_tag_overwrite_trial_api
+  #        with:
+  #          command: app set ddhub-gateway-trial
+  #          options: -p ddhub-client-gateway-api.image.tag=${{needs.semantic-version.outputs.new_version}}
 
   build-fe:
     name: Build Frontend (UEP branding)
@@ -294,7 +294,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
-          node-version: '16.14.2'
+          node-version: '18.20.5'
       - name: Cache node modules
         uses: actions/cache@v4
         env:
@@ -341,18 +341,18 @@ jobs:
       - name: Set ArgoCD Variable
         id: configure
         run: |
-              echo "Running on branch ${{ github.ref }}"
-              if [ "${{ github.ref }}" = "refs/heads/pre_release" ]; then
-                echo "ENVIRONMENT=test" >> "$GITHUB_ENV"
-                echo "ARGOCD_URL=${{ secrets.ARGOCD_DEV_URL }}" >> "$GITHUB_ENV"
-                echo "ARGOCD_USERNAME=${{ secrets.ARGOCD_DEV_USERNAME }}" >> "$GITHUB_ENV"
-                echo "ARGOCD_PWD=${{ secrets.ARGOCD_DEV_PASS }}" >> "$GITHUB_ENV"
-              else
-                echo "ENVIRONMENT=demo" >> "$GITHUB_ENV"
-                echo "ARGOCD_URL=${{ secrets.ARGOCD_STAGING_URL }}" >> "$GITHUB_ENV"
-                echo "ARGOCD_USERNAME=${{ secrets.ARGOCD_STAGING_USERNAME }}" >> "$GITHUB_ENV"
-                echo "ARGOCD_PWD=${{ secrets.ARGOCD_STAGING_PASS }}" >> "$GITHUB_ENV"
-              fi
+          echo "Running on branch ${{ github.ref }}"
+          if [ "${{ github.ref }}" = "refs/heads/pre_release" ]; then
+            echo "ENVIRONMENT=test" >> "$GITHUB_ENV"
+            echo "ARGOCD_URL=${{ secrets.ARGOCD_DEV_URL }}" >> "$GITHUB_ENV"
+            echo "ARGOCD_USERNAME=${{ secrets.ARGOCD_DEV_USERNAME }}" >> "$GITHUB_ENV"
+            echo "ARGOCD_PWD=${{ secrets.ARGOCD_DEV_PASS }}" >> "$GITHUB_ENV"
+          else
+            echo "ENVIRONMENT=demo" >> "$GITHUB_ENV"
+            echo "ARGOCD_URL=${{ secrets.ARGOCD_STAGING_URL }}" >> "$GITHUB_ENV"
+            echo "ARGOCD_USERNAME=${{ secrets.ARGOCD_STAGING_USERNAME }}" >> "$GITHUB_ENV"
+            echo "ARGOCD_PWD=${{ secrets.ARGOCD_STAGING_PASS }}" >> "$GITHUB_ENV"
+          fi
 
       - name: ArgoCD login
         uses: clowdhaus/argo-cd-action/@v1.12.1
@@ -399,7 +399,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
-          node-version: '16.14.2'
+          node-version: '18.20.5'
       - name: Cache node modules
         uses: actions/cache@v4
         env:
