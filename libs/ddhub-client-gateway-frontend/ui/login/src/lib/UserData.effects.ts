@@ -39,7 +39,8 @@ export const routeRestrictions = new Map<string, string>()
   .set('messageOutbox', routerConst.MessageOutbox)
   .set('addressBook', routerConst.AddressBook)
   .set('clientIds', routerConst.ClientIds)
-  .set('integrationApis', routerConst.IntegrationAPIs);
+  .set('integrationApis', routerConst.IntegrationAPIs)
+  .set('roles', routerConst.Roles);
 
 enum VersionStatus {
   UNAVAILABLE = 'Unavailable',

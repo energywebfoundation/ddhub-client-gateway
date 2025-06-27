@@ -48,6 +48,7 @@ export function GenericTable<T>({
   showCheckbox = false,
   setSelectedItems,
   rowsPerPageOptions = [10, 20, 50, 100],
+  renderBanner,
 }: TableProps<T>) {
   const { classes } = useStyles();
 
@@ -94,17 +95,30 @@ export function GenericTable<T>({
   return (
     <>
       {showSearch ? (
-        <Box display="flex">
-          { backendSearch ? (
-            <Search filter={globalFilter} onSearchInput={handleSearchInput} debounceTime={500} />
-          ) : (
-            <Search filter={globalFilter} setFilter={setGlobalFilter} tableRows={tableRows}/>
-          )}
-          {children}
+        <Box>
+          <Box display="flex">
+            {backendSearch ? (
+              <Search
+                filter={globalFilter}
+                onSearchInput={handleSearchInput}
+                debounceTime={500}
+              />
+            ) : (
+              <Search
+                filter={globalFilter}
+                setFilter={setGlobalFilter}
+                tableRows={tableRows}
+              />
+            )}
+            {children}
+          </Box>
         </Box>
       ) : (
         ''
       )}
+
+      {renderBanner && renderBanner()}
+
       <TableContainer component={Paper} {...containerProps}>
         {loading ? (
           <TableRowsLoadingComponent pageSize={loadingRows ?? pageSize} />
@@ -116,11 +130,17 @@ export function GenericTable<T>({
           >
             <TableHead>
               <TableRow>
-                { showCheckbox && (
-                  <TableCell padding="checkbox" classes={{ head: classes.head }}>
+                {showCheckbox && (
+                  <TableCell
+                    padding="checkbox"
+                    classes={{ head: classes.head }}
+                  >
                     <Checkbox
                       color="primary"
-                      checked={rows.length > 0 && selectedTotal === currentPageRowsTotal}
+                      checked={
+                        rows.length > 0 &&
+                        selectedTotal === currentPageRowsTotal
+                      }
                       onChange={handleSelectAllClick}
                       inputProps={{
                         'aria-label': 'select all',
@@ -177,10 +197,15 @@ export function GenericTable<T>({
                 : rows.sort(getComparator(order, orderBy))
               ).map((row, index) => {
                 const firstCol = row.cells[0].value;
-                const isItemSelected = showCheckbox ? isSelected(firstCol) : false;
+                const isItemSelected = showCheckbox
+                  ? isSelected(firstCol)
+                  : false;
                 const labelId = `enhanced-table-checkbox-${index}`;
 
                 const data = row.original as any;
+                const showActions = Array.isArray(actions)
+                  ? actions
+                  : actions?.(data);
                 prepareRow(row);
                 return (
                   <TableRow
@@ -190,11 +215,13 @@ export function GenericTable<T>({
                     {...row.getRowProps()}
                     onClick={() => handleRowClick(data)}
                   >
-                    { showCheckbox && (
+                    {showCheckbox && (
                       <TableCell padding="checkbox">
                         <Checkbox
                           color="primary"
-                          onClick={(event) => handleCheckboxClick(event, firstCol)}
+                          onClick={(event) =>
+                            handleCheckboxClick(event, firstCol)
+                          }
                           checked={isItemSelected}
                           inputProps={{
                             'aria-labelledby': labelId,
@@ -208,7 +235,10 @@ export function GenericTable<T>({
                       };
                       return (
                         <TableCell
-                          style={{ cursor: onRowClick ? 'pointer' : 'default', border: stripedTable ? 'none' : '' }}
+                          style={{
+                            cursor: onRowClick ? 'pointer' : 'default',
+                            border: stripedTable ? 'none' : '',
+                          }}
                           classes={{ body: classes.body }}
                           color={column.color}
                           {...cell.getCellProps()}
@@ -217,8 +247,11 @@ export function GenericTable<T>({
                         </TableCell>
                       );
                     })}
-                    {actions && (
-                      <TableComponentActions<T> data={data} actions={actions} />
+                    {showActions && (
+                      <TableComponentActions<T>
+                        data={data}
+                        actions={showActions}
+                      />
                     )}
                   </TableRow>
                 );
