@@ -5,7 +5,16 @@ import {
 import { Box, Chip, Tooltip, Typography } from '@mui/material';
 import { DateTime } from 'luxon';
 import { alpha, Theme } from '@mui/material/styles';
-import { RoleRequestStatus } from '../components/RoleRequestsList/RoleRequestsList.effects';
+
+export enum RoleRequestStatus {
+  PENDING = 'pending',
+  APPROVING = 'approving (waiting for transaction completion)',
+  APPROVED = 'approved',
+  REVOKING = 'revoking (waiting for transaction completion)',
+  REVOKED = 'revoked',
+  REJECTING = 'rejecting (waiting for transaction completion)',
+  REJECTED = 'rejected',
+}
 
 const shortenedDID = (did: string) => {
   return did.slice(0, 17) + '...' + did.slice(-4);

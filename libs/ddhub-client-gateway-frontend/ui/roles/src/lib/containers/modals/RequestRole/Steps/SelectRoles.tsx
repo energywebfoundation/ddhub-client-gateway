@@ -1,7 +1,7 @@
 import { alpha, Button, Divider, Typography } from '@mui/material';
 import { Box } from '@mui/material';
 import { Minus, Plus, Check } from 'react-feather';
-import { ApplicationDetails } from '../../../../components';
+import { ApplicationDetails, ScrollableBox } from '../../../../components';
 import { theme } from '@ddhub-client-gateway-frontend/ui/utils';
 
 const getIcon = ({
@@ -52,68 +52,70 @@ export const SelectRoles = ({
           Select a role
         </Typography>
 
-        {roles.map((availableRole) => {
-          const isSelected = role === availableRole.namespace;
-          const isSynced = myRoles.some(
-            (myRole) => myRole.namespace === availableRole.namespace
-          );
+        <ScrollableBox maxHeight={200}>
+          {roles.map((availableRole) => {
+            const isSelected = role === availableRole.namespace;
+            const isSynced = myRoles.some(
+              (myRole) => myRole.namespace === availableRole.namespace
+            );
 
-          return (
-            <Box key={availableRole.role}>
-              <Button
-                variant={isSelected ? 'contained' : 'outlined'}
-                sx={{
-                  width: '100%',
-                  display: 'flex',
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  margin: '4px 0',
-                }}
-                onClick={
-                  isSynced
-                    ? undefined
-                    : () => toggleRole(availableRole.namespace)
-                }
-              >
-                <Typography
-                  variant="button"
-                  sx={{ textTransform: 'lowercase' }}
-                  color="text.secondary"
+            return (
+              <Box key={availableRole.role}>
+                <Button
+                  variant={isSelected ? 'contained' : 'outlined'}
+                  sx={{
+                    width: '100%',
+                    display: 'flex',
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    margin: '4px 0',
+                  }}
+                  onClick={
+                    isSynced
+                      ? undefined
+                      : () => toggleRole(availableRole.namespace)
+                  }
                 >
-                  {availableRole.role}
-                </Typography>
-                <Box
-                  sx={{ width: 80, textTransform: 'capitalize' }}
-                  display="flex"
-                  flexDirection="row"
-                  alignItems="center"
-                >
-                  {getIcon({ isSelected, isSynced })}
-                  {isSynced ? (
-                    <Typography
-                      variant="body2"
-                      color={theme.palette.text.secondary}
-                      sx={{ marginLeft: 1 }}
-                    >
-                      Synced
-                    </Typography>
-                  ) : (
-                    <Typography
-                      variant="body2"
-                      color={
-                        isSelected ? undefined : theme.palette.text.secondary
-                      }
-                      sx={{ marginLeft: 1 }}
-                    >
-                      Request
-                    </Typography>
-                  )}
-                </Box>
-              </Button>
-            </Box>
-          );
-        })}
+                  <Typography
+                    variant="button"
+                    sx={{ textTransform: 'lowercase' }}
+                    color="text.secondary"
+                  >
+                    {availableRole.role}
+                  </Typography>
+                  <Box
+                    sx={{ width: 80, textTransform: 'capitalize' }}
+                    display="flex"
+                    flexDirection="row"
+                    alignItems="center"
+                  >
+                    {getIcon({ isSelected, isSynced })}
+                    {isSynced ? (
+                      <Typography
+                        variant="body2"
+                        color={theme.palette.text.secondary}
+                        sx={{ marginLeft: 1 }}
+                      >
+                        Synced
+                      </Typography>
+                    ) : (
+                      <Typography
+                        variant="body2"
+                        color={
+                          isSelected ? undefined : theme.palette.text.secondary
+                        }
+                        sx={{ marginLeft: 1 }}
+                      >
+                        Request
+                      </Typography>
+                    )}
+                  </Box>
+                </Button>
+              </Box>
+            );
+          })}
+        </ScrollableBox>
       </Box>
     </Box>
   );

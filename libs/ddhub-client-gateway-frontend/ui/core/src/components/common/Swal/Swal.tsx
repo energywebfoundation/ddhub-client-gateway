@@ -1,7 +1,14 @@
 import { ReactElement } from 'react';
 import Sweetalert, { SweetAlertIcon } from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
-import { AlertCircle, Check, Info, HelpCircle, XCircle } from 'react-feather';
+import {
+  AlertCircle,
+  Check,
+  Info,
+  HelpCircle,
+  XCircle,
+  Loader,
+} from 'react-feather';
 import { useStyles } from './Swal.styles';
 
 const SwalCustom = withReactContent(Sweetalert);
@@ -14,7 +21,7 @@ export interface SwalProps {
   confirmButtonText?: string;
   cancelButtonText?: string;
   width?: string;
-  html?: string | HTMLElement
+  html?: string | HTMLElement;
 }
 
 export const Swal = () => {
@@ -26,6 +33,7 @@ export const Swal = () => {
     error: <XCircle style={{ stroke: theme.palette.error.main }} />,
     question: <HelpCircle />,
     info: <Info />,
+    pending: <Loader />,
   };
 
   return ({

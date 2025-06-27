@@ -54,9 +54,5 @@
   "roles": {
     "allowedRoles": ["user"],
     "allowedAuthRoles": ["admin"]
-  },
-  "roleRequests": {
-    "allowedRoles": ["user"],
-    "allowedAuthRoles": ["admin"]
   }
 }

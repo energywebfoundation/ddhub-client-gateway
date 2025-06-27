@@ -41,8 +41,11 @@ export class RequesterClaimDTO {
   @ApiProperty()
   namespace: string;
 
-  @ApiProperty()
-  status: string;
+  @ApiProperty({
+    enum: RoleStatus,
+    description: 'Role status',
+  })
+  status: RoleStatus;
 
   @ApiProperty()
   expirationDate?: string;
@@ -65,13 +68,51 @@ export class SearchAppDTO {
   logoUrl: string;
 }
 
+export class FieldDefinitionDTO implements IFieldDefinition {
+  @ApiProperty({
+    oneOf: [
+      { type: 'string', enum: ['text', 'number', 'date', 'boolean', 'json'] },
+    ],
+  })
+  fieldType: string;
+
+  @ApiProperty()
+  label: string;
+
+  @ApiProperty()
+  required?: boolean;
+
+  @ApiProperty()
+  minLength?: number;
+
+  @ApiProperty()
+  maxLength?: number;
+
+  @ApiProperty()
+  pattern?: string;
+
+  @ApiProperty()
+  minValue?: number;
+
+  @ApiProperty()
+  maxValue?: number;
+
+  @ApiProperty()
+  minDate?: Date;
+
+  @ApiProperty()
+  maxDate?: Date;
+}
+
 export class ApplicationRoleDTO {
   @ApiProperty()
   role: string;
 
   @ApiProperty()
   namespace: string;
-  requestorFields?: IFieldDefinition[];
+
+  @ApiProperty({ type: [FieldDefinitionDTO] })
+  requestorFields?: FieldDefinitionDTO[];
 }
 
 export class RequestorFieldDTO {

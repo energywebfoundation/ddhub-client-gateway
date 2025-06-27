@@ -2,33 +2,60 @@ import {
   TableHeader,
   CopyToClipboard,
 } from '@ddhub-client-gateway-frontend/ui/core';
-import { Box, Chip, chipClasses, Typography } from '@mui/material';
+import { Box, Chip, Typography } from '@mui/material';
 import { DateTime } from 'luxon';
 import { alpha, Theme } from '@mui/material/styles';
-import {
-  ExpirationStatus,
-  RoleStatus,
-} from '../components/RoleList/RoleList.types';
+import { ExpirationStatus } from '../components/RoleList/RoleList.types';
+import { RequesterClaimDTOStatus } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 
-const getChipStyles = (status: RoleStatus, theme: Theme) => {
-  console.log(theme.palette);
-  if (status === RoleStatus.approved || status === RoleStatus.synced) {
+export enum RoleStatus {
+  approved = 'Approved',
+  pending = 'Pending',
+  requested = 'Requested',
+  rejected = 'Rejected',
+  synced = 'Synced',
+}
+
+const getChipStyles = (status: RequesterClaimDTOStatus, theme: Theme) => {
+  if (status === 'APPROVED' || status === 'SYNCED') {
     return {
       backgroundColor: alpha(theme.palette.success.main, 0.12),
       color: theme.palette.success.main,
     };
   }
-  if (status === RoleStatus.pending || status === RoleStatus.requested) {
+  if (status === 'AWAITING_APPROVAL' || status === 'NOT_ENROLLED') {
     return {
       backgroundColor: alpha(theme.palette.warning.main, 0.12),
       color: theme.palette.warning.main,
     };
   }
-  if (status === RoleStatus.rejected) {
+  if (status === 'REJECTED' || status === 'NO_CLAIM') {
     return {
       backgroundColor: alpha(theme.palette.error.main, 0.12),
       color: theme.palette.error.main,
     };
+  }
+
+  throw new Error(`Unknown role status: ${status}`);
+};
+
+const mapStatusToLabel = (status: RequesterClaimDTOStatus) => {
+  if (status === 'APPROVED') {
+    return RoleStatus.approved;
+  }
+  if (status === 'SYNCED') {
+    return RoleStatus.synced;
+  }
+  if (status === 'AWAITING_APPROVAL') {
+    return RoleStatus.pending;
+  }
+
+  if (status === 'NOT_ENROLLED') {
+    return RoleStatus.requested;
+  }
+
+  if (status === 'REJECTED' || status === 'NO_CLAIM') {
+    return RoleStatus.rejected;
   }
 
   throw new Error(`Unknown role status: ${status}`);
@@ -71,7 +98,7 @@ export const ROLES_HEADERS: TableHeader[] = [
     Cell: ({ value }: { value: string }) => {
       return (
         <Chip
-          label={value.toLowerCase()}
+          label={mapStatusToLabel(value as RequesterClaimDTOStatus)}
           sx={(theme) => ({
             borderRadius: '5px',
             padding: '1px 2px',
@@ -80,7 +107,7 @@ export const ROLES_HEADERS: TableHeader[] = [
             fontWeight: 405,
             lineHeight: '18px',
             textTransform: 'capitalize',
-            ...getChipStyles(value as RoleStatus, theme),
+            ...getChipStyles(value as RequesterClaimDTOStatus, theme),
           })}
         />
       );

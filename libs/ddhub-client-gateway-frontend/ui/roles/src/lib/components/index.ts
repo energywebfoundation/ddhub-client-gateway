@@ -4,3 +4,6 @@ export * from './ApplicationDetails/ApplicationDetails';
 export * from './RoleInformation/RoleInformation';
 export * from './RoleRequestsList/RoleRequestsList';
 export * from './RoleRequestsList/RoleRequestsList.effects';
+export * from './CheckSwitch/CheckSwitch';
+export * from './ScrollableBox/ScrollableBox';
+export * from './Banner/Banner';

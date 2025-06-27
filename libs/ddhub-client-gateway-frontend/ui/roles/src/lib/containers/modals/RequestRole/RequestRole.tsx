@@ -10,7 +10,7 @@ import { useStyles } from './RequestRole.styles';
 import { REQUEST_ROLE_STEPS } from './Steps/requestSteps';
 import { SelectNamespaceStep } from './Steps/SelectNamespace';
 import { SelectRoles } from './Steps/SelectRoles';
-import { ApplicationDetails, RoleStatus } from '../../../components';
+import { ApplicationDetails } from '../../../components';
 import { RoleDetails } from './Steps/RoleDetails';
 import { RequestSummary } from './Steps/RequestSummary';
 import { theme } from '@ddhub-client-gateway-frontend/ui/utils';
@@ -37,6 +37,9 @@ export const RequestRoleModal = () => {
     setSearchKey,
     roles,
     myRoles,
+    control,
+    formData,
+    isRequesting,
   } = useRequestRoleEffects();
   const { classes } = useStyles();
 
@@ -65,7 +68,7 @@ export const RequestRoleModal = () => {
             role={details.role}
             toggleRole={toggleRole}
             roles={roles}
-            myRoles={myRoles.filter((r) => r.status === RoleStatus.synced)}
+            myRoles={myRoles?.filter((r) => r.status === 'SYNCED')}
           />
         );
       case 2:
@@ -82,13 +85,28 @@ export const RequestRoleModal = () => {
               role={
                 roles?.find((r) => r.namespace === details.role)?.role ?? ''
               }
+              fields={
+                roles?.find((r) => r.namespace === details.role)
+                  ?.requestorFields ?? []
+              }
               register={register}
               errors={errors}
+              control={control}
             />
           </Box>
         );
       case 3:
-        return <RequestSummary details={details} roles={roles} />;
+        return (
+          <RequestSummary
+            details={details}
+            roles={roles}
+            fields={
+              roles?.find((r) => r.namespace === details.role)
+                ?.requestorFields ?? []
+            }
+            formData={formData}
+          />
+        );
       default:
         return null;
     }
@@ -123,31 +141,37 @@ export const RequestRoleModal = () => {
         </Button>
       </Box>
       <Box className={classes.nextButtonWrapper}>
-        <Button
-          variant="contained"
-          disabled={getDisabled(details)}
-          onClick={() => {
-            if (activeStep === 2) {
-              handleSubmit((values) => {
-                setRoleInfo(
-                  values as {
-                    name: string;
-                    department: string;
-                    phone: string;
-                  }
-                );
+        {isRequesting ? (
+          <Button variant="contained" disabled>
+            Requesting...
+          </Button>
+        ) : (
+          <Button
+            variant="contained"
+            disabled={getDisabled(details)}
+            onClick={() => {
+              if (activeStep === 2) {
+                handleSubmit((values) => {
+                  setRoleInfo(
+                    values as {
+                      name: string;
+                      department: string;
+                      phone: string;
+                    }
+                  );
+                  nextStep();
+                })();
+              }
+              if (activeStep === 3) {
+                requestRole();
+              } else {
                 nextStep();
-              })();
-            }
-            if (activeStep === 3) {
-              requestRole();
-            } else {
-              nextStep();
-            }
-          }}
-        >
-          {activeStep === 3 ? 'Request' : 'Next'}
-        </Button>
+              }
+            }}
+          >
+            {activeStep === 3 ? 'Request' : 'Next'}
+          </Button>
+        )}
       </Box>
     </Dialog>
   );

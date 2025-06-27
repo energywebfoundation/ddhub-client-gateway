@@ -75,18 +75,9 @@ export const Drawer = () => {
       menuIcon: <Command className={classes.icon} size={18} />,
     },
     {
-      menuTitle: 'Roles',
-      subMenu: [
-        {
-          href: routerConst.MyRoles,
-          title: 'My roles',
-        },
-        {
-          href: routerConst.RoleRequests,
-          title: 'Role requests',
-        },
-      ],
-      menuIcon: <UserCheck className={classes.icon} size={16} />,
+      title: 'Roles',
+      href: routerConst.Roles,
+      icon: <UserCheck className={classes.icon} size={16} />,
     },
   ];
 

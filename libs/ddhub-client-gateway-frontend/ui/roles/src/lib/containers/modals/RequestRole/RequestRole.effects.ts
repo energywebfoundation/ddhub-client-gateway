@@ -12,32 +12,112 @@ import {
   useRolesControllerGetApps,
   useRolesControllerGetMyRoles,
   useRolesControllerGetAppRoles,
+  useRolesControllerRequestRole,
+  RequestRoleDto,
+  FieldDefinitionDTO,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 
 export type Details = {
   namespace: string;
   role: string;
-  roleInfo: {
-    name: string;
-    department: string;
-    phone: string;
-  };
+  roleInfo: Record<string, string>;
 };
 
-const requestRoleSchema = yup.object().shape({
-  name: yup.string().required('Name is required'),
-  department: yup.string().required('Department is required'),
-  phone: yup.string().required('Phone is required'),
-});
+const getRequestRoleSchema = (requestorFields: FieldDefinitionDTO[]) => {
+  const schemaFields: { [key: string]: any } = {};
+
+  requestorFields.forEach((field) => {
+    let validation: any;
+
+    switch (field.fieldType) {
+      case 'text':
+        validation = yup.string();
+
+        if (field.minLength) {
+          validation = validation.min(
+            field.minLength,
+            `Minimum ${field.minLength} characters`
+          );
+        }
+
+        if (field.maxLength) {
+          validation = validation.max(
+            field.maxLength,
+            `Maximum ${field.maxLength} characters`
+          );
+        }
+
+        if (field.pattern) {
+          validation = validation.matches(
+            new RegExp(field.pattern),
+            `Invalid ${field.label} format`
+          );
+        }
+        break;
+
+      case 'number':
+        validation = yup.number();
+
+        if (field.minValue !== undefined) {
+          validation = validation.min(
+            field.minValue,
+            `Minimum value is ${field.minValue}`
+          );
+        }
+
+        if (field.maxValue !== undefined) {
+          validation = validation.max(
+            field.maxValue,
+            `Maximum value is ${field.maxValue}`
+          );
+        }
+        break;
+
+      case 'date':
+        validation = yup.date();
+
+        if (field.minDate) {
+          validation = validation.min(
+            field.minDate,
+            `Date must be after ${field.minDate}`
+          );
+        }
+
+        if (field.maxDate) {
+          validation = validation.max(
+            field.maxDate,
+            `Date must be before ${field.maxDate}`
+          );
+        }
+        break;
+
+      case 'boolean':
+        validation = yup.boolean();
+        break;
+
+      case 'json':
+        validation = yup.object();
+        break;
+
+      default:
+        validation = yup.mixed();
+        break;
+    }
+
+    if (field.required) {
+      validation = validation.required(`${field.label} is required`);
+    }
+
+    schemaFields[field.label] = validation;
+  });
+
+  return yup.object().shape(schemaFields);
+};
 
 const initialDetails: Details = {
   namespace: '',
   role: '',
-  roleInfo: {
-    name: '',
-    department: '',
-    phone: '',
-  },
+  roleInfo: {},
 };
 
 export const useRequestRoleEffects = () => {
@@ -53,10 +133,20 @@ export const useRequestRoleEffects = () => {
     { query: { enabled: searchKey.length >= 3 } }
   );
   const { data: roles } = useRolesControllerGetAppRoles(details.namespace);
-  const { data: myRoles } = useRolesControllerGetMyRoles();
+  const { data: myRoles, refetch: refetchMyRoles } =
+    useRolesControllerGetMyRoles();
+  const { mutateAsync: requestRoleAsync, isLoading: isRequesting } =
+    useRolesControllerRequestRole();
 
   const dispatch = useModalDispatch();
   const Swal = useCustomAlert();
+
+  // Get the selected role's requestor fields
+  const selectedRole = roles?.find((role) => role.namespace === details.role);
+
+  const dynamicSchema = selectedRole?.requestorFields
+    ? getRequestRoleSchema(selectedRole.requestorFields)
+    : yup.object().shape({});
 
   const {
     register,
@@ -64,9 +154,10 @@ export const useRequestRoleEffects = () => {
     handleSubmit,
     reset,
     formState: { errors, isValid },
+    getValues,
   } = useForm<FieldValues>({
     defaultValues: details.roleInfo,
-    resolver: yupResolver(requestRoleSchema),
+    resolver: yupResolver(dynamicSchema),
     mode: 'onChange',
   });
 
@@ -80,11 +171,7 @@ export const useRequestRoleEffects = () => {
     setDetails({ ...details, namespace });
   };
 
-  const setRoleInfo = (roleInfo: {
-    name: string;
-    department: string;
-    phone: string;
-  }) => {
+  const setRoleInfo = (roleInfo: Record<string, any>) => {
     setDetails({ ...details, roleInfo });
   };
 
@@ -132,23 +219,38 @@ export const useRequestRoleEffects = () => {
   };
 
   const requestRole = async () => {
-    const result = await Swal.success({
-      title: 'Request submitted',
-      text: `Your request for the ${details.role} has been successfully submitted`,
-    });
+    try {
+      const requestRoleDto: RequestRoleDto = {
+        role: details.role,
+        requestorFields: Object.entries(details.roleInfo).map(
+          ([key, value]) => ({
+            key,
+            value: value,
+          })
+        ),
+      };
 
-    if (result.isConfirmed) {
-      closeModal();
+      await requestRoleAsync({ data: requestRoleDto });
+
+      const result = await Swal.success({
+        title: 'Request submitted',
+        text: `Your request for the ${details.role} has been successfully submitted`,
+      });
+
+      if (result.isConfirmed) {
+        closeModal();
+      }
+      await refetchMyRoles();
+    } catch (error) {
+      const result2 = await Swal.warning({
+        title: 'Request failed',
+        text: `Your request for the ${details.role} could not be submitted`,
+      });
+
+      if (result2.isConfirmed) {
+        closeModal();
+      }
     }
-
-    // const result2 = await Swal.warning({
-    //   title: 'Request failed',
-    //   text: `Your request for the ${details.role} could not be submitted`,
-    // });
-
-    // if (result2.isConfirmed) {
-    //   closeModal();
-    // }
   };
 
   const getDisabled = (details: Details) => {
@@ -186,5 +288,7 @@ export const useRequestRoleEffects = () => {
     setSearchKey,
     roles: roles ?? [],
     myRoles: myRoles ?? [],
+    formData: getValues(),
+    isRequesting,
   };
 };

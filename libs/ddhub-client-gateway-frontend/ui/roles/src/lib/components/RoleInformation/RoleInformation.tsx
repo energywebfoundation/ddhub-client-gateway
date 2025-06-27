@@ -1,16 +1,21 @@
-import { CopyToClipboard } from '@ddhub-client-gateway-frontend/ui/core';
+import {
+  CopyToClipboard,
+  EditorView,
+} from '@ddhub-client-gateway-frontend/ui/core';
 import { Box, Typography } from '@mui/material';
-import { Details } from '../../containers/modals/RequestRole/RequestRole.effects';
+import { FieldDefinitionDTO } from '@dsb-client-gateway/dsb-client-gateway-api-client';
+import { ScrollableBox } from '../ScrollableBox/ScrollableBox';
 export const RoleInformation = ({
   namespace,
   role,
-  roleInfo,
+  fields,
+  formData,
 }: {
   namespace: string;
   role: string;
-  roleInfo: Details['roleInfo'];
+  fields: FieldDefinitionDTO[];
+  formData: Record<string, any>;
 }) => {
-  console.log(role);
   return (
     <Box display="flex" flexDirection="column" gap={2} sx={{ marginBottom: 3 }}>
       <Typography
@@ -30,32 +35,35 @@ export const RoleInformation = ({
         <CopyToClipboard text={namespace} />
       </Box>
 
-      <Box display="flex" flexDirection="row" alignItems="center" gap={2}>
-        <Typography variant="body2" color="text.gray[300]">
-          Name:
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          {roleInfo.name}
-        </Typography>
-      </Box>
-
-      <Box display="flex" flexDirection="row" alignItems="center" gap={2}>
-        <Typography variant="body2" color="text.gray[300]">
-          Department:
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          {roleInfo.department}
-        </Typography>
-      </Box>
-
-      <Box display="flex" flexDirection="row" alignItems="center" gap={2}>
-        <Typography variant="body2" color="text.gray[300]">
-          Phone number:
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          {roleInfo.phone}
-        </Typography>
-      </Box>
+      <ScrollableBox maxHeight="220px">
+        {fields.map((field) => {
+          if (field.fieldType === 'json') {
+            return (
+              <Box
+                display="flex"
+                flexDirection="row"
+                alignItems="center"
+                gap={2}
+              >
+                <Typography variant="body2" color="text.gray[300]">
+                  {field.label}:
+                </Typography>
+                <EditorView value={formData[field.label].toString()} />
+              </Box>
+            );
+          }
+          return (
+            <Box display="flex" flexDirection="row" alignItems="center" gap={2}>
+              <Typography variant="body2" color="text.gray[300]">
+                {field.label}:
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                {formData[field.label].toString()}
+              </Typography>
+            </Box>
+          );
+        })}
+      </ScrollableBox>
     </Box>
   );
 };

@@ -4,17 +4,28 @@ import {
   GenericTable,
 } from '@ddhub-client-gateway-frontend/ui/core';
 import { useRoleListEffects } from './RoleList.effects';
-import { ROLES_HEADERS } from '../../models';
-import { Box, Typography } from '@mui/material';
-import { RoleStatus } from './RoleList.types';
+import { ROLES_HEADERS, RoleStatus } from '../../models';
+import { Box, CircularProgress, Typography } from '@mui/material';
+import { Banner } from '../Banner/Banner';
+
+const statusOptions: RoleStatus[] = [
+  RoleStatus.approved,
+  RoleStatus.pending,
+  RoleStatus.requested,
+  RoleStatus.rejected,
+  RoleStatus.synced,
+];
 
 export function RoleList() {
   const {
     roles,
     onCreateHandler,
     isLoading,
-    statusFilter,
     handleChangeStatusFilter,
+    countdown,
+    lastUpdateTime,
+    actions,
+    hasPendingRequests,
   } = useRoleListEffects();
 
   return (
@@ -22,8 +33,18 @@ export function RoleList() {
       <GenericTable
         headers={ROLES_HEADERS}
         tableRows={roles}
-        actions={null}
+        actions={(row) => {
+          if (row.status === 'AWAITING_APPROVAL') {
+            return actions;
+          }
+          return undefined;
+        }}
         loading={isLoading}
+        renderBanner={() =>
+          hasPendingRequests ? (
+            <Banner text="The screen will efresh every 10 seconds if a status requires transaction approval" />
+          ) : null
+        }
       >
         <Box
           display="flex"
@@ -44,19 +65,33 @@ export function RoleList() {
               Status
             </Typography>
             <Autocomplete
-              options={[
-                RoleStatus.pending,
-                RoleStatus.requested,
-                RoleStatus.rejected,
-                'All',
-              ]}
+              options={[...statusOptions, 'All']}
               value={'All'}
               onChange={(_, value) => {
                 handleChangeStatusFilter(value);
               }}
             />
           </Box>
-          <CreateButton onCreate={onCreateHandler} buttonText="Request Role" />
+          <Box
+            display="flex"
+            justifyContent="flex-end"
+            alignItems="baseline"
+            gap={2}
+          >
+            {hasPendingRequests && (
+              <>
+                <CircularProgress size={16} color="primary" />
+                <Typography variant="body2" color="text.primary">
+                  Next refresh in {countdown} seconds. Updated: {lastUpdateTime}
+                </Typography>
+              </>
+            )}
+
+            <CreateButton
+              onCreate={onCreateHandler}
+              buttonText="Request Role"
+            />
+          </Box>
         </Box>
       </GenericTable>
     </div>

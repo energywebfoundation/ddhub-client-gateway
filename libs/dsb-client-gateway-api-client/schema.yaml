@@ -3122,6 +3122,13 @@ components:
           type: "string"
         status:
           type: "string"
+          enum:
+            - "NOT_ENROLLED"
+            - "AWAITING_APPROVAL"
+            - "APPROVED"
+            - "REJECTED"
+            - "SYNCED"
+          description: "Role status"
         expirationDate:
           type: "string"
         expirationStatus:
@@ -3151,6 +3158,49 @@ components:
         - "namespace"
         - "appName"
         - "logoUrl"
+    FieldDefinitionDTO:
+      type: "object"
+      properties:
+        fieldType:
+          oneOf:
+            - type: "string"
+              enum:
+                - "text"
+                - "number"
+                - "date"
+                - "boolean"
+                - "json"
+        label:
+          type: "string"
+        required:
+          type: "boolean"
+        minLength:
+          type: "number"
+        maxLength:
+          type: "number"
+        pattern:
+          type: "string"
+        minValue:
+          type: "number"
+        maxValue:
+          type: "number"
+        minDate:
+          format: "date-time"
+          type: "string"
+        maxDate:
+          format: "date-time"
+          type: "string"
+      required:
+        - "fieldType"
+        - "label"
+        - "required"
+        - "minLength"
+        - "maxLength"
+        - "pattern"
+        - "minValue"
+        - "maxValue"
+        - "minDate"
+        - "maxDate"
     ApplicationRoleDTO:
       type: "object"
       properties:
@@ -3158,9 +3208,14 @@ components:
           type: "string"
         namespace:
           type: "string"
+        requestorFields:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/FieldDefinitionDTO"
       required:
         - "role"
         - "namespace"
+        - "requestorFields"
     RequestorFieldDto:
       type: "object"
       properties:
