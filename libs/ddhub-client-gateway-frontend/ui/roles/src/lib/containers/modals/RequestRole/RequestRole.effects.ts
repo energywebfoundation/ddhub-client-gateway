@@ -234,7 +234,7 @@ export const useRequestRoleEffects = () => {
 
       const result = await Swal.success({
         title: 'Request submitted',
-        text: `Your request for the ${details.role} has been successfully submitted`,
+        html: `Your request for the <strong>${details.role}</strong> has been successfully submitted`,
       });
 
       if (result.isConfirmed) {
@@ -244,7 +244,7 @@ export const useRequestRoleEffects = () => {
     } catch (error) {
       const result2 = await Swal.warning({
         title: 'Request failed',
-        text: `Your request for the ${details.role} could not be submitted`,
+        html: `Your request for the <strong>${details.role}</strong> could not be submitted`,
       });
 
       if (result2.isConfirmed) {

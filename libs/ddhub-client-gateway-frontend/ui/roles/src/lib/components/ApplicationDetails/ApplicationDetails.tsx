@@ -1,7 +1,9 @@
 import { CopyToClipboard } from '@ddhub-client-gateway-frontend/ui/core';
 import { Box, Typography } from '@mui/material';
+import { getApplicationNamespace, getOrganizationNamespace } from '../../utils';
 
 export const ApplicationDetails = ({ namespace }: { namespace: string }) => {
+  const [mainOrg, subOrg] = getOrganizationNamespace(namespace);
   return (
     <Box display="flex" flexDirection="column" gap={2} sx={{ marginBottom: 3 }}>
       <Typography
@@ -16,7 +18,7 @@ export const ApplicationDetails = ({ namespace }: { namespace: string }) => {
           Organization:
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          {namespace.split('.')[2]}
+          {`${mainOrg} ${subOrg ? `> ${subOrg}` : ''}`}
         </Typography>
       </Box>
 
@@ -25,7 +27,7 @@ export const ApplicationDetails = ({ namespace }: { namespace: string }) => {
           Application:
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          {namespace.split('.')[0]}
+          {getApplicationNamespace(namespace)}
         </Typography>
       </Box>
 

@@ -2,7 +2,7 @@ import {
   TTableComponentAction,
   useCustomAlert,
 } from '@ddhub-client-gateway-frontend/ui/core';
-import { fakeRoleRequestsData } from './RoleRequestsList.effects';
+import { RoleRequest } from './RoleRequestsList.effects';
 import { useTheme } from '@mui/material/styles';
 
 export enum ModalActionType {
@@ -56,10 +56,10 @@ const getModalConfig = (
           : 'Confirm role revocation',
       text:
         actionType === ModalActionType.APPROVE
-          ? 'Are you sure you want to approve the role assignment to the user?'
+          ? 'Are you sure to approve this role request?'
           : actionType === ModalActionType.REJECT
-          ? 'Are you sure you want to reject the role assignment to the user?'
-          : 'Are you sure you want to revoke the role assignment to the user?',
+          ? 'Are you sure to reject this role request?'
+          : 'Are you sure to revoke this previously approved role?',
       showCancelButton: true,
       confirmButtonText: 'Yes',
       cancelButtonText: 'No',
@@ -111,7 +111,7 @@ export const useModalActionsEffects = () => {
   const Swal = useCustomAlert();
   const theme = useTheme();
 
-  const actions: TTableComponentAction<typeof fakeRoleRequestsData[0]>[] = [
+  const actions: TTableComponentAction<RoleRequest>[] = [
     {
       label: 'Approve',
       onClick: async ({ fqcn }) => {

@@ -5,24 +5,24 @@ import {
   useRolesControllerDeleteRole,
   useRolesControllerGetMyRoles,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
-import { RoleStatus } from '../../models';
+import { RoleStatusLabel } from '../../models';
 import { useCustomAlert } from '@ddhub-client-gateway-frontend/ui/core';
 
-const mapStatusToLabel = (status: RoleStatus): RequesterClaimDTOStatus => {
-  if (status === RoleStatus.approved) {
-    return 'APPROVED';
+const mapStatusToLabel = (status: RoleStatusLabel): RequesterClaimDTOStatus => {
+  if (status === RoleStatusLabel.approved) {
+    return RequesterClaimDTOStatus.APPROVED;
   }
-  if (status === RoleStatus.pending) {
-    return 'AWAITING_APPROVAL';
+  if (status === RoleStatusLabel.pending) {
+    return RequesterClaimDTOStatus.AWAITING_APPROVAL;
   }
-  if (status === RoleStatus.requested) {
-    return 'NOT_ENROLLED';
+  if (status === RoleStatusLabel.requested) {
+    return RequesterClaimDTOStatus.NOT_ENROLLED;
   }
-  if (status === RoleStatus.rejected) {
-    return 'REJECTED';
+  if (status === RoleStatusLabel.rejected) {
+    return RequesterClaimDTOStatus.REJECTED;
   }
-  if (status === RoleStatus.synced) {
-    return 'SYNCED';
+  if (status === RoleStatusLabel.synced) {
+    return RequesterClaimDTOStatus.SYNCED;
   }
 
   throw new Error(`Unknown role status: ${status}`);
@@ -68,7 +68,7 @@ export const useRoleListEffects = () => {
 
   useEffect(() => {
     const foundPending = roles?.some(
-      (role) => role.status === 'AWAITING_APPROVAL'
+      (role) => role.status === RequesterClaimDTOStatus.AWAITING_APPROVAL
     );
     setHasPendingRequests(foundPending ?? false);
   }, [roles]);
@@ -95,11 +95,6 @@ export const useRoleListEffects = () => {
               }),
               refetch(),
             ]);
-            Swal.success({
-              title: 'Request cancelled',
-              text: 'Your request has been cancelled',
-            });
-            refetch();
           } catch (error) {
             console.error(error);
             Swal.httpError(error);
@@ -137,7 +132,7 @@ export const useRoleListEffects = () => {
     if (statusFilter === 'All' || !statusFilter) {
       return roles;
     }
-    return role.status === mapStatusToLabel(statusFilter as RoleStatus);
+    return role.status === mapStatusToLabel(statusFilter as RoleStatusLabel);
   });
 
   return {

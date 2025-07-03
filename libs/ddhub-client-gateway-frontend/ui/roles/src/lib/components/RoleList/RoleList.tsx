@@ -4,16 +4,17 @@ import {
   GenericTable,
 } from '@ddhub-client-gateway-frontend/ui/core';
 import { useRoleListEffects } from './RoleList.effects';
-import { ROLES_HEADERS, RoleStatus } from '../../models';
+import { ROLES_HEADERS, RoleStatusLabel } from '../../models';
 import { Box, CircularProgress, Typography } from '@mui/material';
 import { Banner } from '../Banner/Banner';
+import { RequesterClaimDTOStatus } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 
-const statusOptions: RoleStatus[] = [
-  RoleStatus.approved,
-  RoleStatus.pending,
-  RoleStatus.requested,
-  RoleStatus.rejected,
-  RoleStatus.synced,
+const statusOptions: RoleStatusLabel[] = [
+  RoleStatusLabel.approved,
+  RoleStatusLabel.pending,
+  RoleStatusLabel.requested,
+  RoleStatusLabel.rejected,
+  RoleStatusLabel.synced,
 ];
 
 export function RoleList() {
@@ -34,7 +35,7 @@ export function RoleList() {
         headers={ROLES_HEADERS}
         tableRows={roles}
         actions={(row) => {
-          if (row.status === 'AWAITING_APPROVAL') {
+          if (row.status === RequesterClaimDTOStatus.AWAITING_APPROVAL) {
             return actions;
           }
           return undefined;
@@ -42,7 +43,7 @@ export function RoleList() {
         loading={isLoading}
         renderBanner={() =>
           hasPendingRequests ? (
-            <Banner text="The screen will efresh every 10 seconds if a status requires transaction approval" />
+            <Banner text="The screen will refresh every 10 seconds if a status requires transaction approval" />
           ) : null
         }
       >

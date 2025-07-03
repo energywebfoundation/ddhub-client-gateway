@@ -8,7 +8,7 @@ import { alpha, Theme } from '@mui/material/styles';
 import { ExpirationStatus } from '../components/RoleList/RoleList.types';
 import { RequesterClaimDTOStatus } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 
-export enum RoleStatus {
+export enum RoleStatusLabel {
   approved = 'Approved',
   pending = 'Pending',
   requested = 'Requested',
@@ -17,19 +17,25 @@ export enum RoleStatus {
 }
 
 const getChipStyles = (status: RequesterClaimDTOStatus, theme: Theme) => {
-  if (status === 'APPROVED' || status === 'SYNCED') {
+  if (
+    status === RequesterClaimDTOStatus.APPROVED ||
+    status === RequesterClaimDTOStatus.SYNCED
+  ) {
     return {
       backgroundColor: alpha(theme.palette.success.main, 0.12),
       color: theme.palette.success.main,
     };
   }
-  if (status === 'AWAITING_APPROVAL' || status === 'NOT_ENROLLED') {
+  if (
+    status === RequesterClaimDTOStatus.AWAITING_APPROVAL ||
+    status === RequesterClaimDTOStatus.NOT_ENROLLED
+  ) {
     return {
       backgroundColor: alpha(theme.palette.warning.main, 0.12),
       color: theme.palette.warning.main,
     };
   }
-  if (status === 'REJECTED' || status === 'NO_CLAIM') {
+  if (status === RequesterClaimDTOStatus.REJECTED) {
     return {
       backgroundColor: alpha(theme.palette.error.main, 0.12),
       color: theme.palette.error.main,
@@ -40,22 +46,22 @@ const getChipStyles = (status: RequesterClaimDTOStatus, theme: Theme) => {
 };
 
 const mapStatusToLabel = (status: RequesterClaimDTOStatus) => {
-  if (status === 'APPROVED') {
-    return RoleStatus.approved;
+  if (status === RequesterClaimDTOStatus.APPROVED) {
+    return RoleStatusLabel.approved;
   }
-  if (status === 'SYNCED') {
-    return RoleStatus.synced;
+  if (status === RequesterClaimDTOStatus.SYNCED) {
+    return RoleStatusLabel.synced;
   }
-  if (status === 'AWAITING_APPROVAL') {
-    return RoleStatus.pending;
-  }
-
-  if (status === 'NOT_ENROLLED') {
-    return RoleStatus.requested;
+  if (status === RequesterClaimDTOStatus.AWAITING_APPROVAL) {
+    return RoleStatusLabel.pending;
   }
 
-  if (status === 'REJECTED' || status === 'NO_CLAIM') {
-    return RoleStatus.rejected;
+  if (status === RequesterClaimDTOStatus.NOT_ENROLLED) {
+    return RoleStatusLabel.requested;
+  }
+
+  if (status === RequesterClaimDTOStatus.REJECTED) {
+    return RoleStatusLabel.rejected;
   }
 
   throw new Error(`Unknown role status: ${status}`);
