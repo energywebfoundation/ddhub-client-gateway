@@ -4,6 +4,7 @@ import {
   CacheClient,
   ClaimsService,
   DidRegistry,
+  DidStoreType,
   ILogger,
   initWithPrivateKeySigner,
   LogLevel,
@@ -65,8 +66,8 @@ export class IamFactoryService {
       );
 
       const { claimsService, didRegistry } = await connectToDidRegistry({
+        type: DidStoreType.SSI,
         privateKey,
-        host: ''
       });
 
       await didRegistry.init();
