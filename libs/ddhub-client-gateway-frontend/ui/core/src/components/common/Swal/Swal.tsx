@@ -27,7 +27,7 @@ export interface SwalProps {
 export const Swal = () => {
   const { classes, theme } = useStyles();
 
-  const icons: Record<SweetAlertIcon, ReactElement> = {
+  const icons: Record<SweetAlertIcon | 'pending', ReactElement> = {
     warning: <AlertCircle style={{ stroke: theme.palette.warning.main }} />,
     success: <Check className={classes.successIcon} />,
     error: <XCircle style={{ stroke: theme.palette.error.main }} />,
