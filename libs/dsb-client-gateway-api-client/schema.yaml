@@ -3109,13 +3109,149 @@ components:
         - "password"
     RequesterClaimDTO:
       type: "object"
-      properties: {}
+      properties:
+        id:
+          type: "string"
+          description: "Unique identifier for the claim request"
+          example: "claim-12345"
+        token:
+          type: "string"
+          description: "Authentication token for the claim request"
+        role:
+          type: "string"
+          description: "The role being requested"
+          example: "energy.producer.iam.ewc"
+        requestDate:
+          type: "string"
+          description: "Date when the claim request was submitted"
+          example: "2024-01-15T10:30:00Z"
+        namespace:
+          type: "string"
+          description: "The namespace for the claim"
+          example: "energy.trading.iam.ewc"
+        status:
+          type: "string"
+          enum:
+            - "NOT_ENROLLED"
+            - "AWAITING_APPROVAL"
+            - "APPROVED"
+            - "REJECTED"
+            - "SYNCED"
+          description: "Current status of the role claim request"
+          example: "PENDING"
+        expirationDate:
+          type: "string"
+          description: "Date when the claim expires"
+          example: "2024-12-31T23:59:59Z"
+        expirationStatus:
+          type: "string"
+          description: "Status indicating if the claim has expired"
+          example: "ACTIVE"
+      required:
+        - "id"
+        - "token"
+        - "role"
+        - "requestDate"
+        - "namespace"
+        - "status"
     SearchAppDTO:
       type: "object"
-      properties: {}
+      properties:
+        name:
+          type: "string"
+          description: "Display name of the application"
+          example: "Energy Trading Platform"
+        namespace:
+          type: "string"
+          description: "The namespace identifier for the application"
+          example: "energy.trading.iam.ewc"
+        appName:
+          type: "string"
+          description: "Internal application name identifier"
+          example: "energy-trading-app"
+        logoUrl:
+          type: "string"
+          description: "URL to the application logo image"
+          example: "https://example.com/logo.png"
+      required:
+        - "name"
+        - "namespace"
+        - "appName"
+        - "logoUrl"
+    FieldDefinitionDTO:
+      type: "object"
+      properties:
+        fieldType:
+          oneOf:
+            - type: "string"
+              enum:
+                - "text"
+                - "number"
+                - "date"
+                - "boolean"
+                - "json"
+          description: "The type of field for form validation and UI rendering"
+          example: "text"
+        label:
+          type: "string"
+          description: "Human-readable label for the field"
+          example: "Company Name"
+        required:
+          type: "boolean"
+          description: "Whether this field is required for submission"
+          example: true
+        minLength:
+          type: "number"
+          description: "Minimum length requirement for text fields"
+          example: 3
+        maxLength:
+          type: "number"
+          description: "Maximum length requirement for text fields"
+          example: 100
+        pattern:
+          type: "string"
+          description: "Regular expression pattern for field validation"
+          example: "^[A-Za-z0-9]+$"
+        minValue:
+          type: "number"
+          description: "Minimum value for numeric fields"
+          example: 0
+        maxValue:
+          type: "number"
+          description: "Maximum value for numeric fields"
+          example: 1000
+        minDate:
+          format: "date-time"
+          type: "string"
+          description: "Minimum allowed date for date fields"
+          example: "2020-01-01"
+        maxDate:
+          format: "date-time"
+          type: "string"
+          description: "Maximum allowed date for date fields"
+          example: "2030-12-31"
+      required:
+        - "fieldType"
+        - "label"
     ApplicationRoleDTO:
       type: "object"
-      properties: {}
+      properties:
+        role:
+          type: "string"
+          description: "The role identifier within the application"
+          example: "energy.producer.iam.ewc"
+        namespace:
+          type: "string"
+          description: "The namespace for the application role"
+          example: "energy.trading.iam.ewc"
+        requestorFields:
+          description: "Array of field definitions required for role requestors"
+          type: "array"
+          items:
+            $ref: "#/components/schemas/FieldDefinitionDTO"
+      required:
+        - "role"
+        - "namespace"
     RequestorFieldDto:
       type: "object"
       properties:
