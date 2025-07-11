@@ -66,8 +66,7 @@ export class IamFactoryService {
       );
 
       const { claimsService, didRegistry } = await connectToDidRegistry({
-        type: DidStoreType.SSI,
-        privateKey,
+        type: DidStoreType.S3,
       });
 
       await didRegistry.init();
