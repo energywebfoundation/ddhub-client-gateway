@@ -19,7 +19,7 @@ export class UserAuthService {
     protected readonly secretsEngineService: SecretsEngineService,
     protected readonly userRolesTokenService: UserRolesTokenService,
     protected readonly configService: ConfigService
-  ) {}
+  ) { }
 
   public verifyToken(accessToken: string): UserTokenData {
     return this.userRolesTokenService.verifyToken(accessToken);
@@ -71,5 +71,18 @@ export class UserAuthService {
     this.logger.warn('incorrect password attempt');
 
     throw new Error('User does not exist or password is incorrect');
+  }
+
+  public async setUserPassword(username: string, password: string): Promise<void> {
+    const isAuthEnabled: boolean = this.configService.get<boolean>(
+      'USER_AUTH_ENABLED',
+      false
+    );
+
+    if (!isAuthEnabled) {
+      throw new Error('Auth not enabled');
+    }
+
+    await this.secretsEngineService.setUserPassword(username, password);
   }
 }

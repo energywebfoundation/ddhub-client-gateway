@@ -40,6 +40,8 @@ export abstract class SecretsEngineService implements OnModuleInit {
    */
   abstract getUserAuthDetails(username: string): Promise<UserDetails>;
   abstract getAllUsers(): Promise<UsersList>;
+  abstract setUserPassword(username: string, password: string): Promise<void>;
+
 }
 
 export interface UserDetails {

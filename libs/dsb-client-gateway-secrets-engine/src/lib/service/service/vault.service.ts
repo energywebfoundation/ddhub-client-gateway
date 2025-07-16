@@ -92,7 +92,7 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
       });
   }
 
-  @Span('vault_setUserAuthDetails')
+  @Span('vault_setUserPassword')
   public async setUserPassword(
     username: string,
     password: string
@@ -104,7 +104,7 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
       username,
     });
 
-    this.logger.log('Writing mnemonic');
+    this.logger.log('Writing user');
   }
 
   @Span('vault_onModuleInit')

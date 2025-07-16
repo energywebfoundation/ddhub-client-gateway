@@ -17,8 +17,7 @@ setLogLevel('info');
 @Injectable()
 export class AzureKeyVaultService
   extends SecretsEngineService
-  implements OnModuleInit
-{
+  implements OnModuleInit {
   private readonly logger = new Logger(AzureKeyVaultService.name);
 
   protected client: SecretClient;
@@ -203,7 +202,7 @@ export class AzureKeyVaultService
         (error) =>
           error.reason?.details?.error?.code === 'Conflict' &&
           error.reason?.details?.error?.innerError?.code ===
-            'ObjectIsDeletedButRecoverable'
+          'ObjectIsDeletedButRecoverable'
       );
 
       for (const { path } of paths) {
@@ -371,6 +370,19 @@ export class AzureKeyVaultService
     } catch (err) {
       this.logger.error(`Could not purge deleted secret: ${err.message}`);
     }
+  }
+
+  @Span('azure_setUserPassword')
+  public async setUserPassword(
+    username: string,
+    password: string
+  ): Promise<void> {
+    this.logger.log('Attempting to write user');
+
+    const _username = this.encodeAzureKey(`${this.prefix}${PATHS.USERS}/${username}`);
+    await this.client.setSecret(_username, password);
+
+    this.logger.log('Writing user');
   }
 
   /**

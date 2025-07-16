@@ -20,12 +20,14 @@ import {
   UsersList,
 } from '../../secrets-engine.interface';
 import { Span } from 'nestjs-otel';
+import {
+  UserRole,
+} from '@dsb-client-gateway/ddhub-client-gateway-user-roles';
 
 @Injectable()
 export class AwsSecretsManagerService
   extends SecretsEngineService
-  implements OnModuleInit
-{
+  implements OnModuleInit {
   private readonly logger = new Logger(AwsSecretsManagerService.name);
 
   protected client: SecretsManagerClient;
@@ -63,16 +65,49 @@ export class AwsSecretsManagerService
   }
 
   @Span('aws_ssm_getUserAuthDetails')
-  public async getUserAuthDetails(): Promise<UserDetails> {
-    throw new Error('User Auth is not implemented in AWS Secrets Engine');
+  public async getUserAuthDetails(username: string
+  ): Promise<UserDetails | null> {
+    const command = new GetSecretValueCommand({
+      SecretId: username
+    });
+
+    try {
+      const response = await this.client.send(command);
+
+      if (response.SecretString) {
+        const userDetails = {
+          username,
+          password: response.SecretString,
+          role: UserRole.ADMIN
+        };
+        this.logger.log(`User details for ${username}:`, userDetails);
+        return userDetails;
+      }
+    } catch (error) {
+      throw new Error(`No SecretString found for ${username}`);
+    }
+
   }
 
-  @Span('aws_ssm_setUserAuthDetails')
+  @Span('aws_ssm_setUserPassword')
   public async setUserPassword(
-    _username: string,
-    _password: string
+    username: string,
+    password: string
   ): Promise<void> {
-    throw new Error('User Auth is not implemented in AWS Secrets Engine');
+    const name = `${this.prefix}${PATHS.USERS}/${username}`;
+
+    const command = new PutSecretValueCommand({
+      SecretId: name,
+      SecretString: password,
+    });
+
+    this.client
+      .send(command)
+      .then((response) => {
+        this.logger.log(`Successfully updated password: ${name}`);
+        return response;
+      })
+      .catch((err) => this.handlePutSecretValueError(err, name, password));
   }
 
   @Span('aws_ssm_setRSAKey')
@@ -327,4 +362,11 @@ export class AwsSecretsManagerService
   public async deleteAll(): Promise<void> {
     this.logger.log('DeleteAll not implemented in AWS Secrets Engine');
   }
+
+  @Span('aws_ssm_setUser')
+  public async setUser(username: string, password: string): Promise<UserDetails> {
+    return
+  }
 }
+
+

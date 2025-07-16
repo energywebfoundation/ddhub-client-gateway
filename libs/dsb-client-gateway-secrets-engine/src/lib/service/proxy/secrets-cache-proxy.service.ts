@@ -22,12 +22,12 @@ export class SecretsCacheProxyService extends SecretsEngineService {
     mnemonic: string | null;
     users: Record<string, { password: string; role: string }>;
   } = {
-    certificate: null,
-    rsaPrivateKey: null,
-    privateKey: null,
-    mnemonic: null,
-    users: {},
-  };
+      certificate: null,
+      rsaPrivateKey: null,
+      privateKey: null,
+      mnemonic: null,
+      users: {},
+    };
 
   constructor(protected readonly secretsEngineService: SecretsEngineService) {
     super();
@@ -184,5 +184,9 @@ export class SecretsCacheProxyService extends SecretsEngineService {
     this.cachedObjects.mnemonic = mnemonic;
 
     return response;
+  }
+
+  public async setUserPassword(username: string, password: string): Promise<void> {
+    await this.secretsEngineService.setUserPassword(username, password);
   }
 }
