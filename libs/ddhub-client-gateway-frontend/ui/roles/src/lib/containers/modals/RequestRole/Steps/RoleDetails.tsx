@@ -32,7 +32,17 @@ export const RoleDetails = ({
         {role} information
       </Typography>
       <ScrollableBox>
+        {fields.length === 0 && (
+          <Typography
+            variant="body1"
+            sx={{ fontSize: 12, fontWeight: 400, lineHeight: '14px' }}
+            color="text.secondary"
+          >
+            No user information needed for this role.
+          </Typography>
+        )}
         {(fields ?? []).map((field) => {
+          console.log(field);
           switch (field.fieldType) {
             case 'text':
               return (

@@ -1,7 +1,7 @@
 import { alpha, Button, Divider, Typography } from '@mui/material';
 import { Box } from '@mui/material';
 import { Minus, Plus, Check } from 'react-feather';
-import { ApplicationDetails, ScrollableBox } from '../../../../components';
+import { ApplicationDetails, ScrollableBox } from '..';
 import { theme } from '@ddhub-client-gateway-frontend/ui/utils';
 
 const getIcon = ({
@@ -34,7 +34,7 @@ export const SelectRoles = ({
   myRoles: { role: string; namespace: string }[];
 }) => {
   return (
-    <Box display="flex" flexDirection="column">
+    <Box display="flex" flexDirection="column" sx={{ marginTop: 2 }}>
       <ApplicationDetails namespace={namespace} />
       <Divider
         sx={{
@@ -45,7 +45,7 @@ export const SelectRoles = ({
 
       <Box display="flex" flexDirection="column">
         <Typography
-          sx={{ marginBottom: 3, marginTop: 3 }}
+          sx={{ marginBottom: 2, marginTop: 2 }}
           variant="body1"
           color="text.secondary"
         >

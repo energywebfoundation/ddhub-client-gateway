@@ -82,6 +82,7 @@ export const ROLES_HEADERS: TableHeader[] = [
         </Box>
       );
     },
+    isSortable: true,
   },
   {
     Header: 'ROLE',
@@ -97,6 +98,7 @@ export const ROLES_HEADERS: TableHeader[] = [
         <CopyToClipboard text={value} />
       </Box>
     ),
+    isSortable: true,
   },
   {
     Header: 'STATUS',
@@ -118,6 +120,7 @@ export const ROLES_HEADERS: TableHeader[] = [
         />
       );
     },
+    isSortable: true,
   },
   {
     Header: 'EXPIRATION STATUS',
