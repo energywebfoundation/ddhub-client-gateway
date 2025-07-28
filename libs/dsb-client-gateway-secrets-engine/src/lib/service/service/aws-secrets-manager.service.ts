@@ -4,19 +4,24 @@ import {
   CreateSecretCommand,
   CreateSecretCommandOutput,
   CreateSecretResponse,
+  DeleteSecretCommand,
   GetSecretValueCommand,
   InvalidRequestException,
+  ListSecretsCommand,
   PutSecretValueCommand,
   PutSecretValueCommandOutput,
   PutSecretValueResponse,
   ResourceNotFoundException,
+  SecretListEntry,
   SecretsManagerClient,
 } from '@aws-sdk/client-secrets-manager';
 import {
+  ApiKeyDetails,
   CertificateDetails,
   PATHS,
   SecretsEngineService,
   UserDetails,
+  UserRole,
   UsersList,
 } from '../../secrets-engine.interface';
 import { Span } from 'nestjs-otel';
@@ -24,8 +29,7 @@ import { Span } from 'nestjs-otel';
 @Injectable()
 export class AwsSecretsManagerService
   extends SecretsEngineService
-  implements OnModuleInit
-{
+  implements OnModuleInit {
   private readonly logger = new Logger(AwsSecretsManagerService.name);
 
   protected client: SecretsManagerClient;
@@ -63,16 +67,49 @@ export class AwsSecretsManagerService
   }
 
   @Span('aws_ssm_getUserAuthDetails')
-  public async getUserAuthDetails(): Promise<UserDetails> {
-    throw new Error('User Auth is not implemented in AWS Secrets Engine');
+  public async getUserAuthDetails(username: string
+  ): Promise<UserDetails | null> {
+    const command = new GetSecretValueCommand({
+      SecretId: username
+    });
+
+    try {
+      const response = await this.client.send(command);
+
+      if (response.SecretString) {
+        const data = JSON.parse(response.SecretString);
+        const userDetails = {
+          username,
+          ...data
+        };
+        this.logger.log(`User details for ${username}:`, userDetails);
+        return userDetails;
+      }
+    } catch (error) {
+      throw new Error(`No SecretString found for ${username}`);
+    }
+
   }
 
-  @Span('aws_ssm_setUserAuthDetails')
+  @Span('aws_ssm_setUserPassword')
   public async setUserPassword(
-    _username: string,
-    _password: string
+    username: string,
+    password: string
   ): Promise<void> {
-    throw new Error('User Auth is not implemented in AWS Secrets Engine');
+    const name = `${this.prefix}${PATHS.USERS}/${username}`;
+    const data = JSON.stringify({ password, role: UserRole.ADMIN });
+    const command = new PutSecretValueCommand({
+      SecretId: name,
+      SecretString: data,
+    });
+
+    this.client
+      .send(command)
+      .then((response) => {
+        this.logger.log(`Successfully updated password: ${name}`);
+        return response;
+      })
+      .catch((err) => this.handlePutSecretValueError(err, name, data));
   }
 
   @Span('aws_ssm_setRSAKey')
@@ -326,5 +363,134 @@ export class AwsSecretsManagerService
   @Span('aws_ssm_deleteAll')
   public async deleteAll(): Promise<void> {
     this.logger.log('DeleteAll not implemented in AWS Secrets Engine');
+  }
+
+  @Span('aws_ssm_setUserPassword')
+  public async delateUser(username: string): Promise<void> {
+    const name = `${this.prefix}${PATHS.USERS}/${username}`;
+
+    const command = new DeleteSecretCommand({
+      SecretId: name
+    });
+
+    this.client
+      .send(command)
+      .then((response) => {
+        this.logger.log(`Successfully delete user: ${name}`);
+        return response;
+      })
+      .catch((err) => {
+        this.logger.error(err.message);
+        return null;
+      });
+  }
+
+  @Span('aws_ssm_createApiKey')
+  public async createApiKey(name: string, daysValid: number): Promise<ApiKeyDetails> {
+    this.logger.log(`Attempting to create api key `);
+
+    const apiKey = this.generateRandomKey();
+    const expiresAt = new Date(Date.now() + daysValid * this.MS_PER_DAY);
+
+    const data = {
+      name,
+      expiresAt: expiresAt.toISOString(),
+    };
+
+    await this.client.send(new CreateSecretCommand({
+      Name: `${this.prefix}${PATHS.API_KEY}/${apiKey}`,
+      SecretString: JSON.stringify(data)
+    }));
+
+    this.logger.log(`create api key ${apiKey}`);
+    return { apiKey, name, expiresAt: expiresAt.toISOString() };
+  }
+
+  @Span('aws_ssm_deleteApiKey')
+  public async deleteApiKey(apiKey: string): Promise<boolean> {
+    try {
+      this.logger.log(`Attempting to delete api key `);
+
+      const name = `${this.prefix}${PATHS.API_KEY}/${apiKey}`;
+
+      const command = new DeleteSecretCommand({
+        SecretId: name
+      });
+
+      await this.client.send(command);
+
+      this.logger.log(`Delete api key ${apiKey}`);
+      return true;
+    } catch (error) {
+      this.logger.error('failed to delete api key');
+      this.logger.error(error);
+      return false;
+    }
+  }
+
+  @Span('aws_ssm_getApiKey')
+  public async getApiKey(apiKey: string): Promise<ApiKeyDetails> {
+    try {
+      this.logger.log(`Attempting to get api key `);
+
+      const command = new GetSecretValueCommand({
+        SecretId: `${this.prefix}${PATHS.USERS}/${apiKey}`,
+      });
+      const response = await this.client.send(command);
+
+      if (response.SecretString) {
+        const result = JSON.parse(response.SecretString);
+        this.logger.log(`Get api key ${apiKey}`);
+        return { ...result };
+      }
+    } catch (error) {
+      this.logger.error('failed to get api key');
+      this.logger.error(error);
+      return null;
+    }
+  }
+
+  @Span('aws_ssm_getAllApiKeys')
+  public async getAllApiKeys(): Promise<ApiKeyDetails[]> {
+    const apiKeySecretIdentifiers: string[] = [];
+    let nextToken: string | undefined = undefined;
+
+    do {
+      const { SecretList = [], NextToken } = await this.client.send(
+        new ListSecretsCommand({
+          NextToken: nextToken,
+          Filters: [
+            { Key: "name", Values: [`${this.prefix}${PATHS.API_KEY}`] }
+          ]
+        })
+      );
+      nextToken = NextToken;
+
+      for (const secret of SecretList as SecretListEntry[]) {
+        apiKeySecretIdentifiers.push(secret.Name);
+      }
+    } while (nextToken);
+
+    const apiKeyListResponse = await Promise.allSettled(
+      apiKeySecretIdentifiers.map((name) => {
+        const apiKey = name.replace(`${this.prefix}/`, "");
+        return this.getApiKey(apiKey);
+      })
+    );
+
+    return apiKeyListResponse
+      .filter(
+        (res): res is PromiseFulfilledResult<ApiKeyDetails | null> => res.status === 'fulfilled'
+      )
+      .map(res => res.value)
+      .filter(item => item !== null);
+  }
+
+  @Span('aws_ssm_validateApiKey')
+  public async validateApiKey(apiKey: string): Promise<boolean> {
+    const result = await this.getApiKey(apiKey);
+    if (!result) return false;
+    if (new Date() > new Date(result.expiresAt)) return false;
+    return true;
   }
 }

@@ -1,15 +1,15 @@
 import { Injectable, Logger } from '@nestjs/common';
 import {
+  ApiKeyDetails,
   CertificateDetails,
-  PATHS,
   SecretsEngineService,
   SetCertificateDetailsResponse,
   SetPrivateKeyResponse,
   SetRSAPrivateKeyResponse,
   UserDetails,
+  UserRole,
   UsersList,
 } from '../../secrets-engine.interface';
-import { Span } from 'nestjs-otel';
 
 @Injectable()
 export class SecretsCacheProxyService extends SecretsEngineService {
@@ -22,12 +22,12 @@ export class SecretsCacheProxyService extends SecretsEngineService {
     mnemonic: string | null;
     users: Record<string, { password: string; role: string }>;
   } = {
-    certificate: null,
-    rsaPrivateKey: null,
-    privateKey: null,
-    mnemonic: null,
-    users: {},
-  };
+      certificate: null,
+      rsaPrivateKey: null,
+      privateKey: null,
+      mnemonic: null,
+      users: {},
+    };
 
   constructor(protected readonly secretsEngineService: SecretsEngineService) {
     super();
@@ -63,7 +63,7 @@ export class SecretsCacheProxyService extends SecretsEngineService {
 
   public async refreshUsersData(): Promise<void> {
     const users: UsersList = await this.secretsEngineService.getAllUsers();
-
+    this.cachedObjects.users = {};
     for (const user of users) {
       this.cachedObjects.users[user.username] = {
         password: user.password,
@@ -184,5 +184,39 @@ export class SecretsCacheProxyService extends SecretsEngineService {
     this.cachedObjects.mnemonic = mnemonic;
 
     return response;
+  }
+
+  public async setUserPassword(username: string, password: string): Promise<void> {
+    await this.secretsEngineService.setUserPassword(username, password);
+    await this.refreshUsersData();
+  }
+
+  public async delateUser(username: string): Promise<void> {
+    await this.secretsEngineService.delateUser(username);
+    await this.refreshUsersData();
+  }
+
+  public async createApiKey(name: string, daysValid: number): Promise<ApiKeyDetails> {
+    return this.secretsEngineService.createApiKey(name, daysValid);
+  }
+
+  public async deleteApiKey(apiKey: string): Promise<boolean> {
+    return this.secretsEngineService.deleteApiKey(apiKey);
+  }
+
+  public async getApiKey(apiKey: string): Promise<ApiKeyDetails> {
+    return this.secretsEngineService.getApiKey(apiKey);
+  }
+
+  public async getAllApiKeys(): Promise<ApiKeyDetails[]> {
+    return this.secretsEngineService.getAllApiKeys();
+  }
+
+  public async validateApiKey(apiKey: string): Promise<boolean> {
+    return this.secretsEngineService.validateApiKey(apiKey);
+  }
+
+  public isAuthEnabled(): boolean {
+    return Object.values(this.cachedObjects.users).some(user => user.role === UserRole.ADMIN);
   }
 }
