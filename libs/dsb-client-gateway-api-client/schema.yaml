@@ -1456,6 +1456,139 @@ paths:
                 $ref: "#/components/schemas/LoginResponseDto"
       tags:
         - "Login"
+  /api/v2/user-api-key/set-password:
+    post:
+      operationId: "UserApiKeyController_setUserPassword"
+      summary: "Set user password"
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                username:
+                  type: "string"
+                password:
+                  type: "string"
+      responses:
+        201:
+          description: ""
+      tags:
+        - "User-ApiKey"
+  /api/v2/user-api-key/user/{username}:
+    delete:
+      operationId: "UserApiKeyController_deleteUser"
+      summary: "Delete a user"
+      parameters:
+        - name: "username"
+          required: true
+          in: "path"
+          schema:
+            type: "string"
+      responses:
+        200:
+          description: ""
+      tags:
+        - "User-ApiKey"
+  /api/v2/user-api-key/create:
+    post:
+      operationId: "UserApiKeyController_createApiKey"
+      summary: "Create an API key"
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                name:
+                  type: "string"
+                daysValid:
+                  type: "number"
+      responses:
+        201:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiKeyResponseDto"
+      tags:
+        - "User-ApiKey"
+  /api/v2/user-api-key/{apiKey}:
+    delete:
+      operationId: "UserApiKeyController_deleteApiKey"
+      summary: "Delete an API key"
+      parameters:
+        - name: "apiKey"
+          required: true
+          in: "path"
+          schema:
+            type: "string"
+      responses:
+        200:
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: "boolean"
+      tags:
+        - "User-ApiKey"
+    get:
+      operationId: "UserApiKeyController_getApiKey"
+      summary: "Get a specific API key"
+      parameters:
+        - name: "apiKey"
+          required: true
+          in: "path"
+          schema:
+            type: "string"
+      responses:
+        200:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiKeyResponseDto"
+      tags:
+        - "User-ApiKey"
+  /api/v2/user-api-key:
+    get:
+      operationId: "UserApiKeyController_getAllApiKeys"
+      summary: "Get all API keys"
+      parameters: []
+      responses:
+        200:
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/ApiKeyResponseDto"
+      tags:
+        - "User-ApiKey"
+  /api/v2/user-api-key/validate/{apiKey}:
+    get:
+      operationId: "UserApiKeyController_validateApiKey"
+      summary: "Validate an API key"
+      parameters:
+        - name: "apiKey"
+          required: true
+          in: "path"
+          schema:
+            type: "string"
+      responses:
+        200:
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: "boolean"
+      tags:
+        - "User-ApiKey"
   /api/v2/ssi-hub/roles:
     get:
       operationId: "RolesController_getMyRoles"
@@ -3107,6 +3240,23 @@ components:
       required:
         - "username"
         - "password"
+    ApiKeyResponseDto:
+      type: "object"
+      properties:
+        apiKey:
+          type: "string"
+          description: "The generated API key"
+        name:
+          type: "string"
+          description: "The name or label for this API key"
+        expiresAt:
+          type: "string"
+          description: "ISO 8601 formatted expiration date of the API key"
+          example: "2025-12-31T23:59:59Z"
+      required:
+        - "apiKey"
+        - "name"
+        - "expiresAt"
     RequesterClaimDTO:
       type: "object"
       properties:

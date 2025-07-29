@@ -19,21 +19,18 @@ export class UserAuthService {
     protected readonly secretsEngineService: SecretsEngineService,
     protected readonly userRolesTokenService: UserRolesTokenService,
     protected readonly configService: ConfigService
-  ) {}
+  ) { }
 
   public verifyToken(accessToken: string): UserTokenData {
     return this.userRolesTokenService.verifyToken(accessToken);
   }
 
   public isAuthEnabled(): boolean {
-    return this.configService.get('USER_AUTH_ENABLED', false);
+    return this.secretsEngineService.isAuthEnabled();
   }
 
   public refreshToken(refreshToken: string): AuthTokens {
-    const isAuthEnabled: boolean = this.configService.get<boolean>(
-      'USER_AUTH_ENABLED',
-      false
-    );
+    const isAuthEnabled: boolean = this.secretsEngineService.isAuthEnabled();
 
     if (!isAuthEnabled) {
       throw new Error('Auth not enabled');
@@ -43,10 +40,7 @@ export class UserAuthService {
   }
 
   public async login(username: string, password: string): Promise<AuthTokens> {
-    const isAuthEnabled: boolean = this.configService.get<boolean>(
-      'USER_AUTH_ENABLED',
-      false
-    );
+    const isAuthEnabled: boolean = this.secretsEngineService.isAuthEnabled();
 
     if (!isAuthEnabled) {
       throw new Error('Auth not enabled');
@@ -72,4 +66,15 @@ export class UserAuthService {
 
     throw new Error('User does not exist or password is incorrect');
   }
+
+  public async setUserPassword(username: string, password: string): Promise<void> {
+    const isAuthEnabled: boolean = this.secretsEngineService.isAuthEnabled();
+
+    if (!isAuthEnabled) {
+      throw new Error('Auth not enabled');
+    }
+
+    await this.secretsEngineService.setUserPassword(username, password);
+  }
+
 }
