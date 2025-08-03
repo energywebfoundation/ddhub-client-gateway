@@ -1,3 +1,4 @@
+import { SecretsEngineService } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
 import {
   CanActivate,
   ExecutionContext,
@@ -11,7 +12,7 @@ export class ApiKeyGuard implements CanActivate {
   protected readonly logger = new Logger(ApiKeyGuard.name);
   protected readonly isAnyCredentialSet: boolean = false;
 
-  constructor(protected readonly configService: ConfigService) {
+  constructor(protected readonly configService: ConfigService, protected readonly secretsEngineService: SecretsEngineService) {
     const credentials: Array<string | undefined> = [
       this.configService.get<string | undefined>('API_KEY'),
       this.configService.get<string | undefined>('API_PASSWORD'),
@@ -34,48 +35,20 @@ export class ApiKeyGuard implements CanActivate {
   }
 
   public async canActivate(context: ExecutionContext): Promise<boolean> {
-    const apiKey: string | undefined = this.configService.get<
-      string | undefined
-    >('API_KEY');
-
-    const password: string | undefined = this.configService.get<
-      string | undefined
-    >('API_PASSWORD');
-
-    const username: string | undefined = this.configService.get<
-      string | undefined
-    >('API_USERNAME');
-
-    if (!apiKey && !password && !username) {
-      return true;
-    }
-
     const request = context.switchToHttp().getRequest();
 
     const { headers } = request;
 
     const apiKeyFromHeaders: string | undefined = headers['x-api-key'];
-
     if (apiKeyFromHeaders) {
-      return apiKeyFromHeaders === apiKey;
+      const isValid = await this.secretsEngineService.validateApiKey(apiKeyFromHeaders);
+      return isValid;
     }
 
-    const usernameFromHeaders: string | undefined = headers['x-api-username'];
-    const passwordFromHeaders: string | undefined = headers['x-api-password'];
-
-    if (!usernameFromHeaders || !passwordFromHeaders) {
-      return false;
-    }
-
-    const decodedPassword: string = new Buffer(
-      passwordFromHeaders,
-      'base64'
-    ).toString('ascii');
-
-    return usernameFromHeaders === username && decodedPassword === password;
+    return false;
   }
 
   protected isAuthEnabled(): boolean {
-    return this.configService.get('USER_AUTH_ENABLED', false);
+    return this.secretsEngineService.isAuthEnabled();
   }
 }

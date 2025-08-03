@@ -1,10 +1,12 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
+  ApiKeyDetails,
   CertificateDetails,
   PATHS,
   SecretsEngineService,
   UserDetails,
+  UserRole,
   UsersList,
 } from '../../secrets-engine.interface';
 import { Span } from 'nestjs-otel';
@@ -17,8 +19,7 @@ setLogLevel('info');
 @Injectable()
 export class AzureKeyVaultService
   extends SecretsEngineService
-  implements OnModuleInit
-{
+  implements OnModuleInit {
   private readonly logger = new Logger(AzureKeyVaultService.name);
 
   protected client: SecretClient;
@@ -31,7 +32,7 @@ export class AzureKeyVaultService
 
   @Span('azure_kv_onModuleInit')
   public async onModuleInit(): Promise<void> {
-    const url = this.configService.get('AZURE_VAULT_URL');
+    const url = this.configService.get('AZURE_azure_URL');
     const credential = new DefaultAzureCredential();
 
     this.client = new SecretClient(url, credential);
@@ -75,13 +76,6 @@ export class AzureKeyVaultService
   public async getUserAuthDetails(
     username: string
   ): Promise<UserDetails | null> {
-    if (this.configService.get('USER_AUTH_ENABLED', false) === false) {
-      this.logger.debug(
-        'User auth is not enabled, skipping getUserAuthDetails call'
-      );
-      return null;
-    }
-
     const secretName = this.encodeAzureKey(
       `${this.prefix}${PATHS.USERS}/${username}`
     );
@@ -97,11 +91,6 @@ export class AzureKeyVaultService
 
   @Span('azure_kv_getAllUsers')
   public async getAllUsers(): Promise<UsersList> {
-    if (this.configService.get('USER_AUTH_ENABLED', false) === false) {
-      this.logger.debug('User auth is not enabled, skipping getAllUsers call');
-      return [];
-    }
-
     const userSecretPath = this.encodeAzureKey(`${this.prefix}${PATHS.USERS}`);
     const userSecretIdentifiers: string[] = [];
     for await (const secret of this.client.listPropertiesOfSecrets()) {
@@ -203,7 +192,7 @@ export class AzureKeyVaultService
         (error) =>
           error.reason?.details?.error?.code === 'Conflict' &&
           error.reason?.details?.error?.innerError?.code ===
-            'ObjectIsDeletedButRecoverable'
+          'ObjectIsDeletedButRecoverable'
       );
 
       for (const { path } of paths) {
@@ -373,6 +362,19 @@ export class AzureKeyVaultService
     }
   }
 
+  @Span('azure_setUserPassword')
+  public async setUserPassword(
+    username: string,
+    password: string
+  ): Promise<void> {
+    this.logger.log('Attempting to write user');
+
+    const _username = this.encodeAzureKey(`${this.prefix}${PATHS.USERS}/${username}`);
+    await this.client.setSecret(_username, JSON.stringify({ password, role: UserRole.ADMIN }));
+
+    this.logger.log('Writing user');
+  }
+
   /**
    * Replace all forward slashes in a key with a dash. Azure does not allow "special" characters in the key name.
    * @param key string to encode
@@ -406,7 +408,7 @@ export class AzureKeyVaultService
         this.encodeAzureKey(`${this.prefix}${PATHS.USERS}/`),
         ''
       ),
-      ...userDetails,
+      ...userDetails
     };
   }
 
@@ -417,5 +419,102 @@ export class AzureKeyVaultService
       this.logger.error(err.message);
       return value;
     }
+  }
+
+  @Span('azure_delateUser')
+  public async delateUser(
+    username: string
+  ): Promise<void> {
+    this.logger.log(`Attempting to delete user ${username}`);
+
+    const _username = this.encodeAzureKey(`${this.prefix}${PATHS.USERS}/${username}`);
+    await this.deleteOne(_username);
+
+    this.logger.log(`Delete user ${username}`);
+  }
+
+  @Span('azure_createApiKey')
+  public async createApiKey(name: string, daysValid: number): Promise<ApiKeyDetails> {
+    this.logger.log(`Attempting to create api key `);
+
+    const apiKey = this.generateRandomKey();
+    const expiresAt = new Date(Date.now() + daysValid * this.MS_PER_DAY);
+
+    const data = {
+      name,
+      expiresAt: expiresAt.toISOString(),
+    };
+
+    await this.client.setSecret(this.encodeAzureKey(`${this.prefix}${PATHS.API_KEY}/${apiKey}`), JSON.stringify({ ...data }));
+
+    this.logger.log(`create api key ${apiKey}`);
+    return { apiKey, name, expiresAt: expiresAt.toISOString() };
+  }
+
+  @Span('azure_deleteApiKey')
+  public async deleteApiKey(apiKey: string): Promise<boolean> {
+    try {
+      this.logger.log(`Attempting to delete api key `);
+
+      await this.client.purgeDeletedSecret(this.encodeAzureKey(`${this.prefix}${PATHS.USERS}/${apiKey}`));
+
+      this.logger.log(`Delete api key ${apiKey}`);
+      return true;
+    } catch (error) {
+      this.logger.error('failed to delete api key');
+      this.logger.error(error);
+      return false;
+    }
+  }
+
+  @Span('azure_getApiKey')
+  public async getApiKey(apiKey: string): Promise<ApiKeyDetails> {
+    try {
+      this.logger.log(`Attempting to get api key `);
+
+      const _result = await this.client.getSecret(this.encodeAzureKey(`${this.prefix}${PATHS.USERS}/${apiKey}`));
+      const result = JSON.parse(_result.value!);
+
+      this.logger.log(`Get api key ${apiKey}`);
+      return { ...result.data };
+    } catch (error) {
+      this.logger.error('failed to get api key');
+      this.logger.error(error);
+      return null;
+    }
+  }
+
+  @Span('azure_getAllApiKeys')
+  public async getAllApiKeys(): Promise<ApiKeyDetails[]> {
+    const apiKeySecretPath = this.encodeAzureKey(`${this.prefix}${PATHS.API_KEY}`);
+    const apiKeySecretIdentifiers: string[] = [];
+
+    for await (const secret of this.client.listPropertiesOfSecrets()) {
+      if (secret.enabled && secret.name.startsWith(apiKeySecretPath)) {
+        apiKeySecretIdentifiers.push(secret.name);
+      }
+    }
+
+    const apiKeyListResponse = await Promise.allSettled(
+      apiKeySecretIdentifiers.map((name) => {
+        const _name = name.replace(`${this.prefix}/`, "");
+        return this.getApiKey(_name)
+      })
+    );
+
+    return apiKeyListResponse
+      .filter(
+        (res): res is PromiseFulfilledResult<ApiKeyDetails> => res.status === 'fulfilled'
+      )
+      .map(({ value }) => value)
+      .filter(item => item !== null);
+  }
+
+  @Span('azure_validateApiKey')
+  public async validateApiKey(apiKey: string): Promise<boolean> {
+    const result = await this.getApiKey(apiKey);
+    if (!result) return false;
+    if (new Date() > new Date(result.expiresAt)) return false;
+    return true;
   }
 }
