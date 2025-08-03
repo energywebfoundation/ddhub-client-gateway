@@ -42,7 +42,6 @@ export const RoleDetails = ({
           </Typography>
         )}
         {(fields ?? []).map((field) => {
-          console.log(field);
           switch (field.fieldType) {
             case 'text':
               return (
