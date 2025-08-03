@@ -10,6 +10,8 @@ import {
   Inbox,
   Edit3,
   UserCheck,
+  Key,
+  User,
 } from 'react-feather';
 import {
   ClientSubscriptionIcon,
@@ -145,6 +147,19 @@ export const Drawer = () => {
     },
   ];
 
+  const usersAndAccessRoutes: (MenuItemProps | CollapsableListItemProps)[] = [
+    {
+      href: routerConst.Users,
+      title: 'Users',
+      icon: <User className={classes.icon} size={18} />,
+    },
+    {
+      href: routerConst.APIKeys,
+      title: 'API Keys',
+      icon: <Key className={classes.icon} size={18} />,
+    },
+  ];
+
   const isMenuItemProps = (
     item: MenuItemProps | CollapsableListItemProps
   ): item is MenuItemProps => {
@@ -217,6 +232,16 @@ export const Drawer = () => {
             Messaging
           </Typography>
           <List>{renderMenuList(messagingRoutes)}</List>
+        </>
+      )}
+
+      {routeListHasDisplayedRoutes(usersAndAccessRoutes) && (
+        <>
+          <Divider classes={{ root: classes.dividerColor }} />
+          <Typography classes={{ root: classes.menuTitle }} variant="body2">
+            Users and Access
+          </Typography>
+          <List>{renderMenuList(usersAndAccessRoutes)}</List>
         </>
       )}
 

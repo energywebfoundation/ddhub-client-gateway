@@ -20,6 +20,8 @@ export const routerConst = {
   ChannelsManagement: '/channels/management',
   Channel: `/channels/[${Queries.FQCN}]`,
   Roles: '/roles',
+  Users: '/users',
+  APIKeys: '/api-keys',
   IntegrationAPIs: '/integration',
   ClientIds: '/client-ids',
   LargeDataMessagingFileUpload: '/messages/large-file-upload',

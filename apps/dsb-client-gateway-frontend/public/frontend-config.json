@@ -54,5 +54,13 @@
   "roles": {
     "allowedRoles": ["user"],
     "allowedAuthRoles": ["admin"]
+  },
+  "users": {
+    "allowedRoles": ["admin"],
+    "allowedAuthRoles": ["admin"]
+  },
+  "apiKeys": {
+    "allowedRoles": ["admin"],
+    "allowedAuthRoles": ["admin"]
   }
 }

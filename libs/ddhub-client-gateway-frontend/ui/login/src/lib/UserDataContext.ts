@@ -36,6 +36,7 @@ type AsyncReturnType<T extends (...args: any) => Promise<any>> = T extends (
 export enum UserRole {
   ADMIN = 'admin',
   MESSAGING = 'messaging',
+  // SUPERADMIN = 'superadmin',
 }
 
 export interface UserDataContext {

@@ -20,6 +20,9 @@
       "@ddhub-client-gateway-frontend/ui/api-hooks": [
         "libs/ddhub-client-gateway-frontend/ui/api-hooks/src/index.ts"
       ],
+      "@ddhub-client-gateway-frontend/ui/api-keys": [
+        "libs/ddhub-client-gateway-frontend/ui/api-keys/src/index.ts"
+      ],
       "@ddhub-client-gateway-frontend/ui/applications": [
         "libs/ddhub-client-gateway-frontend/ui/applications/src/index.ts"
       ],
@@ -55,6 +58,9 @@
       ],
       "@ddhub-client-gateway-frontend/ui/utils": [
         "libs/ddhub-client-gateway-frontend/ui/utils/src/index.ts"
+      ],
+      "@ddhub-client-gateway-frontend/ui/users": [
+        "libs/ddhub-client-gateway-frontend/ui/users/src/index.ts"
       ],
       "@ddhub-client-gateway/identity/models": [
         "libs/ddhub-client-gateway-frontend/identity/models/src/index.ts"
