@@ -30,6 +30,7 @@ interface AutocompleteProps {
   wrapperProps?: BoxProps;
   filterOptions?: (options: Array<any>, state: object) => Array<any>;
   listBoxHeightFull?: boolean;
+  noOptionsText?: string;
 }
 
 export const Autocomplete: FC<AutocompleteProps> = ({
@@ -50,8 +51,10 @@ export const Autocomplete: FC<AutocompleteProps> = ({
   wrapperProps,
   filterOptions,
   listBoxHeightFull,
+  noOptionsText,
 }) => {
   const { classes } = useStyles();
+
   return (
     <Box {...wrapperProps}>
       {label && <InputLabel className={classes.label}>{label}</InputLabel>}
@@ -67,6 +70,7 @@ export const Autocomplete: FC<AutocompleteProps> = ({
         value={value}
         inputValue={inputValue}
         loading={loading}
+        noOptionsText={noOptionsText}
         renderOption={renderOption}
         filterOptions={filterOptions}
         popupIcon={

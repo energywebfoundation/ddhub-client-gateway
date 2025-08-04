@@ -3,7 +3,7 @@ import { Box, Typography } from '@mui/material';
 import { getApplicationNamespace, getOrganizationNamespace } from '../../utils';
 
 export const ApplicationDetails = ({ namespace }: { namespace: string }) => {
-  const [mainOrg, subOrg] = getOrganizationNamespace(namespace);
+  const [mainOrg, subOrg] = getOrganizationNamespace(namespace ?? '');
   return (
     <Box display="flex" flexDirection="column" gap={2} sx={{ marginBottom: 3 }}>
       <Typography
