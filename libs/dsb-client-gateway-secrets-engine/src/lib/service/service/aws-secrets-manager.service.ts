@@ -94,10 +94,11 @@ export class AwsSecretsManagerService
   @Span('aws_ssm_setUserPassword')
   public async setUserPassword(
     username: string,
-    password: string
+    password: string,
+    role: UserRole
   ): Promise<void> {
     const name = `${this.prefix}${PATHS.USERS}/${username}`;
-    const data = JSON.stringify({ password, role: UserRole.ADMIN });
+    const data = JSON.stringify({ password, role });
     const command = new PutSecretValueCommand({
       SecretId: name,
       SecretString: data,
@@ -366,7 +367,7 @@ export class AwsSecretsManagerService
   }
 
   @Span('aws_ssm_setUserPassword')
-  public async delateUser(username: string): Promise<void> {
+  public async deleteUser(username: string): Promise<void> {
     const name = `${this.prefix}${PATHS.USERS}/${username}`;
 
     const command = new DeleteSecretCommand({

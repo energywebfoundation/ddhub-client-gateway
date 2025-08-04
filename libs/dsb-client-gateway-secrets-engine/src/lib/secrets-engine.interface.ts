@@ -42,8 +42,8 @@ export abstract class SecretsEngineService implements OnModuleInit {
    */
   abstract getUserAuthDetails(username: string): Promise<UserDetails>;
   abstract getAllUsers(): Promise<UsersList>;
-  abstract setUserPassword(username: string, password: string): Promise<void>;
-  abstract delateUser(username: string): Promise<void>;
+  abstract setUserPassword(username: string, password: string, role: UserRole): Promise<void>;
+  abstract deleteUser(username: string): Promise<void>;
   abstract createApiKey(name: string, daysValid: number): Promise<ApiKeyDetails>;
   abstract deleteApiKey(apiKey: string): Promise<boolean>;
   abstract getAllApiKeys(): Promise<ApiKeyDetails[]>;
@@ -94,6 +94,8 @@ export type SetCertificateDetailsResponse =
 
 export enum UserRole {
   ADMIN = 'admin',
+  SUPERADMIN = 'superadmin',
+  USER = 'user',
   MESSAGING = 'messaging',
 }
 

@@ -1456,10 +1456,24 @@ paths:
                 $ref: "#/components/schemas/LoginResponseDto"
       tags:
         - "Login"
-  /api/v2/user-api-key/set-password:
+  /api/v2/user-api-key/users/me:
+    get:
+      operationId: "UserApiKeyController_getCurrentUser"
+      summary: "Get current user details"
+      parameters: []
+      responses:
+        200:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserDetailsDto"
+      tags:
+        - "User-ApiKey"
+  /api/v2/user-api-key/users:
     post:
       operationId: "UserApiKeyController_setUserPassword"
-      summary: "Set user password"
+      summary: "Create or set user password"
       parameters: []
       requestBody:
         required: true
@@ -1472,12 +1486,38 @@ paths:
                   type: "string"
                 password:
                   type: "string"
+                role:
+                  type: "string"
+                  enum:
+                    - "admin"
+                    - "superadmin"
+                    - "user"
+                    - "messaging"
+              required:
+                - "username"
+                - "password"
+                - "role"
       responses:
         201:
           description: ""
       tags:
         - "User-ApiKey"
-  /api/v2/user-api-key/user/{username}:
+    get:
+      operationId: "UserApiKeyController_getAllUsers"
+      summary: "Get all users"
+      parameters: []
+      responses:
+        200:
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/UserDetailsDto"
+      tags:
+        - "User-ApiKey"
+  /api/v2/user-api-key/users/{username}:
     delete:
       operationId: "UserApiKeyController_deleteUser"
       summary: "Delete a user"
@@ -1488,11 +1528,11 @@ paths:
           schema:
             type: "string"
       responses:
-        200:
-          description: ""
+        204:
+          description: "User deleted successfully"
       tags:
         - "User-ApiKey"
-  /api/v2/user-api-key/create:
+  /api/v2/user-api-key/api-keys:
     post:
       operationId: "UserApiKeyController_createApiKey"
       summary: "Create an API key"
@@ -1508,6 +1548,9 @@ paths:
                   type: "string"
                 daysValid:
                   type: "number"
+                  default: 30
+              required:
+                - "name"
       responses:
         201:
           description: ""
@@ -1517,25 +1560,22 @@ paths:
                 $ref: "#/components/schemas/ApiKeyResponseDto"
       tags:
         - "User-ApiKey"
-  /api/v2/user-api-key/{apiKey}:
-    delete:
-      operationId: "UserApiKeyController_deleteApiKey"
-      summary: "Delete an API key"
-      parameters:
-        - name: "apiKey"
-          required: true
-          in: "path"
-          schema:
-            type: "string"
+    get:
+      operationId: "UserApiKeyController_getAllApiKeys"
+      summary: "Get all API keys"
+      parameters: []
       responses:
         200:
           description: ""
           content:
             application/json:
               schema:
-                type: "boolean"
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/ApiKeyResponseDto"
       tags:
         - "User-ApiKey"
+  /api/v2/user-api-key/api-keys/{apiKey}:
     get:
       operationId: "UserApiKeyController_getApiKey"
       summary: "Get a specific API key"
@@ -1554,23 +1594,21 @@ paths:
                 $ref: "#/components/schemas/ApiKeyResponseDto"
       tags:
         - "User-ApiKey"
-  /api/v2/user-api-key:
-    get:
-      operationId: "UserApiKeyController_getAllApiKeys"
-      summary: "Get all API keys"
-      parameters: []
+    delete:
+      operationId: "UserApiKeyController_deleteApiKey"
+      summary: "Delete an API key"
+      parameters:
+        - name: "apiKey"
+          required: true
+          in: "path"
+          schema:
+            type: "string"
       responses:
-        200:
-          description: ""
-          content:
-            application/json:
-              schema:
-                type: "array"
-                items:
-                  $ref: "#/components/schemas/ApiKeyResponseDto"
+        204:
+          description: "API key deleted successfully"
       tags:
         - "User-ApiKey"
-  /api/v2/user-api-key/validate/{apiKey}:
+  /api/v2/user-api-key/api-keys/{apiKey}/validate:
     get:
       operationId: "UserApiKeyController_validateApiKey"
       summary: "Validate an API key"
@@ -3240,6 +3278,29 @@ components:
       required:
         - "username"
         - "password"
+    UserDetailsDto:
+      type: "object"
+      properties:
+        username:
+          type: "string"
+          example: "john_doe"
+          description: "Username of the user"
+        password:
+          type: "string"
+          example: "P@ssw0rd123"
+          description: "User password (hashed in DB, plain for input)"
+        role:
+          type: "string"
+          example: "admin"
+          description: "Role of the user"
+          enum:
+            - "admin"
+            - "user"
+            - "viewer"
+      required:
+        - "username"
+        - "password"
+        - "role"
     ApiKeyResponseDto:
       type: "object"
       properties:
