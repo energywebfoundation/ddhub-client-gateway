@@ -8,9 +8,12 @@ import { DialogTitle, Grid, Box, Button, Divider, alpha } from '@mui/material';
 import { useRequestRoleEffects } from './RequestRole.effects';
 import { useStyles } from './RequestRole.styles';
 import { REQUEST_ROLE_STEPS } from './Steps/requestSteps';
-import { SelectNamespaceStep } from './Steps/SelectNamespace';
-import { SelectRoles } from './Steps/SelectRoles';
-import { ApplicationDetails } from '../../../components';
+import { SelectNamespaceStep } from '../../../components/SelectNamespace/SelectNamespace';
+import {
+  ApplicationDetails,
+  ScrollableBox,
+  SelectRoles,
+} from '../../../components';
 import { RoleDetails } from './Steps/RoleDetails';
 import { RequestSummary } from './Steps/RequestSummary';
 import { theme } from '@ddhub-client-gateway-frontend/ui/utils';
@@ -48,30 +51,36 @@ export const RequestRoleModal = () => {
       ? 'Provide data with this form'
       : 'Review details for submission';
 
+  const requestorFields =
+    roles?.find((r) => r.namespace === details.role)?.requestorFields ?? [];
+
+  const role = roles?.find((r) => r.namespace === details.role)?.role ?? '';
+
   const formPart = (id: number) => {
     switch (id) {
       case 0: {
         return (
-          <SelectNamespaceStep
-            namespace={details.namespace}
-            setNamespace={setNamespace}
-            options={namespaces}
-            searchKey={searchKey}
-            setSearchKey={setSearchKey}
-          />
+          <ScrollableBox maxHeight="90%" sx={{ marginBottom: 2 }}>
+            <SelectNamespaceStep
+              namespace={details.namespace}
+              setNamespace={setNamespace}
+              options={namespaces}
+              searchKey={searchKey}
+              setSearchKey={setSearchKey}
+            />
+            {details.namespace && (
+              <SelectRoles
+                namespace={details.namespace}
+                role={details.role}
+                toggleRole={toggleRole}
+                roles={roles}
+                myRoles={myRoles?.filter((r) => r.status === 'SYNCED')}
+              />
+            )}
+          </ScrollableBox>
         );
       }
       case 1:
-        return (
-          <SelectRoles
-            namespace={details.namespace}
-            role={details.role}
-            toggleRole={toggleRole}
-            roles={roles}
-            myRoles={myRoles?.filter((r) => r.status === 'SYNCED')}
-          />
-        );
-      case 2:
         return (
           <Box display="flex" flexDirection="column">
             <ApplicationDetails namespace={details.namespace} />
@@ -82,28 +91,20 @@ export const RequestRoleModal = () => {
               }}
             />
             <RoleDetails
-              role={
-                roles?.find((r) => r.namespace === details.role)?.role ?? ''
-              }
-              fields={
-                roles?.find((r) => r.namespace === details.role)
-                  ?.requestorFields ?? []
-              }
+              role={role}
+              fields={requestorFields}
               register={register}
               errors={errors}
               control={control}
             />
           </Box>
         );
-      case 3:
+      case 2:
         return (
           <RequestSummary
             details={details}
             roles={roles}
-            fields={
-              roles?.find((r) => r.namespace === details.role)
-                ?.requestorFields ?? []
-            }
+            fields={requestorFields}
             formData={formData}
           />
         );
@@ -123,7 +124,7 @@ export const RequestRoleModal = () => {
       <Grid container className={classes.content}>
         <Grid item pt={2} xs={4}>
           <Steps
-            steps={REQUEST_ROLE_STEPS(details)}
+            steps={REQUEST_ROLE_STEPS(details, requestorFields)}
             activeStep={activeStep}
             setActiveStep={navigateToStep}
           />
@@ -136,9 +137,15 @@ export const RequestRoleModal = () => {
         <CloseButton onClose={openCancelModal} />
       </Box>
       <Box className={classes.backButtonWrapper}>
-        <Button variant="outlined" disabled={activeStep === 0} onClick={goBack}>
-          Back
-        </Button>
+        {activeStep >= 1 && (
+          <Button
+            variant="contained"
+            disabled={activeStep === 0}
+            onClick={goBack}
+          >
+            Back
+          </Button>
+        )}
       </Box>
       <Box className={classes.nextButtonWrapper}>
         {isRequesting ? (

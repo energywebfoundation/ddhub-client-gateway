@@ -30,7 +30,12 @@ export const SelectNamespaceStep = ({
       onChange={(_, value) => {
         setNamespace(value?.namespace);
       }}
-      placeholder="Search"
+      noOptionsText={
+        searchKey
+          ? 'No results found. Try using different keywords.'
+          : 'You need to provide at least 3 characters to start searching'
+      }
+      placeholder="Search by organization or application"
       onInputChange={(_, value) => {
         setSearchKey(value);
       }}

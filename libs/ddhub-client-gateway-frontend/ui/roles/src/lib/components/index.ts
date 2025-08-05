@@ -7,3 +7,6 @@ export * from './RoleRequestsList/RoleRequestsList.effects';
 export * from './CheckSwitch/CheckSwitch';
 export * from './ScrollableBox/ScrollableBox';
 export * from './Banner/Banner';
+export * from './SelectRoles/SelectRoles';
+export * from './SelectNamespace/SelectNamespace';
+export * from './RolesCountdown/RolesCountdown';

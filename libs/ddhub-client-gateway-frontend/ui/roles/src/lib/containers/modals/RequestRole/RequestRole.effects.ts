@@ -168,6 +168,9 @@ export const useRequestRoleEffects = () => {
   };
 
   const setNamespace = (namespace: string) => {
+    if (!namespace) {
+      resetToInitialState();
+    }
     setDetails({ ...details, namespace });
   };
 
@@ -235,6 +238,8 @@ export const useRequestRoleEffects = () => {
       const result = await Swal.success({
         title: 'Request submitted',
         html: `Your request for the <strong>${details.role}</strong> has been successfully submitted`,
+        confirmButtonText: 'Confirm',
+        showCancelButton: false,
       });
 
       if (result.isConfirmed) {
@@ -245,6 +250,8 @@ export const useRequestRoleEffects = () => {
       const result2 = await Swal.warning({
         title: 'Request failed',
         html: `Your request for the <strong>${details.role}</strong> could not be submitted`,
+        confirmButtonText: 'Confirm',
+        showCancelButton: false,
       });
 
       if (result2.isConfirmed) {
@@ -266,6 +273,10 @@ export const useRequestRoleEffects = () => {
     return false;
   };
 
+  const myRolesNamespaces = myRoles?.map(
+    (role) => `${role.role}.roles.${role.namespace}`
+  );
+
   return {
     open,
     openCancelModal,
@@ -286,9 +297,10 @@ export const useRequestRoleEffects = () => {
     namespaces: namespaces ?? [],
     searchKey,
     setSearchKey,
-    roles: roles ?? [],
+    roles: roles?.filter((r) => myRolesNamespaces?.includes(r.namespace)) ?? [],
     myRoles: myRoles ?? [],
     formData: getValues(),
     isRequesting,
+    reset: resetToInitialState,
   };
 };
