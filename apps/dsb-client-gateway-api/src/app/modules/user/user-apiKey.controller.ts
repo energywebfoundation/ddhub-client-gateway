@@ -8,7 +8,7 @@ import { UserDetailsDto } from "./dto/response/user-response.dto";
 @Controller('user-api-key')
 @ApiTags('User-ApiKey')
 @UseGuards(UserGuard)
-@Roles(UserRole.ADMIN)
+@Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
 export class UserApiKeyController {
   constructor(private readonly secretsEngineService: SecretsEngineService) { }
 

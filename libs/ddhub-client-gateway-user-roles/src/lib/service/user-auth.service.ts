@@ -54,12 +54,7 @@ export class UserAuthService {
     }
 
     if (password === userDetails.password) {
-      const accountType =
-        userDetails.role === UserRole.ADMIN
-          ? UserRole.ADMIN
-          : UserRole.MESSAGING;
-
-      return this.userRolesTokenService.generateTokens(username, accountType);
+      return this.userRolesTokenService.generateTokens(username, userDetails.role as UserRole);
     }
 
     this.logger.warn('incorrect password attempt');

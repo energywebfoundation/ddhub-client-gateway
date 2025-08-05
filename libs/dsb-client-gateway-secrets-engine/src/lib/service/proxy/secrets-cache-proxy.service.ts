@@ -217,6 +217,6 @@ export class SecretsCacheProxyService extends SecretsEngineService {
   }
 
   public isAuthEnabled(): boolean {
-    return Object.values(this.cachedObjects.users).some(user => user.role === UserRole.ADMIN);
+    return Object.values(this.cachedObjects.users).some(user => user.role !== UserRole.MESSAGING);
   }
 }
