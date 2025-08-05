@@ -15,7 +15,7 @@ export class UserApiKeyController {
   // ---------- Current User ----------
   @Get('users/me')
   @UseGuards(UserGuard)
-  @Roles(UserRole.ADMIN, UserRole.USER, UserRole.SUPERADMIN)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
   @ApiOperation({ summary: 'Get current user details' })
   @ApiResponse({ status: 200, type: UserDetailsDto })
   async getCurrentUser(@Username() username: string): Promise<UserDetailsDto> {

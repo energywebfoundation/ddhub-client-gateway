@@ -3,7 +3,6 @@ import { SetMetadata } from '@nestjs/common';
 export enum UserRole {
   ADMIN = 'admin',
   SUPERADMIN = 'superadmin',
-  USER = 'user',
   MESSAGING = 'messaging',
 }
 
@@ -13,7 +12,6 @@ export const USER_ROLES_PERMISSION_MAP: Record<UserRole, UserRoleEndpointMap> =
 {
   [UserRole.ADMIN]: {},
   [UserRole.SUPERADMIN]: {},
-  [UserRole.USER]: {},
   [UserRole.MESSAGING]: {},
 };
 

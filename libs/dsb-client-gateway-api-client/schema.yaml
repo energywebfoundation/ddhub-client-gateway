@@ -1491,7 +1491,6 @@ paths:
                   enum:
                     - "admin"
                     - "superadmin"
-                    - "user"
                     - "messaging"
               required:
                 - "username"
