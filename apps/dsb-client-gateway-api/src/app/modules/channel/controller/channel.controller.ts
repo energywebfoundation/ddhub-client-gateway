@@ -49,10 +49,10 @@ export class ChannelController {
     protected readonly channelService: ChannelService,
     protected readonly commandbus: CommandBus,
     protected readonly logger: PinoLogger
-  ) {}
+  ) { }
 
   @Get('/messages/count')
-  @Roles(UserRole.MESSAGING, UserRole.ADMIN)
+  @Roles(UserRole.MESSAGING, UserRole.ADMIN, UserRole.SUPERADMIN)
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Channel messages count returned successfully',
@@ -84,7 +84,7 @@ export class ChannelController {
     description: 'Invalid request',
   })
   @HttpCode(HttpStatus.OK)
-  @Roles(UserRole.MESSAGING, UserRole.ADMIN)
+  @Roles(UserRole.MESSAGING, UserRole.ADMIN, UserRole.SUPERADMIN)
   public async getCount(
     @Param('fqcn') fqcn: string
   ): Promise<GetChannelMessagesCountDto> {
@@ -113,7 +113,7 @@ export class ChannelController {
     description: 'Unauthorized',
   })
   @HttpCode(HttpStatus.CREATED)
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
   public async create(
     @Body(ChannelValidationPipe) dto: CreateChannelDto
   ): Promise<ChannelEntity> {
@@ -140,7 +140,7 @@ export class ChannelController {
     status: HttpStatus.NOT_FOUND,
     description: 'Channel not found',
   })
-  @Roles(UserRole.MESSAGING, UserRole.ADMIN)
+  @Roles(UserRole.MESSAGING, UserRole.ADMIN, UserRole.SUPERADMIN)
   public async get(
     @Param() { fqcn }: GetChannelParamsDto
   ): Promise<GetChannelResponseDto> {
@@ -165,7 +165,7 @@ export class ChannelController {
     status: HttpStatus.NOT_FOUND,
     description: 'Channel not found',
   })
-  @Roles(UserRole.MESSAGING, UserRole.ADMIN)
+  @Roles(UserRole.MESSAGING, UserRole.ADMIN, UserRole.SUPERADMIN)
   public async getQualifiedDids(
     @Param() { fqcn }: GetChannelQualifiedDidsParamsDto
   ): Promise<GetChannelQualifiedDidsDto> {
@@ -186,7 +186,7 @@ export class ChannelController {
     status: HttpStatus.UNAUTHORIZED,
     description: 'Unauthorized',
   })
-  @Roles(UserRole.MESSAGING, UserRole.ADMIN)
+  @Roles(UserRole.MESSAGING, UserRole.ADMIN, UserRole.SUPERADMIN)
   public async getByType(
     @Query() query: GetChannelByTypeQueryDto
   ): Promise<GetChannelResponseDto[]> {
@@ -218,7 +218,7 @@ export class ChannelController {
     status: HttpStatus.NOT_FOUND,
     description: 'Channel not found',
   })
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
   public async delete(@Param() { fqcn }: GetChannelParamsDto): Promise<void> {
     this.logger.assign({
       type: fqcn,
@@ -243,7 +243,7 @@ export class ChannelController {
     description: 'Unauthorized',
   })
   @HttpCode(HttpStatus.OK)
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
   public async update(
     @Body() dto: UpdateChannelDto,
     @Param() { fqcn }: GetChannelParamsDto
@@ -258,7 +258,7 @@ export class ChannelController {
   }
 
   @Post('refresh')
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Refreshed cache',

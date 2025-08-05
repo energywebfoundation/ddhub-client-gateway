@@ -8,14 +8,14 @@ import { UserDetailsDto } from "./dto/response/user-response.dto";
 @Controller('user-api-key')
 @ApiTags('User-ApiKey')
 @UseGuards(UserGuard)
-@Roles(UserRole.ADMIN)
+@Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
 export class UserApiKeyController {
   constructor(private readonly secretsEngineService: SecretsEngineService) { }
 
   // ---------- Current User ----------
   @Get('users/me')
   @UseGuards(UserGuard)
-  @Roles(UserRole.ADMIN, UserRole.USER, UserRole.SUPERADMIN)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
   @ApiOperation({ summary: 'Get current user details' })
   @ApiResponse({ status: 200, type: UserDetailsDto })
   async getCurrentUser(@Username() username: string): Promise<UserDetailsDto> {
