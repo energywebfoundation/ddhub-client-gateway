@@ -54,12 +54,7 @@ export class UserAuthService {
     }
 
     if (password === userDetails.password) {
-      const accountType =
-        userDetails.role === UserRole.ADMIN
-          ? UserRole.ADMIN
-          : UserRole.MESSAGING;
-
-      return this.userRolesTokenService.generateTokens(username, accountType);
+      return this.userRolesTokenService.generateTokens(username, userDetails.role as UserRole);
     }
 
     this.logger.warn('incorrect password attempt');
@@ -67,14 +62,14 @@ export class UserAuthService {
     throw new Error('User does not exist or password is incorrect');
   }
 
-  public async setUserPassword(username: string, password: string): Promise<void> {
+  public async setUserPassword(username: string, password: string, role: UserRole): Promise<void> {
     const isAuthEnabled: boolean = this.secretsEngineService.isAuthEnabled();
 
     if (!isAuthEnabled) {
       throw new Error('Auth not enabled');
     }
 
-    await this.secretsEngineService.setUserPassword(username, password);
+    await this.secretsEngineService.setUserPassword(username, password, role);
   }
 
 }

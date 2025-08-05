@@ -78,14 +78,15 @@ export const getRoutesToDisplay = (
   let adminRoutes = new Set<string>();
   if (config.authEnabled && userAuth) {
     switch (userAuth.role) {
+      case UserRole.SUPERADMIN:
       case UserRole.ADMIN:
         if (mtlsIsValid === false) {
           return new Set([routerConst.GatewaySettings]);
         }
 
-        adminRoutes = new Set<string>(
-          mapRoleRestrictions(restrictions, 'allowedAuthRoles', UserRole.ADMIN)
-        );
+        adminRoutes = new Set<string>([
+          ...mapRoleRestrictions(restrictions, 'allowedAuthRoles', userAuth.role as UserRole),
+        ]);
         break;
       case UserRole.MESSAGING: {
         if (mtlsIsValid === false) {

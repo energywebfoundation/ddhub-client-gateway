@@ -28,12 +28,8 @@ const mapStatusToLabel = (status: RoleStatusLabel): RequesterClaimDTOStatus => {
   throw new Error(`Unknown role status: ${status}`);
 };
 
-const REFRESH_INTERVAL = 60;
-
 export const useRoleListEffects = () => {
   const [statusFilter, setStatusFilter] = useState<string>('All');
-  const [countdown, setCountdown] = useState<number>(REFRESH_INTERVAL);
-  const [lastUpdateTime, setLastUpdateTime] = useState<Date>(new Date());
   const [hasPendingRequests, setHasPendingRequests] = useState<boolean>(false);
 
   const { mutateAsync, isLoading: isDeleting } = useRolesControllerDeleteRole();
@@ -46,25 +42,6 @@ export const useRoleListEffects = () => {
   } = useRolesControllerGetMyRoles();
 
   const Swal = useCustomAlert();
-
-  // Countdown timer effect
-  useEffect(() => {
-    if (!hasPendingRequests) {
-      return null;
-    }
-    const interval = setInterval(() => {
-      setCountdown((prevCountdown) => {
-        if (prevCountdown === 0) {
-          refetch();
-          setLastUpdateTime(new Date()); // Update timestamp when countdown resets
-          return REFRESH_INTERVAL; // Reset to 60 when reaching 0
-        }
-        return prevCountdown - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [hasPendingRequests]);
 
   useEffect(() => {
     const foundPending = roles?.some(
@@ -104,18 +81,6 @@ export const useRoleListEffects = () => {
     },
   ];
 
-  // Format last update time
-  const formatLastUpdateTime = (date: Date): string => {
-    const day = date.toLocaleDateString('en-US', { weekday: 'short' });
-    const time = date.toLocaleTimeString('en-US', {
-      hour12: false,
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-    });
-    return `${day} ${time}`;
-  };
-
   const dispatch = useModalDispatch();
 
   const onCreateHandler = () => {
@@ -140,9 +105,8 @@ export const useRoleListEffects = () => {
     isLoading: isLoading || isFetching,
     rolesLoaded: isSuccess,
     statusFilter,
-    countdown,
+    refetch,
     actions,
-    lastUpdateTime: formatLastUpdateTime(lastUpdateTime),
     handleChangeStatusFilter,
     onCreateHandler,
     hasPendingRequests,

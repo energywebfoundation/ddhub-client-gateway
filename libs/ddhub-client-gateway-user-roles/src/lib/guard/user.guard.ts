@@ -17,7 +17,7 @@ export class UserGuard implements CanActivate {
   constructor(
     protected readonly userAuthService: UserAuthService,
     protected readonly reflector: Reflector
-  ) {}
+  ) { }
 
   public isAuthEnabled(): boolean {
     return this.userAuthService.isAuthEnabled();
@@ -61,7 +61,7 @@ export class UserGuard implements CanActivate {
           username: decodedToken.username,
         };
 
-        if (decodedToken.accountType === UserRole.ADMIN) {
+        if (decodedToken.accountType !== UserRole.MESSAGING) {
           return true;
         }
 

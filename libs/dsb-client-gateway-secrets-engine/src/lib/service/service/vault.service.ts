@@ -85,13 +85,14 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
   @Span('vault_setUserPassword')
   public async setUserPassword(
     username: string,
-    password: string
+    password: string,
+    role: UserRole
   ): Promise<void> {
     this.logger.log('Attempting to write user');
 
     await this.client.write(`${this.prefix}${PATHS.USERS}/${username}`, {
       password,
-      role: UserRole.ADMIN
+      role: role
     });
 
     this.logger.log('Writing user');
@@ -244,8 +245,8 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
     return null;
   }
 
-  @Span('vault_delateUser')
-  public async delateUser(username: string): Promise<void> {
+  @Span('vault_deleteUser')
+  public async deleteUser(username: string): Promise<void> {
     this.logger.log(`Attempting to delete user ${username}`);
 
     await this.client.delete(`${this.prefix}${PATHS.USERS}/${username}`);
