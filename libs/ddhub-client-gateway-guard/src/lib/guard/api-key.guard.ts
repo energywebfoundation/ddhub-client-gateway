@@ -7,6 +7,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { UserGuard } from '@dsb-client-gateway/ddhub-client-gateway-user-roles';
 import { SecretsEngineService } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
+import { PinoLogger } from 'nestjs-pino';
 
 const WHITELISTED_ENDPOINTS = [
   '/api/v2/health',
@@ -25,6 +26,7 @@ export class ApiKeyGuard implements CanActivate {
     protected readonly configService: ConfigService,
     protected readonly userGuard: UserGuard,
     protected readonly secretsEngineService: SecretsEngineService,
+    private readonly _logger: PinoLogger
   ) {
     const credentials: Array<string | undefined> = [
       this.configService.get<string | undefined>('API_KEY'),
@@ -66,7 +68,12 @@ export class ApiKeyGuard implements CanActivate {
 
     if (apiKeyFromHeaders) {
       const isValid = await this.secretsEngineService.validateApiKey(apiKeyFromHeaders);
-      request.user = 'api-key';
+      request.user = {
+        authType: 'api-key',
+        apiKey: apiKeyFromHeaders,
+        username: apiKeyFromHeaders,
+      };
+      this._logger.assign({ user: apiKeyFromHeaders });
       return isValid;
     }
 
