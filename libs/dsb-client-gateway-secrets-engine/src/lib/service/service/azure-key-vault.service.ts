@@ -365,12 +365,13 @@ export class AzureKeyVaultService
   @Span('azure_setUserPassword')
   public async setUserPassword(
     username: string,
-    password: string
+    password: string,
+    role: UserRole
   ): Promise<void> {
     this.logger.log('Attempting to write user');
 
     const _username = this.encodeAzureKey(`${this.prefix}${PATHS.USERS}/${username}`);
-    await this.client.setSecret(_username, JSON.stringify({ password, role: UserRole.ADMIN }));
+    await this.client.setSecret(_username, JSON.stringify({ password, role }));
 
     this.logger.log('Writing user');
   }
@@ -421,8 +422,8 @@ export class AzureKeyVaultService
     }
   }
 
-  @Span('azure_delateUser')
-  public async delateUser(
+  @Span('azure_deleteUser')
+  public async deleteUser(
     username: string
   ): Promise<void> {
     this.logger.log(`Attempting to delete user ${username}`);

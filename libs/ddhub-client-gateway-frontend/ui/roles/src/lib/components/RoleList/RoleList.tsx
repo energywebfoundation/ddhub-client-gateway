@@ -5,9 +5,10 @@ import {
 } from '@ddhub-client-gateway-frontend/ui/core';
 import { useRoleListEffects } from './RoleList.effects';
 import { ROLES_HEADERS, RoleStatusLabel } from '../../models';
-import { Box, CircularProgress, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { Banner } from '../Banner/Banner';
 import { RequesterClaimDTOStatus } from '@dsb-client-gateway/dsb-client-gateway-api-client';
+import { RolesCountdown } from '../RolesCountdown/RolesCountdown';
 
 const statusOptions: RoleStatusLabel[] = [
   RoleStatusLabel.approved,
@@ -17,16 +18,18 @@ const statusOptions: RoleStatusLabel[] = [
   RoleStatusLabel.synced,
 ];
 
+const statusOptionsWithAll = [...statusOptions, 'All'];
+
 export function RoleList() {
   const {
     roles,
     onCreateHandler,
     isLoading,
     handleChangeStatusFilter,
-    countdown,
-    lastUpdateTime,
+    refetch,
     actions,
     hasPendingRequests,
+    statusFilter,
   } = useRoleListEffects();
 
   return (
@@ -43,7 +46,7 @@ export function RoleList() {
         loading={isLoading}
         renderBanner={() =>
           hasPendingRequests ? (
-            <Banner text="The screen will refresh every 10 seconds if a status requires transaction approval" />
+            <Banner text="The screen will refresh every 60 seconds if any roles require approval" />
           ) : null
         }
       >
@@ -66,10 +69,14 @@ export function RoleList() {
               Status
             </Typography>
             <Autocomplete
-              options={[...statusOptions, 'All']}
-              value={'All'}
+              wrapperProps={{ width: 150 }}
+              options={statusOptionsWithAll}
+              value={statusFilter}
               onChange={(_, value) => {
-                handleChangeStatusFilter(value);
+                if (value) {
+                  return handleChangeStatusFilter(value);
+                }
+                return handleChangeStatusFilter('All');
               }}
             />
           </Box>
@@ -79,14 +86,7 @@ export function RoleList() {
             alignItems="baseline"
             gap={2}
           >
-            {hasPendingRequests && (
-              <>
-                <CircularProgress size={16} color="primary" />
-                <Typography variant="body2" color="text.primary">
-                  Next refresh in {countdown} seconds. Updated: {lastUpdateTime}
-                </Typography>
-              </>
-            )}
+            {hasPendingRequests && <RolesCountdown refetch={refetch} />}
 
             <CreateButton
               onCreate={onCreateHandler}

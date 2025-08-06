@@ -186,13 +186,13 @@ export class SecretsCacheProxyService extends SecretsEngineService {
     return response;
   }
 
-  public async setUserPassword(username: string, password: string): Promise<void> {
-    await this.secretsEngineService.setUserPassword(username, password);
+  public async setUserPassword(username: string, password: string, role: UserRole): Promise<void> {
+    await this.secretsEngineService.setUserPassword(username, password, role);
     await this.refreshUsersData();
   }
 
-  public async delateUser(username: string): Promise<void> {
-    await this.secretsEngineService.delateUser(username);
+  public async deleteUser(username: string): Promise<void> {
+    await this.secretsEngineService.deleteUser(username);
     await this.refreshUsersData();
   }
 
@@ -217,6 +217,6 @@ export class SecretsCacheProxyService extends SecretsEngineService {
   }
 
   public isAuthEnabled(): boolean {
-    return Object.values(this.cachedObjects.users).some(user => user.role === UserRole.ADMIN);
+    return Object.values(this.cachedObjects.users).some(user => user.role !== UserRole.MESSAGING);
   }
 }
