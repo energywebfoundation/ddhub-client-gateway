@@ -37,7 +37,7 @@ export enum UserRole {
   ADMIN = 'admin',
   SUPERADMIN = 'superadmin',
   MESSAGING = 'messaging',
-  // SUPERADMIN = 'superadmin',
+  USER = 'user',
 }
 
 export interface UserDataContext {

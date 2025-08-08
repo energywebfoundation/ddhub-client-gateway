@@ -77,6 +77,7 @@ export const useLoginStatusEffects = () => {
     if (
       userAuth.authenticated &&
       userAuth.role !== UserRole.ADMIN &&
+      userAuth.role !== UserRole.SUPERADMIN &&
       status !== RoleStatus.SYNCED
     ) {
       if (isCheckingIdentity) {
