@@ -4,6 +4,7 @@ import { UserGuard } from './user.guard';
 import { UserTokenData } from '../service';
 import { Reflector } from '@nestjs/core';
 import { UserRole } from '@dsb-client-gateway/ddhub-client-gateway-user-roles';
+import { PinoLogger } from 'nestjs-pino';
 
 const mockUserAuthService = {
   isAuthEnabled: jest.fn(),
@@ -34,6 +35,15 @@ const mockContextWithoutHeader = {
   }),
 };
 
+const mockPinoLogger = {
+  info: jest.fn(),
+  warn: jest.fn(),
+  error: jest.fn(),
+  debug: jest.fn(),
+  assign: jest.fn(),
+};
+
+
 describe('UserGuard', () => {
   let guard: UserGuard;
   let error: Error | null;
@@ -55,6 +65,10 @@ describe('UserGuard', () => {
         {
           provide: Reflector,
           useValue: mockReflector,
+        },
+        {
+          provide: PinoLogger,
+          useValue: mockPinoLogger,
         },
       ],
     }).compile();
