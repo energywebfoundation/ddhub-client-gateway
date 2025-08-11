@@ -54,5 +54,13 @@
   "roles": {
     "allowedRoles": ["user"],
     "allowedAuthRoles": ["admin"]
+  },
+  "users": {
+    "allowedRoles": ["superadmin"],
+    "allowedAuthRoles": ["superadmin"]
+  },
+  "apiKeys": {
+    "allowedRoles": ["superadmin"],
+    "allowedAuthRoles": ["superadmin"]
   }
 }

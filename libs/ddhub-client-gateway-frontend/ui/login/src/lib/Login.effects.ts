@@ -61,7 +61,9 @@ const useUserLoginEffects = ({
   const { mutate, isLoading } = useLoginControllerLogin({
     mutation: {
       onMutate: () => setIsChecking(true),
-      onSuccess: (res) => setUserAuth(res),
+      onSuccess: (res) => {
+        setUserAuth(res);
+      },
       onError: (error: Error) => {
         if (notifyOnError) {
           notifyOnError(error);
