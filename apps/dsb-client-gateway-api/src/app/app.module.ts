@@ -59,11 +59,13 @@ export class AppModule {
                 levelFirst: true,
                 translateTime: "UTC:yyyy-mm-dd'T'HH:MM:ss.l'Z'",
                 singleLine: true,
+                messageFormat: '[{context}][{user}] {msg}',
+                ignore: 'pid,hostname,context'
               },
             },
             customProps: (req, res) => {
               return {
-                user: res?.req?.user,
+                user: res?.req?.user?.username,
               };
             },
           },

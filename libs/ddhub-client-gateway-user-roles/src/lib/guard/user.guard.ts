@@ -9,6 +9,7 @@ import { UserAuthService } from '../service/user-auth.service';
 import { Reflector } from '@nestjs/core';
 import { EXCLUDED_ROUTE, ROLES_KEY, UserRole } from '../const';
 import { UserTokenData } from '../service';
+import { PinoLogger } from 'nestjs-pino';
 
 @Injectable()
 export class UserGuard implements CanActivate {
@@ -16,7 +17,8 @@ export class UserGuard implements CanActivate {
 
   constructor(
     protected readonly userAuthService: UserAuthService,
-    protected readonly reflector: Reflector
+    protected readonly reflector: Reflector,
+    private readonly _logger: PinoLogger
   ) { }
 
   public isAuthEnabled(): boolean {
@@ -36,7 +38,7 @@ export class UserGuard implements CanActivate {
       return true;
     }
 
-    if (request.user === 'api-key') {
+    if (request.user?.authType === 'api-key') {
       return true;
     }
 
@@ -59,7 +61,10 @@ export class UserGuard implements CanActivate {
 
         request.user = {
           username: decodedToken.username,
+          authType: 'token',
         };
+
+        this._logger.assign({ user: decodedToken.username });
 
         if (decodedToken.accountType !== UserRole.MESSAGING) {
           return true;
