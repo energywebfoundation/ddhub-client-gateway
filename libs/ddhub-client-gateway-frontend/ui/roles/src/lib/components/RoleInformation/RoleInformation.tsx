@@ -23,8 +23,19 @@ export const RoleInformation = ({
         color="text.secondary"
         sx={{ textTransform: 'capitalize' }}
       >
-        {role} information
+        Role information
       </Typography>
+
+      <Box display="flex" flexDirection="row" alignItems="center" gap={2}>
+        <Typography variant="body2" color="text.gray[300]">
+          Role name:
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          {role}
+        </Typography>
+        <CopyToClipboard text={role} />
+      </Box>
+
       <Box display="flex" flexDirection="row" alignItems="center" gap={2}>
         <Typography variant="body2" color="text.gray[300]">
           Role namespace:

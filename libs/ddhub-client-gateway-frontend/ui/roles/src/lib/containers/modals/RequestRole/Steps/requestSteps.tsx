@@ -12,6 +12,7 @@ export const REQUEST_ROLE_STEPS = (
       title: 'Search',
       subtitle: 'Organization - application',
       icon: <Search size={18} />,
+      id: 'search',
     },
     requestorFields.length > 0
       ? {
@@ -19,6 +20,7 @@ export const REQUEST_ROLE_STEPS = (
           subtitle: 'Fill in role details',
           icon: <FileText size={18} />,
           disabled: !details.role || !details.namespace,
+          id: 'details',
         }
       : null,
     {
@@ -26,5 +28,6 @@ export const REQUEST_ROLE_STEPS = (
       subtitle: 'Review details for submission',
       icon: <Check size={18} />,
       disabled: !details.role || !details.namespace,
+      id: 'review',
     },
   ].filter(Boolean);

@@ -43,17 +43,18 @@ export const SelectRoles = ({
         }}
       />
 
-      <Box display="flex" flexDirection="column">
-        <Typography
-          sx={{ marginBottom: 2, marginTop: 2 }}
-          variant="body1"
-          color="text.secondary"
-        >
-          Select a role
-        </Typography>
-
-        <ScrollableBox maxHeight={200}>
-          {roles.map((availableRole) => {
+      <Box display="flex" flexDirection="column" mb={2}>
+        {roles.length > 0 ? (
+          <Typography
+            sx={{ marginBottom: 2, marginTop: 2 }}
+            variant="body1"
+            color="text.secondary"
+          >
+            Select a role
+          </Typography>
+        ) : null}
+        {roles.length > 0 ? (
+          roles.map((availableRole) => {
             const isSelected = role === availableRole.namespace;
             const isSynced = myRoles.some(
               (myRole) => myRole.namespace === availableRole.namespace
@@ -114,8 +115,16 @@ export const SelectRoles = ({
                 </Button>
               </Box>
             );
-          })}
-        </ScrollableBox>
+          })
+        ) : (
+          <Typography variant="body2" color="text.secondary">
+            No available roles. You've already applied for all available roles
+            in the selected organization/application, or this
+            organization/application has no roles available for you to apply
+            for. Please check the My Roles page to review your enrollment
+            status.
+          </Typography>
+        )}
       </Box>
     </Box>
   );

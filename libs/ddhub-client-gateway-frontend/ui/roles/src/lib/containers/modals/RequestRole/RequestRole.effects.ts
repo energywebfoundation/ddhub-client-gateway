@@ -125,7 +125,9 @@ export const useRequestRoleEffects = () => {
     requestRole: { open },
   } = useModalStore();
   const [searchKey, setSearchKey] = useState('');
-  const [activeStep, setActiveStep] = useState(0);
+  const [activeStep, setActiveStep] = useState<'search' | 'details' | 'review'>(
+    'search'
+  );
   const [details, setDetails] = useState<Details>(initialDetails);
 
   const { data: namespaces } = useRolesControllerGetApps(
@@ -162,10 +164,13 @@ export const useRequestRoleEffects = () => {
   });
 
   const resetToInitialState = () => {
-    setActiveStep(0);
+    setActiveStep('search');
     setDetails(initialDetails);
     reset();
   };
+
+  const requestorFields =
+    roles?.find((r) => r.namespace === details.role)?.requestorFields ?? [];
 
   const setNamespace = (namespace: string) => {
     if (!namespace) {
@@ -207,18 +212,36 @@ export const useRequestRoleEffects = () => {
     }
   };
 
-  const navigateToStep = (index: number) => {
-    if (index !== activeStep) {
-      setActiveStep(index);
+  const navigateToStep = (step: 'search' | 'details' | 'review') => {
+    if (step !== activeStep) {
+      setActiveStep(step);
     }
   };
 
   const nextStep = () => {
-    setActiveStep(activeStep + 1);
+    if (activeStep === 'search') {
+      if (requestorFields.length > 0) {
+        setActiveStep('details');
+      } else {
+        setActiveStep('review');
+      }
+    }
+    if (activeStep === 'details') {
+      setActiveStep('review');
+    }
   };
 
   const goBack = () => {
-    setActiveStep(activeStep - 1);
+    if (activeStep === 'details') {
+      setActiveStep('search');
+    }
+    if (activeStep === 'review') {
+      if (requestorFields.length > 0) {
+        setActiveStep('details');
+      } else {
+        setActiveStep('search');
+      }
+    }
   };
 
   const requestRole = async () => {
@@ -260,22 +283,26 @@ export const useRequestRoleEffects = () => {
     }
   };
 
-  const getDisabled = (details: Details) => {
-    if (activeStep === 0) {
-      return !details.namespace;
+  const myRolesNamespaces = myRoles?.map(
+    (role) => `${role.role}.roles.${role.namespace}`
+  );
+
+  const filteredRoles = roles?.filter(
+    (r) => !myRolesNamespaces?.includes(r.namespace)
+  );
+
+  const getDisabled = () => {
+    if (activeStep === 'search') {
+      return !details.namespace || filteredRoles?.length < 1 || !selectedRole;
     }
-    if (activeStep === 1) {
-      return !details.role || !details.namespace;
+    if (activeStep === 'details') {
+      return !details.role || !details.namespace || !isValid;
     }
-    if (activeStep === 2) {
+    if (activeStep === 'review') {
       return !isValid;
     }
     return false;
   };
-
-  const myRolesNamespaces = myRoles?.map(
-    (role) => `${role.role}.roles.${role.namespace}`
-  );
 
   return {
     open,
@@ -297,10 +324,11 @@ export const useRequestRoleEffects = () => {
     namespaces: namespaces ?? [],
     searchKey,
     setSearchKey,
-    roles: roles?.filter((r) => myRolesNamespaces?.includes(r.namespace)) ?? [],
+    roles: filteredRoles ?? [],
     myRoles: myRoles ?? [],
     formData: getValues(),
     isRequesting,
     reset: resetToInitialState,
+    requestorFields,
   };
 };
