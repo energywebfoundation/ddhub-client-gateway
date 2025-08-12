@@ -85,7 +85,11 @@ export const getRoutesToDisplay = (
         }
 
         adminRoutes = new Set<string>([
-          ...mapRoleRestrictions(restrictions, 'allowedAuthRoles', userAuth.role as UserRole),
+          ...mapRoleRestrictions(
+            restrictions,
+            'allowedAuthRoles',
+            userAuth.role as UserRole
+          ),
         ]);
         break;
       case UserRole.MESSAGING: {

@@ -76,7 +76,7 @@ export const useLoginStatusEffects = () => {
   const statusFactory = () => {
     if (
       userAuth.authenticated &&
-      userAuth.role !== UserRole.ADMIN &&
+      userAuth.role === UserRole.MESSAGING &&
       status !== RoleStatus.SYNCED
     ) {
       if (isCheckingIdentity) {
