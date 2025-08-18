@@ -2,7 +2,7 @@ name: Build and publish images
 
 on:
   push:
-    branches: [develop, develop_ewf]
+    branches: [develop]
     paths-ignore:
       - 'devops/**'
       - 'get-started/**'
@@ -196,7 +196,7 @@ jobs:
     name: Build Frontend
     runs-on: ubuntu-latest
     needs: [cancel-previous, unique_id, get_affected]
-    # if: contains(needs.get_affected.outputs.affected, 'dsb-client-gateway-frontend')
+    if: contains(needs.get_affected.outputs.affected, 'dsb-client-gateway-frontend')
     services:
       postgres:
         image: postgres
@@ -237,7 +237,7 @@ jobs:
         run: npm run export
         env:
           DB_NAME: postgresql://ddhub:ddhub@localhost:5432/ddhub
-          # NEXT_PUBLIC_CUSTOM_BRANDING_PATH: '/aemo-logo.svg'
+          NEXT_PUBLIC_CUSTOM_BRANDING_PATH: '/aemo-logo.svg'
           NEXT_PUBLIC_CUSTOM_CGW_NAME: 'TEDD'
       - name: 'Login via Azure CLI'
         uses: azure/login@v1
@@ -266,7 +266,6 @@ jobs:
 
       - name: ArgoCD overwrite DEV image tag
         uses: clowdhaus/argo-cd-action/@v1.12.1
-        if: false
         id: argocd_image_tag_overwrite_dev_ui
         with:
           command: app set ddhub-gateway-dev
@@ -274,7 +273,6 @@ jobs:
 
       - name: ArgoCD overwrite DEV-1 image tag
         uses: clowdhaus/argo-cd-action/@v1.12.1
-        if: false
         id: argocd_image_tag_overwrite_dev1_ui
         with:
           command: app set ddhub-gateway-dev-1
