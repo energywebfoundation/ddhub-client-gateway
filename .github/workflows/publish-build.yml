@@ -2,7 +2,7 @@ name: Build and publish images
 
 on:
   push:
-    branches: [develop]
+    branches: [develop, develop_eaf]
     paths-ignore:
       - 'devops/**'
       - 'get-started/**'
@@ -196,7 +196,7 @@ jobs:
     name: Build Frontend
     runs-on: ubuntu-latest
     needs: [cancel-previous, unique_id, get_affected]
-    if: contains(needs.get_affected.outputs.affected, 'dsb-client-gateway-frontend')
+    # if: contains(needs.get_affected.outputs.affected, 'dsb-client-gateway-frontend')
     services:
       postgres:
         image: postgres
@@ -237,7 +237,7 @@ jobs:
         run: npm run export
         env:
           DB_NAME: postgresql://ddhub:ddhub@localhost:5432/ddhub
-          NEXT_PUBLIC_CUSTOM_BRANDING_PATH: '/aemo-logo.svg'
+          # NEXT_PUBLIC_CUSTOM_BRANDING_PATH: '/aemo-logo.svg'
           NEXT_PUBLIC_CUSTOM_CGW_NAME: 'TEDD'
       - name: 'Login via Azure CLI'
         uses: azure/login@v1
@@ -247,15 +247,15 @@ jobs:
       - name: 'Build and push image (Front-end)'
         uses: azure/docker-login@v1
         with:
-          login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
+          login-server: ${{ secrets.EWF_REGISTRY_LOGIN_SERVER }}
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
       - run: |
           docker build -f ci/Docker/Dockerfile.frontend -t energyweb/ddhub-client-gateway-frontend .
-          docker tag energyweb/ddhub-client-gateway-frontend ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-frontend:${{needs.unique_id.outputs.unique_id}}
-          docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-frontend:${{needs.unique_id.outputs.unique_id}}
-          docker tag energyweb/ddhub-client-gateway-frontend ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-frontend:canary
-          docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-frontend:canary
+          docker tag energyweb/ddhub-client-gateway-frontend ${{ secrets.EWF_REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-frontend:${{needs.unique_id.outputs.unique_id}}
+          docker push ${{ secrets.EWF_REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-frontend:${{needs.unique_id.outputs.unique_id}}
+          docker tag energyweb/ddhub-client-gateway-frontend ${{ secrets.EWF_REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-frontend:canary
+          docker push ${{ secrets.EWF_REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-frontend:canary
 
       - name: ArgoCD login
         uses: clowdhaus/argo-cd-action/@v1.12.1
@@ -266,6 +266,7 @@ jobs:
 
       - name: ArgoCD overwrite DEV image tag
         uses: clowdhaus/argo-cd-action/@v1.12.1
+        if: false
         id: argocd_image_tag_overwrite_dev_ui
         with:
           command: app set ddhub-gateway-dev
@@ -273,6 +274,7 @@ jobs:
 
       - name: ArgoCD overwrite DEV-1 image tag
         uses: clowdhaus/argo-cd-action/@v1.12.1
+        IF: false
         id: argocd_image_tag_overwrite_dev1_ui
         with:
           command: app set ddhub-gateway-dev-1
