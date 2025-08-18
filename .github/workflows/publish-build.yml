@@ -274,7 +274,7 @@ jobs:
 
       - name: ArgoCD overwrite DEV-1 image tag
         uses: clowdhaus/argo-cd-action/@v1.12.1
-        IF: false
+        if: false
         id: argocd_image_tag_overwrite_dev1_ui
         with:
           command: app set ddhub-gateway-dev-1
