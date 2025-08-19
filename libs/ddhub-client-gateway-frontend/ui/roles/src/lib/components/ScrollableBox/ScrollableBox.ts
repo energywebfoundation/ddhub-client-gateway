@@ -3,12 +3,14 @@ import { CSSProperties } from 'react';
 
 export const ScrollableBox = styled(Box)<{
   maxHeight?: CSSProperties['maxHeight'];
-}>(({ theme, maxHeight }) => ({
+  minHeight?: CSSProperties['minHeight'];
+}>(({ theme, maxHeight, minHeight }) => ({
   display: 'flex',
   flexDirection: 'column',
   gap: '10px',
   paddingRight: '10px',
   maxHeight: maxHeight || '235px',
+  minHeight: minHeight || undefined,
   overflowY: 'auto',
   // Firefox
   scrollbarWidth: 'thin',

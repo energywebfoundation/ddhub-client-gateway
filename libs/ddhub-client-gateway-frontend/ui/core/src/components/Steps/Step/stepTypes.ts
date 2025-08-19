@@ -3,4 +3,5 @@ export type TStep = {
   subtitle: string;
   icon: React.ReactNode;
   disabled?: boolean;
+  id?: string;
 };
