@@ -3,6 +3,8 @@ import {
   DdhubFilesService,
   DdhubMessagesService,
   SendMessageResponseFile,
+  decodeValuesOnly,
+  encodeValuesOnly
 } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
 import { SecretsEngineService } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
 import {
@@ -151,11 +153,11 @@ export class MessageService {
 
     const message = shouldEncrypt
       ? this.keyService.encryptMessage(
-          dto.payload,
-          randomKey,
-          EncryptedMessageType['UTF-8']
-        )
-      : dto.payload;
+        dto.payload,
+        randomKey,
+        EncryptedMessageType['UTF-8']
+      )
+      : JSON.stringify(encodeValuesOnly(dto.payload));
 
     messageLoggerContext.debug('fetching private key');
 
@@ -358,24 +360,24 @@ export class MessageService {
     useAnonymousExtChannel: boolean
   ): Promise<GetMessageResponse> {
     let baseMessage: Omit<GetMessageResponse, 'signatureValid' | 'decryption'> =
-      {
-        id: message.messageId,
-        topicVersion: message.topicVersion,
-        topicName: '',
-        topicOwner: '',
-        topicSchemaType: '',
-        payload: message.payload,
-        signature: message.signature,
-        sender: message.senderDid,
-        timestampNanos: message.timestampNanos,
-        timestampISO: DateTime.fromMillis(message.timestampNanos / 1e6).toISO(),
-        transactionId: message.transactionId,
-        initiatingMessageId: message.initiatingMessageId,
-        initiatingTransactionId: message.initiatingTransactionId,
-        payloadEncryption: message.payloadEncryption,
-        clientGatewayMessageId: message.clientGatewayMessageId,
-        topicId: message.topicId,
-      };
+    {
+      id: message.messageId,
+      topicVersion: message.topicVersion,
+      topicName: '',
+      topicOwner: '',
+      topicSchemaType: '',
+      payload: message.payload,
+      signature: message.signature,
+      sender: message.senderDid,
+      timestampNanos: message.timestampNanos,
+      timestampISO: DateTime.fromMillis(message.timestampNanos / 1e6).toISO(),
+      transactionId: message.transactionId,
+      initiatingMessageId: message.initiatingMessageId,
+      initiatingTransactionId: message.initiatingTransactionId,
+      payloadEncryption: message.payloadEncryption,
+      clientGatewayMessageId: message.clientGatewayMessageId,
+      topicId: message.topicId,
+    };
 
     this.logger.log(`attempting to process message ${message.messageId}`);
 
@@ -670,7 +672,7 @@ export class MessageService {
     const messageResponses = await Promise.allSettled(
       messages.map(async (message): Promise<GetMessageResponse> => {
         messageLoggerContext.log(`processing message ${message.messageId}`);
-
+        message.payload = decodeValuesOnly(message.payload);
         const processedMessage: GetMessageResponse = await this.processMessage(
           message.payloadEncryption,
           message,
