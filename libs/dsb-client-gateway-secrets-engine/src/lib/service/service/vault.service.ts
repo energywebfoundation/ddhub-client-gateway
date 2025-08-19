@@ -306,7 +306,7 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
       const result = await this.client.read(`${this.prefix}${PATHS.API_KEY}/${apiKey}`);
 
       this.logger.log(`Get api key ${apiKey}`);
-      return { ...result.data };
+      return { apiKey, ...result.data };
     } catch (error) {
       this.logger.error('failed to get api key');
       this.logger.error(error);
