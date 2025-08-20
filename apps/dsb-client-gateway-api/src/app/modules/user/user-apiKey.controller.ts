@@ -1,6 +1,6 @@
 import { Roles, UserGuard, Username, UserRole } from "@dsb-client-gateway/ddhub-client-gateway-user-roles";
 import { SecretsEngineService } from "@dsb-client-gateway/dsb-client-gateway-secrets-engine";
-import { BadRequestException, Body, Controller, Delete, Get, Param, Post, UseGuards } from "@nestjs/common";
+import { BadRequestException, Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from "@nestjs/common";
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { ApiKeyResponseDto } from "./dto/response/apikey-response.dto";
 import { UserDetailsDto } from "./dto/response/user-response.dto";
@@ -94,6 +94,26 @@ export class UserApiKeyController {
   @ApiResponse({ status: 200, type: ApiKeyResponseDto })
   async getApiKey(@Param('apiKey') apiKey: string): Promise<ApiKeyResponseDto> {
     return this.secretsEngineService.getApiKey(apiKey);
+  }
+
+  @Put('api-keys/:apiKey')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        name: { type: 'string' },
+        daysValid: { type: 'number', default: 30 },
+      },
+      required: ['name'],
+    },
+  })
+  @ApiOperation({ summary: 'Update an API key (name & daysValid)' })
+  @ApiResponse({ status: 200, type: ApiKeyResponseDto })
+  async updateApiKey(
+    @Param('apiKey') apiKey: string,
+    @Body() body: { name: string; daysValid: number },
+  ): Promise<ApiKeyResponseDto> {
+    return this.secretsEngineService.updateApiKey(apiKey, body.name, body.daysValid);
   }
 
   @Delete('api-keys/:apiKey')

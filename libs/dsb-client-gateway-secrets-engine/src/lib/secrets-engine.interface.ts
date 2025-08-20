@@ -49,6 +49,7 @@ export abstract class SecretsEngineService implements OnModuleInit {
   abstract getAllApiKeys(): Promise<ApiKeyDetails[]>;
   abstract validateApiKey(apiKey: string): Promise<boolean>;
   abstract getApiKey(apiKey: string): Promise<ApiKeyDetails>;
+  abstract updateApiKey(apiKey: string, name: string, daysValid: number): Promise<ApiKeyDetails>;
 
   isAuthEnabled(): boolean {
     return false; // default

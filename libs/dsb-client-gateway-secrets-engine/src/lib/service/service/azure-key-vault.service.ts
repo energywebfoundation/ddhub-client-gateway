@@ -452,6 +452,32 @@ export class AzureKeyVaultService
     return { apiKey, name, expiresAt: expiresAt.toISOString() };
   }
 
+  @Span('azure_updateApiKey')
+  public async updateApiKey(apiKey: string, name: string, daysValid: number): Promise<ApiKeyDetails> {
+    this.logger.log(`Attempting to update api key ${apiKey}`);
+
+    const secretPath = this.encodeAzureKey(`${this.prefix}${PATHS.API_KEY}/${apiKey}`);
+
+    // Check that the secret exists
+    const existingSecret = await this.client.getSecret(secretPath).catch(() => null);
+    if (!existingSecret) {
+      throw new Error(`API key "${apiKey}" not found.`);
+    }
+
+    const expiresAt = new Date(Date.now() + daysValid * this.MS_PER_DAY).toISOString();
+
+    const data = {
+      name,
+      expiresAt,
+    };
+
+    // Overwrite the existing key
+    await this.client.setSecret(secretPath, JSON.stringify(data));
+
+    this.logger.log(`updated api key ${apiKey}`);
+    return { apiKey, name, expiresAt };
+  }
+
   @Span('azure_deleteApiKey')
   public async deleteApiKey(apiKey: string): Promise<boolean> {
     try {

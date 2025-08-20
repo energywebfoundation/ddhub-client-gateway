@@ -1593,6 +1593,38 @@ paths:
                 $ref: "#/components/schemas/ApiKeyResponseDto"
       tags:
         - "User-ApiKey"
+    put:
+      operationId: "UserApiKeyController_updateApiKey"
+      summary: "Update an API key (name & daysValid)"
+      parameters:
+        - name: "apiKey"
+          required: true
+          in: "path"
+          schema:
+            type: "string"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                name:
+                  type: "string"
+                daysValid:
+                  type: "number"
+                  default: 30
+              required:
+                - "name"
+      responses:
+        200:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiKeyResponseDto"
+      tags:
+        - "User-ApiKey"
     delete:
       operationId: "UserApiKeyController_deleteApiKey"
       summary: "Delete an API key"

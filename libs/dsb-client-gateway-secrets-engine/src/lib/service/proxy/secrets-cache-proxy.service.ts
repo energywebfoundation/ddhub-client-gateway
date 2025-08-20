@@ -200,6 +200,10 @@ export class SecretsCacheProxyService extends SecretsEngineService {
     return this.secretsEngineService.createApiKey(name, daysValid);
   }
 
+  public async updateApiKey(apiKey: string, name: string, daysValid: number): Promise<ApiKeyDetails> {
+    return this.secretsEngineService.updateApiKey(apiKey, name, daysValid);
+  }
+
   public async deleteApiKey(apiKey: string): Promise<boolean> {
     return this.secretsEngineService.deleteApiKey(apiKey);
   }

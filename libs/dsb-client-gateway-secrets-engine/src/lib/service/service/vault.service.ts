@@ -280,6 +280,43 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
     return { apiKey, name, expiresAt: expiresAt.toISOString() };
   }
 
+  @Span('vault_updateApiKey')
+  public async updateApiKey(apiKey: string, name: string, daysValid: number): Promise<ApiKeyDetails> {
+    this.logger.log(`Attempting to update api key ${apiKey}`);
+
+    // Lookup the existing key
+    const existingKeyData = await this.client.read(`${this.prefix}${PATHS.API_KEY}/${apiKey}`);
+    if (!existingKeyData || !existingKeyData.data) {
+      throw new Error(`API key "${apiKey}" not found.`);
+    }
+
+    // If the name has changed and a document exists under the new name, prevent duplicate
+    if (existingKeyData.data.name !== name) {
+      const existingByName = await this.client.list(`${this.prefix}${PATHS.API_KEY_NAME}`).catch(() => { return { data: { keys: [] } } });
+      const duplicate = existingByName.data.keys.find((key: any) => key === name);
+      if (duplicate) {
+        throw new Error(`API key with name "${name}" already exists.`);
+      }
+
+      // remove the old name entry
+      await this.client.delete(`${this.prefix}${PATHS.API_KEY_NAME}/${existingKeyData.data.name}`);
+    }
+
+    const expiresAt = new Date(Date.now() + daysValid * this.MS_PER_DAY).toISOString();
+
+    const data = {
+      name,
+      expiresAt,
+    };
+
+    // Update the main key and the name lookup
+    await this.client.write(`${this.prefix}${PATHS.API_KEY}/${apiKey}`, data);
+    await this.client.write(`${this.prefix}${PATHS.API_KEY_NAME}/${name}`, data);
+
+    this.logger.log(`updated api key ${apiKey}`);
+    return { apiKey, name, expiresAt };
+  }
+
   @Span('vault_deleteApiKey')
   public async deleteApiKey(apiKey: string): Promise<boolean> {
     try {
