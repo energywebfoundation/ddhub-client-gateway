@@ -186,6 +186,10 @@ export class SecretsCacheProxyService extends SecretsEngineService {
     return response;
   }
 
+  public async userExists(username: string): Promise<boolean> {
+    return this.secretsEngineService.userExists(username);
+  }
+
   public async setUserPassword(username: string, password: string, role: UserRole): Promise<void> {
     await this.secretsEngineService.setUserPassword(username, password, role);
     await this.refreshUsersData();

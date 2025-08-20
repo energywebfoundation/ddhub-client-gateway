@@ -362,6 +362,23 @@ export class AzureKeyVaultService
     }
   }
 
+  @Span('azure_userExists')
+  public async userExists(username: string): Promise<boolean> {
+    const key = this.encodeAzureKey(`${this.prefix}${PATHS.USERS}/${username}`);
+
+    try {
+      const result = await this.client.getSecret(key);
+      return !!result?.value;
+    } catch (err) {
+      // getSecret throws if the secret doesn't exist (404)
+      if (err.statusCode === 404) {
+        return false;
+      }
+      // rethrow any other unexpected errors
+      throw err;
+    }
+  }
+
   @Span('azure_setUserPassword')
   public async setUserPassword(
     username: string,

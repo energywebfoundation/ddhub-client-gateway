@@ -43,6 +43,7 @@ export abstract class SecretsEngineService implements OnModuleInit {
   abstract getUserAuthDetails(username: string): Promise<UserDetails>;
   abstract getAllUsers(): Promise<UsersList>;
   abstract setUserPassword(username: string, password: string, role: UserRole): Promise<void>;
+  abstract userExists(username: string): Promise<boolean>
   abstract deleteUser(username: string): Promise<void>;
   abstract createApiKey(name: string, daysValid: number): Promise<ApiKeyDetails>;
   abstract deleteApiKey(apiKey: string): Promise<boolean>;

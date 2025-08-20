@@ -82,6 +82,12 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
       });
   }
 
+  @Span('vault_userExists')
+  public async userExists(username: string): Promise<boolean> {
+    const result = await this.client.read(`${this.prefix}${PATHS.USERS}/${username}`);
+    return !!result;
+  }
+
   @Span('vault_setUserPassword')
   public async setUserPassword(
     username: string,

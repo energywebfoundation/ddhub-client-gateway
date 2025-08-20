@@ -5,6 +5,7 @@ import {
   CreateSecretCommandOutput,
   CreateSecretResponse,
   DeleteSecretCommand,
+  DescribeSecretCommand,
   GetSecretValueCommand,
   InvalidRequestException,
   ListSecretsCommand,
@@ -90,6 +91,24 @@ export class AwsSecretsManagerService
       throw new Error(`No SecretString found for ${username}`);
     }
 
+  }
+
+  @Span('aws_ssm_userExists')
+  public async userExists(username: string): Promise<boolean> {
+    const name = `${this.prefix}${PATHS.USERS}/${username}`;
+
+    try {
+      await this.client.send(new DescribeSecretCommand({ SecretId: name }));
+      // If DescribeSecret succeeds, the secret already exists
+      return true;
+    } catch (err) {
+      // ResourceNotFoundException means the secret does not exist
+      if (err.name === 'ResourceNotFoundException') {
+        return false;
+      }
+      // any other error should be rethrown
+      throw err;
+    }
   }
 
   @Span('aws_ssm_setUserPassword')
