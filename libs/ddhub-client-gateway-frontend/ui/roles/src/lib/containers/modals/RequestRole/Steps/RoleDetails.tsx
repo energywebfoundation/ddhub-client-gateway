@@ -31,7 +31,9 @@ export const RoleDetails = ({
       >
         {role} information
       </Typography>
-      <ScrollableBox>
+      <ScrollableBox
+        minHeight={fields.length === 0 ? undefined : fields.length * 100}
+      >
         {fields.length === 0 && (
           <Typography
             variant="body1"

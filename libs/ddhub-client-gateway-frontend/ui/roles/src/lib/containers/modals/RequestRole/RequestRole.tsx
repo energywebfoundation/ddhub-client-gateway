@@ -4,7 +4,15 @@ import {
   CloseButton,
   Steps,
 } from '@ddhub-client-gateway-frontend/ui/core';
-import { DialogTitle, Grid, Box, Button, Divider, alpha } from '@mui/material';
+import {
+  DialogTitle,
+  Grid,
+  Box,
+  Button,
+  Divider,
+  alpha,
+  Typography,
+} from '@mui/material';
 import { useRequestRoleEffects } from './RequestRole.effects';
 import { useStyles } from './RequestRole.styles';
 import { REQUEST_ROLE_STEPS } from './Steps/requestSteps';
@@ -17,6 +25,7 @@ import {
 import { RoleDetails } from './Steps/RoleDetails';
 import { RequestSummary } from './Steps/RequestSummary';
 import { theme } from '@ddhub-client-gateway-frontend/ui/utils';
+import { ChevronLeft, ChevronRight } from 'react-feather';
 
 export const RequestRoleModal = () => {
   const {
@@ -43,22 +52,20 @@ export const RequestRoleModal = () => {
     control,
     formData,
     isRequesting,
+    requestorFields,
   } = useRequestRoleEffects();
   const { classes } = useStyles();
 
   const subTitle =
-    activeStep !== 3
+    activeStep !== 'review'
       ? 'Provide data with this form'
       : 'Review details for submission';
 
-  const requestorFields =
-    roles?.find((r) => r.namespace === details.role)?.requestorFields ?? [];
-
   const role = roles?.find((r) => r.namespace === details.role)?.role ?? '';
 
-  const formPart = (id: number) => {
+  const formPart = (id: 'search' | 'details' | 'review') => {
     switch (id) {
-      case 0: {
+      case 'search': {
         return (
           <ScrollableBox maxHeight="90%" sx={{ marginBottom: 2 }}>
             <SelectNamespaceStep
@@ -80,7 +87,7 @@ export const RequestRoleModal = () => {
           </ScrollableBox>
         );
       }
-      case 1:
+      case 'details':
         return (
           <Box display="flex" flexDirection="column">
             <ApplicationDetails namespace={details.namespace} />
@@ -99,7 +106,7 @@ export const RequestRoleModal = () => {
             />
           </Box>
         );
-      case 2:
+      case 'review':
         return (
           <RequestSummary
             details={details}
@@ -126,7 +133,9 @@ export const RequestRoleModal = () => {
           <Steps
             steps={REQUEST_ROLE_STEPS(details, requestorFields)}
             activeStep={activeStep}
-            setActiveStep={navigateToStep}
+            setActiveStep={(step) =>
+              navigateToStep(step as 'search' | 'details' | 'review')
+            }
           />
         </Grid>
         <Grid item className={classes.formWrapper} xs={8}>
@@ -137,27 +146,51 @@ export const RequestRoleModal = () => {
         <CloseButton onClose={openCancelModal} />
       </Box>
       <Box className={classes.backButtonWrapper}>
-        {activeStep >= 1 && (
+        {activeStep !== 'search' && (
           <Button
             variant="contained"
-            disabled={activeStep === 0}
+            className={classes.button}
             onClick={goBack}
+            startIcon={
+              <ChevronLeft size={14} color={theme.palette.text.primary} />
+            }
           >
-            Back
+            <Typography variant="body2" className={classes.buttonText}>
+              Back
+            </Typography>
           </Button>
         )}
       </Box>
       <Box className={classes.nextButtonWrapper}>
         {isRequesting ? (
-          <Button variant="contained" disabled>
-            Requesting...
+          <Button
+            variant="contained"
+            disabled
+            className={classes.button}
+            classes={{ endIcon: classes.buttonIcon }}
+          >
+            <Typography variant="body2" className={classes.buttonText}>
+              Requesting...
+            </Typography>
           </Button>
         ) : (
           <Button
             variant="contained"
-            disabled={getDisabled(details)}
+            disabled={getDisabled()}
+            className={classes.button}
+            classes={{ endIcon: classes.buttonIcon }}
+            endIcon={
+              <ChevronRight
+                size={14}
+                color={
+                  getDisabled()
+                    ? theme.palette.text.disabled
+                    : theme.palette.text.primary
+                }
+              />
+            }
             onClick={() => {
-              if (activeStep === 2) {
+              if (activeStep === 'review') {
                 handleSubmit((values) => {
                   setRoleInfo(
                     values as {
@@ -169,14 +202,16 @@ export const RequestRoleModal = () => {
                   nextStep();
                 })();
               }
-              if (activeStep === 3) {
+              if (activeStep === 'review') {
                 requestRole();
               } else {
                 nextStep();
               }
             }}
           >
-            {activeStep === 3 ? 'Request' : 'Next'}
+            <Typography variant="body2" className={classes.buttonText}>
+              {activeStep === 'review' ? 'Submit' : 'Next'}
+            </Typography>
           </Button>
         )}
       </Box>

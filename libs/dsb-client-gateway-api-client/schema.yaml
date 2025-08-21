@@ -1473,7 +1473,7 @@ paths:
   /api/v2/user-api-key/users:
     post:
       operationId: "UserApiKeyController_setUserPassword"
-      summary: "Create or set user password"
+      summary: "Create user"
       parameters: []
       requestBody:
         required: true
@@ -1498,6 +1498,29 @@ paths:
                 - "role"
       responses:
         201:
+          description: ""
+      tags:
+        - "User-ApiKey"
+    put:
+      operationId: "UserApiKeyController_updateUserPassword"
+      summary: "Update user password"
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                username:
+                  type: "string"
+                password:
+                  type: "string"
+              required:
+                - "username"
+                - "password"
+      responses:
+        200:
           description: ""
       tags:
         - "User-ApiKey"
@@ -1584,6 +1607,38 @@ paths:
           in: "path"
           schema:
             type: "string"
+      responses:
+        200:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiKeyResponseDto"
+      tags:
+        - "User-ApiKey"
+    put:
+      operationId: "UserApiKeyController_updateApiKey"
+      summary: "Update an API key (name & daysValid)"
+      parameters:
+        - name: "apiKey"
+          required: true
+          in: "path"
+          schema:
+            type: "string"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                name:
+                  type: "string"
+                daysValid:
+                  type: "number"
+                  default: 30
+              required:
+                - "name"
       responses:
         200:
           description: ""

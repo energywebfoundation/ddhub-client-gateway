@@ -186,6 +186,10 @@ export class SecretsCacheProxyService extends SecretsEngineService {
     return response;
   }
 
+  public async userExists(username: string): Promise<boolean> {
+    return this.secretsEngineService.userExists(username);
+  }
+
   public async setUserPassword(username: string, password: string, role: UserRole): Promise<void> {
     await this.secretsEngineService.setUserPassword(username, password, role);
     await this.refreshUsersData();
@@ -198,6 +202,10 @@ export class SecretsCacheProxyService extends SecretsEngineService {
 
   public async createApiKey(name: string, daysValid: number): Promise<ApiKeyDetails> {
     return this.secretsEngineService.createApiKey(name, daysValid);
+  }
+
+  public async updateApiKey(apiKey: string, name: string, daysValid: number): Promise<ApiKeyDetails> {
+    return this.secretsEngineService.updateApiKey(apiKey, name, daysValid);
   }
 
   public async deleteApiKey(apiKey: string): Promise<boolean> {
