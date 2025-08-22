@@ -5,6 +5,7 @@ import {
   CreateSecretCommandOutput,
   CreateSecretResponse,
   DeleteSecretCommand,
+  DescribeSecretCommand,
   GetSecretValueCommand,
   InvalidRequestException,
   ListSecretsCommand,
@@ -14,6 +15,7 @@ import {
   ResourceNotFoundException,
   SecretListEntry,
   SecretsManagerClient,
+  UpdateSecretCommand,
 } from '@aws-sdk/client-secrets-manager';
 import {
   ApiKeyDetails,
@@ -89,6 +91,24 @@ export class AwsSecretsManagerService
       throw new Error(`No SecretString found for ${username}`);
     }
 
+  }
+
+  @Span('aws_ssm_userExists')
+  public async userExists(username: string): Promise<boolean> {
+    const name = `${this.prefix}${PATHS.USERS}/${username}`;
+
+    try {
+      await this.client.send(new DescribeSecretCommand({ SecretId: name }));
+      // If DescribeSecret succeeds, the secret already exists
+      return true;
+    } catch (err) {
+      // ResourceNotFoundException means the secret does not exist
+      if (err.name === 'ResourceNotFoundException') {
+        return false;
+      }
+      // any other error should be rethrown
+      throw err;
+    }
   }
 
   @Span('aws_ssm_setUserPassword')
@@ -405,6 +425,36 @@ export class AwsSecretsManagerService
 
     this.logger.log(`create api key ${apiKey}`);
     return { apiKey, name, expiresAt: expiresAt.toISOString() };
+  }
+
+  @Span('aws_ssm_updateApiKey')
+  public async updateApiKey(apiKey: string, name: string, daysValid: number): Promise<ApiKeyDetails> {
+    this.logger.log(`Attempting to update api key ${apiKey}`);
+
+    const secretName = `${this.prefix}${PATHS.API_KEY}/${apiKey}`;
+
+    // Lookup the existing secret to ensure an API key with that id exists
+    const existingSecret = await this.client.send(
+      new GetSecretValueCommand({ SecretId: secretName })
+    ).catch(() => null);
+
+    if (!existingSecret || !existingSecret.SecretString) {
+      throw new Error(`API key "${apiKey}" not found.`);
+    }
+
+    const expiresAt = new Date(Date.now() + daysValid * this.MS_PER_DAY).toISOString();
+    const updatedSecret = JSON.stringify({ name, expiresAt });
+
+    // Update the secret with new name & expiration
+    await this.client.send(
+      new UpdateSecretCommand({
+        SecretId: secretName,
+        SecretString: updatedSecret,
+      }),
+    );
+
+    this.logger.log(`updated api key ${apiKey}`);
+    return { apiKey, name, expiresAt };
   }
 
   @Span('aws_ssm_deleteApiKey')
