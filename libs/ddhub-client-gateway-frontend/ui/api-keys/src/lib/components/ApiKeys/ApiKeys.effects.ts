@@ -50,7 +50,6 @@ export const useApiKeysEffects = () => {
   };
 
   const openApiKeyUpdate = (data: ApiKeyResponseDtoWithStatus) => {
-    console.log('here 2', data);
     dispatch({
       type: ModalActionsEnum.SHOW_UPDATE_API_KEY,
       payload: {
