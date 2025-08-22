@@ -89,7 +89,11 @@ export const mapUrlToBreadcrumbs = new Map<string, Breadcrumb[]>()
     { title: 'Data messaging file upload' },
   ])
   .set(routerConst.Users, [{ title: 'Users' }])
-  .set(routerConst.APIKeys, [{ title: 'API Keys' }])
+  .set(routerConst.APIKeys, [
+    { title: 'API Keys' },
+    { title: 'Users and access' },
+    { title: 'API Keys' }
+  ])
   .set(routerConst.FileDownloadChannel, [
     { title: 'Data messaging file download' },
     {
