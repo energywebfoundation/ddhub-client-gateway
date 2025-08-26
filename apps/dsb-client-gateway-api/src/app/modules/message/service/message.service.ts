@@ -157,7 +157,7 @@ export class MessageService {
         randomKey,
         EncryptedMessageType['UTF-8']
       )
-      : JSON.stringify(encodeValuesOnly(dto.payload));
+      : JSON.stringify(encodeValuesOnly(dto.payload, true), null);
 
     messageLoggerContext.debug('fetching private key');
 
@@ -672,7 +672,7 @@ export class MessageService {
     const messageResponses = await Promise.allSettled(
       messages.map(async (message): Promise<GetMessageResponse> => {
         messageLoggerContext.log(`processing message ${message.messageId}`);
-        message.payload = decodeValuesOnly(message.payload);
+        message.payload = JSON.stringify(decodeValuesOnly(message.payload), null);
         const processedMessage: GetMessageResponse = await this.processMessage(
           message.payloadEncryption,
           message,
