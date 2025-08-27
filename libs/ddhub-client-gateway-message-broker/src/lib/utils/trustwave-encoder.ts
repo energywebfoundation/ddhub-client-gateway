@@ -1,15 +1,59 @@
 import he from 'he';
+import type { JSONSchema7 } from "json-schema";
 
 
-function looksLikeDateTime(str: string): boolean {
-  // Quick reject if it's empty or too short
-  if (!str || str.length < 6) return false;
+function listStringTypeOnlyBy(schema: JSONSchema7, basePtr = ""): string[] {
+  const out: string[] = [];
 
-  // Try to parse as Date
-  const d = new Date(str);
+  if (schema.type === "object" && schema.properties) {
+    for (const [key, sub] of Object.entries(schema.properties)) {
+      const ptr = `${basePtr}/${key}`;
+      if (
+        sub &&
+        (sub as JSONSchema7).type === "string" &&
+        !(sub as JSONSchema7).pattern &&
+        !(sub as JSONSchema7).enum &&
+        !(sub as JSONSchema7).format &&
+        !(sub as JSONSchema7).const
+      ) {
+        out.push(ptr);
+      }
+      out.push(...listStringTypeOnlyBy(sub as JSONSchema7, ptr));
+    }
+  }
 
-  // Check if parsing produced a valid date
-  return !isNaN(d.getTime());
+  if (Array.isArray(schema.allOf)) {
+    for (const s of schema.allOf) {
+      out.push(...listStringTypeOnlyBy(s as JSONSchema7, basePtr));
+    }
+  }
+
+  return Array.from(new Set(out));
+}
+
+function encodeFieldsBy(data: any, ptrs: string[]) {
+  for (const ptr of ptrs) {
+    const parts = ptr.split("/").filter(Boolean);
+    let ref: any = data;
+    for (let i = 0; i < parts.length - 1; i++) {
+      ref = ref?.[parts[i]];
+      if (ref === undefined) break;
+    }
+    const last = parts[parts.length - 1];
+    if (ref && typeof ref[last] === "string") {
+      ref[last] = htmlEncode(ref[last]);
+    }
+  }
+  return data;
+}
+
+function htmlEncode(str: string): string {
+  return he.encode(str, { useNamedReferences: true })
+    .replace(/&apos;/g, '&#x27;')  // enforce Trustwave's mapping
+    .replace(/\//g, '&#x2F;')
+    .replace(/-/g, '&#x2D;')
+    .replace(/\r/g, '&#13;')
+    .replace(/\n/g, '&#10;');
 }
 
 export function encodeTrustwave(str: string): string {
@@ -20,16 +64,7 @@ export function encodeTrustwave(str: string): string {
     // If parsing fails (malformed escapes), just keep the original
   }
 
-  if (looksLikeDateTime(str)) {
-    return str;
-  }
-
-  return he.encode(str, { useNamedReferences: true })
-    .replace(/&apos;/g, '&#x27;')  // enforce Trustwave's mapping
-    .replace(/\//g, '&#x2F;')
-    .replace(/-/g, '&#x2D;')
-    .replace(/\r/g, '&#13;')
-    .replace(/\n/g, '&#10;');
+  return htmlEncode(str);
 }
 
 export function decodeTrustwave(str: string): string {
@@ -38,6 +73,13 @@ export function decodeTrustwave(str: string): string {
     .replace(/&#10;/gi, '\n');
   return he.decode(normalized);
 }
+
+export function encodeValuesBySchema(input: any, schema: JSONSchema7) {
+  const data = typeof input === "string" ? JSON.parse(input) : input;
+  const fields = listStringTypeOnlyBy(schema, "");
+  return encodeFieldsBy(data, fields);
+}
+
 
 export function encodeValuesOnly(input, topLevel?: boolean) {
   let obj = input;

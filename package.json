@@ -185,6 +185,7 @@
     "@types/he": "^1.2.3",
     "@types/highland": "^2.12.14",
     "@types/jest": "^27.0.2",
+    "@types/json-schema": "^7.0.15",
     "@types/json2md": "^1.5.1",
     "@types/jsonwebtoken": "^9.0.4",
     "@types/lokijs": "^1.5.7",

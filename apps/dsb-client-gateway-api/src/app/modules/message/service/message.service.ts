@@ -4,7 +4,7 @@ import {
   DdhubMessagesService,
   SendMessageResponseFile,
   decodeValuesOnly,
-  encodeValuesOnly
+  encodeValuesBySchema,
 } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
 import { SecretsEngineService } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
 import {
@@ -157,7 +157,7 @@ export class MessageService {
         randomKey,
         EncryptedMessageType['UTF-8']
       )
-      : JSON.stringify(encodeValuesOnly(dto.payload, true), null);
+      : JSON.stringify(encodeValuesBySchema(dto.payload, topic.schema), null);
 
     messageLoggerContext.debug('fetching private key');
 
