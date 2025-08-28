@@ -9,8 +9,7 @@ import {
   Settings,
   Inbox,
   Edit3,
-  UserCheck,
-  Key,
+  Users,
   User,
 } from 'react-feather';
 import {
@@ -79,7 +78,21 @@ export const Drawer = () => {
     {
       title: 'Roles',
       href: routerConst.Roles,
-      icon: <UserCheck className={classes.icon} size={16} />,
+      icon: <User className={classes.icon} size={18} />,
+    },
+    {
+      menuTitle: 'Users and access',
+      menuIcon: <Users className={classes.icon} size={18} />,
+      subMenu: [
+        {
+          href: routerConst.Users,
+          title: 'Users',
+        },
+        {
+          href: routerConst.APIKeys,
+          title: 'API Keys',
+        },
+      ],
     },
   ];
 
@@ -144,19 +157,6 @@ export const Drawer = () => {
         },
       ],
       menuIcon: <Inbox className={classes.icon} size={18} />,
-    },
-  ];
-
-  const usersAndAccessRoutes: (MenuItemProps | CollapsableListItemProps)[] = [
-    {
-      href: routerConst.Users,
-      title: 'Users',
-      icon: <User className={classes.icon} size={18} />,
-    },
-    {
-      href: routerConst.APIKeys,
-      title: 'API Keys',
-      icon: <Key className={classes.icon} size={18} />,
     },
   ];
 
@@ -232,16 +232,6 @@ export const Drawer = () => {
             Messaging
           </Typography>
           <List>{renderMenuList(messagingRoutes)}</List>
-        </>
-      )}
-
-      {routeListHasDisplayedRoutes(usersAndAccessRoutes) && (
-        <>
-          <Divider classes={{ root: classes.dividerColor }} />
-          <Typography classes={{ root: classes.menuTitle }} variant="body2">
-            Users and Access
-          </Typography>
-          <List>{renderMenuList(usersAndAccessRoutes)}</List>
         </>
       )}
 
