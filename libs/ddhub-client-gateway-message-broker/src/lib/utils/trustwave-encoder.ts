@@ -49,11 +49,18 @@ function encodeFieldsBy(data: any, ptrs: string[]) {
 
 function htmlEncode(str: string): string {
   return he.encode(str, { useNamedReferences: true })
-    .replace(/&apos;/g, '&#x27;')  // enforce Trustwave's mapping
+    .replace(/&apos;/g, '&#x27;')  // trustwave: use &#x27; (not &apos;)
     .replace(/\//g, '&#x2F;')
     .replace(/-/g, '&#x2D;')
-    .replace(/\r/g, '&#13;')
-    .replace(/\n/g, '&#10;');
+    .replace(/\./g, '&#x2E;')
+    .replace(/\\/g, '&#x5C;')
+    // eslint-disable-next-line no-control-regex
+    .replace(/\x08/g, '&#x08;')   // \b backspace
+    // eslint-disable-next-line no-control-regex
+    .replace(/\x0C/g, '&#x0C;')   // \f form feed
+    .replace(/\n/g, '&#10;')      // newline
+    .replace(/\r/g, '&#13;')      // carriage return
+    .replace(/\t/g, '&#x09;');    // tab
 }
 
 export function encodeTrustwave(str: string): string {
@@ -69,8 +76,17 @@ export function encodeTrustwave(str: string): string {
 
 export function decodeTrustwave(str: string): string {
   const normalized = str
-    .replace(/&#13;/gi, '\r')
-    .replace(/&#10;/gi, '\n');
+    .replace(/&#x27;/gi, "'")   // apostrophe
+    .replace(/&#x2F;/gi, '/')
+    .replace(/&#x2D;/gi, '-')
+    .replace(/&#x2E;/gi, '.')
+    .replace(/&#x5C;/gi, '\\')
+    .replace(/&#x08;/gi, '\b')  // backspace
+    .replace(/&#x0C;/gi, '\f')  // form feed
+    .replace(/&#10;/gi, '\n')   // newline
+    .replace(/&#13;/gi, '\r')   // carriage return
+    .replace(/&#x09;/gi, '\t'); // tab
+
   return he.decode(normalized);
 }
 
