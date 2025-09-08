@@ -32,7 +32,7 @@ export class AzureKeyVaultService
 
   @Span('azure_kv_onModuleInit')
   public async onModuleInit(): Promise<void> {
-    const url = this.configService.get('AZURE_azure_URL');
+    const url = this.configService.get('AZURE_VAULT_URL');
     const credential = new DefaultAzureCredential();
 
     this.client = new SecretClient(url, credential);
