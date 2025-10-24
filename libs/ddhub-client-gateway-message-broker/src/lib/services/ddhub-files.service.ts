@@ -10,7 +10,6 @@ import { DdhubLoginService } from './ddhub-login.service';
 import 'multer';
 import { SendMessageResponseFile } from '../dto';
 import { IncomingMessage } from 'http';
-import { encodeValuesOnly } from '../utils/trustwave-encoder';
 
 @Injectable()
 export class DdhubFilesService extends DdhubBaseService {
@@ -46,7 +45,7 @@ export class DdhubFilesService extends DdhubBaseService {
       const formData = new FormData();
 
       formData.append('file', file);
-      formData.append('fileName', encodeValuesOnly(originalname));
+      formData.append('fileName', originalname);
       formData.append('fqcns', fqcns.join(','));
       formData.append('signature', signature);
       formData.append('topicId', topicId);
