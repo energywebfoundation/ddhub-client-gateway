@@ -20,7 +20,7 @@ import {
 export class AllExceptionsFilter implements ExceptionFilter {
   protected readonly logger = new Logger(AllExceptionsFilter.name);
 
-  constructor(private readonly httpAdapterHost: HttpAdapterHost) {}
+  constructor(private readonly httpAdapterHost: HttpAdapterHost) { }
 
   catch(exception, host: ArgumentsHost): void {
     const { httpAdapter } = this.httpAdapterHost;
