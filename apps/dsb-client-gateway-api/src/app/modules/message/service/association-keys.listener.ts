@@ -21,6 +21,7 @@ interface AssociationKeyEntry {
   validFrom: string;
   validTo: string;
 }
+// comment for CI/CD pipeline
 
 type AssociationKeyPayload = AssociationKeyEntry[];
 
