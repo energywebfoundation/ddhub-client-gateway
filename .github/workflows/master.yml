@@ -6,6 +6,7 @@ on:
     paths-ignore:
       - 'devops/**'
       - 'get-started/**'
+  workflow_dispatch:
 env:
   SECRETS_ENGINE: vault
 
