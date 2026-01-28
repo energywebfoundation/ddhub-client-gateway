@@ -2,7 +2,7 @@ name: Build and publish images
 
 on:
   push:
-    branches: [master, pre_release]
+    branches: [master, pre_release, feat/apikey-log]
     paths-ignore:
       - 'devops/**'
       - 'get-started/**'
