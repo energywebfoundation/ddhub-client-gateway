@@ -63,6 +63,30 @@ export class AppModule {
                 ignore: 'pid,hostname,context'
               },
             },
+            serializers: {
+              req: (req) => {
+                // Sanitize headers to exclude sensitive information
+                // HTTP headers are case-insensitive, so we check lowercase
+                const sanitizedHeaders = { ...req.headers };
+                const sensitiveHeaders = ['x-api-key', 'authorization'];
+
+                // Remove sensitive headers in any case variation
+                Object.keys(sanitizedHeaders).forEach((key) => {
+                  if (sensitiveHeaders.includes(key.toLowerCase())) {
+                    delete sanitizedHeaders[key];
+                  }
+                });
+
+                return {
+                  id: req.id,
+                  method: req.method,
+                  url: req.url,
+                  query: req.query,
+                  params: req.params,
+                  headers: sanitizedHeaders,
+                };
+              },
+            },
             customProps: (req, res) => {
               return {
                 user: res?.req?.user?.username,
