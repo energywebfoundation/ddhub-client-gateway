@@ -43,13 +43,45 @@ export class AwsSecretsManagerService
   }
 
   @Span('aws_ssm_getMnemonic')
-  getMnemonic(): Promise<string | null> {
-    return Promise.resolve(undefined);
+  public async getMnemonic(): Promise<string | null> {
+    const secretName = `${this.prefix}${PATHS.MNEMONIC}`;
+    
+    try {
+      const command = new GetSecretValueCommand({ 
+        SecretId: secretName 
+      });
+      const response = await this.client.send(command);
+      
+      return response.SecretString ?? null;
+    } catch (err: any) {
+      if (err.name === 'ResourceNotFoundException' || err instanceof ResourceNotFoundException) {
+        this.logger.log(`Mnemonic secret not found at ${secretName}.`);
+        return null;
+      }
+      this.logger.error(`Error retrieving mnemonic: ${err.message}`);
+      throw err;
+    }
   }
 
   @Span('aws_ssm_setMnemonic')
-  setMnemonic(_mnemonic: string): Promise<string> {
-    return Promise.resolve('');
+  public async setMnemonic(mnemonic: string): Promise<string> {
+    const name = `${this.prefix}${PATHS.MNEMONIC}`;
+    
+    try {
+      const command = new PutSecretValueCommand({
+        SecretId: name,
+        SecretString: mnemonic,
+      });
+      
+      await this.client.send(command);
+      this.logger.log(`Successfully updated mnemonic: ${name}`);
+      
+      return mnemonic;
+    } catch (err: any) {
+      // Falls back to creating the secret if it doesn't exist yet
+      await this.handlePutSecretValueError(err, name, mnemonic);
+      return mnemonic;
+    }
   }
 
   @Span('aws_ssm_onModuleInit')
@@ -65,7 +97,62 @@ export class AwsSecretsManagerService
 
   @Span('aws_ssm_getAllUsers')
   public async getAllUsers(): Promise<UsersList> {
-    throw new Error('User Auth is not implemented in AWS Secrets Engine');
+    const userPrefix = `${this.prefix}${PATHS.USERS}/`;
+    const userSecretIdentifiers: string[] = [];
+    let nextToken: string | undefined = undefined;
+
+    // 1. Fetch all secret IDs matching the user prefix
+    do {
+      const command = new ListSecretsCommand({
+        Filters: [{ Key: 'name', Values: [userPrefix] }],
+        NextToken: nextToken,
+      });
+
+      const response = await this.client.send(command);
+      if (response.SecretList) {
+        response.SecretList.forEach((secret) => {
+          if (secret.Name) userSecretIdentifiers.push(secret.Name);
+        });
+      }
+      nextToken = response.NextToken;
+    } while (nextToken);
+
+    this.logger.log(`Found ${userSecretIdentifiers.length} secrets matching prefix ${userPrefix}`);
+
+    // 2. Fetch and parse each secret's value
+    const userListResponse = await Promise.allSettled(
+      userSecretIdentifiers.map(async (secretName) => {
+        try {
+          const getCommand = new GetSecretValueCommand({ SecretId: secretName });
+          const { SecretString } = await this.client.send(getCommand);
+
+          if (!SecretString) throw new Error(`Empty secret string for ${secretName}`);
+
+          const parsedData = JSON.parse(SecretString); // Contains { password, role } [4]
+          const username = secretName.replace(userPrefix, '');
+
+          return {
+            username,
+            password: parsedData.password,
+            role: parsedData.role,
+          } as UserDetails;
+        } catch (error) {
+          this.logger.error(`Failed to retrieve or parse secret ${secretName}:`, error);
+          throw error;
+        }
+      })
+    );
+
+    // 3. Return the successfully retrieved users
+    const successfulUsers = userListResponse
+      .filter((res): res is PromiseFulfilledResult<UserDetails> => res.status === 'fulfilled')
+      .map(({ value }) => value);
+
+    if (successfulUsers.length === 0 && userSecretIdentifiers.length > 0) {
+       this.logger.warn(`All ${userSecretIdentifiers.length} secrets failed during GetSecretValueCommand or JSON parsing.`);
+    }
+
+    return successfulUsers;
   }
 
   @Span('aws_ssm_getUserAuthDetails')
@@ -383,7 +470,40 @@ export class AwsSecretsManagerService
 
   @Span('aws_ssm_deleteAll')
   public async deleteAll(): Promise<void> {
-    this.logger.log('DeleteAll not implemented in AWS Secrets Engine');
+    const secretIdentifiers: string[] = [];
+    let nextToken: string | undefined = undefined;
+
+    // 1. Fetch all secret IDs matching the root prefix
+    do {
+      const command = new ListSecretsCommand({
+        Filters: [{ Key: 'name', Values: [this.prefix] }],
+        NextToken: nextToken,
+      });
+
+      const response = await this.client.send(command);
+      if (response.SecretList) {
+        response.SecretList.forEach((secret) => {
+          if (secret.Name) secretIdentifiers.push(secret.Name);
+        });
+      }
+      nextToken = response.NextToken;
+    } while (nextToken);
+
+    // 2. Issue a delete command for each secret
+    if (secretIdentifiers.length > 0) {
+      await Promise.allSettled(
+        secretIdentifiers.map(async (secretName) => {
+          const deleteCommand = new DeleteSecretCommand({
+            SecretId: secretName,
+            ForceDeleteWithoutRecovery: true, // Bypass recovery window to fully delete
+          });
+          return this.client.send(deleteCommand);
+        })
+      );
+      this.logger.log(`Successfully scheduled ${secretIdentifiers.length} secrets for deletion.`);
+    } else {
+      this.logger.log('No secrets found to delete.');
+    }
   }
 
   @Span('aws_ssm_setUserPassword')
@@ -485,14 +605,14 @@ export class AwsSecretsManagerService
       this.logger.log(`Attempting to get api key `);
 
       const command = new GetSecretValueCommand({
-        SecretId: `${this.prefix}${PATHS.USERS}/${apiKey}`,
+        SecretId: `${this.prefix}${PATHS.API_KEY}/${apiKey}`,
       });
       const response = await this.client.send(command);
 
       if (response.SecretString) {
         const result = JSON.parse(response.SecretString);
         this.logger.log(`Get api key ${apiKey}`);
-        return { ...result };
+        return { apiKey, ...result };
       }
     } catch (error) {
       this.logger.error('failed to get api key');
@@ -505,26 +625,29 @@ export class AwsSecretsManagerService
   public async getAllApiKeys(): Promise<ApiKeyDetails[]> {
     const apiKeySecretIdentifiers: string[] = [];
     let nextToken: string | undefined = undefined;
+    const apiKeyPrefix = `${this.prefix}${PATHS.API_KEY}/`;
 
     do {
       const { SecretList = [], NextToken } = await this.client.send(
         new ListSecretsCommand({
           NextToken: nextToken,
           Filters: [
-            { Key: "name", Values: [`${this.prefix}${PATHS.API_KEY}`] }
+            { Key: "name", Values: [apiKeyPrefix] }
           ]
         })
       );
       nextToken = NextToken;
 
       for (const secret of SecretList as SecretListEntry[]) {
-        apiKeySecretIdentifiers.push(secret.Name);
+        if (secret.Name) {
+          apiKeySecretIdentifiers.push(secret.Name);
+        }
       }
     } while (nextToken);
 
     const apiKeyListResponse = await Promise.allSettled(
       apiKeySecretIdentifiers.map((name) => {
-        const apiKey = name.replace(`${this.prefix}/`, "");
+        const apiKey = name.replace(apiKeyPrefix, "");
         return this.getApiKey(apiKey);
       })
     );

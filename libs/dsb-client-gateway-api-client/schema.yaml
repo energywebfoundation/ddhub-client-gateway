@@ -1777,6 +1777,14 @@ info:
 tags: []
 servers: []
 components:
+  securitySchemes:
+    bearer:
+      scheme: "bearer"
+      bearerFormat: "JWT"
+      type: "http"
+      name: "Authorization"
+      description: "Enter JWT token"
+      in: "header"
   schemas:
     RoleDto:
       type: "object"
@@ -3541,6 +3549,8 @@ components:
             $ref: "#/components/schemas/RequestorFieldDto"
       required:
         - "role"
+security:
+  - bearer: []
 externalDocs:
   description: "Postman Collection"
   url: "/docs-json"
