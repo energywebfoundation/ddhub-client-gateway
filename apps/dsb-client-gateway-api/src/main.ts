@@ -98,6 +98,15 @@ async function bootstrap() {
     .setTitle('DDHub Client Gateway')
     .setDescription('DDHub Client Gateway')
     .setVersion('2.0')
+    .addBearerAuth({
+      type: 'http',
+      scheme: 'bearer',
+      bearerFormat: 'JWT',
+      name: 'Authorization',
+      description: 'Enter JWT token',
+      in: 'header',
+    }, 'bearer')
+    .addSecurityRequirements('bearer')
     .setExternalDoc('Postman Collection', '/docs-json')
     .build();
 
@@ -106,7 +115,11 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config, {
     extraModels: [GetChannelMessagesCountDto, GetChannelMessagesCountDto],
   });
-  SwaggerModule.setup('docs', app, document);
+  SwaggerModule.setup('docs', app, document, {
+    swaggerOptions: {
+      persistAuthorization: true,
+    },
+  });
 
   await generateSchema(document);
 
