@@ -76,15 +76,15 @@ jobs:
       - name: 'Build and push image (scheduler)'
         uses: azure/docker-login@v1
         with:
-          login-server: ${{ secrets.EWF_EWF_REGISTRY_LOGIN_SERVER }}
+          login-server: ${{ secrets.EWF_REGISTRY_LOGIN_SERVER }}
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
       - run: |
           docker build -f ci/Docker/Dockerfile.scheduler -t energyweb/ddhub-client-gateway-scheduler .
-          docker tag energyweb/ddhub-client-gateway-scheduler ${{ secrets.EWF_EWF_REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-scheduler:intelligent-${{needs.unique_id.outputs.unique_id}}
-          docker push ${{ secrets.EWF_EWF_REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-scheduler:intelligent-${{needs.unique_id.outputs.unique_id}}
-          docker tag energyweb/ddhub-client-gateway-scheduler ${{ secrets.EWF_EWF_REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-scheduler:intelligent-canary
-          docker push ${{ secrets.EWF_EWF_REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-scheduler:intelligent-canary
+          docker tag energyweb/ddhub-client-gateway-scheduler ${{ secrets.EWF_REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-scheduler:intelligent-${{needs.unique_id.outputs.unique_id}}
+          docker push ${{ secrets.EWF_REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-scheduler:intelligent-${{needs.unique_id.outputs.unique_id}}
+          docker tag energyweb/ddhub-client-gateway-scheduler ${{ secrets.EWF_REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-scheduler:intelligent-canary
+          docker push ${{ secrets.EWF_REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-scheduler:intelligent-canary
 
       # - name: ArgoCD login
       #   uses: clowdhaus/argo-cd-action/@v1.12.1
@@ -157,15 +157,15 @@ jobs:
       - name: 'Build and push image (Back-end)'
         uses: azure/docker-login@v1
         with:
-          login-server: ${{ secrets.EWF_EWF_REGISTRY_LOGIN_SERVER }}
+          login-server: ${{ secrets.EWF_REGISTRY_LOGIN_SERVER }}
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
       - run: |
           docker build -f ci/Docker/Dockerfile.backend -t energyweb/ddhub-client-gateway-backend .
           docker tag energyweb/ddhub-client-gateway-backend ${{ secrets.EWF_REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-backend:intelligent-${{needs.unique_id.outputs.unique_id}}
-          docker push ${{ secrets.EWF_EWF_REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-backend:intelligent-${{needs.unique_id.outputs.unique_id}}
-          docker tag energyweb/ddhub-client-gateway-backend ${{ secrets.EWF_EWF_REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-backend:intelligent-canary
-          docker push ${{ secrets.EWF_EWF_REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-backend:intelligent-canary
+          docker push ${{ secrets.EWF_REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-backend:intelligent-${{needs.unique_id.outputs.unique_id}}
+          docker tag energyweb/ddhub-client-gateway-backend ${{ secrets.EWF_REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-backend:intelligent-canary
+          docker push ${{ secrets.EWF_REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-backend:intelligent-canary
 
       # - name: ArgoCD login
       #   uses: clowdhaus/argo-cd-action/@v1.12.1
@@ -249,15 +249,15 @@ jobs:
       - name: 'Build and push image (Front-end)'
         uses: docker/login-action@v4
         with:
-          registry: ${{ secrets.EWF_EWF_REGISTRY_LOGIN_SERVER }}
+          registry: ${{ secrets.EWF_REGISTRY_LOGIN_SERVER }}
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
       - run: |
           docker build -f ci/Docker/Dockerfile.frontend -t energyweb/ddhub-client-gateway-frontend .
-          docker tag energyweb/ddhub-client-gateway-frontend ${{ secrets.EWF_EWF_REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-frontend:intelligent-${{needs.unique_id.outputs.unique_id}}
-          docker push ${{ secrets.EWF_EWF_REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-frontend:intelligent-${{needs.unique_id.outputs.unique_id}}
-          docker tag energyweb/ddhub-client-gateway-frontend ${{ secrets.EWF_EWF_REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-frontend:intelligent-canary
-          docker push ${{ secrets.EWF_EWF_REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-frontend:intelligent-canary
+          docker tag energyweb/ddhub-client-gateway-frontend ${{ secrets.EWF_REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-frontend:intelligent-${{needs.unique_id.outputs.unique_id}}
+          docker push ${{ secrets.EWF_REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-frontend:intelligent-${{needs.unique_id.outputs.unique_id}}
+          docker tag energyweb/ddhub-client-gateway-frontend ${{ secrets.EWF_REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-frontend:intelligent-canary
+          docker push ${{ secrets.EWF_REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-frontend:intelligent-canary
 
       # - name: ArgoCD login
       #   uses: clowdhaus/argo-cd-action/@v1.12.1
