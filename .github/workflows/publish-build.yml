@@ -30,11 +30,11 @@ jobs:
     outputs:
       unique_id: ${{ steps.unique_id.outputs.id }}
 
-  get_affected:
-    needs: cancel-previous
-    uses: ./.github/workflows/test.yml
-    secrets:
-      NX_BASE: HEAD~1
+  # get_affected:
+  #   needs: cancel-previous
+  #   uses: ./.github/workflows/test.yml
+  #   secrets:
+  #     NX_BASE: HEAD~1
 
   build-scheduler:
     name: Build scheduler
@@ -197,7 +197,7 @@ jobs:
   build-fe:
     name: Build Frontend
     runs-on: ubuntu-latest
-    needs: [cancel-previous, unique_id, get_affected]
+    needs: [cancel-previous, unique_id]
     # if: contains(needs.get_affected.outputs.affected, 'dsb-client-gateway-frontend')
     services:
       postgres:
@@ -239,17 +239,17 @@ jobs:
         run: npm run export
         env:
           DB_NAME: postgresql://ddhub:ddhub@localhost:5432/ddhub
-          NEXT_PUBLIC_CUSTOM_BRANDING_PATH: '/aemo-logo.svg'
-          NEXT_PUBLIC_CUSTOM_CGW_NAME: 'TEDD'
-      - name: 'Login via Azure CLI'
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          NEXT_PUBLIC_CUSTOM_BRANDING_PATH: ${{ secrets.CUSTOME_LOGO }}
+          NEXT_PUBLIC_CUSTOM_CGW_NAME: ${{ secrets.CUSTOME_NAME }}
+      # - name: 'Login via Azure CLI'
+      #   uses: azure/login@v1
+      #   with:
+      #     creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: 'Build and push image (Front-end)'
-        uses: azure/docker-login@v1
+        uses: docker/login-action@v4
         with:
-          login-server: ${{ secrets.EWF_EWF_REGISTRY_LOGIN_SERVER }}
+          registry: ${{ secrets.EWF_EWF_REGISTRY_LOGIN_SERVER }}
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
       - run: |
