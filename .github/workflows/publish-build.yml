@@ -39,7 +39,7 @@ jobs:
   build-scheduler:
     name: Build scheduler
     runs-on: ubuntu-latest
-    needs: [cancel-previous, unique_id, get_affected]
+    needs: [cancel-previous, unique_id]
     # if: contains(needs.get_affected.outputs.affected, 'dsb-client-gateway-scheduler')
     if: false
     steps:
@@ -116,7 +116,7 @@ jobs:
   build-be:
     name: Build Backend
     runs-on: ubuntu-latest
-    needs: [cancel-previous, unique_id, get_affected]
+    needs: [cancel-previous, unique_id]
     # if: contains(needs.get_affected.outputs.affected, 'dsb-client-gateway-api')
     if: false
     steps:
