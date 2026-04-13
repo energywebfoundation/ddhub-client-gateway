@@ -6,7 +6,7 @@ export enum StatusTypeEnum {
   Success = 'SUCCESS',
   Failure = 'FAILURE'
 }
-
+// CI trigger frontend build
 export interface StatusProps {
   type: StatusTypeEnum;
   text: string;
