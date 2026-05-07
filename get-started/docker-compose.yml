@@ -19,7 +19,7 @@ services:
       start_period: 10s
 
   ddhub-gateway-migrationer:
-    image: aemocontainerregistry.azurecr.io/ddhub-client-gateway-backend:latest
+    image: ewfcontainerregistry.azurecr.io/ddhub-client-gateway-backend:intelligent-canary
     container_name: ddhub-gateway-migrationer
     depends_on:
       postgres:
@@ -27,9 +27,10 @@ services:
     command: "./node_modules/.bin/typeorm migrations:run"
     environment:
       NODE_ENV: test
-      DSB_BASE_URL: https://ddhub-demo.energyweb.org
-      CACHE_SERVER_URL: https://identitycache-staging.energyweb.org/v1
-      EVENT_SERVER_URL: https://identitycache-staging.energyweb.org
+      DSB_BASE_URL: https://ddhub-ewc.energyweb.org
+      RPC_URL: https://rpc.energyweb.org
+      CACHE_SERVER_URL: https://identitycache.energyweb.org/v1
+      EVENT_SERVER_URL: https://identitycache.energyweb.org
       SECRETS_ENGINE: $SECRETS_ENGINE
       AWS_REGION: $AWS_REGION
       AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
@@ -39,16 +40,16 @@ services:
       AZURE_CLIENT_ID: $AZURE_CLIENT_ID
       AZURE_TENANT_ID: $AZURE_TENANT_ID
       DB_NAME: postgresql://ddhub:password123@postgres:5432/ddhub
-      PARENT_NAMESPACE: ddhub.apps.energyweb.iam.ewc
-      MTLS_ENABLED: "false"
+      PARENT_NAMESPACE: integration.apps.intelligent.auth.ewc
+      MTLS_ENABLED: "true"
 
   ddhub-gateway-UI:
-    image: aemocontainerregistry.azurecr.io/ddhub-client-gateway-frontend:latest
+    image: ewfcontainerregistry.azurecr.io/ddhub-client-gateway-frontend:intelligent-canary
     ports:
       - "3000:80"
 
   ddhub-gateway-api:
-    image: aemocontainerregistry.azurecr.io/ddhub-client-gateway-backend:latest
+    image: ewfcontainerregistry.azurecr.io/ddhub-client-gateway-backend:intelligent-canary
     container_name: ddhub-gateway-api
     depends_on:
       - 'postgres'
@@ -57,9 +58,10 @@ services:
       - 3333:3333
     environment:
       NODE_ENV: test
-      DSB_BASE_URL: https://ddhub-demo.energyweb.org
-      CACHE_SERVER_URL: https://identitycache-staging.energyweb.org/v1
-      EVENT_SERVER_URL: https://identitycache-staging.energyweb.org
+      DSB_BASE_URL: https://ddhub-ewc.energyweb.org
+      RPC_URL: https://rpc.energyweb.org
+      CACHE_SERVER_URL: https://identitycache.energyweb.org/v1
+      EVENT_SERVER_URL: https://identitycache.energyweb.org
       SECRETS_ENGINE: $SECRETS_ENGINE
       AWS_REGION: $AWS_REGION
       AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
@@ -69,20 +71,21 @@ services:
       AZURE_CLIENT_ID: $AZURE_CLIENT_ID
       AZURE_TENANT_ID: $AZURE_TENANT_ID
       DB_NAME: postgresql://ddhub:password123@postgres:5432/ddhub
-      PARENT_NAMESPACE: ddhub.apps.energyweb.iam.ewc
-      MTLS_ENABLED: "false"
+      PARENT_NAMESPACE: integration.apps.intelligent.auth.ewc
+      MTLS_ENABLED: "true"
 
   ddhub-gateway-scheduler:
-    image: aemocontainerregistry.azurecr.io/ddhub-client-gateway-scheduler:latest
+    image: ewfcontainerregistry.azurecr.io/ddhub-client-gateway-scheduler:intelligent-canary
     container_name: ddhub-gateway-scheduler
     depends_on:
       - 'postgres'
       - 'ddhub-gateway-migrationer'
     environment:
       NODE_ENV: test
-      DSB_BASE_URL: https://ddhub-demo.energyweb.org
-      CACHE_SERVER_URL: https://identitycache-staging.energyweb.org/v1
-      EVENT_SERVER_URL: https://identitycache-staging.energyweb.org
+      DSB_BASE_URL: https://ddhub-ewc.energyweb.org
+      RPC_URL: https://rpc.energyweb.org
+      CACHE_SERVER_URL: https://identitycache.energyweb.org/v1
+      EVENT_SERVER_URL: https://identitycache.energyweb.org
       SECRETS_ENGINE: $SECRETS_ENGINE
       AWS_REGION: $AWS_REGION
       AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
@@ -93,8 +96,8 @@ services:
       AZURE_TENANT_ID: $AZURE_TENANT_ID
       DB_NAME: postgresql://ddhub:password123@postgres:5432/ddhub
       DID_REGISTRY_ADDRESS: "0xc15d5a57a8eb0e1dcbe5d88b8f9a82017e5cc4af"
-      PARENT_NAMESPACE: ddhub.apps.energyweb.iam.ewc
-      MTLS_ENABLED: "false"
+      PARENT_NAMESPACE: integration.apps.intelligent.auth.ewc
+      MTLS_ENABLED: "true"
 
   proxy-server:
     image: nginx:alpine
