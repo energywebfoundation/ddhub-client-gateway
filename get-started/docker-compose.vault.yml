@@ -59,7 +59,7 @@ services:
       start_period: 10s
 
   ddhub-gateway-migrationer:
-    image: aemocontainerregistry.azurecr.io/ddhub-client-gateway-backend:latest
+    image: ewfcontainerregistry.azurecr.io/ddhub-client-gateway-backend:intelligent-canary
     container_name: ddhub-gateway-migrationer
     depends_on:
       postgres:
@@ -74,23 +74,24 @@ services:
       '
     environment:
       NODE_ENV: test
-      DSB_BASE_URL: https://ddhub-demo.energyweb.org
-      CACHE_SERVER_URL: https://identitycache-staging.energyweb.org/v1
-      EVENT_SERVER_URL: https://identitycache-staging.energyweb.org
+      DSB_BASE_URL: https://ddhub-ewc.energyweb.org
+      RPC_URL: https://rpc.energyweb.org
+      CACHE_SERVER_URL: https://identitycache.energyweb.org/v1
+      EVENT_SERVER_URL: https://identitycache.energyweb.org
       VAULT_ENDPOINT: http://vault_demo:8200
       VAULT_TOKEN: $VAULT_TOKEN
       SECRETS_ENGINE: vault
       DB_NAME: postgresql://ddhub:password123@postgres:5432/ddhub
-      PARENT_NAMESPACE: ddhub.apps.energyweb.iam.ewc
-      MTLS_ENABLED: "false"
+      PARENT_NAMESPACE: integration.apps.intelligent.auth.ewc
+      MTLS_ENABLED: "true"
 
   ddhub-gateway-UI:
-    image: aemocontainerregistry.azurecr.io/ddhub-client-gateway-frontend:latest
+    image: ewfcontainerregistry.azurecr.io/ddhub-client-gateway-frontend:intelligent-canary
     ports:
       - "3000:80"
 
   ddhub-gateway-api:
-    image: aemocontainerregistry.azurecr.io/ddhub-client-gateway-backend:latest
+    image: ewfcontainerregistry.azurecr.io/ddhub-client-gateway-backend:intelligent-canary
     container_name: ddhub-gateway-api
     depends_on:
       - 'vault_demo'
@@ -109,18 +110,19 @@ services:
       '
     environment:
       NODE_ENV: test
-      DSB_BASE_URL: https://ddhub-demo.energyweb.org
-      CACHE_SERVER_URL: https://identitycache-staging.energyweb.org/v1
-      EVENT_SERVER_URL: https://identitycache-staging.energyweb.org
+      DSB_BASE_URL: https://ddhub-ewc.energyweb.org
+      RPC_URL: https://rpc.energyweb.org
+      CACHE_SERVER_URL: https://identitycache.energyweb.org/v1
+      EVENT_SERVER_URL: https://identitycache.energyweb.org
       VAULT_ENDPOINT: http://vault_demo:8200
       VAULT_TOKEN: $VAULT_TOKEN
       SECRETS_ENGINE: vault
       DB_NAME: postgresql://ddhub:password123@postgres:5432/ddhub
-      PARENT_NAMESPACE: ddhub.apps.energyweb.iam.ewc
-      MTLS_ENABLED: "false"
+      PARENT_NAMESPACE: integration.apps.intelligent.auth.ewc
+      MTLS_ENABLED: "true"
 
   ddhub-gateway-scheduler:
-    image: aemocontainerregistry.azurecr.io/ddhub-client-gateway-scheduler:latest
+    image: ewfcontainerregistry.azurecr.io/ddhub-client-gateway-scheduler:intelligent-canary
     container_name: ddhub-gateway-scheduler
     depends_on:
       - 'vault_demo'
@@ -137,16 +139,17 @@ services:
       '
     environment:
       NODE_ENV: test
-      DSB_BASE_URL: https://ddhub-demo.energyweb.org
-      CACHE_SERVER_URL: https://identitycache-staging.energyweb.org/v1
-      EVENT_SERVER_URL: https://identitycache-staging.energyweb.org
+      DSB_BASE_URL: https://ddhub-ewc.energyweb.org
+      RPC_URL: https://rpc.energyweb.org
+      CACHE_SERVER_URL: https://identitycache.energyweb.org/v1
+      EVENT_SERVER_URL: https://identitycache.energyweb.org
       VAULT_ENDPOINT: http://vault_demo:8200
       VAULT_TOKEN: $VAULT_TOKEN
       SECRETS_ENGINE: vault
       DB_NAME: postgresql://ddhub:password123@postgres:5432/ddhub
       DID_REGISTRY_ADDRESS: "0xc15d5a57a8eb0e1dcbe5d88b8f9a82017e5cc4af"
-      PARENT_NAMESPACE: ddhub.apps.energyweb.iam.ewc
-      MTLS_ENABLED: "false"
+      PARENT_NAMESPACE: integration.apps.intelligent.auth.ewc
+      MTLS_ENABLED: "true"
 
   proxy-server:
     image: nginx:alpine
