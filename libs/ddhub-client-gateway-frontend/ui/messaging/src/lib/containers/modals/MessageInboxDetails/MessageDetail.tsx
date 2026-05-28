@@ -89,6 +89,9 @@ export const MessageDetail: FC<MessageDetailProps> = ({
                   field.isEntryView ? classes.label : classes.labelText
                 }
                 variant="body2"
+                sx={{
+                  wordBreak: field.isEntryView ? 'break-all' : 'normal',
+                }}
               >
                 {valueFieldText}
               </Typography>
