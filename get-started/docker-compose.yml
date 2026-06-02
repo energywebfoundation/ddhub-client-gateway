@@ -1,3 +1,13 @@
+x-gateway-env: &gateway-env
+  SECRETS_ENGINE: $SECRETS_ENGINE
+  AWS_REGION: $AWS_REGION
+  AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
+  AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
+  AZURE_VAULT_URL: $AZURE_VAULT_URL
+  AZURE_CLIENT_SECRET: $AZURE_CLIENT_SECRET
+  AZURE_CLIENT_ID: $AZURE_CLIENT_ID
+  AZURE_TENANT_ID: $AZURE_TENANT_ID
+
 version: '3'
 services:
   postgres:
@@ -26,22 +36,9 @@ services:
         condition: service_healthy
     command: "./node_modules/.bin/typeorm migrations:run"
     environment:
-      NODE_ENV: test
-      DSB_BASE_URL: https://ddhub-ewc.energyweb.org
-      RPC_URL: https://rpc.energyweb.org
-      CACHE_SERVER_URL: https://identitycache.energyweb.org/v1
-      EVENT_SERVER_URL: https://identitycache.energyweb.org
-      SECRETS_ENGINE: $SECRETS_ENGINE
-      AWS_REGION: $AWS_REGION
-      AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
-      AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
-      AZURE_VAULT_URL: $AZURE_VAULT_URL
-      AZURE_CLIENT_SECRET: $AZURE_CLIENT_SECRET
-      AZURE_CLIENT_ID: $AZURE_CLIENT_ID
-      AZURE_TENANT_ID: $AZURE_TENANT_ID
-      DB_NAME: postgresql://ddhub:password123@postgres:5432/ddhub
-      PARENT_NAMESPACE: integration.apps.intelligent.auth.ewc
-      MTLS_ENABLED: "true"
+      <<: *gateway-env
+    env_file:
+      - .ewc-env
 
   ddhub-gateway-UI:
     image: ewfcontainerregistry.azurecr.io/ddhub-client-gateway-frontend:intelligent-canary
@@ -57,22 +54,9 @@ services:
     ports:
       - 3333:3333
     environment:
-      NODE_ENV: test
-      DSB_BASE_URL: https://ddhub-ewc.energyweb.org
-      RPC_URL: https://rpc.energyweb.org
-      CACHE_SERVER_URL: https://identitycache.energyweb.org/v1
-      EVENT_SERVER_URL: https://identitycache.energyweb.org
-      SECRETS_ENGINE: $SECRETS_ENGINE
-      AWS_REGION: $AWS_REGION
-      AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
-      AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
-      AZURE_VAULT_URL: $AZURE_VAULT_URL
-      AZURE_CLIENT_SECRET: $AZURE_CLIENT_SECRET
-      AZURE_CLIENT_ID: $AZURE_CLIENT_ID
-      AZURE_TENANT_ID: $AZURE_TENANT_ID
-      DB_NAME: postgresql://ddhub:password123@postgres:5432/ddhub
-      PARENT_NAMESPACE: integration.apps.intelligent.auth.ewc
-      MTLS_ENABLED: "true"
+      <<: *gateway-env
+    env_file:
+      - .ewc-env
 
   ddhub-gateway-scheduler:
     image: ewfcontainerregistry.azurecr.io/ddhub-client-gateway-scheduler:intelligent-canary
@@ -81,23 +65,9 @@ services:
       - 'postgres'
       - 'ddhub-gateway-migrationer'
     environment:
-      NODE_ENV: test
-      DSB_BASE_URL: https://ddhub-ewc.energyweb.org
-      RPC_URL: https://rpc.energyweb.org
-      CACHE_SERVER_URL: https://identitycache.energyweb.org/v1
-      EVENT_SERVER_URL: https://identitycache.energyweb.org
-      SECRETS_ENGINE: $SECRETS_ENGINE
-      AWS_REGION: $AWS_REGION
-      AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
-      AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
-      AZURE_VAULT_URL: $AZURE_VAULT_URL
-      AZURE_CLIENT_SECRET: $AZURE_CLIENT_SECRET
-      AZURE_CLIENT_ID: $AZURE_CLIENT_ID
-      AZURE_TENANT_ID: $AZURE_TENANT_ID
-      DB_NAME: postgresql://ddhub:password123@postgres:5432/ddhub
-      DID_REGISTRY_ADDRESS: "0xc15d5a57a8eb0e1dcbe5d88b8f9a82017e5cc4af"
-      PARENT_NAMESPACE: integration.apps.intelligent.auth.ewc
-      MTLS_ENABLED: "true"
+      <<: *gateway-env
+    env_file:
+      - .ewc-env
 
   proxy-server:
     image: nginx:alpine
