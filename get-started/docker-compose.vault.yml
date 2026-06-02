@@ -41,13 +41,13 @@ services:
       sleep 3
       if vault status | grep "Initialized.*false"; then
         echo "Initializing Vault..."
-        vault operator init -key-shares=1 -key-threshold=1 > ./vault-creds/init.txt
-        echo $(grep "Initial Root Token:" ./vault-creds/init.txt | awk "{print \$4}") > ./vault-creds/root_token.txt
-        vault operator unseal $(grep "Unseal Key 1:" ./vault-creds/init.txt | awk "{print \$4}")
-        VAULT_TOKEN=$(grep "Initial Root Token:" ./vault-creds/init.txt | awk "{print \$4}") vault secrets enable -version=1 -path=ddhub kv
+        vault operator init -key-shares=1 -key-threshold=1 > /vault-creds/init.txt
+        echo $(grep "Initial Root Token:" /vault-creds/init.txt | awk "{print \$4}") > /vault-creds/root_token.txt
+        vault operator unseal $(grep "Unseal Key 1:" /vault-creds/init.txt | awk "{print \$4}")
+        VAULT_TOKEN=$(grep "Initial Root Token:" /vault-creds/init.txt | awk "{print \$4}") vault secrets enable -version=1 -path=ddhub kv
       else
         echo "Unsealing Vault..."
-        vault operator unseal $(grep "Unseal Key 1:" ./vault-creds/init.txt | awk "{print \$4}")
+        vault operator unseal $(grep "Unseal Key 1:" /vault-creds/init.txt | awk "{print \$4}")
       fi
       '
 
