@@ -92,9 +92,12 @@ export const useCreateEffects = () => {
       await refetchUsers();
       closeModal();
     } catch (error) {
+      const errorResponse = error.response.data.err.reason;
+      const errorMessage = errorResponse === 'User already exists' ? errorResponse : `We couldn’t create the user. Please try again.`;
+
       const result = await Swal.error({
         title: 'User creation failed',
-        html: `We couldn’t create the user. Please try again.`,
+        html: errorMessage,
         confirmButtonText: 'Try again',
         showCancelButton: true,
         type: 'warning' as const,
