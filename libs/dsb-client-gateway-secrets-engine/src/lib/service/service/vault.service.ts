@@ -84,8 +84,16 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
 
   @Span('vault_userExists')
   public async userExists(username: string): Promise<boolean> {
-    const result = await this.client.read(`${this.prefix}${PATHS.USERS}/${username}`);
-    return !!result;
+    try {
+      const result = await this.client.read(`${this.prefix}${PATHS.USERS}/${username}`);
+      return !!result;
+    } catch (err) {
+      // node-vault rejects with "Status 404" when the secret path does not exist
+      if (err.response?.statusCode === 404) {
+        return false;
+      }
+      throw err;
+    }
   }
 
   @Span('vault_setUserPassword')
