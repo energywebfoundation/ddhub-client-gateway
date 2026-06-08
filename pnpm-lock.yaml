@@ -5,11 +5,8 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
-  axios: ^1.7.4
-  class-validator: ^0.14.1
   dompurify: ^3.2.4
   elliptic: ^6.6.1
-  bn.js: ^5.2.3
   braces: ^3.0.3
   body-parser: ^1.20.3
   path-to-regexp: ^0.1.13
@@ -225,7 +222,7 @@ importers:
         specifier: ^3.0.4
         version: 3.1.0
       bn.js:
-        specifier: ^5.2.3
+        specifier: ~5.2.3
         version: 5.2.3
       body-parser:
         specifier: ^1.20.3
@@ -2745,7 +2742,7 @@ packages:
     peerDependencies:
       cache-manager: '*'
       class-transformer: '*'
-      class-validator: ^0.14.1
+      class-validator: '*'
       reflect-metadata: ^0.1.12
       rxjs: ^7.1.0
     peerDependenciesMeta:
@@ -2793,7 +2790,7 @@ packages:
     peerDependencies:
       '@nestjs/common': ^7.0.8 || ^8.0.0
       class-transformer: ^0.2.0 || ^0.3.0 || ^0.4.0 || ^0.5.0
-      class-validator: ^0.14.1
+      class-validator: ^0.11.1 || ^0.12.0 || ^0.13.0
       reflect-metadata: ^0.1.12
     peerDependenciesMeta:
       class-transformer:
@@ -5579,7 +5576,16 @@ packages:
   axios-retry@4.5.0:
     resolution: {integrity: sha512-aR99oXhpEDGo0UuAlYcn2iGRds30k366Zfa05XWScR9QaQD4JYiP3/1Qt1u7YlefUOK+cn0CcwoL1oefavQUlQ==}
     peerDependencies:
-      axios: ^1.7.4
+      axios: 0.x || 1.x
+
+  axios@0.21.4:
+    resolution: {integrity: sha512-ut5vewkiu8jjGBdqpM44XxjuCjq9LAKeHVmoVfHVzy8eHgxxq8SbAVQNovDA8mVi05kP0Ea/n/UzcSHcTJQfNg==}
+
+  axios@0.25.0:
+    resolution: {integrity: sha512-cD8FOb0tRH3uuEe6+evtAbgJtfxr7ly3fQjYcMcuPlgkwVS9xboaVIpcDV+cYQe+yGykgwZCs1pzjntcGa6l5g==}
+
+  axios@0.27.2:
+    resolution: {integrity: sha512-t+yRIyySRTp/wua5xEr+z1q60QmLq8ABsS5O9Me1AsE5dfKqgnCFzwiCZZ/cGNd1lq4/7akDWMxdhVlucjmnOQ==}
 
   axios@1.17.0:
     resolution: {integrity: sha512-J8SwNxprqqpbfenehxWYXE7CW+wM1BB4w3+N+g+/Wx40xM4rsLrfPmHHxSWIxJLYDgSY/HqlFPIYb2/S3rxafw==}
@@ -5775,6 +5781,15 @@ packages:
 
   bluebird@3.7.2:
     resolution: {integrity: sha512-XpNj6GDQzdfW+r2Wnn7xiSAd7TM3jzkxGXBGTtWKuSXv1xUV+azxAm8jdWZN06QTQk+2N2XB9jRDkvbmQmcRtg==}
+
+  bn.js@4.11.8:
+    resolution: {integrity: sha512-ItfYfPLkWHUjckQCk8xC+LwxgK8NYcXywGigJgSwOP8Y2iyWT4f2vsZnoOXTTbo+o5yXmIUJ4gn5538SO5S3gA==}
+
+  bn.js@4.12.3:
+    resolution: {integrity: sha512-fGTi3gxV/23FTYdAoUtLYp6qySe2KE3teyZitipKNRuVYcBkoP/bB3guXN/XVKUe9mxCHXnc9C4ocyz8OmgN0g==}
+
+  bn.js@5.2.1:
+    resolution: {integrity: sha512-eXRvHzWyYPBuB4NBy0cmYQjGitUrtqwbvlzP3G6VFnNRbsZQIxQ10PbKKHt8gZ/HW/D/747aDl+QkDqg3KQLMQ==}
 
   bn.js@5.2.3:
     resolution: {integrity: sha512-EAcmnPkxpntVL+DS7bO1zhcZNvCkxqtkd0ZY53h06GNQ3DEkkGZ/gKgmDv6DdZQGj9BgfSPKtJJ7Dp1GPP8f7w==}
@@ -15145,7 +15160,6 @@ snapshots:
     transitivePeerDependencies:
       - bufferutil
       - debug
-      - supports-color
       - utf-8-validate
 
   '@ensdomains/ens@0.6.2':
@@ -15776,7 +15790,6 @@ snapshots:
     transitivePeerDependencies:
       - bufferutil
       - debug
-      - supports-color
       - utf-8-validate
 
   '@ew-did-registry/credentials-interface@0.9.1-alpha.1577.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)':
@@ -15819,10 +15832,9 @@ snapshots:
       '@web-std/fetch': 4.2.1
       '@web-std/file': 3.0.3
       '@web-std/form-data': 3.1.0
-      axios: 1.17.0(debug@4.4.3)
+      axios: 0.27.2
     transitivePeerDependencies:
       - debug
-      - supports-color
 
   '@ew-did-registry/did-resolver-interface@0.9.1-alpha.1577.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)':
     dependencies:
@@ -15866,7 +15878,7 @@ snapshots:
 
   '@ew-did-registry/keys@0.9.1-alpha.1577.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)':
     dependencies:
-      bn.js: 5.2.3
+      bn.js: 5.2.1
       ec-key: 0.0.4
       eciesjs: 0.4.18
       elliptic: 6.6.1
@@ -15893,13 +15905,12 @@ snapshots:
       '@ew-did-registry/did-ethr-resolver': 0.9.1-alpha.1577.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
       '@ew-did-registry/did-resolver-interface': 0.9.1-alpha.1577.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
       '@ew-did-registry/keys': 0.9.1-alpha.1577.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
-      axios: 1.17.0(debug@4.4.3)
+      axios: 0.27.2
       didkit-wasm-node: 0.1.6
       ethers: 5.8.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
       - bufferutil
       - debug
-      - supports-color
       - utf-8-validate
 
   '@exodus/schemasafe@1.3.0': {}
@@ -16428,13 +16439,12 @@ snapshots:
   '@json-rpc-tools/provider@1.7.6(bufferutil@4.1.0)(utf-8-validate@5.0.10)':
     dependencies:
       '@json-rpc-tools/utils': 1.7.6
-      axios: 1.17.0(debug@4.4.3)
+      axios: 0.21.4
       safe-json-utils: 1.1.1
       ws: 8.21.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
       - bufferutil
       - debug
-      - supports-color
       - utf-8-validate
 
   '@json-rpc-tools/types@1.7.6':
@@ -16639,16 +16649,15 @@ snapshots:
   '@nestjs/axios@0.0.5(@nestjs/common@8.4.7(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.1.14)(rxjs@7.8.2))(reflect-metadata@0.1.14)(rxjs@7.8.2)':
     dependencies:
       '@nestjs/common': 8.4.7(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.1.14)(rxjs@7.8.2)
-      axios: 1.17.0(debug@4.4.3)
+      axios: 0.25.0
       reflect-metadata: 0.1.14
       rxjs: 7.8.2
     transitivePeerDependencies:
       - debug
-      - supports-color
 
   '@nestjs/common@8.4.7(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.1.14)(rxjs@7.8.2)':
     dependencies:
-      axios: 1.17.0(debug@4.4.3)
+      axios: 0.27.2
       iterare: 1.2.1
       reflect-metadata: 0.1.14
       rxjs: 7.8.2
@@ -16659,7 +16668,6 @@ snapshots:
       class-validator: 0.14.4
     transitivePeerDependencies:
       - debug
-      - supports-color
 
   '@nestjs/config@1.2.1(@nestjs/common@8.4.7(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.1.14)(rxjs@7.8.2))(reflect-metadata@0.1.14)(rxjs@7.8.2)':
     dependencies:
@@ -20869,7 +20877,6 @@ snapshots:
       - bufferutil
       - debug
       - encoding
-      - supports-color
       - utf-8-validate
 
   '@walletconnect/iso-crypto@1.8.0':
@@ -20957,7 +20964,7 @@ snapshots:
       '@walletconnect/encoding': 1.0.2
       '@walletconnect/jsonrpc-utils': 1.0.8
       '@walletconnect/types': 1.8.0
-      bn.js: 5.2.3
+      bn.js: 4.11.8
       js-sha3: 0.8.0
       query-string: 6.13.5
 
@@ -21403,7 +21410,7 @@ snapshots:
 
   asn1.js@5.4.1:
     dependencies:
-      bn.js: 5.2.3
+      bn.js: 4.12.3
       inherits: 2.0.4
       minimalistic-assert: 1.0.1
       safer-buffer: 2.1.2
@@ -21478,6 +21485,25 @@ snapshots:
     dependencies:
       axios: 1.17.0(debug@4.4.3)
       is-retry-allowed: 2.2.0
+
+  axios@0.21.4:
+    dependencies:
+      follow-redirects: 1.16.0(debug@4.4.3)
+    transitivePeerDependencies:
+      - debug
+
+  axios@0.25.0:
+    dependencies:
+      follow-redirects: 1.16.0(debug@4.4.3)
+    transitivePeerDependencies:
+      - debug
+
+  axios@0.27.2:
+    dependencies:
+      follow-redirects: 1.16.0(debug@4.4.3)
+      form-data: 4.0.5
+    transitivePeerDependencies:
+      - debug
 
   axios@1.17.0(debug@4.4.3):
     dependencies:
@@ -21748,6 +21774,12 @@ snapshots:
   bluebird@3.7.1: {}
 
   bluebird@3.7.2: {}
+
+  bn.js@4.11.8: {}
+
+  bn.js@4.12.3: {}
+
+  bn.js@5.2.1: {}
 
   bn.js@5.2.3: {}
 
@@ -23048,7 +23080,6 @@ snapshots:
     transitivePeerDependencies:
       - bufferutil
       - debug
-      - supports-color
       - utf-8-validate
 
   ejs@3.1.10:
@@ -23059,7 +23090,7 @@ snapshots:
 
   elliptic@6.6.1:
     dependencies:
-      bn.js: 5.2.3
+      bn.js: 4.12.3
       brorand: 1.1.0
       hash.js: 1.1.7
       hmac-drbg: 1.0.1
@@ -23725,7 +23756,7 @@ snapshots:
   ethers@4.0.49:
     dependencies:
       aes-js: 3.0.0
-      bn.js: 5.2.3
+      bn.js: 4.12.3
       elliptic: 6.6.1
       hash.js: 1.1.3
       js-sha3: 0.5.7
@@ -24950,7 +24981,7 @@ snapshots:
       '@walletconnect/client': 1.8.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
       '@walletconnect/ethereum-provider': 1.8.0(bufferutil@4.1.0)(encoding@0.1.13)(utf-8-validate@5.0.10)
       '@walletconnect/qrcode-modal': 1.8.0
-      axios: 1.17.0(debug@4.4.3)
+      axios: 0.27.2
       axios-retry: 3.9.1
       base64url: 3.0.1
       concurrently: 6.5.1
@@ -26560,7 +26591,7 @@ snapshots:
     dependencies:
       '@types/elliptic': 6.4.18
       asn1.js: 5.4.1
-      bn.js: 5.2.3
+      bn.js: 4.12.3
       elliptic: 6.6.1
 
   keyv@4.5.4:
@@ -30646,14 +30677,13 @@ snapshots:
 
   wait-on@6.0.1:
     dependencies:
-      axios: 1.17.0(debug@4.4.3)
+      axios: 0.25.0
       joi: 17.13.3
       lodash: 4.18.1
       minimist: 1.2.8
       rxjs: 7.8.2
     transitivePeerDependencies:
       - debug
-      - supports-color
 
   walker@1.0.8:
     dependencies:
