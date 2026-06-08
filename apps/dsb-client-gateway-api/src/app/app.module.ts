@@ -60,7 +60,7 @@ export class AppModule {
                 translateTime: "UTC:yyyy-mm-dd'T'HH:MM:ss.l'Z'",
                 singleLine: true,
                 messageFormat: '[{context}][{user}] {msg}',
-                ignore: 'pid,hostname,context'
+                ignore: 'pid,hostname,context',
               },
             },
             serializers: {
@@ -89,7 +89,7 @@ export class AppModule {
             },
             customProps: (req, res) => {
               return {
-                user: res?.req?.user?.username,
+                user: (res?.req as any)?.user?.username,
               };
             },
           },

@@ -64,11 +64,11 @@ export const useAddressBookContext = (queryClient: QueryClient) => {
     }
   };
 
-  const getAddressBookList = async () => {
+  const getAddressBookList = async (): Promise<GetAllContactsResponseDto[]> => {
     return await queryClient.fetchQuery<GetAllContactsResponseDto[]>(
       getAddressBookControllerGetAllContactsQueryKey(),
-      addressBookControllerGetAllContacts
-    );
+      ({ signal }) => addressBookControllerGetAllContacts(signal)
+    ) as GetAllContactsResponseDto[];
   };
 
   useEffect(() => {

@@ -1,4 +1,5 @@
 {
+  "packageManager": "pnpm",
   "npmScope": "dsb-client-gateway",
   "affected": {
     "defaultBase": "main"
