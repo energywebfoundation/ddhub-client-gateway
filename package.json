@@ -4,7 +4,7 @@
   "license": "MIT",
   "engines": {
     "node": ">=22.0.0",
-    "pnpm": ">=9.0.0"
+    "pnpm": ">=11.0.0"
   },
   "scripts": {
     "migrations:build": "rimraf migrations-build && tsc -p tsconfig.migrations.json",
@@ -163,32 +163,6 @@
     "websocket": "^1.0.34",
     "ws": "^8.3.0",
     "yup": "^0.32.11"
-  },
-  "pnpm": {
-    "overrides": {
-      "dompurify": "^3.2.4",
-      "elliptic": "^6.6.1",
-      "braces": "^3.0.3",
-      "body-parser": "^1.20.3",
-      "path-to-regexp": "^0.1.13",
-      "semver": "^7.5.4",
-      "loader-utils": "^2.0.4",
-      "minimatch": "^3.1.4",
-      "ws": "^8.17.1",
-      "serialize-javascript": "^7.0.3",
-      "lodash": "^4.18.1",
-      "protobufjs": "^7.5.6",
-      "tar": "^7.5.4",
-      "tmp": "^0.2.6",
-      "fastify": "^5.7.2",
-      "multer": "^1.4.5-lts.1",
-      "socket.io-parser": "^4.2.6",
-      "next": "^12.3.5",
-      "underscore": "^1.13.8",
-      "form-data": "^4.0.1",
-      "qs": "^6.13.0",
-      "xml2js": "^0.6.2"
-    }
   },
   "config": {
     "commitizen": {
