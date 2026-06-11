@@ -22,13 +22,14 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 11
       - uses: actions/setup-node@v4
         with:
           node-version: '22.21.1'
-          cache: 'pnpm'
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11
+          cache: true
+          standalone: true
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       - name: Caculate affected apps
@@ -39,8 +40,8 @@ jobs:
           echo $NX_BASE
           echo "affected_apps=$affected_apps" >>"$GITHUB_OUTPUT"
       - name: Run tests
-        if: contains(${{ env.NX_BASE }}, 'develop')
+        if: contains(${{ env.NX_BASE }}, 'develop-intelligent')
         run: npx nx affected --target=test --exclude=dsb-client-gateway-api-e2e,ui-core
       - name: Run linters
-        if: contains(${{ env.NX_BASE }}, 'develop')
+        if: contains(${{ env.NX_BASE }}, 'develop-intelligent')
         run: npx nx affected --target=lint --exclude=dsb-client-gateway-api-e2e,ui-core

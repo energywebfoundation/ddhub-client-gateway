@@ -2,37 +2,12 @@ packages:
   - 'apps/**'
   - 'libs/**'
 
-allowBuilds:
-  '@nestjs/core': set this to true or false
-  '@parcel/watcher': set this to true or false
-  '@scarf/scarf': set this to true or false
-  '@sentry/cli': set this to true or false
-  '@swc/core': set this to true or false
-  better-sqlite3: set this to true or false
-  bufferutil: set this to true or false
-  core-js: set this to true or false
-  core-js-pure: set this to true or false
-  cypress: set this to true or false
-  es5-ext: set this to true or false
-  esbuild: set this to true or false
-  keccak: set this to true or false
-  nestjs-pino: set this to true or false
-  nx: set this to true or false
-  protobufjs: set this to true or false
-  secp256k1: set this to true or false
-  sharp: set this to true or false
-  sqlite3: set this to true or false
-  unrs-resolver: set this to true or false
-  utf-8-validate: set this to true or false
-
 overrides:
   dompurify: ^3.2.4
   elliptic: ^6.6.1
   braces: ^3.0.3
   body-parser: ^1.20.3
-  express>path-to-regexp: ^0.1.13
-  '@nestjs/core>path-to-regexp': ^0.1.13
-  nise>path-to-regexp: ^0.1.13
+  path-to-regexp: ^0.1.13
   semver: ^7.5.4
   loader-utils: ^2.0.4
   minimatch: ^3.1.4
@@ -45,8 +20,29 @@ overrides:
   fastify: ^5.7.2
   multer: ^1.4.5-lts.1
   socket.io-parser: ^4.2.6
-  next: ^15.5.15
+  next: ^12.3.5
   underscore: ^1.13.8
   form-data: ^4.0.1
   qs: ^6.13.0
   xml2js: ^0.6.2
+  axios: ^1.7.9
+
+allowBuilds:
+  "@nestjs/core": true
+  "@parcel/watcher": true
+  "@sentry/cli": true
+  "@swc/core": true
+  "better-sqlite3": true
+  "bufferutil": true
+  "core-js-pure": true
+  "core-js": true
+  "cypress": true
+  "es5-ext": true
+  "esbuild": true
+  "keccak": true
+  "nestjs-pino": true
+  "nx": true
+  "protobufjs": true
+  "secp256k1": true
+  "sqlite3": true
+  "utf-8-validate": true
