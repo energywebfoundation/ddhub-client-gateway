@@ -13,4 +13,5 @@ module.exports = {
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
   coverageDirectory:
     '../../../../coverage/libs/ddhub-client-gateway-frontend/identity/models',
+  passWithNoTests: true,
 };
