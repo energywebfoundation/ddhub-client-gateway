@@ -1,12 +1,14 @@
 {
-  "root": "libs/dsb-client-gateway/ui/applications",
-  "sourceRoot": "libs/dsb-client-gateway/ui/applications/src",
+  "root": "libs/ddhub-client-gateway-frontend/ui/applications",
+  "sourceRoot": "libs/ddhub-client-gateway-frontend/ui/applications/src",
   "projectType": "library",
   "tags": [],
   "targets": {
     "lint": {
       "executor": "@nrwl/linter:eslint",
-      "outputs": ["{options.outputFile}"],
+      "outputs": [
+        "{options.outputFile}"
+      ],
       "options": {
         "lintFilePatterns": [
           "libs/ddhub-client-gateway-frontend/ui/applications/**/*.{ts,tsx,js,jsx}"
@@ -15,11 +17,14 @@
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/ddhub-client-gateway-frontend/ui/applications"],
+      "outputs": [
+        "coverage/libs/ddhub-client-gateway-frontend/ui/applications"
+      ],
       "options": {
         "jestConfig": "libs/ddhub-client-gateway-frontend/ui/applications/jest.config.js",
         "passWithNoTests": true
       }
     }
-  }
+  },
+  "name": "ddhub-client-gateway-ui-applications"
 }
