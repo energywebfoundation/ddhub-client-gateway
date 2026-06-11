@@ -1,12 +1,14 @@
 {
-  "root": "libs/dsb-client-gateway/ui/messaging",
-  "sourceRoot": "libs/dsb-client-gateway/ui/messaging/src",
+  "root": "libs/ddhub-client-gateway-frontend/ui/messaging",
+  "sourceRoot": "libs/ddhub-client-gateway-frontend/ui/messaging/src",
   "projectType": "library",
   "tags": [],
   "targets": {
     "lint": {
       "executor": "@nrwl/linter:eslint",
-      "outputs": ["{options.outputFile}"],
+      "outputs": [
+        "{options.outputFile}"
+      ],
       "options": {
         "lintFilePatterns": [
           "libs/ddhub-client-gateway-frontend/ui/messaging/**/*.{ts,tsx,js,jsx}"
@@ -15,11 +17,14 @@
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/ddhub-client-gateway-frontend/ui/messaging"],
+      "outputs": [
+        "coverage/libs/ddhub-client-gateway-frontend/ui/messaging"
+      ],
       "options": {
         "jestConfig": "libs/ddhub-client-gateway-frontend/ui/messaging/jest.config.js",
         "passWithNoTests": true
       }
     }
-  }
+  },
+  "name": "ddhub-client-gateway-ui-messaging"
 }

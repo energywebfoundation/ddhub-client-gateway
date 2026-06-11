@@ -1,8 +1,13 @@
-import { EntityRepository, Repository, SelectQueryBuilder } from 'typeorm';
+import { Injectable } from '@nestjs/common';
+import { DataSource, Repository, SelectQueryBuilder } from 'typeorm';
 import { TopicEntity } from '../entity/topic.entity';
 
-@EntityRepository(TopicEntity)
+@Injectable()
 export class TopicRepository extends Repository<TopicEntity> {
+  constructor(dataSource: DataSource) {
+    super(TopicEntity, dataSource.createEntityManager());
+  }
+
   /**
    * Returns the total count of topics when passed a list of topic ids
    * By default it returns the count of all versions of the return topics

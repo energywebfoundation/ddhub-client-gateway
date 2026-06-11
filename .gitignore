@@ -63,3 +63,4 @@ apps/dsb-client-gateway-api-e2e/.env.secret
 *.heapsnapshot
 .clinic
 upload
+.nx/

@@ -32,9 +32,9 @@ export function RelatedMessage({ value }: RelatedMessageProps) {
           transactionId: value.transactionId,
         }
       }}
-      passHref
+      onClick={(e) => e.stopPropagation()}
     >
-      <a onClick={(e) => e.stopPropagation()}>{value.relatedMessagesCount}</a>
+      {value.relatedMessagesCount}
     </Link>
   );
 }

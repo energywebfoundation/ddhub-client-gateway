@@ -43,5 +43,6 @@
       }
     }
   },
-  "defaultProject": "dsb-client-gateway-frontend"
+  "defaultProject": "dsb-client-gateway-frontend",
+  "analytics": false
 }

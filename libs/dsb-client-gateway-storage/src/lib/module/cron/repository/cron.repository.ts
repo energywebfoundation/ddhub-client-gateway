@@ -1,5 +1,10 @@
+import { Injectable } from '@nestjs/common';
 import { CronEntity } from '../entity/cron.entity';
-import { EntityRepository, Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 
-@EntityRepository(CronEntity)
-export class CronRepository extends Repository<CronEntity> {}
+@Injectable()
+export class CronRepository extends Repository<CronEntity> {
+  constructor(dataSource: DataSource) {
+    super(CronEntity, dataSource.createEntityManager());
+  }
+}

@@ -1,5 +1,10 @@
-import { EntityRepository, Repository } from 'typeorm';
+import { Injectable } from '@nestjs/common';
+import { DataSource, Repository } from 'typeorm';
 import { ReceivedMessageReadStatusEntity } from '../entity';
 
-@EntityRepository(ReceivedMessageReadStatusEntity)
-export class ReceivedMessageReadStatusRepository extends Repository<ReceivedMessageReadStatusEntity> {}
+@Injectable()
+export class ReceivedMessageReadStatusRepository extends Repository<ReceivedMessageReadStatusEntity> {
+  constructor(dataSource: DataSource) {
+    super(ReceivedMessageReadStatusEntity, dataSource.createEntityManager());
+  }
+}

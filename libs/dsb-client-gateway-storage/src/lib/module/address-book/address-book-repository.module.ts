@@ -6,9 +6,9 @@ import { AddressBookRepositoryWrapper } from './wrapper';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([AddressBookEntity, AddressBookRepository]),
+    TypeOrmModule.forFeature([AddressBookEntity]),
   ],
-  providers: [AddressBookRepositoryWrapper],
+  providers: [AddressBookRepository, AddressBookRepositoryWrapper],
   exports: [AddressBookRepositoryWrapper],
 })
 export class AddressBookRepositoryModule {}

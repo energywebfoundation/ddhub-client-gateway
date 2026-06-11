@@ -5,8 +5,8 @@ import { EventsRepository } from './repository/events.repository';
 import { EventsWrapperRepository } from './wrapper/events-wrapper-repository.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([EventsEntity, EventsRepository])],
-  providers: [EventsWrapperRepository],
+  imports: [TypeOrmModule.forFeature([EventsEntity])],
+  providers: [EventsRepository, EventsWrapperRepository],
   exports: [EventsWrapperRepository],
 })
 export class EventsRepositoryModule {}

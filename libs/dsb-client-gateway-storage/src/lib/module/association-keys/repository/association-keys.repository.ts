@@ -1,8 +1,13 @@
+import { Injectable } from '@nestjs/common';
 import { AssociationKeyEntity } from '../entity/association-key.entity';
-import { EntityRepository, MoreThan, Repository } from 'typeorm';
+import { DataSource, MoreThan, Repository } from 'typeorm';
 
-@EntityRepository(AssociationKeyEntity)
+@Injectable()
 export class AssociationKeysRepository extends Repository<AssociationKeyEntity> {
+  constructor(dataSource: DataSource) {
+    super(AssociationKeyEntity, dataSource.createEntityManager());
+  }
+
   public async get(date: Date): Promise<AssociationKeyEntity | undefined> {
     const query = this.createQueryBuilder('tbl');
 
