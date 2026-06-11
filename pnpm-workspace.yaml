@@ -50,4 +50,4 @@ allowBuilds:
   "utf-8-validate": true
   '@scarf/scarf': true
   unrs-resolver: true
-  sharp: set this to true or false
+  sharp: true
