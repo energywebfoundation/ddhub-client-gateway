@@ -1,5 +1,10 @@
+import { Injectable } from '@nestjs/common';
 import { FileMetadataEntity } from '../entity/file-metadata.entity';
-import { EntityRepository, Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 
-@EntityRepository(FileMetadataEntity)
-export class FileMetadataRepository extends Repository<FileMetadataEntity> {}
+@Injectable()
+export class FileMetadataRepository extends Repository<FileMetadataEntity> {
+  constructor(dataSource: DataSource) {
+    super(FileMetadataEntity, dataSource.createEntityManager());
+  }
+}

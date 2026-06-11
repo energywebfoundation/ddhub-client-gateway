@@ -6,9 +6,9 @@ import { SymmetricKeysRepositoryWrapper } from './wrapper/symmetric-keys-reposit
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([SymmetricKeysEntity, SymmetricKeysRepository]),
+    TypeOrmModule.forFeature([SymmetricKeysEntity]),
   ],
-  providers: [SymmetricKeysRepositoryWrapper],
+  providers: [SymmetricKeysRepository, SymmetricKeysRepositoryWrapper],
   exports: [SymmetricKeysRepositoryWrapper],
 })
 export class SymmetricKeysRepositoryModule {}

@@ -1,12 +1,14 @@
 {
-  "root": "libs/dsb-client-gateway/ui/channels",
-  "sourceRoot": "libs/dsb-client-gateway/ui/channels/src",
+  "root": "libs/ddhub-client-gateway-frontend/ui/channels",
+  "sourceRoot": "libs/ddhub-client-gateway-frontend/ui/channels/src",
   "projectType": "library",
   "tags": [],
   "targets": {
     "lint": {
       "executor": "@nrwl/linter:eslint",
-      "outputs": ["{options.outputFile}"],
+      "outputs": [
+        "{options.outputFile}"
+      ],
       "options": {
         "lintFilePatterns": [
           "libs/ddhub-client-gateway-frontend/ui/channels/**/*.{ts,tsx,js,jsx}"
@@ -15,11 +17,14 @@
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/ddhub-client-gateway-frontend/ui/channels"],
+      "outputs": [
+        "coverage/libs/ddhub-client-gateway-frontend/ui/channels"
+      ],
       "options": {
         "jestConfig": "libs/ddhub-client-gateway-frontend/ui/channels/jest.config.js",
         "passWithNoTests": true
       }
     }
-  }
+  },
+  "name": "ddhub-client-gateway-ui-channels"
 }

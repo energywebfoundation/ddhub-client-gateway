@@ -2,16 +2,14 @@ import { useStyles } from './SidebarFooter.styles';
 import React from 'react';
 import { Box, Typography } from '@mui/material';
 import { useUserDataEffects } from '@ddhub-client-gateway-frontend/ui/login';
-import getConfig from 'next/config';
+import { publicConfig } from '@ddhub-client-gateway-frontend/ui/utils';
 
 function SidebarFooter() {
   const { classes } = useStyles();
   const { version } = useUserDataEffects();
 
-  const { publicRuntimeConfig } = getConfig();
   const defaultLogoPath = '/ew-main-logo.svg';
-  const brandingLogoPath =
-    publicRuntimeConfig?.customBranding ?? defaultLogoPath;
+  const brandingLogoPath = publicConfig.customBranding ?? defaultLogoPath;
   const isCustomBranding = brandingLogoPath !== defaultLogoPath;
 
   return (

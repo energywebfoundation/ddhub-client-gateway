@@ -25,26 +25,9 @@ import { AddressBookRepositoryModule } from '../address-book';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([
-      ReceivedMessageEntity,
-      ReceivedMessageRepository,
-      ReceivedMessageMappingEntity,
-      ReceivedMessageMappingRepository,
-      ReceivedMessageReadStatusEntity,
-      ReceivedMessageReadStatusRepository,
-      SentMessageEntity,
-      SentMessageRepository,
-      SentMessageRecipientEntity,
-      SentMessageRecipientRepository,
-    ]),
+    TypeOrmModule.forFeature([ReceivedMessageEntity, ReceivedMessageMappingEntity, ReceivedMessageReadStatusEntity, SentMessageEntity, SentMessageRecipientEntity]),
   ],
-  providers: [
-    ReceivedMessageReadStatusRepositoryWrapper,
-    SentMessageRecipientRepositoryWrapper,
-    SentMessageRepositoryWrapper,
-    ReceivedMessageRepositoryWrapper,
-    ReceivedMessageMappingRepositoryWrapper,
-  ],
+  providers: [ReceivedMessageRepository, ReceivedMessageMappingRepository, ReceivedMessageReadStatusRepository, SentMessageRepository, SentMessageRecipientRepository, ReceivedMessageReadStatusRepositoryWrapper, SentMessageRecipientRepositoryWrapper, SentMessageRepositoryWrapper, ReceivedMessageRepositoryWrapper, ReceivedMessageMappingRepositoryWrapper],
   exports: [
     ReceivedMessageReadStatusRepositoryWrapper,
     SentMessageRecipientRepositoryWrapper,

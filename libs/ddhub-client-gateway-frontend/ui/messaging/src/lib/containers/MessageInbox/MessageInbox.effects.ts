@@ -2,10 +2,9 @@ import {
   useChannel,
   useReceivedMessages,
 } from '@ddhub-client-gateway-frontend/ui/api-hooks';
-import { Queries } from '@ddhub-client-gateway-frontend/ui/utils';
+import { Queries, publicConfig } from '@ddhub-client-gateway-frontend/ui/utils';
 import { useRouter } from 'next/router';
 import moment from 'moment';
-import getConfig from 'next/config';
 import { TTableComponentAction } from '@ddhub-client-gateway-frontend/ui/core';
 import {
   GetReceivedMessageResponseDto,
@@ -17,9 +16,8 @@ export const useMessageInboxEffects = (isRelatedMessages?: boolean) => {
   const router = useRouter();
   const dispatch = useModalDispatch();
 
-  const { publicRuntimeConfig } = getConfig();
-  const messagingOffset = publicRuntimeConfig?.messagingOffset ?? 10;
-  const messagingAmount = publicRuntimeConfig?.messagingAmount ?? 100;
+  const messagingOffset = publicConfig.messagingOffset ?? 10;
+  const messagingAmount = publicConfig.messagingAmount ?? 100;
   const currentDate = moment().seconds(0).milliseconds(0);
   const fromDate = currentDate.subtract(Number(messagingOffset), 'minutes');
 

@@ -38,9 +38,23 @@ if (
 
 Axios.defaults.baseURL = process.env.NEXT_PUBLIC_SERVER_BASE_URL;
 
-let muiCache: EmotionCache | undefined = undefined;
-export const createMuiCache = () =>
-  (muiCache = createCache({ key: 'mui', prepend: true }));
+let muiCache: EmotionCache | undefined;
+
+export const createMuiCache = () => {
+  if (muiCache) {
+    return muiCache;
+  }
+
+  const insertionPoint =
+    typeof document !== 'undefined'
+      ? document.querySelector<HTMLMetaElement>(
+          'meta[name="emotion-insertion-point"]'
+        ) ?? undefined
+      : undefined;
+
+  muiCache = createCache({ key: 'mui', insertionPoint, prepend: true });
+  return muiCache;
+};
 
 export interface MyAppProps extends AppProps {
   emotionCache?: EmotionCache;
@@ -100,7 +114,7 @@ function MyApp(props: MyAppProps) {
   }, []);
 
   return (
-    <CacheProvider value={muiCache ?? createMuiCache()}>
+    <CacheProvider value={createMuiCache()}>
       <Head>
         <title>DDHub Client Gateway</title>
         <meta

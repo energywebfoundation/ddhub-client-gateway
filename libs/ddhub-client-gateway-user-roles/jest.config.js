@@ -11,5 +11,9 @@ module.exports = {
     '^.+\\.[tj]s$': 'ts-jest',
   },
   moduleFileExtensions: ['ts', 'js', 'html'],
+  moduleNameMapper: {
+    '^@dsb-client-gateway/dsb-client-gateway-secrets-engine$':
+      '<rootDir>/src/test-mocks/secrets-engine.ts',
+  },
   coverageDirectory: '../../coverage/libs/ddhub-client-gateway-user-roles',
 };

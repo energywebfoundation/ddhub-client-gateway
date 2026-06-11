@@ -74,10 +74,11 @@ export const useStyles = makeStyles()((theme) => ({
     right: 20,
   },
   popupIcon: {
-    position: 'absolute',
-    top: 2,
-    right: 2,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
     transform: 'none',
+    padding: 0,
     '& svg': {
       stroke: theme.palette.common.white,
     },

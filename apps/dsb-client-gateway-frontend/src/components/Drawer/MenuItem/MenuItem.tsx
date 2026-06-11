@@ -18,12 +18,14 @@ export const MenuItem = ({ href, onClick, title, icon }: MenuItemProps) => {
   const { classes } = useStyles();
 
   return href ? (
-    <Link href={href} passHref>
-      <ListItem className={clsx(classes.navLink, isActive(href))} component="a">
-        {icon}
-        <MenuItemText title={title} />
-      </ListItem>
-    </Link>
+    <ListItem
+      component={Link}
+      href={href}
+      className={clsx(classes.navLink, isActive(href))}
+    >
+      {icon}
+      <MenuItemText title={title} />
+    </ListItem>
   ) : (
     <ListItem className={classes.navLink} onClick={onClick}>
       {icon}

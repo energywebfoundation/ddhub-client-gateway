@@ -5,8 +5,8 @@ import { EnrolmentRepository } from './repository/enrolment.repository';
 import { EnrolmentWrapperRepository } from './wrapper/enrolment-wrapper.repository';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([EnrolmentEntity, EnrolmentRepository])],
-  providers: [EnrolmentWrapperRepository],
+  imports: [TypeOrmModule.forFeature([EnrolmentEntity])],
+  providers: [EnrolmentRepository, EnrolmentWrapperRepository],
   exports: [EnrolmentWrapperRepository],
 })
 export class EnrolmentRepositoryModule {}

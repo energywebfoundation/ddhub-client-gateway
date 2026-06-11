@@ -1,4 +1,4 @@
-import { useLayoutEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { keyBy } from 'lodash';
 import {
   messageDataService,
@@ -62,7 +62,7 @@ export const useDataMessagingUploadEffects = ({
     value: topic.version,
   }));
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     const subscription = messageDataService
       .getData()
       .subscribe((message: any) => {

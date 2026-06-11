@@ -6,9 +6,9 @@ import { FileMetadataWrapperRepository } from './wrapper/file-metadata-wrapper.r
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([FileMetadataEntity, FileMetadataRepository]),
+    TypeOrmModule.forFeature([FileMetadataEntity]),
   ],
-  providers: [FileMetadataWrapperRepository],
+  providers: [FileMetadataRepository, FileMetadataWrapperRepository],
   exports: [FileMetadataWrapperRepository],
 })
 export class FileMetadataRepositoryModule {}

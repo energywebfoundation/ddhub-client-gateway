@@ -16,7 +16,7 @@ import {
   ClientSubscriptionIcon,
   AddressBookIcon,
 } from '@ddhub-client-gateway-frontend/ui/core';
-import { routerConst } from '@ddhub-client-gateway-frontend/ui/utils';
+import { publicConfig, routerConst } from '@ddhub-client-gateway-frontend/ui/utils';
 import { useStyles } from './Drawer.styles';
 import {
   CollapsableListItemProps,
@@ -28,12 +28,9 @@ import {
   NewMessage,
   useNewMessageEffects,
 } from '@ddhub-client-gateway-frontend/ui/messaging';
-import getConfig from 'next/config';
 
 export const Drawer = () => {
-  const { publicRuntimeConfig } = getConfig();
-  const brandingLogoPath =
-    publicRuntimeConfig?.customBranding ?? '/ew-main-logo.svg';
+  const brandingLogoPath = publicConfig.customBranding ?? '/ew-main-logo.svg';
 
   const {
     userData: { displayedRoutes },

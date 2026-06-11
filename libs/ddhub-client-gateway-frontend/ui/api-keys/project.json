@@ -1,12 +1,14 @@
 {
-  "root": "libs/dsb-client-gateway/ui/api-keys",
-  "sourceRoot": "libs/dsb-client-gateway/ui/api-keys/src",
+  "root": "libs/ddhub-client-gateway-frontend/ui/api-keys",
+  "sourceRoot": "libs/ddhub-client-gateway-frontend/ui/api-keys/src",
   "projectType": "library",
   "tags": [],
   "targets": {
     "lint": {
       "executor": "@nrwl/linter:eslint",
-      "outputs": ["{options.outputFile}"],
+      "outputs": [
+        "{options.outputFile}"
+      ],
       "options": {
         "lintFilePatterns": [
           "libs/ddhub-client-gateway-frontend/ui/api-keys/**/*.{ts,tsx,js,jsx}"
@@ -15,11 +17,14 @@
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/ddhub-client-gateway-frontend/ui/api-keys"],
+      "outputs": [
+        "coverage/libs/ddhub-client-gateway-frontend/ui/api-keys"
+      ],
       "options": {
         "jestConfig": "libs/ddhub-client-gateway-frontend/ui/api-keys/jest.config.js",
         "passWithNoTests": true
       }
     }
-  }
+  },
+  "name": "ddhub-client-gateway-ui-api-keys"
 }

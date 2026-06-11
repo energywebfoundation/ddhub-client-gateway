@@ -6,9 +6,9 @@ import { AssociationKeysWrapperRepository } from './wrapper/association-keys-wra
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([AssociationKeyEntity, AssociationKeysRepository]),
+    TypeOrmModule.forFeature([AssociationKeyEntity]),
   ],
-  providers: [AssociationKeysWrapperRepository],
+  providers: [AssociationKeysRepository, AssociationKeysWrapperRepository],
   exports: [AssociationKeysWrapperRepository],
 })
 export class AssociationKeysRepositoryModule {}

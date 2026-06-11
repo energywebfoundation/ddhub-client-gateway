@@ -6,9 +6,9 @@ import { ApplicationWrapperRepository } from './wrapper/application-wrapper.repo
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([ApplicationEntity, ApplicationRepository]),
+    TypeOrmModule.forFeature([ApplicationEntity]),
   ],
-  providers: [ApplicationWrapperRepository],
+  providers: [ApplicationRepository, ApplicationWrapperRepository],
   exports: [ApplicationWrapperRepository],
 })
 export class ApplicationRepositoryModule {}

@@ -4,38 +4,35 @@
   "projectType": "application",
   "targets": {
     "build": {
-      "executor": "@nrwl/next:build",
-      "outputs": ["{options.outputPath}"],
+      "executor": "@nrwl/workspace:run-commands",
+      "outputs": ["{workspaceRoot}/dist/apps/dsb-client-gateway-frontend"],
       "defaultConfiguration": "production",
       "options": {
-        "root": "apps/dsb-client-gateway-frontend",
-        "outputPath": "dist/apps/dsb-client-gateway-frontend",
-        "assets": [
-          "apps/dsb-client-gateway-frontend/public/frontend-config.json",
-          "apps/dsb-client-gateway-frontend/public/ws.yaml"
-        ]
+        "command": "NODE_ENV=production NX_NEXT_DIST_DIR=../../dist/apps/dsb-client-gateway-frontend/.next next build",
+        "cwd": "apps/dsb-client-gateway-frontend"
       },
       "configurations": {
         "production": {}
       }
     },
     "serve": {
-      "executor": "@nrwl/next:server",
+      "executor": "@nrwl/workspace:run-commands",
       "options": {
-        "buildTarget": "dsb-client-gateway-frontend:build",
-        "dev": true
+        "command": "next dev -p 4200",
+        "cwd": "apps/dsb-client-gateway-frontend"
       },
       "configurations": {
         "production": {
-          "buildTarget": "dsb-client-gateway-frontend:build:production",
-          "dev": false
+          "command": "next start",
+          "cwd": "apps/dsb-client-gateway-frontend"
         }
       }
     },
     "export": {
-      "executor": "@nrwl/next:export",
+      "executor": "@nrwl/workspace:run-commands",
       "options": {
-        "buildTarget": "dsb-client-gateway-frontend:build:production"
+        "command": "NODE_ENV=production NX_STATIC_EXPORT=true NX_NEXT_DIST_DIR=../../dist/apps/dsb-client-gateway-frontend/exported next build",
+        "cwd": "apps/dsb-client-gateway-frontend"
       }
     },
     "test": {

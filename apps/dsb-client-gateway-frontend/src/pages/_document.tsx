@@ -8,6 +8,7 @@ class MyDocument extends Document {
     return (
       <Html lang="en">
         <Head>
+          <meta name="emotion-insertion-point" content="" />
           <link
             href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&amp;display=swap"
             rel="stylesheet"
