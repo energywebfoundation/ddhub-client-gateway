@@ -34,7 +34,7 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-    command: "./node_modules/.bin/typeorm migrations:run"
+    command: "./node_modules/.bin/typeorm migration:run -d ormconfig.js"
     environment:
       <<: *gateway-env
     env_file:
