@@ -6,7 +6,18 @@ import {
 } from '@azure/keyvault-secrets';
 import { AzureKeyVaultService } from './azure-key-vault.service';
 import { Test } from '@nestjs/testing';
-import { getPagedAsyncIterator } from '@azure/core-paging';
+
+function getPagedAsyncIterator<T>(options: {
+  firstPageLink: string;
+  getPage: () => Promise<{ page: T[] }>;
+}) {
+  return {
+    async *[Symbol.asyncIterator]() {
+      const { page } = await options.getPage();
+      yield* page;
+    },
+  };
+}
 
 jest.mock('@azure/identity');
 jest.mock('@azure/keyvault-secrets');
@@ -453,7 +464,7 @@ describe(`${AzureKeyVaultService.name}`, () => {
                 },
               ],
             }),
-        })
+        }) as unknown as ReturnType<SecretClient['listPropertiesOfSecrets']>
       );
 
     const response = await service.getAllUsers();
@@ -481,7 +492,7 @@ describe(`${AzureKeyVaultService.name}`, () => {
                 },
               ],
             }),
-        })
+        }) as unknown as ReturnType<SecretClient['listPropertiesOfSecrets']>
       );
 
     const response = await service.getAllUsers();
