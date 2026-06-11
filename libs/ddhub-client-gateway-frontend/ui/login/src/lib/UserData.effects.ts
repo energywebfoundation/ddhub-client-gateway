@@ -44,11 +44,6 @@ export const routeRestrictions = new Map<string, string>()
   .set('users', routerConst.Users)
   .set('apiKeys', routerConst.APIKeys);
 
-enum VersionStatus {
-  UNAVAILABLE = 'Unavailable',
-  NOT_DETECTED = 'NOT_DETECTED',
-}
-
 const mapRoleRestrictions = (
   restrictions: IndexableRouteRestrictions,
   roleKey: keyof RouteRestriction,
@@ -169,7 +164,7 @@ export const useUserDataEffects = () => {
     {} as RouteRestrictions
   );
   const [identity, setIdentity] = useState({} as IdentityWithEnrolment);
-  const [version, setVersion] = useState<string>(VersionStatus.UNAVAILABLE);
+  const [version, setVersion] = useState<string>('');
 
   useEffect(() => {
     if (authenticated && addressBookContext) {
