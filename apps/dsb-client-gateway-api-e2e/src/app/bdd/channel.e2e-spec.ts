@@ -13,7 +13,7 @@ import {
   whenIUpdatePayloadEncryption,
 } from './helpers/channel.helper';
 import request from 'supertest';
-import { setupApp } from './helpers/app.helper';
+import { setupApp, teardownApp } from './helpers/app.helper';
 import {
   givenIHaveCreatedTopic,
   givenTopicWithIdNoExists,
@@ -38,7 +38,7 @@ describe('Channel Feature', () => {
   const getApp = () => app;
 
   afterAll(async () => {
-    await app.close();
+    await teardownApp(app);
   });
 
   const testMemory = new MemoryHelper();

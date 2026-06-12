@@ -20,6 +20,15 @@ const mockConfigService = {
   get: jest.fn(),
 };
 
+const enableUserAuthEnv = () => {
+  mockConfigService.get.mockImplementation((key: string, defaultVal?: unknown) => {
+    if (key === 'USER_AUTH_ENABLED') {
+      return true;
+    }
+    return defaultVal;
+  });
+};
+
 describe(`${UserAuthService.name}`, () => {
   let error: Error | null;
   let result: unknown;
@@ -54,6 +63,7 @@ describe(`${UserAuthService.name}`, () => {
   describe('refreshToken()', () => {
     describe('should throw error as auth is not enabled', () => {
       beforeEach(async () => {
+        enableUserAuthEnv();
         mockSecretsEngineService.isAuthEnabled = jest.fn().mockImplementationOnce(() => false);
 
         try {
@@ -104,6 +114,7 @@ describe(`${UserAuthService.name}`, () => {
   describe('login()', () => {
     describe('should not login user as password does not match', () => {
       beforeEach(async () => {
+        enableUserAuthEnv();
         mockSecretsEngineService.isAuthEnabled = jest.fn().mockImplementationOnce(() => true);
 
         mockSecretsEngineService.getUserAuthDetails = jest
@@ -146,6 +157,7 @@ describe(`${UserAuthService.name}`, () => {
 
     describe('should login user', () => {
       beforeEach(async () => {
+        enableUserAuthEnv();
         mockSecretsEngineService.isAuthEnabled = jest.fn().mockImplementationOnce(() => true);
 
         mockSecretsEngineService.getUserAuthDetails = jest
@@ -193,6 +205,7 @@ describe(`${UserAuthService.name}`, () => {
 
     describe('should throw error as user does not exists', () => {
       beforeEach(async () => {
+        enableUserAuthEnv();
         mockSecretsEngineService.isAuthEnabled = jest.fn().mockImplementationOnce(() => true);
 
         mockSecretsEngineService.getUserAuthDetails = jest
@@ -231,6 +244,7 @@ describe(`${UserAuthService.name}`, () => {
 
     describe('should throw error as login is disabled', () => {
       beforeEach(async () => {
+        enableUserAuthEnv();
         mockSecretsEngineService.isAuthEnabled = jest.fn().mockImplementationOnce(() => false);
 
         try {

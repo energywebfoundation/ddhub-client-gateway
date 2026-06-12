@@ -42,6 +42,10 @@ try {
 
 module.exports = {
   ...nxPreset,
+  setupFiles: [
+    ...(nxPreset.setupFiles || []),
+    path.join(__dirname, 'jest.setup.js'),
+  ],
   moduleNameMapper: {
     ...(nxPreset.moduleNameMapper || {}),
     ...typespecModuleNameMapper,

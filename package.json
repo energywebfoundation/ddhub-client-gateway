@@ -9,7 +9,7 @@
   "scripts": {
     "migrations:build": "rimraf migrations-build && tsc -p tsconfig.migrations.json",
     "migrations:run": "npm run typeorm -- migration:run -d ormconfig.js",
-    "migrations:test:run": "DB_NAME=postgresql://ddhub:ddhub@localhost:5432/ddhub_test npm run typeorm -- migration:run -d ormconfig.js",
+    "migrations:test:run": "pnpm run migrations:build && node scripts/run-test-migrations.js",
     "typeorm": "node ./node_modules/typeorm/cli.js",
     "generate:envs": "npm run generate:api:envs && npm run generate:scheduler:envs",
     "generate:api:envs": "npm run build:api:envs && node dist/apps/dsb-client-gateway-api-envs/main.js",
@@ -31,6 +31,7 @@
     "test": "nx test",
     "test:spec:api": "nx test dsb-client-gateway-api",
     "test:e2e:api": "nx test dsb-client-gateway-api-e2e",
+    "test:e2e:api:prepare": "bash scripts/e2e-api-prepare.sh",
     "prepare": "husky install"
   },
   "private": true,
