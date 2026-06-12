@@ -48,7 +48,9 @@
       "outputs": ["{options.outputFile}"],
       "options": {
         "lintFilePatterns": [
-          "apps/dsb-client-gateway-frontend/**/*.{ts,tsx,js,jsx}"
+          "apps/dsb-client-gateway-frontend/src/**/*.{ts,tsx,js,jsx}",
+          "apps/dsb-client-gateway-frontend/*.{js,ts}",
+          "apps/dsb-client-gateway-frontend/sentry.client.config.js"
         ]
       }
     }
