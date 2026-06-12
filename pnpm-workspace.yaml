@@ -46,11 +46,20 @@ overrides:
   postcss: ^8.5.10
   yargs-parser: ^5.0.1
   uuid: ^11.1.1
-  "request>uuid": ^3.4.0
-  "@cypress/request>uuid": ^3.4.0
+  "request>uuid": ^11.1.1
+  "@cypress/request>uuid": ^11.1.1
+  "@tootallnate/once": ^2.0.1
+  request: npm:@cypress/request@^3.0.0
+  "@cypress/request": ^3.0.0
+  joi: ^18.2.1
+  "@nestjs/common": ^10.4.16
+  "@nestjs/core": ^11.1.18
+  "@nestjs/testing": ^10.4.16
+  file-type: ^21.3.2
   socket.io: ^4.7.5
   engine.io: ^6.5.4
   webpack-dev-server: ^5.2.4
+
 
 allowBuilds:
   "@nestjs/core": true
