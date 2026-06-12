@@ -43,7 +43,7 @@ export class HeartbeatService implements OnApplicationBootstrap {
     cronJobs.forEach((value, key) => {
       let next;
       try {
-        next = value.nextDates().toDate();
+        next = value.nextDate().toJSDate();
       } catch (e) {
         next = 'error: next fire date is in the past!';
       }

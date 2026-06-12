@@ -313,6 +313,7 @@ export const useUserDataEffects = () => {
     resetUserData,
     userAuthLogout,
     authEnabled: config?.authEnabled ?? false,
+    authenticated,
     configIsLoading,
   };
 };

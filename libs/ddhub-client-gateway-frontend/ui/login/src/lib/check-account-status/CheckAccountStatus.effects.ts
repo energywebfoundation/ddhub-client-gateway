@@ -75,8 +75,13 @@ export const useCheckAccountStatus = (
 ) => {
   const router = useRouter();
   const queryClient = useQueryClient();
-  const { setUserData, setIsCheckingIdentity, refreshIdentity } =
-    useUserDataEffects();
+  const {
+    setUserData,
+    setIsCheckingIdentity,
+    refreshIdentity,
+    authEnabled,
+    authenticated,
+  } = useUserDataEffects();
   const { setIsLoading } = useBackdropContext();
   const [checking, setChecking] = useState(triggerQuery);
   const [error, setError] = useState(null);
@@ -119,7 +124,10 @@ export const useCheckAccountStatus = (
   };
 
   useEffect(() => {
-    if (!error && refreshIdentity) {
+    const shouldFetchIdentity =
+      refreshIdentity && (!authEnabled || authenticated);
+
+    if (!error && shouldFetchIdentity) {
       setIsCheckingIdentity(true);
       getIdentityData()
         .then((res) => {
@@ -139,7 +147,7 @@ export const useCheckAccountStatus = (
           setIsCheckingIdentity(false);
         });
     }
-  }, [error, refreshIdentity]);
+  }, [error, refreshIdentity, authEnabled, authenticated]);
 
   return { checking, setChecking };
 };

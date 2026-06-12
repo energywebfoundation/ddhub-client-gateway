@@ -13,7 +13,6 @@ overrides:
   express>path-to-regexp: ^0.1.13
   '@nestjs/core>path-to-regexp': ^0.1.13
   nise>path-to-regexp: ^0.1.13
-  "@nestjs/swagger>path-to-regexp": ^3.3.0
   semver: ^7.5.4
   loader-utils: ^2.0.4
   minimatch: ^3.1.4
@@ -52,9 +51,6 @@ overrides:
   request: npm:@cypress/request@^3.0.0
   "@cypress/request": ^3.0.0
   joi: ^18.2.1
-  "@nestjs/common": ^10.4.16
-  "@nestjs/core": ^11.1.18
-  "@nestjs/testing": ^10.4.16
   file-type: ^21.3.2
   socket.io: ^4.7.5
   engine.io: ^6.5.4

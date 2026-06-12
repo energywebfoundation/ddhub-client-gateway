@@ -6,7 +6,8 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 export const createDocument = async () => {
   const app = await NestFactory.create(
-    AppModule.register({ shouldValidate: false })
+    AppModule.register({ shouldValidate: false }),
+    { bodyParser: false }
   );
   app.setGlobalPrefix('api/v2');
 

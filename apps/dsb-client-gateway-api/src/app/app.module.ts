@@ -6,7 +6,7 @@ import { IamModule } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
 import { CertificateModule } from './modules/certificate/certificate.module';
 import { KeysModule } from './modules/keys/keys.module';
 import { SecretsEngineModule } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
-import { APP_FILTER, APP_GUARD } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { AllExceptionsFilter } from './modules/utils/filter/all-exceptions.filter';
 import { TerminusModule } from '@nestjs/terminus';
 import { ScheduleModule } from '@nestjs/schedule';
@@ -31,6 +31,7 @@ import { AddressBookModule } from './modules/address-book/address-book.module';
 import { UserModule } from './modules/user/user.module';
 import { DdhubClientGatewayUserRolesModule } from '@dsb-client-gateway/ddhub-client-gateway-user-roles';
 import { RolesModule } from './modules/roles/roles.module';
+import { PinoContextInterceptor } from './modules/utils/interceptors/pino-context.interceptor';
 
 @Module({})
 export class AppModule {
@@ -131,6 +132,10 @@ export class AppModule {
       {
         provide: APP_GUARD,
         useClass: ApiKeyGuard,
+      },
+      {
+        provide: APP_INTERCEPTOR,
+        useClass: PinoContextInterceptor,
       },
     ];
 

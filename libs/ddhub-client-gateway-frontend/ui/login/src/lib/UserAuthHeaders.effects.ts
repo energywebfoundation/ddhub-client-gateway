@@ -17,6 +17,7 @@ export const useUserAuthHeaders = () => {
       Axios.interceptors.request.eject(requestInterceptorId);
       setRequestInterceptorId(undefined);
     }
+    delete Axios.defaults.headers.common['Authorization'];
   };
 
   const encodeParams = (params: Record<string, string>) => {

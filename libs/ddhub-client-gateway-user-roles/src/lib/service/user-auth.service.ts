@@ -26,13 +26,32 @@ export class UserAuthService {
   }
 
   public isAuthEnabled(): boolean {
+    if (!this.isUserAuthEnvEnabled()) {
+      return false;
+    }
+
     return this.secretsEngineService.isAuthEnabled();
   }
 
-  public refreshToken(refreshToken: string): AuthTokens {
-    const isAuthEnabled: boolean = this.secretsEngineService.isAuthEnabled();
+  private isUserAuthEnvEnabled(): boolean {
+    const value = this.configService.get<string | boolean>(
+      'USER_AUTH_ENABLED',
+      false
+    );
 
-    if (!isAuthEnabled) {
+    if (typeof value === 'boolean') {
+      return value;
+    }
+
+    if (typeof value === 'string') {
+      return value.toLowerCase() === 'true';
+    }
+
+    return false;
+  }
+
+  public refreshToken(refreshToken: string): AuthTokens {
+    if (!this.isAuthEnabled()) {
       throw new Error('Auth not enabled');
     }
 
@@ -40,9 +59,7 @@ export class UserAuthService {
   }
 
   public async login(username: string, password: string): Promise<AuthTokens> {
-    const isAuthEnabled: boolean = this.secretsEngineService.isAuthEnabled();
-
-    if (!isAuthEnabled) {
+    if (!this.isAuthEnabled()) {
       throw new Error('Auth not enabled');
     }
 
@@ -63,9 +80,7 @@ export class UserAuthService {
   }
 
   public async setUserPassword(username: string, password: string, role: UserRole): Promise<void> {
-    const isAuthEnabled: boolean = this.secretsEngineService.isAuthEnabled();
-
-    if (!isAuthEnabled) {
+    if (!this.isAuthEnabled()) {
       throw new Error('Auth not enabled');
     }
 
