@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { ReactElement, ReactNode, useEffect } from 'react';
 import { AppProps } from 'next/app';
 import Router from 'next/router';
 import NProgress from 'nprogress';
@@ -60,6 +60,10 @@ export interface MyAppProps extends AppProps {
   emotionCache?: EmotionCache;
 }
 
+type NextPageWithLayout = AppProps['Component'] & {
+  getLayout?: (page: ReactElement) => ReactNode;
+};
+
 function InitializeAccountStatus(props) {
   useUserAuthHeaders();
   useCheckAccountStatus(false);
@@ -95,7 +99,8 @@ function MyApp(props: MyAppProps) {
     useAddressBookContext(queryClient);
 
   const getLayout =
-    (Component as any).getLayout || ((page) => <Layout>{page}</Layout>);
+    (Component as NextPageWithLayout).getLayout ||
+    ((page) => <Layout>{page}</Layout>);
 
   useEffect(() => {
     NProgress.configure({ showSpinner: false });

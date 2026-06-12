@@ -49,8 +49,11 @@
       "options": {
         "lintFilePatterns": [
           "apps/dsb-client-gateway-frontend/src/**/*.{ts,tsx,js,jsx}",
-          "apps/dsb-client-gateway-frontend/*.{js,ts}",
-          "apps/dsb-client-gateway-frontend/sentry.client.config.js"
+          "apps/dsb-client-gateway-frontend/next.config.js",
+          "apps/dsb-client-gateway-frontend/sentry.client.config.js",
+          "apps/dsb-client-gateway-frontend/sentry.server.config.js",
+          "apps/dsb-client-gateway-frontend/index.d.ts",
+          "apps/dsb-client-gateway-frontend/fonts.d.ts"
         ]
       }
     }

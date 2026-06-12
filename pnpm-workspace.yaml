@@ -2,6 +2,9 @@ packages:
   - 'apps/**'
   - 'libs/**'
 
+patchedDependencies:
+  '@nrwl/workspace@13.7.3': patches/@nrwl__workspace@13.7.3.patch
+
 overrides:
   dompurify: ^3.2.4
   elliptic: ^6.6.1
