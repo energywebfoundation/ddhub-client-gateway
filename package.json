@@ -156,7 +156,7 @@
     "sqlite3": "^5.1.7",
     "swagger-ui-express": "4.6.3",
     "sweetalert2": "^11.15.3",
-    "sweetalert2-react-content": "^4.2.0",
+    "sweetalert2-react-content": "^5.1.2",
     "tslib": "^2.0.0",
     "tss-react": "3.6.0",
     "typeorm": "^0.3.30",

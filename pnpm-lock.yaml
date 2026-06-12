@@ -422,8 +422,8 @@ importers:
         specifier: ^11.15.3
         version: 11.26.25
       sweetalert2-react-content:
-        specifier: ^4.2.0
-        version: 4.2.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sweetalert2@11.26.25)
+        specifier: ^5.1.2
+        version: 5.1.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sweetalert2@11.26.25)
       tslib:
         specifier: ^2.0.0
         version: 2.8.1
@@ -12689,11 +12689,11 @@ packages:
     resolution: {integrity: sha512-upi/0ZGkYgEcLeGieoz8gT74oWHA0E7JivX7aN9mAf+Tc7BQoRBvnIGHoPDw+f9TXTW4s6kGYCZJtauP6OYp7g==}
     hasBin: true
 
-  sweetalert2-react-content@4.2.0:
-    resolution: {integrity: sha512-eB324swnq10UJH8nAH2S6GHuAKDgH6GpGU8vI+ulYdmlPzpb0T5QPc7O4RFNRx28GzVZUnfvtpxZbKtZ5/KOnQ==}
+  sweetalert2-react-content@5.1.2:
+    resolution: {integrity: sha512-7s4JSqqw2OOSKxX+NjVkHwNmN2fGliulJYwjDYlYZ/yc9Gfslxd2XlYFFveEp7pXHVXpQHOAth+vnIKDpHAJNA==}
     peerDependencies:
-      react: ^16.0.0 || ^17.0.0
-      react-dom: ^16.0.0 || ^17.0.0
+      react: ^18.0.0 || ^19.0.0
+      react-dom: ^18.0.0 || ^19.0.0
       sweetalert2: ^11.0.0
 
   sweetalert2@11.26.25:
@@ -30996,7 +30996,7 @@ snapshots:
     transitivePeerDependencies:
       - encoding
 
-  sweetalert2-react-content@4.2.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sweetalert2@11.26.25):
+  sweetalert2-react-content@5.1.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sweetalert2@11.26.25):
     dependencies:
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
