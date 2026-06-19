@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { SecretsEngineService } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
 import 'multer';
 import { TlsAgentService } from '@dsb-client-gateway/ddhub-client-gateway-tls-agent';
@@ -52,16 +52,32 @@ export class CertificateService {
     privateKey: Express.Multer.File,
     caCertificate?: Express.Multer.File
   ): Promise<void> {
-    const certificateString = cert.buffer.toString();
-    const privateKeyString = privateKey.buffer.toString();
+    const certificateString = this.readUploadedFile(cert, 'certificate');
+    const privateKeyString = this.readUploadedFile(privateKey, 'privateKey');
+    const caCertificateString = caCertificate
+      ? this.readUploadedFile(caCertificate, 'caCertificate')
+      : null;
 
     await this.secretsEngineService.setCertificateDetails({
-      caCertificate: caCertificate ? caCertificate.buffer.toString() : null,
+      caCertificate: caCertificateString,
       certificate: certificateString,
       privateKey: privateKeyString,
     });
 
     await this.eventsService.triggerEvent(Events.CERTIFICATE_CHANGED);
     await this.eventsService.emitEvent(Events.CERTIFICATE_CHANGED);
+  }
+
+  private readUploadedFile(
+    file: Express.Multer.File,
+    fieldName: string
+  ): string {
+    if (!file?.buffer) {
+      throw new BadRequestException(
+        `Uploaded ${fieldName} file is empty or unreadable`
+      );
+    }
+
+    return file.buffer.toString('utf8');
   }
 }
