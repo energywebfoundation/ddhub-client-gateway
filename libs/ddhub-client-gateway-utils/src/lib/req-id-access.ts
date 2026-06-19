@@ -1,8 +1,7 @@
 import { storage } from 'nestjs-pino/storage.js';
 
-type PinoLikeLogger = {
+type LoggerWithBindings = {
   bindings?: () => Record<string, unknown>;
-  [key: symbol]: unknown;
 };
 
 const readId = (value: unknown): string | null => {
@@ -59,7 +58,7 @@ export const reqIdAccess = (): string | null => {
       return null;
     }
 
-    const logger = store.logger as PinoLikeLogger;
+    const logger = store.logger as unknown as LoggerWithBindings;
 
     if (typeof logger.bindings === 'function') {
       const fromBindings = extractReqIdFromBindings(logger.bindings());
@@ -68,9 +67,11 @@ export const reqIdAccess = (): string | null => {
       }
     }
 
-    const symbols = Object.getOwnPropertySymbols(logger);
+    const symbols = Object.getOwnPropertySymbols(store.logger);
     const internalProps =
-      symbols.length > 2 ? logger[symbols[2]] : undefined;
+      symbols.length > 2
+        ? (store.logger as unknown as Record<symbol, unknown>)[symbols[2]]
+        : undefined;
 
     if (internalProps && typeof internalProps === 'object') {
       const fromInternalBindings = extractReqIdFromBindings(
