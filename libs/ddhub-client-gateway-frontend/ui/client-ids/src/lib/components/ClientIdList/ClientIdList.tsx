@@ -20,7 +20,9 @@ export const ClientIdList = () => {
         showCheckbox={true}
         setSelectedItems={setSelectedItems}
       >
-        <CreateButton onCreate={removeClientIds} buttonText='Remove'/>
+        {clientIds.length > 0 && (
+          <CreateButton onCreate={removeClientIds} buttonText="Remove" />
+        )}
       </GenericTable>
     </section>
   );

@@ -14,7 +14,10 @@ export const useInterceptors = (
 ) => {
   httpService.axiosRef.interceptors.request.use(
     (config: any) => {
-      config.headers['X-Request-Id'] = reqIdAccess();
+      const reqId = reqIdAccess();
+      if (reqId) {
+        config.headers['X-Request-Id'] = reqId;
+      }
       config.headers['X-DDHUB-Client-Version'] = versionService.getVersion();
 
       return config;

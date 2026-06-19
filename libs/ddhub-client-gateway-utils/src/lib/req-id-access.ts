@@ -1,33 +1,88 @@
 import { storage } from 'nestjs-pino/storage.js';
 
-export const reqIdAccess = (): string | null => {
-  const d = storage.getStore();
+type PinoLikeLogger = {
+  bindings?: () => Record<string, unknown>;
+  [key: symbol]: unknown;
+};
 
-  if (!d) {
+const readId = (value: unknown): string | null => {
+  if (typeof value === 'string' && value.length > 0) {
+    return value;
+  }
+
+  return null;
+};
+
+const extractReqIdFromBindings = (
+  bindings: Record<string, unknown> | undefined,
+): string | null => {
+  if (!bindings) {
     return null;
   }
 
-  if (!d.logger) {
-    return null;
+  const req = bindings.req;
+  if (req && typeof req === 'object' && 'id' in req) {
+    const reqId = readId((req as { id?: unknown }).id);
+    if (reqId) {
+      return reqId;
+    }
   }
 
-  const props = d.logger[Object.getOwnPropertySymbols(d.logger)[2]];
+  return readId(bindings.runId) ?? readId(bindings.reqId);
+};
 
-  if (!props) {
+const extractReqIdFromLegacyProps = (props: unknown): string | null => {
+  if (typeof props !== 'string') {
     return null;
   }
 
   const reqPass = props.split(',').find((t) => t.startsWith('"req":'));
 
-  if (!reqPass) {
-    const runIdPass = props.split(',').find((t) => t.startsWith('"runId":'));
+  if (reqPass) {
+    return reqPass.split(':')[2].split('"').join('');
+  }
 
-    if (!runIdPass) {
-      return null;
-    }
+  const runIdPass = props.split(',').find((t) => t.startsWith('"runId":'));
 
+  if (runIdPass) {
     return runIdPass.split(':')[1].split('"').join('');
   }
 
-  return reqPass.split(':')[2].split('"').join('');
+  return null;
+};
+
+export const reqIdAccess = (): string | null => {
+  try {
+    const store = storage.getStore();
+
+    if (!store?.logger) {
+      return null;
+    }
+
+    const logger = store.logger as PinoLikeLogger;
+
+    if (typeof logger.bindings === 'function') {
+      const fromBindings = extractReqIdFromBindings(logger.bindings());
+      if (fromBindings) {
+        return fromBindings;
+      }
+    }
+
+    const symbols = Object.getOwnPropertySymbols(logger);
+    const internalProps =
+      symbols.length > 2 ? logger[symbols[2]] : undefined;
+
+    if (internalProps && typeof internalProps === 'object') {
+      const fromInternalBindings = extractReqIdFromBindings(
+        internalProps as Record<string, unknown>,
+      );
+      if (fromInternalBindings) {
+        return fromInternalBindings;
+      }
+    }
+
+    return extractReqIdFromLegacyProps(internalProps);
+  } catch {
+    return null;
+  }
 };

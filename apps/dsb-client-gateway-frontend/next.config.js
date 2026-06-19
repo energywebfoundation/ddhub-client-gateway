@@ -6,9 +6,16 @@
 const path = require('path');
 const withNx = require('@nrwl/next/plugins/with-nx');
 
+const workspaceRoot = path.join(__dirname, '../..');
+
 const moduleExports = withNx({
   reactStrictMode: true,
   distDir: process.env.NX_NEXT_DIST_DIR || '.next',
+  // pnpm monorepo: avoid Next inferring ~/package-lock.json as the workspace root
+  outputFileTracingRoot: workspaceRoot,
+  turbopack: {
+    root: workspaceRoot,
+  },
   ...(process.env.NX_STATIC_EXPORT === 'true' ? { output: 'export' } : {}),
   // required for our custom server
   // https://github.com/vercel/next.js/issues/7755
