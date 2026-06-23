@@ -16,6 +16,7 @@ import {
 } from '@dsb-client-gateway/ddhub-client-gateway-events';
 import { CommandBus } from '@nestjs/cqrs';
 import { ReloginCommand } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
+import { DidAuthService } from '@dsb-client-gateway/ddhub-client-gateway-did-auth';
 
 @Injectable()
 export class EnrolmentCronService implements OnApplicationBootstrap {
@@ -28,7 +29,8 @@ export class EnrolmentCronService implements OnApplicationBootstrap {
     protected readonly cronWrapper: CronWrapperRepository,
     protected readonly iamService: IamService,
     protected readonly eventsService: EventsService,
-    protected readonly commandBus: CommandBus
+    protected readonly commandBus: CommandBus,
+    protected readonly didAuthService: DidAuthService
   ) { }
 
   public async onApplicationBootstrap(): Promise<void> {
@@ -135,6 +137,8 @@ export class EnrolmentCronService implements OnApplicationBootstrap {
   }
 
   private async triggerRoleChange(): Promise<void> {
+    this.logger.log('Role change detected. Terminating Auth Proxy sessions.');
+    await this.didAuthService.logout();
     await this.eventsService.triggerEvent(Events.ROLES_CHANGE);
     await this.commandBus.execute(new ReloginCommand('ROLES_CHANGE'));
   }

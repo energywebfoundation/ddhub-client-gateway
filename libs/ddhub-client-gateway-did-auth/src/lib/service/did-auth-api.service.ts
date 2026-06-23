@@ -79,4 +79,23 @@ export class DidAuthApiService {
 
     return data;
   }
+
+  public async logout(refreshToken: string): Promise<void> {
+    await lastValueFrom(
+      this.httpService
+        .post(
+          '/auth/logout',
+          {
+            refreshToken,
+            allDevices: true,
+          },
+          {
+            httpsAgent: this.tlsAgentService.get(),
+          }
+        )
+        .pipe(timeout(+this.configService.get<number>('MAX_TIMEOUT', 60000)))
+    ).catch((e) => {
+      this.logger.error(`[Logout Failed][msg] ${e.message}`);
+    });
+  }
 }

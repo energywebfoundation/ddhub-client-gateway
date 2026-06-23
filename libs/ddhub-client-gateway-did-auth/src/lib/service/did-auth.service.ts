@@ -57,4 +57,16 @@ export class DidAuthService {
     this.accessToken = response.access_token;
     this.refreshToken = response.refresh_token;
   }
+
+  public async logout(): Promise<void> {
+    this.logger.log('Attempting to logout and invalidate Auth Proxy sessions');
+
+    if (this.refreshToken) {
+      await this.didAuthApiService.logout(this.refreshToken);
+    }
+
+    // Clear local token state
+    this.accessToken = null;
+    this.refreshToken = null;
+  }
 }

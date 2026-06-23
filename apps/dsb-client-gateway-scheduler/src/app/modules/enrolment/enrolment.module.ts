@@ -6,6 +6,7 @@ import { CronRepositoryModule } from '@dsb-client-gateway/dsb-client-gateway-sto
 import { EnrolmentIdentityChangedHandler } from './handler/enrolment-identity-changed.handler';
 import { DdhubClientGatewayEventsModule } from '@dsb-client-gateway/ddhub-client-gateway-events';
 import { CqrsModule } from '@nestjs/cqrs';
+import { DidAuthModule } from '@dsb-client-gateway/ddhub-client-gateway-did-auth';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { CqrsModule } from '@nestjs/cqrs';
     DdhubClientGatewayEnrolmentModule,
     CronRepositoryModule,
     DdhubClientGatewayEventsModule,
+    DidAuthModule,
   ],
   providers: [
     EnrolmentListenerService,

@@ -1456,6 +1456,17 @@ paths:
                 $ref: "#/components/schemas/LoginResponseDto"
       tags:
         - "Login"
+  /api/v2/login/logout:
+    post:
+      description: "Explicitly calls the Auth Proxy /auth/logout endpoint to invalidate active sessions associated with the user refresh token."
+      operationId: "LoginController_logout"
+      parameters: []
+      responses:
+        200:
+          description: "Successfully logged out and invalidated Auth Proxy sessions"
+      summary: "Logout and invalidate active Auth Proxy sessions"
+      tags:
+        - "Login"
   /api/v2/user-api-key/users/me:
     get:
       operationId: "UserApiKeyController_getCurrentUser"
@@ -1777,14 +1788,6 @@ info:
 tags: []
 servers: []
 components:
-  securitySchemes:
-    bearer:
-      scheme: "bearer"
-      bearerFormat: "JWT"
-      type: "http"
-      name: "Authorization"
-      description: "Enter JWT token"
-      in: "header"
   schemas:
     RoleDto:
       type: "object"
@@ -3549,8 +3552,6 @@ components:
             $ref: "#/components/schemas/RequestorFieldDto"
       required:
         - "role"
-security:
-  - bearer: []
 externalDocs:
   description: "Postman Collection"
   url: "/docs-json"
