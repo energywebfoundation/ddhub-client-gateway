@@ -1,32 +1,43 @@
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { FieldValues, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { LoginRequestDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 
 interface UserLoginFormProps {
   onSubmitHandler: (data: LoginRequestDto) => void;
 }
 
-export const USERNAME_FIELD = 'username';
-export const PASSWORD_FIELD = 'password';
+type UserLoginFormValues = {
+  username: string;
+  userCredential: string;
+};
+
+export const USERNAME_FIELD: keyof Pick<UserLoginFormValues, 'username'> =
+  'username';
+export const USER_CREDENTIAL_FIELD: keyof Pick<
+  UserLoginFormValues,
+  'userCredential'
+> = 'userCredential';
 
 export const useUserLoginFormEffects = ({
   onSubmitHandler,
 }: UserLoginFormProps) => {
   const validationSchema = Yup.object().shape({
     [USERNAME_FIELD]: Yup.string().max(64, 'Maximum length is 64').required(),
-    [PASSWORD_FIELD]: Yup.string().max(64, 'Maximum length is 64').required(),
+    [USER_CREDENTIAL_FIELD]: Yup.string()
+      .max(64, 'Maximum length is 64')
+      .required(),
   });
   const {
     register,
     handleSubmit,
     formState: { errors, isValid },
-  } = useForm<FieldValues>({
+  } = useForm<UserLoginFormValues>({
     resolver: yupResolver(validationSchema),
     mode: 'onChange',
     defaultValues: {
       [USERNAME_FIELD]: '',
-      [PASSWORD_FIELD]: '',
+      [USER_CREDENTIAL_FIELD]: '',
     },
   });
   const fields = [
@@ -38,33 +49,31 @@ export const useUserLoginFormEffects = ({
       },
     },
     {
-      name: PASSWORD_FIELD,
+      name: USER_CREDENTIAL_FIELD,
       label: 'Password',
       inputProps: {
         placeholder: 'Enter your password',
-        type: 'password',
+        type: 'password' as const,
       },
     },
   ];
 
-  const isValidUserLoginData = (data: unknown): data is LoginRequestDto => {
-    return (
-      typeof data === 'object' &&
-      data !== null &&
-      USERNAME_FIELD in data &&
-      PASSWORD_FIELD in data &&
-      !!data[USERNAME_FIELD] &&
-      !!data[PASSWORD_FIELD]
-    );
+  const isValidUserLoginData = (
+    data: UserLoginFormValues,
+  ): data is UserLoginFormValues => {
+    return !!data[USERNAME_FIELD]?.trim() && !!data[USER_CREDENTIAL_FIELD]?.trim();
   };
 
-  const onSubmit = handleSubmit((data: FieldValues) => {
+  const onSubmit = handleSubmit((data) => {
     if (!isValidUserLoginData(data)) {
       // TODO: display error
       return;
     }
 
-    onSubmitHandler(data);
+    onSubmitHandler({
+      username: data[USERNAME_FIELD],
+      password: data[USER_CREDENTIAL_FIELD],
+    });
   });
 
   return {
