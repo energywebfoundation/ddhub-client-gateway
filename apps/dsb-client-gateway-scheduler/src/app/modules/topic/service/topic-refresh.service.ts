@@ -29,6 +29,7 @@ import { TopicDeletedCommand } from '../../channel/command/topic-deleted.command
 @Injectable()
 export class TopicRefreshService implements OnApplicationBootstrap {
   protected readonly logger = new Logger(TopicRefreshService.name);
+  protected refreshing = false;
 
   constructor(
     protected readonly wrapper: TopicRepositoryWrapper,
@@ -70,6 +71,11 @@ export class TopicRefreshService implements OnApplicationBootstrap {
 
   @Span('topic_refresh')
   public async refreshTopics(): Promise<void> {
+    if (this.refreshing) {
+      this.logger.warn('Topic refresh is already running, skipping');
+      return;
+    }
+    this.refreshing = true;
     try {
       const isInitialized: boolean = this.iamService.isInitialized();
 
@@ -117,9 +123,8 @@ export class TopicRefreshService implements OnApplicationBootstrap {
       for (const application of applicationsToRun) {
         const matchingTopicMonitor: TopicMonitorUpdates | undefined =
           topicMonitors.find(
-            ({ owner }: TopicMonitorUpdates) =>
-              (owner) =>
-                application.namespace
+            (monitor: TopicMonitorUpdates) =>
+              monitor.owner === application.namespace
           );
 
         await this.handleApplications(application, matchingTopicMonitor);
@@ -138,6 +143,8 @@ export class TopicRefreshService implements OnApplicationBootstrap {
       });
 
       this.logger.error('refresh topics failed', e);
+    } finally {
+      this.refreshing = false;
     }
   }
 
@@ -297,19 +304,35 @@ export class TopicRefreshService implements OnApplicationBootstrap {
       return [allOwners, []];
     }
 
+    // Aggregate topic monitors by owner name, keeping the latest timestamps
+    const aggregatedMonitors: Record<string, TopicMonitorUpdates> = {};
+    for (const monitor of topicUpdatesMonitor) {
+      const existing = aggregatedMonitors[monitor.owner];
+      if (!existing) {
+        aggregatedMonitors[monitor.owner] = { ...monitor };
+      } else {
+        if (monitor.lastTopicUpdate > existing.lastTopicUpdate) {
+          existing.lastTopicUpdate = monitor.lastTopicUpdate;
+        }
+        if (monitor.lastTopicVersionUpdate > existing.lastTopicVersionUpdate) {
+          existing.lastTopicVersionUpdate = monitor.lastTopicVersionUpdate;
+        }
+      }
+    }
+
     const existingTopicsMonitors: TopicMonitorEntity[] =
       await this.topicMonitorWrapper.topicRepository.get(allOwners);
 
     if (existingTopicsMonitors.length === 0) {
       this.logger.warn('no previously stored monitors');
 
-      return [allOwners, topicUpdatesMonitor];
+      return [allOwners, Object.values(aggregatedMonitors)];
     }
 
     const ownersToReturn: string[] = [];
     const monitorsToReturn: TopicMonitorUpdates[] = [];
 
-    for (const topicMonitor of topicUpdatesMonitor) {
+    for (const topicMonitor of Object.values(aggregatedMonitors)) {
       const matchingElement: TopicMonitorEntity | undefined =
         existingTopicsMonitors.find(
           (topicMonitorEntity: TopicMonitorEntity) =>

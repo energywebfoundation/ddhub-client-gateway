@@ -6,7 +6,7 @@ import {
   HttpStatus,
   Post,
 } from '@nestjs/common';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import {
   AuthTokens,
   ExcludeAuthRoute,
@@ -16,11 +16,23 @@ import { LoginRequestDto } from './dto/request/login-request.dto';
 import { LoginResponseDto } from './dto/response/login-response.dto';
 import { ConfigResponseDto } from './dto/response/config-response.dto';
 import { RefreshTokenRequestDto } from './dto/request/refresh-token-request.dto';
+import { DidAuthService } from '@dsb-client-gateway/ddhub-client-gateway-did-auth';
+import { CommandBus } from '@nestjs/cqrs';
+import { ReloginCommand } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
+import {
+  Events,
+  EventsService,
+} from '@dsb-client-gateway/ddhub-client-gateway-events';
 
 @Controller('login')
 @ApiTags('Login')
 export class LoginController {
-  constructor(protected readonly userAuthService: UserAuthService) {}
+  constructor(
+    protected readonly userAuthService: UserAuthService,
+    protected readonly didAuthService: DidAuthService,
+    protected readonly eventsService: EventsService,
+    protected readonly commandBus: CommandBus
+  ) { }
 
   @Get('config')
   @HttpCode(HttpStatus.OK)
@@ -78,4 +90,21 @@ export class LoginController {
       username: decodedToken.username,
     };
   }
+
+  @Post('logout')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Logout and invalidate active Auth Proxy sessions',
+    description: 'Explicitly calls the Auth Proxy /auth/logout endpoint to invalidate active sessions associated with the user refresh token.',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Successfully logged out and invalidated Auth Proxy sessions',
+  })
+  public async logout(): Promise<void> {
+    await this.didAuthService.logout();
+    await this.eventsService.triggerEvent(Events.LOGOUT);
+    await this.commandBus.execute(new ReloginCommand('LOGOUT'));
+  }
 }
+
