@@ -43,10 +43,20 @@ export class DdhubFilesService extends DdhubBaseService {
   ): Promise<SendMessageResponseFile> {
     this.logger.log('Uploading File');
     try {
+      let encodedFileName = encodeValuesOnly(originalname);
+      if (typeof encodedFileName === 'string') {
+        const lower = encodedFileName.toLowerCase();
+        if (lower.endsWith('&#x2e;csv')) {
+          encodedFileName = encodedFileName.slice(0, -8) + originalname.slice(-4);
+        } else if (lower.endsWith('&#x2e;tsv')) {
+          encodedFileName = encodedFileName.slice(0, -8) + originalname.slice(-4);
+        }
+      }
+
       const formData = new FormData();
 
       formData.append('file', file);
-      formData.append('fileName', encodeValuesOnly(originalname));
+      formData.append('fileName', encodedFileName);
       formData.append('fqcns', fqcns.join(','));
       formData.append('signature', signature);
       formData.append('topicId', topicId);
