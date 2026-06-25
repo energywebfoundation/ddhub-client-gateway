@@ -28,6 +28,7 @@ import { GetMessagesResponseDto } from '../dto/response/get-message-response.dto
 import { DownloadMessageResponse } from '../entity/message.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Readable } from 'stream';
+import { basename } from 'path';
 import { MtlsGuard } from '../../certificate/guards/mtls.guard';
 import { PinoLogger } from 'nestjs-pino';
 import { ClientsInterceptor } from '@dsb-client-gateway/ddhub-client-gateway-clients';
@@ -64,7 +65,7 @@ export class MessageController {
   @Roles(UserRole.MESSAGING, UserRole.ADMIN, UserRole.SUPERADMIN)
   @HttpCode(HttpStatus.OK)
   public async downloadOfflineFile(
-    @Param('cgwId', ParseUUIDPipe)
+    @Param('cgwId', new ParseUUIDPipe({ version: '4' }))
     cgwId: string,
     @Response() res
   ) {
@@ -224,7 +225,7 @@ export class MessageController {
 
       res.set({
         'Content-Type': 'multipart/form-data',
-        'Content-Disposition': `attachment; filename=${file.fileName}`,
+        'Content-Disposition': `attachment; filename="${basename(file.fileName)}"`,
         sender: file.sender,
         signature: file.signature,
         clientGatewayMessageId: file.clientGatewayMessageId,
