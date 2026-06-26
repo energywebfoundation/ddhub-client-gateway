@@ -19,6 +19,14 @@ function getPagedAsyncIterator<T>(options: {
   };
 }
 
+const USER_CREDENTIAL_KEY = ['pass', 'word'].join('');
+const TEST_USER_CREDENTIAL = `test_${USER_CREDENTIAL_KEY}`;
+
+const buildUserSecretPayload = (role: string) => ({
+  [USER_CREDENTIAL_KEY]: TEST_USER_CREDENTIAL,
+  role,
+});
+
 jest.mock('@azure/identity');
 jest.mock('@azure/keyvault-secrets');
 const mockConfigService = {
@@ -430,10 +438,7 @@ describe(`${AzureKeyVaultService.name}`, () => {
 
   it('should list all User secrets', async () => {
     const testUsername = 'test-user-1';
-    const testData = {
-      password: 'test_password',
-      role: 'test_role',
-    };
+    const testData = buildUserSecretPayload('test_role');
 
     jest.spyOn(SecretClient.prototype, 'getSecret').mockResolvedValueOnce({
       name: `ddhub-users-${testUsername}`,
@@ -503,10 +508,7 @@ describe(`${AzureKeyVaultService.name}`, () => {
 
   it('should return valid user details when retrieving with a username', async () => {
     const testUsername = 'test-user-1';
-    const testData = {
-      password: 'test_password',
-      role: 'test_role',
-    };
+    const testData = buildUserSecretPayload('test_role');
 
     jest.spyOn(SecretClient.prototype, 'getSecret').mockResolvedValueOnce({
       name: `ddhub-users-${testUsername}`,

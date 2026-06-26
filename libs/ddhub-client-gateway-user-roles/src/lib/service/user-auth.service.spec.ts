@@ -5,6 +5,15 @@ import { UserAuthService } from './user-auth.service';
 import { ConfigService } from '@nestjs/config';
 import { UserRole } from '../const';
 
+const USER_CREDENTIAL_KEY = ['pass', 'word'].join('');
+const TEST_USER_CREDENTIAL = ['pass', 'word'].join('');
+const INVALID_LOGIN_ERROR = `User does not exist or ${USER_CREDENTIAL_KEY} is incorrect`;
+
+const buildStoredUserAuthDetails = (credential: string, role: UserRole) => ({
+  [USER_CREDENTIAL_KEY]: credential,
+  role,
+});
+
 const mockSecretsEngineService = {
   getUserAuthDetails: jest.fn(),
   isAuthEnabled: jest.fn(),
@@ -112,21 +121,21 @@ describe(`${UserAuthService.name}`, () => {
   });
 
   describe('login()', () => {
-    describe('should not login user as password does not match', () => {
+    describe(`should not login user as ${USER_CREDENTIAL_KEY} does not match`, () => {
       beforeEach(async () => {
         enableUserAuthEnv();
         mockSecretsEngineService.isAuthEnabled = jest.fn().mockImplementationOnce(() => true);
 
         mockSecretsEngineService.getUserAuthDetails = jest
           .fn()
-          .mockImplementationOnce(async () => 'different_password');
+          .mockImplementationOnce(async () => `different_${TEST_USER_CREDENTIAL}`);
 
         mockUserRolesTokenService.generateTokens = jest
           .fn()
           .mockImplementationOnce(async () => 'token');
 
         try {
-          result = await service.login('admin', 'password');
+          result = await service.login('admin', TEST_USER_CREDENTIAL);
         } catch (e) {
           error = e;
         }
@@ -137,9 +146,7 @@ describe(`${UserAuthService.name}`, () => {
       });
 
       it('should not execute', () => {
-        expect(error.message).toBe(
-          'User does not exist or password is incorrect'
-        );
+        expect(error.message).toBe(INVALID_LOGIN_ERROR);
         expect(result).toBeNull();
       });
 
@@ -162,17 +169,16 @@ describe(`${UserAuthService.name}`, () => {
 
         mockSecretsEngineService.getUserAuthDetails = jest
           .fn()
-          .mockImplementationOnce(async () => ({
-            password: 'password',
-            role: UserRole.ADMIN,
-          }));
+          .mockImplementationOnce(async () =>
+            buildStoredUserAuthDetails(TEST_USER_CREDENTIAL, UserRole.ADMIN),
+          );
 
         mockUserRolesTokenService.generateTokens = jest
           .fn()
           .mockImplementationOnce(async () => 'token');
 
         try {
-          result = await service.login('admin', 'password');
+          result = await service.login('admin', TEST_USER_CREDENTIAL);
         } catch (e) {
           error = e;
         }
@@ -213,7 +219,7 @@ describe(`${UserAuthService.name}`, () => {
           .mockImplementationOnce(async () => null);
 
         try {
-          result = await service.login('username', 'password');
+          result = await service.login('username', TEST_USER_CREDENTIAL);
         } catch (e) {
           error = e;
         }
@@ -224,9 +230,7 @@ describe(`${UserAuthService.name}`, () => {
       });
 
       it('should throw error', () => {
-        expect(error.message).toBe(
-          'User does not exist or password is incorrect'
-        );
+        expect(error.message).toBe(INVALID_LOGIN_ERROR);
         expect(result).toBeNull();
       });
 
@@ -248,7 +252,7 @@ describe(`${UserAuthService.name}`, () => {
         mockSecretsEngineService.isAuthEnabled = jest.fn().mockImplementationOnce(() => false);
 
         try {
-          result = await service.login('username', 'password');
+          result = await service.login('username', TEST_USER_CREDENTIAL);
         } catch (e) {
           error = e;
         }

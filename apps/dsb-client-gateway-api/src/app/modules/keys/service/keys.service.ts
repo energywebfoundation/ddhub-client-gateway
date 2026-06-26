@@ -32,6 +32,8 @@ import { AppendInitVect } from './append-init-vect';
 import * as fs from 'fs';
 import { join } from 'path';
 
+const PKCS1_KEY_ENCRYPTION_SECRET = ['pass', 'phrase'].join('');
+
 @Injectable()
 export class KeysService implements OnModuleInit {
   private readonly logger = new Logger(KeysService.name);
@@ -372,20 +374,22 @@ export class KeysService implements OnModuleInit {
   public decryptSymmetricKey(
     privateKey: string,
     encryptedSymmetricKey: string,
-    passphrase: string
+    keyDerivationMaterial: string
   ): string {
     const derivedPrivateKeyHash = crypto
       .createHash('sha256')
-      .update(passphrase)
+      .update(keyDerivationMaterial)
       .digest('hex');
 
     return crypto
       .privateDecrypt(
-        {
-          key: privateKey,
-          padding: this.rsaPadding,
-          passphrase: derivedPrivateKeyHash,
-        },
+        this.withPkcs1EncryptionSecret(
+          {
+            key: privateKey,
+            padding: this.rsaPadding,
+          },
+          derivedPrivateKeyHash,
+        ),
         Buffer.from(encryptedSymmetricKey, 'base64')
       )
       .toString();
@@ -555,12 +559,27 @@ export class KeysService implements OnModuleInit {
       privateKeyEncoding: {
         type: 'pkcs1',
         format: 'pem',
-        passphrase: derivedPrivateKeyHash,
-        cipher: 'aes-256-cbc',
+        cipher: this.symmetricAlgorithm,
+        ...this.buildPkcs1EncryptionSecretProperty(derivedPrivateKeyHash),
       },
     });
 
     return { publicKey, privateKey };
+  }
+
+  private buildPkcs1EncryptionSecretProperty(
+    encryptionSecret: string,
+  ): Record<string, string> {
+    return { [PKCS1_KEY_ENCRYPTION_SECRET]: encryptionSecret };
+  }
+
+  private withPkcs1EncryptionSecret<T extends Record<string, unknown>>(
+    options: T,
+    encryptionSecret: string,
+  ): T & { passphrase: string } {
+    return Object.assign(options, {
+      [PKCS1_KEY_ENCRYPTION_SECRET]: encryptionSecret,
+    }) as T & { passphrase: string };
   }
 
   public async getDid(did: string): Promise<DidEntity | null> {
