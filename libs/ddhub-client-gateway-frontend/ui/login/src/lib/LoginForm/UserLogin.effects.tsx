@@ -1,6 +1,6 @@
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { useForm } from 'react-hook-form';
+import { FieldValues, useForm } from 'react-hook-form';
 import { LoginRequestDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 
 interface UserLoginFormProps {
@@ -32,7 +32,7 @@ export const useUserLoginFormEffects = ({
     register,
     handleSubmit,
     formState: { errors, isValid },
-  } = useForm<UserLoginFormValues>({
+  } = useForm<FieldValues>({
     resolver: yupResolver(validationSchema),
     mode: 'onChange',
     defaultValues: {
@@ -59,12 +59,17 @@ export const useUserLoginFormEffects = ({
   ];
 
   const isValidUserLoginData = (
-    data: UserLoginFormValues,
+    data: FieldValues,
   ): data is UserLoginFormValues => {
-    return !!data[USERNAME_FIELD]?.trim() && !!data[USER_CREDENTIAL_FIELD]?.trim();
+    return (
+      typeof data[USERNAME_FIELD] === 'string' &&
+      !!data[USERNAME_FIELD]?.trim() &&
+      typeof data[USER_CREDENTIAL_FIELD] === 'string' &&
+      !!data[USER_CREDENTIAL_FIELD]?.trim()
+    );
   };
 
-  const onSubmit = handleSubmit((data) => {
+  const onSubmit = handleSubmit((data: FieldValues) => {
     if (!isValidUserLoginData(data)) {
       // TODO: display error
       return;
