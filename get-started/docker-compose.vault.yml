@@ -83,7 +83,7 @@ services:
       sh -c '
         export VAULT_TOKEN=$(cat /vault-creds/root_token.txt)
         echo "Vault token loaded. $VAULT_TOKEN"
-        exec ./node_modules/.bin/typeorm migrations:run
+        exec ./node_modules/.bin/typeorm migration:run -d ormconfig.js
       '
     env_file:
       - .ewc-env

@@ -5,8 +5,8 @@ import { ReqLockRepository } from './repository';
 import { ReqLockWrapperRepository } from './wrapper';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ReqLockEntity, ReqLockRepository])],
-  providers: [ReqLockWrapperRepository],
+  imports: [TypeOrmModule.forFeature([ReqLockEntity])],
+  providers: [ReqLockRepository, ReqLockWrapperRepository],
   exports: [ReqLockWrapperRepository],
 })
 export class ReqLockRepositoryModule {}

@@ -13,13 +13,13 @@ export class DdhubHealthService extends DdhubBaseService {
     protected readonly httpService: HttpService,
     protected readonly retryConfigService: RetryConfigService,
     protected readonly tlsAgentService: TlsAgentService,
-    protected readonly ddhubLoginService: DdhubLoginService
+    protected readonly ddhubLoginService: DdhubLoginService,
   ) {
     super(
       new Logger(DdhubHealthService.name),
       retryConfigService,
       ddhubLoginService,
-      tlsAgentService
+      tlsAgentService,
     );
   }
 
@@ -28,13 +28,13 @@ export class DdhubHealthService extends DdhubBaseService {
       const response = await lastValueFrom(
         this.httpService.get('/health', {
           httpsAgent: await this.tlsAgentService.create(),
-        })
+        }),
       );
 
       this.logger.log(
         `MB Health response: ${response.status} - ${JSON.stringify(
-          response.data
-        )}`
+          response.data,
+        )}`,
       );
 
       return { statusCode: response?.status, message: response.data?.status };
@@ -43,7 +43,7 @@ export class DdhubHealthService extends DdhubBaseService {
         this.logger.error(`MB Health request failed - ${err.message}`);
         return {
           statusCode: err.response?.status || 500,
-          message: err.response?.data || 'Internal Server Error',
+          message: (err.response?.data as string) || 'Internal Server Error',
         };
       }
 

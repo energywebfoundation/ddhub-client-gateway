@@ -4,7 +4,7 @@ import { clearSecrets } from './helpers/secrets.helper';
 import request from 'supertest';
 import { DsbClientGatewayErrors } from '@dsb-client-gateway/dsb-client-gateway-errors';
 import { IamService } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
-import { setupApp } from './helpers/app.helper';
+import { setupApp, teardownApp } from './helpers/app.helper';
 import { MemoryHelper } from './helpers/memory.helper';
 
 const feature = loadFeature('../../feature/identity.feature', {
@@ -41,7 +41,7 @@ describe('Identity Feature', () => {
     });
 
     afterAll(async () => {
-      await app.close();
+      await teardownApp(app);
     });
 
     test('Invalid private key', ({ given, when, then }) => {

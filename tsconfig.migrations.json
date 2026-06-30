@@ -10,7 +10,8 @@
       "resolveJsonModule": true,
       "esModuleInterop": true,
       "rootDir": "./migrations",
-      "skipLibCheck": true
+      "skipLibCheck": true,
+      "types": []
     },
     "exclude": ["apps/*", "libs/*"],
     "include": ["migrations/*.ts"]

@@ -73,9 +73,7 @@ export const Autocomplete: FC<AutocompleteProps> = ({
         noOptionsText={noOptionsText}
         renderOption={renderOption}
         filterOptions={filterOptions}
-        popupIcon={
-          popupIcon ?? <ChevronDown className={classes.popupIcon} size={20} />
-        }
+        popupIcon={popupIcon ?? <ChevronDown size={20} />}
         className={className}
         classes={{
           popupIndicator: classes.popupIcon,

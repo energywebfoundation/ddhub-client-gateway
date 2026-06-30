@@ -5,6 +5,7 @@ import { useSelectAutocompleteEffects } from './SelectAutocomplete.effects';
 import { FormSelectOption } from '../FormSelect';
 import { GenericFormField } from '../../../containers/GenericForm';
 import { useStyles } from './SelectAutocomplete.styles';
+import { getFormFieldPlaceholder } from '../formField.utils';
 
 export interface SelectAutocompleteProps {
   value: FormSelectOption[];
@@ -30,6 +31,7 @@ export const SelectAutocomplete: FC<SelectAutocompleteProps> = ({
   const { classes } = useStyles();
   const { options, textValue, setTextValue, changeHandler, onKeyDown, onBlur } =
     useSelectAutocompleteEffects(onChange, field, value);
+  const placeholder = getFormFieldPlaceholder(field, options);
 
   return (
     <Box {...field.formInputsWrapperProps} flexShrink={0}>
@@ -47,13 +49,14 @@ export const SelectAutocomplete: FC<SelectAutocompleteProps> = ({
         onBlur={onBlur}
         getOptionDisabled={() => disabled}
         disabled={disabled}
+        noOptionsText={options.length === 0 ? placeholder : undefined}
         value={value !== undefined ? value : []}
         renderInput={(params) => (
           <TextField
             autoComplete="off"
             {...params}
             required={field.required && !(value?.length > 0)}
-            placeholder={field.placeholder}
+            placeholder={placeholder}
             onChange={(event: any) => setTextValue(event.target.value)}
             helperText={errorText}
             inputProps={{ ...params.inputProps, ...field.inputProps }}

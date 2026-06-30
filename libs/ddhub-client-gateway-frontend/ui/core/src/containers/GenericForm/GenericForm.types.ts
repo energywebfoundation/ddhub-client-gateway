@@ -23,6 +23,7 @@ export type GenericFormField = {
   label?: string;
   type?: HTMLInputTypeAttribute;
   placeholder?: string;
+  emptyPlaceholder?: string;
   required?: boolean;
   select?: boolean;
   radio?: boolean;

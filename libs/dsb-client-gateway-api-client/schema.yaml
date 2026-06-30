@@ -100,23 +100,23 @@ paths:
           required: false
           in: "query"
           description: "Channel type"
-          example: "sub"
           schema:
+            example: "sub"
+            type: "string"
             enum:
               - "sub"
               - "pub"
-            type: "string"
         - name: "useAnonymousExtChannel"
           required: false
           in: "query"
-          example: true
           schema:
+            example: true
             type: "boolean"
         - name: "payloadEncryption"
           required: false
           in: "query"
-          example: true
           schema:
+            example: true
             type: "boolean"
       responses:
         200:
@@ -181,31 +181,31 @@ paths:
           required: false
           in: "query"
           description: "Channel type"
-          example: "sub"
           schema:
+            example: "sub"
+            type: "string"
             enum:
               - "sub"
               - "pub"
               - "download"
               - "upload"
-            type: "string"
         - name: "useAnonymousExtChannel"
           required: false
           in: "query"
-          example: true
           schema:
+            example: true
             type: "boolean"
         - name: "payloadEncryption"
           required: false
           in: "query"
-          example: true
           schema:
+            example: true
             type: "boolean"
         - name: "messageForms"
           required: false
           in: "query"
-          example: true
           schema:
+            example: true
             type: "boolean"
       responses:
         200:
@@ -228,8 +228,8 @@ paths:
           required: true
           in: "path"
           description: "Channel type"
-          example: "channel.name"
           schema:
+            example: "channel.name"
             type: "string"
       responses:
         200:
@@ -251,8 +251,8 @@ paths:
           required: true
           in: "path"
           description: "Channel type"
-          example: "channel.name"
           schema:
+            example: "channel.name"
             type: "string"
       responses:
         204:
@@ -270,8 +270,8 @@ paths:
           required: true
           in: "path"
           description: "Channel type"
-          example: "channel.name"
           schema:
+            example: "channel.name"
             type: "string"
       requestBody:
         required: true
@@ -300,8 +300,8 @@ paths:
           required: true
           in: "path"
           description: "Channel type"
-          example: "channel.name"
           schema:
+            example: "channel.name"
             type: "string"
       responses:
         200:
@@ -347,73 +347,73 @@ paths:
           required: false
           in: "query"
           description: "Limit per request"
-          example: 1
           schema:
             default: 0
+            example: 1
             type: "number"
         - name: "fqcn"
           required: true
           in: "query"
-          example: "channel.name"
           description: "channel name"
           schema:
+            example: "channel.name"
             type: "string"
         - name: "initiatingMessageId"
           required: false
           in: "query"
-          example: "507f191e810c19729de860ea"
           description: "Initiating message id"
           schema:
+            example: "507f191e810c19729de860ea"
             type: "string"
         - name: "initiatingTransactionId"
           required: false
           in: "query"
-          example: "45d5a89f-7c2c-48b0-ae9a-54f4128e818f"
           description: "Initiating transaction id"
           schema:
+            example: "45d5a89f-7c2c-48b0-ae9a-54f4128e818f"
             type: "string"
         - name: "transactionId"
           required: false
           in: "query"
-          example: "45d5a89f-7c2c-48b0-ae9a-54f4128e818f"
           description: "Transaction id"
           schema:
+            example: "45d5a89f-7c2c-48b0-ae9a-54f4128e818f"
             type: "string"
         - name: "messageId"
           required: false
           in: "query"
-          example: "507f191e810c19729de860ea"
           description: "Message id"
           schema:
+            example: "507f191e810c19729de860ea"
             type: "string"
         - name: "clientGatewayMessageId"
           required: false
           in: "query"
-          example: "45d5a89f-7c2c-48b0-ae9a-54f4128e818f"
           description: "Client Gateway Message id"
           schema:
+            example: "45d5a89f-7c2c-48b0-ae9a-54f4128e818f"
             type: "string"
         - name: "topicName"
           required: false
           in: "query"
-          example: "getOperatingEnvelope"
           description: "topic name"
           schema:
+            example: "getOperatingEnvelope"
             type: "string"
         - name: "topicOwner"
           required: false
           in: "query"
-          example: "torta.apps.eggplant.vege.iam.ewc"
           description: "application namespace"
           schema:
+            example: "torta.apps.eggplant.vege.iam.ewc"
             type: "string"
         - name: "page"
           required: false
           in: "query"
           description: "Current page"
-          example: 1
           schema:
             default: 0
+            example: 1
             type: "number"
       responses:
         200:
@@ -439,79 +439,79 @@ paths:
         - name: "fqcn"
           required: true
           in: "query"
-          example: "channel.name"
           description: "channel name"
           schema:
+            example: "channel.name"
             type: "string"
         - name: "from"
           required: false
           in: "query"
           description: "date from which messages to be fetched"
-          example: "2022-03-31T09:48:44.357Z"
           schema:
+            example: "2022-03-31T09:48:44.357Z"
             type: "string"
         - name: "amount"
           required: false
           in: "query"
-          example: 1
           description: "Latest amount of messages to be fetched"
           schema:
+            example: 1
             type: "number"
         - name: "topicName"
           required: false
           in: "query"
-          example: "getOperatingEnvelope"
           description: "topic name"
           schema:
+            example: "getOperatingEnvelope"
             type: "string"
         - name: "topicOwner"
           required: false
           in: "query"
-          example: "torta.apps.eggplant.vege.iam.ewc"
           description: "application namespace"
           schema:
+            example: "torta.apps.eggplant.vege.iam.ewc"
             type: "string"
         - name: "clientId"
           required: false
           in: "query"
-          example: "test2"
           description: "cursor for pointing to messages"
           schema:
+            example: "test2"
             type: "string"
         - name: "initiatingMessageId"
           required: false
           in: "query"
-          example: "507f191e810c19729de860ea"
           description: "Initiating message id"
           schema:
+            example: "507f191e810c19729de860ea"
             type: "string"
         - name: "initiatingTransactionId"
           required: false
           in: "query"
-          example: "45d5a89f-7c2c-48b0-ae9a-54f4128e818f"
           description: "Initiating transaction id"
           schema:
+            example: "45d5a89f-7c2c-48b0-ae9a-54f4128e818f"
             type: "string"
         - name: "transactionId"
           required: false
           in: "query"
-          example: "45d5a89f-7c2c-48b0-ae9a-54f4128e818f"
           description: "Initiating transaction id"
           schema:
+            example: "45d5a89f-7c2c-48b0-ae9a-54f4128e818f"
             type: "string"
         - name: "messageId"
           required: false
           in: "query"
-          example: "507f191e810c19729de860ea"
           description: "Message id"
           schema:
+            example: "507f191e810c19729de860ea"
             type: "string"
         - name: "messageIds"
           required: false
           in: "query"
-          example: "507f191e810c19729de860ea,507f191e810c19729de9821a"
           description: "Message id array as comma separated string"
           schema:
+            example: "507f191e810c19729de860ea,507f191e810c19729de9821a"
             type: "string"
       responses:
         200:
@@ -552,79 +552,79 @@ paths:
         - name: "fqcn"
           required: true
           in: "query"
-          example: "channel.name"
           description: "channel name"
           schema:
+            example: "channel.name"
             type: "string"
         - name: "from"
           required: false
           in: "query"
           description: "date from which messages to be fetched"
-          example: "2022-03-31T09:48:44.357Z"
           schema:
+            example: "2022-03-31T09:48:44.357Z"
             type: "string"
         - name: "amount"
           required: false
           in: "query"
-          example: 1
           description: "Latest amount of messages to be fetched"
           schema:
+            example: 1
             type: "number"
         - name: "topicName"
           required: false
           in: "query"
-          example: "getOperatingEnvelope"
           description: "topic name"
           schema:
+            example: "getOperatingEnvelope"
             type: "string"
         - name: "topicOwner"
           required: false
           in: "query"
-          example: "torta.apps.eggplant.vege.iam.ewc"
           description: "application namespace"
           schema:
+            example: "torta.apps.eggplant.vege.iam.ewc"
             type: "string"
         - name: "clientId"
           required: false
           in: "query"
-          example: "test2"
           description: "cursor for pointing to messages"
           schema:
+            example: "test2"
             type: "string"
         - name: "initiatingMessageId"
           required: false
           in: "query"
-          example: "507f191e810c19729de860ea"
           description: "Initiating message id"
           schema:
+            example: "507f191e810c19729de860ea"
             type: "string"
         - name: "initiatingTransactionId"
           required: false
           in: "query"
-          example: "45d5a89f-7c2c-48b0-ae9a-54f4128e818f"
           description: "Initiating transaction id"
           schema:
+            example: "45d5a89f-7c2c-48b0-ae9a-54f4128e818f"
             type: "string"
         - name: "transactionId"
           required: false
           in: "query"
-          example: "45d5a89f-7c2c-48b0-ae9a-54f4128e818f"
           description: "Initiating transaction id"
           schema:
+            example: "45d5a89f-7c2c-48b0-ae9a-54f4128e818f"
             type: "string"
         - name: "messageId"
           required: false
           in: "query"
-          example: "507f191e810c19729de860ea"
           description: "Message id"
           schema:
+            example: "507f191e810c19729de860ea"
             type: "string"
         - name: "messageIds"
           required: false
           in: "query"
-          example: "507f191e810c19729de860ea,507f191e810c19729de9821a"
           description: "Message id array as comma separated string"
           schema:
+            example: "507f191e810c19729de860ea,507f191e810c19729de9821a"
             type: "string"
       responses:
         200:
@@ -675,8 +675,8 @@ paths:
           required: true
           in: "query"
           description: "file Id for which file will be downloaded"
-          example: "bb2686d2-97be-436b-8869"
           schema:
+            example: "bb2686d2-97be-436b-8869"
             type: "string"
       responses:
         200:
@@ -768,15 +768,14 @@ paths:
         - "Keys configuration"
   /api/v2/applications:
     get:
-      operationId: "ApplicationsController_getApplications"
-      summary: ""
       description: "Gets Applications"
+      operationId: "ApplicationsController_getApplications"
       parameters:
         - name: "roleName"
           required: true
           in: "query"
-          example: "topiccreator"
           schema:
+            example: "topiccreator"
             type: "string"
       responses:
         200:
@@ -787,19 +786,19 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/ApplicationDTO"
+      summary: ""
       tags:
         - "Applications"
   /api/v2/applications/{namespace}:
     get:
-      operationId: "ApplicationsController_getApplicationsByNamespace"
-      summary: ""
       description: "Gets applications for specified namespace"
+      operationId: "ApplicationsController_getApplicationsByNamespace"
       parameters:
         - name: "namespace"
           required: true
           in: "path"
-          example: "ddhub.apps.energyweb.iam.ewc"
           schema:
+            example: "ddhub.apps.energyweb.iam.ewc"
             type: "string"
       responses:
         200:
@@ -810,6 +809,7 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/ApplicationDTO"
+      summary: ""
       tags:
         - "Applications"
   /api/v2/topics:
@@ -819,37 +819,37 @@ paths:
         - name: "limit"
           required: false
           in: "query"
-          example: 1
           schema:
-            default: 0
+            default: 5
+            example: 1
             type: "number"
         - name: "page"
           required: false
           in: "query"
-          example: 1
           schema:
-            default: 0
+            default: 1
+            example: 1
             type: "number"
         - name: "name"
           required: false
           in: "query"
-          example: "topic name"
           schema:
             default: ""
+            example: "topic name"
             type: "string"
         - name: "owner"
           required: true
           in: "query"
-          example: "ddhub.apps.energyweb.iam.ewc"
           schema:
+            example: "ddhub.apps.energyweb.iam.ewc"
             type: "string"
         - name: "tags"
           required: false
           in: "query"
-          example:
-            - "aggregator"
           schema:
             default: []
+            example:
+              - "aggregator"
             type: "array"
             items:
               type: "string"
@@ -894,22 +894,22 @@ paths:
           required: true
           in: "path"
           description: "id of the topic"
-          example: "62545547fe37f174d7715ff3"
           schema:
+            example: "62545547fe37f174d7715ff3"
             type: "string"
         - name: "limit"
           required: false
           in: "query"
-          example: 1
           schema:
-            default: 0
+            default: 5
+            example: 1
             type: "number"
         - name: "page"
           required: false
           in: "query"
-          example: 1
           schema:
-            default: 0
+            default: 1
+            example: 1
             type: "number"
       responses:
         200:
@@ -930,15 +930,15 @@ paths:
           required: true
           in: "path"
           description: "id of the topic"
-          example: "62545547fe37f174d7715ff3"
           schema:
+            example: "62545547fe37f174d7715ff3"
             type: "string"
         - name: "versionNumber"
           required: true
           in: "path"
           description: "version of the topic"
-          example: "1.0.9"
           schema:
+            example: "1.0.9"
             type: "string"
       responses:
         200:
@@ -958,15 +958,15 @@ paths:
           required: true
           in: "path"
           description: "id of the topic"
-          example: "62545547fe37f174d7715ff3"
           schema:
+            example: "62545547fe37f174d7715ff3"
             type: "string"
         - name: "versionNumber"
           required: true
           in: "path"
           description: "version of the topic"
-          example: "1.0.9"
           schema:
+            example: "1.0.9"
             type: "string"
       requestBody:
         required: true
@@ -996,15 +996,15 @@ paths:
           required: true
           in: "path"
           description: "id of the topic"
-          example: "62545547fe37f174d7715ff3"
           schema:
+            example: "62545547fe37f174d7715ff3"
             type: "string"
         - name: "versionNumber"
           required: true
           in: "path"
           description: "version of the topic"
-          example: "1.0.9"
           schema:
+            example: "1.0.9"
             type: "string"
       responses:
         200:
@@ -1028,10 +1028,10 @@ paths:
         - name: "owner"
           required: true
           in: "query"
-          example:
-            - "torta.apps.eggplant.vege.iam.ewc"
-            - "mini.apps.sliced.carrot.vege.iam.ewc"
           schema:
+            example:
+              - "torta.apps.eggplant.vege.iam.ewc"
+              - "mini.apps.sliced.carrot.vege.iam.ewc"
             type: "array"
             items:
               type: "string"
@@ -1053,28 +1053,28 @@ paths:
         - name: "keyword"
           required: true
           in: "query"
-          example: "Topic_JSON_V12"
           schema:
+            example: "Topic_JSON_V12"
             type: "string"
         - name: "owner"
           required: false
           in: "query"
-          example: "ddhub.apps.energyweb.iam.ewc"
           schema:
+            example: "ddhub.apps.energyweb.iam.ewc"
             type: "string"
         - name: "limit"
           required: false
           in: "query"
-          example: 1
           schema:
             default: 5
+            example: 1
             type: "number"
         - name: "page"
           required: false
           in: "query"
-          example: 1
           schema:
             default: 1
+            example: 1
             type: "number"
       responses:
         200:
@@ -1093,8 +1093,8 @@ paths:
           required: true
           in: "path"
           description: "id of the topic"
-          example: "62545547fe37f174d7715ff3"
           schema:
+            example: "62545547fe37f174d7715ff3"
             type: "string"
       requestBody:
         required: true
@@ -1124,8 +1124,8 @@ paths:
           required: true
           in: "path"
           description: "id of the topic"
-          example: "62545547fe37f174d7715ff3"
           schema:
+            example: "62545547fe37f174d7715ff3"
             type: "string"
       responses:
         200:
@@ -1155,6 +1155,8 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/CronResponseDto"
+      tags:
+        - "Cron"
   /api/v2/gateway:
     get:
       operationId: "GatewayController_get"
@@ -1192,22 +1194,24 @@ paths:
                         status: "up"
                     additionalProperties:
                       type: "object"
+                      required:
+                        - "status"
                       properties:
                         status:
                           type: "string"
-                      additionalProperties:
-                        type: "string"
+                      additionalProperties: true
                     nullable: true
                   error:
                     type: "object"
                     example: {}
                     additionalProperties:
                       type: "object"
+                      required:
+                        - "status"
                       properties:
                         status:
                           type: "string"
-                      additionalProperties:
-                        type: "string"
+                      additionalProperties: true
                     nullable: true
                   details:
                     type: "object"
@@ -1216,11 +1220,12 @@ paths:
                         status: "up"
                     additionalProperties:
                       type: "object"
+                      required:
+                        - "status"
                       properties:
                         status:
                           type: "string"
-                      additionalProperties:
-                        type: "string"
+                      additionalProperties: true
         503:
           description: "The Health Check is not successful"
           content:
@@ -1238,11 +1243,12 @@ paths:
                         status: "up"
                     additionalProperties:
                       type: "object"
+                      required:
+                        - "status"
                       properties:
                         status:
                           type: "string"
-                      additionalProperties:
-                        type: "string"
+                      additionalProperties: true
                     nullable: true
                   error:
                     type: "object"
@@ -1252,11 +1258,12 @@ paths:
                         message: "Could not connect"
                     additionalProperties:
                       type: "object"
+                      required:
+                        - "status"
                       properties:
                         status:
                           type: "string"
-                      additionalProperties:
-                        type: "string"
+                      additionalProperties: true
                     nullable: true
                   details:
                     type: "object"
@@ -1268,11 +1275,12 @@ paths:
                         message: "Could not connect"
                     additionalProperties:
                       type: "object"
+                      required:
+                        - "status"
                       properties:
                         status:
                           type: "string"
-                      additionalProperties:
-                        type: "string"
+                      additionalProperties: true
       tags:
         - "Health"
   /api/v2/clients:
@@ -1312,8 +1320,8 @@ paths:
           required: true
           in: "path"
           description: "Client ID"
-          example: "test.cursor"
           schema:
+            example: "test.cursor"
             type: "string"
       responses:
         204:
@@ -1389,8 +1397,8 @@ paths:
           required: true
           in: "path"
           description: "DID"
-          example: "did:ethr:volta:0xfeFBb03EFc1054Cc4e3Fbf36362689cc1F5924a8"
           schema:
+            example: "did:ethr:volta:0xfeFBb03EFc1054Cc4e3Fbf36362689cc1F5924a8"
             type: "string"
       responses:
         200:
@@ -1470,7 +1478,6 @@ paths:
   /api/v2/user-api-key/users/me:
     get:
       operationId: "UserApiKeyController_getCurrentUser"
-      summary: "Get current user details"
       parameters: []
       responses:
         200:
@@ -1479,12 +1486,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/UserDetailsDto"
+      summary: "Get current user details"
       tags:
         - "User-ApiKey"
   /api/v2/user-api-key/users:
     post:
       operationId: "UserApiKeyController_setUserPassword"
-      summary: "Create user"
       parameters: []
       requestBody:
         required: true
@@ -1510,11 +1517,11 @@ paths:
       responses:
         201:
           description: ""
+      summary: "Create user"
       tags:
         - "User-ApiKey"
     put:
       operationId: "UserApiKeyController_updateUserPassword"
-      summary: "Update user password"
       parameters: []
       requestBody:
         required: true
@@ -1533,11 +1540,11 @@ paths:
       responses:
         200:
           description: ""
+      summary: "Update user password"
       tags:
         - "User-ApiKey"
     get:
       operationId: "UserApiKeyController_getAllUsers"
-      summary: "Get all users"
       parameters: []
       responses:
         200:
@@ -1548,12 +1555,12 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/UserDetailsDto"
+      summary: "Get all users"
       tags:
         - "User-ApiKey"
   /api/v2/user-api-key/users/{username}:
     delete:
       operationId: "UserApiKeyController_deleteUser"
-      summary: "Delete a user"
       parameters:
         - name: "username"
           required: true
@@ -1563,12 +1570,12 @@ paths:
       responses:
         204:
           description: "User deleted successfully"
+      summary: "Delete a user"
       tags:
         - "User-ApiKey"
   /api/v2/user-api-key/api-keys:
     post:
       operationId: "UserApiKeyController_createApiKey"
-      summary: "Create an API key"
       parameters: []
       requestBody:
         required: true
@@ -1591,11 +1598,11 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ApiKeyResponseDto"
+      summary: "Create an API key"
       tags:
         - "User-ApiKey"
     get:
       operationId: "UserApiKeyController_getAllApiKeys"
-      summary: "Get all API keys"
       parameters: []
       responses:
         200:
@@ -1606,12 +1613,12 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/ApiKeyResponseDto"
+      summary: "Get all API keys"
       tags:
         - "User-ApiKey"
   /api/v2/user-api-key/api-keys/{apiKey}:
     get:
       operationId: "UserApiKeyController_getApiKey"
-      summary: "Get a specific API key"
       parameters:
         - name: "apiKey"
           required: true
@@ -1625,11 +1632,11 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ApiKeyResponseDto"
+      summary: "Get a specific API key"
       tags:
         - "User-ApiKey"
     put:
       operationId: "UserApiKeyController_updateApiKey"
-      summary: "Update an API key (name & daysValid)"
       parameters:
         - name: "apiKey"
           required: true
@@ -1657,11 +1664,11 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ApiKeyResponseDto"
+      summary: "Update an API key (name & daysValid)"
       tags:
         - "User-ApiKey"
     delete:
       operationId: "UserApiKeyController_deleteApiKey"
-      summary: "Delete an API key"
       parameters:
         - name: "apiKey"
           required: true
@@ -1671,12 +1678,12 @@ paths:
       responses:
         204:
           description: "API key deleted successfully"
+      summary: "Delete an API key"
       tags:
         - "User-ApiKey"
   /api/v2/user-api-key/api-keys/{apiKey}/validate:
     get:
       operationId: "UserApiKeyController_validateApiKey"
-      summary: "Validate an API key"
       parameters:
         - name: "apiKey"
           required: true
@@ -1690,6 +1697,7 @@ paths:
             application/json:
               schema:
                 type: "boolean"
+      summary: "Validate an API key"
       tags:
         - "User-ApiKey"
   /api/v2/ssi-hub/roles:
@@ -1714,10 +1722,10 @@ paths:
         - name: "searchKey"
           required: true
           in: "query"
-          example: "ddhub"
           schema:
             minLength: 3
             maxLength: 247
+            example: "ddhub"
             type: "string"
       responses:
         200:
@@ -1737,8 +1745,8 @@ paths:
         - name: "namespace"
           required: true
           in: "path"
-          example: "ddhub.apps.energyweb.iam.ewc"
           schema:
+            example: "ddhub.apps.energyweb.iam.ewc"
             type: "string"
       responses:
         200:
@@ -2766,11 +2774,13 @@ components:
         current:
           description: "Current association key"
           nullable: true
+          type: "object"
           allOf:
             - $ref: "#/components/schemas/GetAssociationKeysDto"
         next:
           nullable: true
           description: "Next association key"
+          type: "object"
           allOf:
             - $ref: "#/components/schemas/GetAssociationKeysDto"
       required:

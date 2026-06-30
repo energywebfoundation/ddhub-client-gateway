@@ -100,7 +100,9 @@ export class IdentityService {
       };
     }
 
-    const identity = await this.wrapper.identityRepository.findOne();
+    const identity = await this.wrapper.identityRepository.findOne({
+      where: {},
+    });
 
     if (!identity) {
       return this.getIdentity(true);

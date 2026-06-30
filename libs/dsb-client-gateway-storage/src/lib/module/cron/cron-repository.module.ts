@@ -5,8 +5,8 @@ import { CronRepository } from './repository/cron.repository';
 import { CronWrapperRepository } from './wrapper/cron-wrapper.repository';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([CronEntity, CronRepository])],
-  providers: [CronWrapperRepository],
+  imports: [TypeOrmModule.forFeature([CronEntity])],
+  providers: [CronRepository, CronWrapperRepository],
   exports: [CronWrapperRepository],
 })
 export class CronRepositoryModule {}

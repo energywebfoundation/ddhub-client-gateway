@@ -5,8 +5,8 @@ import { IdentityRepository } from './repository';
 import { IdentityRepositoryWrapper } from './wrapper/identity-repository.wrapper';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([IdentityEntity, IdentityRepository])],
-  providers: [IdentityRepositoryWrapper],
+  imports: [TypeOrmModule.forFeature([IdentityEntity])],
+  providers: [IdentityRepository, IdentityRepositoryWrapper],
   exports: [IdentityRepositoryWrapper],
 })
 export class IdentityRepositoryModule {}

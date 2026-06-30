@@ -9,9 +9,9 @@ import {
 import { Mail } from 'react-feather';
 import { Badge } from '@ddhub-client-gateway-frontend/ui/core';
 import { useStyles } from './BrokerCard.styles';
-import getConfig from 'next/config';
 import { useContext } from 'react';
 import { UserContext } from '@ddhub-client-gateway-frontend/ui/login';
+import { publicConfig } from '@ddhub-client-gateway-frontend/ui/utils';
 
 export function BrokerCard() {
   const userContext = useContext(UserContext);
@@ -21,9 +21,8 @@ export function BrokerCard() {
 
   const { classes } = useStyles();
   const { mtlsIsValid } = userContext;
-  const { publicRuntimeConfig } = getConfig();
   const defaultMbName = 'DDHub Message Broker';
-  const mbName = publicRuntimeConfig?.customMessageBrokerName ?? defaultMbName;
+  const mbName = publicConfig.customMessageBrokerName ?? defaultMbName;
 
   return (
     <Card className={classes.card}>

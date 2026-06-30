@@ -64,7 +64,11 @@ export class UserGuard implements CanActivate {
           authType: 'token',
         };
 
-        this._logger.assign({ user: decodedToken.username });
+        try {
+          this._logger.assign({ user: decodedToken.username });
+        } catch {
+          // assign requires pino request scope; may be unavailable in global guards
+        }
 
         if (decodedToken.accountType !== UserRole.MESSAGING) {
           return true;

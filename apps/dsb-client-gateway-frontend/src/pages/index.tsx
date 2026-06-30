@@ -3,14 +3,12 @@ import { Grid, Stack, Typography } from '@mui/material';
 import React from 'react';
 import { Login } from '@ddhub-client-gateway-frontend/ui/login';
 import { MobileUnsupported } from '../components/MobileUnsupported/MobileUnsupported';
-import getConfig from 'next/config';
+import { publicConfig } from '@ddhub-client-gateway-frontend/ui/utils';
 
 export default function Index() {
   const { classes } = useStyles();
-  const { publicRuntimeConfig } = getConfig();
   const defaultLogoPath = '/ew-main-logo.svg';
-  const brandingLogoPath =
-    publicRuntimeConfig?.customBranding ?? defaultLogoPath;
+  const brandingLogoPath = publicConfig.customBranding ?? defaultLogoPath;
   const isCustomBranding = brandingLogoPath !== defaultLogoPath;
 
   return (

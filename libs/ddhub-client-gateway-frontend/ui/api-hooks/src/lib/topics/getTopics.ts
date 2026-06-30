@@ -12,7 +12,7 @@ import { useTopicsSearch } from './getTopicBySearch';
 
 export const useTopics = ({
   page = 1,
-  limit = 0,
+  limit = 100,
   owner,
 }: TopicsControllerGetTopicsParams) => {
   const Swal = useCustomAlert();

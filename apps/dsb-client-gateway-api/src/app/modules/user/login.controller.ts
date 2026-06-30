@@ -17,14 +17,22 @@ import { LoginResponseDto } from './dto/response/login-response.dto';
 import { ConfigResponseDto } from './dto/response/config-response.dto';
 import { RefreshTokenRequestDto } from './dto/request/refresh-token-request.dto';
 import { DidAuthService } from '@dsb-client-gateway/ddhub-client-gateway-did-auth';
+import { CommandBus } from '@nestjs/cqrs';
+import { ReloginCommand } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
+import {
+  Events,
+  EventsService,
+} from '@dsb-client-gateway/ddhub-client-gateway-events';
 
 @Controller('login')
 @ApiTags('Login')
 export class LoginController {
   constructor(
     protected readonly userAuthService: UserAuthService,
-    protected readonly didAuthService: DidAuthService
-  ) {}
+    protected readonly didAuthService: DidAuthService,
+    protected readonly eventsService: EventsService,
+    protected readonly commandBus: CommandBus
+  ) { }
 
   @Get('config')
   @HttpCode(HttpStatus.OK)
@@ -95,5 +103,8 @@ export class LoginController {
   })
   public async logout(): Promise<void> {
     await this.didAuthService.logout();
+    await this.eventsService.triggerEvent(Events.LOGOUT);
+    await this.commandBus.execute(new ReloginCommand('LOGOUT'));
   }
 }
+

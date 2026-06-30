@@ -39,6 +39,7 @@ export const FormInput: FC<FormInputProps> = memo(
           variant={variant}
           inputProps={{
             ...field.inputProps,
+            placeholder: field.placeholder ?? field.inputProps?.placeholder,
           }}
           classes={{
             root: classes.root,

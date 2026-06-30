@@ -7,7 +7,7 @@ import {
 export const useTopicsSearch = (
   {
     page = 1,
-    limit = 0,
+    limit = 100,
     keyword = '',
     owner,
   }: TopicsControllerGetTopicsBySearchParams) => {

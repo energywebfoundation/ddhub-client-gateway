@@ -12,8 +12,15 @@ import {
   CronWrapperRepository,
   FileMetadataWrapperRepository,
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
-import mockfs from 'mock-fs';
 import moment from 'moment';
+
+jest.mock('fs', () => ({
+  ...jest.requireActual('fs'),
+  readdirSync: jest.fn(),
+  statSync: jest.fn(),
+  unlinkSync: jest.fn(),
+}));
+
 import * as fs from 'fs';
 
 const schedulerRegistryMock: Partial<SchedulerRegistry> = {
@@ -79,6 +86,10 @@ describe('FileCleanerService', () => {
     service = module.get<FileCleanerService>(FileCleanerService);
   });
 
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('should be defined', () => {
     expect(service).toBeInstanceOf(FileCleanerService);
   });
@@ -86,28 +97,36 @@ describe('FileCleanerService', () => {
   describe('removeOldFiles()', () => {
     describe('should cleanup files', () => {
       beforeEach(async () => {
-        mockfs({
-          upload_dir: {
-            'another.offline.unenc': mockfs.file({
-              content: 'to-delete-2',
-              birthtime: moment().subtract(1, 'hour').toDate(),
-            }),
-            'another1.offline.unenc': mockfs.file({
-              content: 'to-not-delete-2',
-              birthtime: new Date(),
-            }),
-          },
-          download_dir: {
-            'some1.enc': mockfs.file({
-              content: 'to-not-delete-1',
-              birthtime: new Date(),
-            }),
-            'some.enc': mockfs.file({
-              content: 'to-delete-1',
-              birthtime: moment().subtract(1, 'hour').toDate(),
-            }),
-          },
+        jest.mocked(fs.readdirSync).mockImplementation((dir) => {
+          if (dir === 'download_dir') {
+            return ['some1.enc', 'some.enc'] as unknown as ReturnType<
+              typeof fs.readdirSync
+            >;
+          }
+
+          if (dir === 'upload_dir') {
+            return [
+              'another.offline.unenc',
+              'another1.offline.unenc',
+            ] as unknown as ReturnType<typeof fs.readdirSync>;
+          }
+
+          return [] as unknown as ReturnType<typeof fs.readdirSync>;
         });
+
+        jest.mocked(fs.statSync).mockImplementation((filePath) => {
+          const name = String(filePath).split('/').pop() ?? '';
+          const isOldFile =
+            name === 'some.enc' || name === 'another.offline.unenc';
+
+          return {
+            birthtime: isOldFile
+              ? moment().subtract(1, 'hour').toDate()
+              : new Date(),
+          } as fs.Stats;
+        });
+
+        jest.mocked(fs.unlinkSync).mockImplementation(() => undefined);
 
         configServiceMock.get = jest.fn().mockImplementation((param) => {
           switch (param) {
@@ -126,7 +145,7 @@ describe('FileCleanerService', () => {
           .fn()
           .mockImplementation(async () => {
             return {
-              msgExpired: 120_000, // 2 minutes into miliseconds
+              msgExpired: 120_000,
               msgMaxSize: 100,
               natsMaxClientidSize: 1,
               fileMaxSize: 1,
@@ -145,12 +164,13 @@ describe('FileCleanerService', () => {
       });
 
       it('fs should list two remaining files', () => {
-        const allFiles = [
-          ...fs.readdirSync('download_dir'),
-          ...fs.readdirSync('upload_dir'),
-        ];
-
-        expect(allFiles).toStrictEqual(['some1.enc', 'another1.offline.unenc']);
+        expect(fs.readdirSync).toHaveBeenCalledWith('download_dir');
+        expect(fs.readdirSync).toHaveBeenCalledWith('upload_dir');
+        expect(fs.unlinkSync).toHaveBeenCalledTimes(2);
+        expect(fs.unlinkSync).toHaveBeenCalledWith('download_dir/some.enc');
+        expect(fs.unlinkSync).toHaveBeenCalledWith(
+          'upload_dir/another.offline.unenc'
+        );
       });
 
       it('should call ddhub config service', () => {
