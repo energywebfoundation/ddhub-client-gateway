@@ -36,6 +36,17 @@ export class EventsService implements OnApplicationBootstrap {
   ) {}
 
   public async onApplicationBootstrap(): Promise<void> {
+    const isCronEnabled = this.configService.get<boolean>(
+      'EVENTS_CRON_ENABLED',
+      true
+    );
+
+    if (!isCronEnabled) {
+      this.logger.warn(`Events cron job is disabled`);
+
+      return;
+    }
+
     const cronJob = new CronJob('* * * * *', async () => {
       this.logger.log(`Executing refresh events`);
 

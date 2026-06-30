@@ -19,7 +19,7 @@ export const SCHEDULER_ENVS = Joi.object({
   CLIENTS_CRON_SCHEDULE: Joi.string()
     .default('*/5 * * * *')
     .description('How often should check for outdated clients'),
-  CLIENTS_CRON_ENABLED: Joi.string()
+  CLIENTS_CRON_ENABLED: Joi.boolean()
     .default(true)
     .description('Should check for outdated clients'),
   CHANNEL_DID_CRON_SCHEDULE: Joi.string()
@@ -87,4 +87,7 @@ export const SCHEDULER_ENVS = Joi.object({
   DID_LISTENER_ENABLED: Joi.boolean()
     .default(true)
     .description('Should listen for DID attributes changes'),
+  EVENTS_CRON_ENABLED: Joi.boolean()
+    .default(true)
+    .description('Should poll for events'),
 });
