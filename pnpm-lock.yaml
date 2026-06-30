@@ -44,7 +44,6 @@ overrides:
   schema-utils@2>ajv: ^6.12.6
   schema-utils@3>ajv: ^6.12.6
   postcss: ^8.5.10
-  yargs-parser: ^5.0.1
   uuid: ^11.1.1
   request>uuid: ^11.1.1
   '@cypress/request>uuid': ^11.1.1
@@ -670,6 +669,9 @@ importers:
       react-test-renderer:
         specifier: 17.0.2
         version: 17.0.2(react@18.3.1)
+      rimraf:
+        specifier: ^3.0.2
+        version: 3.0.2
       supertest:
         specifier: ^6.2.2
         version: 6.3.4(supports-color@10.2.2)
@@ -8571,7 +8573,7 @@ packages:
   git-raw-commits@2.0.11:
     resolution: {integrity: sha512-VnctFhw+xfj8Va1xtfEqCUD2XDrbAPSJx+hSrE5K7fGdjZruW7XV+QOrN7LF/RJyvspRiD2I0asWsxFp0ya26A==}
     engines: {node: '>=10'}
-    deprecated: This package is no longer maintained. For the JavaScript API, please use @conventional-changelog/git-client instead.
+    deprecated: Deprecated and no longer maintained. Use @conventional-changelog/git-client instead.
     hasBin: true
 
   github-from-package@0.0.0:
@@ -13078,6 +13080,7 @@ packages:
   tsconfck@2.1.2:
     resolution: {integrity: sha512-ghqN1b0puy3MhhviwO2kGF8SeMDNhEbnKxjK7h6+fvY9JAxqvXi8y5NAHSQv687OVboS2uZIByzGd45/YxrRHg==}
     engines: {node: ^14.13.1 || ^16 || >=18}
+    deprecated: unmaintained
     hasBin: true
     peerDependencies:
       typescript: ^4.3.5 || ^5.0.0
@@ -13828,8 +13831,31 @@ packages:
     engines: {node: '>= 14.6'}
     hasBin: true
 
-  yargs-parser@5.0.1:
-    resolution: {integrity: sha512-wpav5XYiddjXxirPoCTUPbqM0PXvJ9hiBMvuJgInvo4/lAOTZzUprArw17q2O1P2+GHhbBr18/iQwjL5Z9BqfA==}
+  yargs-parser@13.1.2:
+    resolution: {integrity: sha512-3lbsNRf/j+A4QuSZfDRA7HRSfWrzO0YjqTJd5kjAq37Zep1CEgaYmrH9Q3GwPiB9cHyd1Y1UwggGhJGoxipbzg==}
+
+  yargs-parser@18.1.3:
+    resolution: {integrity: sha512-o50j0JeToy/4K6OZcaQmW6lyXXKhq7csREXcDwk2omFPJEwUNOVtJKvmDr9EI1fAJZUyZcRF7kxGBWmRXudrCQ==}
+    engines: {node: '>=6'}
+
+  yargs-parser@2.4.1:
+    resolution: {integrity: sha512-9pIKIJhnI5tonzG6OnCFlz/yln8xHYcGl+pn3xR0Vzff0vzN1PbNRaelgfgRUwZ3s4i3jvxT9WhmUGL4whnasA==}
+
+  yargs-parser@20.0.0:
+    resolution: {integrity: sha512-8eblPHTL7ZWRkyjIZJjnGf+TijiKJSwA24svzLRVvtgoi/RZiKa9fFQTrlx0OKLnyHSdt/enrdadji6WFfESVA==}
+    engines: {node: '>=10'}
+
+  yargs-parser@20.2.9:
+    resolution: {integrity: sha512-y11nGElTIV+CT3Zv9t7VKl+Q3hTQoT9a1Qzezhhl6Rp21gJ/IVTW7Z3y9EWXhuUBC2Shnf+DX0antecpAwSP8w==}
+    engines: {node: '>=10'}
+
+  yargs-parser@21.0.1:
+    resolution: {integrity: sha512-9BK1jFpLzJROCI5TzwZL/TU4gqjK5xiHV/RfWLOahrjAko/e4DJkRDZQXfvqAsiZzzYhgAzbgz6lg48jcm4GLg==}
+    engines: {node: '>=12'}
+
+  yargs-parser@21.1.1:
+    resolution: {integrity: sha512-tVpsJW7DdjecAiFpbIB1e3qxIQsE6NoPc5/eTdrbbIC4h0LVsWhnoa3g+m2HclBIujHzsxZ4VJVA+GUuc2/LBw==}
+    engines: {node: '>=12'}
 
   yargs@13.3.2:
     resolution: {integrity: sha512-AX3Zw5iPruN5ie6xGRIDgqkT+ZhnRlZMLMHAs8tg7nRruy2Nb+i5o9bwghAogtM08q1dpr2LVoS8KSTMYpWXUw==}
@@ -17811,7 +17837,7 @@ snapshots:
       chalk: 4.1.0
       enquirer: 2.3.6
       v8-compile-cache: 2.3.0
-      yargs-parser: 5.0.1
+      yargs-parser: 20.0.0
 
   '@nrwl/cli@14.5.0(@swc-node/register@1.11.1(@swc/core@1.15.40)(@swc/types@0.1.26)(typescript@4.9.5))(@swc/core@1.15.40)':
     dependencies:
@@ -18925,7 +18951,7 @@ snapshots:
       semver: 7.8.2
       tmp: 0.2.7
       tslib: 2.8.1
-      yargs-parser: 5.0.1
+      yargs-parser: 20.0.0
 
   '@nrwl/tao@14.5.0(@swc-node/register@1.11.1(@swc/core@1.15.40)(@swc/types@0.1.26)(typescript@4.9.5))(@swc/core@1.15.40)':
     dependencies:
@@ -19206,7 +19232,7 @@ snapshots:
       tmp: 0.2.7
       tslib: 2.8.1
       yargs: 17.7.2
-      yargs-parser: 5.0.1
+      yargs-parser: 21.0.1
     optionalDependencies:
       prettier: 2.8.8
     transitivePeerDependencies:
@@ -19247,7 +19273,7 @@ snapshots:
       tmp: 0.2.7
       tslib: 2.8.1
       yargs: 17.7.2
-      yargs-parser: 5.0.1
+      yargs-parser: 21.0.1
     optionalDependencies:
       prettier: 2.8.8
     transitivePeerDependencies:
@@ -19288,7 +19314,7 @@ snapshots:
       tmp: 0.2.7
       tslib: 2.8.1
       yargs: 15.4.1
-      yargs-parser: 5.0.1
+      yargs-parser: 20.0.0
     optionalDependencies:
       prettier: 2.8.8
     transitivePeerDependencies:
@@ -19327,7 +19353,7 @@ snapshots:
       tmp: 0.2.7
       tslib: 2.8.1
       yargs: 15.4.1
-      yargs-parser: 5.0.1
+      yargs-parser: 20.0.0
     optionalDependencies:
       prettier: 2.8.8
     transitivePeerDependencies:
@@ -19366,7 +19392,7 @@ snapshots:
       tmp: 0.2.7
       tslib: 2.8.1
       yargs: 17.7.2
-      yargs-parser: 5.0.1
+      yargs-parser: 21.0.1
     optionalDependencies:
       prettier: 2.8.8
     transitivePeerDependencies:
@@ -28206,7 +28232,7 @@ snapshots:
       redent: 3.0.0
       trim-newlines: 3.0.1
       type-fest: 0.18.1
-      yargs-parser: 5.0.1
+      yargs-parser: 20.2.9
 
   merge-descriptors@1.0.3: {}
 
@@ -28662,7 +28688,7 @@ snapshots:
       tslib: 2.8.1
       v8-compile-cache: 2.3.0
       yargs: 17.7.2
-      yargs-parser: 5.0.1
+      yargs-parser: 21.0.1
     transitivePeerDependencies:
       - '@swc/helpers'
       - '@swc/types'
@@ -28704,7 +28730,7 @@ snapshots:
       tslib: 2.8.1
       v8-compile-cache: 2.3.0
       yargs: 17.7.2
-      yargs-parser: 5.0.1
+      yargs-parser: 21.0.1
     optionalDependencies:
       '@swc-node/register': 1.11.1(@swc/core@1.15.40)(@swc/types@0.1.26)(typescript@4.9.5)
       '@swc/core': 1.15.40
@@ -31312,7 +31338,7 @@ snapshots:
       make-error: 1.3.6
       semver: 7.8.2
       typescript: 4.9.5
-      yargs-parser: 5.0.1
+      yargs-parser: 20.2.9
     optionalDependencies:
       '@babel/core': 7.29.7
       '@types/jest': 27.5.2
@@ -32210,10 +32236,28 @@ snapshots:
 
   yaml@2.9.0: {}
 
-  yargs-parser@5.0.1:
+  yargs-parser@13.1.2:
+    dependencies:
+      camelcase: 5.3.1
+      decamelize: 1.2.0
+
+  yargs-parser@18.1.3:
+    dependencies:
+      camelcase: 5.3.1
+      decamelize: 1.2.0
+
+  yargs-parser@2.4.1:
     dependencies:
       camelcase: 3.0.0
-      object.assign: 4.1.7
+      lodash.assign: 4.2.0
+
+  yargs-parser@20.0.0: {}
+
+  yargs-parser@20.2.9: {}
+
+  yargs-parser@21.0.1: {}
+
+  yargs-parser@21.1.1: {}
 
   yargs@13.3.2:
     dependencies:
@@ -32226,7 +32270,7 @@ snapshots:
       string-width: 3.1.0
       which-module: 2.0.1
       y18n: 4.0.3
-      yargs-parser: 5.0.1
+      yargs-parser: 13.1.2
 
   yargs@15.4.1:
     dependencies:
@@ -32240,7 +32284,7 @@ snapshots:
       string-width: 4.2.3
       which-module: 2.0.1
       y18n: 4.0.3
-      yargs-parser: 5.0.1
+      yargs-parser: 18.1.3
 
   yargs@16.2.0:
     dependencies:
@@ -32250,7 +32294,7 @@ snapshots:
       require-directory: 2.1.1
       string-width: 4.2.3
       y18n: 5.0.8
-      yargs-parser: 5.0.1
+      yargs-parser: 20.2.9
 
   yargs@17.7.2:
     dependencies:
@@ -32260,7 +32304,7 @@ snapshots:
       require-directory: 2.1.1
       string-width: 4.2.3
       y18n: 5.0.8
-      yargs-parser: 5.0.1
+      yargs-parser: 21.1.1
 
   yargs@4.8.1:
     dependencies:
@@ -32277,7 +32321,7 @@ snapshots:
       which-module: 1.0.0
       window-size: 0.2.0
       y18n: 3.2.2
-      yargs-parser: 5.0.1
+      yargs-parser: 2.4.1
 
   yauzl@2.10.0:
     dependencies:

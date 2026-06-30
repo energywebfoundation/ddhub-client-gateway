@@ -51,7 +51,6 @@ overrides:
   "schema-utils@2>ajv": ^6.12.6
   "schema-utils@3>ajv": ^6.12.6
   postcss: ^8.5.10
-  yargs-parser: ^5.0.1
   uuid: ^11.1.1
   "request>uuid": ^11.1.1
   "@cypress/request>uuid": ^11.1.1
