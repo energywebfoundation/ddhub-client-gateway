@@ -15,7 +15,7 @@ export class HeartbeatService implements OnApplicationBootstrap {
 
   public async onApplicationBootstrap(): Promise<void> {
     const isCronEnabled: boolean = this.configService.get<boolean>(
-      'HEARTBEAT_ENABLED',
+      'HEARTBEAT_CRON_ENABLED',
       true
     );
 
