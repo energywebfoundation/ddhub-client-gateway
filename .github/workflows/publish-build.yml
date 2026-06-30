@@ -2,7 +2,7 @@ name: Build and publish images (Intelligent)
 
 on:
   push:
-    branches: [develop-intelligent,fix/audit-pnpm]
+    branches: [develop-intelligent]
     paths-ignore:
       - 'devops/**'
       - 'get-started/**'
