@@ -11,7 +11,8 @@ COPY --chown=node:node dist/apps/dsb-client-gateway-scheduler/package.json /usr/
 COPY --chown=node:node pnpm-lock.yaml /usr/app/
 
 WORKDIR /usr/app
-RUN pnpm install --prod --no-frozen-lockfile --dangerously-allow-all-builds
+RUN echo "package-import-method=copy" > .npmrc
+RUN pnpm install --prod --no-frozen-lockfile --dangerously-allow-all-builds && pnpm add tslib
 
 
 FROM $IMAGE
