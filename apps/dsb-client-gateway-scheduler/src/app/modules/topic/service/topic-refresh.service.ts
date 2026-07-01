@@ -296,7 +296,9 @@ export class TopicRefreshService implements OnApplicationBootstrap {
     const topicUpdatesMonitor: TopicMonitorUpdates[] =
       await this.ddhubTopicsService.topicUpdatesMonitor(allOwners);
 
-    this.logger.log(topicUpdatesMonitor);
+    this.logger.log(
+      `topic monitors received from MB: ${topicUpdatesMonitor.length}`
+    );
 
     if (topicUpdatesMonitor.length === 0) {
       this.logger.warn('no topic monitors received from MB');
