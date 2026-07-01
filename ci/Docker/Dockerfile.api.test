@@ -1,6 +1,10 @@
-ARG IMAGE=node:16.10-alpine
+ARG IMAGE=node:22.21.1-alpine
 
 FROM $IMAGE
+
+RUN apk add --no-cache python3 py3-pip make g++
+
+RUN npm install -g pnpm@11
 
 RUN chown -R node:node /usr/src/app
 
@@ -8,13 +12,4 @@ WORKDIR /usr/src/app
 
 COPY --chown node:node . ./
 
-RUN apk add --no-cache python3 py3-pip make g++ && \
-    npm ci
-
-#COPY --chown=node:node dist/apps/dsb-client-gateway-api/* /usr/app/
-#COPY --chown=node:node package-lock.json /usr/app/
-#
-#WORKDIR /usr/app
-#RUN npm ci --production
-#
-#USER node
+RUN pnpm install --frozen-lockfile
