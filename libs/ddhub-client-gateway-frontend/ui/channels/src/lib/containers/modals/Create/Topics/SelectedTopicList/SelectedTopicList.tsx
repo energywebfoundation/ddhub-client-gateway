@@ -4,6 +4,7 @@ import { Topic } from '../Topics.effects';
 import { useStyles } from './SelectedTopicList.styles';
 import { useSelectedTopicListEffects } from './SelectedTopicList.effects';
 import { ResponseTopicDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
+import { getTopicKey } from '../../../../../utils';
 
 export interface SelectedTopicListProps {
   selectedTopics: Topic[];
@@ -62,7 +63,7 @@ export const SelectedTopicList = ({
           edit={edit}
           showTopicResponse={showTopicResponse}
           saveResponse={saveResponse}
-          responseTopics={getSelectedResponseTopics(topic.id ?? topic.topicId)}
+          responseTopics={getSelectedResponseTopics(getTopicKey(topic) ?? '')}
           remove={() => {
             if (remove) {
               remove(topic);

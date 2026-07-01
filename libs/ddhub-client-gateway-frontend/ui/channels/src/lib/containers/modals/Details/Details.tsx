@@ -23,7 +23,6 @@ import { useStyles } from './Details.styles';
 import { VIEW_STEPS } from '../Create/Steps/models/viewSteps';
 import { includes } from 'lodash';
 import { ChannelType } from '../../../models';
-import { CreateChannelDtoType } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { AddressBookContext } from '@ddhub-client-gateway-frontend/ui/login';
 
 export const Details: FC = () => {
@@ -79,7 +78,8 @@ export const Details: FC = () => {
             topics={channel.conditions?.topics}
             responseTopics={responseTopics}
             showResponseTopics={
-              channel.type === CreateChannelDtoType.pub && channel.messageForms
+              !!channel.messageForms &&
+              getChannelType(channel.type) === ChannelType.Messaging
             }
           />
         );

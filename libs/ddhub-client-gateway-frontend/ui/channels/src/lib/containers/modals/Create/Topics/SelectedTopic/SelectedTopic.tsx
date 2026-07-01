@@ -7,6 +7,7 @@ import {
   InputAdornment,
   TextField,
   Checkbox,
+  ListSubheader,
 } from '@mui/material';
 import { useStyles } from './SelectedTopic.styles';
 import { X as Close, Search } from 'react-feather';
@@ -14,6 +15,7 @@ import { Topic } from '../Topics.effects';
 import React, { useEffect } from 'react';
 import { TopicItem } from '../TopicItem/TopicItem';
 import { SelectedTopicView } from '../SelectedTopicView/SelectedTopicView';
+import { SelectedTopicsCollapse } from '../SelectedTopicView/ResponseTopicsCollapse/ResponseTopicsCollapse';
 import { useSelectedTopicEffects } from './SelectedTopic.effects';
 import { ResponseTopicDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { useSelectedTopicViewEffects } from '../SelectedTopicView/SelectedTopicView.effects';
@@ -89,19 +91,24 @@ export const SelectedTopic = ({
   }, [index]);
 
   return (
-    <Select
+    <Box>
+      <Select
       id={`panel-${index}`}
       key={`panel-${index}`}
       value={topic.topicName}
       open={expanded === `panel-${index}`}
-      onOpen={
-        showTopicResponse
-          ? () => {
-              setExpandResponse(!expandResponse);
-            }
-          : handleOpenEdit
-      }
+      onOpen={handleOpenEdit}
       onClose={handleClose}
+      MenuProps={{
+        autoFocus: false,
+        disableAutoFocus: true,
+        disableEnforceFocus: true,
+        MenuListProps: {
+          onMouseDown: (event) => {
+            event.preventDefault();
+          },
+        },
+      }}
       IconComponent={() => null}
       classes={{
         icon: classes.icon,
@@ -125,6 +132,7 @@ export const SelectedTopic = ({
           responseTopics={responseTopics}
           expandResponse={expandResponse}
           setExpandResponse={setExpandResponse}
+          hideInlineResponseCollapse
         />
       )}
     >
@@ -149,47 +157,60 @@ export const SelectedTopic = ({
           (topicsList.length !== 0 && isResponse)) &&
           !topicsLoading && (
             <Box onKeyDown={handleKeyDown}>
-              <Box className={classes.listHeader}>
-                <Typography className={classes.optionTitle}>
-                  {isResponse ? 'Choose response topics ' : 'Edit topic '}
-                  {topic?.topicName}
-                </Typography>
+              <ListSubheader
+                disableSticky
+                component="div"
+                sx={{ padding: 0, lineHeight: 'inherit' }}
+              >
+                <Box className={classes.listHeader}>
+                  <Typography className={classes.optionTitle}>
+                    {isResponse ? 'Choose response topics ' : 'Edit topic '}
+                    {topic?.topicName}
+                  </Typography>
 
-                <TextField
-                  autoComplete="off"
-                  fullWidth
-                  type="text"
-                  margin="normal"
-                  variant="outlined"
-                  name={inputProps.name}
-                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                    onFilterChange(event.target.value);
-                    inputProps.onChange(event);
-                  }}
-                  inputRef={inputProps.ref}
-                  inputProps={{
-                    ...field.inputProps,
-                  }}
-                  classes={{
-                    root: classes.searchField,
-                  }}
-                  InputProps={{
-                    endAdornment: value && (
-                      <InputAdornment position="end">
-                        <Close
-                          className={classes.closeSearch}
-                          onClick={handleReset}
-                        />
-                      </InputAdornment>
-                    ),
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <Search className={classes.searchIcon} />
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              </Box>
+                  <TextField
+                    autoComplete="off"
+                    fullWidth
+                    type="text"
+                    margin="normal"
+                    variant="outlined"
+                    name={inputProps.name}
+                    onMouseDown={(event) => event.stopPropagation()}
+                    onClick={(event) => event.stopPropagation()}
+                    onKeyDown={handleKeyDown}
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                      onFilterChange(event.target.value);
+                      inputProps.onChange(event);
+                    }}
+                    inputRef={inputProps.ref}
+                    inputProps={{
+                      ...field.inputProps,
+                    }}
+                    classes={{
+                      root: classes.searchField,
+                    }}
+                    InputProps={{
+                      endAdornment: value && (
+                        <InputAdornment position="end">
+                          <Close
+                            className={classes.closeSearch}
+                            onMouseDown={(event) => event.stopPropagation()}
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              handleReset();
+                            }}
+                          />
+                        </InputAdornment>
+                      ),
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <Search className={classes.searchIcon} />
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                </Box>
+              </ListSubheader>
 
               <Box className={classes.topicBox}>
                 {!filteredTopics.length && (
@@ -272,5 +293,12 @@ export const SelectedTopic = ({
           )}
       </Box>
     </Select>
+      {showTopicResponse && (
+        <SelectedTopicsCollapse
+          responseTopics={responseTopics}
+          expandResponse={expandResponse}
+        />
+      )}
+    </Box>
   );
 };
