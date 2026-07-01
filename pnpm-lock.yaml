@@ -56,6 +56,7 @@ overrides:
   engine.io: ^6.5.4
   webpack-dev-server: ^5.2.5
   http-proxy-middleware: ^3.0.6
+  yargs@4.8.1>yargs-parser: 5.0.1
 
 patchedDependencies:
   '@nrwl/workspace@13.7.3': 40976d1b12d390004330a0ea6bcdc8f968e200ca8eee13af285f88c2b7311098
@@ -13838,9 +13839,6 @@ packages:
     resolution: {integrity: sha512-o50j0JeToy/4K6OZcaQmW6lyXXKhq7csREXcDwk2omFPJEwUNOVtJKvmDr9EI1fAJZUyZcRF7kxGBWmRXudrCQ==}
     engines: {node: '>=6'}
 
-  yargs-parser@2.4.1:
-    resolution: {integrity: sha512-9pIKIJhnI5tonzG6OnCFlz/yln8xHYcGl+pn3xR0Vzff0vzN1PbNRaelgfgRUwZ3s4i3jvxT9WhmUGL4whnasA==}
-
   yargs-parser@20.0.0:
     resolution: {integrity: sha512-8eblPHTL7ZWRkyjIZJjnGf+TijiKJSwA24svzLRVvtgoi/RZiKa9fFQTrlx0OKLnyHSdt/enrdadji6WFfESVA==}
     engines: {node: '>=10'}
@@ -13856,6 +13854,9 @@ packages:
   yargs-parser@21.1.1:
     resolution: {integrity: sha512-tVpsJW7DdjecAiFpbIB1e3qxIQsE6NoPc5/eTdrbbIC4h0LVsWhnoa3g+m2HclBIujHzsxZ4VJVA+GUuc2/LBw==}
     engines: {node: '>=12'}
+
+  yargs-parser@5.0.1:
+    resolution: {integrity: sha512-wpav5XYiddjXxirPoCTUPbqM0PXvJ9hiBMvuJgInvo4/lAOTZzUprArw17q2O1P2+GHhbBr18/iQwjL5Z9BqfA==}
 
   yargs@13.3.2:
     resolution: {integrity: sha512-AX3Zw5iPruN5ie6xGRIDgqkT+ZhnRlZMLMHAs8tg7nRruy2Nb+i5o9bwghAogtM08q1dpr2LVoS8KSTMYpWXUw==}
@@ -32246,11 +32247,6 @@ snapshots:
       camelcase: 5.3.1
       decamelize: 1.2.0
 
-  yargs-parser@2.4.1:
-    dependencies:
-      camelcase: 3.0.0
-      lodash.assign: 4.2.0
-
   yargs-parser@20.0.0: {}
 
   yargs-parser@20.2.9: {}
@@ -32258,6 +32254,11 @@ snapshots:
   yargs-parser@21.0.1: {}
 
   yargs-parser@21.1.1: {}
+
+  yargs-parser@5.0.1:
+    dependencies:
+      camelcase: 3.0.0
+      object.assign: 4.1.7
 
   yargs@13.3.2:
     dependencies:
@@ -32321,7 +32322,7 @@ snapshots:
       which-module: 1.0.0
       window-size: 0.2.0
       y18n: 3.2.2
-      yargs-parser: 2.4.1
+      yargs-parser: 5.0.1
 
   yauzl@2.10.0:
     dependencies:

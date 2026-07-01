@@ -63,6 +63,7 @@ overrides:
   engine.io: ^6.5.4
   webpack-dev-server: ^5.2.5
   http-proxy-middleware: ^3.0.6
+  "yargs@4.8.1>yargs-parser": 5.0.1
 
 allowBuilds:
   "@nestjs/core": true
