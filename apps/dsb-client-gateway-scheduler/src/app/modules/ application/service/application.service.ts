@@ -29,7 +29,7 @@ export class ApplicationService implements OnApplicationBootstrap {
     protected readonly schedulerRegistry: SchedulerRegistry,
     protected readonly ddhubTopicService: DdhubTopicsService,
     protected readonly configService: ConfigService
-  ) {}
+  ) { }
 
   public async onApplicationBootstrap(): Promise<void> {
     const isCronEnabled: boolean = this.configService.get<boolean>(
@@ -76,8 +76,8 @@ export class ApplicationService implements OnApplicationBootstrap {
         .catch((e) => {
           this.logger.error(
             'fetching applications for role user ' +
-              this.iamService.getDIDAddress() +
-              ' failed'
+            this.iamService.getDIDAddress() +
+            ' failed'
           );
           this.logger.error(e);
 
@@ -94,8 +94,8 @@ export class ApplicationService implements OnApplicationBootstrap {
         .catch((e) => {
           this.logger.error(
             'fetching applications for role topiccreator ' +
-              this.iamService.getDIDAddress() +
-              ' failed'
+            this.iamService.getDIDAddress() +
+            ' failed'
           );
           this.logger.error(e);
 
@@ -110,8 +110,12 @@ export class ApplicationService implements OnApplicationBootstrap {
       );
 
       const combinedApplications: ApplicationDTO[] = [
-        ...userApplications,
-        ...topicCreatorApplications,
+        ...new Map(
+          [...userApplications, ...topicCreatorApplications].map((app) => [
+            this.getKey(app),
+            app,
+          ])
+        ).values(),
       ];
 
       this.logger.log('combined applications');
