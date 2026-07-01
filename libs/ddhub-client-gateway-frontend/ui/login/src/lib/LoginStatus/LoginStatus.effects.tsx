@@ -10,12 +10,14 @@ import IdentitySuccessful from './IdentitySuccessful/IdentitySuccessful';
 import ResetPrivateKey from '../ResetPrivateKey/ResetPrivateKey';
 import LoadingInfo from '../LoadingInfo/LoadingInfo';
 import { Stack, Typography } from '@mui/material';
+import { useGatewayConfig } from '@ddhub-client-gateway-frontend/ui/api-hooks';
 import { useEffect, useState } from 'react';
 import { UserRole } from '../UserDataContext';
 import NonAdminUser from './NonAdminUser/NonAdminUser';
 
 export const useLoginStatusEffects = () => {
   const [isFirstLogin, setIsFirstLogin] = useState(false);
+  const { isLoading: configIsLoading } = useGatewayConfig();
   const {
     authEnabled,
     isLoading,
@@ -74,6 +76,14 @@ export const useLoginStatusEffects = () => {
   }, [userAuth]);
 
   const statusFactory = () => {
+    if (configIsLoading) {
+      return checkingIdentity();
+    }
+
+    if (authEnabled && !userAuth.authenticated) {
+      return showLoginForm();
+    }
+
     if (
       userAuth.authenticated &&
       userAuth.role === UserRole.MESSAGING &&
@@ -84,10 +94,6 @@ export const useLoginStatusEffects = () => {
       } else {
         return <NonAdminUser />;
       }
-    }
-
-    if (authEnabled && !userAuth.authenticated) {
-      return showLoginForm();
     }
 
     switch (status) {

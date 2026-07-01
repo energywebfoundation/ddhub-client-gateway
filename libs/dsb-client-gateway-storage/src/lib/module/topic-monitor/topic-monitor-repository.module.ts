@@ -6,9 +6,9 @@ import { TopicMonitorRepositoryWrapper } from './wrapper/topic-monitor-repositor
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([TopicMonitorEntity, TopicMonitorRepository]),
+    TypeOrmModule.forFeature([TopicMonitorEntity]),
   ],
-  providers: [TopicMonitorRepositoryWrapper],
+  providers: [TopicMonitorRepository, TopicMonitorRepositoryWrapper],
   exports: [TopicMonitorRepositoryWrapper],
 })
 export class TopicMonitorRepositoryModule {}

@@ -5,8 +5,8 @@ import { DidRepository } from './repository/did.repository';
 import { DidWrapperRepository } from './wrapper';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([DidEntity, DidRepository])],
-  providers: [DidWrapperRepository],
+  imports: [TypeOrmModule.forFeature([DidEntity])],
+  providers: [DidRepository, DidWrapperRepository],
   exports: [DidWrapperRepository],
 })
 export class DidRepositoryModule {}

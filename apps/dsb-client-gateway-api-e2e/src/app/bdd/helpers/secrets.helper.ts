@@ -1,11 +1,10 @@
 import { INestApplication } from '@nestjs/common';
 import { SecretsEngineService } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
 import * as dotenv from 'dotenv';
-
-console.log(process.cwd());
+import * as path from 'path';
 
 dotenv.config({
-  path: '.env.test',
+  path: path.join(__dirname, '../../../../.env.test'),
 });
 
 // Create new connector with HTTP Pooling

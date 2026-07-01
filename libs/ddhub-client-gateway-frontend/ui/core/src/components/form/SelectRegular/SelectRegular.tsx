@@ -10,6 +10,7 @@ import { UseFormRegister, FieldValues } from 'react-hook-form';
 import { GenericFormField } from '../../../containers/GenericForm';
 import { ChevronDown } from 'react-feather';
 import { useStyles } from './SelectRegular.styles';
+import { getFormFieldPlaceholder } from '../formField.utils';
 
 export interface SelectRegularProps {
   field: GenericFormField;
@@ -33,6 +34,7 @@ export const SelectRegular: FC<SelectRegularProps> = ({
 }) => {
   const { classes } = useStyles();
   const options = field.options || [];
+  const placeholder = getFormFieldPlaceholder(field, options);
 
   return (
     <Box {...field.formInputsWrapperProps} flexShrink={0}>
@@ -65,7 +67,7 @@ export const SelectRegular: FC<SelectRegularProps> = ({
               label
             ) : (
               <Typography className={classes.placeholder}>
-                {field.inputProps?.placeholder}
+                {placeholder}
               </Typography>
             );
           },
@@ -77,15 +79,21 @@ export const SelectRegular: FC<SelectRegularProps> = ({
         }}
         {...field.textFieldProps}
       >
-        {options.map((option) => (
-          <MenuItem
-            key={option.label}
-            value={option.value}
-            className={classes.menuItem}
-          >
-            {option.label}
+        {options.length === 0 ? (
+          <MenuItem disabled value="" className={classes.menuItem}>
+            <Typography className={classes.placeholder}>{placeholder}</Typography>
           </MenuItem>
-        ))}
+        ) : (
+          options.map((option) => (
+            <MenuItem
+              key={option.label}
+              value={option.value}
+              className={classes.menuItem}
+            >
+              {option.label}
+            </MenuItem>
+          ))
+        )}
       </TextField>
     </Box>
   );

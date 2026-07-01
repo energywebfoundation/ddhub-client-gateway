@@ -16,7 +16,7 @@ interface useTopicVersionHistoryProps
 export const useTopicVersionHistory = ({
   id,
   page = 1,
-  limit = 0,
+  limit = 10,
 }: useTopicVersionHistoryProps) => {
   const Swal = useCustomAlert();
   const [params, setParams] = useState({ page, limit });

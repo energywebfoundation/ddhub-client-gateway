@@ -47,7 +47,8 @@
     "serve": {
       "executor": "@nrwl/node:execute",
       "options": {
-        "buildTarget": "dsb-client-gateway-scheduler:build"
+        "buildTarget": "dsb-client-gateway-scheduler:build",
+        "inspect": false
       }
     },
     "lint": {

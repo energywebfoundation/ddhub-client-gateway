@@ -1,5 +1,10 @@
-import { EntityRepository, Repository } from 'typeorm';
+import { Injectable } from '@nestjs/common';
+import { DataSource, Repository } from 'typeorm';
 import { AddressBookEntity } from '../entity';
 
-@EntityRepository(AddressBookEntity)
-export class AddressBookRepository extends Repository<AddressBookEntity> {}
+@Injectable()
+export class AddressBookRepository extends Repository<AddressBookEntity> {
+  constructor(dataSource: DataSource) {
+    super(AddressBookEntity, dataSource.createEntityManager());
+  }
+}

@@ -7,7 +7,7 @@ import {
   whenTopicWasRegisteredItShouldExists,
   whenUserCreatesTopic,
 } from './helpers/topic.helper';
-import { setupApp } from './helpers/app.helper';
+import { setupApp, teardownApp } from './helpers/app.helper';
 
 const feature = loadFeature('../../feature/topic.feature', {
   loadRelativePath: true,
@@ -25,7 +25,7 @@ describe.skip('Topic Feature', () => {
   const getApp = () => app;
 
   afterAll(async () => {
-    await app.close();
+    await teardownApp(app);
   });
 
   defineFeature(feature, (test) => {

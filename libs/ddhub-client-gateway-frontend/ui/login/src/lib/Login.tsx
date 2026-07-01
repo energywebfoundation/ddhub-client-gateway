@@ -2,13 +2,12 @@ import { Box, Container, Stack, Typography } from '@mui/material';
 import { useStyles } from './Login.styles';
 import LoginStatus from './LoginStatus/LoginStatus';
 import { useUserDataEffects } from './UserData.effects';
-import getConfig from 'next/config';
+import { publicConfig } from '@ddhub-client-gateway-frontend/ui/utils';
 export function Login() {
   const { classes } = useStyles();
   const { version } = useUserDataEffects();
-  const { publicRuntimeConfig } = getConfig();
   const defaultCgwName = 'Energy Web Client Gateway';
-  const cgwName = publicRuntimeConfig?.customName ?? defaultCgwName;
+  const cgwName = publicConfig.customName ?? defaultCgwName;
 
   return (
     <>

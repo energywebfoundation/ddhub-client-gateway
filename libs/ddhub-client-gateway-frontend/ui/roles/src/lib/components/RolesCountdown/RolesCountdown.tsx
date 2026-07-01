@@ -22,9 +22,11 @@ const formatLastUpdateTime = (date: Date): string => {
 
 export function RolesCountdown({ refetch }: RolesCountdownProps) {
   const [countdown, setCountdown] = useState<number>(REFRESH_INTERVAL);
-  const [lastUpdateTime, setLastUpdateTime] = useState<Date>(new Date());
+  const [lastUpdateTime, setLastUpdateTime] = useState<Date | null>(null);
 
   useEffect(() => {
+    setLastUpdateTime(new Date());
+
     const interval = setInterval(() => {
       setCountdown((prevCountdown) => {
         if (prevCountdown === 0) {
@@ -43,8 +45,10 @@ export function RolesCountdown({ refetch }: RolesCountdownProps) {
     <>
       <CircularProgress size={16} color="primary" />
       <Typography variant="body2" color="text.primary">
-        Next refresh in {countdown} seconds. Updated:{' '}
-        {formatLastUpdateTime(lastUpdateTime)}
+        Next refresh in {countdown} seconds.
+        {lastUpdateTime && (
+          <> Updated: {formatLastUpdateTime(lastUpdateTime)}</>
+        )}
       </Typography>
     </>
   );

@@ -6,7 +6,7 @@ export const useUserAuthHeaders = () => {
   const userContext = useContext(UserContext);
   if (!userContext) {
     throw new Error(
-      'useUserAuthHeaders must be used within a UserContext provider'
+      'useUserAuthHeaders must be used within a UserContext provider',
     );
   }
   const { authEnabled, userAuth, refreshToken } = userContext;
@@ -17,11 +17,15 @@ export const useUserAuthHeaders = () => {
       Axios.interceptors.request.eject(requestInterceptorId);
       setRequestInterceptorId(undefined);
     }
+    delete Axios.defaults.headers.common['Authorization'];
   };
 
   const encodeParams = (params: Record<string, string>) => {
     return Object.entries(params)
-      .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+      .map(
+        ([key, value]) =>
+          `${encodeURIComponent(key)}=${encodeURIComponent(value)}`,
+      )
       .join('&');
   };
 
@@ -39,20 +43,19 @@ export const useUserAuthHeaders = () => {
       const accessToken =
         userAuth.accessToken ?? localStorage.getItem('accessToken');
       const interceptorId = Axios.interceptors.request.use((config) => {
-        return {
-          ...config,
-          headers: {
-            ...config.headers,
-            Authorization: `Bearer ${accessToken}`,
-          },
-        };
+        config.headers.Authorization = `Bearer ${accessToken}`;
+        return config;
       });
       setRequestInterceptorId(interceptorId);
     }
 
     // Encode query params
     Axios.interceptors.request.use((config) => {
-      if (config.method === 'get' && config.params && typeof config.params === 'object') {
+      if (
+        config.method === 'get' &&
+        config.params &&
+        typeof config.params === 'object'
+      ) {
         const queryString = encodeParams(config.params);
         config.url += (config.url?.includes('?') ? '&' : '?') + queryString;
         delete config.params; // prevent axios from re-attaching unencoded params
@@ -73,7 +76,7 @@ export const useUserAuthHeaders = () => {
           return Axios(originalRequest);
         }
         return Promise.reject(err);
-      }
+      },
     );
 
     return () => {

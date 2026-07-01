@@ -1,8 +1,11 @@
-import { IsString } from 'class-validator';
+import { IsString, Matches } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class DownloadMessagesDto {
   @IsString()
+  @Matches(/^[a-zA-Z0-9-]+$/, {
+    message: 'fileId must contain only alphanumeric characters and hyphens',
+  })
   @ApiProperty({
     type: String,
     description: 'file Id for which file will be downloaded',

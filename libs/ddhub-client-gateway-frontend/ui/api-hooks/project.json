@@ -1,12 +1,14 @@
 {
-  "root": "libs/dsb-client-gateway/ui/api-hooks",
-  "sourceRoot": "libs/dsb-client-gateway/ui/api-hooks/src",
+  "root": "libs/ddhub-client-gateway-frontend/ui/api-hooks",
+  "sourceRoot": "libs/ddhub-client-gateway-frontend/ui/api-hooks/src",
   "projectType": "library",
   "tags": [],
   "targets": {
     "lint": {
       "executor": "@nrwl/linter:eslint",
-      "outputs": ["{options.outputFile}"],
+      "outputs": [
+        "{options.outputFile}"
+      ],
       "options": {
         "lintFilePatterns": [
           "libs/ddhub-client-gateway-frontend/ui/api-hooks/**/*.{ts,tsx,js,jsx}"
@@ -15,11 +17,14 @@
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/ddhub-client-gateway-frontend/ui/api-hooks"],
+      "outputs": [
+        "coverage/libs/ddhub-client-gateway-frontend/ui/api-hooks"
+      ],
       "options": {
         "jestConfig": "libs/ddhub-client-gateway-frontend/ui/api-hooks/jest.config.js",
         "passWithNoTests": true
       }
     }
-  }
+  },
+  "name": "ddhub-client-gateway-ui-api-hooks"
 }

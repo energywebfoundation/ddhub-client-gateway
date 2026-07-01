@@ -10,7 +10,7 @@ import { IamService } from '@dsb-client-gateway/dsb-client-gateway-iam-client';
 import { DdhubHealthService } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
 import { VersionService } from '@dsb-client-gateway/ddhub-client-gateway-version';
 import { SecretsEngineService } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
-import { UserRole } from '@dsb-client-gateway/ddhub-client-gateway-user-roles';
+import { UserAuthService } from '@dsb-client-gateway/ddhub-client-gateway-user-roles';
 
 @Controller('gateway')
 @ApiTags('Gateway')
@@ -24,6 +24,7 @@ export class GatewayController {
     protected readonly iamService: IamService,
     protected readonly versionService: VersionService,
     protected readonly secretsEngineService: SecretsEngineService,
+    protected readonly userAuthService: UserAuthService,
   ) {
     const fqcn: string | undefined = this.configService.get<string>('AK_FQCN');
     const topicName: string | undefined =
@@ -54,7 +55,7 @@ export class GatewayController {
   })
   public async get(): Promise<GatewayResponseDto> {
     const health = await this.healthService.health();
-    const authEnabled = this.secretsEngineService.isAuthEnabled();
+    const authEnabled = this.userAuthService.isAuthEnabled();
     return {
       authEnabled,
       version: this.versionService.getVersion(),

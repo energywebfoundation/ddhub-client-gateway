@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { ReactElement, ReactNode, useEffect } from 'react';
 import { AppProps } from 'next/app';
 import Router from 'next/router';
 import NProgress from 'nprogress';
@@ -38,13 +38,31 @@ if (
 
 Axios.defaults.baseURL = process.env.NEXT_PUBLIC_SERVER_BASE_URL;
 
-let muiCache: EmotionCache | undefined = undefined;
-export const createMuiCache = () =>
-  (muiCache = createCache({ key: 'mui', prepend: true }));
+let muiCache: EmotionCache | undefined;
+
+export const createMuiCache = () => {
+  if (muiCache) {
+    return muiCache;
+  }
+
+  const insertionPoint =
+    typeof document !== 'undefined'
+      ? document.querySelector<HTMLMetaElement>(
+          'meta[name="emotion-insertion-point"]'
+        ) ?? undefined
+      : undefined;
+
+  muiCache = createCache({ key: 'mui', insertionPoint, prepend: true });
+  return muiCache;
+};
 
 export interface MyAppProps extends AppProps {
   emotionCache?: EmotionCache;
 }
+
+type NextPageWithLayout = AppProps['Component'] & {
+  getLayout?: (page: ReactElement) => ReactNode;
+};
 
 function InitializeAccountStatus(props) {
   useUserAuthHeaders();
@@ -81,7 +99,8 @@ function MyApp(props: MyAppProps) {
     useAddressBookContext(queryClient);
 
   const getLayout =
-    (Component as any).getLayout || ((page) => <Layout>{page}</Layout>);
+    (Component as NextPageWithLayout).getLayout ||
+    ((page) => <Layout>{page}</Layout>);
 
   useEffect(() => {
     NProgress.configure({ showSpinner: false });
@@ -100,7 +119,7 @@ function MyApp(props: MyAppProps) {
   }, []);
 
   return (
-    <CacheProvider value={muiCache ?? createMuiCache()}>
+    <CacheProvider value={createMuiCache()}>
       <Head>
         <title>DDHub Client Gateway</title>
         <meta

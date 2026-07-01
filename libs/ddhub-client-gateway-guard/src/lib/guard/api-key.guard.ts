@@ -61,7 +61,16 @@ export class ApiKeyGuard implements CanActivate {
     }
 
     if (headers.authorization) {
-      return this.userGuard.canActivate(context);
+      const authenticated = await this.userGuard.canActivate(context);
+      if (authenticated) {
+        return true;
+      }
+
+      // Stale/invalid bearer tokens should not block unauthenticated access
+      // at the global guard; route-level guards handle authorization.
+      if (!this.userGuard.isAuthEnabled()) {
+        return true;
+      }
     }
 
     const apiKeyFromHeaders: string | undefined = headers['x-api-key'];
@@ -73,7 +82,11 @@ export class ApiKeyGuard implements CanActivate {
         apiKey: apiKeyFromHeaders,
         username: apiKeyFromHeaders,
       };
-      this._logger.assign({ user: apiKeyFromHeaders });
+      try {
+        this._logger.assign({ user: apiKeyFromHeaders });
+      } catch {
+        // assign requires pino request scope; may be unavailable in global guards
+      }
       return isValid;
     }
 

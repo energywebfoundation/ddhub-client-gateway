@@ -23,6 +23,7 @@ export class EventsService implements OnApplicationBootstrap {
     [Events.PRIVATE_KEY_CHANGED]: undefined,
     [Events.ROLES_CHANGE]: undefined,
     [Events.CERTIFICATE_CHANGED]: undefined,
+    [Events.LOGOUT]: undefined,
   };
   protected readonly logger = new Logger(EventsService.name);
   protected readonly workerId = uuidv4();
@@ -35,6 +36,17 @@ export class EventsService implements OnApplicationBootstrap {
   ) {}
 
   public async onApplicationBootstrap(): Promise<void> {
+    const isCronEnabled = this.configService.get<boolean>(
+      'EVENTS_CRON_ENABLED',
+      true
+    );
+
+    if (!isCronEnabled) {
+      this.logger.warn(`Events cron job is disabled`);
+
+      return;
+    }
+
     const cronJob = new CronJob('* * * * *', async () => {
       this.logger.log(`Executing refresh events`);
 
@@ -112,6 +124,9 @@ export class EventsService implements OnApplicationBootstrap {
         return;
       case Events.ROLES_CHANGE:
         await this.commandBus.execute(new ReloginCommand('ROLES_CHANGE'));
+        return;
+      case Events.LOGOUT:
+        await this.commandBus.execute(new ReloginCommand('LOGOUT'));
         return;
       case Events.CERTIFICATE_CHANGED:
         await this.commandBus.execute(new CertificateChangedCommand());
