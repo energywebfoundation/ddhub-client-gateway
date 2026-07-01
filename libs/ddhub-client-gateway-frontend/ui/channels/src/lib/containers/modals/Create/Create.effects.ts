@@ -20,6 +20,7 @@ import { ICreateChannel } from '../models/create-channel.interface';
 import { ChannelType } from '../../../models/channel-type.enum';
 import { ConnectionType } from './Details/models/connection-type.enum';
 import { pick } from 'lodash';
+import { getTopicKey } from '../../../utils';
 
 type TGetActionButtonsProps = TActionButtonsProps['nextClickButtonProps'] & {
   canGoBack: boolean;
@@ -119,8 +120,7 @@ export const useCreateChannelEffects = () => {
         channelValues.conditions.responseTopics = [];
       } else if (
         detailsData.channelType === ChannelType.Messaging &&
-        (detailsData.connectionType === ConnectionType.Subscribe ||
-          !detailsData.messageForms)
+        !detailsData.messageForms
       ) {
         channelValues.conditions.responseTopics = [];
       }
@@ -182,8 +182,9 @@ export const useCreateChannelEffects = () => {
     let responseTopicsData: ResponseTopicDto[] = [];
 
     const topicsData = values.conditions.topics.map((topic: Topic) => {
+      const topicKey = getTopicKey(topic);
       const respTopics = values.conditions.responseTopics.filter(
-        (item: ResponseTopicDto) => item.responseTopicId === topic.id
+        (item: ResponseTopicDto) => item.responseTopicId === topicKey
       );
 
       if (respTopics.length) {

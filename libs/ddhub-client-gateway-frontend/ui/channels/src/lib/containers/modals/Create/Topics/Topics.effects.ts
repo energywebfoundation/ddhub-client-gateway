@@ -10,7 +10,7 @@ import {
   ResponseTopicDto,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { ChannelType } from '../../../../models';
-import { getChannelType } from '../../../../utils';
+import { getChannelType, getTopicKey } from '../../../../utils';
 import { TopicChannelValues } from './Topics';
 
 const topicsFilters: Record<ChannelType, GetTopicDtoSchemaType[]> = {
@@ -81,6 +81,7 @@ export const useTopicsEffects = (channelValues: TopicChannelValues) => {
     setSelectedTopics([
       {
         ...selectedTopic,
+        topicId: getTopicKey(selectedTopic),
         owner: selectedApplication.value,
         topicName: selectedTopic.name as string,
         appName: selectedApplication.label,
@@ -121,7 +122,7 @@ export const useTopicsEffects = (channelValues: TopicChannelValues) => {
     const filteredTopic = getFilteredTopics(data);
     setRecent('');
     setSelectedTopics(filteredTopic);
-    resetResponseTopics(data.id);
+    resetResponseTopics(getTopicKey(data) ?? '');
   };
 
   const updateSelectedTopic = (oldTopic: Topic, newTopic: Topic) => {
@@ -136,7 +137,7 @@ export const useTopicsEffects = (channelValues: TopicChannelValues) => {
       ...filteredTopic,
     ]);
 
-    resetResponseTopics(oldTopic.id);
+    resetResponseTopics(getTopicKey(oldTopic) ?? '');
   };
 
   const saveTopicResponse = (
