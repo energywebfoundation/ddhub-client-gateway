@@ -676,13 +676,20 @@ export class MessageService {
     const messageResponses = await Promise.allSettled(
       messages.map(async (message): Promise<GetMessageResponse> => {
         messageLoggerContext.log(`processing message ${message.messageId}`);
-        message.payload = JSON.stringify(decodeValuesOnly(message.payload), null);
+        // message.payload = JSON.stringify(decodeValuesOnly(message.payload), null);
         const processedMessage: GetMessageResponse = await this.processMessage(
           message.payloadEncryption,
           message,
           prefetchedSignatureKeys[message.senderDid],
           channel.useAnonymousExtChannel
         );
+
+        this.logger.log(message.payload);
+        this.logger.log(decodeValuesOnly(message.payload));
+        this.logger.log(JSON.stringify(decodeValuesOnly(message.payload), null));
+
+        processedMessage.payload = JSON.stringify(decodeValuesOnly(message.payload), null);
+
 
         return processedMessage;
       })
