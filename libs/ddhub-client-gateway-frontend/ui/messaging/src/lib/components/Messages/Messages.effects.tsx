@@ -22,9 +22,11 @@ export const useMessagesEffects = () => {
     (item) => item.topicId === topicId
   );
 
+  const messagingOffset = publicConfig.messagingOffset ?? 10;
+  const messagingAmount = publicConfig.messagingAmount ?? 100;
   const currentDate = moment().seconds(0).milliseconds(0);
   const fromDate = moment(currentDate).subtract(
-    publicConfig.messagingOffset,
+    Number(messagingOffset),
     'minutes'
   );
 
@@ -34,7 +36,7 @@ export const useMessagesEffects = () => {
     topicOwner: topic?.owner,
     clientId: 'cgui',
     from: fromDate.toISOString(),
-    amount: publicConfig.messagingAmount,
+    amount: Number(messagingAmount),
   });
 
   const data: TMessage[] = messages.map((message) => {
