@@ -1,11 +1,13 @@
 import { didFormatMinifier } from '@ddhub-client-gateway-frontend/ui/utils';
 import { DownloadMessage } from '../containers/DownloadMessage';
+import { formatTimestampFromNanos } from '../components/Messages/Messages.utils';
 
 export const LARGE_MESSAGES_HEADERS = [
   {
-    Header: 'DATE',
+    Header: 'DATE & TIME',
     accessor: 'timestampNanos',
     isSortable: true,
+    Cell: (props: { value?: number }) => formatTimestampFromNanos(props.value),
   },
   {
     Header: 'FROM',
@@ -32,9 +34,10 @@ export const LARGE_MESSAGES_HEADERS = [
 
 export const MESSAGES_HEADERS = [
   {
-    Header: 'DATE',
+    Header: 'DATE & TIME',
     accessor: 'timestampNanos',
     isSortable: true,
+    Cell: (props: { value?: number }) => formatTimestampFromNanos(props.value),
   },
   {
     Header: 'SCHEMA VERSION',
