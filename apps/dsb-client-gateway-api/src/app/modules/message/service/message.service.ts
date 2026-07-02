@@ -688,7 +688,11 @@ export class MessageService {
         this.logger.log(decodeValuesOnly(message.payload));
         this.logger.log(JSON.stringify(decodeValuesOnly(message.payload), null));
 
-        processedMessage.payload = JSON.stringify(decodeValuesOnly(message.payload), null);
+        const decryptedPayload = decodeValuesOnly(processedMessage.payload);
+        processedMessage.payload =
+          typeof decryptedPayload === 'string'
+            ? decryptedPayload
+            : JSON.stringify(decryptedPayload, null);
 
 
         return processedMessage;
