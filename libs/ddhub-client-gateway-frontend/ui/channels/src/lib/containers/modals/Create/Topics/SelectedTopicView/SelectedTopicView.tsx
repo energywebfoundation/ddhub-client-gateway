@@ -89,7 +89,13 @@ export const SelectedTopicView = ({
                   {showTopicResponse && (
                     <Tooltip title="Response topics">
                       <IconButton
-                        onClick={handleOpenResponse}
+                        onMouseDown={(event: MouseEvent<HTMLElement>) => {
+                          event.stopPropagation();
+                        }}
+                        onClick={(event: MouseEvent<HTMLElement>) => {
+                          event.stopPropagation();
+                          handleOpenResponse?.(event);
+                        }}
                         className={clsx(classes.edit, {
                           [classes.editActive]:
                             expanded && expanded === `panel-${index}`,
@@ -104,7 +110,13 @@ export const SelectedTopicView = ({
 
                   <Tooltip title="Edit topic">
                     <IconButton
-                      onClick={handleOpenEdit}
+                      onMouseDown={(event: MouseEvent<HTMLElement>) => {
+                        event.stopPropagation();
+                      }}
+                      onClick={(event: MouseEvent<HTMLElement>) => {
+                        event.stopPropagation();
+                        handleOpenEdit?.(event);
+                      }}
                       className={clsx(classes.edit, {
                         [classes.editActive]:
                           expanded && expanded === `panel-${index}`,

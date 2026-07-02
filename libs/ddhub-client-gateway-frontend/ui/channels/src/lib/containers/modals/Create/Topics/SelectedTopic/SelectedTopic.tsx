@@ -70,6 +70,7 @@ export const SelectedTopic = ({
     handleKeyDown,
     handleOpenResponse,
     handleOpenEdit,
+    handleSelectOpen,
     isResponse,
     handleClickTopicCheckbox,
     selected,
@@ -97,7 +98,7 @@ export const SelectedTopic = ({
       key={`panel-${index}`}
       value={topic.topicName}
       open={expanded === `panel-${index}`}
-      onOpen={handleOpenEdit}
+      onOpen={handleSelectOpen}
       onClose={handleClose}
       MenuProps={{
         autoFocus: false,
