@@ -1,7 +1,6 @@
 import { useRouter } from 'next/router';
-import dayjs from 'dayjs';
 import {
-  useCachedChannel,
+  useChannel,
   useMessages,
 } from '@ddhub-client-gateway-frontend/ui/api-hooks';
 import {
@@ -10,44 +9,43 @@ import {
   publicConfig,
 } from '@ddhub-client-gateway-frontend/ui/utils';
 import { TMessage } from './Messages.type';
-import { FileContentType } from './Messages.utils';
+import { FileContentType, formatTimestampFromNanos } from './Messages.utils';
 import moment from 'moment';
-import { DateTime } from 'luxon';
 
 export const useMessagesEffects = () => {
   const router = useRouter();
+  const fqcn = router.query[Queries.FQCN] as string;
+  const topicId = router.query[Queries.TopicId] as string;
 
-  const { cachedChannel, topicsById } = useCachedChannel(
-    router.query[Queries.FQCN] as string
+  const { channel, isLoading: channelLoading } = useChannel(fqcn);
+  const topic = channel.conditions?.topics?.find(
+    (item) => item.topicId === topicId
   );
-  const messagingOffset = publicConfig.messagingOffset ?? 10;
-  const messagingAmount = publicConfig.messagingAmount ?? 100;
 
-  const topic = topicsById[router.query[Queries.TopicId] as string];
   const currentDate = moment().seconds(0).milliseconds(0);
-  const fromDate = currentDate.subtract(Number(messagingOffset), 'minutes');
+  const fromDate = moment(currentDate).subtract(
+    publicConfig.messagingOffset,
+    'minutes'
+  );
 
   const { messages, messagesLoaded } = useMessages({
-    fqcn: router.query[Queries.FQCN] as string,
+    fqcn,
     topicName: topic?.topicName,
     topicOwner: topic?.owner,
     clientId: 'cgui',
     from: fromDate.toISOString(),
-    amount: Number(messagingAmount),
+    amount: publicConfig.messagingAmount,
   });
 
   const data: TMessage[] = messages.map((message) => {
-    const timestampMillis = Math.round(message?.timestampNanos / 1e6);
     return {
-      timestamp: DateTime.fromMillis(timestampMillis).toLocaleString(
-        DateTime.DATETIME_MED
-      ),
+      timestamp: formatTimestampFromNanos(message?.timestampNanos),
       timestampNanos: message?.timestampNanos,
       sender: didFormatMinifier(message?.sender),
       schemaType: message?.topicSchemaType,
       details: {
-        topicOwner: topic.owner,
-        topicName: topic.topicName,
+        topicOwner: topic?.owner,
+        topicName: topic?.topicName,
         topicVersion: message?.topicVersion,
         messageId: message?.id,
       },
@@ -58,11 +56,12 @@ export const useMessagesEffects = () => {
     };
   });
 
-  const loading = !messagesLoaded;
+  const loading =
+    !router.isReady || channelLoading || (!!topic && !messagesLoaded);
 
   return {
     topic,
-    channel: cachedChannel,
+    channel,
     messages: data,
     loading,
   };
