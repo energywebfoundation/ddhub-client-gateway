@@ -375,7 +375,7 @@ describe(`${MessageService.name}`, () => {
           'senderDid',
           'signature',
           // eslint-disable-next-line no-useless-escape
-          '\"payload\"',
+          'payload',
           expect.any(Object)
         );
       });
@@ -405,7 +405,7 @@ describe(`${MessageService.name}`, () => {
         expect(mockKeysService.decryptMessage).toBeCalledTimes(1);
         expect(mockKeysService.decryptMessage).toBeCalledWith(
           // eslint-disable-next-line no-useless-escape
-          '\"payload\"',
+          'payload',
           'cgwid',
           'senderDid'
         );
