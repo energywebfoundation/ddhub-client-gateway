@@ -77,7 +77,7 @@ export const CreateModal = () => {
             },
           }}
           errorExists={Boolean(errors['username'])}
-          errorText={errors['username']?.message}
+          errorText={errors['username']?.message as string}
           type="text"
           register={register}
         />
@@ -112,7 +112,7 @@ export const CreateModal = () => {
             },
           }}
           errorExists={Boolean(errors['password'])}
-          errorText={errors['password']?.message}
+          errorText={errors['password']?.message as string}
           type="password"
           register={register}
         />
@@ -148,7 +148,7 @@ export const CreateModal = () => {
             },
           }}
           errorExists={Boolean(errors['confirmPassword'])}
-          errorText={errors['confirmPassword']?.message}
+          errorText={errors['confirmPassword']?.message as string}
           type={showConfirmPassword ? 'text' : 'password'}
           register={register}
         />
