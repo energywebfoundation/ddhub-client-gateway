@@ -48,7 +48,7 @@ export function LoginForm(props: LoginFormProps) {
             variant="outlined"
             field={field}
             register={loginForm.register}
-            errorText={loginForm.errors[field.name]?.message}
+            errorText={loginForm.errors[field.name]?.message as string}
           />
         </Box>
       ))}

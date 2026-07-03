@@ -1,8 +1,9 @@
-import { KeyboardEvent, useState, useEffect, ChangeEvent } from 'react';
+import { KeyboardEvent, useState, useEffect, useRef, ChangeEvent } from 'react';
 import { Topic } from '../Topics.effects';
 import { FieldValues, useForm } from 'react-hook-form';
 import { useAsyncDebounce } from 'react-table';
 import { ResponseTopicDto } from '@dsb-client-gateway/dsb-client-gateway-api-client';
+import { getTopicKey } from '../../../../../utils';
 
 const initialState = {
   owner: '',
@@ -37,6 +38,7 @@ export const useSelectedTopicEffects = ({
   const [isResponse, setIsResponse] = useState<boolean>(false);
   const [selected, setSelected] = useState<ResponseTopicDto[]>([]);
   const [panelId, setPanelId] = useState<string>('');
+  const openIntentRef = useRef<'edit' | 'response'>('edit');
 
   useEffect(() => {
     if (Array.isArray(availableTopics)) {
@@ -57,6 +59,7 @@ export const useSelectedTopicEffects = ({
   const handleClose = () => {
     setIsResponse(false);
     setExpanded(false);
+    openIntentRef.current = 'edit';
     handleReset();
   };
 
@@ -65,26 +68,38 @@ export const useSelectedTopicEffects = ({
     setEditTopic(topic);
   }, [topic]);
 
-  const handleOpenEdit = (event: any) => {
-    event.stopPropagation();
+  const handleOpenEdit = (event?: { stopPropagation?: () => void }) => {
+    event?.stopPropagation?.();
+    openIntentRef.current = 'edit';
     setExpanded(panelId);
     setIsResponse(false);
     setUpdatedTopic(initialState);
     setFilteredTopics(availableTopics);
   };
 
-  const handleOpenResponse = (event: any) => {
-    event.stopPropagation();
+  const handleOpenResponse = (event: { stopPropagation?: () => void }) => {
+    event.stopPropagation?.();
+    openIntentRef.current = 'response';
     setExpanded(panelId);
     setIsResponse(true);
     setFilteredTopics(topicsList);
     setSelected(responseTopics);
   };
 
+  const handleSelectOpen = () => {
+    if (openIntentRef.current === 'response') {
+      return;
+    }
+
+    handleOpenEdit();
+  };
+
   const handleSubmitForm = () => {
     if (isResponse) {
-      const selectedTopicId = editTopic.id ?? editTopic.topicId;
-      saveResponse(selected, selectedTopicId);
+      const selectedTopicId = getTopicKey(editTopic);
+      if (selectedTopicId) {
+        saveResponse(selected, selectedTopicId);
+      }
     } else {
       edit(editTopic, updatedTopic);
     }
@@ -107,7 +122,10 @@ export const useSelectedTopicEffects = ({
     const selectedIdx = selectedIndex(topic.topicName);
 
     if (event.target.checked && selectedIdx === -1) {
-      const selectedTopicId = editTopic.id ?? editTopic.topicId;
+      const selectedTopicId = getTopicKey(editTopic);
+      if (!selectedTopicId) {
+        return;
+      }
 
       const respTopic = {
         topicName: topic.topicName,
@@ -175,6 +193,7 @@ export const useSelectedTopicEffects = ({
     handleKeyDown,
     handleOpenResponse,
     handleOpenEdit,
+    handleSelectOpen,
     isResponse,
     handleClickTopicCheckbox,
     selected,

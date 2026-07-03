@@ -1,20 +1,13 @@
 {
   "extends": [
     "plugin:@nrwl/nx/react-typescript",
-    "../../.eslintrc.json",
-    "next",
-    "next/core-web-vitals"
+    "../../.eslintrc.json"
   ],
-  "ignorePatterns": ["!**/*"],
+  "ignorePatterns": ["!**/*", ".next/**", "dist/**", "next-env.d.ts"],
   "overrides": [
     {
       "files": ["*.ts", "*.tsx", "*.js", "*.jsx"],
-      "rules": {
-        "@next/next/no-html-link-for-pages": [
-          "error",
-          "apps/dsb-client-gateway-frontend/pages"
-        ]
-      }
+      "rules": {}
     },
     {
       "files": ["*.ts", "*.tsx"],

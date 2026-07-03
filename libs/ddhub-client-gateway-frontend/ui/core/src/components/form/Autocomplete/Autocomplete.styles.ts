@@ -49,6 +49,12 @@ export const useStyles = makeStyles()((theme) => ({
         WebkitTextFillColor: theme.palette.grey[500],
       },
     },
+    '& .MuiAutocomplete-endAdornment': {
+      display: 'flex',
+      alignItems: 'center',
+      top: '50%',
+      transform: 'translateY(-50%)',
+    },
     '& .MuiAutocomplete-endAdornment .MuiSvgIcon-root': {
       fill: alpha(theme.palette.grey[100], 0.5),
     },
@@ -65,19 +71,22 @@ export const useStyles = makeStyles()((theme) => ({
     },
   },
   clearIndicator: {
-    position: 'absolute',
-    top: 1,
-    right: 20,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 0,
+    marginRight: 2,
   },
   progress: {
     position: 'absolute',
     right: 20,
   },
   popupIcon: {
-    position: 'absolute',
-    top: 2,
-    right: 2,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
     transform: 'none',
+    padding: 0,
     '& svg': {
       stroke: theme.palette.common.white,
     },

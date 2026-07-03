@@ -1,12 +1,14 @@
 {
-  "root": "libs/dsb-client-gateway/ui/context",
-  "sourceRoot": "libs/dsb-client-gateway/ui/context/src",
+  "root": "libs/ddhub-client-gateway-frontend/ui/context",
+  "sourceRoot": "libs/ddhub-client-gateway-frontend/ui/context/src",
   "projectType": "library",
   "tags": [],
   "targets": {
     "lint": {
       "executor": "@nrwl/linter:eslint",
-      "outputs": ["{options.outputFile}"],
+      "outputs": [
+        "{options.outputFile}"
+      ],
       "options": {
         "lintFilePatterns": [
           "libs/ddhub-client-gateway-frontend/ui/context/**/*.{ts,tsx,js,jsx}"
@@ -15,11 +17,14 @@
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/ddhub-client-gateway-frontend/ui/context"],
+      "outputs": [
+        "coverage/libs/ddhub-client-gateway-frontend/ui/context"
+      ],
       "options": {
         "jestConfig": "libs/ddhub-client-gateway-frontend/ui/context/jest.config.js",
         "passWithNoTests": true
       }
     }
-  }
+  },
+  "name": "ddhub-client-gateway-ui-context"
 }

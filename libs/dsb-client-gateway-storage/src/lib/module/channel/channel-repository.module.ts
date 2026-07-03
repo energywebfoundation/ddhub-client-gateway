@@ -5,8 +5,8 @@ import { ChannelRepository } from './repository/channel.repository';
 import { ChannelWrapperRepository } from './wrapper/channel-wrapper.repository';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ChannelEntity, ChannelRepository])],
-  providers: [ChannelWrapperRepository],
+  imports: [TypeOrmModule.forFeature([ChannelEntity])],
+  providers: [ChannelRepository, ChannelWrapperRepository],
   exports: [ChannelWrapperRepository],
 })
 export class ChannelRepositoryModule {}

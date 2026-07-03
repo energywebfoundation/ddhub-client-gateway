@@ -37,7 +37,7 @@ export class AssociationKeysService implements OnApplicationBootstrap {
     protected readonly ddhubLoginService: DdhubLoginService,
     protected readonly retryConfigService: RetryConfigService,
     protected readonly ddhubChannelStreamService: DdhubChannelStreamService
-  ) {}
+  ) { }
 
   public async updateKeySharedState(keys: string[]): Promise<void> {
     await this.wrapper.repository.update(
@@ -357,7 +357,9 @@ export class AssociationKeysService implements OnApplicationBootstrap {
 
     const keysToDelete: AssociationKeyEntity[] =
       await this.wrapper.repository.find({
-        validTo: LessThanOrEqual(moment().subtract(offset, 'hours').toDate()),
+        where: {
+          validTo: LessThanOrEqual(moment().subtract(offset, 'hours').toDate()),
+        },
       });
 
     for (const key of keysToDelete) {

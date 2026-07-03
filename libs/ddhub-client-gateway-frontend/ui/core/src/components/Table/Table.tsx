@@ -207,12 +207,14 @@ export function GenericTable<T>({
                   ? actions
                   : actions?.(data);
                 prepareRow(row);
+                const { key: rowKey, ...rowProps } = row.getRowProps();
                 return (
                   <TableRow
+                    key={rowKey}
                     className={clsx({
                       [classes.stripedRow]: stripedTable,
                     })}
-                    {...row.getRowProps()}
+                    {...rowProps}
                     onClick={() => handleRowClick(data)}
                   >
                     {showCheckbox && (
@@ -230,29 +232,37 @@ export function GenericTable<T>({
                       </TableCell>
                     )}
                     {row.cells.map((cell) => {
+                      const { key: cellKey, ...cellProps } = cell.getCellProps();
                       const column = cell.column as ColumnInstance & {
                         color: string;
                       };
                       return (
                         <TableCell
+                          key={cellKey}
                           style={{
                             cursor: onRowClick ? 'pointer' : 'default',
                             border: stripedTable ? 'none' : '',
                           }}
                           classes={{ body: classes.body }}
                           color={column.color}
-                          {...cell.getCellProps()}
+                          {...cellProps}
                         >
                           {cell.render('Cell')}
                         </TableCell>
                       );
                     })}
-                    {showActions && (
-                      <TableComponentActions<T>
-                        data={data}
-                        actions={showActions}
-                      />
-                    )}
+                    {actions &&
+                      (showActions ? (
+                        <TableComponentActions<T>
+                          data={data}
+                          actions={showActions}
+                        />
+                      ) : (
+                        <TableCell
+                          classes={{ body: classes.body }}
+                          className={classes.action}
+                        />
+                      ))}
                   </TableRow>
                 );
               })}

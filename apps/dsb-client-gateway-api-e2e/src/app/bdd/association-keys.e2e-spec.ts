@@ -1,6 +1,6 @@
 import { defineFeature, loadFeature } from 'jest-cucumber';
 import { INestApplication } from '@nestjs/common';
-import { setupApp } from './helpers/app.helper';
+import { setupApp, teardownApp } from './helpers/app.helper';
 import { MemoryHelper } from './helpers/memory.helper';
 import { clearDatabase } from './helpers/setup.helper';
 import { givenIHaveIdentitySet } from './helpers/identity.helper';
@@ -34,7 +34,7 @@ describe('Association Keys Feature', () => {
   const getApp = () => app;
 
   afterAll(async () => {
-    await app.close();
+    await teardownApp(app);
   });
 
   const testMemory = new MemoryHelper();

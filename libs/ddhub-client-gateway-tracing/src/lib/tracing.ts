@@ -2,7 +2,7 @@ import { BatchSpanProcessor } from '@opentelemetry/sdk-trace-base';
 import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
 import { NodeSDK } from '@opentelemetry/sdk-node';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
-import { Resource } from '@opentelemetry/resources';
+import { resourceFromAttributes } from '@opentelemetry/resources';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 import { B3InjectEncoding, B3Propagator } from '@opentelemetry/propagator-b3';
 import {
@@ -24,8 +24,7 @@ const exporter = new OTLPTraceExporter({
 // });
 
 export const otelSDK = new NodeSDK({
-  metricInterval: 1000,
-  resource: new Resource({
+  resource: resourceFromAttributes({
     [SemanticResourceAttributes.SERVICE_NAME]:
       process.env.OTEL_SERVICE_NAME || 'ddhub-client-gateway',
     [SemanticResourceAttributes.DEPLOYMENT_ENVIRONMENT]:

@@ -10,6 +10,7 @@ import { DdhubLoginService } from './ddhub-login.service';
 import 'multer';
 import { SendMessageResponseFile } from '../dto';
 import { IncomingMessage } from 'http';
+import { encodeValuesOnly } from '../utils/trustwave-encoder';
 
 @Injectable()
 export class DdhubFilesService extends DdhubBaseService {
@@ -42,10 +43,20 @@ export class DdhubFilesService extends DdhubBaseService {
   ): Promise<SendMessageResponseFile> {
     this.logger.log('Uploading File');
     try {
+      let encodedFileName = encodeValuesOnly(originalname);
+      if (typeof encodedFileName === 'string') {
+        const lower = encodedFileName.toLowerCase();
+        if (lower.endsWith('&#x2e;csv')) {
+          encodedFileName = encodedFileName.slice(0, -8) + originalname.slice(-4);
+        } else if (lower.endsWith('&#x2e;tsv')) {
+          encodedFileName = encodedFileName.slice(0, -8) + originalname.slice(-4);
+        }
+      }
+
       const formData = new FormData();
 
       formData.append('file', file);
-      formData.append('fileName', originalname);
+      formData.append('fileName', encodedFileName);
       formData.append('fqcns', fqcns.join(','));
       formData.append('signature', signature);
       formData.append('topicId', topicId);

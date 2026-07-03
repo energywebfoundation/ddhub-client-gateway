@@ -51,6 +51,7 @@ async function bootstrap() {
     AppModule.register({ shouldValidate: true }),
     {
       bufferLogs: true,
+      bodyParser: false,
     }
   );
 

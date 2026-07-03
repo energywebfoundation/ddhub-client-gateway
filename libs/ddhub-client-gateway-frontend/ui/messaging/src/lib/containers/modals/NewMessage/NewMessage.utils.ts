@@ -12,6 +12,7 @@ export const fields: { [name: string]: GenericFormField } = {
     inputProps: {
       placeholder: 'Select channel',
     },
+    emptyPlaceholder: 'No channels available',
   },
   topic: {
     name: 'Topic Name',
@@ -21,6 +22,7 @@ export const fields: { [name: string]: GenericFormField } = {
     inputProps: {
       placeholder: 'Select topic',
     },
+    emptyPlaceholder: 'No topics available',
   },
   version: {
     name: 'Version',
@@ -30,6 +32,7 @@ export const fields: { [name: string]: GenericFormField } = {
     inputProps: {
       placeholder: 'Select version',
     },
+    emptyPlaceholder: 'No versions available',
   },
   transactionId: {
     name: 'Transaction ID',

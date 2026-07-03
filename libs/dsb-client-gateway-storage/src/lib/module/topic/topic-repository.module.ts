@@ -5,8 +5,8 @@ import { TopicRepository } from './repository';
 import { TopicRepositoryWrapper } from './wrapper/topic-repository.wrapper';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([TopicEntity, TopicRepository])],
-  providers: [TopicRepositoryWrapper],
+  imports: [TypeOrmModule.forFeature([TopicEntity])],
+  providers: [TopicRepository, TopicRepositoryWrapper],
   exports: [TopicRepositoryWrapper],
 })
 export class TopicRepositoryModule {}

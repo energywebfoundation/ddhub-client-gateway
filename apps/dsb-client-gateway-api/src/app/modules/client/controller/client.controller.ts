@@ -48,7 +48,7 @@ export class ClientController {
   ): Promise<void> {
     await this.clientsService.delete(clientId);
   }
-
+// CI trigger api build
   @Delete('/')
   @ApiResponse({
     status: HttpStatus.NO_CONTENT,

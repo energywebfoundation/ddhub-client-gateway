@@ -57,7 +57,7 @@ export const RoleDetails = ({
                   }}
                   register={register}
                   errorExists={!!errors[field.label]}
-                  errorText={errors[field.label]?.message}
+                  errorText={errors[field.label]?.message as string}
                 />
               );
             case 'number':
@@ -73,7 +73,7 @@ export const RoleDetails = ({
                   }}
                   register={register}
                   errorExists={!!errors[field.label]}
-                  errorText={errors[field.label]?.message}
+                  errorText={errors[field.label]?.message as string}
                 />
               );
             case 'date':
@@ -88,7 +88,7 @@ export const RoleDetails = ({
                   }}
                   register={register}
                   errorExists={!!errors[field.label]}
-                  errorText={errors[field.label]?.message}
+                  errorText={errors[field.label]?.message as string}
                 />
               );
             case 'boolean':

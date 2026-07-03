@@ -29,9 +29,9 @@ export function ReplyMessageCount({ value }: ReplyMessageProps) {
           transactionId: value.transactionId,
         },
       }}
-      passHref
+      onClick={(e) => e.stopPropagation()}
     >
-      <a onClick={(e) => e.stopPropagation()}>{value.replyMessagesCount}</a>
+      {value.replyMessagesCount}
     </Link>
   );
 }

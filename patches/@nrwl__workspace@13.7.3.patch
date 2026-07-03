@@ -1,0 +1,13 @@
+diff --git a/src/command-line/utils.js b/src/command-line/utils.js
+index 1111111..2222222 100644
+--- a/src/command-line/utils.js
++++ b/src/command-line/utils.js
+@@ -32,7 +32,7 @@ const runAffected = [
+     'plain',
+     'select',
+ ];
+-const ignoreArgs = ['$0', '_'];
++const ignoreArgs = ['$0', '_', 'version'];
+ function splitArgsIntoNxArgsAndOverrides(args, mode, options = { printWarnings: true }) {
+     const nxSpecific = mode === 'run-one' ? runOne : mode === 'run-many' ? runMany : runAffected;
+     const nxArgs = {};

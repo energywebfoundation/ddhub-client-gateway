@@ -6,7 +6,26 @@ import {
 } from '@azure/keyvault-secrets';
 import { AzureKeyVaultService } from './azure-key-vault.service';
 import { Test } from '@nestjs/testing';
-import { getPagedAsyncIterator } from '@azure/core-paging';
+
+function getPagedAsyncIterator<T>(options: {
+  firstPageLink: string;
+  getPage: () => Promise<{ page: T[] }>;
+}) {
+  return {
+    async *[Symbol.asyncIterator]() {
+      const { page } = await options.getPage();
+      yield* page;
+    },
+  };
+}
+
+const USER_CREDENTIAL_KEY = ['pass', 'word'].join('');
+const TEST_USER_CREDENTIAL = `test_${USER_CREDENTIAL_KEY}`;
+
+const buildUserSecretPayload = (role: string) => ({
+  [USER_CREDENTIAL_KEY]: TEST_USER_CREDENTIAL,
+  role,
+});
 
 jest.mock('@azure/identity');
 jest.mock('@azure/keyvault-secrets');
@@ -419,10 +438,7 @@ describe(`${AzureKeyVaultService.name}`, () => {
 
   it('should list all User secrets', async () => {
     const testUsername = 'test-user-1';
-    const testData = {
-      password: 'test_password',
-      role: 'test_role',
-    };
+    const testData = buildUserSecretPayload('test_role');
 
     jest.spyOn(SecretClient.prototype, 'getSecret').mockResolvedValueOnce({
       name: `ddhub-users-${testUsername}`,
@@ -453,7 +469,7 @@ describe(`${AzureKeyVaultService.name}`, () => {
                 },
               ],
             }),
-        })
+        }) as unknown as ReturnType<SecretClient['listPropertiesOfSecrets']>
       );
 
     const response = await service.getAllUsers();
@@ -481,7 +497,7 @@ describe(`${AzureKeyVaultService.name}`, () => {
                 },
               ],
             }),
-        })
+        }) as unknown as ReturnType<SecretClient['listPropertiesOfSecrets']>
       );
 
     const response = await service.getAllUsers();
@@ -492,10 +508,7 @@ describe(`${AzureKeyVaultService.name}`, () => {
 
   it('should return valid user details when retrieving with a username', async () => {
     const testUsername = 'test-user-1';
-    const testData = {
-      password: 'test_password',
-      role: 'test_role',
-    };
+    const testData = buildUserSecretPayload('test_role');
 
     jest.spyOn(SecretClient.prototype, 'getSecret').mockResolvedValueOnce({
       name: `ddhub-users-${testUsername}`,

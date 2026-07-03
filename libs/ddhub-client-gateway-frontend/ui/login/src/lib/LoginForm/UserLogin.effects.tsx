@@ -7,15 +7,26 @@ interface UserLoginFormProps {
   onSubmitHandler: (data: LoginRequestDto) => void;
 }
 
-export const USERNAME_FIELD = 'username';
-export const PASSWORD_FIELD = 'password';
+type UserLoginFormValues = {
+  username: string;
+  userCredential: string;
+};
+
+export const USERNAME_FIELD: keyof Pick<UserLoginFormValues, 'username'> =
+  'username';
+export const USER_CREDENTIAL_FIELD: keyof Pick<
+  UserLoginFormValues,
+  'userCredential'
+> = 'userCredential';
 
 export const useUserLoginFormEffects = ({
   onSubmitHandler,
 }: UserLoginFormProps) => {
   const validationSchema = Yup.object().shape({
     [USERNAME_FIELD]: Yup.string().max(64, 'Maximum length is 64').required(),
-    [PASSWORD_FIELD]: Yup.string().max(64, 'Maximum length is 64').required(),
+    [USER_CREDENTIAL_FIELD]: Yup.string()
+      .max(64, 'Maximum length is 64')
+      .required(),
   });
   const {
     register,
@@ -26,7 +37,7 @@ export const useUserLoginFormEffects = ({
     mode: 'onChange',
     defaultValues: {
       [USERNAME_FIELD]: '',
-      [PASSWORD_FIELD]: '',
+      [USER_CREDENTIAL_FIELD]: '',
     },
   });
   const fields = [
@@ -38,23 +49,23 @@ export const useUserLoginFormEffects = ({
       },
     },
     {
-      name: PASSWORD_FIELD,
+      name: USER_CREDENTIAL_FIELD,
       label: 'Password',
       inputProps: {
         placeholder: 'Enter your password',
-        type: 'password',
+        type: 'password' as const,
       },
     },
   ];
 
-  const isValidUserLoginData = (data: unknown): data is LoginRequestDto => {
+  const isValidUserLoginData = (
+    data: FieldValues,
+  ): data is UserLoginFormValues => {
     return (
-      typeof data === 'object' &&
-      data !== null &&
-      USERNAME_FIELD in data &&
-      PASSWORD_FIELD in data &&
-      !!data[USERNAME_FIELD] &&
-      !!data[PASSWORD_FIELD]
+      typeof data[USERNAME_FIELD] === 'string' &&
+      !!data[USERNAME_FIELD]?.trim() &&
+      typeof data[USER_CREDENTIAL_FIELD] === 'string' &&
+      !!data[USER_CREDENTIAL_FIELD]?.trim()
     );
   };
 
@@ -64,7 +75,10 @@ export const useUserLoginFormEffects = ({
       return;
     }
 
-    onSubmitHandler(data);
+    onSubmitHandler({
+      username: data[USERNAME_FIELD],
+      password: data[USER_CREDENTIAL_FIELD],
+    });
   });
 
   return {

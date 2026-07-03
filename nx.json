@@ -1,7 +1,8 @@
 {
+  "packageManager": "pnpm",
   "npmScope": "dsb-client-gateway",
   "affected": {
-    "defaultBase": "main"
+    "defaultBase": "develop-intelligent"
   },
   "cli": {
     "defaultCollection": "@nrwl/next"
@@ -42,5 +43,6 @@
       }
     }
   },
-  "defaultProject": "dsb-client-gateway-frontend"
+  "defaultProject": "dsb-client-gateway-frontend",
+  "analytics": false
 }

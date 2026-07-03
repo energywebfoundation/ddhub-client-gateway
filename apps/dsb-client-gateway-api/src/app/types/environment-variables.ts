@@ -146,4 +146,7 @@ export const API_ENVS = Joi.object({
     .positive()
     .default(300) // 5 minutes
     .description('How long cached DID attributes should be valid in seconds'),
+  EVENTS_CRON_ENABLED: Joi.boolean()
+    .default(true)
+    .description('Enable events cron'),
 });

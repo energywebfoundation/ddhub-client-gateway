@@ -19,7 +19,7 @@ import {
   SentMessageEntity,
   TopicEntity,
 } from '@dsb-client-gateway/dsb-client-gateway-storage';
-import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { v4 as uuidv4 } from 'uuid';
 import { ChannelType } from '../../../modules/channel/channel.const';
@@ -53,7 +53,11 @@ import { WsClientService } from './ws-client.service';
 import { Span } from 'nestjs-otel';
 import * as fs from 'fs';
 import { FileSizeException } from '../exceptions/file-size.exception';
-import { join } from 'path';
+import { basename, join, resolve } from 'path';
+import {
+  isPathWithinBase,
+  resolvePathWithinBase,
+} from '../utils/path-safety.util';
 import { FileTypeNotSupportedException } from '../exceptions/file-type-not-supported.exception';
 import { MessageSignatureNotValidException } from '../exceptions/messages-signature-not-valid.exception';
 import { ReqLockExistsException } from '../exceptions/req-lock-exists.exception';
@@ -684,7 +688,11 @@ export class MessageService {
         this.logger.log(decodeValuesOnly(message.payload));
         this.logger.log(JSON.stringify(decodeValuesOnly(message.payload), null));
 
-        processedMessage.payload = JSON.stringify(decodeValuesOnly(message.payload), null);
+        const decryptedPayload = decodeValuesOnly(processedMessage.payload);
+        processedMessage.payload =
+          typeof decryptedPayload === 'string'
+            ? decryptedPayload
+            : JSON.stringify(decryptedPayload, null);
 
 
         return processedMessage;
@@ -1019,11 +1027,20 @@ export class MessageService {
         clientGatewayMessageId
       );
 
-    if (!fileMetadata || !fileMetadata.filePath) {
+    if (!fileMetadata?.filePath) {
       return null;
     }
 
-    const stream = fs.createReadStream(fileMetadata.filePath);
+    const safePath = this.resolveOfflineFilePath(fileMetadata.filePath);
+
+    if (!safePath) {
+      this.logger.error(
+        `blocked path traversal for offline file ${clientGatewayMessageId}`,
+      );
+      return null;
+    }
+
+    const stream = fs.createReadStream(safePath);
 
     return Readable.from(stream);
   }
@@ -1033,7 +1050,12 @@ export class MessageService {
   ): Promise<DownloadMessageResponse> {
     const fileMetadata: FileMetadataEntity = await this.createMetadata(fileId);
 
-    const fullPath: string = join(this.downloadPath, fileId + this.ext);
+    const fullPath = this.resolveDownloadFilePath(fileId);
+
+    if (!fullPath) {
+      this.logger.error(`blocked path traversal for file download ${fileId}`);
+      throw new NotFoundException();
+    }
 
     const isSignatureValid: boolean = await this.keyService.verifySignature(
       fileMetadata.did,
@@ -1176,7 +1198,12 @@ export class MessageService {
       fileId
     );
 
-    const path: string = join(this.downloadPath, fileId + this.ext);
+    const path = this.resolveDownloadFilePath(fileId);
+
+    if (!path) {
+      this.logger.error(`blocked path traversal while creating metadata ${fileId}`);
+      throw new NotFoundException();
+    }
 
     if (fileMetadata) {
       this.logger.debug(`returning file from cache ${fileId}`);
@@ -1228,7 +1255,14 @@ export class MessageService {
     if (fileMetadata) {
       this.logger.debug(`file metadata exists for file ${fileId}`);
 
-      const fullPath = join(this.downloadPath, fileId + this.ext);
+      const fullPath = this.resolveDownloadFilePath(fileId);
+
+      if (!fullPath) {
+        this.logger.error(
+          `blocked path traversal while reading metadata ${fileId}`,
+        );
+        return null;
+      }
 
       const existsInStorage: boolean = fs.existsSync(fullPath);
 
@@ -1268,5 +1302,22 @@ export class MessageService {
     }
 
     return currentKey.associationKey;
+  }
+
+  private resolveDownloadFilePath(fileId: string): string | null {
+    return resolvePathWithinBase(this.downloadPath, `${fileId}${this.ext}`);
+  }
+
+  private resolveOfflineFilePath(filePath: string): string | null {
+    const allowedBases = [
+      this.uploadPath,
+      this.configService.get<string>('MULTER_UPLOADS_PATH', 'uploads'),
+    ];
+
+    const isAllowed = allowedBases.some((baseDir) =>
+      isPathWithinBase(filePath, baseDir),
+    );
+
+    return isAllowed ? resolve(filePath) : null;
   }
 }

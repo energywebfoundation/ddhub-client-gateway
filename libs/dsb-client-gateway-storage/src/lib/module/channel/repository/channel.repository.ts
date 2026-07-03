@@ -1,5 +1,6 @@
+import { Injectable } from '@nestjs/common';
 import { ChannelEntity } from '../entity/channel.entity';
-import { EntityRepository, In, Repository } from 'typeorm';
+import { DataSource, In, Repository } from 'typeorm';
 import { ChannelType } from '@dsb-client-gateway/dsb-client-gateway-storage';
 
 export interface ChannelsHavingTopic {
@@ -12,8 +13,12 @@ export interface ChannelsHavingTopic {
   fqcn: string;
 }
 
-@EntityRepository(ChannelEntity)
+@Injectable()
 export class ChannelRepository extends Repository<ChannelEntity> {
+  constructor(dataSource: DataSource) {
+    super(ChannelEntity, dataSource.createEntityManager());
+  }
+
   public async getChannelsHavingTopics(
     topicName: string,
     topicOwner: string,

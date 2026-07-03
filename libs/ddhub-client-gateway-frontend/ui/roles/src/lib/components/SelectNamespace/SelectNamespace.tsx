@@ -21,14 +21,41 @@ export const SelectNamespaceStep = ({
   searchKey: string;
   setSearchKey: (value: string) => void;
 }) => {
+  type NamespaceOption = {
+    name: string;
+    namespace: string;
+    appName: string;
+    logoUrl: string;
+    label: string;
+  };
+
+  const mappedOptions: NamespaceOption[] = options.map((option) => ({
+    ...option,
+    label: option.name,
+  }));
+
+  const selectedOption =
+    mappedOptions.find((option) => option.namespace === namespace) ?? null;
+
   return (
     <Autocomplete
-      options={options.map((option) => ({
-        ...option,
-        label: option.name,
-      }))}
-      onChange={(_, value) => {
-        setNamespace(value?.namespace);
+      options={mappedOptions}
+      value={selectedOption}
+      inputValue={searchKey}
+      filterOptions={(availableOptions) => availableOptions}
+      getOptionLabel={(option) => option.name ?? option.label ?? ''}
+      isOptionEqualToValue={(option, value) =>
+        option.namespace === value?.namespace
+      }
+      onChange={(_, value: NamespaceOption | null) => {
+        if (value) {
+          setNamespace(value.namespace);
+          setSearchKey(value.name);
+          return;
+        }
+
+        setNamespace('');
+        setSearchKey('');
       }}
       noOptionsText={
         searchKey
@@ -36,8 +63,10 @@ export const SelectNamespaceStep = ({
           : 'You need to provide at least 3 characters to start searching'
       }
       placeholder="Search by organization or application"
-      onInputChange={(_, value) => {
-        setSearchKey(value);
+      onInputChange={(_, value, reason) => {
+        if (reason === 'input' || reason === 'clear') {
+          setSearchKey(value);
+        }
       }}
       label="Search by organization or application"
       renderOption={(
@@ -84,7 +113,6 @@ export const SelectNamespaceStep = ({
           </Box>
         );
       }}
-      value={namespace}
     />
   );
 };

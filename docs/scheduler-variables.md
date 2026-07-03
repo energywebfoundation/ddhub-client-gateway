@@ -8,7 +8,7 @@
 | APPLICATION_CRON_SCHEDULE | string | */1 * * * * | How often should poll for applications data |  |  |
 | APPLICATION_CRON_ENABLED | boolean | true | Should poll for applications data |  |  |
 | CLIENTS_CRON_SCHEDULE | string | */5 * * * * | How often should check for outdated clients |  |  |
-| CLIENTS_CRON_ENABLED | string | true | Should check for outdated clients |  |  |
+| CLIENTS_CRON_ENABLED | boolean | true | Should check for outdated clients |  |  |
 | CHANNEL_DID_CRON_SCHEDULE | string | */1 * * * * | How often should exchange channel roles for DIDs |  |  |
 | CHANNEL_DID_CRON_ENABLED | boolean | true | Should poll for channel DIDs |  |  |
 | MESSAGE_CLEANER_CRON_ENABLED | boolean | true | Should clean messages data |  |  |
@@ -29,6 +29,7 @@
 | UPLOAD_FILES_LIFETIME | number | 30 | Specifies how long stored files should live (in minutes) |  |  |
 | DOWNLOAD_FILES_LIFETIME | number | 30 | Specifies how long downloaded file should live (in minutes) |  |  |
 | DID_LISTENER_ENABLED | boolean | true | Should listen for DID attributes changes |  |  |
+| EVENTS_CRON_ENABLED | boolean | true | Should poll for events |  |  |
 | ASSOCIATION_KEY_INTERVAL | number | 24 | Association key interval (hours) |  |  |
 | ASSOCIATION_KEY_OFFSET | number | 144 | Association key validity time (hours) |  |  |
 | REQ_LOCK_TIMEOUT | number | 5 | Maximum request lock lifetime (in seconds) |  |  |

@@ -16,12 +16,16 @@ interface AutocompleteProps {
   onTextChange?: (
     event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
   ) => void;
-  onInputChange?: (event: React.SyntheticEvent, value: string) => void;
+  onInputChange?: (
+    event: React.SyntheticEvent,
+    value: string,
+    reason?: string
+  ) => void;
   renderOption?: (props: any, option: any) => ReactNode;
   freeSolo?: boolean;
   className?: string;
   label?: string;
-  value?: string | undefined;
+  value?: any;
   inputValue?: string;
   popupIcon?: ReactNode;
   loading?: boolean;
@@ -29,6 +33,8 @@ interface AutocompleteProps {
   placeholder?: string;
   wrapperProps?: BoxProps;
   filterOptions?: (options: Array<any>, state: object) => Array<any>;
+  getOptionLabel?: (option: any) => string;
+  isOptionEqualToValue?: (option: any, value: any) => boolean;
   listBoxHeightFull?: boolean;
   noOptionsText?: string;
 }
@@ -50,6 +56,8 @@ export const Autocomplete: FC<AutocompleteProps> = ({
   disabled,
   wrapperProps,
   filterOptions,
+  getOptionLabel,
+  isOptionEqualToValue,
   listBoxHeightFull,
   noOptionsText,
 }) => {
@@ -73,9 +81,9 @@ export const Autocomplete: FC<AutocompleteProps> = ({
         noOptionsText={noOptionsText}
         renderOption={renderOption}
         filterOptions={filterOptions}
-        popupIcon={
-          popupIcon ?? <ChevronDown className={classes.popupIcon} size={20} />
-        }
+        getOptionLabel={getOptionLabel}
+        isOptionEqualToValue={isOptionEqualToValue}
+        popupIcon={popupIcon ?? <ChevronDown size={20} />}
         className={className}
         classes={{
           popupIndicator: classes.popupIcon,

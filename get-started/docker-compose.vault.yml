@@ -1,3 +1,7 @@
+x-gateway-env: &gateway-env
+  VAULT_ENDPOINT: http://vault_demo:8200
+  SECRETS_ENGINE: vault
+
 version: '3'
 services:
   vault_demo:
@@ -13,12 +17,19 @@ services:
       - IPC_LOCK
     container_name: vault_demo
     entrypoint: "vault server -config=/vault/config/vault.json"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:8200/ui/vault/auth || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 5s
 
   vault-init:
     image: hashicorp/vault:latest
     container_name: vault-init
     depends_on:
-      - vault_demo
+      vault_demo:
+        condition: service_healthy
     environment:
       VAULT_ADDR: http://vault_demo:8200
     volumes:
@@ -30,13 +41,13 @@ services:
       sleep 3
       if vault status | grep "Initialized.*false"; then
         echo "Initializing Vault..."
-        vault operator init -key-shares=1 -key-threshold=1 > ./vault-creds/init.txt
-        echo $(grep "Initial Root Token:" ./vault-creds/init.txt | awk "{print \$4}") > /vault-creds/root_token.txt
-        vault operator unseal $(grep "Unseal Key 1:" ./vault-creds/init.txt | awk "{print \$4}")
-        VAULT_TOKEN=$(grep "Initial Root Token:" ./vault-creds/init.txt | awk "{print \$4}") vault secrets enable -version=1 -path=ddhub kv
+        vault operator init -key-shares=1 -key-threshold=1 > /vault-creds/init.txt
+        echo $(grep "Initial Root Token:" /vault-creds/init.txt | awk "{print \$4}") > /vault-creds/root_token.txt
+        vault operator unseal $(grep "Unseal Key 1:" /vault-creds/init.txt | awk "{print \$4}")
+        VAULT_TOKEN=$(grep "Initial Root Token:" /vault-creds/init.txt | awk "{print \$4}") vault secrets enable -version=1 -path=ddhub kv
       else
         echo "Unsealing Vault..."
-        vault operator unseal $(grep "Unseal Key 1:" ./vault-creds/init.txt | awk "{print \$4}")
+        vault operator unseal $(grep "Unseal Key 1:" /vault-creds/init.txt | awk "{print \$4}")
       fi
       '
 
@@ -59,44 +70,41 @@ services:
       start_period: 10s
 
   ddhub-gateway-migrationer:
-    image: aemocontainerregistry.azurecr.io/ddhub-client-gateway-backend:latest
+    image: ewfcontainerregistry.azurecr.io/ddhub-client-gateway-backend:intelligent-canary
     container_name: ddhub-gateway-migrationer
     depends_on:
       postgres:
         condition: service_healthy
+      vault-init:
+        condition: service_completed_successfully
     volumes:
       - ./vault-creds:/vault-creds
     entrypoint: >
       sh -c '
         export VAULT_TOKEN=$(cat /vault-creds/root_token.txt)
         echo "Vault token loaded. $VAULT_TOKEN"
-        exec ./node_modules/.bin/typeorm migrations:run
+        exec ./node_modules/.bin/typeorm migration:run -d ormconfig.js
       '
+    env_file:
+      - .ewc-env
     environment:
-      NODE_ENV: test
-      DSB_BASE_URL: https://ddhub-demo.energyweb.org
-      CACHE_SERVER_URL: https://identitycache-staging.energyweb.org/v1
-      EVENT_SERVER_URL: https://identitycache-staging.energyweb.org
-      VAULT_ENDPOINT: http://vault_demo:8200
-      VAULT_TOKEN: $VAULT_TOKEN
-      SECRETS_ENGINE: vault
-      DB_NAME: postgresql://ddhub:password123@postgres:5432/ddhub
-      PARENT_NAMESPACE: ddhub.apps.energyweb.iam.ewc
-      MTLS_ENABLED: "false"
+      <<: *gateway-env
 
   ddhub-gateway-UI:
-    image: aemocontainerregistry.azurecr.io/ddhub-client-gateway-frontend:latest
+    image: ewfcontainerregistry.azurecr.io/ddhub-client-gateway-frontend:intelligent-canary
     ports:
       - "3000:80"
 
   ddhub-gateway-api:
-    image: aemocontainerregistry.azurecr.io/ddhub-client-gateway-backend:latest
+    image: ewfcontainerregistry.azurecr.io/ddhub-client-gateway-backend:intelligent-canary
     container_name: ddhub-gateway-api
     depends_on:
-      - 'vault_demo'
-      - 'vault-init'
-      - 'postgres'
-      - 'ddhub-gateway-migrationer'
+      vault-init:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+      ddhub-gateway-migrationer:
+        condition: service_completed_successfully
     ports:
       - 3333:3333
     volumes:
@@ -107,26 +115,21 @@ services:
         echo "Vault token loaded. $VAULT_TOKEN"
         exec node main.js
       '
+    env_file:
+      - .ewc-env
     environment:
-      NODE_ENV: test
-      DSB_BASE_URL: https://ddhub-demo.energyweb.org
-      CACHE_SERVER_URL: https://identitycache-staging.energyweb.org/v1
-      EVENT_SERVER_URL: https://identitycache-staging.energyweb.org
-      VAULT_ENDPOINT: http://vault_demo:8200
-      VAULT_TOKEN: $VAULT_TOKEN
-      SECRETS_ENGINE: vault
-      DB_NAME: postgresql://ddhub:password123@postgres:5432/ddhub
-      PARENT_NAMESPACE: ddhub.apps.energyweb.iam.ewc
-      MTLS_ENABLED: "false"
+      <<: *gateway-env
 
   ddhub-gateway-scheduler:
-    image: aemocontainerregistry.azurecr.io/ddhub-client-gateway-scheduler:latest
+    image: ewfcontainerregistry.azurecr.io/ddhub-client-gateway-scheduler:intelligent-canary
     container_name: ddhub-gateway-scheduler
     depends_on:
-      - 'vault_demo'
-      - 'vault-init'
-      - 'postgres'
-      - 'ddhub-gateway-migrationer'
+      vault-init:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+      ddhub-gateway-migrationer:
+        condition: service_completed_successfully
     volumes:
       - ./vault-creds:/vault-creds
     entrypoint: >
@@ -135,18 +138,10 @@ services:
         echo "Vault token loaded. $VAULT_TOKEN"
         exec node main.js
       '
+    env_file:
+      - .ewc-env
     environment:
-      NODE_ENV: test
-      DSB_BASE_URL: https://ddhub-demo.energyweb.org
-      CACHE_SERVER_URL: https://identitycache-staging.energyweb.org/v1
-      EVENT_SERVER_URL: https://identitycache-staging.energyweb.org
-      VAULT_ENDPOINT: http://vault_demo:8200
-      VAULT_TOKEN: $VAULT_TOKEN
-      SECRETS_ENGINE: vault
-      DB_NAME: postgresql://ddhub:password123@postgres:5432/ddhub
-      DID_REGISTRY_ADDRESS: "0xc15d5a57a8eb0e1dcbe5d88b8f9a82017e5cc4af"
-      PARENT_NAMESPACE: ddhub.apps.energyweb.iam.ewc
-      MTLS_ENABLED: "false"
+      <<: *gateway-env
 
   proxy-server:
     image: nginx:alpine
@@ -157,6 +152,3 @@ services:
     depends_on:
       - ddhub-gateway-UI
       - ddhub-gateway-api
-
-volumes:
-  vault-creds:

@@ -7,7 +7,7 @@ import {
   ChevronUp,
 } from 'react-feather';
 import { CopyToClipboard } from '@ddhub-client-gateway-frontend/ui/core';
-import { MouseEvent } from 'react';
+import { MouseEvent, useState } from 'react';
 import clsx from 'clsx';
 import { useStyles } from '../SelectedTopicView/SelectedTopicView.styles';
 import { Topic } from '../Topics.effects';
@@ -28,6 +28,7 @@ export interface SelectedTopicViewProps {
   responseTopics?: ResponseTopicDto[];
   expandResponse?: boolean;
   setExpandResponse?: (value: boolean) => void;
+  hideInlineResponseCollapse?: boolean;
 }
 
 export const SelectedTopicView = ({
@@ -42,10 +43,25 @@ export const SelectedTopicView = ({
   remove,
   canCopy,
   responseTopics,
-  expandResponse,
-  setExpandResponse,
+  expandResponse: expandResponseProp,
+  setExpandResponse: setExpandResponseProp,
+  hideInlineResponseCollapse = false,
 }: SelectedTopicViewProps) => {
   const { classes, theme } = useStyles();
+  const [uncontrolledExpand, setUncontrolledExpand] = useState(false);
+  const isExpandControlled = setExpandResponseProp !== undefined;
+  const expandResponse = isExpandControlled
+    ? !!expandResponseProp
+    : uncontrolledExpand;
+
+  const handleToggleExpand = (event: MouseEvent<HTMLElement>) => {
+    event.stopPropagation();
+    if (isExpandControlled) {
+      setExpandResponseProp?.(!expandResponse);
+      return;
+    }
+    setUncontrolledExpand((prev) => !prev);
+  };
 
   return (
     <Grid
@@ -73,7 +89,13 @@ export const SelectedTopicView = ({
                   {showTopicResponse && (
                     <Tooltip title="Response topics">
                       <IconButton
-                        onClick={handleOpenResponse}
+                        onMouseDown={(event: MouseEvent<HTMLElement>) => {
+                          event.stopPropagation();
+                        }}
+                        onClick={(event: MouseEvent<HTMLElement>) => {
+                          event.stopPropagation();
+                          handleOpenResponse?.(event);
+                        }}
                         className={clsx(classes.edit, {
                           [classes.editActive]:
                             expanded && expanded === `panel-${index}`,
@@ -88,7 +110,13 @@ export const SelectedTopicView = ({
 
                   <Tooltip title="Edit topic">
                     <IconButton
-                      onClick={handleOpenEdit}
+                      onMouseDown={(event: MouseEvent<HTMLElement>) => {
+                        event.stopPropagation();
+                      }}
+                      onClick={(event: MouseEvent<HTMLElement>) => {
+                        event.stopPropagation();
+                        handleOpenEdit?.(event);
+                      }}
                       className={clsx(classes.edit, {
                         [classes.editActive]:
                           expanded && expanded === `panel-${index}`,
@@ -102,9 +130,12 @@ export const SelectedTopicView = ({
 
                   <Tooltip title="Remove topic">
                     <IconButton
+                      onMouseDown={(event: MouseEvent<HTMLElement>) => {
+                        event.stopPropagation();
+                      }}
                       onClick={(event: MouseEvent<HTMLElement>) => {
                         event.stopPropagation();
-                        remove();
+                        remove?.();
                       }}
                       className={classes.close}
                     >
@@ -116,10 +147,10 @@ export const SelectedTopicView = ({
 
               {showTopicResponse && (
                 <IconButton
-                  onClick={(event: MouseEvent<HTMLElement>) => {
+                  onMouseDown={(event: MouseEvent<HTMLElement>) => {
                     event.stopPropagation();
-                    setExpandResponse(!expandResponse);
                   }}
+                  onClick={handleToggleExpand}
                   className={classes.accordion}
                 >
                   {!expandResponse && <ChevronDown size={18} />}
@@ -154,10 +185,12 @@ export const SelectedTopicView = ({
           )}
         </Grid>
       </Grid>
-      <SelectedTopicsCollapse
-        responseTopics={responseTopics}
-        expandResponse={expandResponse}
-      />
+      {!hideInlineResponseCollapse && (
+        <SelectedTopicsCollapse
+          responseTopics={responseTopics}
+          expandResponse={expandResponse}
+        />
+      )}
     </Grid>
   );
 };

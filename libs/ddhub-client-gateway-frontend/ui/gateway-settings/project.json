@@ -6,7 +6,9 @@
   "targets": {
     "lint": {
       "executor": "@nrwl/linter:eslint",
-      "outputs": ["{options.outputFile}"],
+      "outputs": [
+        "{options.outputFile}"
+      ],
       "options": {
         "lintFilePatterns": [
           "libs/ddhub-client-gateway-frontend/ui/gateway-settings/**/*.{ts,tsx,js,jsx}"
@@ -23,5 +25,6 @@
         "passWithNoTests": true
       }
     }
-  }
+  },
+  "name": "ddhub-client-gateway-ui-gateway-settings"
 }

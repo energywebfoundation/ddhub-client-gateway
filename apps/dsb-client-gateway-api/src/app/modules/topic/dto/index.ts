@@ -456,7 +456,7 @@ export class GetTopicsQueryDto {
   @IsNumber()
   @ApiProperty({
     example: 1,
-    default: 0,
+    default: 5,
     required: false,
     type: Number,
   })
@@ -467,7 +467,7 @@ export class GetTopicsQueryDto {
   @IsOptional()
   @ApiProperty({
     example: 1,
-    default: 0,
+    default: 1,
     required: false,
     type: Number,
   })
@@ -630,7 +630,7 @@ export class GetTopicsWithLimitParamsDto {
   @IsNumber()
   @ApiProperty({
     example: 1,
-    default: 0,
+    default: 5,
     required: false,
     type: Number,
   })
@@ -641,7 +641,7 @@ export class GetTopicsWithLimitParamsDto {
   @IsOptional()
   @ApiProperty({
     example: 1,
-    default: 0,
+    default: 1,
     required: false,
     type: Number,
   })

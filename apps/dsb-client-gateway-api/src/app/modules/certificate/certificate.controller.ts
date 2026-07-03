@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   HttpCode,
@@ -65,17 +66,26 @@ export class CertificateController {
       privateKey,
       caCertificate,
     }: {
-      certificate;
-      privateKey;
-      caCertificate;
+      certificate?: Express.Multer.File[];
+      privateKey?: Express.Multer.File[];
+      caCertificate?: Express.Multer.File[];
     },
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     @Body() dto: UploadCertificateBodyDto
   ): Promise<void> {
+    const certificateFile = certificate?.[0];
+    const privateKeyFile = privateKey?.[0];
+
+    if (!certificateFile?.buffer || !privateKeyFile?.buffer) {
+      throw new BadRequestException(
+        'Both certificate and privateKey files are required'
+      );
+    }
+
     await this.certificateService.save(
-      certificate[0],
-      privateKey[0],
-      caCertificate
+      certificateFile,
+      privateKeyFile,
+      caCertificate?.[0]
     );
   }
 }

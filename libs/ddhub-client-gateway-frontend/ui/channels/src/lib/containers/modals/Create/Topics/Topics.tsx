@@ -11,7 +11,14 @@ import { ActionButtons } from '../ActionButtons';
 import { TActionButtonsProps } from '../ActionButtons/ActionButtons';
 import { Topic, useTopicsEffects } from './Topics.effects';
 import { useStyles } from './Topics.styles';
-import { Filter } from 'react-feather';
+import { getChannelType } from '../../../../utils';
+import { ChannelType } from '../../../../models';
+
+const shouldShowTopicResponse = (
+  channelType: TopicChannelValues['channelType'],
+  messageForms?: boolean,
+) =>
+  !!messageForms && getChannelType(channelType) === ChannelType.Messaging;
 
 export interface TopicChannelValues {
   topics: Topic[];
@@ -47,6 +54,11 @@ export const Topics = ({ channelValues, actionButtonsProps }: TopicsProps) => {
     saveTopicResponse,
     responseTopics,
   } = useTopicsEffects(channelValues);
+
+  const showTopicResponse = shouldShowTopicResponse(
+    channelValues.channelType,
+    channelValues.messageForms,
+  );
 
   return (
     <Grid
@@ -112,18 +124,9 @@ export const Topics = ({ channelValues, actionButtonsProps }: TopicsProps) => {
           </Box>
         )}
 
-        <Box
-          display="flex"
-          justifyContent="space-between"
-          pr={2.5}
-          pt={3.25}
-          pb={1.25}
-        >
+        <Box pr={2.5} pt={3.25} pb={1.25}>
           <Typography className={classes.label}>
             {selectedTopics.length} Topics
-          </Typography>
-          <Typography className={classes.filterLabel}>
-            <Filter size={10} /> Filter
           </Typography>
         </Box>
 
@@ -131,10 +134,7 @@ export const Topics = ({ channelValues, actionButtonsProps }: TopicsProps) => {
           selectedTopics={selectedTopics}
           remove={removeSelectedTopic}
           edit={updateSelectedTopic}
-          showTopicResponse={
-            channelValues.messageForms &&
-            channelValues.channelType === CreateChannelDtoType.sub
-          }
+          showTopicResponse={showTopicResponse}
           saveResponse={saveTopicResponse}
           responseTopics={responseTopics}
           filters={filters}

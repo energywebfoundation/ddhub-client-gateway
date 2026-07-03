@@ -26,16 +26,19 @@ export const useClientIdsEffects = () => {
       }
     );
 
-  const actions: TTableComponentAction<GetAllClientsResponseDto>[] = [
-    {
-      label: 'Remove',
-      color: theme.palette.error.main,
-      onClick: (client: GetAllClientsResponseDto) =>
-        removeClientIdHandler(client.clientId),
-    },
-  ];
-
   const clientIds = data ?? ([] as GetAllClientsResponseDto[]);
+
+  const actions: TTableComponentAction<GetAllClientsResponseDto>[] =
+    clientIds.length > 0
+      ? [
+          {
+            label: 'Remove',
+            color: theme.palette.error.main,
+            onClick: (client: GetAllClientsResponseDto) =>
+              removeClientIdHandler(client.clientId),
+          },
+        ]
+      : [];
 
   const clientIdsFetched = isSuccess && data !== undefined && !isError;
 
