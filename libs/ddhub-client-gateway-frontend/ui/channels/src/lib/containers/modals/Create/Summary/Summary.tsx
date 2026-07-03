@@ -16,6 +16,7 @@ import { RestrictionListView } from '../Restrictions/RestrictionListView/Restric
 import { clone } from 'lodash';
 import { ConnectionType } from '../Details/models/connection-type.enum';
 import { ChannelType } from '../../../../models';
+import { getChannelType, getTopicKey } from '../../../../utils';
 import { Topic } from '../Topics/Topics.effects';
 import { SelectedTopicView } from '../Topics/SelectedTopicView/SelectedTopicView';
 import { AddressBookContext } from '@ddhub-client-gateway-frontend/ui/login';
@@ -100,9 +101,10 @@ export const Summary = ({
               isSummary={true}
               index={index}
               showTopicResponse={
-                channelValues.type === 'pub' && channelValues.messageForms
+                !!channelValues.messageForms &&
+                getChannelType(channelValues.type) === ChannelType.Messaging
               }
-              responseTopics={getSelectedResponseTopics(el.id)}
+              responseTopics={getSelectedResponseTopics(getTopicKey(el) ?? '')}
             />
           ))}
         </Box>

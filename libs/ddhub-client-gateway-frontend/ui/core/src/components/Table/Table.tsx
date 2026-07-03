@@ -251,12 +251,18 @@ export function GenericTable<T>({
                         </TableCell>
                       );
                     })}
-                    {showActions && (
-                      <TableComponentActions<T>
-                        data={data}
-                        actions={showActions}
-                      />
-                    )}
+                    {actions &&
+                      (showActions ? (
+                        <TableComponentActions<T>
+                          data={data}
+                          actions={showActions}
+                        />
+                      ) : (
+                        <TableCell
+                          classes={{ body: classes.body }}
+                          className={classes.action}
+                        />
+                      ))}
                   </TableRow>
                 );
               })}
