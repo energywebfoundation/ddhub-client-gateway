@@ -1,4 +1,5 @@
 import {
+  Button as LoadingButton,
   Dialog,
   DialogSubTitle,
   FormInput,
@@ -24,6 +25,7 @@ export const CreateModal = () => {
     setShowPassword,
     showConfirmPassword,
     setShowConfirmPassword,
+    isSaving,
   } = useCreateEffects();
   const { classes } = useStyles();
 
@@ -159,17 +161,19 @@ export const CreateModal = () => {
           variant="outlined"
           className={classes.backButtonWrapper}
           onClick={closeModal}
+          sx={{ height: 37, minWidth: 75 }}
         >
           Cancel
         </Button>
-        <Button
+        <LoadingButton
           variant="contained"
           className={classes.nextButtonWrapper}
           disabled={!isValid}
+          loading={isSaving}
           onClick={onSubmit}
         >
           Save
-        </Button>
+        </LoadingButton>
       </Box>
     </Dialog>
   );
