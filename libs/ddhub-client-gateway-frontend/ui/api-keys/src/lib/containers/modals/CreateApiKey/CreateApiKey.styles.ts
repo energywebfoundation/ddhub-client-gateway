@@ -37,6 +37,7 @@ export const useStyles = makeStyles()((theme) => ({
     border: `1px solid #404656`,
     borderRadius: 5,
     padding: '10px 12px 12px',
+    cursor: 'pointer',
     transition: 'border-color 0.15s ease, background-color 0.15s ease',
   },
   roleOptionBoxChecked: {
@@ -50,15 +51,15 @@ export const useStyles = makeStyles()((theme) => ({
   },
   roleLabelRoot: {
     marginRight: 0,
-    alignItems: 'flex-start',
+    alignItems: 'center',
     '& .Mui-checked ~ .MuiFormControlLabel-label': {
       color: theme.palette.common.white,
     },
   },
   roleFormControlLabel: {
     fontSize: 14,
-    lineHeight: '21px',
-    fontWeight: 500,
+    lineHeight: '20px',
+    fontWeight: 600,
     fontFamily: theme.typography.body2.fontFamily,
     color: theme.palette.grey[300],
   },
@@ -69,7 +70,5 @@ export const useStyles = makeStyles()((theme) => ({
     fontFamily: theme.typography.body2.fontFamily,
     color: theme.palette.grey[300],
     display: 'block',
-    marginLeft: 30,
-    marginTop: -4,
   },
 }));

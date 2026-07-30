@@ -12,6 +12,7 @@ import {
 } from '@ddhub-client-gateway-frontend/ui/api-hooks';
 import { ApiKeyResponseDtoWithStatus } from '../../../components/ApiKeys/ApiKeys';
 import {
+  ApiKeyResponseDto,
   getUserApiKeyControllerGetAllApiKeysQueryKey,
   UserApiKeyControllerCreateApiKeyBodyRole,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
@@ -149,10 +150,10 @@ export const useCreateApiKeyEffects = () => {
     }
   };
 
-  const onSuccess = () => {
+  const onSuccess = (savedApiKey?: ApiKeyResponseDto) => {
     const successText = openUpdate ? `${labelInput} updated` : 'Success';
     const successSubTitle = openUpdate ? `${labelInput} has been successfully changed.` : 'You have successfully created the API key.';
-    
+
     clear();
     closeModal();
 
@@ -161,9 +162,22 @@ export const useCreateApiKeyEffects = () => {
       text: successSubTitle,
     });
 
-    queryClient.invalidateQueries(
-      getUserApiKeyControllerGetAllApiKeysQueryKey()
-    );
+    // The list endpoint discovers keys via a search index (e.g. AWS Secrets Manager
+    // ListSecrets) that can lag behind a just-completed write, so refetching right
+    // after save can still come back without the record we just saved. The create/update
+    // response already has the authoritative data for this key, so write it into the
+    // cache directly instead of forcing an immediate (and possibly stale) refetch.
+    if (savedApiKey) {
+      queryClient.setQueryData<ApiKeyResponseDto[]>(
+        getUserApiKeyControllerGetAllApiKeysQueryKey(),
+        (existing = []) =>
+          openUpdate
+            ? existing.map((item) =>
+                item.apiKey === savedApiKey.apiKey ? savedApiKey : item
+              )
+            : [...existing, savedApiKey]
+      );
+    }
   };
 
   const createApiKey = () => {
@@ -180,7 +194,7 @@ export const useCreateApiKeyEffects = () => {
     }
   };
 
-  const buttonDisabled = !labelInput || !expiryDate;
+  const buttonDisabled = !labelInput || labelInput.length < 5 || !expiryDate;
 
   return {
     open,

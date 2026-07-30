@@ -130,6 +130,7 @@ export const CreateApiKey: FC = () => {
                     className={clsx(classes.roleOptionBox, {
                       [classes.roleOptionBoxChecked]: roleInput === option.value,
                     })}
+                    onClick={() => roleInputChangeHandler(option.value)}
                   >
                     <FormControlLabel
                       value={option.value}

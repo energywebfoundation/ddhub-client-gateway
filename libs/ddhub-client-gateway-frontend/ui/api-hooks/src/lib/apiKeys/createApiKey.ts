@@ -1,5 +1,6 @@
 import { useCustomAlert } from '@ddhub-client-gateway-frontend/ui/core';
 import {
+    ApiKeyResponseDto,
     UserApiKeyControllerCreateApiKeyBody,
     useUserApiKeyControllerCreateApiKey,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
@@ -27,7 +28,7 @@ export const useApiKeySave = () => {
 
   const createApiKeyHandler = (
     data: UserApiKeyControllerCreateApiKeyBody,
-    onSuccess: () => void
+    onSuccess: (createdApiKey: ApiKeyResponseDto) => void
   ) => {
     mutate({ data }, { onSuccess, onError: createError });
   };
