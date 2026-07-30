@@ -51,18 +51,19 @@ export class ApiKeyGuard implements CanActivate {
     const apiKeyFromHeaders: string | undefined = headers['x-api-key'];
 
     if (apiKeyFromHeaders) {
-      const isValid = await this.secretsEngineService.validateApiKey(apiKeyFromHeaders);
+      const validation = await this.secretsEngineService.validateApiKey(apiKeyFromHeaders);
       request.user = {
         authType: 'api-key',
         apiKey: apiKeyFromHeaders,
         username: apiKeyFromHeaders,
+        role: validation.valid ? validation.role : undefined,
       };
       try {
         this._logger.assign({ user: apiKeyFromHeaders });
       } catch {
         // assign requires pino request scope; may be unavailable in global guards
       }
-      return isValid;
+      return validation.valid;
     }
 
     return true;

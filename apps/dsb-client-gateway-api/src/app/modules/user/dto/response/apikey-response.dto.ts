@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { UserRole } from '@dsb-client-gateway/ddhub-client-gateway-user-roles';
 
 export class ApiKeyResponseDto {
   @ApiProperty({
@@ -16,4 +17,11 @@ export class ApiKeyResponseDto {
     example: '2025-12-31T23:59:59Z',
   })
   expiresAt: string;
+
+  @ApiProperty({
+    description: 'The role that determines which endpoints this API key can access',
+    enum: UserRole,
+    example: UserRole.MESSAGING,
+  })
+  role: string;
 }
