@@ -19,6 +19,7 @@ import {
 } from '@aws-sdk/client-secrets-manager';
 import {
   ApiKeyDetails,
+  ApiKeyValidationResult,
   CertificateDetails,
   PATHS,
   SecretsEngineService,
@@ -527,7 +528,7 @@ export class AwsSecretsManagerService
   }
 
   @Span('aws_ssm_createApiKey')
-  public async createApiKey(name: string, daysValid: number): Promise<ApiKeyDetails> {
+  public async createApiKey(name: string, daysValid: number, role: string = UserRole.MESSAGING): Promise<ApiKeyDetails> {
     this.logger.log(`Attempting to create api key `);
 
     const apiKey = this.generateRandomKey();
@@ -536,6 +537,7 @@ export class AwsSecretsManagerService
     const data = {
       name,
       expiresAt: expiresAt.toISOString(),
+      role,
     };
 
     await this.client.send(new CreateSecretCommand({
@@ -544,11 +546,11 @@ export class AwsSecretsManagerService
     }));
 
     this.logger.log(`create api key ${apiKey}`);
-    return { apiKey, name, expiresAt: expiresAt.toISOString() };
+    return { apiKey, name, expiresAt: expiresAt.toISOString(), role };
   }
 
   @Span('aws_ssm_updateApiKey')
-  public async updateApiKey(apiKey: string, name: string, daysValid: number): Promise<ApiKeyDetails> {
+  public async updateApiKey(apiKey: string, name: string, daysValid: number, role?: string): Promise<ApiKeyDetails> {
     this.logger.log(`Attempting to update api key ${apiKey}`);
 
     const secretName = `${this.prefix}${PATHS.API_KEY}/${apiKey}`;
@@ -563,7 +565,9 @@ export class AwsSecretsManagerService
     }
 
     const expiresAt = new Date(Date.now() + daysValid * this.MS_PER_DAY).toISOString();
-    const updatedSecret = JSON.stringify({ name, expiresAt });
+    const existingData = JSON.parse(existingSecret.SecretString);
+    const resolvedRole = role ?? existingData.role ?? UserRole.MESSAGING;
+    const updatedSecret = JSON.stringify({ name, expiresAt, role: resolvedRole });
 
     // Update the secret with new name & expiration
     await this.client.send(
@@ -574,7 +578,7 @@ export class AwsSecretsManagerService
     );
 
     this.logger.log(`updated api key ${apiKey}`);
-    return { apiKey, name, expiresAt };
+    return { apiKey, name, expiresAt, role: resolvedRole };
   }
 
   @Span('aws_ssm_deleteApiKey')
@@ -612,7 +616,7 @@ export class AwsSecretsManagerService
       if (response.SecretString) {
         const result = JSON.parse(response.SecretString);
         this.logger.log(`Get api key ${apiKey}`);
-        return { apiKey, ...result };
+        return { apiKey, ...result, role: result.role ?? UserRole.MESSAGING };
       }
     } catch (error) {
       this.logger.error('failed to get api key');
@@ -661,10 +665,10 @@ export class AwsSecretsManagerService
   }
 
   @Span('aws_ssm_validateApiKey')
-  public async validateApiKey(apiKey: string): Promise<boolean> {
+  public async validateApiKey(apiKey: string): Promise<ApiKeyValidationResult> {
     const result = await this.getApiKey(apiKey);
-    if (!result) return false;
-    if (new Date() > new Date(result.expiresAt)) return false;
-    return true;
+    if (!result) return { valid: false };
+    if (new Date() > new Date(result.expiresAt)) return { valid: false };
+    return { valid: true, role: result.role };
   }
 }

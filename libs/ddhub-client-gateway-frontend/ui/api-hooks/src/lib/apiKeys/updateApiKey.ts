@@ -26,13 +26,14 @@ export const useUpdateApiKey = () => {
     values: UserApiKeyControllerUpdateApiKeyBody,
     onSuccess: () => void
   ) => {
-    const { name, daysValid } = values;
+    const { name, daysValid, role } = values;
     mutate(
       {
         apiKey,
         data: {
           name,
           daysValid,
+          role,
         },
       },
       {

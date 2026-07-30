@@ -12,7 +12,8 @@ import {
 } from '@ddhub-client-gateway-frontend/ui/api-hooks';
 import { ApiKeyResponseDtoWithStatus } from '../../../components/ApiKeys/ApiKeys';
 import {
-  getUserApiKeyControllerGetAllApiKeysQueryKey
+  getUserApiKeyControllerGetAllApiKeysQueryKey,
+  UserApiKeyControllerCreateApiKeyBodyRole,
 } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import { useQueryClient } from 'react-query';
 
@@ -25,6 +26,9 @@ export const useCreateApiKeyEffects = () => {
   const [labelInput, setLabelInput] = useState('');
   const [expiryDate, setExpiryDate] = useState<DateTime | null>(null);
   const [apiKey, setApiKey] = useState('');
+  const [roleInput, setRoleInput] = useState<UserApiKeyControllerCreateApiKeyBodyRole>(
+    UserApiKeyControllerCreateApiKeyBodyRole.messaging
+  );
   const [isDirty, setIsDirty] = useState(false);
   const [isDateDirty, setIsDateDirty] = useState(false);
   const Swal = useCustomAlert();
@@ -37,6 +41,10 @@ export const useCreateApiKeyEffects = () => {
       setLabelInput(data.name);
       setExpiryDate(DateTime.fromISO(data.expiresAt));
       setApiKey(data.apiKey);
+      setRoleInput(
+        (data.role as UserApiKeyControllerCreateApiKeyBodyRole) ||
+          UserApiKeyControllerCreateApiKeyBodyRole.messaging
+      );
     }
 
     if (open) {
@@ -51,6 +59,12 @@ export const useCreateApiKeyEffects = () => {
       setIsDirty(true);
     }
     setLabelInput(value);
+  };
+
+  const roleInputChangeHandler = (
+    value: UserApiKeyControllerCreateApiKeyBodyRole
+  ) => {
+    setRoleInput(value);
   };
 
   const expiryDateChangeHandler = (value: DateTime | null) => {
@@ -85,6 +99,7 @@ export const useCreateApiKeyEffects = () => {
     } else {
       setLabelInput('');
       setExpiryDate(null);
+      setRoleInput(UserApiKeyControllerCreateApiKeyBodyRole.messaging);
     }
 
     setIsDirty(false);
@@ -155,6 +170,7 @@ export const useCreateApiKeyEffects = () => {
     const data = {
       name: labelInput,
       daysValid: expiryDate ? Math.ceil(expiryDate.diff(DateTime.now(), 'days').days) : undefined,
+      role: roleInput,
     };
 
     if (openUpdate) {
@@ -178,6 +194,8 @@ export const useCreateApiKeyEffects = () => {
     expiryDateChangeHandler,
     labelInput,
     labelInputChangeHandler,
+    roleInput,
+    roleInputChangeHandler,
     isDirty,
     isDateDirty,
     apiKey,

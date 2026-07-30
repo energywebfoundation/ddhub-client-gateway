@@ -51,6 +51,11 @@ export const API_KEYS_HEADERS: TableHeader[] = [
     },
   },
   {
+    Header: 'ROLE',
+    accessor: 'role',
+    isSortable: true,
+  },
+  {
     Header: 'STATUS',
     accessor: 'status',
     isSortable: true,

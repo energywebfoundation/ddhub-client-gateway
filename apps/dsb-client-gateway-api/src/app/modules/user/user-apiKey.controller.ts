@@ -102,6 +102,7 @@ export class UserApiKeyController {
       properties: {
         name: { type: 'string' },
         daysValid: { type: 'number', default: 30 },
+        role: { type: 'string', enum: Object.values(UserRole), default: UserRole.MESSAGING },
       },
       required: ['name'],
     },
@@ -110,8 +111,13 @@ export class UserApiKeyController {
   async createApiKey(
     @Body('name') name: string,
     @Body('daysValid') daysValid: number = 30,
+    @Body('role') role: UserRole = UserRole.MESSAGING,
   ): Promise<ApiKeyResponseDto> {
-    return this.secretsEngineService.createApiKey(name, daysValid);
+    if (!Object.values(UserRole).includes(role)) {
+      throw new BadRequestException(`Invalid role "${role}"`);
+    }
+
+    return this.secretsEngineService.createApiKey(name, daysValid, role);
   }
 
   @Get('api-keys')
@@ -135,17 +141,22 @@ export class UserApiKeyController {
       properties: {
         name: { type: 'string' },
         daysValid: { type: 'number', default: 30 },
+        role: { type: 'string', enum: Object.values(UserRole) },
       },
       required: ['name'],
     },
   })
-  @ApiOperation({ summary: 'Update an API key (name & daysValid)' })
+  @ApiOperation({ summary: 'Update an API key (name, daysValid & role)' })
   @ApiResponse({ status: 200, type: ApiKeyResponseDto })
   async updateApiKey(
     @Param('apiKey') apiKey: string,
-    @Body() body: { name: string; daysValid: number },
+    @Body() body: { name: string; daysValid: number; role?: UserRole },
   ): Promise<ApiKeyResponseDto> {
-    return this.secretsEngineService.updateApiKey(apiKey, body.name, body.daysValid);
+    if (body.role && !Object.values(UserRole).includes(body.role)) {
+      throw new BadRequestException(`Invalid role "${body.role}"`);
+    }
+
+    return this.secretsEngineService.updateApiKey(apiKey, body.name, body.daysValid, body.role);
   }
 
   @Delete('api-keys/:apiKey')
@@ -159,6 +170,8 @@ export class UserApiKeyController {
   @ApiOperation({ summary: 'Validate an API key' })
   @ApiResponse({ status: 200, type: Boolean })
   async validateApiKey(@Param('apiKey') apiKey: string): Promise<boolean> {
-    return this.secretsEngineService.validateApiKey(apiKey);
+    const result = await this.secretsEngineService.validateApiKey(apiKey);
+
+    return result.valid;
   }
 }

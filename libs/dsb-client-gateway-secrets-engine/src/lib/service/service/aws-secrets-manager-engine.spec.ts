@@ -265,4 +265,73 @@ describe('AWS Secrets Manager Engine', () => {
       }
     }
   });
+
+  describe('API keys', () => {
+    const buildApiKeySecretString = (
+      overrides: Partial<{ name: string; expiresAt: string; role: string }> = {}
+    ) =>
+      JSON.stringify({
+        name: 'test-key',
+        expiresAt: new Date(Date.now() + 86400000).toISOString(),
+        role: 'admin',
+        ...overrides,
+      });
+
+    it('should return the stored role for an API key that has one', async () => {
+      const smMockClient = mockClient(SecretsManagerClient);
+      smMockClient.on(GetSecretValueCommand).resolves({
+        SecretString: buildApiKeySecretString({ role: 'admin' }),
+      });
+
+      const result = await service.getApiKey('test');
+      expect(result.role).toEqual('admin');
+    });
+
+    it('should default the role to messaging for an API key with no stored role', async () => {
+      const smMockClient = mockClient(SecretsManagerClient);
+      const secret = JSON.parse(buildApiKeySecretString());
+      delete secret.role;
+
+      smMockClient.on(GetSecretValueCommand).resolves({
+        SecretString: JSON.stringify(secret),
+      });
+
+      const result = await service.getApiKey('test');
+      expect(result.role).toEqual('messaging');
+    });
+
+    it('should return valid: true with the role for a valid, unexpired API key', async () => {
+      const smMockClient = mockClient(SecretsManagerClient);
+      smMockClient.on(GetSecretValueCommand).resolves({
+        SecretString: buildApiKeySecretString({ role: 'messaging' }),
+      });
+
+      const result = await service.validateApiKey('test');
+      expect(result).toStrictEqual({ valid: true, role: 'messaging' });
+    });
+
+    it('should return valid: false for an expired API key', async () => {
+      const smMockClient = mockClient(SecretsManagerClient);
+      smMockClient.on(GetSecretValueCommand).resolves({
+        SecretString: buildApiKeySecretString({
+          expiresAt: new Date(Date.now() - 86400000).toISOString(),
+        }),
+      });
+
+      const result = await service.validateApiKey('test');
+      expect(result).toStrictEqual({ valid: false });
+    });
+
+    it('should return valid: false for an API key that does not exist', async () => {
+      const smMockClient = mockClient(SecretsManagerClient);
+      smMockClient
+        .on(GetSecretValueCommand)
+        .rejects(
+          new ResourceNotFoundException({ Message: 'test', message: 'test', $metadata: {} })
+        );
+
+      const result = await service.validateApiKey('missing');
+      expect(result).toStrictEqual({ valid: false });
+    });
+  });
 });

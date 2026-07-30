@@ -8,7 +8,14 @@ import {
   DialogTitle,
   InputLabel,
   Typography,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
+  Grid,
 } from '@mui/material';
+import { Circle } from 'react-feather';
+import clsx from 'clsx';
+import { UserApiKeyControllerCreateApiKeyBodyRole } from '@dsb-client-gateway/dsb-client-gateway-api-client';
 import {
   Button,
   CloseButton,
@@ -20,6 +27,24 @@ import {
 } from '@ddhub-client-gateway-frontend/ui/core';
 import { useCreateApiKeyEffects } from './CreateApiKey.effects';
 import { useStyles } from './CreateApiKey.styles';
+
+const ROLE_OPTIONS = [
+  {
+    value: UserApiKeyControllerCreateApiKeyBodyRole.messaging,
+    label: 'Messaging',
+    description: 'Send and receive messages only',
+  },
+  {
+    value: UserApiKeyControllerCreateApiKeyBodyRole.admin,
+    label: 'Admin',
+    description: 'Manage channels, topics and applications',
+  },
+  {
+    value: UserApiKeyControllerCreateApiKeyBodyRole.superadmin,
+    label: 'Superadmin',
+    description: 'Full access, including users and API keys',
+  },
+];
 
 export const CreateApiKey: FC = () => {
   const { classes } = useStyles();
@@ -35,6 +60,8 @@ export const CreateApiKey: FC = () => {
     expiryDateChangeHandler,
     labelInput,
     labelInputChangeHandler,
+    roleInput,
+    roleInputChangeHandler,
     isDirty,
     isDateDirty,
     apiKey,
@@ -85,6 +112,47 @@ export const CreateApiKey: FC = () => {
               }
             />
           </Box>
+        </Box>
+        <Box pb={4}>
+          <InputLabel className={classes.label}>Role</InputLabel>
+          <RadioGroup
+            value={roleInput}
+            onChange={(event) => {
+              roleInputChangeHandler(
+                event.target.value as UserApiKeyControllerCreateApiKeyBodyRole
+              );
+            }}
+          >
+            <Grid container spacing={1.5}>
+              {ROLE_OPTIONS.map((option) => (
+                <Grid item xs={4} key={option.value}>
+                  <Box
+                    className={clsx(classes.roleOptionBox, {
+                      [classes.roleOptionBoxChecked]: roleInput === option.value,
+                    })}
+                  >
+                    <FormControlLabel
+                      value={option.value}
+                      control={
+                        <Radio
+                          icon={<Circle size={18} />}
+                          checkedIcon={<Circle size={18} className={classes.roleCircleChecked} />}
+                        />
+                      }
+                      label={option.label}
+                      classes={{
+                        root: classes.roleLabelRoot,
+                        label: classes.roleFormControlLabel,
+                      }}
+                    />
+                    <Typography className={classes.roleSubLabel}>
+                      {option.description}
+                    </Typography>
+                  </Box>
+                </Grid>
+              ))}
+            </Grid>
+          </RadioGroup>
         </Box>
         <Box pb={4}>
           <InputLabel className={classes.label}>Expiry Date</InputLabel>

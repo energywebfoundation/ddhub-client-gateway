@@ -2,6 +2,7 @@ import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
   ApiKeyDetails,
+  ApiKeyValidationResult,
   CertificateDetails,
   PATHS,
   SecretsEngineService,
@@ -452,7 +453,7 @@ export class AzureKeyVaultService
   }
 
   @Span('azure_createApiKey')
-  public async createApiKey(name: string, daysValid: number): Promise<ApiKeyDetails> {
+  public async createApiKey(name: string, daysValid: number, role: string = UserRole.MESSAGING): Promise<ApiKeyDetails> {
     this.logger.log(`Attempting to create api key `);
 
     const apiKey = this.generateRandomKey();
@@ -461,16 +462,17 @@ export class AzureKeyVaultService
     const data = {
       name,
       expiresAt: expiresAt.toISOString(),
+      role,
     };
 
     await this.client.setSecret(this.encodeAzureKey(`${this.prefix}${PATHS.API_KEY}/${apiKey}`), JSON.stringify({ ...data }));
 
     this.logger.log(`create api key ${apiKey}`);
-    return { apiKey, name, expiresAt: expiresAt.toISOString() };
+    return { apiKey, name, expiresAt: expiresAt.toISOString(), role };
   }
 
   @Span('azure_updateApiKey')
-  public async updateApiKey(apiKey: string, name: string, daysValid: number): Promise<ApiKeyDetails> {
+  public async updateApiKey(apiKey: string, name: string, daysValid: number, role?: string): Promise<ApiKeyDetails> {
     this.logger.log(`Attempting to update api key ${apiKey}`);
 
     const secretPath = this.encodeAzureKey(`${this.prefix}${PATHS.API_KEY}/${apiKey}`);
@@ -482,17 +484,20 @@ export class AzureKeyVaultService
     }
 
     const expiresAt = new Date(Date.now() + daysValid * this.MS_PER_DAY).toISOString();
+    const existingData = existingSecret.value ? JSON.parse(existingSecret.value) : {};
+    const resolvedRole = role ?? existingData.role ?? UserRole.MESSAGING;
 
     const data = {
       name,
       expiresAt,
+      role: resolvedRole,
     };
 
     // Overwrite the existing key
     await this.client.setSecret(secretPath, JSON.stringify(data));
 
     this.logger.log(`updated api key ${apiKey}`);
-    return { apiKey, name, expiresAt };
+    return { apiKey, name, expiresAt, role: resolvedRole };
   }
 
   @Span('azure_deleteApiKey')
@@ -516,11 +521,11 @@ export class AzureKeyVaultService
     try {
       this.logger.log(`Attempting to get api key `);
 
-      const _result = await this.client.getSecret(this.encodeAzureKey(`${this.prefix}${PATHS.USERS}/${apiKey}`));
+      const _result = await this.client.getSecret(this.encodeAzureKey(`${this.prefix}${PATHS.API_KEY}/${apiKey}`));
       const result = JSON.parse(_result.value!);
 
       this.logger.log(`Get api key ${apiKey}`);
-      return { ...result.data };
+      return { apiKey, ...result, role: result.role ?? UserRole.MESSAGING };
     } catch (error) {
       this.logger.error('failed to get api key');
       this.logger.error(error);
@@ -555,10 +560,10 @@ export class AzureKeyVaultService
   }
 
   @Span('azure_validateApiKey')
-  public async validateApiKey(apiKey: string): Promise<boolean> {
+  public async validateApiKey(apiKey: string): Promise<ApiKeyValidationResult> {
     const result = await this.getApiKey(apiKey);
-    if (!result) return false;
-    if (new Date() > new Date(result.expiresAt)) return false;
-    return true;
+    if (!result) return { valid: false };
+    if (new Date() > new Date(result.expiresAt)) return { valid: false };
+    return { valid: true, role: result.role };
   }
 }

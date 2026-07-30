@@ -1589,6 +1589,13 @@ paths:
                 daysValid:
                   type: "number"
                   default: 30
+                role:
+                  type: "string"
+                  enum:
+                    - "admin"
+                    - "superadmin"
+                    - "messaging"
+                  default: "messaging"
               required:
                 - "name"
       responses:
@@ -1655,6 +1662,12 @@ paths:
                 daysValid:
                   type: "number"
                   default: 30
+                role:
+                  type: "string"
+                  enum:
+                    - "admin"
+                    - "superadmin"
+                    - "messaging"
               required:
                 - "name"
       responses:
@@ -1664,7 +1677,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ApiKeyResponseDto"
-      summary: "Update an API key (name & daysValid)"
+      summary: "Update an API key (name, daysValid & role)"
       tags:
         - "User-ApiKey"
     delete:
@@ -1796,6 +1809,14 @@ info:
 tags: []
 servers: []
 components:
+  securitySchemes:
+    bearer:
+      scheme: "bearer"
+      bearerFormat: "JWT"
+      type: "http"
+      name: "Authorization"
+      description: "Enter JWT token"
+      in: "header"
   schemas:
     RoleDto:
       type: "object"
@@ -3389,10 +3410,19 @@ components:
           type: "string"
           description: "ISO 8601 formatted expiration date of the API key"
           example: "2025-12-31T23:59:59Z"
+        role:
+          type: "string"
+          description: "The role that determines which endpoints this API key can access"
+          enum:
+            - "admin"
+            - "superadmin"
+            - "messaging"
+          example: "messaging"
       required:
         - "apiKey"
         - "name"
         - "expiresAt"
+        - "role"
     RequesterClaimDTO:
       type: "object"
       properties:
@@ -3562,6 +3592,8 @@ components:
             $ref: "#/components/schemas/RequestorFieldDto"
       required:
         - "role"
+security:
+  - bearer: []
 externalDocs:
   description: "Postman Collection"
   url: "/docs-json"

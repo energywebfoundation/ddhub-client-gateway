@@ -35,6 +35,19 @@ const mockContextWithoutHeader = {
   }),
 };
 
+const buildApiKeyContext = (role: string | undefined) => ({
+  getHandler: jest.fn(),
+  switchToHttp: () => ({
+    getRequest: () => ({
+      headers: {},
+      user: {
+        authType: 'api-key',
+        role,
+      },
+    }),
+  }),
+});
+
 const mockPinoLogger = {
   info: jest.fn(),
   warn: jest.fn(),
@@ -204,6 +217,69 @@ describe('UserGuard', () => {
       it('should call verify token', () => {
         expect(mockUserAuthService.verifyToken).toBeCalledTimes(1);
         expect(mockUserAuthService.verifyToken).toBeCalledWith('mockToken');
+      });
+    });
+
+    describe('api-key auth', () => {
+      beforeEach(() => {
+        mockUserAuthService.isAuthEnabled = jest
+          .fn()
+          .mockImplementation(() => true);
+      });
+
+      it('should allow a messaging-role api-key on a route that allows messaging', async () => {
+        mockReflector.get = jest.fn().mockImplementation((param) => {
+          if (param === 'EXCLUDED_ROUTE') {
+            return false;
+          }
+          return [UserRole.MESSAGING];
+        });
+
+        const result = await guard.canActivate(
+          buildApiKeyContext(UserRole.MESSAGING) as any
+        );
+        expect(result).toBeTruthy();
+      });
+
+      it('should deny a messaging-role api-key on a route that does not allow messaging', async () => {
+        mockReflector.get = jest.fn().mockImplementation((param) => {
+          if (param === 'EXCLUDED_ROUTE') {
+            return false;
+          }
+          return [UserRole.ADMIN, UserRole.SUPERADMIN];
+        });
+
+        const result = await guard.canActivate(
+          buildApiKeyContext(UserRole.MESSAGING) as any
+        );
+        expect(result).toBeFalsy();
+      });
+
+      it('should deny a messaging-role api-key on a route with no @Roles metadata', async () => {
+        mockReflector.get = jest.fn().mockImplementation(() => undefined);
+
+        const result = await guard.canActivate(
+          buildApiKeyContext(UserRole.MESSAGING) as any
+        );
+        expect(result).toBeFalsy();
+      });
+
+      it('should allow an admin-role api-key on any route', async () => {
+        mockReflector.get = jest.fn().mockImplementation(() => undefined);
+
+        const result = await guard.canActivate(
+          buildApiKeyContext(UserRole.ADMIN) as any
+        );
+        expect(result).toBeTruthy();
+      });
+
+      it('should allow a superadmin-role api-key on any route', async () => {
+        mockReflector.get = jest.fn().mockImplementation(() => undefined);
+
+        const result = await guard.canActivate(
+          buildApiKeyContext(UserRole.SUPERADMIN) as any
+        );
+        expect(result).toBeTruthy();
       });
     });
   });

@@ -45,12 +45,12 @@ export abstract class SecretsEngineService implements OnModuleInit {
   abstract setUserPassword(username: string, password: string, role: UserRole): Promise<void>;
   abstract userExists(username: string): Promise<boolean>
   abstract deleteUser(username: string): Promise<void>;
-  abstract createApiKey(name: string, daysValid: number): Promise<ApiKeyDetails>;
+  abstract createApiKey(name: string, daysValid: number, role?: string): Promise<ApiKeyDetails>;
   abstract deleteApiKey(apiKey: string): Promise<boolean>;
   abstract getAllApiKeys(): Promise<ApiKeyDetails[]>;
-  abstract validateApiKey(apiKey: string): Promise<boolean>;
+  abstract validateApiKey(apiKey: string): Promise<ApiKeyValidationResult>;
   abstract getApiKey(apiKey: string): Promise<ApiKeyDetails>;
-  abstract updateApiKey(apiKey: string, name: string, daysValid: number): Promise<ApiKeyDetails>;
+  abstract updateApiKey(apiKey: string, name: string, daysValid: number, role?: string): Promise<ApiKeyDetails>;
 
   isAuthEnabled(): boolean {
     return false; // default
@@ -104,4 +104,9 @@ export type ApiKeyDetails = {
   apiKey: string;
   name: string;
   expiresAt: string;
+  role: string;
 };
+
+export type ApiKeyValidationResult =
+  | { valid: true; role: string }
+  | { valid: false };

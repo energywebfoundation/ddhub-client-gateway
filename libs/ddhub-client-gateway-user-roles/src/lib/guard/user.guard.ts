@@ -39,7 +39,13 @@ export class UserGuard implements CanActivate {
     }
 
     if (request.user?.authType === 'api-key') {
-      return true;
+      const apiKeyRole: string | undefined = request.user.role;
+
+      if (apiKeyRole !== UserRole.MESSAGING) {
+        return true;
+      }
+
+      return this.isRouteAllowedForRole(context, apiKeyRole);
     }
 
     const excludedRoute: boolean = this.reflector.get<boolean>(
@@ -74,18 +80,29 @@ export class UserGuard implements CanActivate {
           return true;
         }
 
-        const requiredRoles = this.reflector.get<string[]>(
-          ROLES_KEY,
-          context.getHandler()
-        );
-
-        return requiredRoles.some((role) => role === decodedToken.accountType);
+        return this.isRouteAllowedForRole(context, decodedToken.accountType);
       } catch (e) {
         return false;
       }
     }
 
     return false;
+  }
+
+  private isRouteAllowedForRole(
+    context: ExecutionContext,
+    role: string
+  ): boolean {
+    const requiredRoles = this.reflector.get<string[]>(
+      ROLES_KEY,
+      context.getHandler()
+    );
+
+    if (!requiredRoles || requiredRoles.length === 0) {
+      return false;
+    }
+
+    return requiredRoles.some((requiredRole) => requiredRole === role);
   }
 }
 
