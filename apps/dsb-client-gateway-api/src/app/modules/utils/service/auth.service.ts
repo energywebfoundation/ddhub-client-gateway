@@ -16,7 +16,24 @@ export class AuthService implements OnModuleInit {
   ) {}
 
   public isAuthEnabled(): boolean {
-    return this.secretsEngineService.isAuthEnabled();
+    return this.isUserAuthEnvEnabled();
+  }
+
+  private isUserAuthEnvEnabled(): boolean {
+    const value = this.configService.get<string | boolean>(
+      'USER_AUTH_ENABLED',
+      false
+    );
+
+    if (typeof value === 'boolean') {
+      return value;
+    }
+
+    if (typeof value === 'string') {
+      return value.toLowerCase() === 'true';
+    }
+
+    return false;
   }
 
   public onModuleInit(): void {
