@@ -72,9 +72,6 @@ describe(`${UserAuthService.name}`, () => {
   describe('refreshToken()', () => {
     describe('should throw error as auth is not enabled', () => {
       beforeEach(async () => {
-        enableUserAuthEnv();
-        mockSecretsEngineService.isAuthEnabled = jest.fn().mockImplementationOnce(() => false);
-
         try {
           result = service.refreshToken('token');
         } catch (e) {
@@ -90,17 +87,13 @@ describe(`${UserAuthService.name}`, () => {
       it('should not call generate tokens', () => {
         expect(mockUserRolesTokenService.refreshToken).toBeCalledTimes(0);
       });
-
-      it('should call config service', () => {
-        expect(mockSecretsEngineService.isAuthEnabled).toBeCalledTimes(1);
-      });
     });
   });
 
-  xdescribe('isAuthEnabled()', () => {
-    describe('should return true', () => {
+  describe('isAuthEnabled()', () => {
+    describe('should return true when USER_AUTH_ENABLED is true', () => {
       beforeEach(async () => {
-        mockSecretsEngineService.isAuthEnabled = jest.fn().mockImplementationOnce(() => true);
+        enableUserAuthEnv();
 
         try {
           result = service.isAuthEnabled();
@@ -114,8 +107,29 @@ describe(`${UserAuthService.name}`, () => {
         expect(result).toBe(true);
       });
 
-      it('should call config service', () => {
-        expect(mockSecretsEngineService.isAuthEnabled).toBeCalledTimes(1);
+      it('should not depend on the secrets engine', () => {
+        expect(mockSecretsEngineService.isAuthEnabled).not.toBeCalled();
+      });
+    });
+
+    describe('should return false when USER_AUTH_ENABLED is not set, regardless of the secrets engine', () => {
+      beforeEach(async () => {
+        mockSecretsEngineService.isAuthEnabled = jest.fn().mockImplementationOnce(() => true);
+
+        try {
+          result = service.isAuthEnabled();
+        } catch (e) {
+          error = e;
+        }
+      });
+
+      it('should return false', () => {
+        expect(error).toBeNull();
+        expect(result).toBe(false);
+      });
+
+      it('should not call the secrets engine', () => {
+        expect(mockSecretsEngineService.isAuthEnabled).not.toBeCalled();
       });
     });
   });
@@ -124,7 +138,6 @@ describe(`${UserAuthService.name}`, () => {
     describe(`should not login user as ${USER_CREDENTIAL_KEY} does not match`, () => {
       beforeEach(async () => {
         enableUserAuthEnv();
-        mockSecretsEngineService.isAuthEnabled = jest.fn().mockImplementationOnce(() => true);
 
         mockSecretsEngineService.getUserAuthDetails = jest
           .fn()
@@ -139,10 +152,6 @@ describe(`${UserAuthService.name}`, () => {
         } catch (e) {
           error = e;
         }
-      });
-
-      it('should call config service', () => {
-        expect(mockSecretsEngineService.isAuthEnabled).toBeCalledTimes(1);
       });
 
       it('should not execute', () => {
@@ -165,7 +174,6 @@ describe(`${UserAuthService.name}`, () => {
     describe('should login user', () => {
       beforeEach(async () => {
         enableUserAuthEnv();
-        mockSecretsEngineService.isAuthEnabled = jest.fn().mockImplementationOnce(() => true);
 
         mockSecretsEngineService.getUserAuthDetails = jest
           .fn()
@@ -182,10 +190,6 @@ describe(`${UserAuthService.name}`, () => {
         } catch (e) {
           error = e;
         }
-      });
-
-      it('should call config service', () => {
-        expect(mockSecretsEngineService.isAuthEnabled).toBeCalledTimes(1);
       });
 
       it('should execute', () => {
@@ -212,7 +216,6 @@ describe(`${UserAuthService.name}`, () => {
     describe('should throw error as user does not exists', () => {
       beforeEach(async () => {
         enableUserAuthEnv();
-        mockSecretsEngineService.isAuthEnabled = jest.fn().mockImplementationOnce(() => true);
 
         mockSecretsEngineService.getUserAuthDetails = jest
           .fn()
@@ -223,10 +226,6 @@ describe(`${UserAuthService.name}`, () => {
         } catch (e) {
           error = e;
         }
-      });
-
-      it('should call config service', () => {
-        expect(mockSecretsEngineService.isAuthEnabled).toBeCalledTimes(1);
       });
 
       it('should throw error', () => {
@@ -248,18 +247,11 @@ describe(`${UserAuthService.name}`, () => {
 
     describe('should throw error as login is disabled', () => {
       beforeEach(async () => {
-        enableUserAuthEnv();
-        mockSecretsEngineService.isAuthEnabled = jest.fn().mockImplementationOnce(() => false);
-
         try {
           result = await service.login('username', TEST_USER_CREDENTIAL);
         } catch (e) {
           error = e;
         }
-      });
-
-      it('should call config service', () => {
-        expect(mockSecretsEngineService.isAuthEnabled).toBeCalledTimes(1);
       });
 
       it('should throw error', () => {

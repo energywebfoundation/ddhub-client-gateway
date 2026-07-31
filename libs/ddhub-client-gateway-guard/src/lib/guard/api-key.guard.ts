@@ -63,7 +63,14 @@ export class ApiKeyGuard implements CanActivate {
       } catch {
         // assign requires pino request scope; may be unavailable in global guards
       }
-      return validation.valid;
+
+      if (validation.valid) {
+        return true;
+      }
+
+      // Stale/invalid api keys should not block unauthenticated access
+      // at the global guard when auth is disabled; route-level guards handle authorization.
+      return !this.userGuard.isAuthEnabled();
     }
 
     return true;

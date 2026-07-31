@@ -12,6 +12,15 @@ const mockSecretsEngineService = {
   getUserAuthDetails: jest.fn(),
 };
 
+const enableUserAuthEnv = () => {
+  mockConfigService.get.mockImplementation((key: string, defaultVal?: unknown) => {
+    if (key === 'USER_AUTH_ENABLED') {
+      return true;
+    }
+    return defaultVal;
+  });
+};
+
 describe(`${AuthService.name}`, () => {
   let service: AuthService;
   let error: Error | null;
@@ -42,7 +51,7 @@ describe(`${AuthService.name}`, () => {
   describe('isAuthorized()', () => {
     describe('should not authorize user if credentials are invalid', () => {
       beforeEach(async () => {
-        mockSecretsEngineService.isAuthEnabled.mockReturnValue(true);
+        enableUserAuthEnv();
         mockSecretsEngineService.getUserAuthDetails.mockResolvedValue({
           username: 'test',
           password: 'invalidPassword',
@@ -74,7 +83,7 @@ describe(`${AuthService.name}`, () => {
 
     describe('should authorize user if credentials are valid', () => {
       beforeEach(async () => {
-        mockSecretsEngineService.isAuthEnabled.mockReturnValue(true);
+        enableUserAuthEnv();
         mockSecretsEngineService.getUserAuthDetails.mockResolvedValue({
           username: 'test',
           password: 'energyweb',
@@ -98,10 +107,8 @@ describe(`${AuthService.name}`, () => {
       });
     });
 
-    describe('should authorize user if auth is not enabled', () => {
+    describe('should authorize user if USER_AUTH_ENABLED is false', () => {
       beforeEach(async () => {
-        mockSecretsEngineService.isAuthEnabled.mockReturnValue(false);
-
         try {
           result = await service.isAuthorized('token');
         } catch (e) {
@@ -125,21 +132,31 @@ describe(`${AuthService.name}`, () => {
   });
 
   describe('isAuthEnabled()', () => {
-    it('should delegate to the secrets engine', () => {
-      mockSecretsEngineService.isAuthEnabled.mockReturnValue(true);
+    it('should return true when USER_AUTH_ENABLED is true', () => {
+      enableUserAuthEnv();
 
       result = service.isAuthEnabled();
 
       expect(result).toBe(true);
-      expect(mockSecretsEngineService.isAuthEnabled).toBeCalledTimes(1);
     });
 
-    it('should return false when the secrets engine reports auth disabled', () => {
-      mockSecretsEngineService.isAuthEnabled.mockReturnValue(false);
+    it('should return false when USER_AUTH_ENABLED is false, regardless of the secrets engine', () => {
+      mockSecretsEngineService.isAuthEnabled.mockReturnValue(true);
 
       result = service.isAuthEnabled();
 
       expect(result).toBe(false);
+      expect(mockSecretsEngineService.isAuthEnabled).not.toBeCalled();
+    });
+
+    it('should not depend on the secrets engine when USER_AUTH_ENABLED is true', () => {
+      enableUserAuthEnv();
+      mockSecretsEngineService.isAuthEnabled.mockReturnValue(false);
+
+      result = service.isAuthEnabled();
+
+      expect(result).toBe(true);
+      expect(mockSecretsEngineService.isAuthEnabled).not.toBeCalled();
     });
   });
 });
