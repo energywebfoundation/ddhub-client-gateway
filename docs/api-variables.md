@@ -12,9 +12,6 @@
 | AK_TOPIC_NAME | string |  | Association keys topic name |  |  |
 | AK_TOPIC_OWNER | string |  | Association keys topic owner |  |  |
 | AK_TOPIC_VERSION | string |  | Association keys topic version |  |  |
-| API_KEY | string |  | API Key to protect API |  |  |
-| API_USERNAME | string |  | USERNAME for authentication |  |  |
-| API_PASSWORD | string |  | PASSWORD for authentication |  |  |
 | PORT | number | 3333 | HTTP port |  |  |
 | WEBSOCKET | string | NONE | Websocket mode | NONE,SERVER,CLIENT |  |
 | EVENTS_MAX_PER_SECOND | number | 2 | Amount of messages to pull for each WebSocket run |  |  |

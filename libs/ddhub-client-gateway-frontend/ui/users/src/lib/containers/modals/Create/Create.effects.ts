@@ -41,7 +41,8 @@ export const useCreateEffects = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const { mutateAsync: createUser } = useUserApiKeyControllerSetUserPassword();
+  const { mutateAsync: createUser, isLoading: isSaving } =
+    useUserApiKeyControllerSetUserPassword();
   const { refetch: refetchUsers } = useUserApiKeyControllerGetAllUsers();
 
   const schema = useMemo(() => getSchema(), []);
@@ -121,5 +122,6 @@ export const useCreateEffects = () => {
     setShowPassword,
     showConfirmPassword,
     setShowConfirmPassword,
+    isSaving,
   };
 };

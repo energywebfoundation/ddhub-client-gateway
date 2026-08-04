@@ -6,7 +6,7 @@
     "e2e": {
       "executor": "@nrwl/cypress:cypress",
       "options": {
-        "cypressConfig": "apps/dsb-client-gateway-frontend-e2e/cypress.json",
+        "cypressConfig": "apps/dsb-client-gateway-frontend-e2e/cypress.config.ts",
         "devServerTarget": "dsb-client-gateway-frontend:serve"
       },
       "configurations": {

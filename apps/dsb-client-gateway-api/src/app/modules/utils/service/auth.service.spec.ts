@@ -1,9 +1,24 @@
 import { AuthService } from './auth.service';
 import { Test } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
+import { SecretsEngineService } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
 
 const mockConfigService = {
   get: jest.fn(),
+};
+
+const mockSecretsEngineService = {
+  isAuthEnabled: jest.fn(),
+  getUserAuthDetails: jest.fn(),
+};
+
+const enableUserAuthEnv = () => {
+  mockConfigService.get.mockImplementation((key: string, defaultVal?: unknown) => {
+    if (key === 'USER_AUTH_ENABLED') {
+      return true;
+    }
+    return defaultVal;
+  });
 };
 
 describe(`${AuthService.name}`, () => {
@@ -23,6 +38,10 @@ describe(`${AuthService.name}`, () => {
           provide: ConfigService,
           useValue: mockConfigService,
         },
+        {
+          provide: SecretsEngineService,
+          useValue: mockSecretsEngineService,
+        },
       ],
     }).compile();
 
@@ -32,18 +51,15 @@ describe(`${AuthService.name}`, () => {
   describe('isAuthorized()', () => {
     describe('should not authorize user if credentials are invalid', () => {
       beforeEach(async () => {
-        mockConfigService.get = jest
-          .fn()
-          .mockImplementation((param: string) => {
-            if (param === 'USERNAME') {
-              return 'invalid';
-            } else {
-              return 'invalidPassword';
-            }
-          });
+        enableUserAuthEnv();
+        mockSecretsEngineService.getUserAuthDetails.mockResolvedValue({
+          username: 'test',
+          password: 'invalidPassword',
+          role: 'admin',
+        });
 
         try {
-          result = service.isAuthorized('dGVzdDplbmVyZ3l3ZWI=');
+          result = await service.isAuthorized('dGVzdDplbmVyZ3l3ZWI=');
         } catch (e) {
           error = e;
         }
@@ -57,22 +73,25 @@ describe(`${AuthService.name}`, () => {
       it('should return false', () => {
         expect(result).toBeFalsy();
       });
+
+      it('should look up the decoded username', () => {
+        expect(
+          mockSecretsEngineService.getUserAuthDetails
+        ).toHaveBeenCalledWith('test');
+      });
     });
 
     describe('should authorize user if credentials are valid', () => {
       beforeEach(async () => {
-        mockConfigService.get = jest
-          .fn()
-          .mockImplementation((param: string) => {
-            if (param === 'USERNAME') {
-              return 'test';
-            } else {
-              return 'energyweb';
-            }
-          });
+        enableUserAuthEnv();
+        mockSecretsEngineService.getUserAuthDetails.mockResolvedValue({
+          username: 'test',
+          password: 'energyweb',
+          role: 'admin',
+        });
 
         try {
-          result = service.isAuthorized('dGVzdDplbmVyZ3l3ZWI=');
+          result = await service.isAuthorized('dGVzdDplbmVyZ3l3ZWI=');
         } catch (e) {
           error = e;
         }
@@ -88,14 +107,10 @@ describe(`${AuthService.name}`, () => {
       });
     });
 
-    describe('should authorize user if auth is not enabled', () => {
+    describe('should authorize user if USER_AUTH_ENABLED is false', () => {
       beforeEach(async () => {
-        mockConfigService.get = jest.fn().mockImplementation(() => {
-          return null;
-        });
-
         try {
-          result = service.isAuthorized('token');
+          result = await service.isAuthorized('token');
         } catch (e) {
           error = e;
         }
@@ -110,83 +125,38 @@ describe(`${AuthService.name}`, () => {
         expect(result).toBeTruthy();
       });
 
-      it('should call config service', () => {
-        expect(mockConfigService.get).toBeCalledTimes(4);
-
-        expect(mockConfigService.get).toHaveBeenNthCalledWith(1, 'USERNAME');
-        expect(mockConfigService.get).toHaveBeenNthCalledWith(2, 'PASSWORD');
-
-        expect(mockConfigService.get).toHaveBeenNthCalledWith(3, 'USERNAME');
-        expect(mockConfigService.get).toHaveBeenNthCalledWith(4, 'PASSWORD');
+      it('should not look up user details', () => {
+        expect(mockSecretsEngineService.getUserAuthDetails).not.toBeCalled();
       });
     });
   });
 
   describe('isAuthEnabled()', () => {
-    describe('auth should be disabled as password and username is not set', () => {
-      beforeEach(async () => {
-        mockConfigService.get = jest.fn().mockImplementation(() => {
-          return null;
-        });
+    it('should return true when USER_AUTH_ENABLED is true', () => {
+      enableUserAuthEnv();
 
-        try {
-          result = service.isAuthEnabled();
-        } catch (e) {
-          error = e;
-        }
-      });
+      result = service.isAuthEnabled();
 
-      it('should execute without error', () => {
-        expect(error).toBeNull();
-        expect(result).toBeDefined();
-      });
-
-      it('result should be true', () => {
-        expect(result).toBeFalsy();
-      });
-
-      it('should call config service', () => {
-        expect(mockConfigService.get).toBeCalledTimes(2);
-
-        expect(mockConfigService.get).toHaveBeenNthCalledWith(1, 'USERNAME');
-        expect(mockConfigService.get).toHaveBeenNthCalledWith(2, 'PASSWORD');
-      });
+      expect(result).toBe(true);
     });
 
-    describe('auth should be enabled', () => {
-      beforeEach(async () => {
-        mockConfigService.get = jest
-          .fn()
-          .mockImplementation((param: string) => {
-            if (param === 'USERNAME') {
-              return 'username';
-            } else {
-              return 'password';
-            }
-          });
+    it('should return false when USER_AUTH_ENABLED is false, regardless of the secrets engine', () => {
+      mockSecretsEngineService.isAuthEnabled.mockReturnValue(true);
 
-        try {
-          result = service.isAuthEnabled();
-        } catch (e) {
-          error = e;
-        }
-      });
+      result = service.isAuthEnabled();
 
-      it('should execute without error', () => {
-        expect(error).toBeNull();
-        expect(result).toBeDefined();
-      });
+      expect(result).toBe(false);
+      expect(mockSecretsEngineService.isAuthEnabled).not.toBeCalled();
+    });
 
-      it('result should be true', () => {
-        expect(result).toBeTruthy();
-      });
+    it('should not depend on the secrets engine when USER_AUTH_ENABLED is true', () => {
+      enableUserAuthEnv();
+      mockSecretsEngineService.isAuthEnabled.mockReturnValue(false);
 
-      it('should call config service', () => {
-        expect(mockConfigService.get).toBeCalledTimes(2);
+      result = service.isAuthEnabled();
 
-        expect(mockConfigService.get).toHaveBeenNthCalledWith(1, 'USERNAME');
-        expect(mockConfigService.get).toHaveBeenNthCalledWith(2, 'PASSWORD');
-      });
+      expect(result).toBe(true);
+      expect(mockSecretsEngineService.isAuthEnabled).not.toBeCalled();
     });
   });
 });

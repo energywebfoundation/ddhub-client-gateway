@@ -1,6 +1,7 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import {
   ApiKeyDetails,
+  ApiKeyValidationResult,
   CertificateDetails,
   PATHS,
   SecretsEngineService,
@@ -84,8 +85,16 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
 
   @Span('vault_userExists')
   public async userExists(username: string): Promise<boolean> {
-    const result = await this.client.read(`${this.prefix}${PATHS.USERS}/${username}`);
-    return !!result;
+    try {
+      const result = await this.client.read(`${this.prefix}${PATHS.USERS}/${username}`);
+      return !!result;
+    } catch (err) {
+      // node-vault rejects with "Status 404" when the secret path does not exist
+      if (err.response?.statusCode === 404) {
+        return false;
+      }
+      throw err;
+    }
   }
 
   @Span('vault_setUserPassword')
@@ -262,7 +271,7 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
   }
 
   @Span('vault_createApiKey')
-  public async createApiKey(name: string, daysValid: number): Promise<ApiKeyDetails> {
+  public async createApiKey(name: string, daysValid: number, role: string = UserRole.MESSAGING): Promise<ApiKeyDetails> {
     this.logger.log(`Attempting to create api key `);
 
     const existingKeys = await this.client.list(`${this.prefix}${PATHS.API_KEY_NAME}`).catch(() => { return { data: { keys: [] } } });
@@ -277,17 +286,18 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
     const data = {
       name,
       expiresAt: expiresAt.toISOString(),
+      role,
     };
 
     await this.client.write(`${this.prefix}${PATHS.API_KEY}/${apiKey}`, { ...data });
     await this.client.write(`${this.prefix}${PATHS.API_KEY_NAME}/${name}`, { ...data });
 
     this.logger.log(`create api key ${apiKey}`);
-    return { apiKey, name, expiresAt: expiresAt.toISOString() };
+    return { apiKey, name, expiresAt: expiresAt.toISOString(), role };
   }
 
   @Span('vault_updateApiKey')
-  public async updateApiKey(apiKey: string, name: string, daysValid: number): Promise<ApiKeyDetails> {
+  public async updateApiKey(apiKey: string, name: string, daysValid: number, role?: string): Promise<ApiKeyDetails> {
     this.logger.log(`Attempting to update api key ${apiKey}`);
 
     // Lookup the existing key
@@ -309,10 +319,12 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
     }
 
     const expiresAt = new Date(Date.now() + daysValid * this.MS_PER_DAY).toISOString();
+    const resolvedRole = role ?? existingKeyData.data.role ?? UserRole.MESSAGING;
 
     const data = {
       name,
       expiresAt,
+      role: resolvedRole,
     };
 
     // Update the main key and the name lookup
@@ -320,7 +332,7 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
     await this.client.write(`${this.prefix}${PATHS.API_KEY_NAME}/${name}`, data);
 
     this.logger.log(`updated api key ${apiKey}`);
-    return { apiKey, name, expiresAt };
+    return { apiKey, name, expiresAt, role: resolvedRole };
   }
 
   @Span('vault_deleteApiKey')
@@ -349,7 +361,7 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
       const result = await this.client.read(`${this.prefix}${PATHS.API_KEY}/${apiKey}`);
 
       this.logger.log(`Get api key ${apiKey}`);
-      return { apiKey, ...result.data };
+      return { apiKey, ...result.data, role: result.data.role ?? UserRole.MESSAGING };
     } catch (error) {
       this.logger.error('failed to get api key');
       this.logger.error(error);
@@ -387,10 +399,10 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
   }
 
   @Span('vault_validateApiKey')
-  public async validateApiKey(apiKey: string): Promise<boolean> {
+  public async validateApiKey(apiKey: string): Promise<ApiKeyValidationResult> {
     const result = await this.getApiKey(apiKey);
-    if (!result) return false;
-    if (new Date() > new Date(result.expiresAt)) return false;
-    return true;
+    if (!result) return { valid: false };
+    if (new Date() > new Date(result.expiresAt)) return { valid: false };
+    return { valid: true, role: result.role };
   }
 }
