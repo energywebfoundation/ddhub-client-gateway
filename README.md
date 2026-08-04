@@ -60,7 +60,7 @@ You can find docker images in `ci` directory.
 For more details please refer to [Deployment Guide](https://energyweb.atlassian.net/wiki/spaces/AEMO/pages/3178627074/DDHub+Client+Deployment+Guide)
 
 ## Cypress tests
-To configure cypress tests we need to configure env. vars listed in `cypress/plugins/index.js`  
+To configure cypress tests we need to configure env. vars listed in `cypress.config.ts`  
 After that we have to setup `cypress/{ENV_NAME}/identity.json` file.
 
 ## Swagger
