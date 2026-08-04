@@ -42,13 +42,6 @@ export const API_ENVS = Joi.object({
   AK_TOPIC_VERSION: Joi.string()
     .optional()
     .description('Association keys topic version'),
-  API_KEY: Joi.string().optional().description('API Key to protect API'),
-  API_USERNAME: Joi.string()
-    .optional()
-    .description('USERNAME for authentication'),
-  API_PASSWORD: Joi.string()
-    .optional()
-    .description('PASSWORD for authentication'),
   PORT: Joi.number().port().default(3333).description('HTTP port'),
   WEBSOCKET: Joi.string()
     .valid(...Object.values(WebSocketImplementation))

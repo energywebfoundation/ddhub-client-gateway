@@ -26,11 +26,7 @@ export class UserAuthService {
   }
 
   public isAuthEnabled(): boolean {
-    if (!this.isUserAuthEnvEnabled()) {
-      return false;
-    }
-
-    return this.secretsEngineService.isAuthEnabled();
+    return this.isUserAuthEnvEnabled();
   }
 
   private isUserAuthEnvEnabled(): boolean {

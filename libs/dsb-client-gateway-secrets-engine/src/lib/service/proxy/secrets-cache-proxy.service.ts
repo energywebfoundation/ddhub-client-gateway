@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import {
   ApiKeyDetails,
+  ApiKeyValidationResult,
   CertificateDetails,
   SecretsEngineService,
   SetCertificateDetailsResponse,
@@ -200,12 +201,12 @@ export class SecretsCacheProxyService extends SecretsEngineService {
     await this.refreshUsersData();
   }
 
-  public async createApiKey(name: string, daysValid: number): Promise<ApiKeyDetails> {
-    return this.secretsEngineService.createApiKey(name, daysValid);
+  public async createApiKey(name: string, daysValid: number, role?: string): Promise<ApiKeyDetails> {
+    return this.secretsEngineService.createApiKey(name, daysValid, role);
   }
 
-  public async updateApiKey(apiKey: string, name: string, daysValid: number): Promise<ApiKeyDetails> {
-    return this.secretsEngineService.updateApiKey(apiKey, name, daysValid);
+  public async updateApiKey(apiKey: string, name: string, daysValid: number, role?: string): Promise<ApiKeyDetails> {
+    return this.secretsEngineService.updateApiKey(apiKey, name, daysValid, role);
   }
 
   public async deleteApiKey(apiKey: string): Promise<boolean> {
@@ -220,7 +221,7 @@ export class SecretsCacheProxyService extends SecretsEngineService {
     return this.secretsEngineService.getAllApiKeys();
   }
 
-  public async validateApiKey(apiKey: string): Promise<boolean> {
+  public async validateApiKey(apiKey: string): Promise<ApiKeyValidationResult> {
     return this.secretsEngineService.validateApiKey(apiKey);
   }
 

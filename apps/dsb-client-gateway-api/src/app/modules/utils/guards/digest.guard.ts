@@ -25,7 +25,7 @@ export class DigestGuard implements CanActivate {
       return false;
     }
 
-    const isAuthorized = this.authService.isAuthorized(authHeaderTokenValue);
+    const isAuthorized = await this.authService.isAuthorized(authHeaderTokenValue);
 
     if (!isAuthorized) {
       this.logger.warn(`Attempt to login with incorrect username/password`);

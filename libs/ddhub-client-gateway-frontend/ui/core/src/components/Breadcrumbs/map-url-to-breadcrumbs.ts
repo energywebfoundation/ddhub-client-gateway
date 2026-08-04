@@ -91,12 +91,12 @@ export const mapUrlToBreadcrumbs = new Map<string, Breadcrumb[]>()
   .set(routerConst.Users, [
     { title: 'Users' },
     { title: 'Users and access' },
-    { title: 'Users', path: routerConst.Users },
+    { title: 'Users' },
   ])
   .set(routerConst.APIKeys, [
     { title: 'API Keys' },
     { title: 'Users and access' },
-    { title: 'API Keys', path: routerConst.APIKeys },
+    { title: 'API Keys' },
   ])
   .set(routerConst.FileDownloadChannel, [
     { title: 'Data messaging file download' },

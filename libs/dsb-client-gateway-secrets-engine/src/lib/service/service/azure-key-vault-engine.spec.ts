@@ -550,4 +550,79 @@ describe(`${AzureKeyVaultService.name}`, () => {
     const response = await service.getUserAuthDetails('test-user-1');
     expect(response).toBeNull();
   });
+
+  describe('API keys', () => {
+    const buildApiKeySecretPayload = (
+      overrides: Partial<{ name: string; expiresAt: string; role: string }> = {}
+    ) => ({
+      name: 'test-key',
+      expiresAt: new Date(Date.now() + 86400000).toISOString(),
+      role: 'admin',
+      ...overrides,
+    });
+
+    it('should return the stored role for an API key that has one', async () => {
+      const payload = buildApiKeySecretPayload({ role: 'admin' });
+
+      jest.spyOn(SecretClient.prototype, 'getSecret').mockResolvedValueOnce({
+        name: 'ddhub-api-key-test',
+        value: JSON.stringify(payload),
+        properties: { vaultUrl: '', name: '' },
+      });
+
+      const result = await service.getApiKey('test');
+      expect(result.role).toEqual('admin');
+    });
+
+    it('should default the role to messaging for an API key with no stored role', async () => {
+      const payload = buildApiKeySecretPayload();
+      delete (payload as any).role;
+
+      jest.spyOn(SecretClient.prototype, 'getSecret').mockResolvedValueOnce({
+        name: 'ddhub-api-key-test',
+        value: JSON.stringify(payload),
+        properties: { vaultUrl: '', name: '' },
+      });
+
+      const result = await service.getApiKey('test');
+      expect(result.role).toEqual('messaging');
+    });
+
+    it('should return valid: true with the role for a valid, unexpired API key', async () => {
+      const payload = buildApiKeySecretPayload({ role: 'messaging' });
+
+      jest.spyOn(SecretClient.prototype, 'getSecret').mockResolvedValueOnce({
+        name: 'ddhub-api-key-test',
+        value: JSON.stringify(payload),
+        properties: { vaultUrl: '', name: '' },
+      });
+
+      const result = await service.validateApiKey('test');
+      expect(result).toStrictEqual({ valid: true, role: 'messaging' });
+    });
+
+    it('should return valid: false for an expired API key', async () => {
+      const payload = buildApiKeySecretPayload({
+        expiresAt: new Date(Date.now() - 86400000).toISOString(),
+      });
+
+      jest.spyOn(SecretClient.prototype, 'getSecret').mockResolvedValueOnce({
+        name: 'ddhub-api-key-test',
+        value: JSON.stringify(payload),
+        properties: { vaultUrl: '', name: '' },
+      });
+
+      const result = await service.validateApiKey('test');
+      expect(result).toStrictEqual({ valid: false });
+    });
+
+    it('should return valid: false for an API key that does not exist', async () => {
+      jest
+        .spyOn(SecretClient.prototype, 'getSecret')
+        .mockRejectedValueOnce(new Error('Secret does not exist'));
+
+      const result = await service.validateApiKey('missing');
+      expect(result).toStrictEqual({ valid: false });
+    });
+  });
 });
