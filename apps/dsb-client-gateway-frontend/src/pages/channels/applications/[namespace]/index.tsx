@@ -7,8 +7,12 @@ import { UserRole } from '@ddhub-client-gateway-frontend/ui/login';
 import { useRouteGuard } from '../../../../utils/RouteGuard.effects';
 
 export default function Topics() {
-  return useRouteGuard<TopicsContainerProps>(TopicsContainer, UserRole.ADMIN, {
-    readonly: true,
-    versionHistoryUrl: routerConst.ChannelTopicVersionHistory,
-  });
+  return useRouteGuard<TopicsContainerProps>(
+    TopicsContainer,
+    [UserRole.ADMIN, UserRole.SUPERADMIN],
+    {
+      readonly: true,
+      versionHistoryUrl: routerConst.ChannelTopicVersionHistory,
+    }
+  );
 }

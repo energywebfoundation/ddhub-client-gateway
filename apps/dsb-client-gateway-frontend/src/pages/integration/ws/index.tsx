@@ -3,5 +3,5 @@ import { UserRole } from '@ddhub-client-gateway-frontend/ui/login';
 import { useRouteGuard } from '../../../utils/RouteGuard.effects';
 
 export default function Ws() {
-  return useRouteGuard(Websocket, UserRole.ADMIN);
+  return useRouteGuard(Websocket, [UserRole.ADMIN, UserRole.SUPERADMIN]);
 }

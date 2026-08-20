@@ -44,6 +44,25 @@ export const routeRestrictions = new Map<string, string>()
   .set('users', routerConst.Users)
   .set('apiKeys', routerConst.APIKeys);
 
+const AUTH_ROLE_INHERITANCE: Record<string, readonly string[]> = {
+  [UserRole.SUPERADMIN]: [UserRole.SUPERADMIN, UserRole.ADMIN],
+};
+
+const matchesRestrictionRole = (
+  role: string | UserRole,
+  allowedRole: string,
+  roleKey: keyof RouteRestriction
+): boolean => {
+  if (roleKey === 'allowedAuthRoles') {
+    const effectiveRoles = AUTH_ROLE_INHERITANCE[role] ?? [role];
+    return effectiveRoles.includes(allowedRole);
+  }
+
+  // IAM enrolment roles are full namespaces (e.g. user.roles.ddhub...),
+  // so substring matching against the short role name is required.
+  return allowedRole === role || role.includes(allowedRole);
+};
+
 const mapRoleRestrictions = (
   restrictions: IndexableRouteRestrictions,
   roleKey: keyof RouteRestriction,
@@ -52,9 +71,8 @@ const mapRoleRestrictions = (
   return Object.keys(restrictions)
     .map((key: string) => {
       if (
-        restrictions[key][roleKey].some(
-          (allowedRole: string) =>
-            allowedRole === role || role.includes(allowedRole)
+        restrictions[key][roleKey].some((allowedRole: string) =>
+          matchesRestrictionRole(role, allowedRole, roleKey)
         )
       ) {
         return routeRestrictions.get(key);
