@@ -1,5 +1,4 @@
 import { Grid } from '@mui/material';
-import { useEffect, useState } from 'react';
 import BrokerCard from '../../components/BrokerCard/BrokerCard';
 import { Scheduler } from '../../components/Scheduler';
 import {
@@ -7,20 +6,16 @@ import {
   useUserDataEffects,
 } from '@ddhub-client-gateway-frontend/ui/login';
 
+const SCHEDULER_VISIBLE_ROLES: readonly string[] = [
+  UserRole.ADMIN,
+  UserRole.SUPERADMIN,
+];
+
 export function Dashboard() {
   const { configIsLoading, authEnabled, userAuth } = useUserDataEffects();
-  const [displayScheduler, setDisplayScheduler] = useState(false);
-
-  useEffect(() => {
-    if (
-      !(
-        configIsLoading ||
-        (authEnabled && userAuth?.role !== UserRole.MESSAGING)
-      )
-    ) {
-      setDisplayScheduler(true);
-    }
-  }, [configIsLoading, authEnabled, userAuth]);
+  const displayScheduler =
+    !configIsLoading &&
+    (!authEnabled || SCHEDULER_VISIBLE_ROLES.includes(userAuth?.role));
 
   return (
     <Grid container spacing={4}>

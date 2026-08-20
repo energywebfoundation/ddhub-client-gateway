@@ -7,8 +7,12 @@ import { UserRole } from '@ddhub-client-gateway-frontend/ui/login';
 import { useRouteGuard } from '../../../utils/RouteGuard.effects';
 
 export default function ListApplications() {
-  return useRouteGuard<ApplicationsProps>(Applications, UserRole.ADMIN, {
-    role: 'user',
-    topicUrl: routerConst.ChannelTopics,
-  });
+  return useRouteGuard<ApplicationsProps>(
+    Applications,
+    [UserRole.ADMIN, UserRole.SUPERADMIN],
+    {
+      role: 'user',
+      topicUrl: routerConst.ChannelTopics,
+    }
+  );
 }
