@@ -3,5 +3,8 @@ import { UserRole } from '@ddhub-client-gateway-frontend/ui/login';
 import { useRouteGuard } from '../../../../utils/RouteGuard.effects';
 
 export default function VersionHistory() {
-  return useRouteGuard(VersionHistoryContainer, UserRole.ADMIN);
+  return useRouteGuard(VersionHistoryContainer, [
+    UserRole.ADMIN,
+    UserRole.SUPERADMIN,
+  ]);
 }
