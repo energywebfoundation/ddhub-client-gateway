@@ -9,7 +9,6 @@ import {
 const SCHEDULER_VISIBLE_ROLES: readonly string[] = [
   UserRole.ADMIN,
   UserRole.SUPERADMIN,
-  UserRole.MESSAGING,
 ];
 
 export function Dashboard() {
