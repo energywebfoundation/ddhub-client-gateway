@@ -48,7 +48,7 @@ export class DidAuthApiService {
   public async refreshToken(
     refreshToken: string | null
   ): Promise<DidAuthResponse | null> {
-    if (!this.refreshToken) {
+    if (!refreshToken) {
       this.logger.error('No refresh token to use');
 
       return null;
