@@ -74,9 +74,10 @@ export abstract class DdhubBaseService {
     }
 
     const { status } = e.response;
+    const responseData = e.response.data as Record<string, any>;
 
     this.logger.error('Request failed', e.request.path);
-    this.logger.error(e.response.data);
+    this.logger.error(responseData);
 
     const invalidCertificateErrorCodes: number[] = [
       495,
@@ -105,42 +106,42 @@ export abstract class DdhubBaseService {
       throw new MessageBrokerException(
         e.message,
         DsbClientGatewayErrors.MB_ERROR,
-        e.response.data.returnCode,
-        e.response.data.returnMessage,
+        responseData.returnCode,
+        responseData.returnMessage,
         e.request.path
       );
     }
 
-    if (e.response.data.returnCode && status === HttpStatus.FORBIDDEN) {
+    if (responseData.returnCode && status === HttpStatus.FORBIDDEN) {
       this.logger.error(
         'Request stopped because resource forbidden',
-        e.response.data.returnCode,
+        responseData.returnCode,
         defaults.stopOnResponseCodes
       );
 
       throw new MessageBrokerUnauthorizedException(
         e.message,
         DsbClientGatewayErrors.MB_ERROR,
-        e.response.data.returnCode,
+        responseData.returnCode,
         e.request.path
       );
     }
 
     if (
-      e.response.data.returnCode &&
-      defaults.stopOnResponseCodes.includes(e.response.data.returnCode)
+      responseData.returnCode &&
+      defaults.stopOnResponseCodes.includes(responseData.returnCode)
     ) {
       this.logger.error(
         'Request stopped because of stopOnResponseCodes rule',
-        e.response.data.returnCode,
+        responseData.returnCode,
         defaults.stopOnResponseCodes
       );
 
       throw new MessageBrokerException(
         e.message,
         DsbClientGatewayErrors.MB_ERROR,
-        e.response.data.returnCode,
-        e.response.data.returnMessage,
+        responseData.returnCode,
+        responseData.returnMessage,
         e.request.path
       );
     }
@@ -156,8 +157,8 @@ export abstract class DdhubBaseService {
     throw new MessageBrokerException(
       e.message,
       DsbClientGatewayErrors.MB_ERROR,
-      e.response.data.returnCode,
-      e.response.data.returnMessage,
+      responseData.returnCode,
+      responseData.returnMessage,
       e.request.path
     );
   }

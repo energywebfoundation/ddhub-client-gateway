@@ -1,7 +1,5 @@
-import {
-  AxiosRequestConfig,
-  AxiosResponse,
-} from '@nestjs/terminus/dist/health-indicator/http/axios.interfaces';
+import { InternalAxiosRequestConfig } from 'axios';
+import { AxiosResponse } from '@nestjs/terminus/dist/health-indicator/http/axios.interfaces';
 import { HttpService } from '@nestjs/axios';
 import { Logger } from '@nestjs/common';
 import { reqIdAccess } from './req-id-access';
@@ -13,7 +11,7 @@ export const useInterceptors = (
   versionService: VersionService
 ) => {
   httpService.axiosRef.interceptors.request.use(
-    (config: AxiosRequestConfig) => {
+    (config: InternalAxiosRequestConfig) => {
       config.headers['X-Request-Id'] = reqIdAccess();
       config.headers['X-DDHUB-Client-Version'] = versionService.getVersion();
 

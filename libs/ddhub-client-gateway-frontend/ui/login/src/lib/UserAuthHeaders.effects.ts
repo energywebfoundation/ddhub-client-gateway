@@ -39,13 +39,8 @@ export const useUserAuthHeaders = () => {
       const accessToken =
         userAuth.accessToken ?? localStorage.getItem('accessToken');
       const interceptorId = Axios.interceptors.request.use((config) => {
-        return {
-          ...config,
-          headers: {
-            ...config.headers,
-            Authorization: `Bearer ${accessToken}`,
-          },
-        };
+        config.headers.Authorization = `Bearer ${accessToken}`;
+        return config;
       });
       setRequestInterceptorId(interceptorId);
     }
