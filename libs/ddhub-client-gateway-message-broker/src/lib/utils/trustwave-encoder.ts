@@ -97,16 +97,17 @@ export function encodeValuesBySchema(input: any, schema: JSONSchema7) {
 }
 
 
-export function encodeValuesOnly(input, topLevel?: boolean) {
+export function encodeValuesOnly(input: any, topLevel = true): any {
   let obj = input;
 
   // If it's a string and looks like JSON, try parsing
-  if (typeof input === 'string') {
+  if (typeof input === 'string' && topLevel) {
     try {
-      if (!topLevel) {
-        obj = JSON.stringify(JSON.parse(input));
+      const parsed = JSON.parse(input);
+      if (parsed !== null && typeof parsed === 'object') {
+        obj = parsed;
       } else {
-        obj = JSON.parse(input);
+        return encodeTrustwave(input);
       }
     } catch (e) {
       // Not valid JSON, just encode the string directly
@@ -115,23 +116,28 @@ export function encodeValuesOnly(input, topLevel?: boolean) {
   }
 
   if (typeof obj === 'string') return encodeTrustwave(obj);
-  if (Array.isArray(obj)) return obj.map(v => encodeValuesOnly(v, false));
+  if (Array.isArray(obj)) return obj.map((v) => encodeValuesOnly(v, false));
   if (obj && typeof obj === 'object') {
     return Object.keys(obj).reduce((acc, k) => {
-      acc[k] = encodeValuesOnly(obj[k]);
+      acc[k] = encodeValuesOnly(obj[k], false);
       return acc;
     }, {});
   }
   return obj;
 }
 
-export function decodeValuesOnly(input) {
+export function decodeValuesOnly(input: any, parseJson = true): any {
   let obj = input;
 
-  // If it's a string and looks like JSON, try parsing
-  if (typeof input === 'string') {
+  // If it's a string and looks like JSON, try parsing only at the top-level container
+  if (typeof input === 'string' && parseJson) {
     try {
-      obj = JSON.parse(input);
+      const parsed = JSON.parse(input);
+      if (parsed !== null && typeof parsed === 'object') {
+        obj = parsed;
+      } else {
+        return decodeTrustwave(input);
+      }
     } catch (e) {
       // Not valid JSON, try decoding HTML-encoded content
       let decoded = input;
@@ -145,8 +151,11 @@ export function decodeValuesOnly(input) {
         decodeCount++;
 
         // Check if it's still encoded
-        stillEncoded = decoded.includes('&lt;') || decoded.includes('&gt;') ||
-          decoded.includes('&#x27;') || decoded.includes('&amp;');
+        stillEncoded =
+          decoded.includes('&lt;') ||
+          decoded.includes('&gt;') ||
+          decoded.includes('&#x27;') ||
+          decoded.includes('&amp;');
 
         // If no change occurred, break to avoid infinite loop
         if (decoded === previousDecoded) {
@@ -155,7 +164,12 @@ export function decodeValuesOnly(input) {
       }
 
       try {
-        obj = JSON.parse(decoded);
+        const parsedAgain = JSON.parse(decoded);
+        if (parsedAgain !== null && typeof parsedAgain === 'object') {
+          obj = parsedAgain;
+        } else {
+          return decoded;
+        }
       } catch (e2) {
         // Still not valid JSON, return the decoded string
         return decoded;
@@ -164,10 +178,10 @@ export function decodeValuesOnly(input) {
   }
 
   if (typeof obj === 'string') return decodeTrustwave(obj);
-  if (Array.isArray(obj)) return obj.map(decodeValuesOnly);
+  if (Array.isArray(obj)) return obj.map((v) => decodeValuesOnly(v, false));
   if (obj && typeof obj === 'object') {
     return Object.keys(obj).reduce((acc, key) => {
-      acc[key] = decodeValuesOnly(obj[key]);
+      acc[key] = decodeValuesOnly(obj[key], false);
       return acc;
     }, {});
   }
