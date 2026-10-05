@@ -1,15 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsOptional } from 'class-validator';
 
-// Swagger-only shape: files arrive via FileFieldsInterceptor, not the body.
-// @IsOptional() keeps this class valid under class-validator's forbidUnknownValues.
+// Swagger-only shape: files arrive via FileFieldsInterceptor, not the body, so
+// the required certificate and privateKey files are enforced in the controller.
 export class UploadCertificateBodyDto {
   @ApiProperty({
     type: 'string',
     format: 'binary',
     description: 'certificate to be uploaded',
   })
-  @IsOptional()
   certificate: string;
 
   @ApiProperty({
@@ -17,7 +16,6 @@ export class UploadCertificateBodyDto {
     format: 'binary',
     description: 'privateKey to be uploaded',
   })
-  @IsOptional()
   privateKey: string;
 
   @ApiProperty({
