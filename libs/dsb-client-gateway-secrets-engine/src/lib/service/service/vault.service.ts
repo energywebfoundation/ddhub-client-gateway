@@ -39,7 +39,7 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
 
   public async getAllUsers(): Promise<UsersList> {
     const res = await this.client
-      .list(`${this.prefix}/${PATHS.USERS}`)
+      .list(`${this.prefix}${PATHS.USERS}`)
       .catch((e) => {
         this.logger.error('failed to load list of users');
         this.logger.error(e);
@@ -372,7 +372,7 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
   @Span('vault_getAllApiKeys')
   public async getAllApiKeys(): Promise<ApiKeyDetails[]> {
     const res = await this.client
-      .list(`${this.prefix}/${PATHS.API_KEY}`)
+      .list(`${this.prefix}${PATHS.API_KEY}`)
       .catch((e) => {
         this.logger.error('failed to load list of users');
         this.logger.error(e);
