@@ -108,21 +108,31 @@ export const useUserData = (queryClient: QueryClient) => {
   const [authenticated, setAuthenticated] = useState(false);
   const [mtlsIsValid, setMtlsIsValid] = useState(false);
 
-  const resetUserData = (withErrorMessage?: string) => {
+  const resetUserData = async (withErrorMessage?: string) => {
     setRefreshIdentity(false);
     setUserData({ ...initialUserData, errorMessage: withErrorMessage ?? '' });
-    return router.push(routerConst.InitialPage);
+    if (router.pathname !== routerConst.InitialPage) {
+      return await router.push(routerConst.InitialPage);
+    }
+    return true;
   };
 
-  const resetAuthData = (withErrorMessage?: string) => {
+  const resetAuthData = async (withErrorMessage?: string) => {
     resetTokenStorage();
     setUserAuth({
       ...initialUserAuthData,
       errorMessage: withErrorMessage ?? '',
     });
+    setUserData({
+      ...initialUserData,
+      errorMessage: withErrorMessage ?? '',
+    });
     setAuthenticated(false);
     setRefreshIdentity(false);
-    return router.push(routerConst.InitialPage);
+    if (router.pathname !== routerConst.InitialPage) {
+      return await router.push(routerConst.InitialPage);
+    }
+    return true;
   };
 
   const userDataValue = useMemo(() => ({ userData, setUserData }), [userData]);
@@ -173,7 +183,9 @@ export const useUserData = (queryClient: QueryClient) => {
         setAuthenticated(true);
       } else {
         if (config.authEnabled) {
-          refreshToken();
+          refreshToken().catch(() => {
+            // Initial load with no or invalid refresh token: stay on login
+          });
         } else {
           setAuthenticated(true);
           setRefreshIdentity(true);
@@ -196,17 +208,17 @@ export const useUserData = (queryClient: QueryClient) => {
     );
   };
 
-  const refreshToken = async () => {
+  const refreshToken = async (): Promise<void> => {
     if (!config?.authEnabled) {
       setAuthenticated(true);
       return;
     }
 
-    setAuthenticated(false);
     const token = localStorage.getItem('refreshToken');
     if (!token) {
-      await resetAuthData('No refresh token found');
-      return;
+      await resetAuthData();
+      await resetUserData();
+      throw new Error('No refresh token found');
     }
 
     const mutationFn: MutationFunction<
@@ -223,13 +235,22 @@ export const useUserData = (queryClient: QueryClient) => {
         variables: { data: { refreshToken: token } },
       });
 
-      const { accessToken, refreshToken, username, role } = response;
+      const { accessToken, refreshToken: newRefreshToken, username, role } =
+        response;
+      updateTokenStorage({
+        accessToken,
+        refreshToken: newRefreshToken,
+        username,
+        role,
+        isChecking: false,
+        authenticated: true,
+      });
       setUserAuth((prevValue) => ({
         ...prevValue,
         username,
         role,
         accessToken,
-        refreshToken,
+        refreshToken: newRefreshToken,
         isChecking: false,
         authenticated: true,
       }));
@@ -237,7 +258,9 @@ export const useUserData = (queryClient: QueryClient) => {
     } catch (error: any) {
       console.error(error);
       setAuthenticated(false);
-      await resetAuthData(error.message);
+      await resetAuthData(error?.message);
+      await resetUserData();
+      throw error;
     }
   };
 

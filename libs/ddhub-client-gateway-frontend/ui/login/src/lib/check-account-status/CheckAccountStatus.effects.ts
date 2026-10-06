@@ -81,6 +81,8 @@ export const useCheckAccountStatus = (
     refreshIdentity,
     authEnabled,
     authenticated,
+    userAuthLogout,
+    resetUserData,
   } = useUserDataEffects();
   const { setIsLoading } = useBackdropContext();
   const [checking, setChecking] = useState(triggerQuery);
@@ -137,8 +139,16 @@ export const useCheckAccountStatus = (
         })
         .catch((e) => {
           setError(e);
-          console.error(e.message);
-          return router.push(routerConst.InitialPage);
+          console.error(e?.message);
+          if (
+            authEnabled &&
+            (e?.response?.status === 401 || e?.response?.status === 403)
+          ) {
+            userAuthLogout();
+            resetUserData();
+          } else if (router.pathname !== routerConst.InitialPage) {
+            router.push(routerConst.InitialPage);
+          }
         })
         .finally(() => {
           if (withBackdrop) {
