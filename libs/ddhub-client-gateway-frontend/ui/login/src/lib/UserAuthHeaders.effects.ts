@@ -1,6 +1,34 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useRef } from 'react';
 import Axios from 'axios';
 import { UserContext } from './UserDataContext';
+
+let refreshPromise: Promise<string | null> | null = null;
+
+interface HeaderRecord {
+  set?: (name: string, value: string) => void;
+  [key: string]: unknown;
+}
+
+const setHeader = (
+  headers: HeaderRecord | undefined,
+  name: string,
+  value: string,
+) => {
+  if (headers && typeof headers.set === 'function') {
+    headers.set(name, value);
+  } else if (headers) {
+    headers[name] = value;
+  }
+};
+
+const encodeParams = (params: Record<string, string>) => {
+  return Object.entries(params)
+    .map(
+      ([key, value]) =>
+        `${encodeURIComponent(key)}=${encodeURIComponent(value)}`,
+    )
+    .join('&');
+};
 
 export const useUserAuthHeaders = () => {
   const userContext = useContext(UserContext);
@@ -9,48 +37,32 @@ export const useUserAuthHeaders = () => {
       'useUserAuthHeaders must be used within a UserContext provider',
     );
   }
-  const { authEnabled, userAuth, refreshToken } = userContext;
-  const [requestInterceptorId, setRequestInterceptorId] = useState<number>();
+  const { authEnabled, userAuth, refreshToken, resetAuthData, resetUserData } =
+    userContext;
 
-  const resetRequestInterceptor = () => {
-    if (requestInterceptorId !== undefined) {
-      Axios.interceptors.request.eject(requestInterceptorId);
-      setRequestInterceptorId(undefined);
-    }
-    delete Axios.defaults.headers.common['Authorization'];
-  };
-
-  const encodeParams = (params: Record<string, string>) => {
-    return Object.entries(params)
-      .map(
-        ([key, value]) =>
-          `${encodeURIComponent(key)}=${encodeURIComponent(value)}`,
-      )
-      .join('&');
-  };
+  const refreshTokenRef = useRef(refreshToken);
+  refreshTokenRef.current = refreshToken;
+  const resetAuthDataRef = useRef(resetAuthData);
+  resetAuthDataRef.current = resetAuthData;
+  const resetUserDataRef = useRef(resetUserData);
+  resetUserDataRef.current = resetUserData;
+  const authEnabledRef = useRef(authEnabled);
+  authEnabledRef.current = authEnabled;
+  const userAuthRef = useRef(userAuth);
+  userAuthRef.current = userAuth;
 
   useEffect(() => {
-    if (!authEnabled || !userAuth || !userAuth.authenticated) {
-      resetRequestInterceptor();
-      return;
-    }
+    const requestInterceptorId = Axios.interceptors.request.use((config) => {
+      if (authEnabledRef.current && userAuthRef.current?.authenticated) {
+        const accessToken =
+          localStorage.getItem('accessToken') ||
+          userAuthRef.current?.accessToken;
+        if (accessToken && config.headers) {
+          setHeader(config.headers as HeaderRecord, 'Authorization', `Bearer ${accessToken}`);
+        }
+      }
 
-    if (
-      userAuth.authenticated &&
-      userAuth.accessToken &&
-      requestInterceptorId === undefined
-    ) {
-      const accessToken =
-        userAuth.accessToken ?? localStorage.getItem('accessToken');
-      const interceptorId = Axios.interceptors.request.use((config) => {
-        config.headers.Authorization = `Bearer ${accessToken}`;
-        return config;
-      });
-      setRequestInterceptorId(interceptorId);
-    }
-
-    // Encode query params
-    Axios.interceptors.request.use((config) => {
+      // Encode query params
       if (
         config.method === 'get' &&
         config.params &&
@@ -60,30 +72,79 @@ export const useUserAuthHeaders = () => {
         config.url += (config.url?.includes('?') ? '&' : '?') + queryString;
         delete config.params; // prevent axios from re-attaching unencoded params
       }
+
       return config;
     });
 
     const responseInterceptorId = Axios.interceptors.response.use(
       undefined,
       async (err) => {
-        const originalRequest = err.config;
-        if (
-          (err.response.status === 401 || err.response.status === 403) &&
-          !originalRequest._retry
-        ) {
-          await refreshToken();
-          originalRequest._retry = true;
-          return Axios(originalRequest);
+        const originalRequest = err?.config;
+        if (!originalRequest) {
+          return Promise.reject(err);
         }
+
+        const isAuthUrl =
+          originalRequest.url?.includes('/login/refresh-token') ||
+          originalRequest.url?.includes('/login');
+
+        const status = err?.response?.status;
+
+        if (authEnabledRef.current && (status === 401 || status === 403)) {
+          if (isAuthUrl) {
+            // Do not retry auth endpoints on 401/403
+            if (originalRequest.url?.includes('/login/refresh-token')) {
+              await resetAuthDataRef.current('Session expired');
+              await resetUserDataRef.current();
+            }
+            return Promise.reject(err);
+          }
+
+          if (originalRequest._retry) {
+            await resetAuthDataRef.current('Session expired');
+            await resetUserDataRef.current();
+            return Promise.reject(err);
+          }
+
+          originalRequest._retry = true;
+
+          try {
+            if (!refreshPromise) {
+              refreshPromise = (async () => {
+                try {
+                  await refreshTokenRef.current();
+                  const token =
+                    localStorage.getItem('accessToken') ||
+                    null;
+                  return token;
+                } finally {
+                  refreshPromise = null;
+                }
+              })();
+            }
+
+            const newToken = await refreshPromise;
+            if (newToken && originalRequest.headers) {
+              setHeader(
+                originalRequest.headers as HeaderRecord,
+                'Authorization',
+                `Bearer ${newToken}`,
+              );
+              return Axios(originalRequest);
+            }
+          } catch (refreshErr) {
+            return Promise.reject(refreshErr);
+          }
+        }
+
         return Promise.reject(err);
       },
     );
 
     return () => {
-      if (requestInterceptorId) {
-        Axios.interceptors.request.eject(requestInterceptorId);
-      }
+      Axios.interceptors.request.eject(requestInterceptorId);
       Axios.interceptors.response.eject(responseInterceptorId);
+      delete Axios.defaults.headers.common['Authorization'];
     };
-  }, [authEnabled, userAuth]);
+  }, []);
 };

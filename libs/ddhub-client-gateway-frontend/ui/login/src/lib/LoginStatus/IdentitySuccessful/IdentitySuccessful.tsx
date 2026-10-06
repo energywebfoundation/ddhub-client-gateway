@@ -1,3 +1,4 @@
+import { useEffect, useCallback } from 'react';
 import { Typography, Stack, Button, darken } from '@mui/material';
 import { makeStyles } from 'tss-react/mui';
 import { Check } from 'react-feather';
@@ -18,12 +19,17 @@ export const IdentitySuccessful = (props: IdentitySuccessfulProps) => {
     navigate();
   });
 
-  const navigate = () => {
+  const navigate = useCallback(() => {
     return router.push(routerConst.Dashboard);
-  };
+  }, [router]);
+
+  useEffect(() => {
+    if (!props.isFirstLogin) {
+      navigate();
+    }
+  }, [props.isFirstLogin, navigate]);
 
   if (!props.isFirstLogin) {
-    navigate();
     return (
       <LoadingInfo mt={2}>
         <Typography>Redirecting...</Typography>
