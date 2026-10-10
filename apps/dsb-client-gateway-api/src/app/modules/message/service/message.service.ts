@@ -4,7 +4,6 @@ import {
   DdhubMessagesService,
   SendMessageResponseFile,
   decodeValuesOnly,
-  encodeValuesBySchema,
 } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
 import { SecretsEngineService } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
 import {
@@ -156,8 +155,7 @@ export class MessageService {
         dto.payload,
         randomKey,
         EncryptedMessageType['UTF-8']
-      )
-      : JSON.stringify(encodeValuesBySchema(dto.payload, topic.schema), null);
+      ) : dto.payload;
 
     messageLoggerContext.debug('fetching private key');
 
@@ -672,13 +670,14 @@ export class MessageService {
     const messageResponses = await Promise.allSettled(
       messages.map(async (message): Promise<GetMessageResponse> => {
         messageLoggerContext.log(`processing message ${message.messageId}`);
-        message.payload = JSON.stringify(decodeValuesOnly(message.payload), null);
         const processedMessage: GetMessageResponse = await this.processMessage(
           message.payloadEncryption,
           message,
           prefetchedSignatureKeys[message.senderDid],
           channel.useAnonymousExtChannel
         );
+
+        processedMessage.payload = JSON.stringify(decodeValuesOnly(message.payload), null);
 
         return processedMessage;
       })
