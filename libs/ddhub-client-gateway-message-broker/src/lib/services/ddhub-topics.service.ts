@@ -22,7 +22,7 @@ import * as qs from 'qs';
 import { DdhubLoginService } from './ddhub-login.service';
 import { MessageBrokerErrors } from '../ddhub-client-gateway-message-broker.const';
 import { TlsAgentService } from '@dsb-client-gateway/ddhub-client-gateway-tls-agent';
-import { decodeValuesOnly, decodeValuesOnlyArray, encodeValuesOnly, encodeValuesOnlyArray } from '../utils/trustwave-encoder';
+import { decodeValuesOnly, decodeValuesOnlyArray } from '../utils/trustwave-encoder';
 
 @Injectable()
 export class DdhubTopicsService extends DdhubBaseService {
@@ -176,7 +176,6 @@ export class DdhubTopicsService extends DdhubBaseService {
   ): Promise<UpdateTopicResponeDto> {
     try {
       this.logger.log('topic to be updated', data);
-      data.tags = encodeValuesOnlyArray(data.tags);
       const result = await this.request<UpdateTopicResponeDto>(
         () =>
           this.httpService.put(`/topics/${id}`, data, {
@@ -203,8 +202,6 @@ export class DdhubTopicsService extends DdhubBaseService {
   public async postTopics(topicData: PostTopicBodyDto): Promise<Topic> {
     try {
       this.logger.log('attempting to create topic ' + topicData.name);
-      topicData.name = encodeValuesOnly(topicData.name);
-      topicData.tags = encodeValuesOnlyArray(topicData.tags);
       const { data } = await this.request<null>(
         () =>
           this.httpService.post('/topics', topicData, {
