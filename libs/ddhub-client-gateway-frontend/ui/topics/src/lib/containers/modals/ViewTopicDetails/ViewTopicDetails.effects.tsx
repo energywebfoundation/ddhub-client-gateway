@@ -74,7 +74,7 @@ export const useViewTopicDetailsEffects = () => {
     },
   ];
 
-  if (userData.displayedRoutes.has(routerConst.TopicManagement)) {
+  if (router.pathname === routerConst.Topics || router.pathname === routerConst.VersionHistory) {
     buttons.push({
       name: 'edit',
       icon: <Edit className={classes.icon} />,
