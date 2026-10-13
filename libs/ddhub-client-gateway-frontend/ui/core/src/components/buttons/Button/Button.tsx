@@ -10,7 +10,12 @@ import {
 import { useStyles } from './Button.styles';
 
 export const Button: FC<
-  ButtonProps & { secondary?: boolean; loading?: boolean, minWidth?: number }
+  ButtonProps & {
+    secondary?: boolean;
+    loading?: boolean;
+    minWidth?: number;
+    textClassName?: string;
+  }
 > = (props) => {
   const { classes, theme } = useStyles();
   const { secondary = false, loading = false, ...rest } = props;
@@ -19,7 +24,7 @@ export const Button: FC<
       {...rest}
       variant={props?.variant ?? 'contained'}
       sx={{ minWidth: props?.minWidth ?? 75 }}
-      className={clsx(classes.button, {
+      className={clsx(classes.button, props.className, {
         [classes.secondaryButton]: secondary,
       })}
     >
@@ -32,7 +37,7 @@ export const Button: FC<
         </Box>
       ) : (
         <Typography
-          className={clsx(classes.buttonText, {
+          className={clsx(classes.buttonText, props.textClassName, {
             [classes.secondaryText]: secondary,
           })}
           variant="body2"
