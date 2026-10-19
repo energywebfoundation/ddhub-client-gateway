@@ -41,6 +41,18 @@ export class TopicService {
     });
   }
 
+  public async getTopicByIdAndVersion(
+    id: string,
+    version: string
+  ): Promise<TopicEntity | null> {
+    return this.wrapper.topicRepository.findOne({
+      where: {
+        id,
+        version,
+      },
+    });
+  }
+
   async getTopicOrThrow(name: string, owner: string, version: string) {
     return this.wrapper.topicRepository.findOneOrFail({
       where: {

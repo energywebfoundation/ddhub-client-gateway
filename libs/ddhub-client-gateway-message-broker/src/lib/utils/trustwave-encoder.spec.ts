@@ -1,4 +1,5 @@
 import {
+  decodeValuesBySchema,
   decodeValuesOnly,
   decodeValuesOnlyArray,
   encodeValuesBySchema,
@@ -252,6 +253,69 @@ describe('trustwave-encoder', () => {
       expect(typeof decoded.id).toBe('string');
       expect(decoded.rawConfig).toBe('{"subKey":"subVal","innerNum":"456"}');
       expect(typeof decoded.rawConfig).toBe('string');
+    });
+  });
+
+  describe('decodeValuesBySchema', () => {
+    const schema: JSONSchema7 = {
+      type: 'object',
+      properties: {
+        name: { type: 'string' },
+        id: { type: 'string', format: 'uuid' },
+        kind: { type: 'string', enum: ['a &amp; b', 'c'] },
+        nested: {
+          type: 'object',
+          properties: {
+            note: { type: 'string' },
+          },
+        },
+      },
+    };
+
+    it('should round trip entity text in encoded fields', () => {
+      const original = {
+        name: 'a &amp; b <x> 1.5-2/3',
+        id: '7f1c0c3e-2b8a-4c3e-9d6f-1a2b3c4d5e6f',
+        kind: 'c',
+        nested: { note: "it's &lt;fine&gt;" },
+      };
+
+      const wire = JSON.stringify(
+        encodeValuesBySchema(JSON.stringify(original), schema)
+      );
+
+      expect(decodeValuesBySchema(wire, schema)).toEqual(original);
+    });
+
+    it('should not decode fields that were not encoded (format/enum)', () => {
+      const wire = JSON.stringify({
+        name: 'plain',
+        id: 'a &amp; b',
+        kind: 'a &amp; b',
+      });
+
+      const decoded = decodeValuesBySchema(wire, schema);
+
+      expect(decoded.id).toBe('a &amp; b');
+      expect(decoded.kind).toBe('a &amp; b');
+    });
+
+    it('should leave fields not in the schema untouched', () => {
+      const decoded = decodeValuesBySchema(
+        JSON.stringify({ extra: 'a &amp; b' }),
+        schema
+      );
+
+      expect(decoded.extra).toBe('a &amp; b');
+    });
+
+    it('should return input unchanged when not JSON or no schema', () => {
+      expect(decodeValuesBySchema('<x>a &amp; b</x>', schema)).toBe(
+        '<x>a &amp; b</x>'
+      );
+      expect(decodeValuesBySchema('{"name":"a &amp; b"}', undefined)).toBe(
+        '{"name":"a &amp; b"}'
+      );
     });
   });
 

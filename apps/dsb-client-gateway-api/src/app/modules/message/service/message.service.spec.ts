@@ -55,6 +55,7 @@ const mockChannelService = {
 const mockTopicService = {
   getTopic: jest.fn(),
   getTopicById: jest.fn(),
+  getTopicByIdAndVersion: jest.fn(),
 };
 const mockKeysService = {
   generateRandomKey: jest.fn(),
@@ -421,6 +422,123 @@ describe(`${MessageService.name}`, () => {
         expect(mockChannelService.getChannelOrThrow).toBeCalledTimes(1);
         expect(mockChannelService.getChannelOrThrow).toBeCalledWith('fqcn');
       });
+    });
+  });
+
+  describe('getMessages() payload decoding', () => {
+    const schema = {
+      type: 'object',
+      properties: {
+        name: { type: 'string' },
+        id: { type: 'string', format: 'uuid' },
+      },
+    };
+
+    const fetchSingle = async (
+      payloadEncryption: boolean,
+      payload: string,
+      decrypted?: string
+    ): Promise<GetMessageResponse> => {
+      jest.resetAllMocks();
+
+      mockPendingAcksWrapperRepository.pendingAcksRepository.find = jest
+        .fn()
+        .mockResolvedValueOnce([]);
+      mockKeysService.prefetchSignatureKeys = jest.fn().mockResolvedValueOnce({
+        senderDid: null,
+      });
+      mockKeysService.verifySignature = jest.fn().mockResolvedValueOnce(true);
+      mockKeysService.decryptMessage = jest.fn().mockResolvedValueOnce({
+        error: null,
+        decrypted,
+      });
+      mockTopicService.getTopicById = jest.fn().mockResolvedValueOnce({
+        owner: 'topicOwner',
+        name: 'topicName',
+        id: 'topicId',
+        version: '0.0.2',
+        schemaType: SchemaType.JSD7,
+        schema: {},
+      });
+      mockTopicService.getTopicByIdAndVersion = jest
+        .fn()
+        .mockResolvedValueOnce({
+          owner: 'topicOwner',
+          name: 'topicName',
+          id: 'topicId',
+          version: '0.0.1',
+          schemaType: SchemaType.JSD7,
+          schema,
+        });
+      mockChannelService.getChannelOrThrow = jest.fn().mockResolvedValueOnce({
+        messageForms: false,
+        useAnonymousExtChannel: false,
+        fqcn: 'fqcn',
+        conditions: {
+          topics: [
+            { topicName: 'topicName', owner: 'topicOwner', topicId: 'topicId' },
+          ],
+          qualifiedDids: ['did1'],
+        },
+        type: ChannelType.SUB,
+      });
+      mockDdhubMessageService.messagesSearch = jest
+        .fn()
+        .mockResolvedValueOnce([
+          {
+            topicId: 'topicId',
+            payload,
+            clientGatewayMessageId: 'cgwid',
+            payloadEncryption,
+            isFile: false,
+            topicVersion: '0.0.1',
+            messageId: 'messageId',
+            transactionId: 'transactionId',
+            senderDid: 'senderDid',
+            signature: 'signature',
+            timestampNanos: DateTime.now().toMillis() * 1e6,
+          },
+        ] as Array<SearchMessageResponseDto>);
+
+      const result = await service.getMessages(
+        {
+          fqcn: 'fqcn',
+          topicOwner: 'topicOwner',
+          topicName: 'topicName',
+          amount: 1,
+          clientId: 'clientId',
+        },
+        true
+      );
+
+      expect(result.length).toBe(1);
+
+      return result[0];
+    };
+
+    it('should not decode entity text in an encrypted payload', async () => {
+      const plaintext = '{"id":"a &amp; b"}';
+
+      const message = await fetchSingle(true, 'ciphertext', plaintext);
+
+      expect(message.payload).toBe(plaintext);
+      expect(mockTopicService.getTopicByIdAndVersion).toBeCalledTimes(0);
+    });
+
+    it('should decode only schema-encoded fields of an unencrypted payload', async () => {
+      const message = await fetchSingle(
+        false,
+        '{"name":"a &amp; b&#x2E;","id":"x &amp; y"}'
+      );
+
+      expect(JSON.parse(message.payload)).toEqual({
+        name: 'a & b.',
+        id: 'x &amp; y',
+      });
+      expect(mockTopicService.getTopicByIdAndVersion).toBeCalledWith(
+        'topicId',
+        '0.0.1'
+      );
     });
   });
 

@@ -31,7 +31,11 @@ function listStringTypeOnlyBy(schema: JSONSchema7, basePtr = ""): string[] {
   return Array.from(new Set(out));
 }
 
-function encodeFieldsBy(data: any, ptrs: string[]) {
+function transformFieldsBy(
+  data: any,
+  ptrs: string[],
+  transform: (value: string) => string
+) {
   for (const ptr of ptrs) {
     const parts = ptr.split("/").filter(Boolean);
     let ref: any = data;
@@ -41,7 +45,7 @@ function encodeFieldsBy(data: any, ptrs: string[]) {
     }
     const last = parts[parts.length - 1];
     if (ref && typeof ref[last] === "string") {
-      ref[last] = htmlEncode(ref[last]);
+      ref[last] = transform(ref[last]);
     }
   }
   return data;
@@ -93,7 +97,38 @@ export function decodeTrustwave(str: string): string {
 export function encodeValuesBySchema(input: any, schema: JSONSchema7) {
   const data = typeof input === "string" ? JSON.parse(input) : input;
   const fields = listStringTypeOnlyBy(schema, "");
-  return encodeFieldsBy(data, fields);
+  return transformFieldsBy(data, fields, htmlEncode);
+}
+
+/**
+ * Inverse of encodeValuesBySchema: decodes only the fields that the sender
+ * encoded (plain string fields without pattern/enum/format/const). All other
+ * fields are returned untouched, so legitimate entity text such as "&amp;" in
+ * a format/enum field survives the round trip.
+ *
+ * Returns the input unchanged if it is not a JSON object/array or there is no
+ * schema to derive the encoded fields from.
+ */
+export function decodeValuesBySchema(input: any, schema: JSONSchema7 | undefined | null) {
+  if (!schema || typeof schema !== "object") {
+    return input;
+  }
+
+  let data = input;
+  if (typeof input === "string") {
+    try {
+      data = JSON.parse(input);
+    } catch {
+      return input;
+    }
+  }
+
+  if (data === null || typeof data !== "object") {
+    return input;
+  }
+
+  const fields = listStringTypeOnlyBy(schema, "");
+  return transformFieldsBy(data, fields, decodeTrustwave);
 }
 
 
