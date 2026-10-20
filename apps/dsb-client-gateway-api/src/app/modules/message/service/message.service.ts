@@ -3,7 +3,7 @@ import {
   DdhubFilesService,
   DdhubMessagesService,
   SendMessageResponseFile,
-  decodeValuesOnly,
+  decodeValuesBySchema,
   encodeValuesBySchema,
 } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
 import { SecretsEngineService } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
@@ -356,6 +356,30 @@ export class MessageService {
     return topicIds;
   }
 
+  /**
+   * Unencrypted payloads are trustwave-encoded on send (see sendMessage), so
+   * decode exactly the fields encodeValuesBySchema touched, using the schema
+   * of the topic version the message was sent with. Encrypted payloads are
+   * never encoded and must not go through this.
+   */
+  private async decodeUnencryptedPayload(
+    message: SearchMessageResponseDto,
+    topic: TopicEntity
+  ): Promise<string> {
+    const versionedTopic: TopicEntity =
+      (await this.topicService.getTopicByIdAndVersion(
+        message.topicId,
+        message.topicVersion
+      )) ?? topic;
+
+    const decoded = decodeValuesBySchema(
+      message.payload,
+      versionedTopic.schema
+    );
+
+    return typeof decoded === 'string' ? decoded : JSON.stringify(decoded);
+  }
+
   @Span('message_processMessage')
   private async processMessage(
     payloadEncryption: boolean,
@@ -419,6 +443,7 @@ export class MessageService {
 
         return {
           ...baseMessage,
+          payload: await this.decodeUnencryptedPayload(message, topic),
           signatureValid: EncryptionStatus.NOT_REQUIRED,
           decryption: {
             status: EncryptionStatus.NOT_REQUIRED,
@@ -466,6 +491,7 @@ export class MessageService {
 
         return {
           ...baseMessage,
+          payload: await this.decodeUnencryptedPayload(message, topic),
           signatureValid: isSignatureValid
             ? EncryptionStatus.SUCCESS
             : EncryptionStatus.FAILED,
@@ -676,26 +702,13 @@ export class MessageService {
     const messageResponses = await Promise.allSettled(
       messages.map(async (message): Promise<GetMessageResponse> => {
         messageLoggerContext.log(`processing message ${message.messageId}`);
-        // message.payload = JSON.stringify(decodeValuesOnly(message.payload), null);
-        const processedMessage: GetMessageResponse = await this.processMessage(
+
+        return this.processMessage(
           message.payloadEncryption,
           message,
           prefetchedSignatureKeys[message.senderDid],
           channel.useAnonymousExtChannel
         );
-
-        this.logger.log(message.payload);
-        this.logger.log(decodeValuesOnly(message.payload));
-        this.logger.log(JSON.stringify(decodeValuesOnly(message.payload), null));
-
-        const decryptedPayload = decodeValuesOnly(processedMessage.payload);
-        processedMessage.payload =
-          typeof decryptedPayload === 'string'
-            ? decryptedPayload
-            : JSON.stringify(decryptedPayload, null);
-
-
-        return processedMessage;
       })
     );
 

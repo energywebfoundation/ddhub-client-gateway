@@ -13,10 +13,12 @@ const mockUserAuthService = {
 
 const mockReflector = {
   get: jest.fn(),
+  getAllAndOverride: jest.fn((key: string) => mockReflector.get(key)),
 };
 
 const mockContext = {
   getHandler: jest.fn(),
+  getClass: jest.fn(),
   switchToHttp: () => ({
     getRequest: () => ({
       headers: {
@@ -28,6 +30,7 @@ const mockContext = {
 
 const mockContextWithoutHeader = {
   getHandler: jest.fn(),
+  getClass: jest.fn(),
   switchToHttp: () => ({
     getRequest: () => ({
       headers: {},
@@ -37,6 +40,7 @@ const mockContextWithoutHeader = {
 
 const buildApiKeyContext = (role: string | undefined) => ({
   getHandler: jest.fn(),
+  getClass: jest.fn(),
   switchToHttp: () => ({
     getRequest: () => ({
       headers: {},
@@ -64,6 +68,9 @@ describe('UserGuard', () => {
 
   beforeEach(async () => {
     jest.clearAllMocks();
+    mockReflector.getAllAndOverride = jest.fn((key: string) =>
+      mockReflector.get(key)
+    );
 
     error = null;
     result = null;
@@ -262,6 +269,20 @@ describe('UserGuard', () => {
           buildApiKeyContext(UserRole.MESSAGING) as any
         );
         expect(result).toBeFalsy();
+      });
+
+      it('should resolve @Roles from the handler first, then the class', async () => {
+        mockReflector.get = jest.fn().mockImplementation(() => undefined);
+        mockReflector.getAllAndOverride = jest
+          .fn()
+          .mockImplementation(() => [UserRole.MESSAGING]);
+
+        const context = buildApiKeyContext(UserRole.MESSAGING);
+        const result = await guard.canActivate(context as any);
+
+        expect(result).toBeTruthy();
+        expect(context.getHandler).toBeCalled();
+        expect(context.getClass).toBeCalled();
       });
 
       it('should allow an admin-role api-key on any route', async () => {
