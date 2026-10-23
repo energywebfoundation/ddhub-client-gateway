@@ -48,10 +48,10 @@ export const UpdateTopic: FC = () => {
         </Box>
       ) : (
         <>
-          <DialogTitle>Update topic</DialogTitle>
+          <DialogTitle>{canUpdateSchema ? 'Update topic schema' : 'Update topic metadata'}</DialogTitle>
           <form onSubmit={onSubmit}>
             <DialogContent sx={{ padding: 0 }}>
-              <DialogSubTitle>Update topic data</DialogSubTitle>
+              <DialogSubTitle>{canUpdateSchema ? `Edit the topic's version and schema` : `Edit the topic's tags`}</DialogSubTitle>
               <Grid container mt={4}>
                 <Grid item xs={4}>
                   {application && <ApplicationInfo application={application} />}
