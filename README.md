@@ -401,7 +401,7 @@ Several defaults point at Energy Web development services and the Volta testnet,
 | Unit tests affected by a change | `pnpm nx affected --target=test` |
 | Database migrations | `pnpm migrations:test:run` |
 | API end-to-end (Gherkin features) | `pnpm test:e2e:api:prepare`, then `pnpm test:e2e:api` |
-| Admin UI end-to-end (Cypress) | Set the `CYPRESS_*` variables listed in `cypress.config.ts`, add `cypress/{ENV_NAME}/identity.json`, then `pnpm exec cypress run` |
+| Admin UI end-to-end (Cypress) | Set the `CYPRESS_*` variables listed in `cypress.config.ts`, add `cypress/fixtures/{CYPRESS_TARGET_ENV}/identity.json`, then `pnpm exec cypress run` |
 
 `test:e2e:api:prepare` starts PostgreSQL and Vault from `ci/docker-compose.yml`, creates the `ddhub_test` database and runs the migrations against it.
 
