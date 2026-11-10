@@ -133,8 +133,33 @@ export function decodeValuesOnly(input) {
     try {
       obj = JSON.parse(input);
     } catch (e) {
-      // Not valid JSON, just encode the string directly
-      return decodeTrustwave(input);
+      // Not valid JSON, try decoding HTML-encoded content
+      let decoded = input;
+      let stillEncoded = true;
+      let decodeCount = 0;
+      const maxDecodes = 3; // Handle up to triple encoding
+
+      while (stillEncoded && decodeCount < maxDecodes) {
+        const previousDecoded = decoded;
+        decoded = decodeTrustwave(decoded);
+        decodeCount++;
+
+        // Check if it's still encoded
+        stillEncoded = decoded.includes('&lt;') || decoded.includes('&gt;') ||
+          decoded.includes('&#x27;') || decoded.includes('&amp;');
+
+        // If no change occurred, break to avoid infinite loop
+        if (decoded === previousDecoded) {
+          break;
+        }
+      }
+
+      try {
+        obj = JSON.parse(decoded);
+      } catch (e2) {
+        // Still not valid JSON, return the decoded string
+        return decoded;
+      }
     }
   }
 
