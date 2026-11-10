@@ -10,7 +10,7 @@ import { HTMLInputTypeAttribute } from 'react';
 
 export interface FormInputProps {
   field: GenericFormField;
-  register: UseFormRegister<FieldValues>;
+  register: UseFormRegister<FieldValues> | UseFormRegister<any>;
   errorExists?: boolean;
   errorText?: string;
   isDirty?: boolean;

@@ -1,1 +1,1 @@
-export * from './containers/Users';
+export * from './containers/Users/UserContainer';
