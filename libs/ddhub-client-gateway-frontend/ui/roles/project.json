@@ -1,0 +1,25 @@
+{
+  "root": "libs/dsb-client-gateway/ui/roles",
+  "sourceRoot": "libs/dsb-client-gateway/ui/roles/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": [
+          "libs/ddhub-client-gateway-frontend/ui/roles/**/*.{ts,tsx,js,jsx}"
+        ]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/libs/ddhub-client-gateway-frontend/ui/roles"],
+      "options": {
+        "jestConfig": "libs/ddhub-client-gateway-frontend/ui/roles/jest.config.js",
+        "passWithNoTests": true
+      }
+    }
+  }
+}

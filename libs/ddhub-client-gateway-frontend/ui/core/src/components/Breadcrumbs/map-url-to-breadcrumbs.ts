@@ -34,6 +34,7 @@ export const mapUrlToBreadcrumbs = new Map<string, Breadcrumb[]>()
     { title: 'My Apps and Topics', path: routerConst.ChannelApps },
     { title: 'Topics' },
   ])
+  .set(routerConst.Roles, [{ title: 'My roles' }])
   .set(routerConst.VersionHistory, [
     { type: BreadcrumbsType.App, title: '' },
     { title: 'Apps and Topics', path: routerConst.TopicManagement },
@@ -86,6 +87,16 @@ export const mapUrlToBreadcrumbs = new Map<string, Breadcrumb[]>()
   .set(routerConst.DataMessagingFileUpload, [
     { title: 'Data messaging file upload' },
     { title: 'Data messaging file upload' },
+  ])
+  .set(routerConst.Users, [
+    { title: 'Users' },
+    { title: 'Users and access' },
+    { title: 'Users', path: routerConst.Users },
+  ])
+  .set(routerConst.APIKeys, [
+    { title: 'API Keys' },
+    { title: 'Users and access' },
+    { title: 'API Keys', path: routerConst.APIKeys },
   ])
   .set(routerConst.FileDownloadChannel, [
     { title: 'Data messaging file download' },

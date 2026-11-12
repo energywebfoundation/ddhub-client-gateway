@@ -32,7 +32,7 @@ export class AddressBookController {
   constructor(
     protected readonly addressBookService: AddressBookService,
     protected readonly logger: PinoLogger
-  ) {}
+  ) { }
 
   @Post()
   @ApiResponse({
@@ -40,7 +40,7 @@ export class AddressBookController {
     description: 'Contact created successfully',
   })
   @HttpCode(HttpStatus.NO_CONTENT)
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
   public async storeContact(@Body() dto: CreateContactDto): Promise<void> {
     await this.addressBookService.save(dto.did, dto.alias);
   }
@@ -51,7 +51,7 @@ export class AddressBookController {
     description: 'Contact deleted successfully',
   })
   @HttpCode(HttpStatus.NO_CONTENT)
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
   public async deleteContact(@Param('did') did: string): Promise<void> {
     await this.addressBookService.delete(did);
   }
@@ -62,7 +62,7 @@ export class AddressBookController {
     description: 'Contact modified successfully',
   })
   @HttpCode(HttpStatus.NO_CONTENT)
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
   public async updateContact(
     @Param('did') did: string,
     @Body() dto: UpdateContactRequestDto

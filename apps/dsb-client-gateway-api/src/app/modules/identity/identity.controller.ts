@@ -23,7 +23,7 @@ import {
 @ApiTags('Identity')
 @UseGuards(UserGuard)
 export class IdentityController {
-  constructor(protected readonly identityService: IdentityService) {}
+  constructor(protected readonly identityService: IdentityService) { }
 
   @Get()
   @ApiResponse({
@@ -40,7 +40,7 @@ export class IdentityController {
     status: HttpStatus.UNAUTHORIZED,
     description: 'Unauthorized',
   })
-  @Roles(UserRole.MESSAGING, UserRole.ADMIN)
+  @Roles(UserRole.MESSAGING, UserRole.ADMIN, UserRole.SUPERADMIN)
   public async get(): Promise<IdentityResponseDto> {
     return this.identityService.getIdentityWithEnrolment();
   }
@@ -60,7 +60,7 @@ export class IdentityController {
     status: HttpStatus.UNAUTHORIZED,
     description: 'Unauthorized',
   })
-  @Roles(UserRole.MESSAGING, UserRole.ADMIN)
+  @Roles(UserRole.MESSAGING, UserRole.ADMIN, UserRole.SUPERADMIN)
   public async getClaims(): Promise<ClaimsResponseDto> {
     return this.identityService.getClaims();
   }
@@ -80,7 +80,7 @@ export class IdentityController {
     status: HttpStatus.UNAUTHORIZED,
     description: 'Unauthorized',
   })
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
   @HttpCode(HttpStatus.OK)
   public async post(
     @Body() { privateKey }: CreateIdentityDto

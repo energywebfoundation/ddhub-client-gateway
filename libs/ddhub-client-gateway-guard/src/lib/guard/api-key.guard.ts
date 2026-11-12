@@ -6,6 +6,8 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { UserGuard } from '@dsb-client-gateway/ddhub-client-gateway-user-roles';
+import { SecretsEngineService } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
+import { PinoLogger } from 'nestjs-pino';
 
 const WHITELISTED_ENDPOINTS = [
   '/api/v2/health',
@@ -22,7 +24,9 @@ export class ApiKeyGuard implements CanActivate {
 
   constructor(
     protected readonly configService: ConfigService,
-    protected readonly userGuard: UserGuard
+    protected readonly userGuard: UserGuard,
+    protected readonly secretsEngineService: SecretsEngineService,
+    private readonly _logger: PinoLogger
   ) {
     const credentials: Array<string | undefined> = [
       this.configService.get<string | undefined>('API_KEY'),
@@ -48,22 +52,6 @@ export class ApiKeyGuard implements CanActivate {
   }
 
   public async canActivate(context: ExecutionContext): Promise<boolean> {
-    const apiKey: string | undefined = this.configService.get<
-      string | undefined
-    >('API_KEY');
-
-    const password: string | undefined = this.configService.get<
-      string | undefined
-    >('API_PASSWORD');
-
-    const username: string | undefined = this.configService.get<
-      string | undefined
-    >('API_USERNAME');
-
-    if (!apiKey && !password && !username) {
-      return true;
-    }
-
     const request = context.switchToHttp().getRequest();
 
     const { headers } = request;
@@ -78,27 +66,21 @@ export class ApiKeyGuard implements CanActivate {
 
     const apiKeyFromHeaders: string | undefined = headers['x-api-key'];
 
-    if (apiKeyFromHeaders && apiKeyFromHeaders === apiKey) {
-      request.user = 'api-key';
-      return true;
+    if (apiKeyFromHeaders) {
+      const isValid = await this.secretsEngineService.validateApiKey(apiKeyFromHeaders);
+      request.user = {
+        authType: 'api-key',
+        apiKey: apiKeyFromHeaders,
+        username: apiKeyFromHeaders,
+      };
+      this._logger.assign({ user: apiKeyFromHeaders });
+      return isValid;
     }
 
-    const usernameFromHeaders: string | undefined = headers['x-api-username'];
-    const passwordFromHeaders: string | undefined = headers['x-api-password'];
-
-    if (!usernameFromHeaders || !passwordFromHeaders) {
-      return false;
-    }
-
-    const decodedPassword: string = new Buffer(
-      passwordFromHeaders,
-      'base64'
-    ).toString('ascii');
-
-    return usernameFromHeaders === username && decodedPassword === password;
+    return true;
   }
 
   protected isAuthEnabled(): boolean {
-    return this.configService.get('USER_AUTH_ENABLED', false);
+    return this.secretsEngineService.isAuthEnabled();
   }
 }

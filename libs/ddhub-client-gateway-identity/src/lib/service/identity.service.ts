@@ -26,6 +26,7 @@ import { TriggerEventCommand } from '../../../../ddhub-client-gateway-events/src
 import { Events } from '@dsb-client-gateway/ddhub-client-gateway-events';
 import { ReloginCommand } from '../../../../ddhub-client-gateway-message-broker/src/lib/command/relogin.command';
 import { CleanupCommand } from '@dsb-client-gateway/ddhub-client-gateway-cleanup';
+import { NotEnoughBalanceException } from '../exceptions';
 
 @Injectable()
 export class IdentityService {
@@ -39,7 +40,7 @@ export class IdentityService {
     @Inject(forwardRef(() => EnrolmentService))
     protected readonly enrolmentService: EnrolmentService,
     protected readonly commandBus: CommandBus
-  ) {}
+  ) { }
 
   public async removeIdentity(): Promise<void> {
     await this.wrapper.identityRepository.clear();
@@ -121,6 +122,11 @@ export class IdentityService {
 
     this.logger.log(`Balance state: ${balanceState}`);
 
+    if (balanceState === BalanceState.NONE) {
+      this.logger.warn(`No balance for ${wallet.address}, not deriving keys`);
+      throw new NotEnoughBalanceException(wallet.address);
+    }
+
     const publicIdentity: IdentityEntity = {
       publicKey: wallet.publicKey,
       balance: balanceState,
@@ -146,16 +152,6 @@ export class IdentityService {
     await this.enrolmentService.generateEnrolment();
 
     await this.commandBus.execute(new ReloginCommand('IDENTITY_CHANGE'));
-
-    if (balanceState === BalanceState.NONE) {
-      this.logger.warn(`No balance for ${wallet.address}, not deriving keys`);
-
-      await this.commandBus.execute(
-        new TriggerEventCommand(Events.PRIVATE_KEY_CHANGED)
-      );
-
-      return;
-    }
 
     await this.commandBus.execute(new RefreshKeysCommand());
 

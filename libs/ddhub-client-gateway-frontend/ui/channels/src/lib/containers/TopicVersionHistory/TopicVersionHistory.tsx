@@ -29,8 +29,8 @@ export function TopicVersionHistory() {
           onRowClick={openTopicDetails}
           showSearch={false}
           loading={loading}
-          defaultSortBy='name'
-          defaultOrder='asc'
+          defaultSortBy="name"
+          defaultOrder="asc"
           onPageChange={handlePageChange}
           paginationProps={pagination}
         />

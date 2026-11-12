@@ -25,7 +25,7 @@ export class KeysController {
   constructor(
     protected readonly associationKeysService: AssociationKeysService,
     protected readonly commandBus: CommandBus
-  ) {}
+  ) { }
 
   @Post('/association')
   @HttpCode(HttpStatus.NO_CONTENT)
@@ -33,7 +33,7 @@ export class KeysController {
     status: HttpStatus.NO_CONTENT,
     description: 'Successfully created association keys',
   })
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
   public async forceGeneration(): Promise<void> {
     await this.associationKeysService.derivePublicKeys();
   }
@@ -44,7 +44,7 @@ export class KeysController {
     description: 'List of association keys',
     type: [GetAssociationKeysDto],
   })
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
   public async getAssociationKeys(): Promise<GetAssociationKeysDto[]> {
     return this.associationKeysService.getAllKeys();
   }
@@ -56,7 +56,7 @@ export class KeysController {
     description:
       'Force initialization of external channel for current association keys',
   })
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
   public async initAssociationKeys(): Promise<void> {
     await this.associationKeysService.initExternalChannels();
   }
@@ -67,7 +67,7 @@ export class KeysController {
     status: HttpStatus.NO_CONTENT,
     description: 'Force sharing association keys',
   })
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
   public async sendAssociationKeys(): Promise<void> {
     await this.commandBus.execute(new ForceAssociationKeysRunCommand());
   }
@@ -78,7 +78,7 @@ export class KeysController {
     type: GetCurrentKeyDto,
   })
   @Get('/association/current')
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
   public async getCurrentAssociationKey(): Promise<GetCurrentKeyDto> {
     return this.associationKeysService.getCurrentAndNext();
   }

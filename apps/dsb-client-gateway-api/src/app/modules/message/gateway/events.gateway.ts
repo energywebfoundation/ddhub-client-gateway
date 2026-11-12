@@ -78,7 +78,9 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayInit {
         client.request.url.split('?')[1]
       ).get('clientId');
 
-      if (_clientId === null) {
+      const clientIdTrim = _clientId?.trim();
+
+      if (!clientIdTrim) {
         this.logger.warn(
           `required parameter 'clientId' not specified, dropping connection`
         );
@@ -90,8 +92,8 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayInit {
         return;
       }
 
-      const clientIdRegex = new RegExp(/^[a-zA-Z0-9\-:]+$/);
-      if (!clientIdRegex.test(_clientId)) {
+      const clientIdRegex = new RegExp(/^[a-zA-Z0-9]+$/);
+      if (!clientIdRegex.test(clientIdTrim)) {
         this.logger.warn(
           `Required paramater 'clientId' with format Alphanumeric string`
         );
@@ -103,8 +105,8 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayInit {
         return;
       }
 
-      await this.clientsService.attemptCreateClient(_clientId).catch((e) => {
-        this.logger.error(`failed to use client ${_clientId}`);
+      await this.clientsService.attemptCreateClient(clientIdTrim).catch((e) => {
+        this.logger.error(`failed to use client ${clientIdTrim}`);
 
         client.close(
           1000,
@@ -136,7 +138,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayInit {
       }
 
       this.logger.log(
-        `New client connected ${_clientId}, total client connected ${this.server.clients.size}`
+        `New client connected ${clientIdTrim}, total client connected ${this.server.clients.size}`
       );
     } catch (e) {
       this.logger.error(`unexpected websocket error`);

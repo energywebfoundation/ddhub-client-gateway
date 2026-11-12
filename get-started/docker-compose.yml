@@ -1,19 +1,5 @@
 version: '3'
 services:
-  vault_demo:
-    image: hashicorp/vault:latest
-    restart: always
-    volumes:
-      - /vault/file
-      - /etc/vault/logs
-      - ../config:/vault/config
-    ports:
-      - "8200:8200/tcp"
-    cap_add:
-      - IPC_LOCK
-    container_name: vault_demo
-    entrypoint: "vault server -config=/vault/config/vault.json"
-
   postgres:
     image: postgres:14.1-alpine
     restart: always
@@ -45,8 +31,6 @@ services:
       CACHE_SERVER_URL: https://identitycache-staging.energyweb.org/v1
       EVENT_SERVER_URL: https://identitycache-staging.energyweb.org
       SECRETS_ENGINE: $SECRETS_ENGINE
-      VAULT_ENDPOINT: http://vault_demo:8200
-      VAULT_TOKEN: $VAULT_TOKEN
       AWS_REGION: $AWS_REGION
       AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
       AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
@@ -67,7 +51,6 @@ services:
     image: aemocontainerregistry.azurecr.io/ddhub-client-gateway-backend:latest
     container_name: ddhub-gateway-api
     depends_on:
-      - 'vault_demo'
       - 'postgres'
       - 'ddhub-gateway-migrationer'
     ports:
@@ -78,8 +61,6 @@ services:
       CACHE_SERVER_URL: https://identitycache-staging.energyweb.org/v1
       EVENT_SERVER_URL: https://identitycache-staging.energyweb.org
       SECRETS_ENGINE: $SECRETS_ENGINE
-      VAULT_ENDPOINT: http://vault_demo:8200
-      VAULT_TOKEN: $VAULT_TOKEN
       AWS_REGION: $AWS_REGION
       AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
       AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
@@ -95,7 +76,6 @@ services:
     image: aemocontainerregistry.azurecr.io/ddhub-client-gateway-scheduler:latest
     container_name: ddhub-gateway-scheduler
     depends_on:
-      - 'vault_demo'
       - 'postgres'
       - 'ddhub-gateway-migrationer'
     environment:
@@ -104,8 +84,6 @@ services:
       CACHE_SERVER_URL: https://identitycache-staging.energyweb.org/v1
       EVENT_SERVER_URL: https://identitycache-staging.energyweb.org
       SECRETS_ENGINE: $SECRETS_ENGINE
-      VAULT_ENDPOINT: http://vault_demo:8200
-      VAULT_TOKEN: $VAULT_TOKEN
       AWS_REGION: $AWS_REGION
       AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
       AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY

@@ -28,7 +28,9 @@ export interface TableProps<T> {
   tableRows: T[];
   onRowClick?: (data: T) => void;
   loading?: boolean;
-  actions?: TTableComponentAction<T>[];
+  actions?:
+    | TTableComponentAction<T>[]
+    | ((data: T) => TTableComponentAction<T>[] | undefined);
   children?: ReactElement;
   showSearch?: boolean;
   showFooter?: boolean;
@@ -45,4 +47,5 @@ export interface TableProps<T> {
   showCheckbox?: boolean;
   setSelectedItems?: (values: string[]) => void;
   rowsPerPageOptions?: number[];
+  renderBanner?: () => ReactElement;
 }

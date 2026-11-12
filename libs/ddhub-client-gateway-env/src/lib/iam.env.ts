@@ -9,7 +9,6 @@ export const IAM_ENVS = Joi.object({
     .default('ddhub.apps.energyweb.iam.ewc')
     .description('Parent namespace for IAM lookup'),
   EVENT_SERVER_URL: Joi.string()
-    .uri()
     .default('identityevents-dev.energyweb.org')
     .description('NATS URL for listening for DID roles updates'),
   NATS_ENV_NAME: Joi.string().default('ewf-dev'),

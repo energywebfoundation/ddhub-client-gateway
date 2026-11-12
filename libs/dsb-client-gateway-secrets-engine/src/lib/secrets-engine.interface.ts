@@ -13,6 +13,8 @@ export enum PATHS {
   RSA_KEY = 'rsa_key',
   MNEMONIC = 'mnemonic',
   USERS = 'users',
+  API_KEY = 'api_key',
+  API_KEY_NAME = 'api_key_name',
 }
 
 export abstract class SecretsEngineService implements OnModuleInit {
@@ -40,6 +42,26 @@ export abstract class SecretsEngineService implements OnModuleInit {
    */
   abstract getUserAuthDetails(username: string): Promise<UserDetails>;
   abstract getAllUsers(): Promise<UsersList>;
+  abstract setUserPassword(username: string, password: string, role: UserRole): Promise<void>;
+  abstract userExists(username: string): Promise<boolean>
+  abstract deleteUser(username: string): Promise<void>;
+  abstract createApiKey(name: string, daysValid: number): Promise<ApiKeyDetails>;
+  abstract deleteApiKey(apiKey: string): Promise<boolean>;
+  abstract getAllApiKeys(): Promise<ApiKeyDetails[]>;
+  abstract validateApiKey(apiKey: string): Promise<boolean>;
+  abstract getApiKey(apiKey: string): Promise<ApiKeyDetails>;
+  abstract updateApiKey(apiKey: string, name: string, daysValid: number): Promise<ApiKeyDetails>;
+
+  isAuthEnabled(): boolean {
+    return false; // default
+  }
+
+  protected readonly MS_PER_DAY = 24 * 60 * 60 * 1000;
+  protected generateRandomKey(length = 48): string {
+    return [...Array(length)]
+      .map(() => Math.floor(Math.random() * 36).toString(36))
+      .join('');
+  }
 }
 
 export interface UserDetails {
@@ -71,3 +93,15 @@ export type SetCertificateDetailsResponse =
   | PutSecretValueResponse[]
   | KeyVaultSecret[]
   | null;
+
+export enum UserRole {
+  ADMIN = 'admin',
+  SUPERADMIN = 'superadmin',
+  MESSAGING = 'messaging',
+}
+
+export type ApiKeyDetails = {
+  apiKey: string;
+  name: string;
+  expiresAt: string;
+};

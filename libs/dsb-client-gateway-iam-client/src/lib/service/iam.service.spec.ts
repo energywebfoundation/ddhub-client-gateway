@@ -11,12 +11,15 @@ import { IamFactoryService } from './iam-factory.service';
 import { ConfigService } from '@nestjs/config';
 import { RetryConfigService } from '@dsb-client-gateway/ddhub-client-gateway-utils';
 import { RoleStatus } from '@ddhub-client-gateway/identity/models';
+import moment from 'moment';
 
 const mockCacheClient = {
   getClaimsBySubject: jest.fn(),
   getDIDsForRole: jest.fn(),
   getClaimsByRequester: jest.fn(),
   getAppDefinition: jest.fn(),
+  getNamespaceBySearchPhrase: jest.fn(),
+  getApplicationRoles: jest.fn(),
 };
 
 const mockClaimsService = {
@@ -25,6 +28,7 @@ const mockClaimsService = {
   publishPublicClaim: jest.fn(),
   requestClaim: jest.fn(),
   createClaimRequest: jest.fn(),
+  deleteClaim: jest.fn(),
 };
 
 const mockDidRegistry = {
@@ -357,7 +361,7 @@ describe('IamService', () => {
           claim: {
             claimType: 'claim',
             claimTypeVersion: 1,
-            fields: [],
+            requestorFields: [],
           },
           registrationTypes: [
             RegistrationTypes.OnChain,
@@ -541,6 +545,411 @@ describe('IamService', () => {
       it('should execute', () => {
         expect(error).toBeNull();
         expect(result).toBe('mockedDid');
+      });
+    });
+  });
+
+  describe('getRequesterClaims()', () => {
+    describe('should return claims with status', () => {
+      const futureTs = moment().add(7, 'days').valueOf();
+      const pastTs = moment().subtract(30, 'days').valueOf();
+
+      beforeEach(async () => {
+        service['cacheClient'] = mockCacheClient as unknown as CacheClient;
+
+        mockCacheClient.getClaimsByRequester = jest
+          .fn()
+          .mockImplementationOnce(async () => {
+            return [
+              {
+                id: '1',
+                token: 'token1',
+                claimType: 'user.roles.global.apps.ddhub.energyweb.auth.ewc',
+                namespace: 'energyweb',
+                createdAt: '2024-01-01T00:00:00Z',
+                expirationTimestamp: futureTs,
+                isAccepted: true,
+                isRejected: false,
+              },
+              {
+                id: '2',
+                token: 'token2',
+                claimType: 'marketing.roles.global.apps.ddhub.energyweb.auth.ewc',
+                namespace: 'namespace2',
+                createdAt: '2024-01-01T00:00:00Z',
+                expirationTimestamp: pastTs, // expired
+                isAccepted: true,
+                isRejected: false,
+              },
+              {
+                id: '3',
+                token: 'token3',
+                claimType: 'topiccreator.roles.global.apps.ddhub.energyweb.auth.ewc',
+                namespace: 'ewx',
+                createdAt: '2024-01-01T00:00:00Z',
+                expirationTimestamp: null,
+                isAccepted: false,
+                isRejected: false,
+              },
+            ];
+          });
+
+        try {
+          result = await service.getRequesterClaims('testDid');
+        } catch (e) {
+          error = e;
+        }
+      });
+
+      it('should execute without error', () => {
+        expect(error).toBeNull();
+        expect(result).toBeDefined();
+      });
+
+      it('should call getClaimsByRequester with correct parameters', () => {
+        expect(mockCacheClient.getClaimsByRequester).toBeCalledTimes(1);
+        expect(mockCacheClient.getClaimsByRequester).toBeCalledWith('testDid');
+      });
+
+      it('should return correctly formatted claims', () => {
+        const castedResult = result as any;
+        expect(castedResult).toHaveLength(3);
+
+        expect(castedResult[0]).toEqual({
+          id: '1',
+          token: 'token1',
+          role: 'user',
+          requestDate: '2024-01-01T00:00:00Z',
+          namespace: 'energyweb',
+          status: 'APPROVED',
+          expirationDate: moment(futureTs).toISOString(),
+          expirationStatus: null,
+        });
+
+        expect(castedResult[1]).toEqual({
+          id: '2',
+          token: 'token2',
+          role: 'marketing',
+          requestDate: '2024-01-01T00:00:00Z',
+          namespace: 'namespace2',
+          status: 'APPROVED',
+          expirationDate: moment(pastTs).toISOString(),
+          expirationStatus: 'EXPIRED',
+        });
+
+        expect(castedResult[2]).toEqual({
+          id: '3',
+          token: 'token3',
+          role: 'topiccreator',
+          requestDate: '2024-01-01T00:00:00Z',
+          namespace: 'ewx',
+          status: 'AWAITING_APPROVAL',
+          expirationDate: null,
+          expirationStatus: null,
+        });
+      });
+    });
+
+    describe('should handle errors', () => {
+      beforeEach(async () => {
+        service['cacheClient'] = mockCacheClient as unknown as CacheClient;
+
+        mockCacheClient.getClaimsByRequester = jest
+          .fn()
+          .mockImplementationOnce(async () => {
+            throw new Error('Failed to fetch claims');
+          });
+
+        try {
+          result = await service.getRequesterClaims('testDid');
+        } catch (e) {
+          error = e;
+        }
+      });
+
+      it('should throw error', () => {
+        expect(error).toBeDefined();
+        expect(error.message).toBe('Failed to fetch claims');
+      });
+    });
+  });
+
+  describe('searchApps()', () => {
+    describe('should return applications with app definition', () => {
+      beforeEach(async () => {
+        service['cacheClient'] = mockCacheClient as unknown as CacheClient;
+
+        mockCacheClient.getNamespaceBySearchPhrase = jest
+          .fn()
+          .mockImplementationOnce(async () => {
+            return [
+              {
+                name: 'app1',
+                namespace: 'namespace1',
+                definition: {
+                  appName: 'App One',
+                  logoUrl: 'https://example.com/logo1.png'
+                }
+              },
+              {
+                name: 'app2',
+                namespace: 'namespace2',
+                definition: {
+                  appName: 'App Two',
+                  logoUrl: 'https://example.com/logo2.png'
+                }
+              }
+            ];
+          });
+
+        try {
+          result = await service.searchApps('test');
+        } catch (e) {
+          error = e;
+        }
+      });
+
+      it('should execute without error', () => {
+        expect(error).toBeNull();
+        expect(result).toBeDefined();
+      });
+
+      it('should call getNamespaceBySearchPhrase with correct parameters', () => {
+        expect(mockCacheClient.getNamespaceBySearchPhrase).toBeCalledTimes(1);
+        expect(mockCacheClient.getNamespaceBySearchPhrase).toBeCalledWith('test', ['App', 'Org']);
+      });
+
+      it('should return correctly formatted applications', () => {
+        const castedResult = result as any;
+        expect(castedResult).toHaveLength(2);
+
+        expect(castedResult[0]).toEqual({
+          name: 'app1',
+          namespace: 'namespace1',
+          appName: 'App One',
+          logoUrl: 'https://example.com/logo1.png'
+        });
+
+        expect(castedResult[1]).toEqual({
+          name: 'app2',
+          namespace: 'namespace2',
+          appName: 'App Two',
+          logoUrl: 'https://example.com/logo2.png'
+        });
+      });
+    });
+
+    describe('should handle applications without app definition', () => {
+      beforeEach(async () => {
+        service['cacheClient'] = mockCacheClient as unknown as CacheClient;
+
+        mockCacheClient.getNamespaceBySearchPhrase = jest
+          .fn()
+          .mockImplementationOnce(async () => {
+            return [
+              {
+                name: 'app1',
+                namespace: 'namespace1',
+                definition: {}
+              }
+            ];
+          });
+
+        try {
+          result = await service.searchApps('test');
+        } catch (e) {
+          error = e;
+        }
+      });
+
+      it('should execute without error', () => {
+        expect(error).toBeNull();
+        expect(result).toBeDefined();
+      });
+
+      it('should return application with empty appName and logoUrl', () => {
+        const castedResult = result as any;
+        expect(castedResult).toHaveLength(1);
+
+        expect(castedResult[0]).toEqual({
+          name: 'app1',
+          namespace: 'namespace1',
+          appName: '',
+          logoUrl: ''
+        });
+      });
+    });
+
+    describe('should handle errors', () => {
+      beforeEach(async () => {
+        service['cacheClient'] = mockCacheClient as unknown as CacheClient;
+
+        mockCacheClient.getNamespaceBySearchPhrase = jest
+          .fn()
+          .mockImplementationOnce(async () => {
+            throw new Error('Failed to search apps');
+          });
+
+        try {
+          result = await service.searchApps('test');
+        } catch (e) {
+          error = e;
+        }
+      });
+
+      it('should throw error', () => {
+        expect(error).toBeDefined();
+        expect(error.message).toBe('Failed to search apps');
+      });
+    });
+  });
+
+  describe('getAppRoles()', () => {
+    describe('should return application roles', () => {
+      beforeEach(async () => {
+        service['cacheClient'] = mockCacheClient as unknown as CacheClient;
+
+        mockCacheClient.getApplicationRoles = jest
+          .fn()
+          .mockImplementationOnce(async () => {
+            return [
+              {
+                name: 'admin',
+                namespace: 'namespace1',
+                definition: {
+                  requestorFields: [{
+                    label: 'Organisation Name',
+                    pattern: null,
+                    required: true,
+                    fieldType: 'text',
+                    maxLength: null,
+                    minLength: null
+                  }],
+                }
+              },
+              {
+                name: 'user',
+                namespace: 'namespace1',
+                definition: {
+                  requestorFields: []
+                },
+              }
+            ];
+          });
+
+        try {
+          result = await service.getAppRoles('namespace1');
+        } catch (e) {
+          error = e;
+        }
+      });
+
+      it('should execute without error', () => {
+        expect(error).toBeNull();
+        expect(result).toBeDefined();
+      });
+
+      it('should call getApplicationRoles with correct parameters', () => {
+        expect(mockCacheClient.getApplicationRoles).toBeCalledTimes(1);
+        expect(mockCacheClient.getApplicationRoles).toBeCalledWith('namespace1');
+      });
+
+      it('should return correctly formatted roles', () => {
+        const castedResult = result as any;
+        expect(castedResult).toHaveLength(2);
+
+        expect(castedResult[0]).toEqual({
+          role: 'admin',
+          namespace: 'namespace1',
+          requestorFields: [{
+            label: 'Organisation Name',
+            pattern: null,
+            required: true,
+            fieldType: 'text',
+            maxLength: null,
+            minLength: null
+          }],
+        });
+
+        expect(castedResult[1]).toEqual({
+          role: 'user',
+          namespace: 'namespace1',
+          requestorFields: [],
+        });
+      });
+    });
+
+    describe('should handle errors', () => {
+      beforeEach(async () => {
+        service['cacheClient'] = mockCacheClient as unknown as CacheClient;
+
+        mockCacheClient.getApplicationRoles = jest
+          .fn()
+          .mockImplementationOnce(async () => {
+            throw new Error('Failed to fetch roles');
+          });
+
+        try {
+          result = await service.getAppRoles('namespace1');
+        } catch (e) {
+          error = e;
+        }
+      });
+
+      it('should throw error', () => {
+        expect(error).toBeDefined();
+        expect(error.message).toBe('Failed to fetch roles');
+      });
+    });
+  });
+
+  describe('deleteClaimById()', () => {
+    describe('should delete claim successfully', () => {
+      beforeEach(async () => {
+        service['claimsService'] = mockClaimsService as unknown as ClaimsService;
+
+        try {
+          await service.deleteClaimById('test-claim-id');
+        } catch (e) {
+          error = e;
+        }
+      });
+
+      it('should execute without error', () => {
+        expect(error).toBeNull();
+      });
+
+      it('should call deleteClaim with correct parameters', () => {
+        expect(mockClaimsService.deleteClaim).toBeCalledTimes(1);
+        expect(mockClaimsService.deleteClaim).toBeCalledWith({ id: 'test-claim-id' });
+      });
+    });
+
+    describe('should handle errors', () => {
+      beforeEach(async () => {
+        service['claimsService'] = mockClaimsService as unknown as ClaimsService;
+
+        mockClaimsService.deleteClaim = jest
+          .fn()
+          .mockImplementationOnce(async () => {
+            throw new Error('Failed to delete claim');
+          });
+
+        try {
+          await service.deleteClaimById('test-claim-id');
+        } catch (e) {
+          error = e;
+        }
+      });
+
+      it('should throw error', () => {
+        expect(error).toBeDefined();
+        expect(error.message).toBe('Failed to delete claim');
+      });
+
+      it('should call deleteClaim with correct parameters', () => {
+        expect(mockClaimsService.deleteClaim).toBeCalledTimes(1);
+        expect(mockClaimsService.deleteClaim).toBeCalledWith({ id: 'test-claim-id' });
       });
     });
   });

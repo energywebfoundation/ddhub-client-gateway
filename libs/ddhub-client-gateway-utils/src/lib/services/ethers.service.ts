@@ -32,7 +32,7 @@ export class EthersService {
       claimData: {
         blockNumber: 999999999999,
       },
-      iat: Math.floor(Date.now() / 1000), // Issued at now
+      iat: Math.floor(Date.now() / 1000), // Current
       exp: Math.floor(Date.now() / 1000) + ttl  // Expires in 5 minutes
     };
 

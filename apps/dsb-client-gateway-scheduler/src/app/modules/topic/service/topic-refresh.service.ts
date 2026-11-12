@@ -15,6 +15,8 @@ import {
   TopicDataResponse,
   TopicMonitorUpdates,
   TopicVersionResponse,
+  decodeValuesOnly,
+  decodeValuesOnlyArray
 } from '@dsb-client-gateway/ddhub-client-gateway-message-broker';
 import { SchedulerRegistry } from '@nestjs/schedule';
 import { CronJob } from 'cron';
@@ -38,7 +40,7 @@ export class TopicRefreshService implements OnApplicationBootstrap {
     protected readonly configService: ConfigService,
     protected readonly commandBus: CommandBus,
     protected readonly topicMonitorWrapper: TopicMonitorRepositoryWrapper
-  ) {}
+  ) { }
 
   public async onApplicationBootstrap(): Promise<void> {
     const isCronEnabled: boolean = this.configService.get<boolean>(
@@ -238,11 +240,11 @@ export class TopicRefreshService implements OnApplicationBootstrap {
           await this.wrapper.topicRepository.save({
             id: topic.id,
             owner: topic.owner,
-            name: topic.name,
+            name: decodeValuesOnly(topic.name),
             schemaType: topic.schemaType,
             version: topicVersion.version,
             schema: topicVersion.schema,
-            tags: topicVersion.tags,
+            tags: decodeValuesOnlyArray(topicVersion.tags),
             majorVersion: major,
             minorVersion: minor,
             patchVersion: patch,

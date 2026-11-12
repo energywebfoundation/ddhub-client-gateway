@@ -43,7 +43,7 @@ export class DdhubHealthService extends DdhubBaseService {
         this.logger.error(`MB Health request failed - ${err.message}`);
         return {
           statusCode: err.response?.status || 500,
-          message: err.response?.data || 'Internal Server Error',
+          message: (err.response?.data as string) || 'Internal Server Error',
         };
       }
 

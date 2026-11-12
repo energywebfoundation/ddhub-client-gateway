@@ -12,16 +12,16 @@ import {
 @ApiTags('Enrolment')
 @UseGuards(UserGuard)
 export class EnrolmentController {
-  constructor(protected readonly enrolmentService: EnrolmentService) {}
+  constructor(protected readonly enrolmentService: EnrolmentService) { }
 
   @Get()
-  @Roles(UserRole.MESSAGING, UserRole.ADMIN)
+  @Roles(UserRole.MESSAGING, UserRole.ADMIN, UserRole.SUPERADMIN)
   public async get(): Promise<Enrolment> {
     return this.enrolmentService.get();
   }
 
   @Post()
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
   public async init() {
     await this.enrolmentService.startListening();
   }

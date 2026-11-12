@@ -30,6 +30,7 @@ import { DdhubClientGatewayVersionModule } from '@dsb-client-gateway/ddhub-clien
 import { AddressBookModule } from './modules/address-book/address-book.module';
 import { UserModule } from './modules/user/user.module';
 import { DdhubClientGatewayUserRolesModule } from '@dsb-client-gateway/ddhub-client-gateway-user-roles';
+import { RolesModule } from './modules/roles/roles.module';
 
 @Module({})
 export class AppModule {
@@ -58,11 +59,37 @@ export class AppModule {
                 levelFirst: true,
                 translateTime: "UTC:yyyy-mm-dd'T'HH:MM:ss.l'Z'",
                 singleLine: true,
+                messageFormat: '[{context}][{user}] {msg}',
+                ignore: 'pid,hostname,context'
+              },
+            },
+            serializers: {
+              req: (req) => {
+                // Sanitize headers to exclude sensitive information
+                // HTTP headers are case-insensitive, so we check lowercase
+                const sanitizedHeaders = { ...req.headers };
+                const sensitiveHeaders = ['x-api-key', 'authorization'];
+
+                // Remove sensitive headers in any case variation
+                Object.keys(sanitizedHeaders).forEach((key) => {
+                  if (sensitiveHeaders.includes(key.toLowerCase())) {
+                    delete sanitizedHeaders[key];
+                  }
+                });
+
+                return {
+                  id: req.id,
+                  method: req.method,
+                  url: req.url,
+                  query: req.query,
+                  params: req.params,
+                  headers: sanitizedHeaders,
+                };
               },
             },
             customProps: (req, res) => {
               return {
-                user: res?.req?.user,
+                user: res?.req?.user?.username,
               };
             },
           },
@@ -93,6 +120,7 @@ export class AppModule {
       AddressBookModule,
       UserModule,
       DdhubClientGatewayUserRolesModule,
+      RolesModule,
     ];
 
     const providers = [

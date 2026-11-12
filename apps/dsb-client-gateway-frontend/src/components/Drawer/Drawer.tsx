@@ -9,6 +9,8 @@ import {
   Settings,
   Inbox,
   Edit3,
+  Users,
+  User,
 } from 'react-feather';
 import {
   ClientSubscriptionIcon,
@@ -72,6 +74,25 @@ export const Drawer = () => {
         },
       ],
       menuIcon: <Command className={classes.icon} size={18} />,
+    },
+    {
+      title: 'Roles',
+      href: routerConst.Roles,
+      icon: <User className={classes.icon} size={18} />,
+    },
+    {
+      menuTitle: 'Users and access',
+      menuIcon: <Users className={classes.icon} size={18} />,
+      subMenu: [
+        {
+          href: routerConst.Users,
+          title: 'Users',
+        },
+        {
+          href: routerConst.APIKeys,
+          title: 'API Keys',
+        },
+      ],
     },
   ];
 

@@ -7,7 +7,6 @@ import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions'
 import { B3InjectEncoding, B3Propagator } from '@opentelemetry/propagator-b3';
 import {
   CompositePropagator,
-  W3CBaggagePropagator,
   W3CTraceContextPropagator,
 } from '@opentelemetry/core';
 import { diag, DiagConsoleLogger, DiagLogLevel } from '@opentelemetry/api';
@@ -35,7 +34,6 @@ export const otelSDK = new NodeSDK({
   textMapPropagator: new CompositePropagator({
     propagators: [
       new W3CTraceContextPropagator(),
-      new W3CBaggagePropagator(),
       new B3Propagator(),
       new B3Propagator({
         injectEncoding: B3InjectEncoding.MULTI_HEADER,

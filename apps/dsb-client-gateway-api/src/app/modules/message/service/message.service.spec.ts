@@ -40,7 +40,6 @@ import {
 } from '../message.const';
 import { MalformedJSONException } from '../exceptions/malformed-json.exception';
 import { DateTime } from 'luxon';
-import { GetReceivedMessageResponseDto } from '../dto/response/get-received-message-response.dto';
 
 const mockSecretsEngineService = {
   getPrivateKey: jest.fn(),
@@ -375,7 +374,8 @@ describe(`${MessageService.name}`, () => {
         expect(mockKeysService.verifySignature).toBeCalledWith(
           'senderDid',
           'signature',
-          'payload',
+          // eslint-disable-next-line no-useless-escape
+          '\"payload\"',
           expect.any(Object)
         );
       });
@@ -404,7 +404,8 @@ describe(`${MessageService.name}`, () => {
       it('should decrypt message', () => {
         expect(mockKeysService.decryptMessage).toBeCalledTimes(1);
         expect(mockKeysService.decryptMessage).toBeCalledWith(
-          'payload',
+          // eslint-disable-next-line no-useless-escape
+          '\"payload\"',
           'cgwid',
           'senderDid'
         );

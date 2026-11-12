@@ -46,7 +46,7 @@ export class TopicsController {
   constructor(
     protected readonly ddhubTopicsService: DdhubTopicsService,
     protected readonly topicService: TopicService
-  ) {}
+  ) { }
 
   @Get('')
   @ApiResponse({
@@ -151,7 +151,7 @@ export class TopicsController {
     description: 'Unauthorized',
   })
   @HttpCode(HttpStatus.CREATED)
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
   public async postTopics(
     @Body() data: PostTopicBodyDto
   ): Promise<PostTopicDto> {
@@ -182,7 +182,7 @@ export class TopicsController {
     description: 'Topic not found',
   })
   @HttpCode(HttpStatus.OK)
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
   public async updateTopicsByIdAndVersion(
     @Param() { id, versionNumber }: TopicsByIdAndVersionParamsDto,
     @Body() data: UpdateTopicHistoryBodyDto
@@ -215,7 +215,7 @@ export class TopicsController {
     description: 'Topic not found',
   })
   @HttpCode(HttpStatus.OK)
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
   public async updateTopics(
     @Param() { id }: GetTopicsParamsDto,
     @Body() data: UpdateTopicBodyDto
@@ -248,7 +248,7 @@ export class TopicsController {
     description: 'Topic not found',
   })
   @HttpCode(HttpStatus.OK)
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
   public async deleteTopics(
     @Param() { id }: GetTopicsParamsDto
   ): Promise<DeleteTopic> {
@@ -280,7 +280,7 @@ export class TopicsController {
     description: 'Topic not found',
   })
   @HttpCode(HttpStatus.OK)
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
   public async deleteTopicsByVersion(
     @Param() { id, versionNumber }: DeleteTopicsVersionParamsDto
   ): Promise<DeleteTopic> {

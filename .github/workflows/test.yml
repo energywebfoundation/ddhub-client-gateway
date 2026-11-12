@@ -3,12 +3,12 @@ on:
   workflow_call:
     outputs:
       affected:
-        description: "Affected Apps comparing with develop branch"
+        description: 'Affected Apps comparing with develop branch'
         value: ${{ jobs.run_tests.outputs.affected }}
     secrets:
       NX_BASE:
         required: true
-        description: "NX comparison base"
+        description: 'NX comparison base'
 
 jobs:
   run_tests:
@@ -24,7 +24,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
-          node-version: '16.14.2'
+          node-version: '18.20.5'
       - name: Cache node modules
         uses: actions/cache@v4
         env:
@@ -54,4 +54,3 @@ jobs:
       - name: Run linters
         if: contains(${{ env.NX_BASE }}, 'develop')
         run: nx affected --target=lint --exclude=dsb-client-gateway-api-e2e,ui-core
-

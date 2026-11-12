@@ -3,5 +3,8 @@ import { UserRole } from '@ddhub-client-gateway-frontend/ui/login';
 import { useRouteGuard } from '../../utils/RouteGuard.effects';
 
 export default function Index() {
-  return useRouteGuard(SettingsContainer, UserRole.ADMIN);
+  return useRouteGuard(SettingsContainer, [
+    UserRole.ADMIN,
+    UserRole.SUPERADMIN,
+  ]);
 }

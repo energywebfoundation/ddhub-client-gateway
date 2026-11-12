@@ -3,8 +3,8 @@ import { Step } from './Step/Step';
 import { TStep } from './Step/stepTypes';
 
 export interface StepsProps {
-  activeStep: number;
-  setActiveStep?: (index: number) => void;
+  activeStep: number | string;
+  setActiveStep?: (index: number | string) => void;
   steps: TStep[];
 }
 
@@ -15,7 +15,7 @@ export const Steps = ({ activeStep, setActiveStep, steps }: StepsProps) => {
         return (
           <Step
             key={index}
-            active={activeStep === index}
+            active={activeStep === index || activeStep === step.id}
             subtitle={step.subtitle}
             title={step.title}
             icon={step.icon}
@@ -23,7 +23,7 @@ export const Steps = ({ activeStep, setActiveStep, steps }: StepsProps) => {
             disabled={step.disabled}
             clickHandler={() => {
               if (setActiveStep) {
-                setActiveStep(index);
+                setActiveStep(step.id || index);
               }
             }}
           />

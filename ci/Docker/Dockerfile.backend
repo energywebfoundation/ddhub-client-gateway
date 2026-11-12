@@ -1,4 +1,4 @@
-ARG IMAGE=node:16.10-alpine
+ARG IMAGE=node:18.20.5-alpine
 ARG NODE_ENV=production
 
 # -----Note-------#
@@ -20,9 +20,11 @@ RUN apk add --no-cache python3 py3-pip make g++
 
 COPY --chown=node:node dist/apps/dsb-client-gateway-api/package.json /usr/app/
 COPY --chown=node:node package-lock.json /usr/app/
+COPY --chown=node:node package.json /usr/app/root-package.json
+COPY --chown=node:node ci/Docker/apply-overrides.js /usr/app/
 
 WORKDIR /usr/app
-RUN npm ci --production
+RUN node apply-overrides.js package.json root-package.json && npm ci --omit=dev
 
 
 FROM $IMAGE

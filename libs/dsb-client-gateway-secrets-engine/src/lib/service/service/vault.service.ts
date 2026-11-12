@@ -1,11 +1,13 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import {
+  ApiKeyDetails,
   CertificateDetails,
   PATHS,
   SecretsEngineService,
   SetPrivateKeyResponse,
   SetRSAPrivateKeyResponse,
   UserDetails,
+  UserRole,
   UsersList,
 } from '../../secrets-engine.interface';
 import { ConfigService } from '@nestjs/config';
@@ -35,11 +37,6 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
   }
 
   public async getAllUsers(): Promise<UsersList> {
-    if (this.configService.get('USER_AUTH_ENABLED', false) === false) {
-      this.logger.debug('User auth is not enabled, skipping getAllUsers call');
-      return [];
-    }
-
     const res = await this.client
       .list(`${this.prefix}/${PATHS.USERS}`)
       .catch((e) => {
@@ -74,13 +71,6 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
   public async getUserAuthDetails(
     username: string
   ): Promise<UserDetails | null> {
-    if (this.configService.get('USER_AUTH_ENABLED', false) === false) {
-      this.logger.debug(
-        'User auth is not enabled, skipping getUserAuthDetails call'
-      );
-      return null;
-    }
-
     return this.client
       .read(`${this.prefix}${PATHS.USERS}/${username}`)
       .then(({ data }) => ({ password: data.password, role: data.role }))
@@ -92,19 +82,26 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
       });
   }
 
-  @Span('vault_setUserAuthDetails')
+  @Span('vault_userExists')
+  public async userExists(username: string): Promise<boolean> {
+    const result = await this.client.read(`${this.prefix}${PATHS.USERS}/${username}`);
+    return !!result;
+  }
+
+  @Span('vault_setUserPassword')
   public async setUserPassword(
     username: string,
-    password: string
+    password: string,
+    role: UserRole
   ): Promise<void> {
     this.logger.log('Attempting to write user');
 
     await this.client.write(`${this.prefix}${PATHS.USERS}/${username}`, {
       password,
-      username,
+      role: role
     });
 
-    this.logger.log('Writing mnemonic');
+    this.logger.log('Writing user');
   }
 
   @Span('vault_onModuleInit')
@@ -252,5 +249,148 @@ export class VaultService extends SecretsEngineService implements OnModuleInit {
 
     this.logger.log('Writing private key');
     return null;
+  }
+
+  @Span('vault_deleteUser')
+  public async deleteUser(username: string): Promise<void> {
+    this.logger.log(`Attempting to delete user ${username}`);
+
+    await this.client.delete(`${this.prefix}${PATHS.USERS}/${username}`);
+
+    this.logger.log(`Delete user ${username}`);
+    return null;
+  }
+
+  @Span('vault_createApiKey')
+  public async createApiKey(name: string, daysValid: number): Promise<ApiKeyDetails> {
+    this.logger.log(`Attempting to create api key `);
+
+    const existingKeys = await this.client.list(`${this.prefix}${PATHS.API_KEY_NAME}`).catch(() => { return { data: { keys: [] } } });
+    const duplicate = existingKeys.data.keys.find((key: any) => key === name);
+    if (duplicate) {
+      throw new Error(`API key with name "${name}" already exists.`);
+    }
+
+    const apiKey = this.generateRandomKey();
+    const expiresAt = new Date(Date.now() + daysValid * this.MS_PER_DAY);
+
+    const data = {
+      name,
+      expiresAt: expiresAt.toISOString(),
+    };
+
+    await this.client.write(`${this.prefix}${PATHS.API_KEY}/${apiKey}`, { ...data });
+    await this.client.write(`${this.prefix}${PATHS.API_KEY_NAME}/${name}`, { ...data });
+
+    this.logger.log(`create api key ${apiKey}`);
+    return { apiKey, name, expiresAt: expiresAt.toISOString() };
+  }
+
+  @Span('vault_updateApiKey')
+  public async updateApiKey(apiKey: string, name: string, daysValid: number): Promise<ApiKeyDetails> {
+    this.logger.log(`Attempting to update api key ${apiKey}`);
+
+    // Lookup the existing key
+    const existingKeyData = await this.client.read(`${this.prefix}${PATHS.API_KEY}/${apiKey}`);
+    if (!existingKeyData || !existingKeyData.data) {
+      throw new Error(`API key "${apiKey}" not found.`);
+    }
+
+    // If the name has changed and a document exists under the new name, prevent duplicate
+    if (existingKeyData.data.name !== name) {
+      const existingByName = await this.client.list(`${this.prefix}${PATHS.API_KEY_NAME}`).catch(() => { return { data: { keys: [] } } });
+      const duplicate = existingByName.data.keys.find((key: any) => key === name);
+      if (duplicate) {
+        throw new Error(`API key with name "${name}" already exists.`);
+      }
+
+      // remove the old name entry
+      await this.client.delete(`${this.prefix}${PATHS.API_KEY_NAME}/${existingKeyData.data.name}`);
+    }
+
+    const expiresAt = new Date(Date.now() + daysValid * this.MS_PER_DAY).toISOString();
+
+    const data = {
+      name,
+      expiresAt,
+    };
+
+    // Update the main key and the name lookup
+    await this.client.write(`${this.prefix}${PATHS.API_KEY}/${apiKey}`, data);
+    await this.client.write(`${this.prefix}${PATHS.API_KEY_NAME}/${name}`, data);
+
+    this.logger.log(`updated api key ${apiKey}`);
+    return { apiKey, name, expiresAt };
+  }
+
+  @Span('vault_deleteApiKey')
+  public async deleteApiKey(apiKey: string): Promise<boolean> {
+    try {
+      this.logger.log(`Attempting to delete api key `);
+      const result = await this.getApiKey(apiKey);
+      if (!result) return false;
+      await this.client.delete(`${this.prefix}${PATHS.API_KEY}/${apiKey}`);
+      await this.client.delete(`${this.prefix}${PATHS.API_KEY_NAME}/${result.name}`);
+
+      this.logger.log(`Delete api key ${apiKey}`);
+      return true;
+    } catch (error) {
+      this.logger.error('failed to delete api key');
+      this.logger.error(error);
+      return false;
+    }
+  }
+
+  @Span('vault_getApiKey')
+  public async getApiKey(apiKey: string): Promise<ApiKeyDetails> {
+    try {
+      this.logger.log(`Attempting to get api key `);
+
+      const result = await this.client.read(`${this.prefix}${PATHS.API_KEY}/${apiKey}`);
+
+      this.logger.log(`Get api key ${apiKey}`);
+      return { apiKey, ...result.data };
+    } catch (error) {
+      this.logger.error('failed to get api key');
+      this.logger.error(error);
+      return null;
+    }
+  }
+
+  @Span('vault_getAllApiKeys')
+  public async getAllApiKeys(): Promise<ApiKeyDetails[]> {
+    const res = await this.client
+      .list(`${this.prefix}/${PATHS.API_KEY}`)
+      .catch((e) => {
+        this.logger.error('failed to load list of users');
+        this.logger.error(e);
+
+        return {
+          data: {
+            keys: [],
+          },
+        };
+      });
+
+    const keys: string[] = res.data.keys;
+
+    const details: ApiKeyDetails[] = [];
+    for (const key of keys) {
+      const _name = key.replace(`${this.prefix}/`, "");
+      const result = await this.getApiKey(_name);
+      details.push({
+        ...result,
+      });
+    }
+    const cleanedDetails: ApiKeyDetails[] = details.filter(item => item !== null);
+    return cleanedDetails;
+  }
+
+  @Span('vault_validateApiKey')
+  public async validateApiKey(apiKey: string): Promise<boolean> {
+    const result = await this.getApiKey(apiKey);
+    if (!result) return false;
+    if (new Date() > new Date(result.expiresAt)) return false;
+    return true;
   }
 }

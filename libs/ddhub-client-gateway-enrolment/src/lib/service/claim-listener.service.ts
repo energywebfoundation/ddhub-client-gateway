@@ -25,7 +25,7 @@ export class ClaimListenerService {
     private readonly iamService: IamService,
     @Inject(forwardRef(() => EnrolmentService))
     private readonly enrolmentService: EnrolmentService
-  ) {}
+  ) { }
 
   public async stop(): Promise<void> {
     this.sub.unsubscribe();
@@ -38,7 +38,6 @@ export class ClaimListenerService {
     if (this.eventEmitter) {
       this.logger.warn('Already listening');
       this.eventEmitter.emit(EnrolmentEvents.LISTEN);
-
       return;
     }
 
@@ -120,11 +119,10 @@ export class ClaimListenerService {
   }
 
   private getTopicName(): string {
-    return `${
-      ClaimEventType.ISSUE_CREDENTIAL
-    }.claim-exchange.${this.iamService.getDIDAddress()}.${this.configService.get<string>(
-      'NATS_ENV_NAME',
-      'ewf-dev'
-    )}`;
+    return `${ClaimEventType.ISSUE_CREDENTIAL
+      }.claim-exchange.${this.iamService.getDIDAddress()}.${this.configService.get<string>(
+        'NATS_ENV_NAME',
+        'ewf-dev'
+      )}`;
   }
 }

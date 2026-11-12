@@ -39,7 +39,10 @@ export const routeRestrictions = new Map<string, string>()
   .set('messageOutbox', routerConst.MessageOutbox)
   .set('addressBook', routerConst.AddressBook)
   .set('clientIds', routerConst.ClientIds)
-  .set('integrationApis', routerConst.IntegrationAPIs);
+  .set('integrationApis', routerConst.IntegrationAPIs)
+  .set('roles', routerConst.Roles)
+  .set('users', routerConst.Users)
+  .set('apiKeys', routerConst.APIKeys);
 
 enum VersionStatus {
   UNAVAILABLE = 'Unavailable',
@@ -75,14 +78,19 @@ export const getRoutesToDisplay = (
   let adminRoutes = new Set<string>();
   if (config.authEnabled && userAuth) {
     switch (userAuth.role) {
+      case UserRole.SUPERADMIN:
       case UserRole.ADMIN:
         if (mtlsIsValid === false) {
           return new Set([routerConst.GatewaySettings]);
         }
 
-        adminRoutes = new Set<string>(
-          mapRoleRestrictions(restrictions, 'allowedAuthRoles', UserRole.ADMIN)
-        );
+        adminRoutes = new Set<string>([
+          ...mapRoleRestrictions(
+            restrictions,
+            'allowedAuthRoles',
+            userAuth.role as UserRole
+          ),
+        ]);
         break;
       case UserRole.MESSAGING: {
         if (mtlsIsValid === false) {

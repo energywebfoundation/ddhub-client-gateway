@@ -23,7 +23,7 @@ import {
 @ApiTags('Clients')
 @UseGuards(UserGuard)
 export class ClientController {
-  constructor(protected readonly clientsService: ClientsService) {}
+  constructor(protected readonly clientsService: ClientsService) { }
 
   @Get('/')
   @ApiResponse({
@@ -42,7 +42,7 @@ export class ClientController {
     description: 'Client deleted',
   })
   @HttpCode(HttpStatus.NO_CONTENT)
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
   public async delete(
     @Param() { clientId }: DeleteClientParamsDto
   ): Promise<void> {
@@ -55,7 +55,7 @@ export class ClientController {
     description: 'Clients deleted',
   })
   @HttpCode(HttpStatus.NO_CONTENT)
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
   public async deleteAll(
     @Body() { clientsIds }: DeleteManyClientsBodyDto
   ): Promise<void> {

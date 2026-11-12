@@ -36,7 +36,7 @@ import { join } from 'path';
 export class KeysService implements OnModuleInit {
   private readonly logger = new Logger(KeysService.name);
   private readonly symmetricAlgorithm = 'aes-256-cbc';
-  private readonly rsaPadding = crypto.constants.RSA_PKCS1_PADDING;
+  private readonly rsaPadding = crypto.constants.RSA_PKCS1_OAEP_PADDING;
 
   constructor(
     protected readonly secretsEngineService: SecretsEngineService,
@@ -48,7 +48,7 @@ export class KeysService implements OnModuleInit {
     protected readonly iamInitService: IamInitService,
     protected readonly didWrapper: DidWrapperRepository,
     protected readonly configService: ConfigService
-  ) {}
+  ) { }
 
   @Span('keys_storeKeysForMessage')
   public async storeKeysForMessage(): Promise<void> {
@@ -444,8 +444,7 @@ export class KeysService implements OnModuleInit {
     const existingKeyInDid = did.publicKey.filter(
       (c) =>
         c.id ===
-        `${this.iamService.getDIDAddress()}#${
-          DIDPublicKeyTags.DSB_SYMMETRIC_ENCRYPTION
+        `${this.iamService.getDIDAddress()}#${DIDPublicKeyTags.DSB_SYMMETRIC_ENCRYPTION
         }`
     );
 
@@ -513,8 +512,7 @@ export class KeysService implements OnModuleInit {
     const existingKeyInDid = did.publicKey.filter(
       (c) =>
         c.id ===
-        `${this.iamService.getDIDAddress()}#${
-          DIDPublicKeyTags.DSB_SIGNATURE_KEY
+        `${this.iamService.getDIDAddress()}#${DIDPublicKeyTags.DSB_SIGNATURE_KEY
         }`
     );
 

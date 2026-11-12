@@ -4,6 +4,7 @@ import {
   CacheClient,
   ClaimsService,
   DidRegistry,
+  DidStoreType,
   ILogger,
   initWithPrivateKeySigner,
   LogLevel,
@@ -64,20 +65,9 @@ export class IamFactoryService {
         'connected to iam cache server, connecting to did registry'
       );
 
-      const projectId = configService.get('INFURA_PROJECT_ID');
-      const projectSecret = configService.get('INFURA_PROJECT_SECRET');
-
-      const auth =
-        'Basic ' +
-        Buffer.from(projectId + ':' + projectSecret).toString('base64');
-
       const { claimsService, didRegistry } = await connectToDidRegistry({
-        host: configService.get<string>('IPFS_HOST'),
-        port: configService.get<number>('IPFS_PORT'),
-        protocol: configService.get<string>('IPFS_PROTOCOL'),
-        headers: {
-          authorization: auth,
-        },
+        type: DidStoreType.SSI,
+        privateKey,
       });
 
       await didRegistry.init();

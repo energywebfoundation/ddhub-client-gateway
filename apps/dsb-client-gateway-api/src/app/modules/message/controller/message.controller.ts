@@ -54,14 +54,14 @@ export class MessageController {
     protected readonly messageService: MessageService,
     protected readonly offlineMessagesService: OfflineMessagesService,
     protected readonly pinoLogger: PinoLogger
-  ) {}
+  ) { }
 
   @Get('/sent/download/:cgwId')
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'File downloaded successfully',
   })
-  @Roles(UserRole.MESSAGING, UserRole.ADMIN)
+  @Roles(UserRole.MESSAGING, UserRole.ADMIN, UserRole.SUPERADMIN)
   @HttpCode(HttpStatus.OK)
   public async downloadOfflineFile(
     @Param('cgwId', ParseUUIDPipe)
@@ -98,7 +98,7 @@ export class MessageController {
     status: HttpStatus.NOT_FOUND,
     description: 'Messages Not found',
   })
-  @Roles(UserRole.MESSAGING, UserRole.ADMIN)
+  @Roles(UserRole.MESSAGING, UserRole.ADMIN, UserRole.SUPERADMIN)
   @HttpCode(HttpStatus.OK)
   public async getSentMessages(
     @Query() dto: GetSentMessagesRequestDto
@@ -132,7 +132,7 @@ export class MessageController {
     status: HttpStatus.NOT_FOUND,
     description: 'Messages Not found',
   })
-  @Roles(UserRole.MESSAGING, UserRole.ADMIN)
+  @Roles(UserRole.MESSAGING, UserRole.ADMIN, UserRole.SUPERADMIN)
   @HttpCode(HttpStatus.OK)
   public async getReceivedMessages(
     @Query() dto: GetMessagesDto
@@ -152,7 +152,7 @@ export class MessageController {
     description: 'Messages acked successfully',
   })
   @HttpCode(HttpStatus.NO_CONTENT)
-  @Roles(UserRole.MESSAGING, UserRole.ADMIN)
+  @Roles(UserRole.MESSAGING, UserRole.ADMIN, UserRole.SUPERADMIN)
   public async ackMessages(
     @Body() body: AckMessagesRequestDto,
     @Username() username: string
@@ -181,7 +181,7 @@ export class MessageController {
   })
   @HttpCode(HttpStatus.OK)
   @UseInterceptors(ClientsInterceptor('clientId', 'query', 'fqcn', 'query'))
-  @Roles(UserRole.MESSAGING, UserRole.ADMIN)
+  @Roles(UserRole.MESSAGING, UserRole.ADMIN, UserRole.SUPERADMIN)
   public async getMessage(
     @Query() dto: GetMessagesDto
   ): Promise<GetMessageResponse[]> {
@@ -209,7 +209,7 @@ export class MessageController {
     description: 'Unauthorized',
   })
   @HttpCode(HttpStatus.OK)
-  @Roles(UserRole.MESSAGING, UserRole.ADMIN)
+  @Roles(UserRole.MESSAGING, UserRole.ADMIN, UserRole.SUPERADMIN)
   public async downloadMessage(
     @Query() { fileId }: DownloadMessagesDto,
     @Response() res
@@ -259,7 +259,7 @@ export class MessageController {
   })
   @UseInterceptors(ClientsInterceptor('clientId', 'body', 'fqcn', 'body'))
   @HttpCode(HttpStatus.OK)
-  @Roles(UserRole.MESSAGING, UserRole.ADMIN)
+  @Roles(UserRole.MESSAGING, UserRole.ADMIN, UserRole.SUPERADMIN)
   public async create(
     @Body() dto: SendMessageDto
   ): Promise<SendMessageResponseDto> {
@@ -294,7 +294,7 @@ export class MessageController {
   @HttpCode(HttpStatus.CREATED)
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('file'))
-  @Roles(UserRole.MESSAGING, UserRole.ADMIN)
+  @Roles(UserRole.MESSAGING, UserRole.ADMIN, UserRole.SUPERADMIN)
   public async uploadFile(
     @UploadedFile('file') file: Express.Multer.File,
     @Body() dto: uploadMessageBodyDto

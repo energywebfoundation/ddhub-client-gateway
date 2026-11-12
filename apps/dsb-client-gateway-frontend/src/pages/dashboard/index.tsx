@@ -13,7 +13,10 @@ export function Dashboard() {
 
   useEffect(() => {
     if (
-      !(configIsLoading || (authEnabled && userAuth?.role !== UserRole.ADMIN))
+      !(
+        configIsLoading ||
+        (authEnabled && userAuth?.role !== UserRole.MESSAGING)
+      )
     ) {
       setDisplayScheduler(true);
     }

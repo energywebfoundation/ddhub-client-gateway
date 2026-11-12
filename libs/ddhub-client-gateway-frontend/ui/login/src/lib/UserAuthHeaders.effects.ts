@@ -19,6 +19,12 @@ export const useUserAuthHeaders = () => {
     }
   };
 
+  const encodeParams = (params: Record<string, string>) => {
+    return Object.entries(params)
+      .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+      .join('&');
+  };
+
   useEffect(() => {
     if (!authEnabled || !userAuth || !userAuth.authenticated) {
       resetRequestInterceptor();
@@ -33,16 +39,21 @@ export const useUserAuthHeaders = () => {
       const accessToken =
         userAuth.accessToken ?? localStorage.getItem('accessToken');
       const interceptorId = Axios.interceptors.request.use((config) => {
-        return {
-          ...config,
-          headers: {
-            ...config.headers,
-            Authorization: `Bearer ${accessToken}`,
-          },
-        };
+        config.headers.Authorization = `Bearer ${accessToken}`;
+        return config;
       });
       setRequestInterceptorId(interceptorId);
     }
+
+    // Encode query params
+    Axios.interceptors.request.use((config) => {
+      if (config.method === 'get' && config.params && typeof config.params === 'object') {
+        const queryString = encodeParams(config.params);
+        config.url += (config.url?.includes('?') ? '&' : '?') + queryString;
+        delete config.params; // prevent axios from re-attaching unencoded params
+      }
+      return config;
+    });
 
     const responseInterceptorId = Axios.interceptors.response.use(
       undefined,
