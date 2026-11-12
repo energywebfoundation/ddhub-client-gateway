@@ -83,13 +83,16 @@ jobs:
           login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
-      - run: |
+      - env:
+          REGISTRY_LOGIN_SERVER: ${{ secrets.REGISTRY_LOGIN_SERVER }}
+          IMAGE_TAG: ${{ needs.semantic-version.outputs.new_version }}
+        run: |
           docker build -f ci/Docker/Dockerfile.scheduler -t energyweb/ddhub-client-gateway-scheduler .
-          docker tag energyweb/ddhub-client-gateway-scheduler ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-scheduler:${{needs.semantic-version.outputs.new_version}}
-          docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-scheduler:${{needs.semantic-version.outputs.new_version}}
-          if [ "${{ github.ref }}" = "refs/heads/master" ]; then
-            docker tag energyweb/ddhub-client-gateway-scheduler ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-scheduler:latest
-            docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-scheduler:latest
+          docker tag energyweb/ddhub-client-gateway-scheduler "$REGISTRY_LOGIN_SERVER"/ddhub-client-gateway-scheduler:"$IMAGE_TAG"
+          docker push "$REGISTRY_LOGIN_SERVER"/ddhub-client-gateway-scheduler:"$IMAGE_TAG"
+          if [ "$GITHUB_REF" = "refs/heads/master" ]; then
+            docker tag energyweb/ddhub-client-gateway-scheduler "$REGISTRY_LOGIN_SERVER"/ddhub-client-gateway-scheduler:latest
+            docker push "$REGISTRY_LOGIN_SERVER"/ddhub-client-gateway-scheduler:latest
           fi
 
       - name: 'Build and push image (scheduler) - EWF registry'
@@ -101,26 +104,36 @@ jobs:
           password: ${{ secrets.REGISTRY_PASSWORD }}
       - name: 'Push to EWF registry'
         if: github.ref == 'refs/heads/master'
+        env:
+          EWF_REGISTRY_LOGIN_SERVER: ${{ secrets.EWF_REGISTRY_LOGIN_SERVER }}
+          IMAGE_TAG: ${{ needs.semantic-version.outputs.new_version }}
         run: |
-          docker tag energyweb/ddhub-client-gateway-scheduler ${{ secrets.EWF_REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-scheduler:${{needs.semantic-version.outputs.new_version}}
-          docker push ${{ secrets.EWF_REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-scheduler:${{needs.semantic-version.outputs.new_version}}
-          docker tag energyweb/ddhub-client-gateway-scheduler ${{ secrets.EWF_REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-scheduler:latest
-          docker push ${{ secrets.EWF_REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-scheduler:latest
+          docker tag energyweb/ddhub-client-gateway-scheduler "$EWF_REGISTRY_LOGIN_SERVER"/ddhub-client-gateway-scheduler:"$IMAGE_TAG"
+          docker push "$EWF_REGISTRY_LOGIN_SERVER"/ddhub-client-gateway-scheduler:"$IMAGE_TAG"
+          docker tag energyweb/ddhub-client-gateway-scheduler "$EWF_REGISTRY_LOGIN_SERVER"/ddhub-client-gateway-scheduler:latest
+          docker push "$EWF_REGISTRY_LOGIN_SERVER"/ddhub-client-gateway-scheduler:latest
 
       - name: Set ArgoCD Variable
         id: configure
+        env:
+          ARGOCD_DEV_URL: ${{ secrets.ARGOCD_DEV_URL }}
+          ARGOCD_DEV_USERNAME: ${{ secrets.ARGOCD_DEV_USERNAME }}
+          ARGOCD_DEV_PASS: ${{ secrets.ARGOCD_DEV_PASS }}
+          ARGOCD_STAGING_URL: ${{ secrets.ARGOCD_STAGING_URL }}
+          ARGOCD_STAGING_USERNAME: ${{ secrets.ARGOCD_STAGING_USERNAME }}
+          ARGOCD_STAGING_PASS: ${{ secrets.ARGOCD_STAGING_PASS }}
         run: |
-          echo "Running on branch ${{ github.ref }}"
-          if [ "${{ github.ref }}" = "refs/heads/pre_release" ]; then
+          echo "Running on branch $GITHUB_REF"
+          if [ "$GITHUB_REF" = "refs/heads/pre_release" ]; then
             echo "ENVIRONMENT=test" >> "$GITHUB_ENV"
-            echo "ARGOCD_URL=${{ secrets.ARGOCD_DEV_URL }}" >> "$GITHUB_ENV"
-            echo "ARGOCD_USERNAME=${{ secrets.ARGOCD_DEV_USERNAME }}" >> "$GITHUB_ENV"
-            echo "ARGOCD_PWD=${{ secrets.ARGOCD_DEV_PASS }}" >> "$GITHUB_ENV"
+            echo "ARGOCD_URL=$ARGOCD_DEV_URL" >> "$GITHUB_ENV"
+            echo "ARGOCD_USERNAME=$ARGOCD_DEV_USERNAME" >> "$GITHUB_ENV"
+            echo "ARGOCD_PWD=$ARGOCD_DEV_PASS" >> "$GITHUB_ENV"
           else
             echo "ENVIRONMENT=demo" >> "$GITHUB_ENV"
-            echo "ARGOCD_URL=${{ secrets.ARGOCD_STAGING_URL }}" >> "$GITHUB_ENV"
-            echo "ARGOCD_USERNAME=${{ secrets.ARGOCD_STAGING_USERNAME }}" >> "$GITHUB_ENV"
-            echo "ARGOCD_PWD=${{ secrets.ARGOCD_STAGING_PASS }}" >> "$GITHUB_ENV"
+            echo "ARGOCD_URL=$ARGOCD_STAGING_URL" >> "$GITHUB_ENV"
+            echo "ARGOCD_USERNAME=$ARGOCD_STAGING_USERNAME" >> "$GITHUB_ENV"
+            echo "ARGOCD_PWD=$ARGOCD_STAGING_PASS" >> "$GITHUB_ENV"
           fi
 
       - name: ArgoCD login
@@ -197,7 +210,9 @@ jobs:
       - name: Build migrations
         run: npm run migrations:build
       - name: Generate version file
-        run: echo ${{needs.semantic-version.outputs.new_version}} > version.md
+        env:
+          IMAGE_TAG: ${{ needs.semantic-version.outputs.new_version }}
+        run: echo "$IMAGE_TAG" > version.md
 
       - name: 'Login via Azure CLI'
         uses: azure/login@cb79c773a3cfa27f31f25eb3f677781210c9ce3d # v1.6.1
@@ -210,13 +225,16 @@ jobs:
           login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
-      - run: |
+      - env:
+          REGISTRY_LOGIN_SERVER: ${{ secrets.REGISTRY_LOGIN_SERVER }}
+          IMAGE_TAG: ${{ needs.semantic-version.outputs.new_version }}
+        run: |
           docker build -f ci/Docker/Dockerfile.backend -t energyweb/ddhub-client-gateway-backend .
-          docker tag energyweb/ddhub-client-gateway-backend ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-backend:${{needs.semantic-version.outputs.new_version}}
-          docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-backend:${{needs.semantic-version.outputs.new_version}}
-          if [ "${{ github.ref }}" = "refs/heads/master" ]; then
-            docker tag energyweb/ddhub-client-gateway-backend ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-backend:latest
-            docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-backend:latest
+          docker tag energyweb/ddhub-client-gateway-backend "$REGISTRY_LOGIN_SERVER"/ddhub-client-gateway-backend:"$IMAGE_TAG"
+          docker push "$REGISTRY_LOGIN_SERVER"/ddhub-client-gateway-backend:"$IMAGE_TAG"
+          if [ "$GITHUB_REF" = "refs/heads/master" ]; then
+            docker tag energyweb/ddhub-client-gateway-backend "$REGISTRY_LOGIN_SERVER"/ddhub-client-gateway-backend:latest
+            docker push "$REGISTRY_LOGIN_SERVER"/ddhub-client-gateway-backend:latest
           fi
 
       - name: 'Build and push image (Back-end) - EWF registry'
@@ -228,11 +246,14 @@ jobs:
           password: ${{ secrets.REGISTRY_PASSWORD }}
       - name: 'Push to EWF registry'
         if: github.ref == 'refs/heads/master'
+        env:
+          EWF_REGISTRY_LOGIN_SERVER: ${{ secrets.EWF_REGISTRY_LOGIN_SERVER }}
+          IMAGE_TAG: ${{ needs.semantic-version.outputs.new_version }}
         run: |
-          docker tag energyweb/ddhub-client-gateway-backend ${{ secrets.EWF_REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-backend:${{needs.semantic-version.outputs.new_version}}
-          docker push ${{ secrets.EWF_REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-backend:${{needs.semantic-version.outputs.new_version}}
-          docker tag energyweb/ddhub-client-gateway-backend ${{ secrets.EWF_REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-backend:latest
-          docker push ${{ secrets.EWF_REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-backend:latest
+          docker tag energyweb/ddhub-client-gateway-backend "$EWF_REGISTRY_LOGIN_SERVER"/ddhub-client-gateway-backend:"$IMAGE_TAG"
+          docker push "$EWF_REGISTRY_LOGIN_SERVER"/ddhub-client-gateway-backend:"$IMAGE_TAG"
+          docker tag energyweb/ddhub-client-gateway-backend "$EWF_REGISTRY_LOGIN_SERVER"/ddhub-client-gateway-backend:latest
+          docker push "$EWF_REGISTRY_LOGIN_SERVER"/ddhub-client-gateway-backend:latest
 
       - name: Create a GitHub release
         uses: ncipollo/release-action@339a81892b84b4eeb0f6e744e4574d79d0d9b8dd # v1.21.0
@@ -244,18 +265,25 @@ jobs:
 
       - name: Set ArgoCD Variable
         id: configure
+        env:
+          ARGOCD_DEV_URL: ${{ secrets.ARGOCD_DEV_URL }}
+          ARGOCD_DEV_USERNAME: ${{ secrets.ARGOCD_DEV_USERNAME }}
+          ARGOCD_DEV_PASS: ${{ secrets.ARGOCD_DEV_PASS }}
+          ARGOCD_STAGING_URL: ${{ secrets.ARGOCD_STAGING_URL }}
+          ARGOCD_STAGING_USERNAME: ${{ secrets.ARGOCD_STAGING_USERNAME }}
+          ARGOCD_STAGING_PASS: ${{ secrets.ARGOCD_STAGING_PASS }}
         run: |
-          echo "Running on branch ${{ github.ref }}"
-          if [ "${{ github.ref }}" = "refs/heads/pre_release" ]; then
+          echo "Running on branch $GITHUB_REF"
+          if [ "$GITHUB_REF" = "refs/heads/pre_release" ]; then
             echo "ENVIRONMENT=test" >> "$GITHUB_ENV"
-            echo "ARGOCD_URL=${{ secrets.ARGOCD_DEV_URL }}" >> "$GITHUB_ENV"
-            echo "ARGOCD_USERNAME=${{ secrets.ARGOCD_DEV_USERNAME }}" >> "$GITHUB_ENV"
-            echo "ARGOCD_PWD=${{ secrets.ARGOCD_DEV_PASS }}" >> "$GITHUB_ENV"
+            echo "ARGOCD_URL=$ARGOCD_DEV_URL" >> "$GITHUB_ENV"
+            echo "ARGOCD_USERNAME=$ARGOCD_DEV_USERNAME" >> "$GITHUB_ENV"
+            echo "ARGOCD_PWD=$ARGOCD_DEV_PASS" >> "$GITHUB_ENV"
           else
             echo "ENVIRONMENT=demo" >> "$GITHUB_ENV"
-            echo "ARGOCD_URL=${{ secrets.ARGOCD_STAGING_URL }}" >> "$GITHUB_ENV"
-            echo "ARGOCD_USERNAME=${{ secrets.ARGOCD_STAGING_USERNAME }}" >> "$GITHUB_ENV"
-            echo "ARGOCD_PWD=${{ secrets.ARGOCD_STAGING_PASS }}" >> "$GITHUB_ENV"
+            echo "ARGOCD_URL=$ARGOCD_STAGING_URL" >> "$GITHUB_ENV"
+            echo "ARGOCD_USERNAME=$ARGOCD_STAGING_USERNAME" >> "$GITHUB_ENV"
+            echo "ARGOCD_PWD=$ARGOCD_STAGING_PASS" >> "$GITHUB_ENV"
           fi
 
       - name: ArgoCD login
@@ -359,29 +387,39 @@ jobs:
           login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
-      - run: |
+      - env:
+          REGISTRY_LOGIN_SERVER: ${{ secrets.REGISTRY_LOGIN_SERVER }}
+          IMAGE_TAG: ${{ needs.semantic-version.outputs.new_version }}
+        run: |
           docker build -f ci/Docker/Dockerfile.frontend -t energyweb/ddhub-client-gateway-frontend .
-          docker tag energyweb/ddhub-client-gateway-frontend ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-frontend:${{needs.semantic-version.outputs.new_version}}
-          docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-frontend:${{needs.semantic-version.outputs.new_version}}
-          if [ "${{ github.ref }}" = "refs/heads/master" ]; then
-            docker tag energyweb/ddhub-client-gateway-frontend ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-frontend:latest
-            docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-frontend:latest
+          docker tag energyweb/ddhub-client-gateway-frontend "$REGISTRY_LOGIN_SERVER"/ddhub-client-gateway-frontend:"$IMAGE_TAG"
+          docker push "$REGISTRY_LOGIN_SERVER"/ddhub-client-gateway-frontend:"$IMAGE_TAG"
+          if [ "$GITHUB_REF" = "refs/heads/master" ]; then
+            docker tag energyweb/ddhub-client-gateway-frontend "$REGISTRY_LOGIN_SERVER"/ddhub-client-gateway-frontend:latest
+            docker push "$REGISTRY_LOGIN_SERVER"/ddhub-client-gateway-frontend:latest
           fi
 
       - name: Set ArgoCD Variable
         id: configure
+        env:
+          ARGOCD_DEV_URL: ${{ secrets.ARGOCD_DEV_URL }}
+          ARGOCD_DEV_USERNAME: ${{ secrets.ARGOCD_DEV_USERNAME }}
+          ARGOCD_DEV_PASS: ${{ secrets.ARGOCD_DEV_PASS }}
+          ARGOCD_STAGING_URL: ${{ secrets.ARGOCD_STAGING_URL }}
+          ARGOCD_STAGING_USERNAME: ${{ secrets.ARGOCD_STAGING_USERNAME }}
+          ARGOCD_STAGING_PASS: ${{ secrets.ARGOCD_STAGING_PASS }}
         run: |
-          echo "Running on branch ${{ github.ref }}"
-          if [ "${{ github.ref }}" = "refs/heads/pre_release" ]; then
+          echo "Running on branch $GITHUB_REF"
+          if [ "$GITHUB_REF" = "refs/heads/pre_release" ]; then
             echo "ENVIRONMENT=test" >> "$GITHUB_ENV"
-            echo "ARGOCD_URL=${{ secrets.ARGOCD_DEV_URL }}" >> "$GITHUB_ENV"
-            echo "ARGOCD_USERNAME=${{ secrets.ARGOCD_DEV_USERNAME }}" >> "$GITHUB_ENV"
-            echo "ARGOCD_PWD=${{ secrets.ARGOCD_DEV_PASS }}" >> "$GITHUB_ENV"
+            echo "ARGOCD_URL=$ARGOCD_DEV_URL" >> "$GITHUB_ENV"
+            echo "ARGOCD_USERNAME=$ARGOCD_DEV_USERNAME" >> "$GITHUB_ENV"
+            echo "ARGOCD_PWD=$ARGOCD_DEV_PASS" >> "$GITHUB_ENV"
           else
             echo "ENVIRONMENT=demo" >> "$GITHUB_ENV"
-            echo "ARGOCD_URL=${{ secrets.ARGOCD_STAGING_URL }}" >> "$GITHUB_ENV"
-            echo "ARGOCD_USERNAME=${{ secrets.ARGOCD_STAGING_USERNAME }}" >> "$GITHUB_ENV"
-            echo "ARGOCD_PWD=${{ secrets.ARGOCD_STAGING_PASS }}" >> "$GITHUB_ENV"
+            echo "ARGOCD_URL=$ARGOCD_STAGING_URL" >> "$GITHUB_ENV"
+            echo "ARGOCD_USERNAME=$ARGOCD_STAGING_USERNAME" >> "$GITHUB_ENV"
+            echo "ARGOCD_PWD=$ARGOCD_STAGING_PASS" >> "$GITHUB_ENV"
           fi
 
       - name: ArgoCD login
@@ -462,13 +500,16 @@ jobs:
           login-server: ${{ secrets.EWF_REGISTRY_LOGIN_SERVER }}
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
-      - run: |
+      - env:
+          EWF_REGISTRY_LOGIN_SERVER: ${{ secrets.EWF_REGISTRY_LOGIN_SERVER }}
+          IMAGE_TAG: ${{ needs.semantic-version.outputs.new_version }}
+        run: |
           docker build -f ci/Docker/Dockerfile.frontend -t energyweb/ddhub-client-gateway-frontend .
-          docker tag energyweb/ddhub-client-gateway-frontend ${{ secrets.EWF_REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-frontend:${{needs.semantic-version.outputs.new_version}}
-          docker push ${{ secrets.EWF_REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-frontend:${{needs.semantic-version.outputs.new_version}}
-          if [ "${{ github.ref }}" = "refs/heads/master" ]; then
-            docker tag energyweb/ddhub-client-gateway-frontend ${{ secrets.EWF_REGISTRY_LOGIN_SERVER }}/ewf-ddhub-client-gateway-frontend:latest
-            docker push ${{ secrets.EWF_REGISTRY_LOGIN_SERVER }}/ewf-ddhub-client-gateway-frontend:latest
+          docker tag energyweb/ddhub-client-gateway-frontend "$EWF_REGISTRY_LOGIN_SERVER"/ddhub-client-gateway-frontend:"$IMAGE_TAG"
+          docker push "$EWF_REGISTRY_LOGIN_SERVER"/ddhub-client-gateway-frontend:"$IMAGE_TAG"
+          if [ "$GITHUB_REF" = "refs/heads/master" ]; then
+            docker tag energyweb/ddhub-client-gateway-frontend "$EWF_REGISTRY_LOGIN_SERVER"/ewf-ddhub-client-gateway-frontend:latest
+            docker push "$EWF_REGISTRY_LOGIN_SERVER"/ewf-ddhub-client-gateway-frontend:latest
           fi
 
 #      - name: ArgoCD overwrite QA image tag

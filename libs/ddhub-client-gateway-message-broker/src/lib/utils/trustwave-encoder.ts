@@ -31,16 +31,27 @@ function listStringTypeOnlyBy(schema: JSONSchema7, basePtr = ""): string[] {
   return Array.from(new Set(out));
 }
 
+const DANGEROUS_KEYS = new Set(['__proto__', 'constructor', 'prototype']);
+
 function encodeFieldsBy(data: any, ptrs: string[]) {
   for (const ptr of ptrs) {
     const parts = ptr.split("/").filter(Boolean);
     let ref: any = data;
     for (let i = 0; i < parts.length - 1; i++) {
-      ref = ref?.[parts[i]];
-      if (ref === undefined) break;
+      const key = parts[i];
+      if (DANGEROUS_KEYS.has(key) || !Object.prototype.hasOwnProperty.call(ref ?? {}, key)) {
+        ref = undefined;
+        break;
+      }
+      ref = ref[key];
     }
     const last = parts[parts.length - 1];
-    if (ref && typeof ref[last] === "string") {
+    if (
+      ref &&
+      !DANGEROUS_KEYS.has(last) &&
+      Object.prototype.hasOwnProperty.call(ref, last) &&
+      typeof ref[last] === "string"
+    ) {
       ref[last] = htmlEncode(ref[last]);
     }
   }

@@ -53,7 +53,7 @@ import { WsClientService } from './ws-client.service';
 import { Span } from 'nestjs-otel';
 import * as fs from 'fs';
 import { FileSizeException } from '../exceptions/file-size.exception';
-import { join } from 'path';
+import { basename, join } from 'path';
 import { FileTypeNotSupportedException } from '../exceptions/file-type-not-supported.exception';
 import { MessageSignatureNotValidException } from '../exceptions/messages-signature-not-valid.exception';
 import { ReqLockExistsException } from '../exceptions/req-lock-exists.exception';
@@ -916,7 +916,7 @@ export class MessageService {
   ): Promise<string> {
     const originalFilePath = join(
       this.uploadPath,
-      clientGatewayMessageId + this.offlineExt
+      basename(clientGatewayMessageId) + this.offlineExt
     );
 
     const stream = fs.createWriteStream(originalFilePath);
@@ -1026,7 +1026,7 @@ export class MessageService {
   ): Promise<DownloadMessageResponse> {
     const fileMetadata: FileMetadataEntity = await this.createMetadata(fileId);
 
-    const fullPath: string = join(this.downloadPath, fileId + this.ext);
+    const fullPath: string = join(this.downloadPath, basename(fileId) + this.ext);
 
     const isSignatureValid: boolean = await this.keyService.verifySignature(
       fileMetadata.did,
@@ -1169,7 +1169,7 @@ export class MessageService {
       fileId
     );
 
-    const path: string = join(this.downloadPath, fileId + this.ext);
+    const path: string = join(this.downloadPath, basename(fileId) + this.ext);
 
     if (fileMetadata) {
       this.logger.debug(`returning file from cache ${fileId}`);
@@ -1221,7 +1221,7 @@ export class MessageService {
     if (fileMetadata) {
       this.logger.debug(`file metadata exists for file ${fileId}`);
 
-      const fullPath = join(this.downloadPath, fileId + this.ext);
+      const fullPath = join(this.downloadPath, basename(fileId) + this.ext);
 
       const existsInStorage: boolean = fs.existsSync(fullPath);
 

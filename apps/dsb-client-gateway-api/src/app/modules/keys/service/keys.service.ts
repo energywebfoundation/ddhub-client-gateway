@@ -30,7 +30,7 @@ import { EthersService } from '@dsb-client-gateway/ddhub-client-gateway-utils';
 import { Readable } from 'stream';
 import { AppendInitVect } from './append-init-vect';
 import * as fs from 'fs';
-import { join } from 'path';
+import { basename, join } from 'path';
 
 @Injectable()
 export class KeysService implements OnModuleInit {
@@ -187,7 +187,7 @@ export class KeysService implements OnModuleInit {
 
     const path = join(
       this.configService.get<string>('MULTER_UPLOADS_PATH', 'uploads'),
-      filename + '.enc'
+      basename(filename) + '.enc'
     );
 
     const writeStream = fs.createWriteStream(path);

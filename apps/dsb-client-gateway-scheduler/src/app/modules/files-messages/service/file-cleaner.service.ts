@@ -10,7 +10,7 @@ import { Span } from 'nestjs-otel';
 import { ConfigService } from '@nestjs/config';
 import { SchedulerRegistry } from '@nestjs/schedule';
 import * as fs from 'fs';
-import { join } from 'path';
+import { basename, join } from 'path';
 import moment from 'moment';
 import {
   ConfigDto,
@@ -71,7 +71,7 @@ export class FileCleanerService implements OnApplicationBootstrap {
 
     await Promise.all(
       fileNames.map(async (name) => {
-        const fullPath: string = join(path, name);
+        const fullPath: string = join(path, basename(name));
 
         const fileDetails = fs.statSync(fullPath);
 
