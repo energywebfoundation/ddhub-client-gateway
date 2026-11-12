@@ -185,9 +185,15 @@ export class KeysService implements OnModuleInit {
       iv
     );
 
+    const safeName = basename(filename);
+    if (!/^[A-Za-z0-9._-]+$/.test(safeName)) {
+      throw new Error('Invalid encrypted file name');
+    }
+    // Path confined to upload dir; segment allowlisted above.
+    // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal
     const path = join(
       this.configService.get<string>('MULTER_UPLOADS_PATH', 'uploads'),
-      basename(filename) + '.enc'
+      safeName + '.enc'
     );
 
     const writeStream = fs.createWriteStream(path);

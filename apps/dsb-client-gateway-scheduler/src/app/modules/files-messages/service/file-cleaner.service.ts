@@ -71,7 +71,14 @@ export class FileCleanerService implements OnApplicationBootstrap {
 
     await Promise.all(
       fileNames.map(async (name) => {
-        const fullPath: string = join(path, basename(name));
+        const safeName = basename(name);
+        if (!/^[A-Za-z0-9._-]+$/.test(safeName)) {
+          this.logger.warn(`skipping unexpected file name: ${name}`);
+          return;
+        }
+        // Names come from readdir of a controlled directory; allowlisted above.
+        // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal
+        const fullPath: string = join(path, safeName);
 
         const fileDetails = fs.statSync(fullPath);
 

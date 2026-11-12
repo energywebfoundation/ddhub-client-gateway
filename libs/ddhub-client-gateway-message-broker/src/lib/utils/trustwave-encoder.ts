@@ -33,26 +33,40 @@ function listStringTypeOnlyBy(schema: JSONSchema7, basePtr = ""): string[] {
 
 const DANGEROUS_KEYS = new Set(['__proto__', 'constructor', 'prototype']);
 
+function readOwn(obj: object, key: string): unknown {
+  if (DANGEROUS_KEYS.has(key)) {
+    return undefined;
+  }
+  if (!Object.prototype.hasOwnProperty.call(obj, key)) {
+    return undefined;
+  }
+  // Own-property read only; dangerous keys rejected above.
+  // nosemgrep: javascript.lang.security.audit.prototype-pollution.prototype-pollution-loop.prototype-pollution-loop
+  return (obj as Record<string, unknown>)[key]; // nosemgrep: javascript.lang.security.audit.prototype-pollution.prototype-pollution-loop.prototype-pollution-loop
+}
+
 function encodeFieldsBy(data: any, ptrs: string[]) {
   for (const ptr of ptrs) {
     const parts = ptr.split("/").filter(Boolean);
-    let ref: any = data;
+    let ref: unknown = data;
     for (let i = 0; i < parts.length - 1; i++) {
-      const key = parts[i];
-      if (DANGEROUS_KEYS.has(key) || !Object.prototype.hasOwnProperty.call(ref ?? {}, key)) {
+      if (!ref || typeof ref !== 'object') {
         ref = undefined;
         break;
       }
-      ref = ref[key];
+      ref = readOwn(ref as object, parts[i]);
     }
     const last = parts[parts.length - 1];
     if (
       ref &&
+      typeof ref === 'object' &&
       !DANGEROUS_KEYS.has(last) &&
       Object.prototype.hasOwnProperty.call(ref, last) &&
-      typeof ref[last] === "string"
+      typeof (ref as Record<string, unknown>)[last] === "string"
     ) {
-      ref[last] = htmlEncode(ref[last]);
+      (ref as Record<string, unknown>)[last] = htmlEncode(
+        (ref as Record<string, string>)[last]
+      );
     }
   }
   return data;

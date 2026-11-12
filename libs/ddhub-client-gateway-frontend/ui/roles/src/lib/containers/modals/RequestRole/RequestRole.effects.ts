@@ -48,10 +48,10 @@ const getRequestRoleSchema = (requestorFields: FieldDefinitionDTO[]) => {
         }
 
         if (field.pattern) {
-          // Pattern is defined by the role/claim field schema, not free-form user RegExp.
-          // nosemgrep: javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp
           validation = validation.matches(
-            new RegExp(field.pattern),
+            // Pattern comes from role/claim field schema, not free-form user RegExp.
+            // nosemgrep: javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp
+            new RegExp(field.pattern), // nosemgrep: javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp
             `Invalid ${field.label} format`
           );
         }

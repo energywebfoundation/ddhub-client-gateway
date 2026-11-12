@@ -854,7 +854,12 @@ export class MessageService {
         clientGatewayMessageId
       );
     } else {
-      filePath = join(this.uploadPath, clientGatewayMessageId + this.ext);
+      const safeMessageId = basename(clientGatewayMessageId);
+      if (!/^[A-Za-z0-9._-]+$/.test(safeMessageId)) {
+        throw new Error('Invalid client gateway message id');
+      }
+      // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal
+      filePath = join(this.uploadPath, safeMessageId + this.ext);
 
       const stream = fs.createWriteStream(filePath);
 
@@ -914,9 +919,14 @@ export class MessageService {
     clientGatewayMessageId: string,
     file: Express.Multer.File
   ): Promise<string> {
+    const safeMessageId = basename(clientGatewayMessageId);
+    if (!/^[A-Za-z0-9._-]+$/.test(safeMessageId)) {
+      throw new Error('Invalid client gateway message id');
+    }
+    // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal
     const originalFilePath = join(
       this.uploadPath,
-      basename(clientGatewayMessageId) + this.offlineExt
+      safeMessageId + this.offlineExt
     );
 
     const stream = fs.createWriteStream(originalFilePath);
@@ -1026,7 +1036,12 @@ export class MessageService {
   ): Promise<DownloadMessageResponse> {
     const fileMetadata: FileMetadataEntity = await this.createMetadata(fileId);
 
-    const fullPath: string = join(this.downloadPath, basename(fileId) + this.ext);
+    const safeFileId = basename(fileId);
+    if (!/^[A-Za-z0-9._-]+$/.test(safeFileId)) {
+      throw new Error('Invalid file id');
+    }
+    // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal
+    const fullPath: string = join(this.downloadPath, safeFileId + this.ext);
 
     const isSignatureValid: boolean = await this.keyService.verifySignature(
       fileMetadata.did,
@@ -1169,7 +1184,12 @@ export class MessageService {
       fileId
     );
 
-    const path: string = join(this.downloadPath, basename(fileId) + this.ext);
+    const safeFileId = basename(fileId);
+    if (!/^[A-Za-z0-9._-]+$/.test(safeFileId)) {
+      throw new Error('Invalid file id');
+    }
+    // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal
+    const path: string = join(this.downloadPath, safeFileId + this.ext);
 
     if (fileMetadata) {
       this.logger.debug(`returning file from cache ${fileId}`);
@@ -1221,7 +1241,12 @@ export class MessageService {
     if (fileMetadata) {
       this.logger.debug(`file metadata exists for file ${fileId}`);
 
-      const fullPath = join(this.downloadPath, basename(fileId) + this.ext);
+      const safeFileId = basename(fileId);
+      if (!/^[A-Za-z0-9._-]+$/.test(safeFileId)) {
+        throw new Error('Invalid file id');
+      }
+      // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal
+      const fullPath = join(this.downloadPath, safeFileId + this.ext);
 
       const existsInStorage: boolean = fs.existsSync(fullPath);
 
