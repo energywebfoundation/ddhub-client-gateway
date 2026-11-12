@@ -923,11 +923,8 @@ export class MessageService {
     if (!/^[A-Za-z0-9._-]+$/.test(safeMessageId)) {
       throw new Error('Invalid client gateway message id');
     }
-    // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal
-    const originalFilePath = join(
-      this.uploadPath,
-      safeMessageId + this.offlineExt
-    );
+    // Path confined to upload dir; segment allowlisted above.
+    const originalFilePath = join(this.uploadPath, `${safeMessageId}${this.offlineExt}`); // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal
 
     const stream = fs.createWriteStream(originalFilePath);
 
