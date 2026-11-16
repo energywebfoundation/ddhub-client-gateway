@@ -30,7 +30,7 @@ import { EthersService } from '@dsb-client-gateway/ddhub-client-gateway-utils';
 import { Readable } from 'stream';
 import { AppendInitVect } from './append-init-vect';
 import * as fs from 'fs';
-import { join } from 'path';
+import { basename, join } from 'path';
 
 @Injectable()
 export class KeysService implements OnModuleInit {
@@ -185,10 +185,13 @@ export class KeysService implements OnModuleInit {
       iv
     );
 
-    const path = join(
-      this.configService.get<string>('MULTER_UPLOADS_PATH', 'uploads'),
-      filename + '.enc'
-    );
+    const safeName = basename(filename);
+    if (!/^[A-Za-z0-9._-]+$/.test(safeName)) {
+      throw new Error('Invalid encrypted file name');
+    }
+    const uploadDir = this.configService.get<string>('MULTER_UPLOADS_PATH', 'uploads');
+    // Path confined to upload dir; segment allowlisted above.
+    const path = join(uploadDir, `${safeName}.enc`); // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal
 
     const writeStream = fs.createWriteStream(path);
 

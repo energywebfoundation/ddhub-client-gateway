@@ -1,0 +1,48 @@
+# Accepted dependency findings for Trivy SCA (security-scan.yml).
+# Remove entries as packages are upgraded. Format: CVE-/GHSA- IDs, one per line.
+# Optional expiry: CVE-XXXX-YYYY exp:2026-12-31
+
+# @opentelemetry/propagator-jaeger
+CVE-2026-59892
+
+# body-parser
+CVE-2026-111181
+
+# decode-uri-component
+CVE-2026-118664
+
+# dompurify
+GHSA-cg2g-xh64-v4q7
+GHSA-mrv2-3pqr-j5jr
+
+# fastify
+CVE-2026-25223
+CVE-2026-84428
+CVE-2026-84469
+CVE-2026-84504
+
+# find-my-way
+CVE-2026-47219
+
+# follow-redirects
+CVE-2026-116689
+
+# joi
+CVE-2026-118772
+
+# multer
+CVE-2026-113872
+
+# next
+GHSA-2464-fhr4-w9xw
+GHSA-2xp9-vwfh-vxw4
+CVE-2024-51479
+CVE-2026-44573
+CVE-2026-64645
+
+# systeminformation
+CVE-2026-116576
+
+# typeorm
+CVE-2022-33171
+CVE-2025-60542

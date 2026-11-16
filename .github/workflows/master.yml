@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 3
     steps:
-      - uses: styfle/cancel-workflow-action@0.9.0
+      - uses: styfle/cancel-workflow-action@89f242ee29e10c53a841bfe71cc0ce7b2f065abc # 0.9.0
         with:
           access_token: ${{ github.token }}
 
@@ -25,13 +25,13 @@ jobs:
     needs: [cancel-previous]
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           fetch-depth: 0
 
       - name: Bump version and push tag
         id: tag_version
-        uses: mathieudutour/github-tag-action@v6.0
+        uses: mathieudutour/github-tag-action@d745f2e74aaf1ee82e747b181f7a0967978abee0 # v6.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           release_branches: master
@@ -47,14 +47,14 @@ jobs:
     runs-on: ubuntu-latest
     needs: [cancel-previous, semantic-version]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           fetch-depth: 0
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: '18.20.5'
       - name: Cache node modules
-        uses: actions/cache@v4
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         env:
           cache-name: cache-node-modules
         with:
@@ -73,72 +73,85 @@ jobs:
         run: nx build dsb-client-gateway-scheduler --prod
 
       - name: 'Login via Azure CLI'
-        uses: azure/login@v1
+        uses: azure/login@cb79c773a3cfa27f31f25eb3f677781210c9ce3d # v1.6.1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: 'Build and push image (scheduler)'
-        uses: azure/docker-login@v1
+        uses: azure/docker-login@83efeb77770c98b620c73055fbb59b2847e17dc0 # v1.0.1
         with:
           login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
-      - run: |
+      - env:
+          REGISTRY_LOGIN_SERVER: ${{ secrets.REGISTRY_LOGIN_SERVER }}
+          IMAGE_TAG: ${{ needs.semantic-version.outputs.new_version }}
+        run: |
           docker build -f ci/Docker/Dockerfile.scheduler -t energyweb/ddhub-client-gateway-scheduler .
-          docker tag energyweb/ddhub-client-gateway-scheduler ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-scheduler:${{needs.semantic-version.outputs.new_version}}
-          docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-scheduler:${{needs.semantic-version.outputs.new_version}}
-          if [ "${{ github.ref }}" = "refs/heads/master" ]; then
-            docker tag energyweb/ddhub-client-gateway-scheduler ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-scheduler:latest
-            docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-scheduler:latest
+          docker tag energyweb/ddhub-client-gateway-scheduler "$REGISTRY_LOGIN_SERVER"/ddhub-client-gateway-scheduler:"$IMAGE_TAG"
+          docker push "$REGISTRY_LOGIN_SERVER"/ddhub-client-gateway-scheduler:"$IMAGE_TAG"
+          if [ "$GITHUB_REF" = "refs/heads/master" ]; then
+            docker tag energyweb/ddhub-client-gateway-scheduler "$REGISTRY_LOGIN_SERVER"/ddhub-client-gateway-scheduler:latest
+            docker push "$REGISTRY_LOGIN_SERVER"/ddhub-client-gateway-scheduler:latest
           fi
 
       - name: 'Build and push image (scheduler) - EWF registry'
         if: github.ref == 'refs/heads/master'
-        uses: azure/docker-login@v1
+        uses: azure/docker-login@83efeb77770c98b620c73055fbb59b2847e17dc0 # v1.0.1
         with:
           login-server: ${{ secrets.EWF_REGISTRY_LOGIN_SERVER }}
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
       - name: 'Push to EWF registry'
         if: github.ref == 'refs/heads/master'
+        env:
+          EWF_REGISTRY_LOGIN_SERVER: ${{ secrets.EWF_REGISTRY_LOGIN_SERVER }}
+          IMAGE_TAG: ${{ needs.semantic-version.outputs.new_version }}
         run: |
-          docker tag energyweb/ddhub-client-gateway-scheduler ${{ secrets.EWF_REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-scheduler:${{needs.semantic-version.outputs.new_version}}
-          docker push ${{ secrets.EWF_REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-scheduler:${{needs.semantic-version.outputs.new_version}}
-          docker tag energyweb/ddhub-client-gateway-scheduler ${{ secrets.EWF_REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-scheduler:latest
-          docker push ${{ secrets.EWF_REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-scheduler:latest
+          docker tag energyweb/ddhub-client-gateway-scheduler "$EWF_REGISTRY_LOGIN_SERVER"/ddhub-client-gateway-scheduler:"$IMAGE_TAG"
+          docker push "$EWF_REGISTRY_LOGIN_SERVER"/ddhub-client-gateway-scheduler:"$IMAGE_TAG"
+          docker tag energyweb/ddhub-client-gateway-scheduler "$EWF_REGISTRY_LOGIN_SERVER"/ddhub-client-gateway-scheduler:latest
+          docker push "$EWF_REGISTRY_LOGIN_SERVER"/ddhub-client-gateway-scheduler:latest
 
       - name: Set ArgoCD Variable
         id: configure
+        env:
+          ARGOCD_DEV_URL: ${{ secrets.ARGOCD_DEV_URL }}
+          ARGOCD_DEV_USERNAME: ${{ secrets.ARGOCD_DEV_USERNAME }}
+          ARGOCD_DEV_PASS: ${{ secrets.ARGOCD_DEV_PASS }}
+          ARGOCD_STAGING_URL: ${{ secrets.ARGOCD_STAGING_URL }}
+          ARGOCD_STAGING_USERNAME: ${{ secrets.ARGOCD_STAGING_USERNAME }}
+          ARGOCD_STAGING_PASS: ${{ secrets.ARGOCD_STAGING_PASS }}
         run: |
-          echo "Running on branch ${{ github.ref }}"
-          if [ "${{ github.ref }}" = "refs/heads/pre_release" ]; then
+          echo "Running on branch $GITHUB_REF"
+          if [ "$GITHUB_REF" = "refs/heads/pre_release" ]; then
             echo "ENVIRONMENT=test" >> "$GITHUB_ENV"
-            echo "ARGOCD_URL=${{ secrets.ARGOCD_DEV_URL }}" >> "$GITHUB_ENV"
-            echo "ARGOCD_USERNAME=${{ secrets.ARGOCD_DEV_USERNAME }}" >> "$GITHUB_ENV"
-            echo "ARGOCD_PWD=${{ secrets.ARGOCD_DEV_PASS }}" >> "$GITHUB_ENV"
+            echo "ARGOCD_URL=$ARGOCD_DEV_URL" >> "$GITHUB_ENV"
+            echo "ARGOCD_USERNAME=$ARGOCD_DEV_USERNAME" >> "$GITHUB_ENV"
+            echo "ARGOCD_PWD=$ARGOCD_DEV_PASS" >> "$GITHUB_ENV"
           else
             echo "ENVIRONMENT=demo" >> "$GITHUB_ENV"
-            echo "ARGOCD_URL=${{ secrets.ARGOCD_STAGING_URL }}" >> "$GITHUB_ENV"
-            echo "ARGOCD_USERNAME=${{ secrets.ARGOCD_STAGING_USERNAME }}" >> "$GITHUB_ENV"
-            echo "ARGOCD_PWD=${{ secrets.ARGOCD_STAGING_PASS }}" >> "$GITHUB_ENV"
+            echo "ARGOCD_URL=$ARGOCD_STAGING_URL" >> "$GITHUB_ENV"
+            echo "ARGOCD_USERNAME=$ARGOCD_STAGING_USERNAME" >> "$GITHUB_ENV"
+            echo "ARGOCD_PWD=$ARGOCD_STAGING_PASS" >> "$GITHUB_ENV"
           fi
 
       - name: ArgoCD login
-        uses: clowdhaus/argo-cd-action/@v1.12.1
+        uses: clowdhaus/argo-cd-action@4619d5f8ddfb2bd6ec028f512ecc6508aa4c3dc2 # v1.12.1
         id: argocd_login
         with:
           command: login ${{ env.ARGOCD_URL }}
           options: --insecure --password ${{ env.ARGOCD_PWD }} --username ${{ env.ARGOCD_USERNAME }}
 
       - name: ArgoCD overwrite target scheduler image tag
-        uses: clowdhaus/argo-cd-action/@v1.12.1
+        uses: clowdhaus/argo-cd-action@4619d5f8ddfb2bd6ec028f512ecc6508aa4c3dc2 # v1.12.1
         id: argocd_image_tag_overwrite_target_scheduler
         with:
           command: app set ddhub-gateway-${{ env.ENVIRONMENT }}
           options: -p ddhub-client-gateway-api.clientgateway.scheduler.image.tag=${{needs.semantic-version.outputs.new_version}}
 
       - name: ArgoCD overwrite target scheduler-1 image tag
-        uses: clowdhaus/argo-cd-action/@v1.12.1
+        uses: clowdhaus/argo-cd-action@4619d5f8ddfb2bd6ec028f512ecc6508aa4c3dc2 # v1.12.1
         if: github.ref == 'refs/heads/pre_release'
         id: argocd_image_tag_overwrite_target_scheduler1
         with:
@@ -146,21 +159,21 @@ jobs:
           options: -p ddhub-client-gateway-api.clientgateway.scheduler.image.tag=${{needs.semantic-version.outputs.new_version}}
 
   #      - name: ArgoCD overwrite QA image tag
-  #        uses: clowdhaus/argo-cd-action/@v1.12.1
+  #        uses: clowdhaus/argo-cd-action@4619d5f8ddfb2bd6ec028f512ecc6508aa4c3dc2 # v1.12.1
   #        id: argocd_image_tag_overwrite_qa_scheduler
   #        with:
   #          command: app set ddhub-gateway-qa
   #          options: -p ddhub-client-gateway-api.clientgateway.scheduler.image.tag=${{needs.semantic-version.outputs.new_version}}
   #
   #      - name: ArgoCD overwrite QA-1 image tag
-  #        uses: clowdhaus/argo-cd-action/@v1.12.1
+  #        uses: clowdhaus/argo-cd-action@4619d5f8ddfb2bd6ec028f512ecc6508aa4c3dc2 # v1.12.1
   #        id: argocd_image_tag_overwrite_qa1_scheduler
   #        with:
   #          command: app set ddhub-gateway-qa-1
   #          options: -p ddhub-client-gateway-api.clientgateway.scheduler.image.tag=${{needs.semantic-version.outputs.new_version}}
   #
   #      - name: ArgoCD overwrite TRIAL image tag
-  #        uses: clowdhaus/argo-cd-action/@v1.12.1
+  #        uses: clowdhaus/argo-cd-action@4619d5f8ddfb2bd6ec028f512ecc6508aa4c3dc2 # v1.12.1
   #        id: argocd_image_tag_overwrite_trial_scheduler
   #        with:
   #          command: app set ddhub-gateway-trial
@@ -170,14 +183,14 @@ jobs:
     runs-on: ubuntu-latest
     needs: [cancel-previous, semantic-version]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           fetch-depth: 0
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: '18.20.5'
       - name: Cache node modules
-        uses: actions/cache@v4
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         env:
           cache-name: cache-node-modules
         with:
@@ -197,45 +210,53 @@ jobs:
       - name: Build migrations
         run: npm run migrations:build
       - name: Generate version file
-        run: echo ${{needs.semantic-version.outputs.new_version}} > version.md
+        env:
+          IMAGE_TAG: ${{ needs.semantic-version.outputs.new_version }}
+        run: echo "$IMAGE_TAG" > version.md
 
       - name: 'Login via Azure CLI'
-        uses: azure/login@v1
+        uses: azure/login@cb79c773a3cfa27f31f25eb3f677781210c9ce3d # v1.6.1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: 'Build and push image (Back-end)'
-        uses: azure/docker-login@v1
+        uses: azure/docker-login@83efeb77770c98b620c73055fbb59b2847e17dc0 # v1.0.1
         with:
           login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
-      - run: |
+      - env:
+          REGISTRY_LOGIN_SERVER: ${{ secrets.REGISTRY_LOGIN_SERVER }}
+          IMAGE_TAG: ${{ needs.semantic-version.outputs.new_version }}
+        run: |
           docker build -f ci/Docker/Dockerfile.backend -t energyweb/ddhub-client-gateway-backend .
-          docker tag energyweb/ddhub-client-gateway-backend ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-backend:${{needs.semantic-version.outputs.new_version}}
-          docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-backend:${{needs.semantic-version.outputs.new_version}}
-          if [ "${{ github.ref }}" = "refs/heads/master" ]; then
-            docker tag energyweb/ddhub-client-gateway-backend ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-backend:latest
-            docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-backend:latest
+          docker tag energyweb/ddhub-client-gateway-backend "$REGISTRY_LOGIN_SERVER"/ddhub-client-gateway-backend:"$IMAGE_TAG"
+          docker push "$REGISTRY_LOGIN_SERVER"/ddhub-client-gateway-backend:"$IMAGE_TAG"
+          if [ "$GITHUB_REF" = "refs/heads/master" ]; then
+            docker tag energyweb/ddhub-client-gateway-backend "$REGISTRY_LOGIN_SERVER"/ddhub-client-gateway-backend:latest
+            docker push "$REGISTRY_LOGIN_SERVER"/ddhub-client-gateway-backend:latest
           fi
 
       - name: 'Build and push image (Back-end) - EWF registry'
         if: github.ref == 'refs/heads/master'
-        uses: azure/docker-login@v1
+        uses: azure/docker-login@83efeb77770c98b620c73055fbb59b2847e17dc0 # v1.0.1
         with:
           login-server: ${{ secrets.EWF_REGISTRY_LOGIN_SERVER }}
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
       - name: 'Push to EWF registry'
         if: github.ref == 'refs/heads/master'
+        env:
+          EWF_REGISTRY_LOGIN_SERVER: ${{ secrets.EWF_REGISTRY_LOGIN_SERVER }}
+          IMAGE_TAG: ${{ needs.semantic-version.outputs.new_version }}
         run: |
-          docker tag energyweb/ddhub-client-gateway-backend ${{ secrets.EWF_REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-backend:${{needs.semantic-version.outputs.new_version}}
-          docker push ${{ secrets.EWF_REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-backend:${{needs.semantic-version.outputs.new_version}}
-          docker tag energyweb/ddhub-client-gateway-backend ${{ secrets.EWF_REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-backend:latest
-          docker push ${{ secrets.EWF_REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-backend:latest
+          docker tag energyweb/ddhub-client-gateway-backend "$EWF_REGISTRY_LOGIN_SERVER"/ddhub-client-gateway-backend:"$IMAGE_TAG"
+          docker push "$EWF_REGISTRY_LOGIN_SERVER"/ddhub-client-gateway-backend:"$IMAGE_TAG"
+          docker tag energyweb/ddhub-client-gateway-backend "$EWF_REGISTRY_LOGIN_SERVER"/ddhub-client-gateway-backend:latest
+          docker push "$EWF_REGISTRY_LOGIN_SERVER"/ddhub-client-gateway-backend:latest
 
       - name: Create a GitHub release
-        uses: ncipollo/release-action@v1
+        uses: ncipollo/release-action@339a81892b84b4eeb0f6e744e4574d79d0d9b8dd # v1.21.0
         if: github.ref == 'refs/heads/master'
         with:
           tag: ${{ needs.semantic-version.outputs.new_version }}
@@ -244,36 +265,43 @@ jobs:
 
       - name: Set ArgoCD Variable
         id: configure
+        env:
+          ARGOCD_DEV_URL: ${{ secrets.ARGOCD_DEV_URL }}
+          ARGOCD_DEV_USERNAME: ${{ secrets.ARGOCD_DEV_USERNAME }}
+          ARGOCD_DEV_PASS: ${{ secrets.ARGOCD_DEV_PASS }}
+          ARGOCD_STAGING_URL: ${{ secrets.ARGOCD_STAGING_URL }}
+          ARGOCD_STAGING_USERNAME: ${{ secrets.ARGOCD_STAGING_USERNAME }}
+          ARGOCD_STAGING_PASS: ${{ secrets.ARGOCD_STAGING_PASS }}
         run: |
-          echo "Running on branch ${{ github.ref }}"
-          if [ "${{ github.ref }}" = "refs/heads/pre_release" ]; then
+          echo "Running on branch $GITHUB_REF"
+          if [ "$GITHUB_REF" = "refs/heads/pre_release" ]; then
             echo "ENVIRONMENT=test" >> "$GITHUB_ENV"
-            echo "ARGOCD_URL=${{ secrets.ARGOCD_DEV_URL }}" >> "$GITHUB_ENV"
-            echo "ARGOCD_USERNAME=${{ secrets.ARGOCD_DEV_USERNAME }}" >> "$GITHUB_ENV"
-            echo "ARGOCD_PWD=${{ secrets.ARGOCD_DEV_PASS }}" >> "$GITHUB_ENV"
+            echo "ARGOCD_URL=$ARGOCD_DEV_URL" >> "$GITHUB_ENV"
+            echo "ARGOCD_USERNAME=$ARGOCD_DEV_USERNAME" >> "$GITHUB_ENV"
+            echo "ARGOCD_PWD=$ARGOCD_DEV_PASS" >> "$GITHUB_ENV"
           else
             echo "ENVIRONMENT=demo" >> "$GITHUB_ENV"
-            echo "ARGOCD_URL=${{ secrets.ARGOCD_STAGING_URL }}" >> "$GITHUB_ENV"
-            echo "ARGOCD_USERNAME=${{ secrets.ARGOCD_STAGING_USERNAME }}" >> "$GITHUB_ENV"
-            echo "ARGOCD_PWD=${{ secrets.ARGOCD_STAGING_PASS }}" >> "$GITHUB_ENV"
+            echo "ARGOCD_URL=$ARGOCD_STAGING_URL" >> "$GITHUB_ENV"
+            echo "ARGOCD_USERNAME=$ARGOCD_STAGING_USERNAME" >> "$GITHUB_ENV"
+            echo "ARGOCD_PWD=$ARGOCD_STAGING_PASS" >> "$GITHUB_ENV"
           fi
 
       - name: ArgoCD login
-        uses: clowdhaus/argo-cd-action/@v1.12.1
+        uses: clowdhaus/argo-cd-action@4619d5f8ddfb2bd6ec028f512ecc6508aa4c3dc2 # v1.12.1
         id: argocd_login
         with:
           command: login ${{ env.ARGOCD_URL }}
           options: --insecure --password ${{ env.ARGOCD_PWD }} --username ${{ env.ARGOCD_USERNAME }}
 
       - name: ArgoCD overwrite target api image tag
-        uses: clowdhaus/argo-cd-action/@v1.12.1
+        uses: clowdhaus/argo-cd-action@4619d5f8ddfb2bd6ec028f512ecc6508aa4c3dc2 # v1.12.1
         id: argocd_image_tag_overwrite_target_api
         with:
           command: app set ddhub-gateway-${{ env.ENVIRONMENT }}
           options: -p ddhub-client-gateway-api.image.tag=${{needs.semantic-version.outputs.new_version}}
 
       - name: ArgoCD overwrite target api-1 image tag
-        uses: clowdhaus/argo-cd-action/@v1.12.1
+        uses: clowdhaus/argo-cd-action@4619d5f8ddfb2bd6ec028f512ecc6508aa4c3dc2 # v1.12.1
         if: github.ref == 'refs/heads/pre_release'
         id: argocd_image_tag_overwrite_target_api_1
         with:
@@ -281,21 +309,21 @@ jobs:
           options: -p ddhub-client-gateway-api.image.tag=${{needs.semantic-version.outputs.new_version}}
   #
   #      - name: ArgoCD overwrite QA image tag
-  #        uses: clowdhaus/argo-cd-action/@v1.12.1
+  #        uses: clowdhaus/argo-cd-action@4619d5f8ddfb2bd6ec028f512ecc6508aa4c3dc2 # v1.12.1
   #        id: argocd_image_tag_overwrite_qa_api
   #        with:
   #          command: app set ddhub-gateway-qa
   #          options: -p ddhub-client-gateway-api.image.tag=${{needs.semantic-version.outputs.new_version}}
   #
   #      - name: ArgoCD overwrite QA-1 image tag
-  #        uses: clowdhaus/argo-cd-action/@v1.12.1
+  #        uses: clowdhaus/argo-cd-action@4619d5f8ddfb2bd6ec028f512ecc6508aa4c3dc2 # v1.12.1
   #        id: argocd_image_tag_overwrite_qa1_api
   #        with:
   #          command: app set ddhub-gateway-qa-1
   #          options: -p ddhub-client-gateway-api.image.tag=${{needs.semantic-version.outputs.new_version}}
   #
   #      - name: ArgoCD overwrite TRIAL image tag
-  #        uses: clowdhaus/argo-cd-action/@v1.12.1
+  #        uses: clowdhaus/argo-cd-action@4619d5f8ddfb2bd6ec028f512ecc6508aa4c3dc2 # v1.12.1
   #        id: argocd_image_tag_overwrite_trial_api
   #        with:
   #          command: app set ddhub-gateway-trial
@@ -319,14 +347,14 @@ jobs:
           --health-timeout 5s
           --health-retries 5
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           fetch-depth: 0
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: '18.20.5'
       - name: Cache node modules
-        uses: actions/cache@v4
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         env:
           cache-name: cache-node-modules
         with:
@@ -349,57 +377,67 @@ jobs:
           NEXT_PUBLIC_CUSTOM_CGW_NAME: ${{ secrets.CUSTOME_NAME }}
 
       - name: 'Login via Azure CLI'
-        uses: azure/login@v1
+        uses: azure/login@cb79c773a3cfa27f31f25eb3f677781210c9ce3d # v1.6.1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: 'Build and push image (Front-end)'
-        uses: azure/docker-login@v1
+        uses: azure/docker-login@83efeb77770c98b620c73055fbb59b2847e17dc0 # v1.0.1
         with:
           login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
-      - run: |
+      - env:
+          REGISTRY_LOGIN_SERVER: ${{ secrets.REGISTRY_LOGIN_SERVER }}
+          IMAGE_TAG: ${{ needs.semantic-version.outputs.new_version }}
+        run: |
           docker build -f ci/Docker/Dockerfile.frontend -t energyweb/ddhub-client-gateway-frontend .
-          docker tag energyweb/ddhub-client-gateway-frontend ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-frontend:${{needs.semantic-version.outputs.new_version}}
-          docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-frontend:${{needs.semantic-version.outputs.new_version}}
-          if [ "${{ github.ref }}" = "refs/heads/master" ]; then
-            docker tag energyweb/ddhub-client-gateway-frontend ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-frontend:latest
-            docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-frontend:latest
+          docker tag energyweb/ddhub-client-gateway-frontend "$REGISTRY_LOGIN_SERVER"/ddhub-client-gateway-frontend:"$IMAGE_TAG"
+          docker push "$REGISTRY_LOGIN_SERVER"/ddhub-client-gateway-frontend:"$IMAGE_TAG"
+          if [ "$GITHUB_REF" = "refs/heads/master" ]; then
+            docker tag energyweb/ddhub-client-gateway-frontend "$REGISTRY_LOGIN_SERVER"/ddhub-client-gateway-frontend:latest
+            docker push "$REGISTRY_LOGIN_SERVER"/ddhub-client-gateway-frontend:latest
           fi
 
       - name: Set ArgoCD Variable
         id: configure
+        env:
+          ARGOCD_DEV_URL: ${{ secrets.ARGOCD_DEV_URL }}
+          ARGOCD_DEV_USERNAME: ${{ secrets.ARGOCD_DEV_USERNAME }}
+          ARGOCD_DEV_PASS: ${{ secrets.ARGOCD_DEV_PASS }}
+          ARGOCD_STAGING_URL: ${{ secrets.ARGOCD_STAGING_URL }}
+          ARGOCD_STAGING_USERNAME: ${{ secrets.ARGOCD_STAGING_USERNAME }}
+          ARGOCD_STAGING_PASS: ${{ secrets.ARGOCD_STAGING_PASS }}
         run: |
-          echo "Running on branch ${{ github.ref }}"
-          if [ "${{ github.ref }}" = "refs/heads/pre_release" ]; then
+          echo "Running on branch $GITHUB_REF"
+          if [ "$GITHUB_REF" = "refs/heads/pre_release" ]; then
             echo "ENVIRONMENT=test" >> "$GITHUB_ENV"
-            echo "ARGOCD_URL=${{ secrets.ARGOCD_DEV_URL }}" >> "$GITHUB_ENV"
-            echo "ARGOCD_USERNAME=${{ secrets.ARGOCD_DEV_USERNAME }}" >> "$GITHUB_ENV"
-            echo "ARGOCD_PWD=${{ secrets.ARGOCD_DEV_PASS }}" >> "$GITHUB_ENV"
+            echo "ARGOCD_URL=$ARGOCD_DEV_URL" >> "$GITHUB_ENV"
+            echo "ARGOCD_USERNAME=$ARGOCD_DEV_USERNAME" >> "$GITHUB_ENV"
+            echo "ARGOCD_PWD=$ARGOCD_DEV_PASS" >> "$GITHUB_ENV"
           else
             echo "ENVIRONMENT=demo" >> "$GITHUB_ENV"
-            echo "ARGOCD_URL=${{ secrets.ARGOCD_STAGING_URL }}" >> "$GITHUB_ENV"
-            echo "ARGOCD_USERNAME=${{ secrets.ARGOCD_STAGING_USERNAME }}" >> "$GITHUB_ENV"
-            echo "ARGOCD_PWD=${{ secrets.ARGOCD_STAGING_PASS }}" >> "$GITHUB_ENV"
+            echo "ARGOCD_URL=$ARGOCD_STAGING_URL" >> "$GITHUB_ENV"
+            echo "ARGOCD_USERNAME=$ARGOCD_STAGING_USERNAME" >> "$GITHUB_ENV"
+            echo "ARGOCD_PWD=$ARGOCD_STAGING_PASS" >> "$GITHUB_ENV"
           fi
 
       - name: ArgoCD login
-        uses: clowdhaus/argo-cd-action/@v1.12.1
+        uses: clowdhaus/argo-cd-action@4619d5f8ddfb2bd6ec028f512ecc6508aa4c3dc2 # v1.12.1
         id: argocd_login
         with:
           command: login ${{ env.ARGOCD_URL }}
           options: --insecure --password ${{ env.ARGOCD_PWD }} --username ${{ env.ARGOCD_USERNAME }}
 
       - name: ArgoCD overwrite target image tag
-        uses: clowdhaus/argo-cd-action/@v1.12.1
+        uses: clowdhaus/argo-cd-action@4619d5f8ddfb2bd6ec028f512ecc6508aa4c3dc2 # v1.12.1
         id: argocd_image_tag_overwrite_target_ui
         with:
           command: app set ddhub-gateway-${{ env.ENVIRONMENT }}
           options: -p ddhub-client-gateway-api.clientgateway.ui.image.tag=${{needs.semantic-version.outputs.new_version}}
 
       - name: ArgoCD overwrite target UI-1 image tag
-        uses: clowdhaus/argo-cd-action/@v1.12.1
+        uses: clowdhaus/argo-cd-action@4619d5f8ddfb2bd6ec028f512ecc6508aa4c3dc2 # v1.12.1
         if: github.ref == 'refs/heads/pre_release'
         id: argocd_image_tag_overwrite_target_ui_1
         with:
@@ -424,14 +462,14 @@ jobs:
           --health-timeout 5s
           --health-retries 5
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           fetch-depth: 0
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: '18.20.5'
       - name: Cache node modules
-        uses: actions/cache@v4
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         env:
           cache-name: cache-node-modules
         with:
@@ -452,41 +490,44 @@ jobs:
           DB_NAME: postgresql://ddhub:ddhub@localhost:5432/ddhub
 
       - name: 'Login via Azure CLI'
-        uses: azure/login@v1
+        uses: azure/login@cb79c773a3cfa27f31f25eb3f677781210c9ce3d # v1.6.1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: 'Build and push image (Front-end)'
-        uses: azure/docker-login@v1
+        uses: azure/docker-login@83efeb77770c98b620c73055fbb59b2847e17dc0 # v1.0.1
         with:
           login-server: ${{ secrets.EWF_REGISTRY_LOGIN_SERVER }}
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
-      - run: |
+      - env:
+          EWF_REGISTRY_LOGIN_SERVER: ${{ secrets.EWF_REGISTRY_LOGIN_SERVER }}
+          IMAGE_TAG: ${{ needs.semantic-version.outputs.new_version }}
+        run: |
           docker build -f ci/Docker/Dockerfile.frontend -t energyweb/ddhub-client-gateway-frontend .
-          docker tag energyweb/ddhub-client-gateway-frontend ${{ secrets.EWF_REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-frontend:${{needs.semantic-version.outputs.new_version}}
-          docker push ${{ secrets.EWF_REGISTRY_LOGIN_SERVER }}/ddhub-client-gateway-frontend:${{needs.semantic-version.outputs.new_version}}
-          if [ "${{ github.ref }}" = "refs/heads/master" ]; then
-            docker tag energyweb/ddhub-client-gateway-frontend ${{ secrets.EWF_REGISTRY_LOGIN_SERVER }}/ewf-ddhub-client-gateway-frontend:latest
-            docker push ${{ secrets.EWF_REGISTRY_LOGIN_SERVER }}/ewf-ddhub-client-gateway-frontend:latest
+          docker tag energyweb/ddhub-client-gateway-frontend "$EWF_REGISTRY_LOGIN_SERVER"/ddhub-client-gateway-frontend:"$IMAGE_TAG"
+          docker push "$EWF_REGISTRY_LOGIN_SERVER"/ddhub-client-gateway-frontend:"$IMAGE_TAG"
+          if [ "$GITHUB_REF" = "refs/heads/master" ]; then
+            docker tag energyweb/ddhub-client-gateway-frontend "$EWF_REGISTRY_LOGIN_SERVER"/ewf-ddhub-client-gateway-frontend:latest
+            docker push "$EWF_REGISTRY_LOGIN_SERVER"/ewf-ddhub-client-gateway-frontend:latest
           fi
 
 #      - name: ArgoCD overwrite QA image tag
-#        uses: clowdhaus/argo-cd-action/@v1.12.1
+#        uses: clowdhaus/argo-cd-action@4619d5f8ddfb2bd6ec028f512ecc6508aa4c3dc2 # v1.12.1
 #        id: argocd_image_tag_overwrite_qa_ui
 #        with:
 #          command: app set ddhub-gateway-qa
 #          options: -p ddhub-client-gateway-api.clientgateway.ui.image.tag=${{needs.semantic-version.outputs.new_version}}
 #
 #      - name: ArgoCD overwrite QA-1 image tag
-#        uses: clowdhaus/argo-cd-action/@v1.12.1
+#        uses: clowdhaus/argo-cd-action@4619d5f8ddfb2bd6ec028f512ecc6508aa4c3dc2 # v1.12.1
 #        id: argocd_image_tag_overwrite_qa1_ui
 #        with:
 #          command: app set ddhub-gateway-qa-1
 #          options: -p ddhub-client-gateway-api.clientgateway.ui.image.tag=${{needs.semantic-version.outputs.new_version}}
 #
 #      - name: ArgoCD overwrite TRIAL image tag
-#        uses: clowdhaus/argo-cd-action/@v1.12.1
+#        uses: clowdhaus/argo-cd-action@4619d5f8ddfb2bd6ec028f512ecc6508aa4c3dc2 # v1.12.1
 #        id: argocd_image_tag_overwrite_trial_ui
 #        with:
 #          command: app set ddhub-gateway-trial

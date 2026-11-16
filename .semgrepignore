@@ -1,0 +1,11 @@
+# Local/dev Compose stacks — production hardening belongs in AKS/Helm, not these files.
+docker-compose.yml
+docker-compose.test.yml
+ci/docker-compose.yml
+get-started/docker-compose.yml
+get-started/docker-compose.vault.yml
+
+# OpenAPI docs describe the current auth scheme; changing it is a product decision.
+apps/dsb-client-gateway-frontend/public/rest.yaml
+libs/dsb-client-gateway-api-client/schema.yaml
+schema.yaml
