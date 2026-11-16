@@ -20,7 +20,8 @@ export function IsSchemaValid(
 }
 
 function validateJSONSchema(schema: object, payload: string) {
-  const ajv = new Ajv({ allErrors: true, multipleOfPrecision: 1 });
+  // First error is enough for SchemaNotValidException; avoid unbounded error allocation.
+  const ajv = new Ajv({ allErrors: false, multipleOfPrecision: 1 });
   ajv.addVocabulary(['uiSchema', 'enumNames']);
 
   addFormats(ajv, {

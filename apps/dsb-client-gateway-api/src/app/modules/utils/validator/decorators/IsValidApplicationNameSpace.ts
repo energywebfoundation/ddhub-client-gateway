@@ -17,6 +17,8 @@ export function IsValidApplicationNameSpace(
             'APPLICATION_NAMESPACE_REGULAR_EXPRESSION'
           );
           if (typeof value === 'string' && value.length > 0) {
+            // Pattern comes from trusted deployment config, not request input.
+            // nosemgrep: javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp
             return !!value.match(new RegExp(applicationNameSpacePattern));
           }
           return false;

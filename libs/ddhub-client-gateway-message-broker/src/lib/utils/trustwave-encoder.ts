@@ -31,17 +31,42 @@ function listStringTypeOnlyBy(schema: JSONSchema7, basePtr = ""): string[] {
   return Array.from(new Set(out));
 }
 
+const DANGEROUS_KEYS = new Set(['__proto__', 'constructor', 'prototype']);
+
+function readOwn(obj: object, key: string): unknown {
+  if (DANGEROUS_KEYS.has(key)) {
+    return undefined;
+  }
+  if (!Object.prototype.hasOwnProperty.call(obj, key)) {
+    return undefined;
+  }
+  // Own-property read only; dangerous keys rejected above.
+  // nosemgrep: javascript.lang.security.audit.prototype-pollution.prototype-pollution-loop.prototype-pollution-loop
+  return (obj as Record<string, unknown>)[key]; // nosemgrep: javascript.lang.security.audit.prototype-pollution.prototype-pollution-loop.prototype-pollution-loop
+}
+
 function encodeFieldsBy(data: any, ptrs: string[]) {
   for (const ptr of ptrs) {
     const parts = ptr.split("/").filter(Boolean);
-    let ref: any = data;
+    let ref: unknown = data;
     for (let i = 0; i < parts.length - 1; i++) {
-      ref = ref?.[parts[i]];
-      if (ref === undefined) break;
+      if (!ref || typeof ref !== 'object') {
+        ref = undefined;
+        break;
+      }
+      ref = readOwn(ref as object, parts[i]);
     }
     const last = parts[parts.length - 1];
-    if (ref && typeof ref[last] === "string") {
-      ref[last] = htmlEncode(ref[last]);
+    if (
+      ref &&
+      typeof ref === 'object' &&
+      !DANGEROUS_KEYS.has(last) &&
+      Object.prototype.hasOwnProperty.call(ref, last) &&
+      typeof (ref as Record<string, unknown>)[last] === "string"
+    ) {
+      (ref as Record<string, unknown>)[last] = htmlEncode(
+        (ref as Record<string, string>)[last]
+      );
     }
   }
   return data;
