@@ -29,6 +29,7 @@ export const Update = () => {
     isUpdating,
     getActionButtonsProps,
     messageForms,
+    isInitialized,
   } = useUpdateChannelEffects();
   const { classes } = useStyles();
 
@@ -185,7 +186,7 @@ export const Update = () => {
           <Steps steps={UPDATE_STEPS} activeStep={activeStep} />
         </Grid>
         <Grid item className={classes.updateFormWrapper} xs={8}>
-          {formPart(activeStep)}
+          {isInitialized && formPart(activeStep)}
         </Grid>
       </Grid>
       <Box className={classes.closeButtonWrapper}>

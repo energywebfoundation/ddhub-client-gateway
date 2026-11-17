@@ -57,6 +57,9 @@ export const useUpdateChannelEffects = () => {
 
   const [channelValues, setChannelValues] =
     useState<UpdateChannelDto>(initialState);
+  // The form steps keep their own local state seeded from props on mount,
+  // so they must not render until channelValues hold the channel's data.
+  const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
     if (open) {
@@ -88,6 +91,7 @@ export const useUpdateChannelEffects = () => {
       });
 
       setMessageForms(channel.messageForms);
+      setIsInitialized(true);
     } else {
       resetToInitialState();
     }
@@ -96,6 +100,7 @@ export const useUpdateChannelEffects = () => {
   const resetToInitialState = () => {
     setChannelValues(initialState);
     setActiveStep(0);
+    setIsInitialized(false);
   };
 
   const setRestrictions = (data: { dids: string[]; roles: string[] }) => {
@@ -198,5 +203,6 @@ export const useUpdateChannelEffects = () => {
     isUpdating,
     getActionButtonsProps,
     messageForms,
+    isInitialized,
   };
 };
