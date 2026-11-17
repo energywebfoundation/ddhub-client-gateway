@@ -34,7 +34,7 @@ export const useStyles = makeStyles()((theme) => ({
     color: theme.palette.common.white,
     fontFamily: theme.typography.body2.fontFamily,
     marginBottom: 1,
-    textAlign: 'center',
+    textAlign: 'left',
   },
   labelText: {
     fontSize: 12,
