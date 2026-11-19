@@ -1,5 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
+// `Error`, `SendMessageSuccessResponse` and `SendMessageFailedResponse` are not
+// referenced by any route and therefore do not appear in the OpenAPI document.
 export class Error {
   @ApiProperty({
     description: 'code sent for error',
@@ -109,24 +111,26 @@ export class SendMessageFailedResponse {
   err: Error;
 }
 
+
 export class Recipients {
   @ApiProperty({
-    description: 'total number of recipients',
+    description:
+      'Number of recipient DIDs the message broker addressed (the channel qualified DIDs, plus anonymous recipients when given).',
     type: Number,
     example: 3,
   })
   total: number;
 
   @ApiProperty({
-    description:
-      'total number of recipients for whom message is sent successfully',
+    description: 'Number of recipients the message was delivered to.',
     type: Number,
     example: 2,
   })
   sent: number;
 
   @ApiProperty({
-    description: 'total number of recipients for whom message is failed',
+    description:
+      'Number of recipients the delivery failed for. The HTTP request still succeeds when some or all recipients fail, so always check this value (and `status`).',
     type: Number,
     example: 1,
   })
@@ -135,22 +139,26 @@ export class Recipients {
 
 export class Details {
   @ApiProperty({
-    description: 'did for which message is successful or failed',
+    description: 'Recipient DID this entry refers to.',
     type: String,
+    required: false,
     example: 'did:ethr:volta:0x09Df5d33f1242E1b8aA5E0E0F6BfA687E6846993',
   })
   did?: string;
 
   @ApiProperty({
-    description: 'message Id returned by message broker',
+    description: 'Message ID of the copy for this recipient. Absent when delivery failed.',
     type: String,
-    example: '623c875beaa0422bfc19b1ce',
+    required: false,
+    example: '657a1f0c2b3e4d5f6a7b8c9d',
   })
   messageId?: string;
 
   @ApiProperty({
-    description: 'status code returned by message broker',
+    description:
+      'HTTP-like status code reported by the message broker for this recipient. `200` means delivered; any other value is a failure.',
     type: Number,
+    required: false,
     example: 200,
   })
   statusCode?: number;
@@ -158,54 +166,64 @@ export class Details {
 
 export class Status {
   @ApiProperty({
-    description: 'details of messages sent or failed',
+    description: 'The recipients in this group.',
     type: () => [Details],
-    example: `[
-            {
-                "did": "did:ethr:volta:0x09Df5d33f1242E1b8aA5E0E0F6BfA687E6846993",
-                "messageId": "623c875beaa0422bfc19b1ce",
-                "statusCode": 200
-            }
-        ]`,
+    example: [
+      {
+        did: 'did:ethr:volta:0x09Df5d33f1242E1b8aA5E0E0F6BfA687E6846993',
+        messageId: '657a1f0c2b3e4d5f6a7b8c9d',
+        statusCode: 200,
+      },
+    ],
   })
   details: Details[];
 
   @ApiProperty({
-    description: 'name of message sent or failed',
+    description: `Name of the result group, as reported by the message broker:
+- \`SENT\`: recipients the message was delivered to.
+- \`FAILED\`: recipients the delivery failed for.`,
     type: String,
-    example: 'SENT or FAILED',
+    example: 'SENT',
   })
   name: string;
 }
 
+/**
+ * Response of `POST /messages` and `POST /messages/upload`. It is the send
+ * result of the message broker, passed through unchanged.
+ */
 export class SendMessageResponseDto {
   @ApiProperty({
-    description: 'client Gateway Message Id',
+    description: 'ID of the send request (UUID v4). The same for all recipients.',
     type: String,
+    format: 'uuid',
     example: '0b271eb8-1e21-4817-95af-7951649360ed',
   })
   clientGatewayMessageId: string;
 
   @ApiProperty({
-    description: 'did',
+    description:
+      'DID field of the message broker send result, passed through unchanged.',
     type: String,
-    example: 'did: ethr: volta: 0x09Df5d33f1242E1b8aA5E0E0F6BfA687E6846993',
+    example: 'did:ethr:volta:0x09Df5d33f1242E1b8aA5E0E0F6BfA687E6846993',
   })
   did: string;
 
   @ApiProperty({
-    description: 'recipients',
+    description: 'Delivery counters over all recipients.',
     type: () => Recipients,
   })
   recipients: Recipients;
 
   @ApiProperty({
-    description: 'status of messages sent',
+    description:
+      'A list of results grouped by outcome (`SENT` or `FAILED`), each with its recipients.',
     type: () => [Status],
   })
   status: Status[];
 }
 
+// Not referenced by any route; the channel module exposes its own GetChannelQualifiedDidsDto.
 export class GetChannelQualifiedDidsDto {
   @ApiProperty({
     description: 'Channel name / fqcn',

@@ -11,21 +11,44 @@ import { IsDID } from '../../../utils/validator/decorators/IsDid';
 import { IsValidChannelName } from '../../../utils/validator/decorators/IsValidChannelName';
 import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
+import {
+  CHANNEL_TYPE_DESCRIPTION,
+  CONDITIONS_DESCRIPTION,
+  CONDITIONS_DIDS_DESCRIPTION,
+  CONDITIONS_RESPONSE_TOPICS_DESCRIPTION,
+  CONDITIONS_ROLES_DESCRIPTION,
+  CONDITIONS_TOPICS_DESCRIPTION,
+  DID_EXAMPLE,
+  MESSAGE_FORMS_DESCRIPTION,
+  PAYLOAD_ENCRYPTION_DESCRIPTION,
+  RESPONSE_TOPIC_ID_DESCRIPTION,
+  ROLE_EXAMPLE,
+  TOPIC_ID_EXAMPLE,
+  TOPIC_NAME_DESCRIPTION,
+  TOPIC_NAME_EXAMPLE,
+  TOPIC_OWNER_DESCRIPTION,
+  TOPIC_OWNER_EXAMPLE,
+  USE_ANONYMOUS_EXT_CHANNEL_DESCRIPTION,
+} from '../channel-swagger.docs';
+
+// NOTE: `TopicDto`, `ResponseTopicDto` and `ChannelConditionsDto` are also
+// declared in `create-channel.dto.ts`. Both map to the same OpenAPI schema
+// names, so their Swagger decorators must stay identical.
 
 export class TopicDto {
   @IsString()
   @ApiProperty({
     type: String,
-    description: 'Topic name',
-    example: 'operatorEnvelope',
+    description: TOPIC_NAME_DESCRIPTION,
+    example: TOPIC_NAME_EXAMPLE,
   })
   topicName: string;
 
   @IsString()
   @ApiProperty({
     type: String,
-    example: 'aemo.edge',
-    description: 'Owner name',
+    description: TOPIC_OWNER_DESCRIPTION,
+    example: TOPIC_OWNER_EXAMPLE,
   })
   owner: string;
 }
@@ -34,24 +57,24 @@ export class ResponseTopicDto {
   @IsString()
   @ApiProperty({
     type: String,
-    description: 'Topic name',
-    example: 'operatorEnvelope',
+    description: `${TOPIC_NAME_DESCRIPTION} This is the topic to reply on.`,
+    example: TOPIC_NAME_EXAMPLE,
   })
   topicName: string;
 
   @IsString()
   @ApiProperty({
     type: String,
-    example: 'aemo.edge',
-    description: 'Owner name',
+    description: `${TOPIC_OWNER_DESCRIPTION} Owner of the topic to reply on.`,
+    example: TOPIC_OWNER_EXAMPLE,
   })
   owner: string;
 
   @IsString()
   @ApiProperty({
     type: String,
-    example: 'id',
-    description: 'Response topic id',
+    description: RESPONSE_TOPIC_ID_DESCRIPTION,
+    example: TOPIC_ID_EXAMPLE,
   })
   responseTopicId: string;
 }
@@ -63,9 +86,9 @@ export class ChannelConditionsDto {
     message: 'Malformed DID',
   })
   @ApiProperty({
-    description: 'Array of DIDS',
+    description: CONDITIONS_DIDS_DESCRIPTION,
     type: [String],
-    example: ['did:ethr:volta:0x09Df5d33f1242E1b8aA5E0E0F6BfA687E6846993'],
+    example: [DID_EXAMPLE],
   })
   dids: string[];
 
@@ -79,9 +102,9 @@ export class ChannelConditionsDto {
       'Malformed role. Role should contain only alphanumeric lowercase letters, use . as a separator. Max length 255',
   })
   @ApiProperty({
-    description: 'Array of roles',
+    description: CONDITIONS_ROLES_DESCRIPTION,
     type: [String],
-    example: ['marketoperator.roles'],
+    example: [ROLE_EXAMPLE],
   })
   roles: string[];
 
@@ -92,7 +115,7 @@ export class ChannelConditionsDto {
   @ArrayUnique((o) => `${o.topicName}_${o.owner}`)
   @Type(() => TopicDto)
   @ApiProperty({
-    description: 'Array of topics',
+    description: CONDITIONS_TOPICS_DESCRIPTION,
     type: () => [TopicDto],
   })
   topics: TopicDto[];
@@ -104,7 +127,7 @@ export class ChannelConditionsDto {
   @ArrayUnique((o) => `${o.topicName}_${o.owner}`)
   @Type(() => ResponseTopicDto)
   @ApiProperty({
-    description: 'Array of response topics',
+    description: CONDITIONS_RESPONSE_TOPICS_DESCRIPTION,
     type: () => [ResponseTopicDto],
   })
   responseTopics: ResponseTopicDto[];
@@ -113,21 +136,21 @@ export class ChannelConditionsDto {
 export class UpdateChannelDto {
   @IsEnum(ChannelType)
   @ApiProperty({
-    description: 'Channel type',
+    description: 'Must equal the current type of the channel (`CHANNEL::RESTRICTED_FIELDS_UPDATE` otherwise).',
     enum: [
       ChannelType.SUB,
       ChannelType.PUB,
       ChannelType.DOWNLOAD,
       ChannelType.UPLOAD,
     ],
-    example: 'sub',
+    example: ChannelType.PUB,
   })
   type: ChannelType;
 
   @ApiProperty({
-    description: 'Use anonymous external channels',
+    description: 'Omit it, or send the current value (`CHANNEL::RESTRICTED_FIELDS_UPDATE` otherwise).',
     type: Boolean,
-    example: true,
+    example: false,
     required: false,
   })
   @IsBoolean()
@@ -135,7 +158,7 @@ export class UpdateChannelDto {
   useAnonymousExtChannel: boolean;
 
   @ApiProperty({
-    description: 'Enable message forms',
+    description: 'Ignored: cannot be changed after creation.',
     type: Boolean,
     example: true,
     required: false,
@@ -145,7 +168,12 @@ export class UpdateChannelDto {
   messageForms: boolean;
 
   @ApiProperty({
-    description: 'Channel encryption',
+    description: [
+      'Encrypt what is sent on this channel from now on.',
+      '- `true`: only the recipients can read the messages or files (`pub` and `upload`).',
+      '- `false`: sent in clear text, still signed.',
+      '- Ignored on anonymous external channels and on `sub` / `download` channels.',
+    ].join('\n'),
     type: Boolean,
     example: true,
   })
@@ -156,7 +184,11 @@ export class UpdateChannelDto {
   @IsOptional()
   @Type(() => ChannelConditionsDto)
   @ApiProperty({
-    description: 'Channel conditions',
+    description: [
+      'New `dids`, `roles`, `topics` and `responseTopics`. Each list replaces the current one.',
+      '- Send `conditions`, `topics` and `responseTopics` even when empty (`[]`).',
+    ].join('\n'),
+    type: () => ChannelConditionsDto,
   })
   conditions?: ChannelConditionsDto;
 }

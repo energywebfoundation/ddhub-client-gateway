@@ -212,13 +212,22 @@ export class AwsSecretsManagerService
       SecretString: data,
     });
 
-    this.client
-      .send(command)
-      .then((response) => {
-        this.logger.log(`Successfully updated password: ${name}`);
-        return response;
-      })
-      .catch((err) => this.handlePutSecretValueError(err, name, data));
+    // Awaited so the caller (and the user cache refresh after it) only runs
+    // once the secret is written, and failures reach the API response.
+    try {
+      await this.client.send(command);
+      this.logger.log(`Successfully updated password: ${name}`);
+    } catch (err) {
+      if (!(err instanceof ResourceNotFoundException)) {
+        throw err;
+      }
+
+      this.logger.log(`${name} not found, creating...`);
+      await this.client.send(
+        new CreateSecretCommand({ Name: name, SecretString: data })
+      );
+      this.logger.log(`Successfully created secret: ${name}`);
+    }
   }
 
   @Span('aws_ssm_setRSAKey')
@@ -515,21 +524,22 @@ export class AwsSecretsManagerService
       SecretId: name
     });
 
-    this.client
-      .send(command)
-      .then((response) => {
-        this.logger.log(`Successfully delete user: ${name}`);
-        return response;
-      })
-      .catch((err) => {
-        this.logger.error(err.message);
-        return null;
-      });
+    try {
+      await this.client.send(command);
+      this.logger.log(`Successfully delete user: ${name}`);
+    } catch (err) {
+      // Deleting an unknown user is not an error.
+      if (!(err instanceof ResourceNotFoundException)) {
+        throw err;
+      }
+    }
   }
 
   @Span('aws_ssm_createApiKey')
   public async createApiKey(name: string, daysValid: number, role: string = UserRole.MESSAGING): Promise<ApiKeyDetails> {
     this.logger.log(`Attempting to create api key `);
+
+    await this.assertApiKeyNameAvailable(name);
 
     const apiKey = this.generateRandomKey();
     const expiresAt = new Date(Date.now() + daysValid * this.MS_PER_DAY);
@@ -566,6 +576,10 @@ export class AwsSecretsManagerService
 
     const expiresAt = new Date(Date.now() + daysValid * this.MS_PER_DAY).toISOString();
     const existingData = JSON.parse(existingSecret.SecretString);
+
+    if (existingData.name !== name) {
+      await this.assertApiKeyNameAvailable(name, apiKey);
+    }
     const resolvedRole = role ?? existingData.role ?? UserRole.MESSAGING;
     const updatedSecret = JSON.stringify({ name, expiresAt, role: resolvedRole });
 

@@ -3,10 +3,15 @@ import { ArrayMinSize, IsArray, IsNotEmpty } from 'class-validator';
 
 export class AckMessagesRequestDto {
   @ApiProperty({
-    example: ['id1', 'id2'],
+    example: ['657a1f0c2b3e4d5f6a7b8c9d', '657a1f0c2b3e4d5f6a7b8c9e'],
     isArray: true,
     type: String,
-    description: 'Offline messages IDs to acknowledge',
+    minItems: 1,
+    description: [
+      'IDs of received messages to mark as read.',
+      '- At least one ID.',
+      '- Unknown IDs are accepted.',
+    ].join('\n'),
   })
   @IsArray()
   @IsNotEmpty()

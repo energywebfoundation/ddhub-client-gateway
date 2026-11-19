@@ -9,34 +9,39 @@ import {
 import { SchemaType } from '../../../topic/topic.const';
 import { EncryptionStatus } from '../../message.const';
 
+/**
+ * Item of `GET /messages/received`: a message read from the local store of
+ * received messages (channels with message forms enabled), not from the
+ * message broker.
+ */
 export class GetReceivedMessageResponseDto {
   @IsString()
   @ApiProperty({
-    description: 'message id',
+    description: 'Message ID. Use it to mark the message as read, or as `initiatingMessageId` when replying.',
     type: String,
-    example: '110',
+    example: '657a1f0c2b3e4d5f6a7b8c9d',
   })
   id: string;
 
   @IsString()
   @ApiProperty({
-    description: 'topic id',
+    description: 'Message broker ID of the topic.',
     type: String,
-    example: '111',
+    example: '62545547fe37f174d7715ff3',
   })
   topicId: string;
 
   @ApiProperty({
     type: Number,
     example: 2,
-    description: 'Reply messages count',
+    description: 'Number of replies this gateway sent to this message.',
     default: 0,
   })
   replyMessagesCount: number;
 
   @IsString()
   @ApiProperty({
-    description: 'topic Name',
+    description: 'Topic name.',
     type: String,
     example: 'getOperatingEnvelope',
   })
@@ -44,15 +49,15 @@ export class GetReceivedMessageResponseDto {
 
   @IsString()
   @ApiProperty({
-    description: 'application namespace',
+    description: 'Application namespace that owns the topic.',
     type: String,
-    example: 'torta.apps.eggplant.vege.iam.ewc',
+    example: 'ddhub.apps.energyweb.iam.ewc',
   })
   topicOwner: string;
 
   @IsString()
   @ApiProperty({
-    description: 'Topic Version',
+    description: 'Topic version the sender used.',
     type: String,
     example: '1.0.0',
   })
@@ -62,7 +67,8 @@ export class GetReceivedMessageResponseDto {
   @IsNotEmpty()
   @IsEnum(SchemaType)
   @ApiProperty({
-    description: 'schema type of the topic',
+    description:
+      'Schema type of the topic. This endpoint currently always returns `JSD7`, whatever the real schema type of the topic is.',
     type: String,
     enum: [
       SchemaType.JSD7,
@@ -77,15 +83,15 @@ export class GetReceivedMessageResponseDto {
 
   @IsString()
   @ApiProperty({
-    description: 'Payload sent to message',
+    description: 'The payload as received, decrypted where possible.',
     type: String,
-    example: '{"fileId":"624bfd4f4c6cf04abfc20041"}',
+    example: '{"siteId":"NMI-0001","limitKw":49.5,"validFrom":"2024-03-31T10:00:00Z"}',
   })
   payload: string;
 
   @IsString()
   @ApiProperty({
-    description: 'signature sent to message',
+    description: "Sender's signature (hex) as received.",
     type: String,
     example:
       '0x0abc6026b01856a756de47ec6f44d9c14fe69009bbf3b9b6cf522d8d783a1c654425848381affca5dab9284d8715fa2f9e34155374bafd923d75c219496cbe161c',
@@ -94,7 +100,7 @@ export class GetReceivedMessageResponseDto {
 
   @IsString()
   @ApiProperty({
-    description: 'message sender did',
+    description: 'DID of the sending gateway.',
     type: String,
     example: 'did:ethr:volta:0x03830466Ce257f9B798B0f27359D7639dFB6457D',
   })
@@ -102,54 +108,111 @@ export class GetReceivedMessageResponseDto {
 
   @IsString()
   @ApiProperty({
-    description: 'message sender alias if set',
+    description:
+      'Name of the sender in the local address book. Absent when the sender DID has no address book entry.',
     type: String,
-    example: 'John Doe',
+    required: false,
+    example: 'Distribution Network Operator A',
   })
   senderAlias?: string;
 
   @IsNumber()
   @ApiProperty({
-    description: 'timestamp in nano seconds',
+    description:
+      'Message timestamp in nanoseconds since the Unix epoch (stored with millisecond precision).',
     type: Number,
-    example: 1649147198388,
+    example: 1711878524357000000,
   })
   timestampNanos: number;
 
   @IsString()
   @ApiProperty({
-    description: 'timestamp formatted in ISO',
+    description: '`timestampNanos` as an ISO 8601 date-time.',
     type: String,
-    example: '2023-11-19T16:00:00.000Z',
+    format: 'date-time',
+    example: '2024-03-31T09:48:44.357Z',
   })
   timestampISO: string;
 
   @IsString()
   @ApiProperty({
-    description: 'transactionId sent to message for idempotency',
+    description: 'Transaction ID set by the sender, if any.',
     type: String,
-    example: '1649147198388',
+    example: '45d5a89f-7c2c-48b0-ae9a-54f4128e818f',
   })
   transactionId: string;
 
+  @ApiProperty({
+    description:
+      'Message ID of the message this one replies to, as set by the sender. Absent for messages that are not replies.',
+    type: String,
+    required: false,
+    example: '657a1f0c2b3e4d5f6a7b8c9c',
+  })
+  initiatingMessageId?: string;
+
+  @ApiProperty({
+    description:
+      'Transaction ID of the conversation this message replies to, as set by the sender. Absent for messages that are not replies.',
+    type: String,
+    required: false,
+    example: '8ac55aa7-7d6d-438a-98bd-376079903c7b',
+  })
+  initiatingTransactionId?: string;
+
+  @ApiProperty({
+    description: 'Whether the sender encrypted the payload in transit.',
+    type: Boolean,
+    example: true,
+  })
+  payloadEncryption: boolean;
+
+  @ApiProperty({
+    description:
+      'UUID generated by the sending gateway for its send request.',
+    type: String,
+    format: 'uuid',
+    example: '0b271eb8-1e21-4817-95af-7951649360ed',
+  })
+  clientGatewayMessageId: string;
+
   @IsEnum(EncryptionStatus)
   @ApiProperty({
-    description: 'Signature validation status for a message',
-    enum: [
-      EncryptionStatus.FAILED,
-      EncryptionStatus.NOT_PERFORMED,
-      EncryptionStatus.NOT_REQUIRED,
-      EncryptionStatus.REQUIRED_NOT_PERFORMED,
-      EncryptionStatus.SUCCESS,
-    ],
-    example: 'SUCCESS',
+    description: [
+      'Signature check of the stored message:',
+      '- `SUCCESS`: matches.',
+      '- `FAILED`: does not match. Encrypted messages usually show `FAILED` here even when the check passed on arrival.',
+    ].join('\n'),
+    enum: EncryptionStatus,
+    example: EncryptionStatus.SUCCESS,
   })
   signatureValid: EncryptionStatus;
 
-  @IsNumber()
   @ApiProperty({
     description:
-      'Related messages count. Only appears for channels with message forms.',
+      'Decryption result. Always `{ "status": "NOT_REQUIRED" }` here, because stored payloads are already in plaintext.',
+    type: 'object',
+    properties: {
+      status: {
+        type: 'string',
+        enum: Object.values(EncryptionStatus),
+        description: 'Always present; always `NOT_REQUIRED` for stored messages.',
+        example: EncryptionStatus.NOT_REQUIRED,
+      },
+      errorMessage: {
+        type: 'string',
+        description: 'Never set for stored messages.',
+      },
+    },
+  })
+  decryption: {
+    status: EncryptionStatus;
+    errorMessage?: string;
+  };
+
+  @IsNumber()
+  @ApiProperty({
+    description: 'Number of other stored messages in the same conversation.',
     type: Number,
     example: 5,
     required: false,
@@ -158,7 +221,7 @@ export class GetReceivedMessageResponseDto {
 
   @IsBoolean()
   @ApiProperty({
-    description: 'Acknowledgement status of the message',
+    description: '`true` once any user marked the message as read.',
     type: Boolean,
     example: false,
   })

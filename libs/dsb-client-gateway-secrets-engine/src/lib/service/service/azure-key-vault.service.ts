@@ -456,6 +456,8 @@ export class AzureKeyVaultService
   public async createApiKey(name: string, daysValid: number, role: string = UserRole.MESSAGING): Promise<ApiKeyDetails> {
     this.logger.log(`Attempting to create api key `);
 
+    await this.assertApiKeyNameAvailable(name);
+
     const apiKey = this.generateRandomKey();
     const expiresAt = new Date(Date.now() + daysValid * this.MS_PER_DAY);
 
@@ -485,6 +487,11 @@ export class AzureKeyVaultService
 
     const expiresAt = new Date(Date.now() + daysValid * this.MS_PER_DAY).toISOString();
     const existingData = existingSecret.value ? JSON.parse(existingSecret.value) : {};
+
+    if (existingData.name !== name) {
+      await this.assertApiKeyNameAvailable(name, apiKey);
+    }
+
     const resolvedRole = role ?? existingData.role ?? UserRole.MESSAGING;
 
     const data = {
@@ -505,7 +512,13 @@ export class AzureKeyVaultService
     try {
       this.logger.log(`Attempting to delete api key `);
 
-      await this.client.purgeDeletedSecret(this.encodeAzureKey(`${this.prefix}${PATHS.USERS}/${apiKey}`));
+      const existing = await this.getApiKey(apiKey);
+      if (!existing) return false;
+
+      const poller = await this.client.beginDeleteSecret(
+        this.encodeAzureKey(`${this.prefix}${PATHS.API_KEY}/${apiKey}`)
+      );
+      await poller.pollUntilDone();
 
       this.logger.log(`Delete api key ${apiKey}`);
       return true;
@@ -538,17 +551,19 @@ export class AzureKeyVaultService
     const apiKeySecretPath = this.encodeAzureKey(`${this.prefix}${PATHS.API_KEY}`);
     const apiKeySecretIdentifiers: string[] = [];
 
+    // Secret names look like `<prefix>-api-key-<apiKey>` once encoded.
+    const apiKeySecretNamePrefix = `${apiKeySecretPath}-`;
+
     for await (const secret of this.client.listPropertiesOfSecrets()) {
-      if (secret.enabled && secret.name.startsWith(apiKeySecretPath)) {
+      if (secret.enabled && secret.name.startsWith(apiKeySecretNamePrefix)) {
         apiKeySecretIdentifiers.push(secret.name);
       }
     }
 
     const apiKeyListResponse = await Promise.allSettled(
-      apiKeySecretIdentifiers.map((name) => {
-        const _name = name.replace(`${this.prefix}/`, "");
-        return this.getApiKey(_name)
-      })
+      apiKeySecretIdentifiers.map((name) =>
+        this.getApiKey(name.slice(apiKeySecretNamePrefix.length))
+      )
     );
 
     return apiKeyListResponse

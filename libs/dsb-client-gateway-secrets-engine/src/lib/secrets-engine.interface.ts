@@ -52,6 +52,19 @@ export abstract class SecretsEngineService implements OnModuleInit {
   abstract getApiKey(apiKey: string): Promise<ApiKeyDetails>;
   abstract updateApiKey(apiKey: string, name: string, daysValid: number, role?: string): Promise<ApiKeyDetails>;
 
+  /**
+   * Throws when another API key already uses `name`. For engines that keep
+   * no name index (Vault has its own). `exceptApiKey` is the key being
+   * renamed, which may keep its own name.
+   */
+  protected async assertApiKeyNameAvailable(name: string, exceptApiKey?: string): Promise<void> {
+    const keys = await this.getAllApiKeys();
+
+    if (keys.some((key) => key.name === name && key.apiKey !== exceptApiKey)) {
+      throw new Error(`API key with name "${name}" already exists.`);
+    }
+  }
+
   isAuthEnabled(): boolean {
     return false; // default
   }

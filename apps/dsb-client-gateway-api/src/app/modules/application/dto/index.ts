@@ -6,6 +6,12 @@ export class GetApplicationsQueryDto {
   @IsNotEmpty()
   @IsString()
   @ApiProperty({
+    description: [
+      'Role the gateway holds in the application:',
+      '- `user`: applications it uses.',
+      '- `topiccreator`: applications whose topics it manages.',
+      '- Any other value returns an empty list.',
+    ].join('\n'),
     example: 'topiccreator',
     type: String,
   })
@@ -15,60 +21,67 @@ export class GetApplicationsQueryDto {
 export class ApplicationDTO implements ApplicationEntity {
   @IsString()
   @ApiProperty({
-    description: 'app Name',
+    description: 'Name of the application as defined in its SSI-Hub application definition.',
     type: String,
-    example: 'application.something',
+    example: 'EWDS Demo Application',
   })
   public appName: string;
 
   @IsString()
   @IsOptional()
   @ApiProperty({
-    description: 'url of the logo',
+    description: 'Logo URL from the SSI-Hub application definition. `null` when the definition has none.',
     type: String,
-    example: 'url of the logo',
+    nullable: true,
+    example: 'https://example.com/assets/app-logo.png',
   })
   public logoUrl?: string;
 
   @IsString()
   @IsOptional()
   @ApiProperty({
-    description: 'url of the website',
+    description: 'Website URL from the SSI-Hub application definition. `null` when the definition has none.',
     type: String,
-    example: 'url of the website',
+    nullable: true,
+    example: 'https://example.com',
   })
   public websiteUrl?: string;
 
   @IsString()
   @IsOptional()
   @ApiProperty({
-    description: 'description of the app',
+    description: 'Free text description from the SSI-Hub application definition. `null` when the definition has none.',
     type: String,
-    example: 'description',
+    nullable: true,
+    example: 'Application owning the market data topics.',
   })
   public description?: string;
 
   @IsString()
   @ApiProperty({
-    description: 'When application got stored in cache',
+    description: 'When this gateway first listed the application (ISO 8601).',
     type: String,
-    example: '2022-05-18T11:19:07.000Z',
+    format: 'date-time',
+    example: '2026-05-18T11:19:07.000Z',
   })
   public createdDate: Date;
 
   @IsString()
   @ApiProperty({
-    description: 'When application got stored in cache',
+    description: 'When this gateway last updated the entry (ISO 8601).',
     type: String,
-    example: '2022-05-18T11:19:07.000Z',
+    format: 'date-time',
+    example: '2026-05-18T11:20:07.000Z',
   })
   public updatedDate: Date;
 
   @IsString()
   @IsOptional()
   @ApiProperty({
-    description: 'application namespace',
+    description:
+      'SSI-Hub namespace of the application. Topics are owned by an application namespace (`owner` of a topic), so use this value wherever a topic owner is expected.',
     type: String,
+    nullable: true,
     example: 'ddhub.apps.energyweb.iam.ewc',
   })
   public namespace?: string;
@@ -76,7 +89,11 @@ export class ApplicationDTO implements ApplicationEntity {
   @IsString()
   @IsOptional()
   @ApiProperty({
-    description: 'application assigned roles',
+    description: [
+      'Roles the gateway holds in the application:',
+      '- `user`: uses the application (for example its topics in channels).',
+      '- `topiccreator`: manages the topics of the application.',
+    ].join('\n'),
     type: [String],
     example: ['user', 'topiccreator'],
   })
@@ -85,9 +102,11 @@ export class ApplicationDTO implements ApplicationEntity {
   @IsString()
   @IsOptional()
   @ApiProperty({
-    description: 'number of topics',
+    description:
+      'Number of topics owned by the application namespace, as reported by the EWDS Message Broker at the last refresh. `0` when the broker reported none.',
     type: Number,
-    example: '4',
+    nullable: true,
+    example: 4,
   })
   public topicsCount?: number;
 }

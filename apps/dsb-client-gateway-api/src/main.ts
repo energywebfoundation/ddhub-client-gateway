@@ -4,14 +4,13 @@ import { NestFactory } from '@nestjs/core';
 import { WsAdapter } from '@nestjs/platform-ws';
 import * as bodyParser from 'body-parser';
 import { AppModule } from './app/app.module';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 import { otelSDK } from '@dsb-client-gateway/ddhub-client-gateway-tracing';
 import { ValidationException } from '@dsb-client-gateway/dsb-client-gateway-errors';
 import { Logger } from 'nestjs-pino';
 import * as fs from 'fs';
 import * as Yaml from 'json-to-pretty-yaml';
-import { GetChannelMessagesCountDto } from './app/modules/channel/dto/request/get-channel-messages-count.dto';
+import { setupSwagger } from './swagger/swagger.config';
 /**
  * Have to export this for nx to add it to the package.json
  * See: https://github.com/nrwl/nx/issues/6901
@@ -95,32 +94,9 @@ async function bootstrap() {
     })
   );
 
-  const config = new DocumentBuilder()
-    .setTitle('DDHub Client Gateway')
-    .setDescription('DDHub Client Gateway')
-    .setVersion('2.0')
-    .addBearerAuth({
-      type: 'http',
-      scheme: 'bearer',
-      bearerFormat: 'JWT',
-      name: 'Authorization',
-      description: 'Enter JWT token',
-      in: 'header',
-    }, 'bearer')
-    .addSecurityRequirements('bearer')
-    .setExternalDoc('Postman Collection', '/docs-json')
-    .build();
-
   app.useWebSocketAdapter(new WsAdapter(app));
 
-  const document = SwaggerModule.createDocument(app, config, {
-    extraModels: [GetChannelMessagesCountDto, GetChannelMessagesCountDto],
-  });
-  SwaggerModule.setup('docs', app, document, {
-    swaggerOptions: {
-      persistAuthorization: true,
-    },
-  });
+  const document = setupSwagger(app);
 
   await generateSchema(document);
 

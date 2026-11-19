@@ -624,5 +624,87 @@ describe(`${AzureKeyVaultService.name}`, () => {
       const result = await service.validateApiKey('missing');
       expect(result).toStrictEqual({ valid: false });
     });
+
+    const mockListedApiKeys = (keys: Record<string, { name: string }>) => {
+      jest.spyOn(SecretClient.prototype, 'listPropertiesOfSecrets').mockReturnValue(
+        getPagedAsyncIterator<SecretProperties>({
+          firstPageLink: '',
+          getPage: () =>
+            Promise.resolve({
+              page: <SecretProperties[]>[
+                ...Object.keys(keys).map((apiKey) => ({ name: `ddhub-api-key-${apiKey}`, enabled: true })),
+                { name: 'ddhub-users-operator01', enabled: true },
+              ],
+            }),
+        }) as unknown as ReturnType<SecretClient['listPropertiesOfSecrets']>
+      );
+      jest.spyOn(SecretClient.prototype, 'getSecret').mockImplementation(async (secretName: string) => {
+        const apiKey = Object.keys(keys).find((k) => secretName === `ddhub-api-key-${k}`);
+        if (!apiKey) throw new Error('Secret does not exist');
+        return {
+          name: secretName,
+          value: JSON.stringify(buildApiKeySecretPayload(keys[apiKey])),
+          properties: { vaultUrl: '', name: secretName },
+        };
+      });
+    };
+
+    it('should list API keys with their key value', async () => {
+      mockListedApiKeys({ abc123: { name: 'erp' } });
+
+      const keys = await service.getAllApiKeys();
+
+      expect(keys.map((k) => [k.apiKey, k.name])).toEqual([['abc123', 'erp']]);
+    });
+
+    it('should reject creating an API key with a name already in use', async () => {
+      mockListedApiKeys({ abc123: { name: 'erp' } });
+      const setSecret = jest.spyOn(SecretClient.prototype, 'setSecret');
+
+      await expect(service.createApiKey('erp', 30)).rejects.toThrow('API key with name "erp" already exists.');
+      expect(setSecret).not.toBeCalled();
+    });
+
+    it('should create an API key with a new name', async () => {
+      mockListedApiKeys({ abc123: { name: 'erp' } });
+      const setSecret = jest.spyOn(SecretClient.prototype, 'setSecret').mockResolvedValue({} as any);
+
+      const created = await service.createApiKey('billing', 30);
+
+      expect(created.name).toBe('billing');
+      expect(setSecret).toBeCalledTimes(1);
+    });
+
+    it('should reject renaming an API key to a name another key uses', async () => {
+      mockListedApiKeys({ abc123: { name: 'erp' }, def456: { name: 'billing' } });
+      const setSecret = jest.spyOn(SecretClient.prototype, 'setSecret');
+
+      await expect(service.updateApiKey('def456', 'erp', 30)).rejects.toThrow('API key with name "erp" already exists.');
+      expect(setSecret).not.toBeCalled();
+    });
+
+    it('should let an API key keep its own name on update', async () => {
+      mockListedApiKeys({ abc123: { name: 'erp' } });
+      const setSecret = jest.spyOn(SecretClient.prototype, 'setSecret').mockResolvedValue({} as any);
+
+      await service.updateApiKey('abc123', 'erp', 30);
+
+      expect(setSecret).toBeCalledTimes(1);
+    });
+
+    it('should delete the API key secret itself', async () => {
+      mockListedApiKeys({ abc123: { name: 'erp' } });
+      const pollUntilDone = jest.fn().mockResolvedValue(undefined);
+      const beginDelete = jest
+        .spyOn(SecretClient.prototype, 'beginDeleteSecret')
+        .mockResolvedValue({ pollUntilDone } as any);
+
+      expect(await service.deleteApiKey('abc123')).toBe(true);
+      expect(beginDelete).toBeCalledWith('ddhub-api-key-abc123');
+      expect(pollUntilDone).toBeCalled();
+
+      expect(await service.deleteApiKey('unknown')).toBe(false);
+      expect(beginDelete).toBeCalledTimes(1);
+    });
   });
 });
