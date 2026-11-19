@@ -1,7 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { UserRole } from '@dsb-client-gateway/ddhub-client-gateway-user-roles';
 import {
-  IsEnum,
   IsNotEmpty,
   IsString,
   MaxLength,
@@ -10,8 +8,10 @@ import {
 
 export class LoginRequestDto {
   @ApiProperty({
-    description: 'Username',
-    example: 'admin',
+    description: 'Username (exact, case sensitive).',
+    example: 'operator01',
+    minLength: 4,
+    maxLength: 64,
   })
   @IsString()
   @IsNotEmpty()
@@ -20,8 +20,12 @@ export class LoginRequestDto {
   public username: string;
 
   @ApiProperty({
-    description: 'Password',
-    example: 'password',
+    description:
+      'Password of the user account. Compared as-is with the stored password.',
+    example: 'change-me-please',
+    minLength: 4,
+    maxLength: 128,
+    format: 'password',
   })
   @IsString()
   @MaxLength(128)

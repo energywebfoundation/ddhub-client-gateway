@@ -8,8 +8,9 @@ export class DownloadMessagesDto {
   })
   @ApiProperty({
     type: String,
-    description: 'file Id for which file will be downloaded',
-    example: 'bb2686d2-97be-436b-8869',
+    pattern: '^[a-zA-Z0-9-]+$',
+    description: 'ID of the file, from a file message on a `download` channel. Letters, digits and hyphens only.',
+    example: '624bfd4f4c6cf04abfc20041',
   })
   fileId: string;
 }

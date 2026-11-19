@@ -1,17 +1,19 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { FQCN_EXAMPLE } from '../channel-swagger.docs';
 
 export class GetChannelMessagesCountDto {
   @ApiProperty({
-    description: 'Count of total messages',
+    description: 'Number of messages stored for the channel: sent for `pub`, received for other types.',
     type: Number,
+    minimum: 0,
     example: 5,
   })
   count: number;
 
   @ApiProperty({
-    description: 'Channel name',
+    description: 'FQCN of the channel the count belongs to.',
     type: String,
-    example: 'szostak.pub',
+    example: FQCN_EXAMPLE,
   })
   fqcn: string;
 }

@@ -302,6 +302,77 @@ describe('UserGuard', () => {
         );
         expect(result).toBeTruthy();
       });
+
+      it.each(['owner', 'ADMIN', ''])(
+        'should deny an api-key with the unknown role %p, even on an admin route',
+        async (role) => {
+          mockReflector.get = jest
+            .fn()
+            .mockImplementation(() => [UserRole.ADMIN, UserRole.SUPERADMIN]);
+
+          const result = await guard.canActivate(
+            buildApiKeyContext(role) as any
+          );
+          expect(result).toBeFalsy();
+        }
+      );
+
+      it('should treat an api-key without a role as a messaging key', async () => {
+        mockReflector.get = jest
+          .fn()
+          .mockImplementation(() => [UserRole.MESSAGING]);
+        expect(
+          await guard.canActivate(buildApiKeyContext(undefined) as any)
+        ).toBeTruthy();
+
+        mockReflector.get = jest
+          .fn()
+          .mockImplementation(() => [UserRole.ADMIN, UserRole.SUPERADMIN]);
+        expect(
+          await guard.canActivate(buildApiKeyContext(undefined) as any)
+        ).toBeFalsy();
+      });
+    });
+
+    describe('token auth roles', () => {
+      const tokenWithRole = (accountType: unknown) => {
+        mockUserAuthService.isAuthEnabled = jest.fn(() => true);
+        mockUserAuthService.verifyToken = jest.fn(() => ({
+          type: 'access',
+          accountType,
+          username: 'str',
+        }));
+      };
+
+      beforeEach(() => {
+        mockReflector.get = jest.fn().mockImplementation((param) => {
+          if (param === 'EXCLUDED_ROUTE') {
+            return false;
+          }
+          return [UserRole.ADMIN, UserRole.SUPERADMIN];
+        });
+      });
+
+      it.each([UserRole.ADMIN, UserRole.SUPERADMIN])(
+        'should allow a %p token on an admin route',
+        async (role) => {
+          tokenWithRole(role);
+          expect(await guard.canActivate(mockContext as any)).toBeTruthy();
+        }
+      );
+
+      it('should deny a messaging token on an admin route', async () => {
+        tokenWithRole(UserRole.MESSAGING);
+        expect(await guard.canActivate(mockContext as any)).toBeFalsy();
+      });
+
+      it.each(['owner', 'ADMIN', '', undefined])(
+        'should deny a token with the unknown role %p',
+        async (role) => {
+          tokenWithRole(role);
+          expect(await guard.canActivate(mockContext as any)).toBeFalsy();
+        }
+      );
     });
   });
 });

@@ -1,6 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString } from 'class-validator';
 
+// Not referenced by any route, so it does not appear in the OpenAPI document.
+// Internal (symmetric key) messages are handled by the scheduler and KeysService.
+
 export class InternalMessageDto {
   @IsString()
   @ApiProperty({

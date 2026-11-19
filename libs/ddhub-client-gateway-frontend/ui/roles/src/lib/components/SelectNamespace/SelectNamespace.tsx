@@ -16,7 +16,7 @@ export const SelectNamespaceStep = ({
     name: string;
     namespace: string;
     appName: string;
-    logoUrl: string;
+    logoUrl?: string;
   }[];
   searchKey: string;
   setSearchKey: (value: string) => void;
@@ -25,7 +25,7 @@ export const SelectNamespaceStep = ({
     name: string;
     namespace: string;
     appName: string;
-    logoUrl: string;
+    logoUrl?: string;
     label: string;
   };
 
@@ -75,7 +75,7 @@ export const SelectNamespaceStep = ({
           name: string;
           namespace: string;
           appName: string;
-          logoUrl: string;
+          logoUrl?: string;
         }
       ) => {
         const index = props['data-option-index'];

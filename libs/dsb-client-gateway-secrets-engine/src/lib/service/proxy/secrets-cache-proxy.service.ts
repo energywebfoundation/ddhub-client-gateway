@@ -194,11 +194,15 @@ export class SecretsCacheProxyService extends SecretsEngineService {
   public async setUserPassword(username: string, password: string, role: UserRole): Promise<void> {
     await this.secretsEngineService.setUserPassword(username, password, role);
     await this.refreshUsersData();
+    // Listing can lag behind a write (AWS ListSecrets is eventually
+    // consistent), so apply the change the write just confirmed.
+    this.cachedObjects.users[username] = { password, role };
   }
 
   public async deleteUser(username: string): Promise<void> {
     await this.secretsEngineService.deleteUser(username);
     await this.refreshUsersData();
+    delete this.cachedObjects.users[username];
   }
 
   public async createApiKey(name: string, daysValid: number, role?: string): Promise<ApiKeyDetails> {

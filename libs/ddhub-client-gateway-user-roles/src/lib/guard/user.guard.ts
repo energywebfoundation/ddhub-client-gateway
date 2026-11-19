@@ -39,13 +39,11 @@ export class UserGuard implements CanActivate {
     }
 
     if (request.user?.authType === 'api-key') {
-      const apiKeyRole: string | undefined = request.user.role;
+      // Keys stored without a role are treated as messaging keys, the same
+      // role the API reports for them.
+      const apiKeyRole: string = request.user.role ?? UserRole.MESSAGING;
 
-      if (apiKeyRole !== UserRole.MESSAGING) {
-        return true;
-      }
-
-      return this.isRouteAllowedForRole(context, apiKeyRole);
+      return this.isRoleAllowed(context, apiKeyRole);
     }
 
     const excludedRoute: boolean = this.reflector.get<boolean>(
@@ -76,15 +74,32 @@ export class UserGuard implements CanActivate {
           // assign requires pino request scope; may be unavailable in global guards
         }
 
-        if (decodedToken.accountType !== UserRole.MESSAGING) {
-          return true;
-        }
-
-        return this.isRouteAllowedForRole(context, decodedToken.accountType);
+        return this.isRoleAllowed(context, decodedToken.accountType);
       } catch (e) {
         return false;
       }
     }
+
+    return false;
+  }
+
+  /**
+   * admin and superadmin may call every route, messaging only the routes
+   * whose @Roles include it. Any other role value is denied.
+   */
+  private isRoleAllowed(
+    context: ExecutionContext,
+    role: string | undefined
+  ): boolean {
+    if (role === UserRole.ADMIN || role === UserRole.SUPERADMIN) {
+      return true;
+    }
+
+    if (role === UserRole.MESSAGING) {
+      return this.isRouteAllowedForRole(context, role);
+    }
+
+    this.logger.warn(`denied request with unknown role "${role}"`);
 
     return false;
   }

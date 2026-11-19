@@ -18,7 +18,7 @@ export const Search = ({
     name: string;
     namespace: string;
     appName: string;
-    logoUrl: string;
+    logoUrl?: string;
   }[];
   searchKey: string;
   setSearchKey: (searchKey: string) => void;

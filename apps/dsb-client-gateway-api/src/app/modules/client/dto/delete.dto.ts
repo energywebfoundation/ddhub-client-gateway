@@ -8,9 +8,10 @@ export class DeleteClientParamsDto {
     message: 'clientId contains invalid characters',
   })
   @ApiProperty({
-    description: 'Client ID',
+    description: 'Client id to delete. No spaces, line breaks or `&` `<` `>` `"` `\'` `/`; URL-encode other special characters such as `@` or `:`.',
     type: String,
-    example: 'test.cursor',
+    example: 'consumer01:channel.name',
+    pattern: '^[^\\s&<>"\'/\\r\\n]+$',
   })
   clientId: string;
 }

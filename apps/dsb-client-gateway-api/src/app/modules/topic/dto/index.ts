@@ -16,15 +16,74 @@ import { IsValidTopicName } from '../../utils/validator/decorators/isValidTopicN
 import { ConfigService } from '@nestjs/config';
 import { IsValidVersion } from '../../utils/validator/decorators/isValidVersion';
 
+/* ------------------------------------------------------------------------ */
+/* Shared OpenAPI texts (documentation only, no runtime effect)             */
+/* ------------------------------------------------------------------------ */
+
+const TOPIC_ID_DESCRIPTION =
+  'Topic id assigned by the message broker when the topic was created. All versions of a topic share the same id.';
+const TOPIC_ID_EXAMPLE = '62545547fe37f174d7715ff3';
+
+const TOPIC_NAME_DESCRIPTION = 'Topic name, unique within its owner namespace.';
+const TOPIC_NAME_PATTERN = '^[a-zA-z0-9.]{1,255}$';
+const TOPIC_NAME_EXAMPLE = 'operatorEnvelope';
+
+const SCHEMA_TYPE_DESCRIPTION = [
+  'Type of data the topic carries:',
+  '- `JSD7`: JSON, for `pub` and `sub` channels. Payloads are checked against the schema.',
+  '- `XML`: XML, for `pub` and `sub` channels.',
+  '- `XSD6`: XML files, for `upload` and `download` channels.',
+  '- `CSV`, `TSV`: comma or tab separated files, for `upload` and `download` channels.',
+].join('\n');
+const SCHEMA_TYPE_ENUM = [
+  SchemaType.JSD7,
+  SchemaType.XML,
+  SchemaType.XSD6,
+  SchemaType.CSV,
+  SchemaType.TSV,
+];
+
+const SCHEMA_EXAMPLE = JSON.stringify({
+  type: 'object',
+  properties: {
+    data: {
+      type: 'number',
+    },
+  },
+});
+
+const VERSION_RULES =
+  'Format: `MAJOR.MINOR.PATCH`.';
+const VERSION_EXAMPLE = '1.0.9';
+
+const OWNER_DESCRIPTION =
+  'Owner of the topic: the namespace of the application (in the Energy Web SSI-Hub) the topic belongs to.';
+const OWNER_EXAMPLE = 'ddhub.apps.energyweb.iam.ewc';
+const OWNER_RULES =
+  'Must be an application namespace, for example `<app>.apps.<org>.iam.ewc`.';
+
+const TAGS_DESCRIPTION =
+  'Labels to group and filter topics. Shared by all versions.';
+const TAGS_EXAMPLE = ['aggregator'];
+
+const LIMIT_DESCRIPTION =
+  'Page size: maximum number of records to return. Defaults to 5 when omitted. Must be a number; send a positive integer.';
+const PAGE_DESCRIPTION =
+  'Page number, starting at 1. Defaults to 1 when omitted. Must be a positive number (send an integer >= 1).';
+
+/* ------------------------------------------------------------------------ */
+/* Topic records                                                            */
+/* ------------------------------------------------------------------------ */
+
 export class GetTopicDto {
   constructor(protected readonly configService: ConfigService) { }
 
   @IsString()
   @IsNotEmpty()
   @ApiProperty({
-    description: 'id of the topic',
+    description: TOPIC_ID_DESCRIPTION,
     type: String,
-    example: '62545547fe37f174d7715ff3',
+    example: TOPIC_ID_EXAMPLE,
   })
   id: string;
 
@@ -35,9 +94,9 @@ export class GetTopicDto {
   @IsString()
   @IsNotEmpty()
   @ApiProperty({
-    description: 'name of the topic',
+    description: TOPIC_NAME_DESCRIPTION,
     type: String,
-    example: 'Topic_JSON_V12',
+    example: TOPIC_NAME_EXAMPLE,
   })
   name: string;
 
@@ -45,41 +104,28 @@ export class GetTopicDto {
   @IsNotEmpty()
   @IsEnum(SchemaType)
   @ApiProperty({
-    description: 'schema type of the topic',
+    description: SCHEMA_TYPE_DESCRIPTION,
     type: String,
-    enum: [
-      SchemaType.JSD7,
-      SchemaType.XML,
-      SchemaType.XSD6,
-      SchemaType.CSV,
-      SchemaType.TSV,
-    ],
-    example: 'JSD7',
+    enum: SCHEMA_TYPE_ENUM,
+    example: SchemaType.JSD7,
   })
   schemaType: SchemaType;
 
   @IsString()
   @IsNotEmpty()
   @ApiProperty({
-    description: 'schema of the topic',
+    description: 'Schema of the version. In lists it is a JSON object, not a string.',
     type: String,
-    example: JSON.stringify({
-      type: 'object',
-      properties: {
-        data: {
-          type: 'number',
-        },
-      },
-    }),
+    example: SCHEMA_EXAMPLE,
   })
   schema: string;
 
   @IsString()
   @IsNotEmpty()
   @ApiProperty({
-    description: 'version of the topic',
+    description: 'Highest version of the topic (`MAJOR.MINOR.PATCH`).',
     type: String,
-    example: '1.0.9',
+    example: VERSION_EXAMPLE,
   })
   version: string;
 
@@ -89,9 +135,9 @@ export class GetTopicDto {
   @IsString()
   @IsNotEmpty()
   @ApiProperty({
-    description: 'owner of the topic',
+    description: OWNER_DESCRIPTION,
     type: String,
-    example: 'torta.apps.eggplant.vege.iam.ewc',
+    example: OWNER_EXAMPLE,
   })
   owner: string;
 
@@ -99,9 +145,9 @@ export class GetTopicDto {
   @IsNotEmpty()
   @ArrayUnique()
   @ApiProperty({
-    description: 'tags of the topic',
+    description: TAGS_DESCRIPTION,
     type: [String],
-    example: `["aggregator"]`,
+    example: TAGS_EXAMPLE,
   })
   tags: string[];
 }
@@ -110,9 +156,9 @@ export class PostTopicDto {
   @IsString()
   @IsNotEmpty()
   @ApiProperty({
-    description: 'id of the topic',
+    description: TOPIC_ID_DESCRIPTION,
     type: String,
-    example: '62545547fe37f174d7715ff3',
+    example: TOPIC_ID_EXAMPLE,
   })
   id: string;
 
@@ -123,9 +169,9 @@ export class PostTopicDto {
   @IsString()
   @IsNotEmpty()
   @ApiProperty({
-    description: 'name of the topic',
+    description: TOPIC_NAME_DESCRIPTION,
     type: String,
-    example: 'Topic_JSON_V12',
+    example: TOPIC_NAME_EXAMPLE,
   })
   name: string;
 
@@ -133,41 +179,29 @@ export class PostTopicDto {
   @IsNotEmpty()
   @IsEnum(SchemaType)
   @ApiProperty({
-    description: 'schema type of the topic',
+    description: SCHEMA_TYPE_DESCRIPTION,
     type: String,
-    enum: [
-      SchemaType.JSD7,
-      SchemaType.XML,
-      SchemaType.XSD6,
-      SchemaType.CSV,
-      SchemaType.TSV,
-    ],
-    example: 'JSD7',
+    enum: SCHEMA_TYPE_ENUM,
+    example: SchemaType.JSD7,
   })
   schemaType: SchemaType;
 
   @IsString()
   @IsNotEmpty()
   @ApiProperty({
-    description: 'schema of the topic',
+    description:
+      'Schema definition of this version as a string (for `JSD7`: the JSON Schema document encoded as JSON text).',
     type: String,
-    example: JSON.stringify({
-      type: 'object',
-      properties: {
-        data: {
-          type: 'number',
-        },
-      },
-    }),
+    example: SCHEMA_EXAMPLE,
   })
   schema: string;
 
   @IsString()
   @IsNotEmpty()
   @ApiProperty({
-    description: 'version of the topic',
+    description: 'Version of the topic (`MAJOR.MINOR.PATCH`).',
     type: String,
-    example: '1.0.9',
+    example: VERSION_EXAMPLE,
   })
   version: string;
 
@@ -177,9 +211,9 @@ export class PostTopicDto {
     message: 'Malformed owner name. Please enter correct owner name',
   })
   @ApiProperty({
-    description: 'owner of the topic',
+    description: OWNER_DESCRIPTION,
     type: String,
-    example: 'torta.apps.eggplant.vege.iam.ewc',
+    example: OWNER_EXAMPLE,
   })
   owner: string;
 
@@ -187,9 +221,9 @@ export class PostTopicDto {
   @IsNotEmpty()
   @ArrayUnique()
   @ApiProperty({
-    description: 'tags of the topic',
+    description: TAGS_DESCRIPTION,
     type: [String],
-    example: `["aggregator"]`,
+    example: TAGS_EXAMPLE,
   })
   tags: string[];
 }
@@ -198,9 +232,9 @@ export class PutTopicDto {
   @IsString()
   @IsNotEmpty()
   @ApiProperty({
-    description: 'id of the topic',
+    description: TOPIC_ID_DESCRIPTION,
     type: String,
-    example: '62545547fe37f174d7715ff3',
+    example: TOPIC_ID_EXAMPLE,
   })
   id: string;
 
@@ -211,9 +245,9 @@ export class PutTopicDto {
   @IsString()
   @IsNotEmpty()
   @ApiProperty({
-    description: 'name of the topic',
+    description: TOPIC_NAME_DESCRIPTION,
     type: String,
-    example: 'Topic_JSON_V12',
+    example: TOPIC_NAME_EXAMPLE,
   })
   name: string;
 
@@ -221,16 +255,10 @@ export class PutTopicDto {
   @IsNotEmpty()
   @IsEnum(SchemaType)
   @ApiProperty({
-    description: 'schema type of the topic',
+    description: SCHEMA_TYPE_DESCRIPTION,
     type: String,
-    enum: [
-      SchemaType.JSD7,
-      SchemaType.XML,
-      SchemaType.XSD6,
-      SchemaType.CSV,
-      SchemaType.TSV,
-    ],
-    example: 'JSD7',
+    enum: SCHEMA_TYPE_ENUM,
+    example: SchemaType.JSD7,
   })
   schemaType: SchemaType;
 
@@ -240,9 +268,9 @@ export class PutTopicDto {
     message: 'Malformed owner name. Please enter correct owner name',
   })
   @ApiProperty({
-    description: 'owner of the topic',
+    description: OWNER_DESCRIPTION,
     type: String,
-    example: 'torta.apps.eggplant.vege.iam.ewc',
+    example: OWNER_EXAMPLE,
   })
   owner: string;
 
@@ -250,9 +278,9 @@ export class PutTopicDto {
   @IsNotEmpty()
   @ArrayUnique()
   @ApiProperty({
-    description: 'tags of the topic',
+    description: 'The tags of the topic now.',
     type: [String],
-    example: `["aggregator"]`,
+    example: TAGS_EXAMPLE,
   })
   tags: string[];
 }
@@ -261,9 +289,9 @@ export class GetTopicSearchDto {
   @IsString()
   @IsNotEmpty()
   @ApiProperty({
-    description: 'id of the topic',
+    description: TOPIC_ID_DESCRIPTION,
     type: String,
-    example: '62545547fe37f174d7715ff3',
+    example: TOPIC_ID_EXAMPLE,
   })
   id: string;
 
@@ -274,9 +302,9 @@ export class GetTopicSearchDto {
   @IsString()
   @IsNotEmpty()
   @ApiProperty({
-    description: 'name of the topic',
+    description: TOPIC_NAME_DESCRIPTION,
     type: String,
-    example: 'Topic_JSON_V12',
+    example: TOPIC_NAME_EXAMPLE,
   })
   name: string;
 
@@ -284,33 +312,27 @@ export class GetTopicSearchDto {
   @IsNotEmpty()
   @IsEnum(SchemaType)
   @ApiProperty({
-    description: 'schema type of the topic',
+    description: SCHEMA_TYPE_DESCRIPTION,
     type: String,
-    enum: [
-      SchemaType.JSD7,
-      SchemaType.XML,
-      SchemaType.XSD6,
-      SchemaType.CSV,
-      SchemaType.TSV,
-    ],
-    example: 'JSD7',
+    enum: SCHEMA_TYPE_ENUM,
+    example: SchemaType.JSD7,
   })
   schemaType: SchemaType;
 
   @IsString()
   @IsNotEmpty()
   @ApiProperty({
-    description: 'owner of the topic',
+    description: OWNER_DESCRIPTION,
     type: String,
-    example: 'torta.apps.eggplant.vege.iam.ewc',
+    example: OWNER_EXAMPLE,
   })
   owner: string;
 
   @IsString()
   @ApiProperty({
-    description: 'version of the topic',
+    description: 'Version of this record (`MAJOR.MINOR.PATCH`).',
     type: String,
-    example: '1.0.9',
+    example: VERSION_EXAMPLE,
   })
   @IsValidVersion({
     message: 'malformed version',
@@ -321,18 +343,19 @@ export class GetTopicSearchDto {
   @IsNotEmpty()
   @ArrayUnique()
   @ApiProperty({
-    description: 'tags of the topic',
+    description: TAGS_DESCRIPTION,
     type: [String],
-    example: `["aggregator"]`,
+    example: TAGS_EXAMPLE,
   })
   tags: string[];
 
   @IsOptional()
   @IsString()
   @ApiProperty({
-    description: 'timestamp of the topic updated',
+    description: 'When this gateway first saw the version (ISO 8601). Not returned when listing versions.',
     type: String,
-    example: '2022-06-08T05:43:15.510Z',
+    format: 'date-time',
+    example: '2026-06-08T05:43:15.510Z',
     required: false,
   })
   public createdDate?: string;
@@ -340,21 +363,26 @@ export class GetTopicSearchDto {
   @IsOptional()
   @IsString()
   @ApiProperty({
-    description: 'timestamp of the topic updated',
+    description: 'When this gateway last saw the version change (ISO 8601). Not returned when listing versions.',
     type: String,
-    example: '2022-06-08T05:43:15.510Z',
+    format: 'date-time',
+    example: '2026-06-08T05:43:15.510Z',
     required: false,
   })
   public updatedDate?: string;
 }
 
+/* ------------------------------------------------------------------------ */
+/* Request bodies                                                           */
+/* ------------------------------------------------------------------------ */
+
 export class UpdateTopicBodyDto {
   @IsArray()
   @IsNotEmpty()
   @ApiProperty({
-    description: 'tags of the topic',
+    description: 'The full new list of tags; replaces the current tags. Send `[]` to remove all.',
     type: [String],
-    example: `["aggregator"]`,
+    example: TAGS_EXAMPLE,
   })
   tags: string[];
 }
@@ -363,16 +391,9 @@ export class UpdateTopicHistoryBodyDto {
   @IsString()
   @IsNotEmpty()
   @ApiProperty({
-    description: 'schema of the topic',
+    description: 'Schema of the version, as a string. For `JSD7`, a JSON Schema as JSON text.',
     type: String,
-    example: JSON.stringify({
-      type: 'object',
-      properties: {
-        data: {
-          type: 'number',
-        },
-      },
-    }),
+    example: SCHEMA_EXAMPLE,
   })
   schema: string;
 }
@@ -395,6 +416,10 @@ export class GetMessagesQueryDto {
   public clientId?: string;
 }
 
+/* ------------------------------------------------------------------------ */
+/* Query and path parameters                                                */
+/* ------------------------------------------------------------------------ */
+
 export class GetTopicsCountQueryDto {
   @IsNotEmpty()
   @IsValidApplicationNameSpace(new ConfigService(), {
@@ -402,9 +427,10 @@ export class GetTopicsCountQueryDto {
     each: true,
   })
   @ApiProperty({
+    description: 'Application namespace, for example `<app>.apps.<org>.iam.ewc`. Repeat it for several (`?owner=a&owner=b`).',
     example: [
-      'torta.apps.eggplant.vege.iam.ewc',
-      'mini.apps.sliced.carrot.vege.iam.ewc',
+      'ddhub.apps.energyweb.iam.ewc',
+      'marketoperator.apps.energyweb.iam.ewc',
     ],
     type: [String],
   })
@@ -415,7 +441,9 @@ export class GetTopicsSearchQueryDto {
   @IsNotEmpty()
   @IsString()
   @ApiProperty({
-    example: 'Topic_JSON_V12',
+    description:
+      'Text to look for in topic names (matches anywhere in the name). `%` and `_` in the keyword act as wildcards. Required and non-empty.',
+    example: 'operator',
     type: String,
   })
   public keyword: string;
@@ -423,7 +451,9 @@ export class GetTopicsSearchQueryDto {
   @IsString()
   @IsOptional()
   @ApiProperty({
-    example: 'ddhub.apps.energyweb.iam.ewc',
+    description:
+      'Only return topics of this owner (exact match on the application namespace). Not format-validated on this endpoint. Omit to search all owners.',
+    example: OWNER_EXAMPLE,
     required: false,
     type: String,
   })
@@ -432,7 +462,8 @@ export class GetTopicsSearchQueryDto {
   @IsOptional()
   @IsNumber()
   @ApiProperty({
-    example: 1,
+    description: LIMIT_DESCRIPTION,
+    example: 10,
     default: 5,
     required: false,
     type: Number,
@@ -443,6 +474,7 @@ export class GetTopicsSearchQueryDto {
   @IsPositive()
   @IsOptional()
   @ApiProperty({
+    description: PAGE_DESCRIPTION,
     example: 1,
     default: 1,
     required: false,
@@ -455,7 +487,8 @@ export class GetTopicsQueryDto {
   @IsOptional()
   @IsNumber()
   @ApiProperty({
-    example: 1,
+    description: LIMIT_DESCRIPTION,
+    example: 10,
     default: 5,
     required: false,
     type: Number,
@@ -466,6 +499,7 @@ export class GetTopicsQueryDto {
   @IsPositive()
   @IsOptional()
   @ApiProperty({
+    description: PAGE_DESCRIPTION,
     example: 1,
     default: 1,
     required: false,
@@ -475,9 +509,10 @@ export class GetTopicsQueryDto {
 
   @IsOptional()
   @ApiProperty({
-    example: 'topic name',
+    description:
+      'Only return the topic with exactly this name (exact, case-sensitive match). Omit to return all topics of the owner.',
+    example: TOPIC_NAME_EXAMPLE,
     type: String,
-    default: '',
     required: false,
   })
   public name: string;
@@ -488,7 +523,8 @@ export class GetTopicsQueryDto {
   @IsNotEmpty()
   @IsString()
   @ApiProperty({
-    example: 'ddhub.apps.energyweb.iam.ewc',
+    description: `Application namespace whose topics to list (required). ${OWNER_RULES}`,
+    example: OWNER_EXAMPLE,
     required: true,
     type: String,
   })
@@ -496,32 +532,33 @@ export class GetTopicsQueryDto {
 
   @IsOptional()
   @ApiProperty({
-    example: ['aggregator'],
+    description: 'Topics with at least one of these tags; a tag matches when it contains the text. Repeat it for several tags.',
+    example: TAGS_EXAMPLE,
     required: false,
-    default: [],
     type: [String],
   })
   public tags: string[];
 }
+
+/* ------------------------------------------------------------------------ */
+/* Responses                                                                */
+/* ------------------------------------------------------------------------ */
+
 export class PaginatedResponse {
   @IsNumber()
   @ApiProperty({
-    description: 'total number of channels',
+    description:
+      'Total number of topics matching the filters (latest version of each topic counted once), across all pages.',
     type: Number,
-    example: 1,
+    example: 12,
   })
   public count: number;
 
-  @ApiProperty({
-    description: 'limit of channels',
-    type: Number,
-    example: 1,
-  })
   @IsOptional()
   @IsNumber()
   @ApiProperty({
-    description: 'page number out of total pages',
-    example: 1,
+    description: 'Page size used for this response (the `limit` query parameter, default 5).',
+    example: 5,
     default: 5,
     required: false,
     type: Number,
@@ -532,6 +569,7 @@ export class PaginatedResponse {
   @IsPositive()
   @IsOptional()
   @ApiProperty({
+    description: 'Page number of this response (the `page` query parameter, default 1).',
     example: 1,
     default: 1,
     required: false,
@@ -540,7 +578,8 @@ export class PaginatedResponse {
   public page: number = 1;
 
   @ApiProperty({
-    description: 'Topics records',
+    description:
+      'A list of topics on this page, each at its highest version, with its schema.',
     type: () => [GetTopicDto],
   })
   @ArrayUnique()
@@ -551,36 +590,28 @@ export class PaginatedResponse {
 export class PaginatedTopicResponse {
   @IsNumber()
   @ApiProperty({
-    description: 'total number of channels',
+    description: 'Total number of versions of the topic, across all pages.',
     type: Number,
-    example: 1,
+    example: 3,
   })
   public count: number;
 
-  @ApiProperty({
-    description: 'limit of channels',
-    type: Number,
-    example: 1,
-  })
   @IsOptional()
   @IsNumber()
   @ApiProperty({
-    example: 1,
+    description: 'Page size used for this response (the `limit` query parameter, default 5).',
+    example: 5,
     default: 5,
     required: false,
     type: Number,
   })
   public limit: number = 5;
 
-  @ApiProperty({
-    description: 'page number out of total pages',
-    type: Number,
-    example: 1,
-  })
   @IsNumber()
   @IsPositive()
   @IsOptional()
   @ApiProperty({
+    description: 'Page number of this response (the `page` query parameter, default 1).',
     example: 1,
     default: 1,
     required: false,
@@ -589,7 +620,7 @@ export class PaginatedTopicResponse {
   public page: number = 1;
 
   @ApiProperty({
-    description: 'Topics records',
+    description: 'A list of versions on this page, without the schema. Order not guaranteed.',
     type: () => [GetTopicSearchDto],
   })
   @ArrayUnique()
@@ -600,7 +631,7 @@ export class PaginatedTopicResponse {
 export class TopicCountDto {
   @IsNumber()
   @ApiProperty({
-    description: 'number of topics',
+    description: 'Number of topics this owner has on the message broker.',
     type: Number,
     example: 2,
   })
@@ -608,9 +639,9 @@ export class TopicCountDto {
 
   @IsString()
   @ApiProperty({
-    description: 'owner name',
+    description: 'Application namespace the count belongs to.',
     type: String,
-    example: 'torta.apps.eggplant.vege.iam.ewc',
+    example: OWNER_EXAMPLE,
   })
   public owner: string;
 }
@@ -618,9 +649,9 @@ export class TopicCountDto {
 export class GetTopicsParamsDto {
   @IsString()
   @ApiProperty({
-    description: 'id of the topic',
+    description: TOPIC_ID_DESCRIPTION,
     type: String,
-    example: '62545547fe37f174d7715ff3',
+    example: TOPIC_ID_EXAMPLE,
   })
   public id: string;
 }
@@ -629,7 +660,8 @@ export class GetTopicsWithLimitParamsDto {
   @IsOptional()
   @IsNumber()
   @ApiProperty({
-    example: 1,
+    description: LIMIT_DESCRIPTION,
+    example: 10,
     default: 5,
     required: false,
     type: Number,
@@ -640,6 +672,7 @@ export class GetTopicsWithLimitParamsDto {
   @IsPositive()
   @IsOptional()
   @ApiProperty({
+    description: PAGE_DESCRIPTION,
     example: 1,
     default: 1,
     required: false,
@@ -652,17 +685,18 @@ export class GetTopicsWithLimitParamsDto {
 export class TopicsByIdAndVersionParamsDto {
   @IsString()
   @ApiProperty({
-    description: 'id of the topic',
+    description: TOPIC_ID_DESCRIPTION,
     type: String,
-    example: '62545547fe37f174d7715ff3',
+    example: TOPIC_ID_EXAMPLE,
   })
   public id: string;
 
   @IsString()
   @ApiProperty({
-    description: 'version of the topic',
+    description: `Topic version. ${VERSION_RULES}`,
     type: String,
-    example: '1.0.9',
+    example: VERSION_EXAMPLE,
+    pattern: '^(\\d+\\.)(\\d+\\.)(\\d+)$',
   })
   @IsValidVersion({
     message: 'malformed version',
@@ -673,17 +707,18 @@ export class TopicsByIdAndVersionParamsDto {
 export class DeleteTopicsVersionParamsDto {
   @IsString()
   @ApiProperty({
-    description: 'id of the topic',
+    description: TOPIC_ID_DESCRIPTION,
     type: String,
-    example: '62545547fe37f174d7715ff3',
+    example: TOPIC_ID_EXAMPLE,
   })
   public id: string;
 
   @IsString()
   @ApiProperty({
-    description: 'version of the topic',
+    description: `Version to delete. ${VERSION_RULES}`,
     type: String,
-    example: '1.0.9',
+    example: VERSION_EXAMPLE,
+    pattern: '^(\\d+\\.)(\\d+\\.)(\\d+)$',
   })
   @IsValidVersion({
     message: 'malformed version',
@@ -694,15 +729,15 @@ export class DeleteTopicsVersionParamsDto {
 export class DeleteTopic {
   @IsString()
   @ApiProperty({
-    description: 'timestamp of the topic updated',
+    description: 'Time of the deletion as reported by the message broker.',
     type: String,
-    example: '2022-04-12',
+    example: '2026-04-12T10:15:30.000Z',
   })
   public timestamp: string;
 
   @IsString()
   @ApiProperty({
-    description: 'returnCode from MB',
+    description: 'Return code reported by the message broker.',
     type: String,
     example: '200',
   })
@@ -710,7 +745,7 @@ export class DeleteTopic {
 
   @IsString()
   @ApiProperty({
-    description: 'returnMessage from MB',
+    description: 'Human-readable result reported by the message broker.',
     type: String,
     example: 'Success',
   })
@@ -725,9 +760,16 @@ export class PostTopicBodyDto {
   @IsString()
   @IsNotEmpty()
   @ApiProperty({
-    description: 'name of the topic',
+    description: [
+      'Topic name, unique within `owner`.',
+      '- 1 to 255 characters: letters, digits, dots and underscores.',
+      '- No spaces or dashes.',
+    ].join('\n'),
     type: String,
-    example: 'Topic_JSON_V12',
+    example: TOPIC_NAME_EXAMPLE,
+    pattern: TOPIC_NAME_PATTERN,
+    minLength: 1,
+    maxLength: 255,
   })
   name: string;
 
@@ -735,32 +777,25 @@ export class PostTopicBodyDto {
   @IsNotEmpty()
   @IsEnum(SchemaType)
   @ApiProperty({
-    description: 'schema type of the topic',
+    description: [
+      'Type of data the topic carries. Cannot be changed later.',
+      '- `JSD7`: JSON, for `pub` and `sub` channels. Payloads are checked against the schema.',
+      '- `XML`: XML, for `pub` and `sub` channels.',
+      '- `XSD6`: XML files, for `upload` and `download` channels.',
+      '- `CSV`, `TSV`: comma or tab separated files, for `upload` and `download` channels.',
+    ].join('\n'),
     type: String,
-    enum: [
-      SchemaType.JSD7,
-      SchemaType.XML,
-      SchemaType.XSD6,
-      SchemaType.CSV,
-      SchemaType.TSV,
-    ],
-    example: 'JSD7',
+    enum: SCHEMA_TYPE_ENUM,
+    example: SchemaType.JSD7,
   })
   schemaType: SchemaType;
 
   @IsString()
   @IsNotEmpty()
   @ApiProperty({
-    description: 'schema of the topic',
+    description: 'Schema of the first version, as a string. For `JSD7`, a JSON Schema as JSON text. An invalid schema returns `MB::ERROR`.',
     type: String,
-    example: JSON.stringify({
-      type: 'object',
-      properties: {
-        data: {
-          type: 'number',
-        },
-      },
-    }),
+    example: SCHEMA_EXAMPLE,
   })
   schema: string;
 
@@ -770,27 +805,28 @@ export class PostTopicBodyDto {
   @IsString()
   @IsNotEmpty()
   @ApiProperty({
-    description: 'version of the topic',
+    description: 'First version (`MAJOR.MINOR.PATCH`).',
     type: String,
-    example: '1.0.9',
+    example: '1.0.0',
+    pattern: '^(\\d+\\.)(\\d+\\.)(\\d+)$',
   })
   version: string;
 
   @IsString()
   @IsNotEmpty()
   @ApiProperty({
-    description: 'owner of the topic',
+    description: 'Application namespace that owns the topic. An invalid owner returns `MB::ERROR`.',
     type: String,
-    example: 'torta.apps.eggplant.vege.iam.ewc',
+    example: OWNER_EXAMPLE,
   })
   owner: string;
 
   @IsArray()
   @ArrayUnique()
   @ApiProperty({
-    description: 'tags of the topic',
+    description: 'Labels to group and filter topics, unique. Send `[]` for none.',
     type: [String],
-    example: `["aggregator"]`,
+    example: TAGS_EXAMPLE,
   })
   tags: string[];
 }

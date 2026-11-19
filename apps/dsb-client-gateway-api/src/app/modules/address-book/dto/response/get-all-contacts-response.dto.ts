@@ -2,14 +2,14 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class GetAllContactsResponseDto {
   @ApiProperty({
-    description: 'DID',
+    description: 'DID of the contact, exactly as it was stored.',
     example: 'did:ethr:volta:0x782aB0383Bfc807439d8EE29516937B47815d697',
   })
   public did: string;
 
   @ApiProperty({
-    description: 'Alias',
-    example: 'Krzysztof Szostak',
+    description: 'Display name of the contact (unique across contacts).',
+    example: 'Grid Operator North',
   })
   public alias: string;
 }

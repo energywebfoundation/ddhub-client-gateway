@@ -1,5 +1,5 @@
 import { Controller, Get, HttpStatus } from '@nestjs/common';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import {
   GatewayResponseDto,
   MessageBrokerStatus,
@@ -11,9 +11,10 @@ import { DdhubHealthService } from '@dsb-client-gateway/ddhub-client-gateway-mes
 import { VersionService } from '@dsb-client-gateway/ddhub-client-gateway-version';
 import { SecretsEngineService } from '@dsb-client-gateway/dsb-client-gateway-secrets-engine';
 import { UserAuthService } from '@dsb-client-gateway/ddhub-client-gateway-user-roles';
+import { SwaggerTags } from '../../../swagger/swagger.constants';
 
 @Controller('gateway')
-@ApiTags('Gateway')
+@ApiTags(SwaggerTags.GATEWAY)
 export class GatewayController {
   protected readonly isAssociationKeyEnabled: boolean;
 
@@ -44,14 +45,22 @@ export class GatewayController {
   }
 
   @Get()
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'Gateway data',
-    type: () => GatewayResponseDto,
+  @ApiOperation({
+    summary: 'Get the gateway runtime status',
+    description: [
+      'Shows the gateway status and settings.',
+      '',
+      '**Returns**',
+      '- Version, DID, whether login is enabled, Message Broker status, certificate status, enrolment namespace and association key sharing.',
+      '',
+      '**Notes**',
+      '- Checks the Message Broker on every call; a failing broker shows as `messageBrokerStatus: ERROR`.',
+    ].join('\n'),
   })
   @ApiResponse({
-    status: HttpStatus.UNAUTHORIZED,
-    description: 'Unauthorized',
+    status: HttpStatus.OK,
+    description: 'Gateway runtime status.',
+    type: () => GatewayResponseDto,
   })
   public async get(): Promise<GatewayResponseDto> {
     const health = await this.healthService.health();
